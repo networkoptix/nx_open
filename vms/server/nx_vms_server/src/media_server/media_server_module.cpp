@@ -184,7 +184,7 @@ QnMediaServerModule::QnMediaServerModule(
     {
         soapServer = store(new QnSoapServer());
         soapServer->bind();
-        // Starting soap server to accept event notifications from onvif cameras
+        // Starting soap server to accept event notifications from onvif cameras.
         soapServer->start();
     }
 #endif //ENABLE_ONVIF

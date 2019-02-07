@@ -35,7 +35,7 @@ void loadResourcesFromEcs(
     {
         // read servers list
         api::MediaServerDataList mediaServerList;
-        while (ec2Connection->makeMediaServerManager(Qn::kSystemAccess)
+        while (ec2Connection->getMediaServerManager(Qn::kSystemAccess)
             ->getServersSync(&mediaServerList) != ec2::ErrorCode::ok)
         {
             NX_ERROR(typeid(InitialDataLoaderFunctionsTag), lit("Can't get servers."));
@@ -45,7 +45,7 @@ void loadResourcesFromEcs(
         }
 
         api::DiscoveryDataList discoveryDataList;
-        while (ec2Connection->makeDiscoveryManager(Qn::kSystemAccess)
+        while (ec2Connection->getDiscoveryManager(Qn::kSystemAccess)
             ->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok)
         {
             NX_ERROR(typeid(InitialDataLoaderFunctionsTag), lit("Can't get discovery data."));
@@ -91,13 +91,13 @@ void loadResourcesFromEcs(
             {
                 if (needToStop())
                     return;
-            } while (ec2Connection->makeResourceManager(Qn::kSystemAccess)
+            } while (ec2Connection->getResourceManager(Qn::kSystemAccess)
                 ->setResourceStatusSync(mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
         }
 
         // read resource status
         nx::vms::api::ResourceStatusDataList statusList;
-        while ((rez = ec2Connection->makeResourceManager(Qn::kSystemAccess)->getStatusListSync(
+        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(
             QnUuid(),
             &statusList)) != ec2::ErrorCode::ok)
         {
@@ -112,7 +112,7 @@ void loadResourcesFromEcs(
 
         // read attributes for all servers
         api::MediaServerUserAttributesDataList mediaServerUserAttributesList;
-        while ((rez = ec2Connection->makeMediaServerManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)
             ->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(typeid(InitialDataLoaderFunctionsTag),
@@ -127,7 +127,7 @@ void loadResourcesFromEcs(
     {
         // read camera list
         nx::vms::api::CameraDataList cameras;
-        while ((rez = ec2Connection->makeCameraManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)
             ->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(typeid(InitialDataLoaderFunctionsTag),
@@ -139,7 +139,7 @@ void loadResourcesFromEcs(
 
         // read camera attributes
         nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
-        while ((rez = ec2Connection->makeCameraManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)
             ->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(typeid(InitialDataLoaderFunctionsTag),
@@ -152,7 +152,7 @@ void loadResourcesFromEcs(
 
         // read properties dictionary
         nx::vms::api::ResourceParamWithRefDataList kvPairs;
-        while ((rez = ec2Connection->makeResourceManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)
             ->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(typeid(InitialDataLoaderFunctionsTag),
@@ -193,7 +193,7 @@ void loadResourcesFromEcs(
 
     {
         nx::vms::api::ServerFootageDataList serverFootageData;
-        while ((rez = ec2Connection->makeCameraManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)
             ->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get cameras history. Reason: " << ec2::toString(rez);
@@ -208,7 +208,7 @@ void loadResourcesFromEcs(
     {
         // Loading users.
         nx::vms::api::UserDataList users;
-        while ((rez = ec2Connection->makeUserManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)
             ->getUsersSync(&users)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get users. Reason: " << ec2::toString(rez);
@@ -224,7 +224,7 @@ void loadResourcesFromEcs(
     {
         //loading videowalls
         nx::vms::api::VideowallDataList videowalls;
-        while ((rez = ec2Connection->makeVideowallManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getVideowallManager(Qn::kSystemAccess)
             ->getVideowallsSync(&videowalls)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get videowalls. Reason: " << ec2::toString(rez);
@@ -240,7 +240,7 @@ void loadResourcesFromEcs(
     {
         //loading layouts
         nx::vms::api::LayoutDataList layouts;
-        while ((rez = ec2Connection->makeLayoutManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getLayoutManager(Qn::kSystemAccess)
             ->getLayoutsSync(&layouts)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get layouts. Reason: " << ec2::toString(rez);
@@ -256,7 +256,7 @@ void loadResourcesFromEcs(
     {
         //loading webpages
         nx::vms::api::WebPageDataList webpages;
-        while ((rez = ec2Connection->makeWebPageManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getWebPageManager(Qn::kSystemAccess)
             ->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get webpages. Reason: " << ec2::toString(rez);
@@ -272,7 +272,7 @@ void loadResourcesFromEcs(
     {
         //loading accessible resources
         nx::vms::api::AccessRightsDataList accessRights;
-        while ((rez = ec2Connection->makeUserManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)
             ->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get accessRights. Reason: " << ec2::toString(rez);
@@ -286,7 +286,7 @@ void loadResourcesFromEcs(
     {
         // Loading user roles.
         api::UserRoleDataList userRoles;
-        while ((rez = ec2Connection->makeUserManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)
             ->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get roles. Reason: " << ec2::toString(rez);
@@ -300,7 +300,7 @@ void loadResourcesFromEcs(
     {
         //Loading event rules.
         nx::vms::api::EventRuleDataList rules;
-        while ((rez = ec2Connection->makeEventRulesManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getEventRulesManager(Qn::kSystemAccess)
             ->getEventRulesSync(&rules)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get event rules. Reason: " << ec2::toString(rez);
@@ -314,7 +314,7 @@ void loadResourcesFromEcs(
     {
         // load licenses
         QnLicenseList licenses;
-        while ((rez = ec2Connection->makeLicenseManager(Qn::kSystemAccess)
+        while ((rez = ec2Connection->getLicenseManager(Qn::kSystemAccess)
             ->getLicensesSync(&licenses)) != ec2::ErrorCode::ok)
         {
             qDebug() << "Can't get license list. Reason: " << ec2::toString(rez);
@@ -330,7 +330,7 @@ void loadResourcesFromEcs(
     {
         // Load analytics plugins and engines.
         nx::vms::api::AnalyticsPluginDataList pluginList;
-        auto analyticsManager = ec2Connection->makeAnalyticsManager(Qn::kSystemAccess);
+        auto analyticsManager = ec2Connection->getAnalyticsManager(Qn::kSystemAccess);
 
         while ((rez = analyticsManager->getAnalyticsPluginsSync(&pluginList)) != ec2::ErrorCode::ok)
         {

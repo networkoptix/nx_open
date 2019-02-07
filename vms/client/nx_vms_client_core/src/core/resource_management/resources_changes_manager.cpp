@@ -194,7 +194,7 @@ void QnResourcesChangesManager::deleteResources(
             idToDelete << parentToDelete;
         idToDelete << resource->getId();
     }
-    connection->makeResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
+    connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
         makeReplyProcessor(this, handler));
 }
 
@@ -277,7 +277,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     auto changes = pool->getAttributesList(idList);
     nx::vms::api::CameraAttributesDataList apiAttributes;
     ec2::fromResourceListToApi(changes, apiAttributes);
-    connection->makeCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
+    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(apiAttributes, this,
         makeReplyProcessor(this, handler));
 
     // TODO: #GDM SafeMode values are not rolled back
@@ -323,7 +323,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
 
      nx::vms::api::CameraDataList apiCameras;
      ec2::fromResourceListToApi(cameras, apiCameras);
-     connection->makeCameraManager(Qn::kSystemAccess)->save(apiCameras, this,
+     connection->getCameraManager(Qn::kSystemAccess)->save(apiCameras, this,
          makeReplyProcessor(this, handler));
 }
 
@@ -413,7 +413,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     auto changes = pool->getAttributesList(idList);
     vms::api::MediaServerUserAttributesDataList attributes;
     ec2::fromResourceListToApi(changes, attributes);
-    connection->makeMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
+    connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
         makeReplyProcessor(this, handler));
 
     // TODO: #GDM SafeMode values are not rolled back
@@ -455,7 +455,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     vms::api::UserData apiUser;
     ec2::fromResourceToApi(user, apiUser);
 
-    connection->makeUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
+    connection->getUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
         replyProcessor);
 }
 
@@ -483,7 +483,7 @@ void QnResourcesChangesManager::saveUsers(const QnUserResourceList& users)
                 resourcePool()->addNewResources(users);
         };
 
-    connection->makeUserManager(Qn::kSystemAccess)->save(apiUsers, this,
+    connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, this,
         makeReplyProcessor(this, handler));
 }
 
@@ -512,7 +512,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     accessRights.userId = subject.effectiveId();
     for (const auto& id: accessibleResources)
         accessRights.resourceIds.push_back(id);
-    connection->makeUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
+    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         makeReplyProcessor(this, handler));
 }
 
@@ -526,7 +526,7 @@ void QnResourcesChangesManager::cleanAccessibleResources(const QnUuid& subject)
 
     vms::api::AccessRightsData accessRights;
     accessRights.userId = subject;
-    connection->makeUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
+    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         makeReplyProcessor(this, handler));
 }
 
@@ -552,7 +552,7 @@ void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& r
                 userRolesManager()->addOrUpdateUserRole(backup);
         };
 
-    connection->makeUserManager(Qn::kSystemAccess)->saveUserRole(role, this,
+    connection->getUserManager(Qn::kSystemAccess)->saveUserRole(role, this,
         makeReplyProcessor(this, handler));
 }
 
@@ -575,7 +575,7 @@ void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
             userRolesManager()->addOrUpdateUserRole(backup);
         };
 
-    connection->makeUserManager(Qn::kSystemAccess)->removeUserRole(id, this,
+    connection->getUserManager(Qn::kSystemAccess)->removeUserRole(id, this,
         makeReplyProcessor(this, handler));
 }
 
@@ -600,7 +600,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
     nx::vms::api::VideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
 
-    connection->makeVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,
+    connection->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,
         replyProcessor);
 }
 
@@ -627,7 +627,7 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
     nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
-    connection->makeLayoutManager(Qn::kSystemAccess)->save(apiLayout, this, replyProcessor);
+    connection->getLayoutManager(Qn::kSystemAccess)->save(apiLayout, this, replyProcessor);
 }
 
 void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
@@ -651,7 +651,7 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     nx::vms::api::WebPageData apiWebpage;
     ec2::fromResourceToApi(webPage, apiWebpage);
 
-    connection->makeWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, replyProcessor);
+    connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, replyProcessor);
 
     // TODO: #GDM Prorperties are not rolled back
     resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});

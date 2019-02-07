@@ -38,7 +38,7 @@ QIODevice* QnDbStorageResource::open(const QString& fileName, QIODevice::OpenMod
     if (!connection)
         return nullptr;
 
-    auto fileManager = connection->makeStoredFileManager(Qn::kSystemAccess);
+    auto fileManager = connection->getStoredFileManager(Qn::kSystemAccess);
 
     if (!fileManager)
         return nullptr;

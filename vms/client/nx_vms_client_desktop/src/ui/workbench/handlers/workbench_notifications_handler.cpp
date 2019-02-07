@@ -118,7 +118,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             {
                 static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
 
-                const auto manager = connection->makeEventRulesManager(Qn::kSystemAccess);
+                const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
                 nx::vms::api::EventActionData actionData;
                 ec2::fromResourceToApi(action, actionData);
                 manager->broadcastEventAction(actionData, this, fakeHandler);

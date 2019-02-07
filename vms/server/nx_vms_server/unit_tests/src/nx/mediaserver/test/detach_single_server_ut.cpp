@@ -56,7 +56,7 @@ public:
     void givenCloudUser()
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
-        ec2::AbstractUserManagerPtr userManager = ec2Connection->makeUserManager(Qn::kSystemAccess);
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
@@ -86,7 +86,7 @@ public:
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         vms::api::UserDataList users;
-        ec2Connection->makeUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         ASSERT_EQ(2, users.size());
 
         nx::vms::discovery::ModuleEndpoint endpoint2;
@@ -132,7 +132,7 @@ public:
         for (int i = 0; i < 10; ++i) //< Detach may take some time in rear cases.
         {
             users.clear();
-            ec2Connection->makeUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+            ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
             if (users.size() == 1)
                 return;
 

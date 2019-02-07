@@ -596,7 +596,7 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
         {
             if (auto connection = commonModule()->ec2Connection())
             {
-                connection->makeResourceManager(Qn::kSystemAccess)->setResourceStatus(
+                connection->getResourceManager(Qn::kSystemAccess)->setResourceStatus(
                     resourceId,
                     res->getStatus(),
                     ec2::DummyHandler::instance(),

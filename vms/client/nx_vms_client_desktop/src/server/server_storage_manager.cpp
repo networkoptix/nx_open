@@ -244,7 +244,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
-    conn->makeMediaServerManager(Qn::kSystemAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
+    conn->getMediaServerManager(Qn::kSystemAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
     {
         Q_UNUSED(reqID);
         if (error != ec2::ErrorCode::ok)
@@ -264,7 +264,7 @@ void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids 
     if (!conn)
         return;
 
-    conn->makeMediaServerManager(Qn::kSystemAccess)->removeStorages(ids, this, [] {});
+    conn->getMediaServerManager(Qn::kSystemAccess)->removeStorages(ids, this, [] {});
     invalidateRequests();
 }
 

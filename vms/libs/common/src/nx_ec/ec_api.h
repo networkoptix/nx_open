@@ -998,35 +998,35 @@ public:
     virtual nx::vms::api::Timestamp getTransactionLogTime() const = 0;
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) = 0;
 
-    virtual AbstractResourceManagerPtr makeResourceManager(
+    virtual AbstractResourceManagerPtr getResourceManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractMediaServerManagerPtr makeMediaServerManager(
+    virtual AbstractMediaServerManagerPtr getMediaServerManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractCameraManagerPtr makeCameraManager(
+    virtual AbstractCameraManagerPtr getCameraManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractLicenseManagerPtr makeLicenseManager(
+    virtual AbstractLicenseManagerPtr getLicenseManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractEventRulesManagerPtr makeEventRulesManager(
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractUserManagerPtr makeUserManager(
+    virtual AbstractUserManagerPtr getUserManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractLayoutManagerPtr makeLayoutManager(
+    virtual AbstractLayoutManagerPtr getLayoutManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractLayoutTourManagerPtr makeLayoutTourManager(
+    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractVideowallManagerPtr makeVideowallManager(
+    virtual AbstractVideowallManagerPtr getVideowallManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractStoredFileManagerPtr makeStoredFileManager(
+    virtual AbstractStoredFileManagerPtr getStoredFileManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractUpdatesManagerPtr makeUpdatesManager(
+    virtual AbstractUpdatesManagerPtr getUpdatesManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractMiscManagerPtr makeMiscManager(
+    virtual AbstractMiscManagerPtr getMiscManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractDiscoveryManagerPtr makeDiscoveryManager(
+    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractWebPageManagerPtr makeWebPageManager(
+    virtual AbstractWebPageManagerPtr getWebPageManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractAnalyticsManagerPtr makeAnalyticsManager(
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
         const Qn::UserAccessData& userAccessData) = 0;
 
     virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;

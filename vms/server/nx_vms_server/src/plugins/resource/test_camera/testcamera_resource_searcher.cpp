@@ -109,9 +109,9 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 processedMac << mac;
 
                 resource->setMAC(nx::utils::MacAddress(mac));
-                resource->setUrl(
-                    QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':')
-                    + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );
+                resource->setUrl(QLatin1String("tcp://") + remoteEndpoint.address.toString()
+                    + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/')
+                    + QLatin1String(params[j]));
                 resources.insert(mac, resource);
             }
         }

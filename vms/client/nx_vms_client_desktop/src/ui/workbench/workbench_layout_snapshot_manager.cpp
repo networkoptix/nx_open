@@ -125,7 +125,7 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
-    int reqID = commonModule()->ec2Connection()->makeLayoutManager(Qn::kSystemAccess)->save(
+    int reqID = commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->save(
         apiLayout, this, [this, layout, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
             markBeingSaved(layout->getId(), false);

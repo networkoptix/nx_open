@@ -208,7 +208,7 @@ public:
 
             nx::vms::api::MediaServerData apiServer;
             ec2::fromResourceToApi(server, apiServer);
-            ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
+            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
         return result;
