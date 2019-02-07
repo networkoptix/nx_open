@@ -42,7 +42,7 @@ def threadedTestRun(loc, lang):
                                                                                                                 lang) + str(file[1]) + '" --output {}multi{}.xml'.format(str(file[0]), idx) + ' test-cases\\' + str(file[0]) + '.robot')
     # loop through the serial tests and run them
     for idx, file in enumerate(serialList):
-        system('robot -v BROWSER:headlesschrome --loglevel trace -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -e Threaded -e "Threaded File" --output {}multi{}.xml'.format(
+        system('robot -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -e Threaded -e "Threaded File" --output {}multi{}.xml'.format(
             path.join(loc, 'combined-results'), lang, str(file), idx + 200) + ' test-cases\\' + str(file) + '.robot')
 
     # fill the queue with all the commands
@@ -63,8 +63,8 @@ def threadedTestRun(loc, lang):
     fileList = list(set(fileList))
     for idx, file in enumerate(fileList):
         system('rebot -o threadedRun{}.xml -R {}multi*.xml'.format(idx, str(file)))
-    system('rebot -o queuedRun.xml --loglevel trace -N  {} threadedRun*.xml'.format(lang))
+    system('rebot -o queuedRun.xml -N  {} threadedRun*.xml'.format(lang))
 
 
 if __name__ == '__main__':
-    threadedTestRun("outputs","pt_PT")   
+    threadedTestRun("outputs","en_US")
