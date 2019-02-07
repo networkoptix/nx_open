@@ -53,13 +53,7 @@ std::string hash(const std::string& key)
 
 } // namespace
 
-KeyValueDao::KeyValueDao(nx::sql::AsyncSqlQueryExecutor* queryExecutor)
-    :
-    m_queryExecutor(queryExecutor)
-{
-}
-
-void KeyValueDao::save(
+void KeyValueDao::insertOrUpdate(
     nx::sql::QueryContext* queryContext,
     const std::string& key,
     const std::string& value)
@@ -93,11 +87,6 @@ std::optional<std::string> KeyValueDao::get(
         return std::nullopt;
 
     return query->value(kValue).toString().toStdString();
-}
-
-nx::sql::AsyncSqlQueryExecutor& KeyValueDao::queryExecutor()
-{
-    return *m_queryExecutor;
 }
 
 } // namespace nx::clusterdb::map::dao

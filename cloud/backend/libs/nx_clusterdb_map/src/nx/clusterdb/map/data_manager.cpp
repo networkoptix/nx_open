@@ -18,24 +18,10 @@ ResultCode toResultCode(nx::sql::DBResult dbResult)
     {
         case DBResult::ok:
             return ResultCode::ok;
-        case DBResult::statementError:
-            return ResultCode::statementError;
-        case DBResult::ioError:
-            return ResultCode::ioError;
         case DBResult::notFound:
             return ResultCode::notFound;
-        case DBResult::cancelled:
-            return ResultCode::cancelled;
-        case DBResult::retryLater:
-            return ResultCode::retryLater;
-        case DBResult::uniqueConstraintViolation:
-            return ResultCode::uniqueConstraintViolation;
-        case DBResult::connectionError:
-            return ResultCode::connectionError;
         case DBResult::logicError:
             return ResultCode::logicError;
-        case DBResult::endOfData:
-            return ResultCode::endOfData;
         default:
             return ResultCode::unknownError;
     }
@@ -45,27 +31,27 @@ ResultCode toResultCode(nx::sql::DBResult dbResult)
 
 DataManager::DataManager(
     nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
-    dao::KeyValueDao* keyValueDao,
+    nx::sql::AsyncSqlQueryExecutor* queryExecutor,
     const std::string& systemId)
     :
     m_syncEngine(syncronizationEngine),
-    m_keyValueDao(keyValueDao),
+    m_queryExecutor(queryExecutor),
     m_systemId(systemId)
 {
-    using namespace std::placeholders;
-
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(
             [this](auto&&... args)
             {
-                return incomingSave(std::move(args)...);
+                saveRecievedRecord(std::forward<decltype(args)>(args)...);
+                return nx::sql::DBResult::ok;
             });
 
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::RemoveKeyValuePair>(
             [this](auto&&... args)
             {
-                return incomingRemove(std::move(args)...);
+                removeRecievedRecord(std::forward<decltype(args)>(args)...);
+                return nx::sql::DBResult::ok;
             });
 }
 
@@ -78,20 +64,22 @@ DataManager::~DataManager()
         .removeHandler<command::RemoveKeyValuePair>();
 }
 
-void DataManager::save(
+void DataManager::insertOrUpdate(
     const std::string& key,
     const std::string& value,
     UpdateCompletionHander completionHandler)
 {
-    using namespace std::placeholders;
+    if (key.empty())
+        return completionHandler(ResultCode::logicError);
 
     m_syncEngine->transactionLog().startDbTransaction(
         m_systemId,
-        [this, key, value](auto&&... args)
+        [this, key, value](nx::sql::QueryContext* queryContext)
         {
-            return saveToDb(std::move(args)..., key, value);
+            insertToOrUpdateDb(queryContext, key, value);
+            return nx::sql::DBResult::ok;
         },
-        [this, completionHandler = std::move(completionHandler)](
+        [completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
             completionHandler(toResultCode(dbResult));
@@ -102,13 +90,15 @@ void DataManager::remove(
     const std::string& key,
     UpdateCompletionHander completionHandler)
 {
-    using namespace std::placeholders;
+    if (key.empty())
+        return completionHandler(ResultCode::logicError);
 
     m_syncEngine->transactionLog().startDbTransaction(
         m_systemId,
-        [this, key](auto&&... args)
+        [this, key](nx::sql::QueryContext* queryContext)
         {
-            return removeFromDb(std::move(args)..., key);
+            removeFromDb(queryContext, key);
+            return nx::sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
@@ -121,84 +111,75 @@ void DataManager::get(
     const std::string& key,
     LookupCompletionHander completionHandler)
 {
-    auto value = std::make_shared<std::string>();
+    if (key.empty())
+        return completionHandler(ResultCode::logicError, std::string());
 
-    m_keyValueDao->queryExecutor().executeSelect(
-        [this, key, value](nx::sql::QueryContext* queryContext)
+    auto value = std::make_shared<std::optional<std::string>>();
+
+    m_queryExecutor->executeSelect(
+        [this, key, value](nx::sql::QueryContext* queryContext) mutable
         {
-            auto fetchResult = getFromDb(queryContext, key);
-            if (fetchResult.second.has_value())
-                *value = *fetchResult.second;
-            return fetchResult.first;
+            *value = getFromDb(queryContext, key);
+
+            // Sql db doesn't throw notFound error if key lookup fails, so return it manually.
+            return value->has_value()
+                ? nx::sql::DBResult::ok
+                : nx::sql::DBResult::notFound;
         },
-        [this, value, completionHandler = std::move(completionHandler)](
-            nx::sql::DBResult dbResult)
+        [value, completionHandler = std::move(completionHandler)](
+            nx::sql::DBResult dbResult) mutable
         {
-            completionHandler(toResultCode(dbResult), *value);
+            completionHandler(
+                toResultCode(dbResult),
+                value->has_value() ? std::move(*(*value)) : std::string());
         }
     );
 }
 
-nx::sql::DBResult DataManager::saveToDb(
+void DataManager::insertToOrUpdateDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key,
     const std::string& value)
 {
-    if (key.empty())
-        return nx::sql::DBResult::logicError;
+    m_keyValueDao.insertOrUpdate(queryContext, key, value);
 
-    m_keyValueDao->save(queryContext, key, value);
-
-    return m_syncEngine->transactionLog()
+    m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveKeyValuePair>(
             queryContext, m_systemId, KeyValuePair{key, value});
 }
 
-DataManager::FetchResult DataManager::getFromDb(
+std::optional<std::string> DataManager::getFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key)
 {
-    if (key.empty())
-        return FetchResult(nx::sql::DBResult::logicError, std::nullopt);
-
-    auto value = m_keyValueDao->get(queryContext, key);
-    auto result = value.has_value()
-        ? nx::sql::DBResult::ok
-        : nx::sql::DBResult::notFound;
-
-    return FetchResult(result, value);
+   return m_keyValueDao.get(queryContext, key);
 }
 
-nx::sql::DBResult DataManager::removeFromDb(
+void DataManager::removeFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key)
 {
-    if (key.empty())
-        return nx::sql::DBResult::logicError;
+    m_keyValueDao.remove(queryContext, key);
 
-    m_keyValueDao->remove(queryContext, key);
-
-    return m_syncEngine->transactionLog()
+    m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
             queryContext, m_systemId, Key{key});
 }
 
-nx::sql::DBResult DataManager::incomingSave(
+void DataManager::saveRecievedRecord(
     nx::sql::QueryContext* queryContext,
     const std::string& /*systemId*/,
     clusterdb::engine::Command<KeyValuePair> command)
 {
-    m_keyValueDao->save(queryContext, command.params.key, command.params.value);
-    return nx::sql::DBResult::ok;
+    m_keyValueDao.insertOrUpdate(queryContext, command.params.key, command.params.value);
 }
 
-nx::sql::DBResult DataManager::incomingRemove(
+void DataManager::removeRecievedRecord(
     nx::sql::QueryContext* queryContext,
     const std::string& /*systemId*/,
     clusterdb::engine::Command<Key> command)
 {
-    m_keyValueDao->remove(queryContext, command.params.key);
-    return nx::sql::DBResult::ok;
+    m_keyValueDao.remove(queryContext, command.params.key);
 }
 
 } // namespace nx::clusterdb::map
