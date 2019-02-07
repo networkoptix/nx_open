@@ -31,7 +31,7 @@ void ClientConnectionTunnelingServer::authorize(
 {
     using namespace std::placeholders;
 
-    const auto sessionId = 
+    const auto sessionId =
         requestContext->requestPathParams.getByName(api::kSessionIdName);
     if (sessionId.empty())
     {

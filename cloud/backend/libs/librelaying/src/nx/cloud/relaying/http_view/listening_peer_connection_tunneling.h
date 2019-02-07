@@ -25,7 +25,7 @@ protected:
         CompletionHandler completionHandler) override;
 
 private:
-    using TunnelingServer = 
+    using TunnelingServer =
         nx::network::http::tunneling::Server<std::string /*listeningPeerName*/>;
 
     relaying::AbstractListeningPeerManager* m_listeningPeerManager = nullptr;
