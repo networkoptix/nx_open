@@ -733,8 +733,8 @@ bool QnSecurityCamResource::hasMotion() const
     if (motionType == Qn::MotionType::MT_SoftwareGrid)
     {
         return hasDualStreaming()
-            || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability)
-            || !getProperty(kForcedMotionStreamKey).isEmpty();
+            || getCameraCapabilities().testFlag(Qn::PrimaryStreamSoftMotionCapability)
+            || motionStreamIndex().isForced;
     }
     return motionType != Qn::MotionType::MT_NoMotion;
 }
