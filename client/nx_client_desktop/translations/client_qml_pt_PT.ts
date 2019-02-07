@@ -12,8 +12,8 @@
       <translation>Nenhum servidor encontrado</translation>
     </message>
     <message>
-      <source>Check your network connection or press "Connect to Server" button to enter known server address</source>
-      <translation>Verifique sua conexão de rede ou pressione "Conectar-se ao servidor" para inserir o endereço de servidor conhecido</translation>
+      <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
+      <translation>Verifique sua conexão de rede ou pressione &quot;Conectar-se ao servidor&quot; para inserir o endereço de servidor conhecido</translation>
     </message>
   </context>
   <context>

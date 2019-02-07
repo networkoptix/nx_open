@@ -230,7 +230,7 @@
   <context>
     <name>QCocoaTheme</name>
     <message>
-      <source>Don't Save</source>
+      <source>Don&apos;t Save</source>
       <translation>Não guardar</translation>
     </message>
   </context>
@@ -332,7 +332,7 @@ Pressione ESC para cancelar</translation>
   <context>
     <name>QDialog</name>
     <message>
-      <source>What's This?</source>
+      <source>What&apos;s This?</source>
       <translation>O que é isto?</translation>
     </message>
   </context>
@@ -568,14 +568,14 @@ Por favor verifique o nome do ficheiro.</translation>
       <translation>Apagar</translation>
     </message>
     <message>
-      <source>'%1' is write protected.
+      <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>'%1' está protegido contra escrita.
+      <translation>&apos;%1&apos; está protegido contra escrita.
 Quer apagar mesmo assim?</translation>
     </message>
     <message>
-      <source>Are you sure you want to delete '%1'?</source>
-      <translation>Tem a certeza de que deseja apagar '%1'?</translation>
+      <source>Are you sure you want to delete &apos;%1&apos;?</source>
+      <translation>Tem a certeza de que deseja apagar &apos;%1&apos;?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -682,8 +682,8 @@ Quer apagar mesmo assim?</translation>
       <translation>Nome do ficheiro inválido</translation>
     </message>
     <message>
-      <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt;O nome "%1" não pode ser usado.&lt;/b&gt;&lt;p&gt;Tente usar outro nome, com menos caracteres ou sem pontuação.</translation>
+      <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+      <translation>&lt;b&gt;O nome &quot;%1&quot; não pode ser usado.&lt;/b&gt;&lt;p&gt;Tente usar outro nome, com menos caracteres ou sem pontuação.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -747,7 +747,7 @@ Quer apagar mesmo assim?</translation>
     <name>QGuiApplication</name>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
-      <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+      <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
       <translation>LTR</translation>
     </message>
   </context>
@@ -835,7 +835,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>%1, ...</source>
-      <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
+      <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
       <translation type="unfinished">%1, ...</translation>
     </message>
   </context>
@@ -1137,7 +1137,7 @@ Quer apagar mesmo assim?</translation>
   <context>
     <name>QWhatsThisAction</name>
     <message>
-      <source>What's This?</source>
+      <source>What&apos;s This?</source>
       <translation>O que é isto?</translation>
     </message>
   </context>

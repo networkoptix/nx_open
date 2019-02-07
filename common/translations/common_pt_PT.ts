@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Você está prestes a fazer "merge" de Sistemas com licenças Starter.</translation>
+      <translation>Você está prestes a fazer &quot;merge&quot; de Sistemas com licenças Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>Avançar com o "merge" mesmo assim?</translation>
+      <translation>Avançar com o &quot;merge&quot; mesmo assim?</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -131,8 +131,8 @@
       <translation>Verifique que o Servidor está a correr.</translation>
     </message>
     <message>
-      <source>Received bad response from Server %1: "%2".</source>
-      <translation>Recebi uma má resposta do Servidor %1: "%2".</translation>
+      <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+      <translation>Recebi uma má resposta do Servidor %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -155,8 +155,8 @@
       <translation>Por favor contacte o suporte.</translation>
     </message>
     <message>
-      <source>An input/output error has occurred. OS message: "%1".</source>
-      <translation>Ocorreu um erro de entrada/saída. Mensagem do OS: "%1".</translation>
+      <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+      <translation>Ocorreu um erro de entrada/saída. Mensagem do OS: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -179,12 +179,12 @@
       <translation>Verifique que a câmara está ligada à rede. Tente reiniciar a câmara.</translation>
     </message>
     <message>
-      <source>Device request "%1" failed with error "%2".</source>
-      <translation>Pedido de dispositivo "%1" falhou com erro "%2".</translation>
+      <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Pedido de dispositivo &quot;%1&quot; falhou com erro &quot;%2&quot;.</translation>
     </message>
     <message>
-      <source>Camera request "%1" failed with error "%2".</source>
-      <translation>Pedido de câmara "%1" falhou com erro "%2".</translation>
+      <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Pedido de câmara &quot;%1&quot; falhou com erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -223,8 +223,8 @@
       <translation>Verifique que o módulo I/O está ligado à rede. Tente reiniciar o módulo I/O.</translation>
     </message>
     <message>
-      <source>I/O Module request "%1" failed with error "%2".</source>
-      <translation>Pedido de módulo I/O "%1" falhou com erro "%2".</translation>
+      <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Pedido de módulo I/O &quot;%1&quot; falhou com erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -303,16 +303,16 @@
       <translation>A câmara foi restaurada do arquivo. Apague a câmara e adicione-a novamente para ver o vídeo ao vivo.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error "%1").</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro "%1").</translation>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro &quot;%1&quot;).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error "%1").</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro "%1").</translation>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro &quot;%1&quot;).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error "%1").</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro "%1").</translation>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Marca d'água: %1</translation>
+      <translation>Marca d&apos;água: %1</translation>
     </message>
     <message>
       <source>Time License</source>
@@ -724,32 +724,32 @@
     </message>
     <message>
       <source>Lst</source>
-      <extracomment>Short for 'Lowest'</extracomment>
+      <extracomment>Short for &apos;Lowest&apos;</extracomment>
       <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
-      <extracomment>Short for 'Low'</extracomment>
+      <extracomment>Short for &apos;Low&apos;</extracomment>
       <translation>Bx</translation>
     </message>
     <message>
       <source>Me</source>
-      <extracomment>Short for 'Medium'</extracomment>
+      <extracomment>Short for &apos;Medium&apos;</extracomment>
       <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
-      <extracomment>Short for 'High'</extracomment>
+      <extracomment>Short for &apos;High&apos;</extracomment>
       <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
-      <extracomment>Short for 'Best'</extracomment>
+      <extracomment>Short for &apos;Best&apos;</extracomment>
       <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
-      <extracomment>Short for 'Preset'</extracomment>
+      <extracomment>Short for &apos;Preset&apos;</extracomment>
       <translation>Ps</translation>
     </message>
   </context>
@@ -757,7 +757,7 @@
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Não foi encontrado o 'container' correspondente na biblioteca FFMPEG.</translation>
+      <translation>Não foi encontrado o &apos;container&apos; correspondente na biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
@@ -1235,8 +1235,8 @@
       <translation>Erro de Rede em %1</translation>
     </message>
     <message>
-      <source>Server "%1" Failure</source>
-      <translation>Falha no servidor "%1"</translation>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation>Falha no servidor &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1249,20 +1249,20 @@
       <translation>Conflito IP da câmara no %1</translation>
     </message>
     <message>
-      <source>Server "%1" Conflict</source>
-      <translation>Conflito no servidor "%1"</translation>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation>Conflito no servidor &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Server "%1" Started</source>
-      <translation>Servidor "%1" Iniciado</translation>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation>Servidor &quot;%1&quot; Iniciado</translation>
     </message>
     <message>
-      <source>Server "%1" has a license problem</source>
-      <translation>O Servidor "%1" tem um problema de licenças</translation>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation>O Servidor &quot;%1&quot; tem um problema de licenças</translation>
     </message>
     <message>
-      <source>Server "%1" has finished an archive backup</source>
-      <translation>O Servidor "%1" terminou um backup de arquivos</translation>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation>O Servidor &quot;%1&quot; terminou um backup de arquivos</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1392,12 +1392,12 @@
       <translation>HDD/SSD sem velocidade suficiente para gravação em %1.</translation>
     </message>
     <message>
-      <source>HDD/SSD disk "%1" is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Disco HDD / SSD "%1" está cheio. O disco contém muitos dados que não são geridos pelo VMS.</translation>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>Disco HDD / SSD &quot;%1&quot; está cheio. O disco contém muitos dados que não são geridos pelo VMS.</translation>
     </message>
     <message>
-      <source>System disk "%1" is almost full.</source>
-      <translation>O disco do sistema "%1" está quase cheio.</translation>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>O disco do sistema &quot;%1&quot; está quase cheio.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1417,7 +1417,7 @@
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>Falhou o backup do arquivo: Erro em 'Catálogo' de ficheiros</translation>
+      <translation>Falhou o backup do arquivo: Erro em &apos;Catálogo&apos; de ficheiros</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
@@ -1532,11 +1532,11 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Definir para modo "FullScreen"</translation>
+      <translation>Definir para modo &quot;FullScreen&quot;</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation>Sair do "Full Screen"</translation>
+      <translation>Sair do &quot;Full Screen&quot;</translation>
     </message>
   </context>
   <context>

@@ -995,7 +995,7 @@ para ver mais favoritos</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n layout</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
@@ -1012,8 +1012,8 @@ para ver mais favoritos</translation>
       <translation>O formato AVI não é recomendado para exportar uma gravação não contínua com faixa de áudio.</translation>
     </message>
     <message>
-      <source>We recommend to export video from this camera as "Multi Video" to avoid downscaling.</source>
-      <translation>Recomendamos exportar o vídeo desta câmara como "Multi Video" para evitar downscaling.</translation>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Recomendamos exportar o vídeo desta câmara como &quot;Multi Video&quot; para evitar downscaling.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
@@ -1079,7 +1079,7 @@ para ver mais favoritos</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n layout</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
@@ -1155,24 +1155,24 @@ para ver mais favoritos</translation>
   <context>
     <name>LocalFiles</name>
     <message>
-      <source>Path "%1" is invalid. Please try another path.</source>
-      <translation>O caminho "%1" é inválido. Por favor, tente outro caminho.</translation>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation>O caminho &quot;%1&quot; é inválido. Por favor, tente outro caminho.</translation>
     </message>
     <message>
-      <source>File "%1" already exists. Please try another name.</source>
-      <translation>O arquivo "%1" já existe. Por favor, tente outro nome.</translation>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation>O arquivo &quot;%1&quot; já existe. Por favor, tente outro nome.</translation>
     </message>
     <message>
-      <source>File "%1" is used by another process.</source>
-      <translation>O arquivo "%1" é usado por outro processo.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>O arquivo &quot;%1&quot; é usado por outro processo.</translation>
     </message>
     <message>
-      <source>File "%1" cannot be written. Please try another name.</source>
-      <translation>O arquivo "%1" não pode ser gravado. Por favor, tente outro nome.</translation>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>O arquivo &quot;%1&quot; não pode ser gravado. Por favor, tente outro nome.</translation>
     </message>
     <message>
-      <source>File name "%1" is reserved by operating system. Please try another name.</source>
-      <translation>O nome do ficheiro "%1" está reservado pelo sistema operacional. Por favor, tente outro nome.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>O nome do ficheiro &quot;%1&quot; está reservado pelo sistema operacional. Por favor, tente outro nome.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
@@ -1287,8 +1287,8 @@ para ver mais favoritos</translation>
   <context>
     <name>Ptz</name>
     <message>
-      <source>Cannot get the current position from camera "%1"</source>
-      <translation>Não é possível obter a posição atual da câmera "%1"</translation>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation>Não é possível obter a posição atual da câmera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1299,8 +1299,8 @@ para ver mais favoritos</translation>
       <translation>Falha ao obter a posição atual</translation>
     </message>
     <message>
-      <source>Cannot set the current position for camera "%1"</source>
-      <translation>Não é possível definir a posição atual para a câmera "%1"</translation>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation>Não é possível definir a posição atual para a câmera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1458,7 +1458,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Ajuste para o menor valor que não degrade a visualização ao vivo. Um buffer maior torna a reprodução mais suave, mas aumenta o atraso entre o tempo real e a visualização ao vivo; Um buffer menor diminui o atraso, mas pode causar "soluços".</translation>
+      <translation>Ajuste para o menor valor que não degrade a visualização ao vivo. Um buffer maior torna a reprodução mais suave, mas aumenta o atraso entre o tempo real e a visualização ao vivo; Um buffer menor diminui o atraso, mas pode causar &quot;soluços&quot;.</translation>
     </message>
   </context>
   <context>
@@ -1480,8 +1480,8 @@ para ver mais favoritos</translation>
       <translation>As definições do Min e Max determinam a idade do arquivo que deve ser mantido para esta câmara.</translation>
     </message>
     <message>
-      <source>If "Auto" option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation>Se a opção "Auto" estiver ativada, a filmagem mais antiga entre todas as câmaras será apagada primeiro.</translation>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Se a opção &quot;Auto&quot; estiver ativada, a filmagem mais antiga entre todas as câmaras será apagada primeiro.</translation>
     </message>
   </context>
   <context>
@@ -1820,7 +1820,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
-      <comment>Relates to 'Global Settings' subject</comment>
+      <comment>Relates to &apos;Global Settings&apos; subject</comment>
       <translation>afeta todos os servidores no sistema</translation>
     </message>
   </context>
@@ -2008,12 +2008,12 @@ para ver mais favoritos</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
       <source>to</source>
-      <extracomment>"to" is from the sentence "Send email _to_:"</extracomment>
+      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
       <translation>para</translation>
     </message>
     <message>
       <source>at</source>
-      <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
+      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
       <translation>nas</translation>
     </message>
     <message>
@@ -2608,7 +2608,7 @@ para ver mais favoritos</translation>
       <translation>A senha deve ter pelo menos 8 símbolos e conter diferentes tipos de caracteres.</translation>
     </message>
     <message>
-      <source>Password should not be equal to camera's user name</source>
+      <source>Password should not be equal to camera&apos;s user name</source>
       <translation>A senha não deve ser igual ao nome de utilizador da câmara</translation>
     </message>
   </context>
@@ -2662,8 +2662,8 @@ para ver mais favoritos</translation>
       <translation>Detecção de movimento desativada ou não suportada</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the "Motion" tab in Camera Settings.</source>
-      <translation>Para garantir que seja suportado e habilitá-lo, vá para a guia "Motion" nas Configurações da Câmera.</translation>
+      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+      <translation>Para garantir que seja suportado e habilitá-lo, vá para a guia &quot;Motion&quot; nas Configurações da Câmera.</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
@@ -2678,8 +2678,8 @@ para ver mais favoritos</translation>
       <translation>Detecção de movimento desativada</translation>
     </message>
     <message>
-      <source>To enable or adjust it, go to the "Motion" tab in Camera Settings.</source>
-      <translation>Para ativar ou ajustar, vá para a guia "Motion" nas Configurações da Câmera.</translation>
+      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+      <translation>Para ativar ou ajustar, vá para a guia &quot;Motion&quot; nas Configurações da Câmera.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -2905,7 +2905,7 @@ a %1</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
-      <comment>%1 is a cloud site name like "Nx Cloud"</comment>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
       <translation>Por favor, faça o login em %1 e siga as instruções fornecidas.</translation>
     </message>
     <message>
@@ -3170,15 +3170,15 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "source" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;source&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "descrição" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;descrição&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
   </context>
   <context>
@@ -3282,8 +3282,8 @@ a %1</translation>
       <translation>O formato sample do dispositivo de entrada %1 não é suportado.</translation>
     </message>
     <message>
-      <source>Could not find audio encoder "%1".</source>
-      <translation>Não foi possível encontrar o encoder de áudio "%1".</translation>
+      <source>Could not find audio encoder &quot;%1&quot;.</source>
+      <translation>Não foi possível encontrar o encoder de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
@@ -3313,16 +3313,16 @@ a %1</translation>
       <translation>Tamanho do ecrã deve ser um múltiplo de 8.</translation>
     </message>
     <message>
-      <source>Could not find audio encoder "%1".</source>
-      <translation>Não foi possível encontrar o codificador de áudio "%1".</translation>
+      <source>Could not find audio encoder &quot;%1&quot;.</source>
+      <translation>Não foi possível encontrar o codificador de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Could not initialize audio device "%1".</source>
-      <translation>Não foi possível inicializar o dispositivo de áudio "%1".</translation>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>Não foi possível inicializar o dispositivo de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or "none" in the Screen Recording settings.</source>
-      <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou "nenhum" nas configurações de gravação de tela.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>Formatos de áudio de 44.1 kHz e 48 kHz não são suportados pelo dispositivo de captura de áudio. Por favor, selecione outro dispositivo de áudio ou &quot;nenhum&quot; nas configurações de gravação de tela.</translation>
     </message>
   </context>
   <context>
@@ -3882,8 +3882,8 @@ a %1</translation>
       </translation>
     </message>
     <message>
-      <source>Changing any LDAP settings other than "Search Filter" will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>A alteração de qualquer definição do LDAP para além do "Filtro de pesquisa" resultará em perda de conectividade para todos os utilizadores sincronizados pelo através do LDAP.</translation>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>A alteração de qualquer definição do LDAP para além do &quot;Filtro de pesquisa&quot; resultará em perda de conectividade para todos os utilizadores sincronizados pelo através do LDAP.</translation>
     </message>
   </context>
   <context>
@@ -4557,8 +4557,8 @@ a %1</translation>
       <translation>AO VIVO</translation>
     </message>
     <message>
-      <source>%1 (Tour "%2" is active)</source>
-      <translation>%1 (Tour "%2" está ativo)</translation>
+      <source>%1 (Tour &quot;%2&quot; is active)</source>
+      <translation>%1 (Tour &quot;%2&quot; está ativo)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4690,8 +4690,8 @@ a %1</translation>
       <translation>Fluxo secundário desativado para estas câmaras</translation>
     </message>
     <message>
-      <source>Set Recording to "Always"</source>
-      <translation>Definir gravação para "Sempre"</translation>
+      <source>Set Recording to &quot;Always&quot;</source>
+      <translation>Definir gravação para &quot;Sempre&quot;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
@@ -4702,8 +4702,8 @@ a %1</translation>
       <translation>múltiplos valores</translation>
     </message>
     <message>
-      <source>"Motion + Low - Res" recording option cannot be set.</source>
-      <translation>"Motion + Low - A opção de gravação Res" não pode ser definida.</translation>
+      <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+      <translation>&quot;Motion + Low - A opção de gravação Res&quot; não pode ser definida.</translation>
     </message>
   </context>
   <context>
@@ -5054,12 +5054,12 @@ a %1</translation>
       <translation>Redefinir</translation>
     </message>
     <message>
-      <source>Hotkey used by preset "%1"</source>
-      <translation>Hotkey usada por predefinição "%1"</translation>
+      <source>Hotkey used by preset &quot;%1&quot;</source>
+      <translation>Hotkey usada por predefinição &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Hotkey used by tour "%1"</source>
-      <translation>Hotkey usado pelo tour "%1"</translation>
+      <source>Hotkey used by tour &quot;%1&quot;</source>
+      <translation>Hotkey usado pelo tour &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -5710,7 +5710,7 @@ a %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servidores com failover activado irão automaticamente "capturar" câmaras de servidores que estejam offline.</translation>
+      <translation>Servidores com failover activado irão automaticamente &quot;capturar&quot; câmaras de servidores que estejam offline.</translation>
     </message>
   </context>
   <context>
@@ -5911,7 +5911,7 @@ a %1</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. 'Nx Cloud'.</comment>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Instância incompatível %1. Para atualizar o sistema de desconecte de %1 primeiro.</translation>
     </message>
     <message>
@@ -5942,11 +5942,11 @@ a %1</translation>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
-' sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
       <translation>Tags Html podem ser usadas no texto personalizado:
-&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;também diferentes &lt;font color="red"&gt;cores&lt;/font&gt; e &lt;font size="18"&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;atingido&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negro&lt;/b&gt; ou &lt;i&gt;&lt;/i&gt;</translation>
+&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;também diferentes &lt;font color=&quot;red&quot;&gt;cores&lt;/font&gt; e &lt;font size=&quot;18&quot;&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;atingido&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negro&lt;/b&gt; ou &lt;i&gt;&lt;/i&gt;</translation>
     </message>
   </context>
   <context>
@@ -6007,8 +6007,8 @@ a %1</translation>
       <translation>Fluxo secundário desativado para esta câmera</translation>
     </message>
     <message>
-      <source>Set Recording to "Always"</source>
-      <translation>Definir gravação para "Sempre"</translation>
+      <source>Set Recording to &quot;Always&quot;</source>
+      <translation>Definir gravação para &quot;Sempre&quot;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
@@ -6023,8 +6023,8 @@ a %1</translation>
       <translation>Essa ação não pode ser desfeita.</translation>
     </message>
     <message>
-      <source>"Motion + Low - Res" recording option cannot be set.</source>
-      <translation>"Motion + Baixo - Res" opção de gravação não pode ser definida.</translation>
+      <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+      <translation>&quot;Motion + Baixo - Res&quot; opção de gravação não pode ser definida.</translation>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
@@ -6097,8 +6097,8 @@ a %1</translation>
       <translation>Assinatura de Suporte</translation>
     </message>
     <message>
-      <source>No preset found. Use "Advanced" option.</source>
-      <translation>Nenhuma predefinição encontrada. Use a opção "Avançada".</translation>
+      <source>No preset found. Use &quot;Advanced&quot; option.</source>
+      <translation>Nenhuma predefinição encontrada. Use a opção &quot;Avançada&quot;.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -6320,8 +6320,8 @@ a %1</translation>
       <translation>Adicione mais drives para usá-los como armazenamento de backup.</translation>
     </message>
     <message>
-      <source>Change "Main" to "Backup" for some of the storage above to enable backup.</source>
-      <translation>Altere "Principal" para "Backup" para algum armazenamento acima para ativar o backup.</translation>
+      <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
+      <translation>Altere &quot;Principal&quot; para &quot;Backup&quot; para algum armazenamento acima para ativar o backup.</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
@@ -6796,37 +6796,37 @@ a %1</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
-      <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
+      <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
-      <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
+      <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
-      <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
+      <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
-      <comment>Format for displaying day caption in timeline's header.</comment>
+      <comment>Format for displaying day caption in timeline&apos;s header.</comment>
       <translation type="unfinished">dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <comment>Format for displaying month caption in timeline's header.</comment>
+      <comment>Format for displaying month caption in timeline&apos;s header.</comment>
       <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
-      <comment>Format for displaying year caption in timeline's header</comment>
+      <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
-      <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
@@ -7210,12 +7210,12 @@ a %1</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. 'Local users'</comment>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
       <translation>%1 pertencem apenas a este sistema e são totalmente geridos pelos administradores do sistema.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. 'Cloud users'</comment>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
       <translation>%1 pode ter acesso a muitos sistemas. Os administradores podem gerir apenas os seus direitos.</translation>
     </message>
   </context>
@@ -7257,8 +7257,8 @@ a %1</translation>
       <translation>Exibir %1</translation>
     </message>
     <message>
-      <source>Delete "%1"?</source>
-      <translation>Excluir "%1"?</translation>
+      <source>Delete &quot;%1&quot;?</source>
+      <translation>Excluir &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -7313,8 +7313,8 @@ a %1</translation>
   <context>
     <name>QnWearableUploadWidget</name>
     <message>
-      <source>User "%1" is currently uploading footage to this camera.</source>
-      <translation>O utilizador "%1" está actualmente a enviar gravações para esta câmara.</translation>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>O utilizador &quot;%1&quot; está actualmente a enviar gravações para esta câmara.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7476,7 +7476,7 @@ a %1</translation>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Não pode ser feito o "merge" dos Sistemas %1</translation>
+      <translation>Não pode ser feito o &quot;merge&quot; dos Sistemas %1</translation>
     </message>
   </context>
   <context>
@@ -7739,8 +7739,8 @@ a %1</translation>
       <translation>Apenas são suportados ficheiros de vídeo com registo de data e hora correctos.</translation>
     </message>
     <message>
-      <source>Could not start upload as user "%1" is currently uploading footage to this camera.</source>
-      <translation>Não foi possível iniciar o upload, visto que o utilizador "%1" está a fazer o upload de imagens para esta câmara.</translation>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>Não foi possível iniciar o upload, visto que o utilizador &quot;%1&quot; está a fazer o upload de imagens para esta câmara.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
@@ -8133,11 +8133,11 @@ a %1</translation>
     <name>nx::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation>Fluxo Primário</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Fluxo Secundário</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>No secondary stream</source>
@@ -8295,19 +8295,19 @@ a %1</translation>
     <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation>células</translation>
+      <translation type="unfinished">cells</translation>
     </message>
     <message>
       <source>No picture</source>
-      <translation>Sem imagem</translation>
+      <translation type="unfinished">No picture</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation>Erro ao carregar imagem</translation>
+      <translation type="unfinished">Error while loading picture</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation>Erro ao carregar imagem</translation>
+      <translation type="unfinished">Error while uploading picture</translation>
     </message>
     <message>
       <source>Select file...</source>
@@ -8319,22 +8319,22 @@ a %1</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation>Imagem não pode ser lida</translation>
+      <translation type="unfinished">Picture cannot be read</translation>
     </message>
     <message>
       <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>A foto é muito grande. O tamanho máximo é %1 MB</translation>
+      <translation type="unfinished">Picture is too big. Maximum size is %1 MB</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation>Imagem não pode ser carregada</translation>
+      <translation type="unfinished">Picture cannot be loaded</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation>células</translation>
+      <translation type="unfinished">cells</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
@@ -8367,7 +8367,7 @@ a %1</translation>
     <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
     <message>
       <source>Secondary Stream</source>
-      <translation>Fluxo Secundário</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>I/O Module ID</source>
@@ -8379,27 +8379,27 @@ a %1</translation>
     </message>
     <message>
       <source>Audio Stream</source>
-      <translation>Stream de Áudio</translation>
+      <translation type="unfinished">Audio Stream</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>Fluxo Primário</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
-      <translation>URL não está disponível. Abra o fluxo e tente novamente.</translation>
+      <translation type="unfinished">URL is not available. Open stream and try again.</translation>
     </message>
     <message>
       <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL não está disponível. Abra o fluxo de vídeo e tente novamente.</translation>
+      <translation type="unfinished">URL is not available. Open video stream and try again.</translation>
     </message>
     <message>
       <source>I/O module has no audio stream</source>
-      <translation>Módulo de E / S não tem fluxo de áudio</translation>
+      <translation type="unfinished">I/O module has no audio stream</translation>
     </message>
     <message>
       <source>Camera has no secondary stream</source>
-      <translation>A câmera não tem fluxo secundário</translation>
+      <translation type="unfinished">Camera has no secondary stream</translation>
     </message>
   </context>
   <context>
@@ -8424,8 +8424,8 @@ a %1</translation>
   <context>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
-      <source>Set layout resolution to "Auto" to increase performance.</source>
-      <translation>Defina a resolução do layout como "Auto" para aumentar o desempenho.</translation>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Defina a resolução do layout como &quot;Auto&quot; para aumentar o desempenho.</translation>
     </message>
   </context>
   <context>
@@ -8452,12 +8452,12 @@ a %1</translation>
   <context>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
-      <source>Could not open file "%1"</source>
-      <translation>Não foi possível abrir o ficheiro "%1"</translation>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>Não foi possível abrir o ficheiro &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Could not calculate md5 for file "%1"</source>
-      <translation>Não foi possível calcular o md5 para o ficheiro "%1"</translation>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>Não foi possível calcular o md5 para o ficheiro &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
@@ -8519,8 +8519,8 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bookmarks</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n bookmark</numerusform>
         <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
@@ -8532,8 +8532,8 @@ a %1</translation>
   <context>
     <name>nx::client::desktop::legacy::ExportLayoutTool</name>
     <message>
-      <source>File "%1" is used by another process. Please try another name.</source>
-      <translation>O arquivo "%1" é usado por outro processo. Por favor, tente outro nome.</translation>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>O arquivo &quot;%1&quot; é usado por outro processo. Por favor, tente outro nome.</translation>
     </message>
     <message>
       <source>Could not create output file %1...</source>
@@ -8544,12 +8544,12 @@ a %1</translation>
       <translation>Ocorreu um erro desconhecido.</translation>
     </message>
     <message>
-      <source>Exporting to "%1"...</source>
-      <translation>Exportando para "%1"...</translation>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exportando para &quot;%1&quot;...</translation>
     </message>
     <message>
       <source>Could not export device %1.</source>
-      <extracomment>"Could not export camera AXIS1334"</extracomment>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
       <translation>Não foi possível exportar o dispositivo %1.</translation>
     </message>
     <message>
@@ -8648,7 +8648,7 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
@@ -8829,28 +8829,28 @@ a %1</translation>
       </translation>
     </message>
     <message>
-      <source>Server "%1" is not responding.</source>
-      <translation>O servidor "%1" não está respondendo.</translation>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation>O servidor &quot;%1&quot; não está respondendo.</translation>
     </message>
     <message numerus="yes">
-      <source>Server "%1" cannot access %n devices. Move them anyway?</source>
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor "%1" não pode acessar %n dispositivos. Mova-os mesmo assim?</numerusform>
-        <numerusform>Servidor "%1" não pode acessar %n dispositivos. Mova-os mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mova-os mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mova-os mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Server "%1" cannot access %n cameras. Move them anyway?</source>
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor "%1" não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
-        <numerusform>Servidor "%1" não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Server "%1" cannot access %n I/O modules. Move them anyway?</source>
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>O servidor "%1" não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
-        <numerusform>O servidor "%1" não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
       </translation>
     </message>
     <message>
@@ -9002,7 +9002,7 @@ a %1</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation>Aviso! Esta "build" é apenas para fins de teste!</translation>
+      <translation>Aviso! Esta &quot;build&quot; é apenas para fins de teste!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
