@@ -9,13 +9,15 @@ const noop = () => {
 };
 
 /* Usage
- <nx-multi-select name="permissions"
- canSelectAll?
- description="Roles"
- [items]="[{label: 'a', id: 1}, {label: 'b', id:3}]"
- [ngModel]="[1, 3]"       <- selected items id's
- (ngModelChanged)="onChange(result)">
- </nx-select>
+ <nx-multi-select
+     name="permissions"
+     canSelectAll?
+     canSearch?
+     description="Roles"
+     [items]="[{label: 'a', id: 1}, {label: 'b', id:3}]"
+     [ngModel]="[1, 3]"       <- selected items id's
+     (ngModelChanged)="onChange(result)">
+ </nx-multi-select>
  */
 
 @Component({
@@ -35,11 +37,13 @@ const noop = () => {
 export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnChanges {
     @Input('items') itemsOrig: any;
     @Input() canSelectAll: any;
+    @Input() canSearch: any;
 
     private items: any;
     private show: boolean;
     private numSelected: string;
     private innerValue: any;
+    private filter: string;
 
     // Placeholders for the callbacks which are later provided
     // by the Control Value Accessor
@@ -48,20 +52,22 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     constructor(private translate: TranslateService) {
         this.show = false;
+        this.filter = '';
     }
 
     // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
         this.canSelectAll = (this.canSelectAll !== undefined);
+        this.canSearch = (this.canSearch !== undefined);
     }
 
-    selectAll() {
+    clearSelected() {
         this.items.forEach((item) => {
-            item.selected = true;
+            item.selected = false;
             const index = this.innerValue.indexOf(item.id);
-            if (index === -1) {
-                this.innerValue.push(item.id);
+            if (index > -1) {
+                this.innerValue.splice(index, 1);
             }
         });
 
@@ -88,6 +94,15 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
         return false;
     }
 
+    applyLocalFilter(value) {
+        this.filter = value;
+        setTimeout(() => {
+            this.items = this.itemsOrig.filter((item) => {
+                return item.id.toLowerCase().includes(value.toLowerCase());
+            });
+        });
+    }
+
     updateItems() {
         this.items.forEach((item) => {
             item.selected = (this.innerValue !== undefined) ? (this.innerValue.indexOf(item.id) > -1) : false;
@@ -99,12 +114,9 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     updateLabel() {
         switch (this.innerValue.length) {
-            case 0: {
-                this.numSelected = 'None selected';
-                break;
-            }
+            case 0:
             case this.items.length: {
-                this.numSelected = 'All selected';
+                this.numSelected = 'Any';
                 break;
             }
             default: {

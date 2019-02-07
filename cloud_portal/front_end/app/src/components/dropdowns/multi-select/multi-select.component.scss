@@ -6,8 +6,14 @@ nx-multi-select {
         display : block;
     }
     
-    .dropdown-menu--list {
-        max-height : 120px !important;
-        margin     : 0;
+    .dropdown-menu {
+        &--list {
+            max-height : 277px !important; // 312px - list header height
+            margin     : 0;
+        }
+        
+        .dropdown-item--non-checkbox {
+            padding-left : 12px !important;
+        }
     }
 }

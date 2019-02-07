@@ -5,6 +5,8 @@
             <div class="btn-group w-100">
                 <span class="glyphicon glyphicon-search icon-search"></span>
                 <input [(ngModel)]="localFilter.query"
+                       [ngModelOptions]="{debounceTime : 500}"
+                       (ngModelChange)="modelChanged()"
                        type="text"
                        class="form-control w-100 search-input"
                        [ngClass]="{'non-empty': localFilter.query != ''}"
@@ -62,7 +64,7 @@
             </div>
         </div>
 
-        <div class="col-12 dropdown p-0 mt-2" *ngIf="expandable"
+        <div class="col-12 dropdown p-0 mt-2" *ngIf="expandable && advSearch"
              [ngClass]="{'show': showAdvancedOptions}" (nxClickElsewhere)="show = false">
             <div class="area clearfix d-flex">
                 <div class="float-left">
@@ -71,7 +73,7 @@
                             <span></span>
                             <span></span>
                         </div>
-                        <span translete>Advanced search</span>
+                        <span translate>Advanced search</span>
                     </a>
                 </div>
                 <div *ngIf="numberFilters != 0" class="ml-3 float-left d-flex align-items-baseline">

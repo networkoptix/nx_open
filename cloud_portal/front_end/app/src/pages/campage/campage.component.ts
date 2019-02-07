@@ -219,6 +219,9 @@ export class NxCampageComponent implements OnInit, DoCheck {
                             )),
                             selected: []
                         });
+
+                // Trigger model change for search component
+                this.filterModel = {...this.filterModel};
             });
     }
 

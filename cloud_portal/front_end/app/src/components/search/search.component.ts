@@ -17,30 +17,21 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
     styleUrls    : ['./search.component.scss']
 })
 
-export class NxSearchComponent implements OnInit, AfterViewInit, ControlValueAccessor {
+export class NxSearchComponent implements OnInit, ControlValueAccessor {
     @Input() expandable: any;
 
     private localFilter: any = {};
-    private debounceTime = 500;
     private numberFilters = 0;
-    public showAdvancedOptions = false;
+
+    advSearch = false;
+    showAdvancedOptions = false;
+
 
     constructor(private _elementRef: ElementRef, private _renderer: Renderer2) {
     }
 
     ngOnInit() {
         this.expandable = (this.expandable !== undefined);  // optional param
-    }
-
-    ngAfterViewInit() {
-        fromEvent(this._elementRef.nativeElement, 'keyup')
-                .map((evt: any) => evt.target.value)
-                .debounceTime(this.debounceTime)
-                .distinctUntilChanged()
-                .subscribe((event) => {
-                    this.localFilter.query = event;
-                    this.onChangeCallback(this.localFilter);
-                });
     }
 
     // Placeholders for the callbacks which are later provided
@@ -62,6 +53,9 @@ export class NxSearchComponent implements OnInit, AfterViewInit, ControlValueAcc
     writeValue(value: any): void {
         if (value) {
             this.localFilter = value;
+            this.advSearch = (this.localFilter.selects && this.localFilter.selects.length) ||
+                    (this.localFilter.multiselects && this.localFilter.multiselects.length) ||
+                    (this.localFilter.tags && this.localFilter.tags.length);
         }
         const normalizedValue = this.isBlank(value) ? '' : value;
         this._renderer.setProperty(this._elementRef.nativeElement, 'value', normalizedValue);

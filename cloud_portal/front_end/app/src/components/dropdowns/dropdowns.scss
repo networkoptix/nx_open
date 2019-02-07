@@ -97,6 +97,7 @@ header {
             overflow        : auto;
             padding         : 0;
             list-style-type : none;
+            margin-bottom   : 0;
         }
         
         &--footer, &--header {
@@ -164,6 +165,19 @@ header {
                     cursor       : pointer;
                     width        : calc(100% - 10px);
                 }
+            }
+            
+            .icon-search {
+                margin : 10px 0 0 24px !important;
+            }
+    
+            .search-clear {
+                right    : 24px;
+            }
+            
+            .search-input {
+                width  : calc(100% - 24px);
+                margin : 0 12px !important;
             }
         }
     }
