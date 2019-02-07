@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_factory.h>
 
 #include "api/relay_api_client_stub.h"
 

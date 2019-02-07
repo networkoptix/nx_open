@@ -6,7 +6,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/type_utils.h>
 
-#include "relay_api_client.h"
+#include "../relay_api_client.h"
 
 namespace nx::cloud::relay::api::detail {
 

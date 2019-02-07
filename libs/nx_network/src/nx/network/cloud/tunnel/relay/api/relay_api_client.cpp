@@ -1,6 +1,6 @@
 #include "relay_api_client.h"
 
-#include "relay_api_client_factory.h"
+#include "detail/relay_api_client_factory.h"
 
 namespace nx::cloud::relay::api {
 

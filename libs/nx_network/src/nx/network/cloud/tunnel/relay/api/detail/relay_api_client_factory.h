@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
-#include "relay_api_client.h"
+#include "../relay_api_client.h"
 
 namespace nx::cloud::relay::api::detail {
 

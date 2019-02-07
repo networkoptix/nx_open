@@ -2,9 +2,9 @@
 
 #include <boost/preprocessor/seq/for_each.hpp>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_get_post_tunnel.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_connect.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_upgrade.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_get_post_tunnel.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_connect.h>
 
 namespace nx::cloud::relay::test {
 

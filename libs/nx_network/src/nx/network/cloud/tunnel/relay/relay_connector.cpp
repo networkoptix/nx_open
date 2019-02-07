@@ -4,7 +4,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "api/relay_api_client_factory.h"
 #include "relay_outgoing_tunnel_connection.h"
 
 namespace nx {
