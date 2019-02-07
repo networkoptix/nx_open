@@ -1540,6 +1540,11 @@
       <source>Search Filter</source>
       <translation>Filtro de pesquisa</translation>
     </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation type="unfinished">Search Timeout (s)</translation>
+    </message>
   </context>
   <context>
     <name>LdapUsersDialog</name>
@@ -2706,7 +2711,7 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>

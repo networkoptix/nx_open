@@ -2515,7 +2515,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>

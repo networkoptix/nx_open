@@ -1540,6 +1540,11 @@
       <source>Search Filter</source>
       <translation>Фільтр пошуку</translation>
     </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation>Залишилося часу (с)</translation>
+    </message>
   </context>
   <context>
     <name>LdapUsersDialog</name>
