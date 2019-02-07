@@ -39,7 +39,7 @@ public:
     void setLiveMode(bool value);
     int copyLastGopFromCamera(
         QnVideoCameraPtr camera,
-        nx::vms::api::MotionStreamType streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         qint64 skipTime,
         bool iFramesOnly);
     QnMutex* dataQueueMutex();

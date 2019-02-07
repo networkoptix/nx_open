@@ -696,10 +696,10 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     if (canCheckLive)
     {
         QnVideoCameraPtr camera;
-        const nx::vms::api::MotionStreamType streamIndex =
+        const nx::vms::api::StreamIndex streamIndex =
             (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
-            ? nx::vms::api::MotionStreamType::primary
-            : nx::vms::api::MotionStreamType::secondary;
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary;
         if (getResource())
             camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
 
@@ -1331,10 +1331,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && QnResource::isOnline(status))
         {
-            const nx::vms::api::MotionStreamType streamIndex =
+            const nx::vms::api::StreamIndex streamIndex =
                 (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
-                ? nx::vms::api::MotionStreamType::primary
-                : nx::vms::api::MotionStreamType::secondary;
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary;
             bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
             copySize = d->dataProcessor->copyLastGopFromCamera(
                 camera,
@@ -1480,10 +1480,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                const nx::vms::api::MotionStreamType streamIndex =
+                const nx::vms::api::StreamIndex streamIndex =
                     (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
-                    ? nx::vms::api::MotionStreamType::primary
-                    : nx::vms::api::MotionStreamType::secondary;
+                    ? nx::vms::api::StreamIndex::primary
+                    : nx::vms::api::StreamIndex::secondary;
                 bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
                 d->dataProcessor->copyLastGopFromCamera(
                     camera,

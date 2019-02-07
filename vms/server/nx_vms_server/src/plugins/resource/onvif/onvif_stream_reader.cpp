@@ -440,8 +440,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
             return CameraDiagnostics::RequestFailedResult("selectVideoEncoderConfig", QString());
 
         auto streamIndex = isPrimary
-            ? nx::vms::api::MotionStreamType::primary
-            : nx::vms::api::MotionStreamType::secondary;
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary;
         m_onvifRes->updateVideoEncoder1(*currentVEConfig, streamIndex, params);
 
         // Usually getMaxOnvifRequestTries returns 1, but for some OnvifResource descendants it's
@@ -497,8 +497,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         outInfo->videoEncoderConfigurationToken = currentVEConfig->token;
 
         auto streamIndex = isPrimary
-            ? nx::vms::api::MotionStreamType::primary
-            : nx::vms::api::MotionStreamType::secondary;
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary;
         m_onvifRes->updateVideoEncoder2(*currentVEConfig, streamIndex, params);
 
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();

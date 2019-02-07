@@ -336,7 +336,7 @@ void CameraSettingsDialogStore::setTrustCameraTime(bool value)
         [&](State state) { return Reducer::setTrustCameraTime(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setForcedMotionStreamType(nx::vms::api::MotionStreamType value)
+void CameraSettingsDialogStore::setForcedMotionStreamType(nx::vms::api::StreamIndex value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setForcedMotionStreamType(std::move(state), value); });

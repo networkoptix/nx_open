@@ -16,7 +16,7 @@ public:
     static const QLatin1String anyResolution;
     static QString resolutionToString( const QSize& resolution = QSize() );
 
-    nx::vms::api::MotionStreamType getEncoderIndex() const;
+    nx::vms::api::StreamIndex getEncoderIndex() const;
 
     // We have to keep compatibility with previous version. So, this field stay int
     int encoderIndex;
@@ -37,7 +37,7 @@ public:
     std::map<QString, QString> customStreamParams; // TODO remove outdated field
 
     CameraMediaStreamInfo(
-        nx::vms::api::MotionStreamType encoderIndex = nx::vms::api::MotionStreamType::undefined,
+        nx::vms::api::StreamIndex encoderIndex = nx::vms::api::StreamIndex::undefined,
         const QSize& _resolution = QSize(),
         AVCodecID _codec = AV_CODEC_ID_NONE)
         :
@@ -67,7 +67,7 @@ public:
 class CameraBitrateInfo
 {
 public:
-    nx::vms::api::MotionStreamType encoderIndex;
+    nx::vms::api::StreamIndex encoderIndex;
     QString timestamp;
 
     float rawSuggestedBitrate = -1; //< Megabits per second
@@ -85,7 +85,7 @@ public:
     bool isConfigured = false;
 
     CameraBitrateInfo(
-        nx::vms::api::MotionStreamType index = nx::vms::api::MotionStreamType::undefined,
+        nx::vms::api::StreamIndex index = nx::vms::api::StreamIndex::undefined,
         QString time = QString())
         :
         encoderIndex(index),

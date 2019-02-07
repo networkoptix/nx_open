@@ -907,9 +907,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
 void HanwhaResource::initMediaStreamCapabilities()
 {
-    m_capabilities.streamCapabilities[MotionStreamType::primary] =
+    m_capabilities.streamCapabilities[StreamIndex::primary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
-    m_capabilities.streamCapabilities[MotionStreamType::secondary] =
+    m_capabilities.streamCapabilities[StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
         ResourcePropertyKey::kMediaCapabilities,

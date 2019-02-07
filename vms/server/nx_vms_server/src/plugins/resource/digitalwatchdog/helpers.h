@@ -13,14 +13,14 @@ class CproApiClient
 public:
     CproApiClient(QnDigitalWatchdogResource* resource);
 
-    boost::optional<QStringList> getSupportedVideoCodecs(nx::vms::api::MotionStreamType streamIndex);
-    boost::optional<QString> getVideoCodec(nx::vms::api::MotionStreamType streamIndex);
+    boost::optional<QStringList> getSupportedVideoCodecs(nx::vms::api::StreamIndex streamIndex);
+    boost::optional<QString> getVideoCodec(nx::vms::api::StreamIndex streamIndex);
 
-    bool setVideoCodec(nx::vms::api::MotionStreamType streamIndex, const QString& value);
+    bool setVideoCodec(nx::vms::api::StreamIndex streamIndex, const QString& value);
 
 private:
     bool updateVideoConfig();
-    int indexOfStream(nx::vms::api::MotionStreamType streamIndex);
+    int indexOfStream(nx::vms::api::StreamIndex streamIndex);
 
     boost::optional<std::pair<int, int>> rangeOfTag(
         const QByteArray& openTag, const QByteArray& closeTag,
@@ -42,9 +42,9 @@ public:
     JsonApiClient(nx::network::SocketAddress address, QAuthenticator auth);
 
     nx::vms::server::resource::StreamCapabilityMap getSupportedVideoCodecs(
-        int channelNumber, nx::vms::api::MotionStreamType streamIndex);
+        int channelNumber, nx::vms::api::StreamIndex streamIndex);
     bool sendStreamParams(
-        int channelNumber, nx::vms::api::MotionStreamType streamIndex, const QnLiveStreamParams& streamParams);
+        int channelNumber, nx::vms::api::StreamIndex streamIndex, const QnLiveStreamParams& streamParams);
 
 private:
     QJsonObject getParams(QString paramName);

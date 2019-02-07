@@ -82,9 +82,9 @@ public:
         int newState,
         unsigned long int timestamp ) override;
 
-    const QList<nxcip::Resolution>& getEncoderResolutionList(MotionStreamType encoderNumber) const;
+    const QList<nxcip::Resolution>& getEncoderResolutionList(StreamIndex encoderNumber) const;
 
-    nxcip::Resolution getSelectedResolutionForEncoder(MotionStreamType encoderIndex ) const;
+    nxcip::Resolution getSelectedResolutionForEncoder(StreamIndex encoderIndex ) const;
 
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
@@ -120,9 +120,9 @@ private:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
-    nxcip::Resolution getMaxResolution(MotionStreamType encoderNumber) const;
+    nxcip::Resolution getMaxResolution(StreamIndex encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution(MotionStreamType encoderNumber, 
+    nxcip::Resolution getNearestResolution(StreamIndex encoderNumber, 
 		const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);

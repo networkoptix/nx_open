@@ -309,12 +309,12 @@ QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
     return QnMotionRegion::ErrorCode::Ok;
 }
 
-vms::api::MotionStreamType forcedMotionStreamType(const Camera& camera)
+vms::api::StreamIndex forcedMotionStreamType(const Camera& camera)
 {
     const auto motionStreamIndex = camera->motionStreamIndex();
     return motionStreamIndex.isForced
         ? motionStreamIndex.index
-		: nx::vms::api::MotionStreamType::undefined;
+		: nx::vms::api::StreamIndex::undefined;
 }
 
 State updateDuplicateLogicalIdInfo(State state)
@@ -379,7 +379,7 @@ bool isDefaultExpertSettings(const State& state)
     }
 
     if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
-        && state.expert.forcedMotionStreamType() != vms::api::MotionStreamType::undefined)
+        && state.expert.forcedMotionStreamType() != vms::api::StreamIndex::undefined)
     {
         return false;
     }
@@ -567,7 +567,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.recording.defaultStreamResolution = firstCamera->streamInfo().getResolution();
         state.recording.mediaStreamCapability = firstCamera->cameraMediaCapability().
-            streamCapabilities.value(nx::vms::api::MotionStreamType::primary);
+            streamCapabilities.value(nx::vms::api::StreamIndex::primary);
 
         state.recording.customBitrateAvailable = true;
         state = loadMinMaxCustomBitrate(std::move(state));
@@ -696,7 +696,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return camera->trustCameraTime();
         });
 
-    fetchFromCameras<vms::api::MotionStreamType>(state.expert.forcedMotionStreamType, cameras,
+    fetchFromCameras<vms::api::StreamIndex>(state.expert.forcedMotionStreamType, cameras,
         [](const Camera& camera) { return forcedMotionStreamType(camera); });
 
     fetchFromCameras<bool>(state.expert.remoteMotionDetectionEnabled, cameras,
@@ -710,7 +710,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.expert.motionStreamOverridden = combinedValue(cameras,
         [](const Camera& camera)
         {
-            return forcedMotionStreamType(camera) != vms::api::MotionStreamType::undefined;
+            return forcedMotionStreamType(camera) != vms::api::StreamIndex::undefined;
         });
 
     if (state.canSwitchPtzPresetTypes())
@@ -1209,13 +1209,13 @@ State CameraSettingsDialogStateReducer::setRtpTransportType(
 }
 
 State CameraSettingsDialogStateReducer::setForcedMotionStreamType(
-    State state, vms::api::MotionStreamType value)
+    State state, vms::api::StreamIndex value)
 {
     if (state.devicesDescription.supportsMotionStreamOverride != CombinedValue::All)
         return state;
 
     state.expert.forcedMotionStreamType.setUser(value);
-    state.expert.motionStreamOverridden = value == nx::vms::api::MotionStreamType::undefined
+    state.expert.motionStreamOverridden = value == nx::vms::api::StreamIndex::undefined
         ? CombinedValue::None
         : CombinedValue::All;
 
@@ -1314,7 +1314,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
-    state = setForcedMotionStreamType(std::move(state), nx::vms::api::MotionStreamType::undefined);
+    state = setForcedMotionStreamType(std::move(state), nx::vms::api::StreamIndex::undefined);
     state = setLogicalId(std::move(state), {});
 
     state.isDefaultExpertSettings = true;

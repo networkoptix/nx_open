@@ -435,7 +435,7 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
 }
 
 nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDriver(
-	MotionStreamType streamIndex)
+	StreamIndex streamIndex)
 {
     using namespace nx::vms::server::resource;
 
@@ -452,7 +452,7 @@ nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabili
             key.resolution = resolution;
 
             nx::media::CameraStreamCapability capabilities;
-            if (streamIndex == MotionStreamType::secondary)
+            if (streamIndex == StreamIndex::secondary)
                 capabilities.maxFps = m_maxSecondaryFps[resolution];
             result.insert(key, capabilities);
         }
@@ -606,7 +606,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         return CameraDiagnostics::CameraInvalidParams(
             lit("Resolution list is empty"));
     }
-    m_resolutionList[(int) MotionStreamType::primary] = availResolutions;
+    m_resolutionList[(int) StreamIndex::primary] = availResolutions;
 
     if (dualStreaming)
     {
@@ -626,7 +626,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         int maxSecondaryRes =
             SECONDARY_STREAM_MAX_RESOLUTION.width()
             * SECONDARY_STREAM_MAX_RESOLUTION.height();
-        m_resolutionList[(int) MotionStreamType::secondary] = availResolutions;
+        m_resolutionList[(int) StreamIndex::secondary] = availResolutions;
     }
 
     // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
@@ -712,7 +712,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
 CameraDiagnostics::Result QnActiResource::detectMaxFpsForSecondaryCodec()
 {
-    const auto& resolutionList = m_resolutionList[(int)MotionStreamType::secondary];
+    const auto& resolutionList = m_resolutionList[(int)StreamIndex::secondary];
     for (const auto& codec: m_availableEncoders)
     {
         for (const auto& resolution: resolutionList)

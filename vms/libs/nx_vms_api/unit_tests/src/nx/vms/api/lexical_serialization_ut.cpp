@@ -12,7 +12,7 @@
 namespace nx::vms::api {
 namespace test {
 
-using MotionStreamTypeData = std::pair<MotionStreamType, std::vector<std::string>>;
+using MotionStreamTypeData = std::pair<StreamIndex, std::vector<std::string>>;
 class MotionStreamTypeLexicalTest: public ::testing::TestWithParam<MotionStreamTypeData>
 {
 };
@@ -20,14 +20,14 @@ class MotionStreamTypeLexicalTest: public ::testing::TestWithParam<MotionStreamT
 TEST_P(MotionStreamTypeLexicalTest, assertParsedCorrectly)
 {
     auto [input, output] = GetParam();
-    const auto value = QnLexical::serialized<MotionStreamType>(input);
+    const auto value = QnLexical::serialized<StreamIndex>(input);
     ASSERT_EQ(value.toStdString(), output[0]);
 
     for (const auto& sampleOutput: output)
 	{
-        const auto parsed = QnLexical::deserialized<MotionStreamType>(
+        const auto parsed = QnLexical::deserialized<StreamIndex>(
 			QString::fromStdString(sampleOutput),
-			MotionStreamType::undefined);
+			StreamIndex::undefined);
         ASSERT_EQ(input, parsed);
 	}
 }
@@ -35,9 +35,9 @@ TEST_P(MotionStreamTypeLexicalTest, assertParsedCorrectly)
 // Vector defines list of values, which must be correctly deserialized.
 // First value is the correct serialization value.
 std::vector<MotionStreamTypeData> motionStreamTestData = {
-	{MotionStreamType::undefined, {"", "-1", "some_strange_string"}},
-    {MotionStreamType::primary, {"primary", "0"}},
-    {MotionStreamType::secondary, {"secondary", "1"}}
+	{StreamIndex::undefined, {"", "-1", "some_strange_string"}},
+    {StreamIndex::primary, {"primary", "0"}},
+    {StreamIndex::secondary, {"secondary", "1"}}
 };
 
 INSTANTIATE_TEST_CASE_P(MotionStreamTypeLexicalSerialization,

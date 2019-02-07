@@ -45,7 +45,7 @@ struct StreamCapabilityKey
     }
 };
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
-using StreamCapabilityMaps = QMap<nx::vms::api::MotionStreamType, StreamCapabilityMap>;
+using StreamCapabilityMaps = QMap<nx::vms::api::StreamIndex, StreamCapabilityMap>;
 
 class Camera:
     public QnVirtualCameraResource,
@@ -95,7 +95,7 @@ public:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
 
     /** Gets supported codecs and their resolution list. */
-    StreamCapabilityMap getStreamCapabilityMap(nx::vms::api::MotionStreamType streamIndex);
+    StreamCapabilityMap getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex);
 
     /**
      * @param resolution Resolution for which we want to find the closest one.
@@ -223,7 +223,7 @@ protected:
      * CameraStreamCapability could be null. That case it is auto-filled with default values.
      */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(
-		nx::vms::api::MotionStreamType streamIndex);
+		nx::vms::api::StreamIndex streamIndex);
 
     /**
      * @return stream capability traits
@@ -246,7 +246,7 @@ protected:
 
 private:
     using StreamCapabilityAdvancedParameterProviders = std::map<
-		nx::vms::api::MotionStreamType, 
+		nx::vms::api::StreamIndex, 
         std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
 
     int m_channelNumber; // video/audio source number

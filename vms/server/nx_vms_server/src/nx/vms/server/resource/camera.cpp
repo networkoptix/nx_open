@@ -251,7 +251,7 @@ bool Camera::setAdvancedParameter(const QString& id, const QString& value)
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParameters =
-        [&](nx::vms::api::MotionStreamType streamIndex)
+        [&](nx::vms::api::StreamIndex streamIndex)
         {
             QnMutexLocker lock(&m_initMutex);
             if (!isInitialized())
@@ -265,8 +265,8 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         };
 
     QnAdvancedStreamParams parameters;
-    parameters.primaryStream = getStreamParameters(nx::vms::api::MotionStreamType::primary);
-    parameters.secondaryStream = getStreamParameters(nx::vms::api::MotionStreamType::secondary);
+    parameters.primaryStream = getStreamParameters(nx::vms::api::StreamIndex::primary);
+    parameters.secondaryStream = getStreamParameters(nx::vms::api::StreamIndex::secondary);
     return parameters;
 }
 
@@ -434,7 +434,7 @@ void Camera::initializationDone()
     fixInputPortMonitoring();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::MotionStreamType streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
 {
     // Implementation may be overloaded in a driver.
 	return StreamCapabilityMap();
@@ -467,12 +467,12 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
     const StreamCapabilityMaps streamCapabilityMaps = {
-        {MotionStreamType::primary, getStreamCapabilityMap(MotionStreamType::primary)},
-        {MotionStreamType::secondary, getStreamCapabilityMap(MotionStreamType::secondary)}
+        {StreamIndex::primary, getStreamCapabilityMap(StreamIndex::primary)},
+        {StreamIndex::secondary, getStreamCapabilityMap(StreamIndex::secondary)}
     };
 
     const auto traits = mediaTraits();
-    for (const auto streamType: {MotionStreamType::primary, MotionStreamType::secondary})
+    for (const auto streamType: {StreamIndex::primary, StreamIndex::secondary})
     {
         //auto streamCapabilities = getStreamCapabilityMap(streamType);
         if (!streamCapabilityMaps[streamType].isEmpty())
@@ -522,7 +522,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
     return CameraDiagnostics::NoErrorResult();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::MotionStreamType streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex)
 {
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
