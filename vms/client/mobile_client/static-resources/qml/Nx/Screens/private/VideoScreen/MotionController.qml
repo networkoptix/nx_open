@@ -25,10 +25,8 @@ Item
 
     onAllowDrawingChanged:
     {
-        if (!allowDrawing || !d.customInitialPoint)
-            return
-
-        d.selectionRoi.start(function() { handleLongPressed() })
+        if (allowDrawing && d.customInitialPoint && d.selectionRoi)
+            d.selectionRoi.start()
     }
 
     function clearCustomRoi()
@@ -60,6 +58,12 @@ Item
             rect ? d.toRelative(Qt.vector2d(rect.right, rect.bottom)) : undefined)
     }
 
+    function handleLongPressed()
+    {
+        if (!controller.allowDrawing)
+            controller.requestDrawing()
+    }
+
     function handlePositionChanged(pos)
     {
         var relativePos = d.toRelative(pos)
@@ -73,23 +77,6 @@ Item
         {
             handleCancelled()
         }
-    }
-
-    function handleLongPressed()
-    {
-        if (!controller.allowDrawing)
-        {
-            controller.requestDrawing()
-            return
-        }
-
-        d.customFirstPoint = d.customInitialPoint
-        d.customSecondPoint = d.customInitialPoint
-        d.selectionRoi.show()
-        if (d.customRoi)
-            d.customRoi.hide()
-
-        makeShortVibration()
     }
 
     function handlePressed(pos)
@@ -197,11 +184,21 @@ Item
     onDrawingRoiChanged:
     {
         if (drawingRoi)
-            return
+        {
+            d.customFirstPoint = d.customInitialPoint
+            d.customSecondPoint = d.customInitialPoint
+            d.selectionRoi.show()
+            if (d.customRoi)
+                d.customRoi.hide()
 
-        d.customRoi = d.selectionRoi
-        d.selectionRoi = null
-        d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+            makeShortVibration()
+        }
+        else
+        {
+            d.customRoi = d.selectionRoi
+            d.selectionRoi = null
+            d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+        }
     }
 
     onCameraRotationChanged: updateDefaultRoi()
