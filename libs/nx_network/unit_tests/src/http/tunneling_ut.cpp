@@ -308,6 +308,7 @@ TYPED_TEST_P(HttpTunneling, timeout_supported)
 
 TYPED_TEST_P(HttpTunneling, custom_http_headers_are_transferred)
 {
+    this->givenTunnellingServer();
     this->addSomeCustomHttpHeadersToTheClient();
     this->whenRequestTunnel();
 
