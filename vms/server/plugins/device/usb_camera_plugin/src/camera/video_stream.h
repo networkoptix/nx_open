@@ -103,7 +103,6 @@ private:
     std::thread m_videoThread;
     std::atomic_bool m_terminated = true;
     std::atomic_bool m_ioError = false;
-    int m_initCode = 0;
 
 private:
     /**
@@ -120,10 +119,9 @@ private:
     void uninitialize();
     int initializeInputFormat();
     void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
-    std::shared_ptr<ffmpeg::Packet> readFrame();
+    int readFrame(std::shared_ptr<ffmpeg::Packet>& result);
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
-    void setCameraState(CameraState cameraState);
 
     bool checkIoError(int ffmpegError);
     void setLastError(int ffmpegError);

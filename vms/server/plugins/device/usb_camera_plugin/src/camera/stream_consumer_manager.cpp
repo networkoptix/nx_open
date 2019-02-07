@@ -17,7 +17,7 @@ size_t PacketConsumerManager::size() const
 void PacketConsumerManager::flush()
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
-    for (auto & consumer: m_consumers)
+    for (auto& consumer: m_consumers)
     {
         if (auto c = consumer.lock())
             c->flush();
@@ -36,7 +36,7 @@ void PacketConsumerManager::removeConsumer(
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
     int index = -1;
-    for (const auto & c : m_consumers)
+    for (const auto& c: m_consumers)
     {
         ++index;
         auto consumerLocked = c.lock();

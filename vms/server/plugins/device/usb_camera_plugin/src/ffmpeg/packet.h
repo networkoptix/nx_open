@@ -35,7 +35,7 @@ public:
 
     bool keyPacket() const;
 
-    void copy(AVPacket& source);
+    int copy(AVPacket& source);
 
 private:
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
