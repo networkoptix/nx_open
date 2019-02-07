@@ -12,6 +12,7 @@ class NX_NETWORK_API AbstractTunnelValidator:
     public aio::BasicPollable
 {
 public:
+    virtual void setTimeout(std::chrono::milliseconds timeout) = 0;
     virtual void validate(ValidateTunnelCompletionHandler handler) = 0;
     virtual std::unique_ptr<AbstractStreamSocket> takeConnection() = 0;
 };

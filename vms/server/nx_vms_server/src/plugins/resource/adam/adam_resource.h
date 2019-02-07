@@ -22,7 +22,7 @@ class QnAdamResource:
     };
 
 public:
-    static const QString kManufacture;
+    static const QString kManufacturer;
 
     QnAdamResource(QnMediaServerModule* serverModule);
     virtual ~QnAdamResource();

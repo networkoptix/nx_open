@@ -147,7 +147,7 @@ TEST_F(MergeSystems, SafeMode_To)
 
 void waitForMergeFinished(
     const std::vector<LauncherPtr>& servers,
-    int size,
+    int serverCount,
     const nx::vms::api::SystemMergeHistoryRecord& mergeResult)
 {
     int success = 0;
@@ -155,11 +155,11 @@ void waitForMergeFinished(
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         success = 0;
-        for (int i = 0; i < size; ++i)
+        for (int i = 0; i < serverCount; ++i)
         {
             auto connection = servers[i]->serverModule()->ec2Connection();
             nx::vms::api::SystemMergeHistoryRecordList mergeData;
-            connection->makeMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
+            connection->getMiscManager(Qn::kSystemAccess)->getSystemMergeHistorySync(&mergeData);
 
             auto itr = std::find_if(
                 mergeData.begin(), mergeData.end(),
@@ -171,7 +171,7 @@ void waitForMergeFinished(
                 ++success;
 
         }
-    } while (success != size);
+    } while (success != serverCount);
 }
 
 TEST_F(MergeSystems, DoubleMergeWithTakeLocalSettings)

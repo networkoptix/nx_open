@@ -47,7 +47,7 @@ public:
     QString idForToStringFromPtr() const;
 
 private:
-    bool initSocket();
+    bool reinitSocket();
     ModbusMBAPHeader buildHeader(const ModbusRequest& request);
 
 private:

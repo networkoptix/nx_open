@@ -8,7 +8,7 @@ class QnWearableCameraResource: public nx::vms::server::resource::Camera
     using base_type = nx::vms::server::resource::Camera;
 
 public:
-    static const QString kManufacture;
+    static const QString kManufacturer;
 
     QnWearableCameraResource(QnMediaServerModule* serverModule);
     virtual ~QnWearableCameraResource() override;

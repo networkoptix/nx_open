@@ -1,7 +1,7 @@
 #include "ondemand_media_data_provider.h"
 
 #include <nx/utils/thread/mutex.h>
-
+#include <nx/utils/log/log.h>
 
 static const size_t MAX_DATA_QUEUE_SIZE = 16;
 
@@ -10,12 +10,14 @@ OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbs
     m_dataProvider( dataProvider ),
     m_prevPacketTimestamp( -1 )
 {
+    NX_VERBOSE(this, "New");
     m_dataProvider->addDataProcessor( this );
 }
 
 OnDemandMediaDataProvider::~OnDemandMediaDataProvider() throw()
 {
     m_dataProvider->removeDataProcessor( this );
+    NX_VERBOSE(this, "Delete");
 }
 
 //!Implementation of AbstractOnDemandDataProvider::tryRead

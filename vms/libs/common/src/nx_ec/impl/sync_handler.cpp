@@ -7,8 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-namespace ec2::impl
-{
+namespace ec2::impl {
 
 SyncHandler::SyncHandler(): m_done(false), m_errorCode(ErrorCode::ok)
 {

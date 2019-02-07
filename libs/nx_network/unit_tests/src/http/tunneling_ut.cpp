@@ -291,6 +291,12 @@ INSTANTIATE_TYPED_TEST_CASE_P(Ssl, HttpTunneling, SslMethodMask);
 
 namespace {
 
+struct ValidatorBehavior
+{
+    ResultCode expectedResult = ResultCode::ok;
+    bool failWithTimeout = false;
+};
+
 class TestValidator:
     public BaseTunnelValidator
 {
@@ -299,24 +305,34 @@ class TestValidator:
 public:
     TestValidator(
         std::unique_ptr<AbstractStreamSocket> tunnel,
-        ResultCode resultCode,
+        ValidatorBehavior behaviorDescriptor,
         nx::utils::SyncQueue<ResultCode>* validationResults)
         :
         base_type(std::move(tunnel)),
-        m_resultCode(resultCode),
+        m_behaviorDescriptor(behaviorDescriptor),
         m_validationResults(validationResults)
     {
     }
 
+    virtual void setTimeout(std::chrono::milliseconds timeout) override
+    {
+        m_timeout = timeout;
+    }
+
     virtual void validate(ValidateTunnelCompletionHandler handler) override
     {
-        m_validationResults->push(m_resultCode);
-        post([this, handler = std::move(handler)]() { handler(m_resultCode); });
+        if (m_behaviorDescriptor.failWithTimeout && !m_timeout)
+            return;
+
+        m_validationResults->push(m_behaviorDescriptor.expectedResult);
+        post([this, handler = std::move(handler)]()
+            { handler(m_behaviorDescriptor.expectedResult); });
     }
 
 private:
-    ResultCode m_resultCode = ResultCode::ok;
+    ValidatorBehavior m_behaviorDescriptor;
     nx::utils::SyncQueue<ResultCode>* m_validationResults = nullptr;
+    std::optional<std::chrono::milliseconds> m_timeout;
 };
 
 } // namespace
@@ -338,13 +354,20 @@ protected:
 
     void givenSuccessfulValidator()
     {
-        m_expectedResult = ResultCode::ok;
+        m_validatorBehavior.expectedResult = ResultCode::ok;
         setTunnelValidator();
     }
 
     void givenFailingValidator()
     {
-        m_expectedResult = ResultCode::ioError;
+        m_validatorBehavior.expectedResult = ResultCode::ioError;
+        setTunnelValidator();
+    }
+
+    void givenValidatorFailingTimeout()
+    {
+        m_validatorBehavior.expectedResult = ResultCode::ioError;
+        m_validatorBehavior.failWithTimeout = true;
         setTunnelValidator();
     }
 
@@ -352,7 +375,7 @@ protected:
     {
         const auto result = m_validationResults.pop(std::chrono::milliseconds::zero());
         ASSERT_TRUE(result);
-        ASSERT_EQ(m_expectedResult, *result);
+        ASSERT_EQ(m_validatorBehavior.expectedResult, *result);
     }
 
     void andTunnelTypePrioritiesChanged()
@@ -363,7 +386,7 @@ protected:
 private:
     int m_initialTopTunnelTypeId = -1;
     nx::utils::SyncQueue<ResultCode> m_validationResults;
-    ResultCode m_expectedResult = ResultCode::ok;
+    ValidatorBehavior m_validatorBehavior;
 
     void setTunnelValidator()
     {
@@ -372,7 +395,7 @@ private:
             {
                 return std::make_unique<TestValidator>(
                     std::move(tunnel),
-                    m_expectedResult,
+                    m_validatorBehavior,
                     &m_validationResults);
             });
     }
@@ -397,6 +420,16 @@ TEST_F(HttpTunnelingValidation, validation_error_is_reported)
     thenTunnelIsNotEstablished();
     andValidationIsCompleted();
     andTunnelTypePrioritiesChanged();
+}
+
+TEST_F(HttpTunnelingValidation, client_forwards_timeout_to_validator)
+{
+    givenValidatorFailingTimeout();
+
+    whenRequestTunnel();
+
+    thenTunnelIsNotEstablished();
+    andValidationIsCompleted();
 }
 
 } // namespace nx::network::http::tunneling::test

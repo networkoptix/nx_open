@@ -66,7 +66,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
             if (ownData != newData && source == ec2::NotificationSource::Remote)
             {
                 // If remote peer send update to our server then ignore it and resend our own data.
-                commonModule()->ec2Connection()->makeMediaServerManager(Qn::kSystemAccess)->save(
+                commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->save(
                     ownData,
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);
@@ -182,7 +182,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(
         auto connection = commonModule()->ec2Connection();
         if (connection)
         {
-            auto resourceManager = connection->makeResourceManager(Qn::kSystemAccess);
+            auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
             resourceManager->setResourceStatusSync(resource->getId(), Qn::Online);
             resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
         }
@@ -273,7 +273,7 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         vms::api::MediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
         auto connection = commonModule()->ec2Connection();
-        connection->makeMediaServerManager(Qn::kSystemAccess)->save(
+        connection->getMediaServerManager(Qn::kSystemAccess)->save(
             apiServer,
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);
@@ -282,7 +282,7 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     {
         vms::api::StorageDataList apiStorages;
         ec2::fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
-        commonModule()->ec2Connection()->makeMediaServerManager(Qn::kSystemAccess)->saveStorages(
+        commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveStorages(
             apiStorages,
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);

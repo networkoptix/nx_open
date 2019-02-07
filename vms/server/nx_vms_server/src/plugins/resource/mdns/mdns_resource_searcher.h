@@ -14,17 +14,15 @@ public:
     QnMdnsResourceSearcher(QnMediaServerModule* serverModule);
     ~QnMdnsResourceSearcher();
 
-    //bool isProxy() const;
-
     virtual QnResourceList findResources() override;
 
 private:
-    /*!
-        \param result Just found resources. In case if same camera has been found on multiple network interfaces
-        \param Local address, MDNS response had been received on
-        \param foundHostAddress Source address of received MDNS packet
-        \note Searcher MUST not duplicate resources, already present in \a result
-    */
+    /**
+     * @param result Just found resources. In case if same camera has been found on multiple network interfaces
+     * @param Local address, MDNS response had been received on
+     * @param foundHostAddress Source address of received MDNS packet
+     *     note Searcher MUST not duplicate resources, already present in \a result
+     */
     virtual QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& result,
         const QByteArray& responseData,

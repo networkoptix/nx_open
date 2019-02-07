@@ -175,7 +175,7 @@ void LicenseWatcher::processResponse(QByteArray responseData)
         return;
     }
 
-    auto licenseManager = connection->makeLicenseManager(Qn::kSystemAccess);
+    auto licenseManager = connection->getLicenseManager(Qn::kSystemAccess);
     for (auto itr = response.licenseErrors.begin(); itr != response.licenseErrors.end(); ++itr)
     {
         QByteArray licenseKey = itr.key().toUtf8();
@@ -224,7 +224,7 @@ ServerLicenseInfo LicenseWatcher::licenseData() const
         return result; //< Server is about to stop.
 
     QnLicenseList licenseList;
-    auto licenseManager = connection->makeLicenseManager(Qn::kSystemAccess);
+    auto licenseManager = connection->getLicenseManager(Qn::kSystemAccess);
     if (licenseManager->getLicensesSync(&licenseList) != ec2::ErrorCode::ok)
         return result;
 

@@ -112,7 +112,7 @@ const AVInputFormat * InputFormat::inputFormat() const
     return m_inputFormat;
 }
 
-AVStream * InputFormat::stream(int index) const
+AVStream * InputFormat::stream(uint32_t index) const
 {
     if (index < 0 || index >= m_formatContext->nb_streams)
         return nullptr;

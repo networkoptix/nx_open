@@ -426,7 +426,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                 {
                     if (info.uuid == commonModule()->moduleGUID())
                     {
-                        ec2Connection->makeMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                        ec2Connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
                             info.data,
                             ec2::DummyHandler::instance(),
                             &ec2::DummyHandler::onRequestDone);

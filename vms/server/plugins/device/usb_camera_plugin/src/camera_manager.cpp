@@ -89,9 +89,9 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     return nxcip::NX_NO_ERROR;
 }
 
-int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
+int CameraManager::getCameraInfo(nxcip::CameraInfo* info) const
 {
-    memcpy(info, &m_camera->info(), sizeof(m_camera->info()));
+    *info = m_camera->info();
     return nxcip::NX_NO_ERROR;
 }
 

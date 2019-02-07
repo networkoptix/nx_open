@@ -515,7 +515,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera)
         {
             const auto cameraType = qnResTypePool->getResourceType(camera->getTypeId());
-            return cameraType && cameraType->getManufacture() == lit("ArecontVision");
+            return cameraType && cameraType->getManufacturer() == lit("ArecontVision");
         });
 
     state.devicesDescription.canSwitchPtzPresetTypes = combinedValue(cameras,

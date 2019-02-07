@@ -1958,14 +1958,13 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     _oasisWsnB2__Subscribe request;
-    std::string address = std::string("http://") + localAddress + std::string(":")
+    std::string address = std::string("http://") + localAddress + ":"
         + std::to_string(QnSoapServer::instance()->port())
         + QnSoapServer::instance()->path().toStdString();
     request.ConsumerReference.Address = address.data();
 
     std::string duration = std::string("PT")
-        + std::to_string(DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT)
-        + std::string("S");
+        + std::to_string(DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT) + "S";
     request.InitialTerminationTime = &duration;
 
     //creating filter

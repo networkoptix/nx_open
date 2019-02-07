@@ -6,8 +6,7 @@ struct AVStream;
 struct AVIOContext;
 struct AVFormatContext;
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace ffmpeg { class Codec; }
 namespace ffmpeg { class Packet; }
@@ -37,5 +36,5 @@ private:
     static int writePacket(void * opaque, uint8_t *buffer, int bufferSize);
 };
 
-}
-}
+} // namespace nx::usb_cam
+

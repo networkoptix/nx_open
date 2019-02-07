@@ -82,7 +82,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
@@ -91,7 +91,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
     return result;
 }
 
-QString HanwhaResourceSearcher::manufacture() const
+QString HanwhaResourceSearcher::manufacturer() const
 {
     return kHanwhaManufacturerName;
 }

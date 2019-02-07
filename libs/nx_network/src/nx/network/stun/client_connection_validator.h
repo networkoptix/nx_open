@@ -21,6 +21,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    virtual void setTimeout(std::chrono::milliseconds timeout) override;
     virtual void validate(http::tunneling::ValidateTunnelCompletionHandler handler) override;
     virtual std::unique_ptr<AbstractStreamSocket> takeConnection() override;
 
@@ -31,6 +32,7 @@ private:
     MessagePipeline m_messagePipeline;
     http::tunneling::ValidateTunnelCompletionHandler m_completionHandler;
     std::unique_ptr<AbstractStreamSocket> m_connection;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     void sendBindingRequest();
     void processMessage(Message message);

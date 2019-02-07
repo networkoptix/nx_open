@@ -226,6 +226,18 @@ void Worker::setState(State state)
     m_mutex.lock();
 }
 
+
+bool Worker::hasNotDownloadingChunks() const
+{
+    for (int i = 0; i < m_downloadingChunks.size(); ++i)
+    {
+        if (m_downloadingChunks[i] == false && fileInformation().downloadedChunks[i] == false)
+            return true;
+    }
+
+    return false;
+}
+
 void Worker::doWork()
 {
     while (true)
@@ -302,7 +314,10 @@ void Worker::doWork()
                 case FileInformation::Status::downloading:
                     if (m_usingInternet)
                     {
-                        downloadNextChunk();
+                        if (hasNotDownloadingChunks())
+                            downloadNextChunk();
+                        else
+                            setShouldWaitForAsyncOperationCompletion();
                     }
                     else if (haveChunksToDownloadUnsafe())
                     {

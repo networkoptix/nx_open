@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <optional>
 #include <memory>
 #include <tuple>
 
@@ -56,6 +57,7 @@ private:
     OpenTunnelCompletionHandler m_completionHandler;
     OpenTunnelResult m_lastResult;
     std::unique_ptr<AbstractTunnelValidator> m_validator;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     void handleOpenTunnelCompletion(OpenTunnelResult result);
     void handleTunnelValidationResult(ResultCode result);

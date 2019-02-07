@@ -253,7 +253,7 @@ QnJsonRestResult SystemMergeProcessor::checkIfSystemsHaveServerWithSameId(
     }
 
     auto serverManager =
-        m_commonModule->ec2Connection()->makeMediaServerManager(Qn::kSystemAccess);
+        m_commonModule->ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
     nx::vms::api::MediaServerDataExList localMediaServers;
     resultCode = serverManager->getServersExSync(&localMediaServers);
     if (resultCode != ec2::ErrorCode::ok)
@@ -402,7 +402,7 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
         simpleUrl.setHost(url.host());
         if (url.port() != m_remoteModuleInformation.port)
             simpleUrl.setPort(url.port());
-        auto discoveryManager = m_commonModule->ec2Connection()->makeDiscoveryManager(accessRights);
+        auto discoveryManager = m_commonModule->ec2Connection()->getDiscoveryManager(accessRights);
         discoveryManager->addDiscoveryInformation(
             m_remoteModuleInformation.id,
             simpleUrl, false,
@@ -647,7 +647,7 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
         }
     }
 
-    auto miscManager = m_commonModule->ec2Connection()->makeMiscManager(Qn::kSystemAccess);
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
     ec2::ErrorCode errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
@@ -779,7 +779,7 @@ bool SystemMergeProcessor::addMergeHistoryRecord(
             mergeHistoryRecord.sign(m_cloudAuthKey);
     }
 
-    auto miscManager = m_commonModule->ec2Connection()->makeMiscManager(Qn::kSystemAccess);
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
     const auto errorCode = miscManager->saveSystemMergeHistoryRecord(mergeHistoryRecord);
     if (errorCode != ::ec2::ErrorCode::ok)
     {

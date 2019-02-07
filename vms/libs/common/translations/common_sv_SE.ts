@@ -408,87 +408,87 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Professionell</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Videovägg</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O Modul</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Starta</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Analog enkoder</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation type="unfinished">Analog Licenses</translation>
+      <translation>Analoga licenser</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation type="unfinished">Professional Licenses</translation>
+      <translation>Professionella tjänster</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation type="unfinished">Edge Licenses</translation>
+      <translation>Edge licenser</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation type="unfinished">Vmax Licenses</translation>
+      <translation>Vmax Licenser</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation type="unfinished">Analog Encoder Licenses</translation>
+      <translation>Analoga Encoder licenser</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation type="unfinished">Video Wall Licenses</translation>
+      <translation>Videovägg licenser</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation type="unfinished">I/O Module Licenses</translation>
+      <translation>I/o-modul licenser</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation type="unfinished">Start Licenses</translation>
+      <translation>Vmax Licenser</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Ogiltig</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation type="unfinished">Invalid Licenses</translation>
+      <translation>Ogiltig licens</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation type="unfinished">Free</translation>
+      <translation>Gratis</translation>
     </message>
     <message>
       <source>Free license</source>
-      <translation type="unfinished">Free license</translation>
+      <translation>Gratis licens</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Tidslicens</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -503,30 +503,30 @@
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
+      <translation>
+        <numerusform>%n %2 används av %1.</numerusform>
+        <numerusform>%n %2 används av %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+      <translation>
+        <numerusform>%n %2 kommer att användas av %1.</numerusform>
+        <numerusform>%n %2 kommer att användas av %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
+      <translation>
+        <numerusform>Aktivera %n mer %1.</numerusform>
+        <numerusform>Aktivera %n mer %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>%n mer %1 kommer att användas.</numerusform>
+        <numerusform>%n mer %1 kommer att användas.</numerusform>
       </translation>
     </message>
   </context>
@@ -534,31 +534,31 @@
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
-      <translation type="unfinished">Invalid signature</translation>
+      <translation>Ogiltig signatur</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation type="unfinished">Invalid customization</translation>
+      <translation>Ogiltig anpassning</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Licensen har upphört att gälla</translation>
     </message>
     <message>
       <source>Invalid type</source>
-      <translation type="unfinished">Invalid type</translation>
+      <translation>Ogiltig typ</translation>
     </message>
     <message>
       <source>Only single license is allowed for this device</source>
-      <translation type="unfinished">Only single license is allowed for this device</translation>
+      <translation>Endast en singel licens är tillåten för den här enheten</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>Denna licenstyp kräver högre programvaruversion</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Okänt fel</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -569,92 +569,92 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Ny server</translation>
     </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
+      <translation>
+        <numerusform>%n Kamera (or)</numerusform>
+        <numerusform>%n Kamera (or)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
+      <translation>
+        <numerusform>%n kamera (or)</numerusform>
+        <numerusform>%n kamera (or)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
+      <translation>
+        <numerusform>%n Enhet (er)</numerusform>
+        <numerusform>%n Enhet (er)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
+      <translation>
+        <numerusform>%n enhet (er)</numerusform>
+        <numerusform>%n enhet (er)</numerusform>
       </translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kameror</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation type="unfinished">cameras</translation>
+      <translation>kameror</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation type="unfinished">camera</translation>
+      <translation>kamera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Enheter</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation type="unfinished">devices</translation>
+      <translation>enheter</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Enhet</translation>
     </message>
     <message>
       <source>device</source>
-      <translation type="unfinished">device</translation>
+      <translation>enhet</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
+      <translation>
+        <numerusform>%n I/O-modul (er)</numerusform>
+        <numerusform>%n I/O-modul (er)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
+      <translation>
+        <numerusform>%n I/O-modul (er)</numerusform>
+        <numerusform>%n I/O-modul (er)</numerusform>
       </translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation type="unfinished">I/O Modules</translation>
+      <translation>I/O-moduler</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation type="unfinished">I/O modules</translation>
+      <translation>I/O-moduler</translation>
     </message>
     <message>
       <source>I/O Module</source>

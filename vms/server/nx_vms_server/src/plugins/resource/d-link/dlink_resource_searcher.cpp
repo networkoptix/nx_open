@@ -43,9 +43,9 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufacture " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufacturer " << resourceType->getManufacturer() << " != " << manufacturer();
         return result;
     }
 
@@ -145,11 +145,11 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             QnPlDlinkResourcePtr resource (new QnPlDlinkResource(serverModule()));
 
-            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
             if (rt.isNull())
                 continue;
 
-            QnResourceData resourceData = dataPool()->data(manufacture(), name);
+            QnResourceData resourceData = dataPool()->data(manufacturer(), name);
             if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
                 continue; // model forced by ONVIF
 
@@ -168,7 +168,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
     return result;
 }
 
-QString QnPlDlinkResourceSearcher::manufacture() const
+QString QnPlDlinkResourceSearcher::manufacturer() const
 {
     return QnPlDlinkResource::MANUFACTURE;
 }
@@ -235,11 +235,11 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
-    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

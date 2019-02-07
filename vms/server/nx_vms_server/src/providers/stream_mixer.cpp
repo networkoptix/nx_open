@@ -20,6 +20,7 @@ using namespace std::literals::chrono_literals;
 
 QnStreamMixer::QnStreamMixer()
 {
+    NX_VERBOSE(this, "New");
 }
 
 QnStreamMixer::~QnStreamMixer()
@@ -28,6 +29,7 @@ QnStreamMixer::~QnStreamMixer()
         source.provider->removeDataProcessor(this);
 
     m_sourceMap.clear();
+    NX_VERBOSE(this, "Delete");
 }
 
 void QnStreamMixer::addDataSource(QnAbstractStreamDataProviderPtr& source)

@@ -735,7 +735,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
             /* We can get here during disconnect process */
             if (auto connection = commonModule()->ec2Connection())
             {
-                connection->makeMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
                     info.data,
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);

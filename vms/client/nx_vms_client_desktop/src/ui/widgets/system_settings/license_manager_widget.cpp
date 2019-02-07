@@ -555,7 +555,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
             Q_UNUSED(reqID);
             at_licensesReceived(licenseKey, errorCode, licensesToUpdate);
         };
-        commonModule()->ec2Connection()->makeLicenseManager(Qn::kSystemAccess)->addLicenses(
+        commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
             licensesToUpdate, this, addLisencesHandler);
     }
 
@@ -645,7 +645,7 @@ void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRem
             at_licenseRemoved(reqID, errorCode, license);
         };
 
-    const auto manager = commonModule()->ec2Connection()->makeLicenseManager(Qn::kSystemAccess);
+    const auto manager = commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess);
     manager->removeLicense(license, this, removeLisencesHandler);
 }
 

@@ -38,7 +38,7 @@ public:
     virtual bool ping() override;
     //!Implementation of QnNetworkResource::mergeResourcesIfNeeded
     virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
-    //!Implementation of QnSecurityCamResource::manufacture
+    //!Implementation of QnSecurityCamResource::manufacturer
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -122,8 +122,8 @@ private:
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution(MotionStreamType encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution(MotionStreamType encoderNumber, 
-		const nxcip::Resolution& desiredResolution ) const;
+    nxcip::Resolution getNearestResolution(MotionStreamType encoderNumber,
+        const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);
 };
