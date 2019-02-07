@@ -43,6 +43,9 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     void setTimeout(std::chrono::milliseconds timeout);
+
+    void setCustomHeaders(HttpHeaders headers);
+
     void openTunnel(OpenTunnelCompletionHandler completionHandler);
 
     const Response& response() const;
