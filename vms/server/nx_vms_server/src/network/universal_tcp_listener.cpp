@@ -67,7 +67,7 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 void QnUniversalTcpListener::stop()
 {
     directDisconnectAll();
-    stop();
+    QnHttpConnectionListener::stop();
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
