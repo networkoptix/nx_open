@@ -24,13 +24,12 @@ public:
     void uninitialize();
 
 private:
-    std::shared_ptr<ffmpeg::Frame> decode(const ffmpeg::Packet * packet);
-    int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
-    bool shouldDrop(const ffmpeg::Frame * frame);
+    std::shared_ptr<ffmpeg::Frame> decode(const ffmpeg::Packet* packet);
+    int encode(const ffmpeg::Frame* frame, ffmpeg::Packet* outPacket);
+    bool shouldDrop(const ffmpeg::Frame* frame);
 
     int initializeDecoder(AVCodecParameters* codecPar);
     int initializeEncoder(const CodecParameters& codecParams);
-    void setEncoderOptions(ffmpeg::Codec* encoder);
 
 private:
     CurrentTimeGetter m_timeGetter;

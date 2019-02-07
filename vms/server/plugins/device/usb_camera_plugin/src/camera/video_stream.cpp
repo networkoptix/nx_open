@@ -30,12 +30,12 @@ static const char * ffmpegDeviceTypePlatformDependent()
 }
 
 #ifdef _WIN32
-static bool isKeyFrame(const ffmpeg::Packet * packet)
+static bool isKeyFrame(const ffmpeg::Packet* packet)
 {
     if (!packet)
         return false;
 
-    const quint8 * udata = static_cast<const quint8 *>(packet->data());
+    const quint8* udata = static_cast<const quint8*>(packet->data());
 
     FrameTypeExtractor extractor(packet->codecId());
 
@@ -66,26 +66,6 @@ std::string VideoStream::ffmpegUrl() const
     if (auto cam = m_camera.lock())
         return cam->ffmpegUrl();
     return {};
-}
-
-float VideoStream::fps() const
-{
-    return m_codecParams.fps;
-}
-
-float VideoStream::actualFps() const
-{
-    return m_fpsCounter.actualFps > 0 ? m_fpsCounter.actualFps.load() : m_codecParams.fps;
-}
-
-std::chrono::milliseconds VideoStream::timePerFrame() const
-{
-    return std::chrono::milliseconds((int)(1.0f / fps() * kMsecInSec));
-}
-
-std::chrono::milliseconds VideoStream::actualTimePerFrame() const
-{
-    return std::chrono::milliseconds((int)(1.0f / actualFps() * kMsecInSec));
 }
 
 void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
@@ -163,7 +143,6 @@ void VideoStream::run()
         if (!packet)
             continue;
 
-        m_fpsCounter.update(std::chrono::milliseconds(m_timeProvider->millisSinceEpoch()));
         m_packetConsumerManager.pushPacket(packet);
     }
     uninitialize();
