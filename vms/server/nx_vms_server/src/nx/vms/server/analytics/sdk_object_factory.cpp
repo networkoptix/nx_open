@@ -21,6 +21,7 @@
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <api/runtime_info_manager.h>
 
 #include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx_ec/ec_api.h>
@@ -248,6 +249,7 @@ bool SdkObjectFactory::initEngineResources()
             pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
+    QSet<QnUuid> activeEngines;
     std::map<QnUuid, Ptr<IEngine>> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
@@ -320,11 +322,21 @@ bool SdkObjectFactory::initEngineResources()
 
                 continue;
             }
-            engineResource->setStatus(Qn::Online);
+            activeEngines.insert(engineResource->getId());
         }
     }
 
+    updateActiveEngines(activeEngines);
     return true;
+}
+
+void SdkObjectFactory::updateActiveEngines(const QSet<QnUuid> activeEngines)
+{
+    auto runtimeInfoManager = serverModule()->commonModule()->runtimeInfoManager();
+    auto localRuntimeInfo = runtimeInfoManager->localInfo();
+
+    localRuntimeInfo.data.activeAnalyticsEngines = activeEngines;
+    runtimeInfoManager->updateLocalItem(localRuntimeInfo);
 }
 
 nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(

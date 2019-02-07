@@ -30,6 +30,8 @@ private:
     bool initPluginResources();
     bool initEngineResources();
 
+    void updateActiveEngines(const QSet<QnUuid> activeEngines);
+
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,
         const QnUuid& engineId) const;
