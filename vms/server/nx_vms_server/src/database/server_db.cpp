@@ -1227,6 +1227,9 @@ bool QnServerDb::getBookmarksInternal(
         addFilter("start_time + duration  >= ?", (qint64) filter.startTimeMs.count());
     }
 
+    if (filter.sparsing.minVisibleLengthMs.count() > 0)
+        addFilter("duration  >= ?", (qint64) filter.sparsing.minVisibleLengthMs.count());
+
     if (!filter.text.isEmpty())
     {
         const auto getFilterValue =
