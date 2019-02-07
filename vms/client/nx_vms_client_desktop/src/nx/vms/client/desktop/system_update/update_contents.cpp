@@ -222,12 +222,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         alreadyInstalled = false;
 
     auto systemInfo = QnAppInfo::currentSystemInformation();
-    if (nx::update::findPackage(
-            commonModule->moduleGUID(),
-            commonModule->engineVersion(),
-            systemInfo,
-            contents.info,
-            true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)
+    if (nx::update::findPackage(*commonModule, &contents.clientPackage, &errorMessage)
         != nx::update::FindPackageResult::ok)
     {
         NX_ERROR(typeid(UpdateContents))

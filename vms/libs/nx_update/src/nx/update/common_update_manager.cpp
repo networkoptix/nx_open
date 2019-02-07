@@ -2,11 +2,7 @@
 #include <api/global_settings.h>
 #include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
-#include <utils/common/app_info.h>
-#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/assert.h>
-#include <api/runtime_info_manager.h>
-#include <nx/network/socket_global.h>
 #include <nx/update/common_update_installer.h>
 #include <utils/common/synctime.h>
 
@@ -261,23 +257,14 @@ update::FindPackageResult CommonUpdateManager::findPackage(
     update::Package* outPackage,
     QString* outMessage) const
 {
-    return update::findPackage(
-        commonModule()->moduleGUID(),
-        commonModule()->engineVersion(),
-        QnAppInfo::currentSystemInformation(),
-        globalSettings()->targetUpdateInformation(),
-        runtimeInfoManager()->localInfo().data.peer.isClient(),
-        nx::network::SocketGlobals::cloud().cloudHost(),
-        !globalSettings()->cloudSystemId().isEmpty(),
-        outPackage,
-        outMessage);
+    return update::findPackage(*commonModule(), outPackage, outMessage);
 }
 
 bool CommonUpdateManager::deserializedUpdateInformation(update::Information* outUpdateInformation,
     const QString& caller) const
 {
-    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->targetUpdateInformation(),
-        outUpdateInformation, nullptr);
+    const auto deserializeResult = nx::update::fromByteArray(
+        globalSettings()->targetUpdateInformation(), outUpdateInformation, nullptr);
 
     if (deserializeResult != nx::update::FindPackageResult::ok)
     {
