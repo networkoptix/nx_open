@@ -19,7 +19,6 @@ Item
     readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
 
-
     signal requestDrawing()
     signal emptyRoiCleared()
 
@@ -267,6 +266,8 @@ Item
 
             var horizontalRange = 44
             var verticalRange = 32
+            var maxHorizontalValue = horizontalRange - 1
+            var maxVerticalValue = verticalRange - 1
 
             var left = Math.floor(topLeft.x * horizontalRange)
             var right = Math.floor(bottomRight.x * horizontalRange)
@@ -274,15 +275,15 @@ Item
             var bottom = Math.floor(bottomRight.y * verticalRange)
 
             result.correctBounds =
-                left <= horizontalRange
+                left < horizontalRange
                 && right >= 0
-                && top <= verticalRange
+                && top < verticalRange
                 && bottom >= 0
 
             left = result.correctBounds ? Math.max(left, 0) : 0
-            right = result.correctBounds ? Math.min(right, horizontalRange) : horizontalRange
+            right = result.correctBounds ? Math.min(right, maxHorizontalValue) : maxHorizontalValue
             top = result.correctBounds ? Math.max(top, 0) : 0
-            bottom = result.correctBounds ? Math.min(bottom, verticalRange) : verticalRange
+            bottom = result.correctBounds ? Math.min(bottom, maxVerticalValue) : maxVerticalValue
 
             result.filter = JSON.stringify([[
                 { "x": left, "y": top, "width": right - left + 1, "height": bottom - top + 1 }
@@ -343,4 +344,3 @@ Item
         }
     }
 }
-
