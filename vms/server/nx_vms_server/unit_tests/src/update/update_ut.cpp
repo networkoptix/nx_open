@@ -58,9 +58,11 @@ protected:
         setUpdateInformation(participants);
     }
 
-    void thenTargetUpdateInformationShouldBeRetrievable(const QString& versionKey = QString())
+    void thenTargetUpdateInformationShouldBeRetrievable(
+        bool shouldBeEmpty = false,
+        const QString& versionKey = QString())
     {
-        issueAndCheckUpdateInformationRequest(true, versionKey);
+        issueAndCheckUpdateInformationRequest(shouldBeEmpty, versionKey);
     }
 
     void thenInstalledtUpdateInformationShouldBeRetrievable(bool isEmpty)
@@ -197,7 +199,7 @@ protected:
         issueFinishUpdateRequestAndAssertResponse(false, expectedCode);
     }
 
-    void thenFinishUpdateWithignorePendingPeersShouldSucceed()
+    void thenFinishUpdateWithIgnorePendingPeersShouldSucceed()
     {
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
@@ -245,21 +247,21 @@ private:
         }
     }
 
-    void issueAndCheckUpdateInformationrequest(
+    void issueAndCheckUpdateInformationRequest(
         bool shouldBeEmpty = false,
         const QString& versionKey = QString())
     {
         update::Information receivedUpdateInfo;
-        const QString path = "/ec2/updateInformation";
+        QString path = "/ec2/updateInformation";
         if (!versionKey.isNull())
             path += "?version=" + versionKey;
 
         NX_TEST_API_GET(m_peers[0].get(), path, &receivedUpdateInfo);
 
         if (shouldBeEmpty)
-            ASSERT_TRUE(receivedUpdateInfo.isNull());
+            ASSERT_TRUE(receivedUpdateInfo.isEmpty());
         else
-            ASSERT_EQ(m_updateInformation, receivedUpdateInfo);
+            ASSERT_EQ(m_updateInformation.version, receivedUpdateInfo.version);
     }
 
     void setUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())
@@ -739,7 +741,7 @@ TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
     whenServerRestartedWithNewVersion(0);
     whenServerRestartedWithOldVersion(1);
     whenServersConnected();
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+    thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
@@ -757,7 +759,7 @@ TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
 
     thenInstallUpdateWithPeersParameterShouldFail({ peerId(0), peerId(1) });
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0) });
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+    thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
@@ -775,7 +777,7 @@ TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
 
     thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0), peerId(1) });
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0), peerId(1) });
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+    thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_success_installedUpdateInformationSetCorrectly)
@@ -784,16 +786,23 @@ TEST_F(Updates, finishUpdate_success_installedUpdateInformationSetCorrectly)
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
     thenTargetUpdateInformationShouldBeRetrievable();
-    thenTargetUpdateInformationShouldBeRetrievable("target");
-    thenInstalledtUpdateInformationShouldBeRetrievable("installed");
+    thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false, "target");
+    thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true);
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
-        {peerId(1), update::Status::Code::readyToInstall},
-        {peerId(2), update::Status::Code::readyToInstall}};
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall}};
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 
     thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0), peerId(1) });
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0), peerId(1) });
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+
+    whenServersRestartedWithNewVersions();
+
+    thenFinishUpdateShouldSucceed();
+    thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
+    thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
+    thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
 }
+
 } // namespace nx::vms::server::test
