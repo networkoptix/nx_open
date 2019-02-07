@@ -79,7 +79,8 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                 continue
 
             for global_context in global_contexts:
-                process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
+                process_context_structure(cloud_portal, global_context, integration_dict,
+                                          None, current_version, False, False)
 
             integration_dict['id'] = integration.id
             integrations_json.append(integration_dict)
