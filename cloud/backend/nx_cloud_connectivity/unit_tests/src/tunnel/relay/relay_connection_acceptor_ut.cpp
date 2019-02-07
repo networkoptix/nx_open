@@ -132,7 +132,7 @@ private:
         m_listeningPeerConnectionsToRelay.push(std::move(socket));
     }
 
-    std::unique_ptr<nx::cloud::relay::api::Client> createClient(
+    std::unique_ptr<nx::cloud::relay::api::AbstractClient> createClient(
         const nx::utils::Url& relayUrl)
     {
         return std::make_unique<nx::cloud::relay::api::ClientOverHttpUpgrade>(

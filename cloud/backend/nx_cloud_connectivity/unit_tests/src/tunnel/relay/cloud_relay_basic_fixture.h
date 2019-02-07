@@ -34,7 +34,7 @@ private:
     boost::optional<nx::cloud::relay::api::ClientFactory::Function>
         m_clientFactoryBak;
 
-    std::unique_ptr<nx::cloud::relay::api::Client>
+    std::unique_ptr<nx::cloud::relay::api::AbstractClient>
         clientFactoryFunc(const utils::Url & /*relayUrl*/);
 };
 

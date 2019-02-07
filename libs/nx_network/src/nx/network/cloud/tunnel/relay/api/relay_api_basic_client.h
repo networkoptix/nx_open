@@ -11,9 +11,9 @@
 namespace nx::cloud::relay::api {
 
 class NX_NETWORK_API BasicClient:
-    public Client
+    public AbstractClient
 {
-    using base_type = Client;
+    using base_type = AbstractClient;
 
 public:
     BasicClient(

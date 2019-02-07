@@ -20,7 +20,7 @@ ClientFactory& ClientFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<Client> ClientFactory::defaultFactoryFunction(
+std::unique_ptr<AbstractClient> ClientFactory::defaultFactoryFunction(
     const utils::Url& baseUrl)
 {
     using namespace std::placeholders;

@@ -21,7 +21,7 @@ Connector::Connector(
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
     m_relayClient(
-        nx::cloud::relay::api::ClientFactory::instance().create(m_relayUrl))
+        std::make_unique<nx::cloud::relay::api::Client>(m_relayUrl))
 {
     bindToAioThread(getAioThread());
 }

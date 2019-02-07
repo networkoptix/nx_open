@@ -13,7 +13,7 @@
 namespace nx::cloud::relay::api {
 
 using ClientFactoryFunction =
-    std::unique_ptr<Client>(const nx::utils::Url& baseUrl);
+    std::unique_ptr<AbstractClient>(const nx::utils::Url& baseUrl);
 
 /**
  * Always instantiates client type with the highest priority.
@@ -45,7 +45,7 @@ public:
 
 private:
     using InternalFactoryFunction = nx::utils::MoveOnlyFunc<
-        std::unique_ptr<Client>(const nx::utils::Url&, ClientFeedbackFunction)>;
+        std::unique_ptr<AbstractClient>(const nx::utils::Url&, ClientFeedbackFunction)>;
 
     struct ClientTypeContext
     {
@@ -57,7 +57,7 @@ private:
     QnMutex m_mutex;
     int m_prevUsedTypeId = 0;
 
-    std::unique_ptr<Client> defaultFactoryFunction(
+    std::unique_ptr<AbstractClient> defaultFactoryFunction(
         const nx::utils::Url& baseUrl);
 
     void processClientFeedback(int typeId, ResultCode resultCode);

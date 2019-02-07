@@ -76,7 +76,7 @@ void OutgoingTunnelConnection::establishNewConnection(
                     relayClient.reset();
             }
             if (!relayClient)
-                relayClient = nx::cloud::relay::api::ClientFactory::instance().create(m_relayUrl);
+                relayClient = std::make_unique<nx::cloud::relay::api::Client>(m_relayUrl);
 
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(

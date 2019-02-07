@@ -42,7 +42,7 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
-            m_relayClient = api::ClientFactory::instance().create(relay().basicUrl());
+            m_relayClient = std::make_unique<api::Client>(relay().basicUrl());
         return *m_relayClient;
     }
 

@@ -96,7 +96,7 @@ private:
     const std::string m_serverId;
     nx::network::http::AsyncClient m_httpClient;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>> m_responseQueue;
-    std::unique_ptr<api::Client> m_relayClient;
+    std::unique_ptr<api::AbstractClient> m_relayClient;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_serverToClientConnection;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_clientToServerConnection;
 

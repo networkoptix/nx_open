@@ -19,7 +19,7 @@ public:
     virtual ~AbstractClientTypeHolder() = default;
 
     virtual void registerType(api::ClientFactory* factory) const = 0;
-    virtual bool isSameType(api::Client* client) const = 0;
+    virtual bool isSameType(api::AbstractClient* client) const = 0;
 };
 
 template<typename T>
@@ -32,7 +32,7 @@ public:
         factory->registerClientType<T>();
     }
 
-    virtual bool isSameType(api::Client* client) const override
+    virtual bool isSameType(api::AbstractClient* client) const override
     {
         return dynamic_cast<T*>(client) != nullptr;
     }
@@ -218,7 +218,7 @@ protected:
 private:
     const nx::utils::Url m_relayUrl;
     api::ClientFactory m_factory;
-    std::unique_ptr<api::Client> m_client;
+    std::unique_ptr<api::AbstractClient> m_client;
     std::deque<std::unique_ptr<AbstractClientTypeHolder>> m_clientTypes;
     int m_operationalClientTypeId = -1;
     int m_remeberedClientTypeIndex = -1;
