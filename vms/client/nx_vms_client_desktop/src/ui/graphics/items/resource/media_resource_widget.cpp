@@ -2088,6 +2088,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         codecString = codecContext->getCodecName();
 
     QString hqLqString;
+    QString protocolString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
     {
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
@@ -2099,12 +2100,12 @@ QString QnMediaResourceWidget::calculateDetailsText() const
             {
                 case nx::network::Protocol::udt:
                     // aka UDP hole punching.
-                    hqLqString += " (N)";
+                    protocolString = " (N)";
                     break;
 
                 case nx::network::cloud::Protocol::relay:
                     // relayed connection (aka proxy).
-                    hqLqString += " (P)";
+                    protocolString = " (P)";
                     break;
 
                 default:
@@ -2117,22 +2118,29 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     static const int kDetailsTextPixelSize = 11;
 
     QString result;
+    const auto addDetailsString =
+		[&result](const QString& value)
+        {
+            if (!value.isEmpty())
+                result.append(htmlFormattedParagraph(value, kDetailsTextPixelSize, /*bold*/ true));
+        };
+
     if (hasVideo())
     {
         const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
         const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
         const QSize actualResolution = Geometry::cwiseMul(channelResolution, videoLayout);
 
-        result.append(
-            htmlFormattedParagraph(
-                lit("%1x%2").arg(actualResolution.width()).arg(actualResolution.height()),
-                kDetailsTextPixelSize,
-                true));
-        result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
+        addDetailsString(QString("%1x%2")
+			.arg(actualResolution.width())
+			.arg(actualResolution.height()));
+        addDetailsString(QString("%1fps").arg(fps, 0, 'f', 2));
     }
-    result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
-    result.append(htmlFormattedParagraph(codecString, kDetailsTextPixelSize, true));
-    result.append(htmlFormattedParagraph(hqLqString, kDetailsTextPixelSize, true));
+
+    const QString bandwidthString = QString("%1Mbps").arg(mbps, 0, 'f', 2);
+    addDetailsString(bandwidthString + protocolString);
+    addDetailsString(codecString);
+    addDetailsString(hqLqString);
 
     return result;
 }
