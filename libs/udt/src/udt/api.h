@@ -92,7 +92,7 @@ public:
 
     int m_multiplexerId;                             // multiplexer ID
 
-    pthread_mutex_t m_ControlLock;            // lock this socket exclusively for control APIs: bind/listen/connect
+    std::mutex m_ControlLock;            // lock this socket exclusively for control APIs: bind/listen/connect
 
 private:
     CUDTSocket(const CUDTSocket&);
@@ -177,6 +177,7 @@ public:
     int listen(const UDTSOCKET u, int backlog);
     UDTSOCKET accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen);
     int connect(const UDTSOCKET u, const sockaddr* name, int namelen);
+    int shutdown(const UDTSOCKET u, int how);
     int close(const UDTSOCKET u);
     int getpeername(const UDTSOCKET u, sockaddr* name, int* namelen);
     int getsockname(const UDTSOCKET u, sockaddr* name, int* namelen);
@@ -218,9 +219,9 @@ private:
 private:
     std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_Sockets;       // stores all the socket structures
 
-    pthread_mutex_t m_ControlLock;                    // used to synchronize UDT API
+    std::mutex m_ControlLock;                    // used to synchronize UDT API
 
-    pthread_mutex_t m_IDLock;                         // used to synchronize ID generation
+    std::mutex m_IDLock;                         // used to synchronize ID generation
     UDTSOCKET m_SocketID;                             // seed to generate a new unique socket ID
 
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
@@ -254,7 +255,7 @@ private:
     std::mutex m_GCStopLock;
     std::condition_variable m_GCStopCond;
 
-    pthread_mutex_t m_InitLock;
+    std::mutex m_InitLock;
     int m_iInstanceCount;                // number of startup() called by application
     bool m_bGCStatus;                    // if the GC thread is working (true)
 
