@@ -1,5 +1,6 @@
 {
     "__comment__": [
+    "Version number is global.",
     "Get width from here:                                            ",
     "http://en.wikipedia.org/wiki/Image_sensor_format                ",
     "Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          ",
@@ -15,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0",
+    "version": "1.0.1.10",
     "data": [
         {
             "keys": [
