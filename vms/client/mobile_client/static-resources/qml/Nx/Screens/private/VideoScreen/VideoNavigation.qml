@@ -729,6 +729,42 @@ Item
 
             opacity: d.controlsOpacity
 
+            ChunkPositionWatcher
+            {
+                id: chunkPositionWatcher
+                motionSearchMode: videoNavigation.motionSearchMode
+                position: timeline.position
+                chunkProvider: timeline.chunkProvider
+            }
+
+            PlaybackJumpButton
+            {
+                forward: false
+                visible: d.hasArchive && videoNavigation.canViewArchive
+                anchors.right: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: 8
+
+                onClicked:
+                {
+                    videoScreenController.setPosition(chunkPositionWatcher.prevChunkStartTimeMs())
+                }
+            }
+
+            PlaybackJumpButton
+            {
+                enabled: !d.liveMode
+                visible: d.hasArchive && videoNavigation.canViewArchive
+                anchors.left: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 8
+
+                onClicked:
+                {
+                    videoScreenController.setPosition(chunkPositionWatcher.nextChunkStartTimeMs())
+                }
+            }
+
             onClicked:
             {
                 if (paused)
