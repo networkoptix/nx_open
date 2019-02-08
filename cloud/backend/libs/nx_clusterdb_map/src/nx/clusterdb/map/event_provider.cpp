@@ -4,7 +4,7 @@
 
 namespace nx::clusterdb::map {
 
-void EventProvider::subsribeToRecordInserted(
+void EventProvider::subscribeToRecordInserted(
     InsertTriggerHandler insertTriggerHandler,
     nx::utils::SubscriptionId* const subscriptionId)
 {

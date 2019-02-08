@@ -21,7 +21,7 @@ using RemoveTriggerhandler = nx::utils::MoveOnlyFunc<void(
 class NX_KEY_VALUE_DB_API EventProvider
 {
 public:
-    void subsribeToRecordInserted(
+    void subscribeToRecordInserted(
         InsertTriggerHandler insertTriggerHandler,
         nx::utils::SubscriptionId* const subscriptionId);
 
