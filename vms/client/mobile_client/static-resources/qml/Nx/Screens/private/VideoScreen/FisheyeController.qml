@@ -45,7 +45,7 @@ Object
 
         function updateZoom(x, y, scale)
         {
-            interactor.updateZoom(x, y, Math.log(scale) / Math.LN2, false)
+            interactor.updateZoom(x, y, Math.log(scale) / Math.LN2)
         }
     }
 
@@ -204,7 +204,7 @@ Object
                 var deltaPower = wheel.angleDelta.y * kSensitivity / 1.0e5
 
                 interactor.startZoom(wheel.x, wheel.y)
-                interactor.updateZoom(wheel.x, wheel.y, deltaPower, true)
+                interactor.updateZoom(wheel.x, wheel.y, deltaPower)
 
                 if (mouseAreaHandler.draggingStarted)
                     interactor.startRotation()

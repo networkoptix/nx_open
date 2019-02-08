@@ -104,7 +104,7 @@ void makeShortVibration()
     if (!vibrator.isValid())
         return;
 
-    static constexpr jlong kDuration = 100;
+    static constexpr jlong kDuration = 20;
     vibrator.callMethod<void>("vibrate", "(J)V", kDuration);
 }
 

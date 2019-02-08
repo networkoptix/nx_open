@@ -77,6 +77,6 @@ void setKeepScreenOn(bool keepScreenOn) {
 
 void makeShortVibration()
 {
-    static constexpr int kShortVibrationId = 1520;
+    static constexpr int kShortVibrationId = 1519;
     AudioServicesPlaySystemSound(kShortVibrationId);
 }
