@@ -1,3 +1,4 @@
+#include <list>
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -208,9 +209,14 @@ protected:
         notification.request->requestLine.version = {"unknown", "unknown"};
 
         m_notificationBuffers.push_back(notification.toString());
+        std::promise<SystemError::ErrorCode> done;
         m_serverConnection->sendAsync(
             m_notificationBuffers.back(),
-            [](SystemError::ErrorCode, std::size_t) {});
+            [this, &done](SystemError::ErrorCode result, std::size_t)
+            {
+                m_serverConnection->post([&done, result]() { done.set_value(result); });
+            });
+        ASSERT_EQ(SystemError::noError, done.get_future().get());
     }
 
     void whenRelayActivatesConnection()
@@ -323,7 +329,7 @@ private:
     utils::SyncQueue<SystemError::ErrorCode> m_activateConnectionResult;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_serverConnection;
     nx::network::SocketAddress m_clientEndpoint;
-    std::vector<nx::Buffer> m_notificationBuffers;
+    std::list<nx::Buffer> m_notificationBuffers;
     std::unique_ptr<detail::ReverseConnection> m_connection;
 
     virtual void SetUp() override
