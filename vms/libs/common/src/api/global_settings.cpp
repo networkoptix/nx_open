@@ -681,8 +681,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRemoteArchiveSynchronizationThreadsDefault,
         this);
 
-    m_updateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
-        kUpdateInformationName,
+    m_targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kTargetUpdateInformationName,
+        QByteArray(),
+        this);
+
+    m_installedUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kInstalledUpdateInformationName,
         QByteArray(),
         this);
 
@@ -877,10 +882,17 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_updateInformationAdaptor,
+        m_targetUpdateInformationAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
-        &QnGlobalSettings::updateInformationChanged,
+        &QnGlobalSettings::targetUpdateInformationChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_installedUpdateInformationAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::installedUpdateInformationChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -922,7 +934,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_cloudConnectRelayingEnabledAdaptor
         << m_edgeRecordingEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
-        << m_updateInformationAdaptor
+        << m_targetUpdateInformationAdaptor
+        << m_installedUpdateInformationAdaptor
         << m_maxWearableArchiveSynchronizationThreads
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
@@ -1681,14 +1694,24 @@ void QnGlobalSettings::setEdgeRecordingEnabled(bool enabled)
     m_edgeRecordingEnabledAdaptor->setValue(enabled);
 }
 
-QByteArray QnGlobalSettings::updateInformation() const
+QByteArray QnGlobalSettings::targetUpdateInformation() const
 {
-    return m_updateInformationAdaptor->value();
+    return m_targetUpdateInformationAdaptor->value();
 }
 
-void QnGlobalSettings::setUpdateInformation(const QByteArray& updateInformation)
+void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInformation)
 {
-    m_updateInformationAdaptor->setValue(updateInformation);
+    m_targetUpdateInformationAdaptor->setValue(updateInformation);
+}
+
+QByteArray QnGlobalSettings::installedUpdateInformation() const
+{
+    return m_installedUpdateInformationAdaptor->value();
+}
+
+void QnGlobalSettings::setInstalledUpdateInformation(const QByteArray& updateInformation)
+{
+    m_installedUpdateInformationAdaptor->setValue(updateInformation);
 }
 
 FileToPeerList QnGlobalSettings::downloaderPeers() const

@@ -676,12 +676,7 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
-    nx::update::findPackage(
-        commonModule()->moduleGUID(),
-        commonModule()->engineVersion(),
-        systemInfo,
-        m_updateManifest,
-        /*isClient=*/true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
+    nx::update::findPackage(*commonModule(), &contents.clientPackage, &errorMessage);
     // TODO: Should move this to Widget somehow.
     verifyUpdateManifest(contents, {});
     return contents;

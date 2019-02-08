@@ -100,7 +100,8 @@ const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
 const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
 const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
-static const QString kUpdateInformationName = lit("updateInformation");
+static const QString kTargetUpdateInformationName = lit("targetUpdateInformation");
+static const QString kInstalledUpdateInformationName = lit("installedUpdateInformation");
 static const QString kDownloaderPeersName = lit("downloaderPeers");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
@@ -343,8 +344,11 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
-    QByteArray updateInformation() const;
-    void setUpdateInformation(const QByteArray& updateInformation);
+    QByteArray targetUpdateInformation() const;
+    void setTargetUpdateInformation(const QByteArray& updateInformation);
+
+    QByteArray installedUpdateInformation() const;
+    void setInstalledUpdateInformation(const QByteArray& updateInformation);
 
     FileToPeerList downloaderPeers() const;
     void setdDownloaderPeers(const FileToPeerList& downloaderPeers);
@@ -396,7 +400,8 @@ signals:
     void timeSynchronizationSettingsChanged();
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
-    void updateInformationChanged();
+    void targetUpdateInformationChanged();
+    void installedUpdateInformationChanged();
     void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
@@ -516,7 +521,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
-    QnResourcePropertyAdaptor<QByteArray>* m_updateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_targetUpdateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_installedUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
