@@ -60,9 +60,6 @@ Yunhong Gu, last updated 01/01/2011
 using namespace std;
 
 
-static const int MILLIS_IN_SEC = 1000;
-static const int NSEC_IN_MS = 1000;
-
 CEPoll::CEPoll():
     m_iIDSeed(0)
 {

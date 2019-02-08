@@ -2770,7 +2770,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
 
 void ServerSideConnectionAcceptor::addEPoll(
     const int eid,
-    int eventsToReport)
+    int /*eventsToReport*/)
 {
     CGuard lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
     m_pollIds.insert(eid);

@@ -795,7 +795,7 @@ CRcvQueue::CRcvQueue(
     int size,
     int payload,
     int ipVersion,
-    int hsize,
+    int /*hsize*/,
     UdpChannel* c,
     CTimer* t)
     :
