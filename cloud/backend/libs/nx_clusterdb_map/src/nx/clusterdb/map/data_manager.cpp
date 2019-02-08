@@ -45,7 +45,7 @@ DataManager::DataManager(
         .registerCommandHandler<command::SaveKeyValuePair>(
             [this](auto&&... args)
             {
-                saveRecievedRecord(std::forward<decltype(args)>(args)...);
+                insertOrUpdateReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
             });
 
@@ -53,7 +53,7 @@ DataManager::DataManager(
         .registerCommandHandler<command::RemoveKeyValuePair>(
             [this](auto&&... args)
             {
-                removeRecievedRecord(std::forward<decltype(args)>(args)...);
+                removeReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
             });
 }
@@ -171,7 +171,7 @@ void DataManager::removeFromDb(
             queryContext, m_systemId, Key{key});
 }
 
-void DataManager::saveRecievedRecord(
+void DataManager::insertOrUpdateReceivedRecord(
     nx::sql::QueryContext* queryContext,
     const std::string& /*systemId*/,
     clusterdb::engine::Command<KeyValuePair> command)
@@ -180,7 +180,7 @@ void DataManager::saveRecievedRecord(
     m_eventProvider->notifyRecordInserted(queryContext, command.params.key, command.params.value);
 }
 
-void DataManager::removeRecievedRecord(
+void DataManager::removeReceivedRecord(
     nx::sql::QueryContext* queryContext,
     const std::string& /*systemId*/,
     clusterdb::engine::Command<Key> command)

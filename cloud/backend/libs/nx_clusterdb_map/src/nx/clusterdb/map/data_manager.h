@@ -97,7 +97,7 @@ private:
     /**
      * Synchronizes incoming save operation from another node
      */
-    void saveRecievedRecord(
+    void insertOrUpdateReceivedRecord(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         nx::clusterdb::engine::Command<KeyValuePair> command);
@@ -105,7 +105,7 @@ private:
     /**
      * Synchronizes incoming remove operation from another node
      */
-    void removeRecievedRecord(
+    void removeReceivedRecord(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         nx::clusterdb::engine::Command<Key> command);
