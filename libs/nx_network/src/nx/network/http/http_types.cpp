@@ -232,6 +232,13 @@ StringType toString(Value val)
             return StringType("See Other");
         case notModified:
             return StringType("Not Modified");
+        case useProxy:
+            return StringType("Use Proxy");
+        case temporaryRedirect:
+            return StringType("Temporary Redirect");
+        case permanentRedirect:
+            return StringType("Permanent Redirect");
+
         case badRequest:
             return StringType("Bad Request");
         case unauthorized:

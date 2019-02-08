@@ -5,9 +5,9 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/type_utils.h>
 
-#include "relay_api_http_paths.h"
+#include "../relay_api_http_paths.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 BasicClient::BasicClient(
     const nx::utils::Url& baseUrl,
@@ -138,4 +138,4 @@ void BasicClient::giveFeedback(ResultCode resultCode)
         m_feedbackFunction(resultCode);
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

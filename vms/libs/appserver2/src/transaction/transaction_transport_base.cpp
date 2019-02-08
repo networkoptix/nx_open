@@ -123,7 +123,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connected = false;
     m_prevGivenHandlerID = 0;
     m_credentialsSource = CredentialsSource::serverKey;
-    m_postedTranCount = 0;
     m_asyncReadScheduled = false;
     m_remoteIdentityTime = 0;
     m_connectionType = ConnectionType::none;
@@ -319,6 +318,11 @@ void QnTransactionTransportBase::stopWhileInAioThread()
     m_outgoingTranClient.reset();
     m_outgoingDataSocket.reset();
     m_incomingDataSocket.reset();
+}
+
+void QnTransactionTransportBase::setReceivedTransactionsQueueControlEnabled(bool value)
+{
+    m_receivedTransactionsQueueControlEnabled = value;
 }
 
 void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
@@ -711,7 +715,11 @@ void QnTransactionTransportBase::onSomeBytesRead(
     }
 
     if (m_state >= QnTransactionTransportBase::Closed)
+    {
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG, lm("Connection to %1 is closed. Not reading anymore")
+            .args(m_remotePeer.id.toString()));
         return;
+    }
 
     NX_ASSERT(m_state == ReadyForStreaming);
 
@@ -725,8 +733,14 @@ void QnTransactionTransportBase::onSomeBytesRead(
 
     m_readBuffer.resize(0);
 
-    if (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME)
+    if (m_receivedTransactionsQueueControlEnabled &&
+        m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME)
+    {
+        NX_VERBOSE(this, lm("There are already %1 transactions posted. "
+            "Suspending receiving new transactions until pending transactions are processed")
+            .args(m_postedTranCount));
         return; //not reading futher while that much transactions are not processed yet
+    }
 
     m_readBuffer.reserve(m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE);
     scheduleAsyncRead();
@@ -799,7 +813,8 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
     if (watcher.objectDestroyed())
         return; //connection has been removed by handler
 
-    ++m_postedTranCount;
+    if (m_receivedTransactionsQueueControlEnabled)
+        ++m_postedTranCount;
 }
 
 bool QnTransactionTransportBase::hasUnsendData() const
@@ -845,6 +860,9 @@ void QnTransactionTransportBase::receivedTransaction(
 
 void QnTransactionTransportBase::transactionProcessed()
 {
+    if (!m_receivedTransactionsQueueControlEnabled)
+        return;
+
     post(
         [this]()
         {
@@ -913,12 +931,18 @@ void QnTransactionTransportBase::waitForNewTransactionsReady()
 {
     QnMutexLocker lk(&m_mutex);
 
-    if (m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME && m_state >= ReadyForStreaming)
+    auto postedTranQueueIsReady =
+        [this]()
+        {
+            return !m_receivedTransactionsQueueControlEnabled ||
+                m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME;
+        };
+
+    if (postedTranQueueIsReady() && m_state >= ReadyForStreaming)
         return;
 
     //waiting for some transactions to be processed
-    while ((m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME && m_state != Closed) ||
-        m_state < ReadyForStreaming)
+    while ((!postedTranQueueIsReady() && m_state != Closed) || m_state < ReadyForStreaming)
     {
         m_cond.wait(lk.mutex());
     }

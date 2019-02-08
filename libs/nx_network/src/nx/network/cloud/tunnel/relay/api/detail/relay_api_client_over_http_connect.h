@@ -2,7 +2,7 @@
 
 #include "relay_api_client_over_http_upgrade.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API ClientOverHttpConnect:
     public ClientOverHttpUpgrade
@@ -24,4 +24,4 @@ private:
         BeginListeningHandler completionHandler);
 };
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

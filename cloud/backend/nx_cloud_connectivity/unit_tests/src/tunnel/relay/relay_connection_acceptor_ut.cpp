@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_upgrade.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/http/test_http_server.h>
@@ -23,7 +23,7 @@ public:
     RelayTest()
     {
         m_factoryFunctionBak =
-            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+            nx::cloud::relay::api::detail::ClientFactory::instance().setCustomFunc(
                 [this](auto&&... args) { return createClient(std::move(args)...); });
 
         setKeepAliveReported(true);
@@ -33,7 +33,7 @@ public:
     {
         if (m_factoryFunctionBak)
         {
-            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+            nx::cloud::relay::api::detail::ClientFactory::instance().setCustomFunc(
                 std::move(*m_factoryFunctionBak));
             m_factoryFunctionBak = std::nullopt;
         }
@@ -98,7 +98,7 @@ private:
     nx::network::http::TestHttpServer m_testHttpServer;
     nx::utils::Url m_relayServerUrl;
     api::BeginListeningResponse m_beginListeningResponse;
-    std::optional<nx::cloud::relay::api::ClientFactory::Function> m_factoryFunctionBak;
+    std::optional<nx::cloud::relay::api::detail::ClientFactory::Function> m_factoryFunctionBak;
 
     void processIncomingConnection(
         nx::network::http::RequestContext requestContext,
@@ -132,10 +132,10 @@ private:
         m_listeningPeerConnectionsToRelay.push(std::move(socket));
     }
 
-    std::unique_ptr<nx::cloud::relay::api::Client> createClient(
+    std::unique_ptr<nx::cloud::relay::api::AbstractClient> createClient(
         const nx::utils::Url& relayUrl)
     {
-        return std::make_unique<nx::cloud::relay::api::ClientOverHttpUpgrade>(
+        return std::make_unique<nx::cloud::relay::api::detail::ClientOverHttpUpgrade>(
             relayUrl, nullptr);
     }
 };

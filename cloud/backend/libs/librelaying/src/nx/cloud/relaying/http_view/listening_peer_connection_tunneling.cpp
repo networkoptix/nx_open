@@ -40,7 +40,7 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     const nx::network::http::RequestContext* requestContext,
     CompletionHandler completionHandler)
 {
-    const auto serverId = 
+    const auto serverId =
         requestContext->requestPathParams.getByName(relay::api::kServerIdName);
     if (serverId.empty())
     {

@@ -26,7 +26,7 @@ void ExperimentalTunnelClient::bindToAioThread(
         m_downChannelHttpClient->bindToAioThread(aioThread);
     if (m_upChannelHttpClient)
         m_upChannelHttpClient->bindToAioThread(aioThread);
-    
+
     if (m_downChannel)
         m_downChannel->bindToAioThread(aioThread);
     if (m_upChannel)
@@ -64,6 +64,7 @@ void ExperimentalTunnelClient::openTunnel(
 void ExperimentalTunnelClient::initiateDownChannel()
 {
     m_downChannelHttpClient = std::make_unique<AsyncClient>();
+    m_downChannelHttpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
         m_downChannelHttpClient->setResponseReadTimeout(*m_timeout);
@@ -191,8 +192,8 @@ void ExperimentalTunnelClient::prepareOpenUpChannelRequest()
     HttpHeaders headers;
 
     headers.emplace("Content-Type", "application/octet-stream");
-    // TODO: #ak HttpServerConnection currently does not support 
-    // streaming request body. So, it notifies handler only when 
+    // TODO: #ak HttpServerConnection currently does not support
+    // streaming request body. So, it notifies handler only when
     // the whole message has been received.
     //headers.emplace("Content-Length", "10000000000");
     headers.emplace("Content-Length", "0");

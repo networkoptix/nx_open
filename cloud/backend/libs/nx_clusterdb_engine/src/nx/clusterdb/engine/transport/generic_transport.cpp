@@ -100,10 +100,6 @@ void GenericTransport::sendTransaction(
     CommandTransportHeader transportHeader,
     const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer)
 {
-    transportHeader.vmsTransportHeader.fillSequence(
-        m_localPeer.id,
-        m_localPeer.instanceId);
-
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
@@ -116,8 +112,8 @@ void GenericTransport::sendTransaction(
                 return;
             }
 
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing send transaction %1 to %2")
-                .args(transactionSerializer->header().command,
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing sending command %1 to %2")
+                .args(engine::toString(transactionSerializer->header()),
                     m_commonTransportHeaderOfRemoteTransaction));
 
             //cannot send transaction right now: updating local transaction sequence
@@ -303,17 +299,16 @@ void GenericTransport::onTransactionsReadFromLog(
     // So, here we need to unite sets m_remotePeerTranState and readedUpTo.
     m_remotePeerTranState = readedUpTo;
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
-        lm("systemId %1. Synchronize to (%2), already synchronized to (%3)")
-        .args(m_systemId, stateToString(m_tranStateToSynchronizeTo),
-            stateToString(m_remotePeerTranState)));
-
-    // TODO: #ak Instead of m_tranStateToSynchronizeTo > m_remotePeerTranState we should check
-    // if m_tranStateToSynchronizeTo contains something that is missing in m_remotePeerTranState.
-    if (resultCode == ResultCode::partialContent
-        || m_tranStateToSynchronizeTo > m_remotePeerTranState)
+    if (resultCode == ResultCode::partialContent ||
+        m_tranStateToSynchronizeTo.containsDataMissingIn(m_remotePeerTranState))
     {
-        NX_ASSERT(!m_prevReadResult || (*m_prevReadResult < readedUpTo));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("systemId %1. Synchronize to (%2), already synchronized to (%3)")
+            .args(m_systemId, stateToString(m_tranStateToSynchronizeTo),
+                stateToString(m_remotePeerTranState)));
+
+        // Asserting that something new has been read.
+        NX_ASSERT(!m_prevReadResult || readedUpTo.containsDataMissingIn(*m_prevReadResult));
         m_prevReadResult = readedUpTo;
 
         // Local state could have been updated while we were synchronizing remote peer
@@ -327,8 +322,14 @@ void GenericTransport::onTransactionsReadFromLog(
             [this](auto&&... args) { onTransactionsReadFromLog(std::move(args)...); });
         return;
     }
+    else
+    {
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. "
+            "Done initial synchronization to (%2)")
+                .args(m_systemId, stateToString(m_remotePeerTranState)));
+    }
 
-    // Sending transactions to remote peer is allowed now
+    // Sending transactions to remote peer is allowed now.
     enableOutputChannel();
 }
 

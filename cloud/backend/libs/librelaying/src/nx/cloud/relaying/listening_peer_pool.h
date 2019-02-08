@@ -20,24 +20,16 @@
 #include <nx/utils/time.h>
 
 #include "detail/statistics_calculator.h"
+#include "listening_peer_connection_watcher.h"
 #include "settings.h"
 #include "statistics.h"
 
-namespace nx {
-namespace cloud {
-namespace relaying {
+namespace nx::cloud::relaying {
 
 using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
     void(relay::api::ResultCode,
         std::unique_ptr<network::AbstractStreamSocket> socket,
         std::string /*peerName*/)>;
-
-struct ClientInfo
-{
-    std::string relaySessionId;
-    network::SocketAddress endpoint;
-    std::string peerName;
-};
 
 class NX_RELAYING_API AbstractListeningPeerPool
 {
@@ -126,8 +118,8 @@ private:
 
     struct ConnectionContext
     {
-        std::unique_ptr<network::AbstractStreamSocket> connection;
-        nx::Buffer readBuffer;
+        nx::network::SocketAddress peerEndpoint;
+        std::unique_ptr<ListeningPeerConnectionWatcher> connectionWatcher;
     };
 
     struct ConnectionAwaitContext
@@ -189,12 +181,6 @@ private:
         const std::string& peerName,
         ConnectionContext* connectionContext);
 
-    void onConnectionReadCompletion(
-        const std::string& peerName,
-        ConnectionContext* connectionContext,
-        SystemError::ErrorCode sysErrorCode,
-        std::size_t bytesRead);
-
     void closeConnection(
         const std::string& peerName,
         ConnectionContext* connectionContext,
@@ -244,6 +230,4 @@ private:
         const Settings& settings);
 };
 
-} // namespace relaying
-} // namespace cloud
-} // namespace nx
+} // namespace nx::cloud::relaying

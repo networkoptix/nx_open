@@ -6,14 +6,14 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/type_utils.h>
 
-#include "relay_api_client.h"
+#include "../relay_api_client.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API BasicClient:
-    public Client
+    public AbstractClient
 {
-    using base_type = Client;
+    using base_type = AbstractClient;
 
 public:
     BasicClient(
@@ -243,4 +243,4 @@ void BasicClient::executeRequest(
         });
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail
