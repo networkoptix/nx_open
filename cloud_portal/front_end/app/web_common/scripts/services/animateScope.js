@@ -168,6 +168,8 @@ angular.module('nxCommon')
                 defaultScope.$apply();
             }*/
             if(updationLimit!==0) {
+                // Offset self call soplayer will have time to process video
+                // Safari is the problem ... also mobile devices will be more responsive -- TT
                 setTimeout(function () {
                     window.animationFrame(animationFunction);
                     if (updationLimit) {
