@@ -97,12 +97,12 @@ protected:
         whenInsertKeyValuePair();
 
         thenEventTriggered();
-        andEventRecievedKeyMatchesInsertionKey();
-        andEventRecievedValueMatchesInsertionValue();
+        andEventReceivedKeyMatchesInsertionKey();
+        andEventReceivedValueMatchesInsertionValue();
 
         m_eventTriggered = false;
-        m_eventRecievedKey.clear();
-        m_eventRecievedValue.clear();
+        m_eventReceivedKey.clear();
+        m_eventReceivedValue.clear();
     }
 
     void givenRecordRemovedEventWasAlreadyTriggered()
@@ -114,10 +114,10 @@ protected:
 
         thenOperationSucceeded();
         thenEventTriggered();
-        andEventRecievedKeyMatchesRemovalKey();
+        andEventReceivedKeyMatchesRemovalKey();
 
         m_eventTriggered = false;
-        m_eventRecievedKey.clear();
+        m_eventReceivedKey.clear();
     }
 
     void whenInsertKeyValuePair(size_t dbIndex = 0, size_t randomPairIndex = 0)
@@ -178,8 +178,8 @@ protected:
             [this](nx::sql::QueryContext* /*queryContext*/, std::string key, std::string value)
             {
                 m_eventTriggered = true;
-                m_eventRecievedKey = key;
-                m_eventRecievedValue = value;
+                m_eventReceivedKey = key;
+                m_eventReceivedValue = value;
             },
             &m_eventSubscriptionId);
     }
@@ -190,7 +190,7 @@ protected:
             [this](nx::sql::QueryContext* /*queryContext*/, std::string key)
             {
                 m_eventTriggered = true;
-                m_eventRecievedKey = key;
+                m_eventReceivedKey = key;
             },
             &m_eventSubscriptionId);
     }
@@ -271,29 +271,29 @@ protected:
         ASSERT_NE(oldValue, m_fetchedValue);
     }
 
-    void andEventRecievedKeyMatchesInsertionKey()
+    void andEventReceivedKeyMatchesInsertionKey()
     {
-        ASSERT_EQ(m_eventRecievedKey, randomPair()->key);
+        ASSERT_EQ(m_eventReceivedKey, randomPair()->key);
     }
 
-    void andEventRecievedKeyMatchesRemovalKey()
+    void andEventReceivedKeyMatchesRemovalKey()
     {
-        ASSERT_EQ(m_eventRecievedKey, randomPair()->key);
+        ASSERT_EQ(m_eventReceivedKey, randomPair()->key);
     }
 
-    void andEventRecievedValueMatchesInsertionValue()
+    void andEventReceivedValueMatchesInsertionValue()
     {
-        ASSERT_EQ(m_eventRecievedValue, randomPair()->value);
+        ASSERT_EQ(m_eventReceivedValue, randomPair()->value);
     }
 
-    void andEventRecievedKeyDoesNotMatchInsertionKey()
+    void andEventReceivedKeyDoesNotMatchInsertionKey()
     {
-        ASSERT_NE(m_eventRecievedKey, randomPair()->key);
+        ASSERT_NE(m_eventReceivedKey, randomPair()->key);
     }
 
-    void andEventRecievedKeyDoesNotMatchRemovalKey()
+    void andEventReceivedKeyDoesNotMatchRemovalKey()
     {
-        ASSERT_NE(m_eventRecievedKey, randomPair()->key);
+        ASSERT_NE(m_eventReceivedKey, randomPair()->key);
     }
 
 private:
@@ -373,8 +373,8 @@ private:
 
     nx::utils::SubscriptionId m_eventSubscriptionId = nx::utils::kInvalidSubscriptionId;
     std::atomic_bool m_eventTriggered = false;
-    std::string m_eventRecievedKey;
-    std::string m_eventRecievedValue;
+    std::string m_eventReceivedKey;
+    std::string m_eventReceivedValue;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -471,7 +471,7 @@ TEST_F(Database, eventprovider_triggers_record_inserted_event)
     givenEmptyDb();
     givenRandomKeyValuePair();
     whenSubscribeToRecordInsertedEvent();
-    whenInsertKeyValuePair();    thenOperationSucceeded();    thenEventTriggered();    andEventRecievedKeyMatchesInsertionKey();    andEventRecievedValueMatchesInsertionValue();
+    whenInsertKeyValuePair();    thenOperationSucceeded();    thenEventTriggered();    andEventReceivedKeyMatchesInsertionKey();    andEventReceivedValueMatchesInsertionValue();
 }
 
 TEST_F(Database, eventprovider_triggers_record_removed_event)
@@ -483,7 +483,7 @@ TEST_F(Database, eventprovider_triggers_record_removed_event)
     thenOperationSucceeded();
     thenEventTriggered();
 
-    andEventRecievedKeyMatchesRemovalKey();
+    andEventReceivedKeyMatchesRemovalKey();
 }
 
 TEST_F(Database, eventprovider_does_not_trigger_record_inserted_event_after_unsubscribing)
@@ -494,7 +494,7 @@ TEST_F(Database, eventprovider_does_not_trigger_record_inserted_event_after_unsu
     whenInsertKeyValuePair();
 
     thenEventIsNotTriggered();
-    andEventRecievedKeyDoesNotMatchInsertionKey();
+    andEventReceivedKeyDoesNotMatchInsertionKey();
 }
 
 TEST_F(Database, eventprovider_does_not_trigger_record_removed_event_after_unsubscribing)
@@ -505,7 +505,7 @@ TEST_F(Database, eventprovider_does_not_trigger_record_removed_event_after_unsub
     whenRemoveKey();
 
     thenEventIsNotTriggered();
-    andEventRecievedKeyDoesNotMatchRemovalKey();
+    andEventReceivedKeyDoesNotMatchRemovalKey();
 }
 
 TEST_F(Database, DISABLED_multiple_databases_synchronize_insert_operation)
