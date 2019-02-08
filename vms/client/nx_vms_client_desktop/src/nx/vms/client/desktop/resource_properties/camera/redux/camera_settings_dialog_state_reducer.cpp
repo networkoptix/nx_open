@@ -128,6 +128,7 @@ float calculateBitrateForQualityMbps(const State& state, Qn::StreamQuality quali
             quality,
             state.recording.defaultStreamResolution,
             state.recording.brush.fps,
+            QString(), //< Calculate bitrate for default codec.
             state.recording.mediaStreamCapability,
             state.recording.useBitratePerGop));
 }
@@ -314,7 +315,7 @@ vms::api::MotionStreamType forcedMotionStreamType(const Camera& camera)
     const auto motionStreamIndex = camera->motionStreamIndex();
     return motionStreamIndex.isForced
         ? motionStreamIndex.index
-		: nx::vms::api::MotionStreamType::undefined;
+        : nx::vms::api::MotionStreamType::undefined;
 }
 
 State updateDuplicateLogicalIdInfo(State state)

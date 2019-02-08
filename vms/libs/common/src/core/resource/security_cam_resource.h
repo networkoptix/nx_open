@@ -320,8 +320,10 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
-    virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
-    static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
+    virtual int suggestBitrateKbps(
+        const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
+    static float rawSuggestBitrateKbps(
+        Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec);
 
     /**
      * All events emitted by analytics driver bound to the resource can be captured within
@@ -344,7 +346,8 @@ public:
      */
     bool isDefaultAuth() const;
 
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps,
+        const QString& codec, Qn::ConnectionRole role = Qn::CR_Default) const;
 
     static Qn::ConnectionRole toConnectionRole(MotionStreamType index);
     static MotionStreamType toStreamIndex(Qn::ConnectionRole role);

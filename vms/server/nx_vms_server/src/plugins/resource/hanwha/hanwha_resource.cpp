@@ -2506,7 +2506,10 @@ int HanwhaResource::streamBitrate(
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
-    streamParams.resolution = streamResolution(role);
+    if (streamParams.resolution.isEmpty())
+        streamParams.resolution = streamResolution(role); //< Set default value if empty.
+    if (streamParams.codec.isEmpty())
+        streamParams.codec = toHanwhaString(streamCodec(role)); //< Set default value if empty.
     if (bitrateKbps == 0)
     {
         // Since we can't fully control bitrate on the NVRs that don't have bypass

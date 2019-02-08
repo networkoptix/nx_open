@@ -527,8 +527,8 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::MotionStreamTyp
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
-        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1);
-        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps());
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1, key.codec);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps(), key.codec);
         result.maxFps = getMaxFps();
         return result;
     };

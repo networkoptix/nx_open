@@ -1414,12 +1414,14 @@ void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QS
         qnSyncTime->currentMSecsSinceEpoch());
 }
 
-float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps)
+float QnSecurityCamResource::rawSuggestBitrateKbps(
+    Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec)
 {
     return nx::core::CameraBitrateCalculator::suggestBitrateForQualityKbps(
         quality,
         resolution,
-        fps);
+        fps,
+        codec);
 }
 
 bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
@@ -1512,10 +1514,12 @@ int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamPa
             result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
         return result;
     }
-    return suggestBitrateForQualityKbps(streamParams.quality, streamParams.resolution, streamParams.fps, role);
+    return suggestBitrateForQualityKbps(
+        streamParams.quality, streamParams.resolution, streamParams.fps, streamParams.codec, role);
 }
 
-int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
+int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality quality,
+    QSize resolution, int fps, const QString& codec, Qn::ConnectionRole role) const
 {
     if (role == Qn::CR_Default)
         role = Qn::CR_LiveVideo;
@@ -1526,6 +1530,7 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
         quality,
         resolution,
         fps,
+        codec,
         streamCapability,
         useBitratePerGop());
 }

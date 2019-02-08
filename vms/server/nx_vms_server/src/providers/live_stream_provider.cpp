@@ -197,7 +197,7 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
         if (!params.resolution.isEmpty())
         {
             params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
-                params.quality, params.resolution, params.fps, getRole());
+                params.quality, params.resolution, params.fps, params.codec, getRole());
         }
     }
 
@@ -622,13 +622,13 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     CameraBitrateInfo info(encoderIndex(), std::move(now));
 
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
-        liveParams.quality, liveParams.resolution, liveParams.fps) / 1024;
+        liveParams.quality, liveParams.resolution, liveParams.fps, liveParams.codec) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
         liveParams, getRole())) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
     info.bitratePerGop = m_cameraRes->useBitratePerGop();
-    info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
+    info.bitrateFactor = 1; // TODO: #mux Pass actual value when available [2.6]
     info.numberOfChannels = getNumberOfChannels();
 
     info.fps = liveParams.fps;
