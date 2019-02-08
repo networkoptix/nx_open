@@ -50,6 +50,8 @@ Item
             actionButtonsPanelOpacityBehaviour.enabled = false
             actionButtonsPanel.opacity = 0
             actionButtonsPanelOpacityBehaviour.enabled = true
+            if (d.windowSize > 0)
+                timeline.windowSize = d.lastWindowSize
         }
     }
 
@@ -81,6 +83,7 @@ Item
         property real controlsOpacity:
             Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
 
+        property real lastWindowSize: -1
         property real controlsOpacityInternal: controlsNeeded ? 1.0 : 0.0
         Behavior on controlsOpacityInternal
         {
@@ -165,8 +168,10 @@ Item
             if (lastChunkEndMs <= 0)
                 lastChunkEndMs = liveMs
 
-            timeline.windowSize =
-                Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
+            if (d.lastWindowSize > 0)
+                return
+
+            timeline.windowSize = Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
         }
     }
 
@@ -329,6 +334,8 @@ Item
                 opacity: timeline.lineOpacity
                 color: timeline.lineColor
             }
+
+            onWindowSizeChanged: d.lastWindowSize = windowSize
 
             onMovingChanged:
             {
