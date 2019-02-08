@@ -70,7 +70,7 @@ DataManager::~DataManager()
 void DataManager::insertOrUpdate(
     const std::string& key,
     const std::string& value,
-    UpdateCompletionHander completionHandler)
+    UpdateCompletionHandler completionHandler)
 {
     if (key.empty())
         return completionHandler(ResultCode::logicError);
@@ -91,7 +91,7 @@ void DataManager::insertOrUpdate(
 
 void DataManager::remove(
     const std::string& key,
-    UpdateCompletionHander completionHandler)
+    UpdateCompletionHandler completionHandler)
 {
     if (key.empty())
         return completionHandler(ResultCode::logicError);
@@ -112,7 +112,7 @@ void DataManager::remove(
 
 void DataManager::get(
     const std::string& key,
-    LookupCompletionHander completionHandler)
+    LookupCompletionHandler completionHandler)
 {
     if (key.empty())
         return completionHandler(ResultCode::logicError, std::string());

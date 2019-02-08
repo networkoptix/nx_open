@@ -28,12 +28,12 @@ enum ResultCode
     unknownError
 };
 
-using UpdateCompletionHander = nx::utils::MoveOnlyFunc<void(ResultCode)>;
+using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 
 /**
  * value is defined only when ResultCode::ok is reported.
  */
-using LookupCompletionHander =
+using LookupCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, std::string /*value*/)>;
 
 class NX_KEY_VALUE_DB_API DataManager
@@ -52,21 +52,21 @@ public:
     void insertOrUpdate(
         const std::string& key,
         const std::string& value,
-        UpdateCompletionHander completionHandler);
+        UpdateCompletionHandler completionHandler);
 
     /**
      * Removes a key/value pair.
      */
     void remove(
         const std::string& key,
-        UpdateCompletionHander completionHandler);
+        UpdateCompletionHandler completionHandler);
 
     /**
      * Retrieves the value for the given key.
      */
     void get(
         const std::string& key,
-        LookupCompletionHander completionHandler);
+        LookupCompletionHandler completionHandler);
 
 private:
     /**
