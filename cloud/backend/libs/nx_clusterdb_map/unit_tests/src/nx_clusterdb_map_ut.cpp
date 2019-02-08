@@ -489,7 +489,6 @@ TEST_F(Database, eventprovider_triggers_record_removed_event)
 TEST_F(Database, eventprovider_does_not_trigger_record_inserted_event_after_unsubscribing)
 {
     givenRecordInsertedEventWasAlreadyTriggered();
-    givenRandomKeyValuePair();
 
     whenUnsubscribeFromRecordInsertedEvent();
     whenInsertKeyValuePair();
