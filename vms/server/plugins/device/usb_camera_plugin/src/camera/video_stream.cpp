@@ -19,7 +19,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-static const char * ffmpegDeviceTypePlatformDependent()
+static const char* ffmpegDeviceTypePlatformDependent()
 {
     return
 #ifdef _WIN32

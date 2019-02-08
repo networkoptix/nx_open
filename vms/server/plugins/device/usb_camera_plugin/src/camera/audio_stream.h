@@ -48,7 +48,7 @@ private:
 private:
     std::string m_url;
     std::weak_ptr<Camera> m_camera;
-    nxpl::TimeProvider * const m_timeProvider;
+    nxpl::TimeProvider* const m_timeProvider;
     PacketConsumerManager m_packetConsumerManager;
     mutable std::mutex m_mutex;
 
