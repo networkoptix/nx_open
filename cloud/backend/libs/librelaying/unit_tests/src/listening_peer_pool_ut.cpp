@@ -115,7 +115,7 @@ protected:
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
         m_peerConnections.push_back(connection.get());
-        pool().addConnection(peerName, std::move(connection));
+        pool().addConnection(peerName, "", std::move(connection));
         ++m_connectionsEstablishedCount;
     }
 
