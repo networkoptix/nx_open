@@ -1,7 +1,7 @@
 #--------------------------------------------------------------------------------------------------
 # Test for disabled (via -DNX_INI_CONFIG_DISABLED) ini_config.
 
-add_library(disabled_ini_config_ut SHARED
+set(disabled_ini_config_ut_files
     ../src/nx/kit/ini_config.h
     ../src/nx/kit/ini_config.cpp
     ../src/nx/kit/test.h
@@ -12,8 +12,19 @@ add_library(disabled_ini_config_ut SHARED
     ../src/nx/kit/output_redirector.cpp
     src/ini_config_ut.cpp
     src/disabled_ini_config_ut.h
-    src/disabled_ini_config_ut.cpp
-)
+    src/disabled_ini_config_ut.cpp)
+
+if (APPLE)
+    set (disabled_ini_config_ut_files ${disabled_ini_config_ut_files}
+        ../src/nx/kit/apple_utils.h
+        ../src/nx/kit/apple_utils.mm)
+endif()
+
+add_library(disabled_ini_config_ut SHARED ${disabled_ini_config_ut_files})
+if(APPLE)
+    find_library(Foundation_LIBRARY Foundation REQIRED)
+    target_link_libraries(disabled_ini_config_ut ${Foundation_LIBRARY})
+endif()
 
 target_include_directories(disabled_ini_config_ut PRIVATE ../src)
 
