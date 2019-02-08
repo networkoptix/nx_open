@@ -66,20 +66,20 @@ int LoggerCollection::add(std::shared_ptr<AbstractLogger> logger)
 std::shared_ptr<AbstractLogger> LoggerCollection::get(const Tag& tag, bool exactMatch) const
 {
     QnMutexLocker lock(&m_mutex);
-    for (auto& it: m_loggersByFilter)
+    if (exactMatch)
     {
-        if (exactMatch)
-        {
-            if (it.first.toString() == tag.toString())
-                return it.second.logger;
-        }
-        else
-        {
-            if (it.first.accepts(tag))
-                return it.second.logger;
-        }
+        const Filter filter(tag);
+        auto it = m_loggersByFilters.find(filter);
+        return it == m_loggersByFilters.cend()
+            ? m_mainLogger
+            : it->second;
     }
 
+    for (auto& it: m_loggersByFilters)
+    {
+        if (it.first.accepts(tag))
+            return it.second;
+    }
     return m_mainLogger;
 }
 
