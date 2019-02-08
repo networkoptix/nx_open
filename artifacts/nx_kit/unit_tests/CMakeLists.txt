@@ -14,7 +14,7 @@ set(disabled_ini_config_ut_files
     src/disabled_ini_config_ut.h
     src/disabled_ini_config_ut.cpp)
 
-if (APPLE)
+if(APPLE)
     set (disabled_ini_config_ut_files ${disabled_ini_config_ut_files}
         ../src/nx/kit/apple_utils.h
         ../src/nx/kit/apple_utils.mm)
