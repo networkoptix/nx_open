@@ -9,7 +9,7 @@ set(_withTestCamera ON)
 set(_withTests ON)
 set(_withMiniLauncher OFF)
 set(_withRootTool OFF)
-set(_withPaxtonPlugin OFF)
+set(_withP2PConnectionTestingUtility OFF)
 
 if("${platform}" STREQUAL "linux")
     if("${arch}" MATCHES "arm|aarch64")
@@ -48,8 +48,6 @@ if(WINDOWS)
     set(_withNxTool ${build_nxtool})
     if("${arch}" STREQUAL "x64")
         set(_withClouds ON)
-    elseif(arch STREQUAL "x86")
-        set(_withPaxtonPlugin ${build_paxton})
     endif()
     if(NOT developerBuild)
         set(_withMiniLauncher ON)
@@ -76,12 +74,27 @@ option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withScreenChecker "Enable screen checker" OFF)
+option(withNovBrowser "Enable Nov Browser" OFF)
 nx_option(withRootTool "Enable root tool" ${_withRootTool})
-option(withPaxtonPlugin "Build Paxton plugin" ${_withPaxtonPlugin})
+nx_option(
+    withP2PConnectionTestingUtility
+    "Enable P2P connection testing utility"
+    ${_withP2PConnectionTestingUtility})
+option(withDocumentation "Generate documentation" OFF)
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
     ON
+)
+
+cmake_dependent_option(withAnalyticsSdk "Enable nx_analytics_sdk build"
+    OFF "NOT withDistributions"
+    ON
+)
+
+cmake_dependent_option(withUnitTestsArchive "Enable unit tests archive generation"
+    OFF "withTests"
+    OFF
 )
 
 option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by default")
@@ -103,4 +116,4 @@ unset(_withTests)
 unset(_withCassandraTests)
 unset(_withMiniLauncher)
 unset(_withRootTool)
-unset(_withPaxtonPlugin)
+unset(_withP2PConnectionTestingUtility)

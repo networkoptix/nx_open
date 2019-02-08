@@ -21,7 +21,7 @@
     "emailSubject": "You have been invited to %PRODUCT_NAME%"
   },
   "ipvd_feedback": {
-    "emailSubject": "Camera Page Feedback"
+    "emailSubject": "Camera Page Feedback for {{message.product}}"
   },
   "sales_inquiry": {
     "emailSubject": "Sales inquiry for {{message.product}}"

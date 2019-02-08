@@ -34,12 +34,13 @@ Open New Browser On Failure
 
 *** Test Cases ***
 the page is opened and shows the user list to owner
-    [tags]    C41881
+    [tags]    C41881    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Location Should Be    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Wait Until Element Is Visible    ${USERS LIST}
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
+    [tags]    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
@@ -47,6 +48,7 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Wait Until Page Does Not Contain Element    ${BACKDROP}
 
 should confirm, if not owner deletes system (You will loose access to this system)
+    [tags]    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM NX}
@@ -56,14 +58,14 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 share button should be disabled
-    [tags]    C41881
+    [tags]    C41881    Threaded
     Set Window Size    1920    1080
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Page Does Not Contain Element    //div[contains(@uib-modal-backdrop, "modal-backdrop")]
     Wait Until Element Is Visible    ${SHARE BUTTON DISABLED}
 
 open in nx button should be disabled
-    [tags]    C41881
+    [tags]    C41881    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
     Log Out
@@ -72,7 +74,7 @@ open in nx button should be disabled
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
 
 should show offline next to system name
-    [tags]    C41881
+    [tags]    C41881    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
     Log Out
@@ -81,6 +83,7 @@ should show offline next to system name
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
 
 should not be able to delete/edit users
+    [tags]    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL VIEWER}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL VIEWER}')]
@@ -90,18 +93,20 @@ should not be able to delete/edit users
     Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL VIEWER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
+    [tags]    Threaded
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Element Is Visible    ${JUMBOTRON}
 
 should open System page by link to not authorized user and show it, after owner logs in
+    [tags]    Threaded
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Log In    ${EMAIL OWNER}   ${password}    None
     Verify In System    Auto Tests 2
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
-    [tags]    C41572
+    [tags]    C41572    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
@@ -110,12 +115,13 @@ should open System page by link to user without permission and show alert (Syste
     Location Should Be    ${url}/systems
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
+    [tags]    Threaded
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Log In    ${EMAIL NOPERM}   ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
 rename button opens dialog and clicking cancel closes rename dialog without rename
-    [tags]    C41880
+    [tags]    C41880    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
@@ -125,7 +131,7 @@ rename button opens dialog and clicking cancel closes rename dialog without rena
     Verify In System    Auto Tests 2
 
 clicking 'X' closes rename dialog without rename
-    [tags]    C41880
+    [tags]    C41880    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
@@ -136,7 +142,7 @@ clicking 'X' closes rename dialog without rename
     Verify In System    Auto Tests 2
 
 clicking save with no input in rename dialoge throws error
-    [tags]    C41880
+    [tags]    C41880    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
@@ -150,6 +156,7 @@ clicking save with no input in rename dialoge throws error
     Click Button    ${RENAME CANCEL}
 
 does not show Share button to viewer, advanced viewer, live viewer
+    [tags]    Threaded
     @{emails}    Set Variable    ${EMAIL VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL ADV VIEWER}
     :FOR    ${user}    IN    @{emails}
     \  Log in to Autotests 2 System    ${user}
@@ -161,7 +168,7 @@ does not show Share button to viewer, advanced viewer, live viewer
     \  Log Out
 
 should show "your system" for owner and "owner's name" for non-owners
-    [tags]    C41881
+    [tags]    C41881    Threaded
     Log in to AutoTests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
     Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']

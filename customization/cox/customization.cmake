@@ -26,13 +26,9 @@ set(defaultWebPages "{\"Home Page\": \"https://www.cox.com\"}")
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{F2825E30-F367-4040-93B9-B71F05FDD6B1}")
 set(customization.clientUpgradeCode "{7083E473-BD53-4084-9BAD-9216EBF6BF3F}")
-set(customization.serverUpgradeCode "{d40d7717-5fa1-445f-a472-d597227f21bd}")
 set(customization.clientBundleUpgradeCode "{2c88e1bd-34e3-4ee3-9196-76c48ef9084f}")
 set(customization.serverBundleUpgradeCode "{7ca048d1-9ed1-4a45-be0b-669b7db8f933}")
 set(customization.fullBundleUpgradeCode "{eb1f51b4-7462-4047-906f-5f789648b151}")
-
-#set(nxtool.company.name "Cox Communications")
-#set(nxtool.bundleUpgradeCode "{fe75d48f-0f7e-4fca-a98e-357a61ae498a}")
 
 set(deb.customization.company.name "cox")
 
@@ -41,7 +37,6 @@ set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, I
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
-set(mac.skip.sign "true")
 
 set(codeSigning "OFF")
 
@@ -53,11 +48,6 @@ set(ios.sign.identity "iPhone Developer: Ivan Vigasin (KZ74EE5FP2)")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0006")
-
-# Installer Customizations
-set(windows.skip.sign "true")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Additional Features
 set(vmax "true")

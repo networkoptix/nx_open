@@ -2,9 +2,10 @@
 
 #include <memory>
 
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/stream_proxy.h>
 
 #include <test_support/merge_test_fixture.h>
 
@@ -20,27 +21,35 @@ public:
 
     bool initialize();
 
-    nx::cdb::AccountWithPassword registerCloudAccount();
+    void installProxyBeforeCdb(
+        std::unique_ptr<nx::network::StreamProxy> proxy,
+        const nx::network::SocketAddress& proxyEndpoint);
+
+    nx::cloud::db::AccountWithPassword registerCloudAccount();
 
     bool connectToCloud(
         VmsPeer& peerWrapper,
-        const nx::cdb::AccountWithPassword& ownerAccount);
+        const nx::cloud::db::AccountWithPassword& ownerAccount);
 
-    nx::cdb::CdbLauncher& cdb();
-    const nx::cdb::CdbLauncher& cdb() const;
+    nx::cloud::db::CdbLauncher& cdb();
+    const nx::cloud::db::CdbLauncher& cdb() const;
+
+    nx::network::SocketAddress cdbEndpoint() const;
 
     bool isSystemRegistered(
-        const nx::cdb::AccountWithPassword& account,
+        const nx::cloud::db::AccountWithPassword& account,
         const std::string& cloudSystemId) const;
 
     bool isSystemOnline(
-        const nx::cdb::AccountWithPassword& account,
+        const nx::cloud::db::AccountWithPassword& account,
         const std::string& cloudSystemId) const;
 
 private:
-    mutable nx::cdb::CdbLauncher m_cdb;
+    mutable nx::cloud::db::CdbLauncher m_cdb;
+    std::unique_ptr<nx::network::StreamProxy> m_cdbProxy;
     nx::network::http::TestHttpServer m_httpProxy;
     std::vector<std::string> m_customHostNames;
+    std::optional<nx::network::SocketAddress> m_proxyEndpoint;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -62,7 +71,7 @@ public:
 
     bool connectToCloud(
         Cloud* cloud,
-        const nx::cdb::AccountWithPassword& cloudAccount);
+        const nx::cloud::db::AccountWithPassword& cloudAccount);
 
     bool isConnectedToCloud() const;
 
@@ -89,11 +98,11 @@ public:
     void waitUntilVmsTransactionLogMatchesCloudOne(
         const VmsPeer& vmsPeer,
         const std::string& cloudSystemId,
-        const nx::cdb::AccountWithPassword& account);
+        const nx::cloud::db::AccountWithPassword& account);
 
     void waitUntilVmsTransactionLogMatchesCloudOne(
         VmsSystem* vmsSystem,
-        const nx::cdb::AccountWithPassword& account);
+        const nx::cloud::db::AccountWithPassword& account);
 
 private:
     std::string m_baseDir;

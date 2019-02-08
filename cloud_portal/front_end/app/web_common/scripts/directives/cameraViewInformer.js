@@ -16,7 +16,7 @@
             } else {
                 scope.iconClass = 'camera-view-error';
                 scope.placeholderTitle = LANG.common.cameraStates.error;
-                scope.message = scope.flags.errorDescription;
+                scope.message = (scope.flags.errorDescription !== '') ? scope.flags.errorDescription : LANG.common.cameraStates[scope.alertType];
             }
         }
         

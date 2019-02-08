@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
     "thisSystem": "sistem",
-    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez"
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "iyi",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "Sil",
     "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
-    "successMerge": "Sistem {{systemName}}, {{systemName}} ile birleştirildi",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
   "account": {

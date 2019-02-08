@@ -9,6 +9,7 @@
 }
 
 button {
+    font-family: $font-family-regular;
     font-size: rem(13px);
     font-weight: 400;
     white-space: nowrap;
@@ -54,6 +55,7 @@ button {
 .badge-brand {
     color : $light16;
     background-color: $light4;
+    line-height: 1rem;
     
     &:hover {
         background-color : $light5;

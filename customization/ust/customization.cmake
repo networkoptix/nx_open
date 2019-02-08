@@ -29,7 +29,6 @@ set(android.keypass "qweasd123")
 
 set(customization.upgradeCode "{23a24724-a901-4308-90ef-eabdfd93174f}")
 set(customization.clientUpgradeCode "{77a5f99b-00b4-427c-9aa1-40e46f84b43c}")
-set(customization.serverUpgradeCode "{48450207-3e31-4e2e-8416-95744aae0d5f}")
 set(customization.clientBundleUpgradeCode "{dbdab234-4b8e-493b-a408-fbec12461a3e}")
 set(customization.serverBundleUpgradeCode "{c83442b5-2dd4-4196-9af0-b87e96b41c3c}")
 set(customization.fullBundleUpgradeCode "{a6e3dab6-ee2b-4282-a57b-8bd8af95840b}")
@@ -50,7 +49,3 @@ set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0023")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

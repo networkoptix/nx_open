@@ -1,27 +1,29 @@
 import {
-    Component, OnInit, OnDestroy,
+    Component, OnDestroy,
     Input, SimpleChanges, OnChanges
 } from '@angular/core';
 
-import { NxConfigService } from '../../../services/nx-config';
-import { NxRibbonService } from '../../../components/ribbon/ribbon.service';
+import { NxConfigService }  from '../../../services/nx-config';
+import { NxRibbonService }  from '../../../components/ribbon/ribbon.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-    selector: 'integrations-list-component',
+    selector   : 'integrations-list-component',
     templateUrl: 'list.component.html',
-    styleUrls: ['list.component.scss']
+    styleUrls  : ['list.component.scss']
 })
 
-export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges {
+export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
     @Input() list;
 
     defaultLogo: string;
     config: any;
+    lang: any;
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
+        this.lang = this.translate.translations[this.translate.currentLang];
     }
 
     constructor(private configService: NxConfigService,
@@ -55,14 +57,16 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
         plugin.information.logo = plugin.information.logo || this.defaultLogo;
     }
 
-    ngOnInit(): void {
-    }
-
     ngOnDestroy() {
         this.ribbonService.hide();
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        // on reload language service is initialized later
+        if (!this.lang) {
+            this.lang = this.translate.translations[this.translate.currentLang];
+        }
+
         let haveInReview = false;
         if (changes.list) {
             // inject platform icons info
@@ -74,18 +78,11 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
             });
 
             if (haveInReview) {
-                this.translate
-                        .get([
-                                'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
-                                'Back to the editing interfaces'
-                        ])
-                        .subscribe(res => {
-                            this.ribbonService.show(
-                                    res['This page is a preview of the latest changes, and it doesn\'t match publicly available version.'],
-                                    res['Back to the editing interfaces'],
-                                    this.config.links.admin.product
-                            );
-                        });
+                this.ribbonService.show(
+                        this.lang.integration_preview,
+                        this.lang.integration_back_to_edit,
+                        this.config.links.admin.product.replace('%ID%/pages/', '')
+                );
             }
         }
     }

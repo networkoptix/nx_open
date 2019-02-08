@@ -11,7 +11,7 @@ from django.shortcuts import redirect
 
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes
 from api.models import Account
-from cms.models import Customization, UserGroupsToProductPermissions, get_cloud_portal_product
+from cms.models import Customization, Product, UserGroupsToProductPermissions, get_cloud_portal_product
 from notifications import notifications_api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
@@ -83,6 +83,8 @@ def send_event(request):
             if product.exists():
                 request.data['product'] = product.first().name
                 product_id = product.first().id
+        else:
+            request.data['product'] = request.data['productId']
 
         user = request.user
         request.data['sender_email'] = user.email

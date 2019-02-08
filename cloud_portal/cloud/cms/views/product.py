@@ -146,7 +146,7 @@ def page_editor(request):
             customization_review = customization_review.first()
 
         redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(customization_review.id,))
-        return redirect(redirect_url)
+        return redirect(redirect_url), []
 
     return preview_link, context_errors
 

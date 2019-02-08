@@ -90,9 +90,18 @@ window.L = {};
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.companyLink = response.companyLink;
+                    appState.companyName = response.companyName;
+                    appState.copyrightYear = response.copyrightYear;
+                    appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
+                    appState.sortSupportedDevices = response.sortSupportedDevices;
+                    appState.supportedResolutions = response.supportedResolutions;
+                    appState.supportedHardwareTypes = response.supportedHardwareTypes;
+                    appState.searchTags = response.searchTags;
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    
                     angular.extend(CONFIG, appState);
                 });
 
@@ -320,6 +329,12 @@ window.L = {};
                                     }]
                                 }
                             })
+                            .when('/admin', {
+                                resolve: {
+                                    test: function(){
+                                        window.location = '/admin/';
+                                    }
+                                }})
                             // for history purpose
                             .when('/downloads/history', {
                                 template: '<download-history></download-history>'
@@ -331,7 +346,7 @@ window.L = {};
                                 }],
                                 resolve: {
                                     getParam: [ '$route', function($route){
-                                        return $route.current.params.param
+                                        return $route.current.params.param;
                                     }]
                                 }
                             })
@@ -351,6 +366,9 @@ window.L = {};
                             })
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
+                            })
+                            .when('/campage', {
+                                template: ''
                             })
                             .when('/sandbox', {
                                 template: ''

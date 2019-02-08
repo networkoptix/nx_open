@@ -34,6 +34,7 @@ front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-up
 *.pyc
 *.pid
 *.log
+*.sql
 
 env
 cloud/.idea

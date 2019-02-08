@@ -137,7 +137,9 @@
     "cantOpenClient": "Ứng dụng %VMS_NAME% ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
     "lostConnection": "Kết nối với {{systemName}} bị mất",
     "thisSystem": "hệ thống",
-    "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10"
+    "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "tốt",
@@ -180,10 +182,10 @@
     "confirmUnshareFromMeAction": "Ngắt kết nối",
     "confirmUnshare": "Người dùng này sẽ không thể truy cập vào Hệ thống. Bạn có chắc không?",
     "confirmUnshareTitle": "Xóa người dùng?",
-    "confirmUnshareAction": "Xóa bỏ",
+    "confirmUnshareAction": "Xoá",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
-    "successMerge": "Hệ thống {{systemName}} đã được hợp nhất với {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
   },
   "account": {

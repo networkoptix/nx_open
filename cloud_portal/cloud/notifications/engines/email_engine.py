@@ -43,8 +43,10 @@ def email_cache(customization_name, cache_type, value=None, force=None):
 
 def send(email, msg_type, message, language_code, customization_name):
 
+    customization_cache = cloud_portal_customization_cache(customization_name, 'email')
+
     config = {
-        'portal_url': cloud_portal_customization_cache(customization_name, "portal_url")
+        'portal_url': customization_cache["portal_url"]
     }
 
     subject = get_email_title(customization_name, language_code, msg_type)
@@ -56,16 +58,16 @@ def send(email, msg_type, message, language_code, customization_name):
     email_html_body = pystache.render(message_html_template, {"message": message, "config": config})
     email_txt_body = pystache.render(message_txt_template, {"message": message, "config": config})
 
-    email_from_name = cloud_portal_customization_cache(customization_name, "mail_from_name")
-    email_from_email = cloud_portal_customization_cache(customization_name, "mail_from_email")
+    email_from_name = customization_cache["mail_from_name"]
+    email_from_email = customization_cache["mail_from_email"]
     email_from = '%s <%s>' % (email_from_name, email_from_email)
 
     mail_obj = EmailBackend(
-        host=cloud_portal_customization_cache(customization_name, "smtp_host"),
-        port=int(cloud_portal_customization_cache(customization_name, "smtp_port")),
-        password=str(cloud_portal_customization_cache(customization_name, "smtp_password")),
-        username=str(cloud_portal_customization_cache(customization_name, "smtp_user")),
-        use_tls=cloud_portal_customization_cache(customization_name, "smtp_tls"),
+        host=customization_cache["smtp_host"],
+        port=int(customization_cache["smtp_port"]),
+        password=str(customization_cache["smtp_password"]),
+        username=str(customization_cache["smtp_user"]),
+        use_tls=customization_cache["smtp_tls"],
     )
 
     msg = EmailMultiAlternatives(

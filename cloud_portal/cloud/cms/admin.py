@@ -356,8 +356,11 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(Q(customization__name__in=request.user.customizations) |
-                           Q(version__product__created_by=request.user))
+            qs = qs.filter(Q(customization__name__in=request.user.customizations))
+
+        if not UserGroupsToProductPermissions.\
+                check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
+            qs = qs.filter(Q(version__product__created_by=request.user))
         return qs
 
     def get_readonly_fields(self, request, obj=None):

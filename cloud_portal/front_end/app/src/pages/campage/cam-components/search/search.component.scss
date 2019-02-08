@@ -1,0 +1,93 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+@import '../../../../styles/_mixins';
+
+.nx-search {
+    .btn-text {
+        &:hover {
+            .nav-arrow span {
+                background-color : $dark15 !important;
+            }
+        }
+        
+        .nav-arrow {
+            position : relative;
+        
+            span {
+                height : 1px;
+            
+                &:nth-child(1) {
+                    top  : 10px;
+                    left : 1px;
+                }
+            
+                &:nth-child(2) {
+                    top  : 9px;
+                    left : 8px;
+                }
+            }
+        }
+    }
+    
+    .icon-search {
+        position: absolute;
+        margin: 10px 0 0 10px;
+    }
+
+    .search-input {
+        width: 200px;
+        height: 40px;
+        padding-left: 40px;
+        font-size: 15px;
+        font-family: $font-family-regular;
+        color: $light16;
+        border-radius: 2px;
+        border: 1px solid $light6;
+        background: transparent;
+
+        &:placeholder-shown {
+            @include placeholder();
+        }
+
+        &:active, &:focus, &.non-empty {
+            background-color: $light1;
+            color: $dark9;
+            border: 1px solid $brand_core;
+        }
+        
+        &:hover:not(:active):not(:focus) {
+            border: 1px solid $light8;
+        }
+        
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:active,
+        &:-webkit-autofill:focus {
+            background-color: $light1 !important;
+            color: $dark9 !important;
+            -webkit-box-shadow: 0 0 0 1000px $light1 inset !important;
+            -webkit-text-fill-color: $dark9 !important;
+        }
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 10px;
+        top: 0;
+        bottom: 0;
+        line-height: 40px;
+        margin: auto;
+        cursor: pointer
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+
+        li {
+            margin: 0 4px 4px 0;
+            cursor: pointer;
+            text-align: center;
+            width: auto;
+        }
+    }
+}

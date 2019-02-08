@@ -1,0 +1,64 @@
+#pragma once
+
+#include "hanwha_request_helper.h"
+
+#include <nx/network/http/http_async_client.h>
+
+namespace nx {
+namespace vms::server {
+namespace plugins {
+
+/** Returns current time thift (Server UTC time - camera UTC time). */
+std::optional<std::chrono::milliseconds> hanwhaUtcTimeShift(
+    const std::shared_ptr<HanwhaSharedResourceContext>& context);
+
+/**
+ * Synchronizes camera/NVR time with qSyncTime and keeps time zone shift updated.
+ */
+class HanwhaTimeSyncronizer
+{
+public:
+    HanwhaTimeSyncronizer();
+    ~HanwhaTimeSyncronizer();
+
+    HanwhaTimeSyncronizer(const HanwhaTimeSyncronizer&) = delete;
+    HanwhaTimeSyncronizer& operator=(const HanwhaTimeSyncronizer&) = delete;
+    HanwhaTimeSyncronizer(HanwhaTimeSyncronizer&&) = delete;
+    HanwhaTimeSyncronizer& operator=(HanwhaTimeSyncronizer&&) = delete;
+
+    void start(HanwhaSharedResourceContext* resourceConext);
+    void setTimeSynchronizationEnabled(bool enabled);
+
+    /** Notifies value change (Server UTC time - camera UTC time). */
+    using UtcTimeShiftHandler = utils::MoveOnlyFunc<void(std::chrono::milliseconds)>;
+    void setTimeShiftHandler(UtcTimeShiftHandler handler);
+
+private:
+    void verifyDateTime();
+    void setDateTime(const QDateTime& dateTime);
+    void retryVerificationIn(std::chrono::milliseconds timeout);
+    void updateTimeShift(
+        std::chrono::milliseconds utcTimeShift,
+        std::chrono::milliseconds timeZoneShift);
+
+    void fireStartPromises();
+    void doRequest(
+        const QString& action, std::map<QString, QString> params,
+        bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler);
+
+    HanwhaSharedResourceContext* m_resourceConext = nullptr;
+    QMetaObject::Connection m_syncTymeConnection;
+    network::aio::Timer m_timer;
+    nx::network::http::AsyncClient m_httpClient;
+
+    std::list<utils::promise<void>*> m_startPromises;
+    UtcTimeShiftHandler m_utcTimeShiftHandler;
+    std::chrono::milliseconds m_utcTimeShift{0};
+    std::chrono::milliseconds m_timeZoneShift{0};
+    std::atomic<bool> m_timeSynchronizationEnabled{true};
+    bool m_isAsyncClientInProgress{false};
+};
+
+} // namespace plugins
+} // namespace vms::server
+} // namespace nx

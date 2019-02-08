@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
     "thisSystem": "a rendszer",
-    "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott"
+    "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "jó",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "Törlés",
     "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
-    "successMerge": "A {{systemName}} rendszert egyesítjük az {{systemName}} verzióval",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "{{email}} engedélyei vissavonva"
   },
   "account": {

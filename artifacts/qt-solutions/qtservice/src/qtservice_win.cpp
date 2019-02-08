@@ -694,15 +694,12 @@ DWORD QtServiceSysPrivate::serviceFlags(QtServiceBase::ServiceFlags flags) const
 class HandlerThread : public QThread
 {
 public:
-    HandlerThread()
-        : success(true), console(false), QThread()
-        {}
-
     bool calledOk() { return success; }
     bool runningAsConsole() { return console; }
 
 protected:
-    bool success, console;
+    bool success = true;
+    bool console = false;
     void run()
         {
             SERVICE_TABLE_ENTRYW st [2];

@@ -8,14 +8,14 @@ angular.module('webadminApp')
         $scope.connect = connect;
         $scope.Config = Config;
         if(connect) {
-            $scope.title = 'Connect system to <span class="product-name">' + Config.cloud.productName + '</span>';
+            $scope.title = 'Connect System to <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.actionLabel = 'Connect System';
 
             $scope.successMessage = 'System is connected to <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.errorMessage = 'Can\'t connect: some error happened';
 
         }else{
-            $scope.title = 'Disconnect system from <span class="product-name">' + Config.cloud.productName + '</span>';
+            $scope.title = 'Disconnect System from <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.actionLabel = 'Disconnect System';
 
             $scope.successMessage = 'System was disconnected from <span class="product-name">' + Config.cloud.productName + '</span>';
@@ -62,10 +62,10 @@ angular.module('webadminApp')
                 'currentPassword':'Incorrect current password',
                 'UNAUTHORIZED':'Wrong password.',
                 'password':'Wrong password.',
-                'INCOMPATIBLE':'Remote system has incompatible version.',
+                'INCOMPATIBLE':'Remote System has incompatible version.',
                 'url':'Wrong url.',
-                'SAFE_MODE':'Can\'t connect to a system. Remote system is in safe mode.',
-                'CONFIGURATION_ERROR':'Can\'t connect to a system. Maybe one of the systems is in safe mode.',
+                'SAFE_MODE':'Can\'t connect to a System. Remote System is in safe mode.',
+                'CONFIGURATION_ERROR':'Can\'t connect to a System. Maybe one of the Systems is in safe mode.',
 
                 // Cloud errors:
                 'notAuthorized': 'Login or password are incorrect',

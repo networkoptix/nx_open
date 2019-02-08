@@ -339,11 +339,14 @@ angular.module('webadminApp')
                 'danger').then(function (oldPassword) {
                     //1. Check password
                     //return mediaserver.checkCurrentPassword(oldPassword).then(function(){
-                            return mediaserver.disconnectFromSystem(oldPassword).then(function(){
-                                return dialogs.alert(L.settings.disconnectedFromSystemSuccess).
-                                    finally(function(){
+                            return mediaserver.disconnectFromSystem(oldPassword).then(function(data){
+                                if(data.data.error!=='0') {
+                                    dialogs.alert( L.settings.disconnectedFromSystemError + ': ' + data.data.errorString);
+                                }else {
+                                    return dialogs.alert(L.settings.disconnectedFromSystemSuccess).finally(function () {
                                         window.location.reload();
                                     });
+                                }
                             }, function(error){
                                 dialogs.alert(L.settings.unexpectedError);
                                 console.error(error);
@@ -357,11 +360,15 @@ angular.module('webadminApp')
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             function doDisconnect(oldPassword, localLogin,localPassword){
                 // 2. Send request to the system only
-                return mediaserver.disconnectFromCloud(oldPassword, localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedFromCloudSuccess.replace("{{CLOUD_NAME}}",
-                                  Config.cloud.productName)).finally(function(){
-                                      window.location.reload();
-                                  });
+                return mediaserver.disconnectFromCloud(oldPassword, localLogin, localPassword).then(function(data){
+                    if(data.data.error!=='0') {
+                        dialogs.alert( L.settings.disconnectedFromCloudError + ': ' + data.data.errorString);
+                    }else {
+                        dialogs.alert(L.settings.disconnectedFromCloudSuccess.replace("{{CLOUD_NAME}}",
+                            Config.cloud.productName)).finally(function () {
+                            window.location.reload();
+                        });
+                    }
                 }, function(error){
                     dialogs.alert(L.settings.unexpectedError);
                     console.error(error);
@@ -491,8 +498,10 @@ angular.module('webadminApp')
 
                 $scope.trafficSettings = {
                     // This weird check is due to servers weird response to api/systemSettings request
-                    trafficEncryptionForced: systemSettings.trafficEncryptionForced === 'true',
-                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced === 'true'
+                    trafficEncryptionForced: systemSettings.trafficEncryptionForced === 'true' ||
+                                             systemSettings.trafficEncryptionForced === true,
+                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced === 'true' ||
+                                                  systemSettings.videoTrafficEncryptionForced === true
                 };
             });
         }

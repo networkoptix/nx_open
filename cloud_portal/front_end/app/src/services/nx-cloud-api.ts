@@ -7,12 +7,18 @@ import { NxConfigService } from './nx-config';
     providedIn: 'root'
 })
 export class NxCloudApiService {
+    CONFIG: any;
 
     constructor(private http: HttpClient,
                 private config: NxConfigService) {
+        this.CONFIG = config.getConfig();
+    }
+
+    getAllCameras(company): Observable<any> {
+        return this.http.get(this.CONFIG.cacamerasUrl, { params: { company }});
     }
 
     getIntegrations(): Observable<any> {
-        return this.http.get(this.config.getConfig().apiBase + '/integrations');
+        return this.http.get(this.CONFIG.apiBase + '/integrations');
     }
 }

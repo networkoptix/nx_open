@@ -1,0 +1,15 @@
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyTitle("${display.product.name} Net2 Minidriver")]
+[assembly: AssemblyDescription("Net2 OEM DVR ${display.product.name} driver")]
+[assembly: AssemblyCompany("${company.name}")]
+[assembly: AssemblyProduct("${company.name} ${display.product.name}")]
+[assembly: AssemblyCopyright("${nx_copyright}")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyVersion("${releaseVersion}.${buildNumber}")]
+[assembly: AssemblyFileVersion("${releaseVersion}.${buildNumber}")]
+[assembly: ComVisibleAttribute(false)]
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]

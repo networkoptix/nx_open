@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 
 import { SandboxModule } from './sandbox/sandbox.module';
+import { CampageModule } from './campage/campage.module';
+import { Angular2CsvModule } from 'angular2-csv';
 
 import { MainModule }                from './main/main.module';
 import { DownloadModule }            from './download/download.module';
@@ -13,7 +15,7 @@ import { OtherDetailsModule }        from './details/others/others.module';
 import { RightMenuModule }        from './right-menu/right-menu.module';
 import { ContentModule }          from './content/content.module';
 import { IntegrationsModule }     from './integration/integrations.module';
-import { IntegrationsListModule } from './integration//list/list.module';
+import { IntegrationsListModule } from './integration/list/list.module';
 
 @NgModule({
     imports        : [
@@ -29,6 +31,8 @@ import { IntegrationsListModule } from './integration//list/list.module';
         IntegrationsListModule,
         ContentModule,          // TODO: Remove it after test
         RightMenuModule,        // TODO: Remove it after test
+        CampageModule,
+        Angular2CsvModule,
     ],
     declarations   : [],
     entryComponents: [],
@@ -46,6 +50,8 @@ import { IntegrationsListModule } from './integration//list/list.module';
         IntegrationsListModule,
         ContentModule,          // TODO: Remove it after test
         RightMenuModule,        // TODO: Remove it after test
+        CampageModule,
+        Angular2CsvModule,
     ]
 })
 export class PagesModule {

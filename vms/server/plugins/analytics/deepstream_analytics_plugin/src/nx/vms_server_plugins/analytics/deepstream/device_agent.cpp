@@ -1,0 +1,190 @@
+#include "device_agent.h"
+
+#include <plugins/plugin_tools.h>
+
+#include <nx/sdk/common/string.h>
+
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
+
+#include <nx/vms_server_plugins/analytics/deepstream/deepstream_common.h>
+#include <nx/vms_server_plugins/analytics/deepstream/openalpr_common.h>
+#include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
+#include <nx/vms_server_plugins/analytics/deepstream/default/default_pipeline_builder.h>
+#include <nx/vms_server_plugins/analytics/deepstream/openalpr/openalpr_pipeline_builder.h>
+
+#define NX_PRINT_PREFIX "deepstream::DeviceAgent::"
+#include <nx/kit/debug.h>
+
+namespace nx {
+namespace vms_server_plugins {
+namespace analytics {
+namespace deepstream {
+
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
+
+DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine)
+{
+    NX_OUTPUT << __func__ << "(\"" << m_engine->plugin()->name() << "\") -> " << this;
+
+    std::unique_ptr<BasePipelineBuilder> builder;
+
+    if (ini().pipelineType == kOpenAlprPipeline)
+        builder = std::make_unique<OpenAlprPipelineBuilder>(m_engine);
+    else
+        builder = std::make_unique<DefaultPipelineBuilder>(m_engine);
+
+    m_pipeline = builder->build(id);
+    m_pipeline->start();
+}
+
+void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
+{
+    if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
+    {
+        addRef();
+        return static_cast<nx::sdk::analytics::IDeviceAgent*>(this);
+    }
+
+    if (interfaceId == nx::sdk::analytics::IID_ConsumingDeviceAgent)
+    {
+        addRef();
+        return static_cast<nx::sdk::analytics::IConsumingDeviceAgent*>(this);
+    }
+
+    if (interfaceId == nxpl::IID_PluginInterface)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return nullptr;
+}
+
+void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+{
+    NX_OUTPUT << __func__ << " Received  settings:";
+    NX_OUTPUT << "{";
+
+    const auto count = settings->count();
+    for (int i = 0; i < count; ++i)
+    {
+        NX_OUTPUT << "    " << settings->key(i)
+            << ": " << settings->value(i)
+            << ((i < count - 1) ? "," : "");
+    }
+    NX_OUTPUT << "}";
+}
+
+nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+{
+    return nullptr;
+}
+
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+{
+    NX_OUTPUT << __func__ << " Setting metadata handler";
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_handler = handler;
+    m_pipeline->setMetadataCallback(
+        [this](IMetadataPacket* packet)
+        {
+            NX_OUTPUT << __func__ << " Calling metadata handler";
+            m_handler->handleMetadata(packet);
+        });
+
+    NX_OUTPUT << __func__ << "() END -> noError";
+    return Error::noError;
+}
+
+nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
+{
+#if 0
+    nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> compressedVideo(
+        dataPacket->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
+
+    if (!compressedVideo)
+        return nx::sdk::Error::noError;
+
+    NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();
+#endif
+
+    NX_OUTPUT
+        << __func__
+        << " Pushing data packet to pipeline";
+
+    m_pipeline->pushDataPacket(dataPacket);
+    return Error::noError;
+}
+
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isEmpty())
+    {
+        stopFetchingMetadata();
+        return nx::sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
+    return Error::noError;
+}
+
+void DeviceAgent::stopFetchingMetadata()
+{
+    NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
+}
+
+const nx::sdk::IString* DeviceAgent::manifest(Error* error) const
+{
+    *error = Error::noError;
+
+    if (!m_manifest.empty())
+        return new nx::sdk::common::String(m_manifest);
+
+    std::string objectTypeIds;
+    const auto& objectClassDescritions = m_engine->objectClassDescritions();
+    static const std::string kIndent = "        ";
+    if (ini().pipelineType == kOpenAlprPipeline)
+    {
+        objectTypeIds += kIndent + "\"" + kLicensePlateGuid +"\"";
+    }
+    else
+    {
+        for (std::size_t i = 0; i < objectClassDescritions.size(); ++i)
+        {
+            objectTypeIds += kIndent + "\"" + objectClassDescritions[i].typeId + "\"";
+
+            if (i < objectClassDescritions.size() - 1)
+                objectTypeIds += ",\n";
+        }
+    }
+
+    m_manifest = /*suppress newline*/1 + R"json(
+{
+    "supportedObjectTypeIds": [
+)json" + objectTypeIds + R"json(
+    ]
+}
+)json";
+
+    return new nx::sdk::common::String(m_manifest);
+}
+
+DeviceAgent::~DeviceAgent()
+{
+    NX_OUTPUT << __func__ << "(" << this << ") BEGIN";
+    stopFetchingMetadata();
+    NX_OUTPUT << __func__ << "(" << this << ") END";
+}
+
+} // namespace deepstream
+} // namespace analytics
+} // namespace vms_server_plugins
+} // namespace nx

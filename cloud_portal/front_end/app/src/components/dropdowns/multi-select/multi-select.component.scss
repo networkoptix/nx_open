@@ -1,0 +1,19 @@
+nx-multi-select {
+    width   : 100%;
+    display : block;
+    
+    label {
+        display : block;
+    }
+    
+    .dropdown-menu {
+        &--list {
+            max-height : 277px !important; // 312px - list header height
+            margin     : 0;
+        }
+        
+        .dropdown-item--non-checkbox {
+            padding-left : 12px !important;
+        }
+    }
+}

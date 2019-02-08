@@ -28,6 +28,7 @@ export class LoginModalContent implements OnInit {
 
     config: any;
     auth: any;
+    next: string;
     password: string;
     remember: boolean;
 
@@ -47,6 +48,7 @@ export class LoginModalContent implements OnInit {
                 private genericModal: NxModalGenericComponent) {
 
         this.auth = this.localStorage;
+        this.next = '';
         this.password = '';
         this.remember = true;
         this.wrongPassword = false;
@@ -92,6 +94,11 @@ export class LoginModalContent implements OnInit {
     }
 
     ngOnInit() {
+        // Check the url queryparams for next. if it exists set next equal to it.
+        const nextUrl = /\?next=(.*)/.exec(this.document.location.search.replace(/%2F/g, '/'));
+        if (nextUrl && nextUrl.length > 1) {
+            this.next = nextUrl[1];
+        }
         this.password = '';
 
         this.login = this.process.init(() => {
@@ -147,6 +154,8 @@ export class LoginModalContent implements OnInit {
                     // this.location.go(this.config.redirectAuthorised);
                     this.document.location.href = this.config.redirectAuthorised;
                 }
+            } else if (this.next) {
+                this.document.location.href = this.next;
             } else {
                 setTimeout(() => {
                     // TODO: Repace this once 'register' page is moved to A5

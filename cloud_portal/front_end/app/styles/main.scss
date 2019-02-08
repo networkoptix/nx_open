@@ -110,6 +110,7 @@ nx-app {
             top       : 50%;
             left      : 50%;
             transform : translate(-50%, -50%);
+            z-index   : -1;
         }
     }
 }
@@ -517,7 +518,6 @@ td{
     display: inline-block;
     height: 20px;
     margin-top: 12px;
-    line-height: 12px;
     border-radius: $border-radius-small;
     font-family: $font-family-medium;
     font-size: $font-size-sm;
@@ -843,8 +843,10 @@ h1 .badge {
 }
 
 .disabled{
-    color: $light10;
+    color  : $light10;
+    cursor : default !important;
 }
+
 .input-overlay{
     input{
         padding-right:30px;

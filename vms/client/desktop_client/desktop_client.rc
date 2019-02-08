@@ -1,0 +1,32 @@
+#include <windows.h>
+#include <app_icons.h>
+
+IDI_ICON_APPLICATION    ICON    DISCARDABLE     "${customization.dir}/icons/all/favicon.ico"
+IDI_ICON_VIDEOWALL      ICON    DISCARDABLE     "${customization.dir}/icons/all/videowall.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
+PRODUCTVERSION  ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",        "${company.name}"
+            VALUE "FileDescription",    "${client.display.name}"
+            VALUE "FileVersion",        "${release.version}.${buildNumber}"
+            VALUE "InternalName",       "${client.name}"
+            VALUE "LegalCopyright",     "${nx_copyright}"
+            VALUE "LegalTrademarks1",   "All Rights Reserved"
+            VALUE "LegalTrademarks2",   "All Rights Reserved"
+            VALUE "OriginalFilename",   "desktop_client.exe"
+            VALUE "ProductName",        "desktop_client"
+            VALUE "ProductVersion",     "${release.version}.${buildNumber}"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

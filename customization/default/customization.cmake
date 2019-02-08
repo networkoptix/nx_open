@@ -39,13 +39,15 @@ set(android.keypass "31O2zNNy")
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{ce572797-45bf-4f1c-a783-369ea79c597e}")
 set(customization.clientUpgradeCode "{6ae0699e-af9d-4cc1-85a3-9bf8819563af}")
-set(customization.serverUpgradeCode "{b4582e3d-c6e1-4f51-806b-ad69417a2584}")
 
 set(customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34}")
 set(customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
 set(customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")
 
+# NxTool section
 set(nxtool.company.name "Nx")
+set(nxtool.productId "{be19c0da-73f6-4ea7-9ad6-9dfd86d9e35e}")
+set(nxtool.productUpgradeCode "{cc740987-5070-4750-b853-327417176031}")
 set(nxtool.bundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
 
 set(deb.customization.company.name "networkoptix")
@@ -61,7 +63,6 @@ set(ios.group_identifier "group.com.networkoptix.NxMobile")
 set(ios.sign.identity "iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)")
 set(ios.old_app_appstore_id "id648369716")
 
-set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
@@ -72,7 +73,3 @@ set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(freeLicenseIsTrial true)
 set(freeLicenseCount 4)
 set(freeLicenseKey "0000-0000-0000-0005")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

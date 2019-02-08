@@ -393,6 +393,19 @@ table.webclient-window>tbody>tr>td{
   margin-left: -72px;
   margin-top: -2px;
 }
+.camera-preview-inline{
+  width:70px !important;
+  height:40px !important;
+  margin-right: 10px;
+  background-color: $light5;
+  border-radius: 1px;
+  font-size: 14px;
+  border: 1px solid $additional_light2;
+
+  position:relative;
+}
+
+
 
 .cameras-panel .nav > li.active > a .camera-preview{
   border: 1px solid $light1;

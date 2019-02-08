@@ -3,6 +3,8 @@ from django.utils.log import AdminEmailHandler
 import md5, traceback
 from rest_framework import status
 
+from cloud.settings import DEBUG
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -46,4 +48,5 @@ class CatchExceptionMiddleware(object):
         logging.critical("{}: {}\nCall Stack:\n{}".format(exception.__class__.__name__,
                                                           exception.message,
                                                           traceback.format_exc().replace("Traceback", "")))
-        return HttpResponse("Error with request", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not DEBUG:
+            return HttpResponse("Error with request", status=status.HTTP_500_INTERNAL_SERVER_ERROR)

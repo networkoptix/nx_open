@@ -28,9 +28,9 @@ def determine_package_versions(
     v = {
         "gcc": "8.1",
         "clang": "6.0.0",
-        "qt": "5.11.1",
+        "qt": "5.11.3",
         "boost": "1.67.0",
-        "openssl": "1.0.2o",
+        "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
         "openldap": "2.4.42",
@@ -59,7 +59,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
-        v["ffmpeg"] = "3.1.9"
+        v["ffmpeg"] = "3.1.9-2"
 
     if platform == "macosx":
         v["ffmpeg"] = "3.1.9"
@@ -85,12 +85,14 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
+        v["ffmpeg"] = "3.1.9"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
 
     if box == "tx1":
-        v["festival"] = "2.1x"
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
 
     if not "festival-vox" in v:
@@ -104,7 +106,7 @@ def determine_package_versions(
 
 
 def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
-    have_mediaserver = platform not in ("android", "ios")
+    have_mediaserver = platform not in ("android", "ios", "macosx")
     have_desktop_client = platform in ("windows", "macosx") \
         or (platform == "linux" and box in ("none", "tx1"))
     have_mobile_client = have_desktop_client or platform in ("android", "ios")
@@ -161,13 +163,13 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
-        sync("windows/signtool", path_variable="signtool_directory")
+        sync("windows/ilmerge", path_variable="ilmerge_directory")
 
     if platform in ("windows", "linux"):
         sync("%s/pandoc" % platform, path_variable="pandoc_directory")
 
     if box == "edge1":
-        sync("cpro-1.0.0-2")
+        sync("cpro-1.0.1")
         sync("gdb")
 
     if arch == "x64":
@@ -191,7 +193,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("any/nx_sdk-1.7.1")
         sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
-        sync("any/apidoctool-2.0", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
         if not sync("any/server-external", optional=True):
             sync("any/server-external-" + release_version)
 
@@ -199,7 +201,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("openldap")
             sync("sasl2")
 
-    if platform in ("linux", "windows"):
+    if have_mediaserver or have_desktop_client:
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
     sync("any/certificates", path_variable="certificates_path")

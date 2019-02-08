@@ -1,0 +1,68 @@
+@import '../../../../styles/custom/custom_palette';
+@import '../../../../styles/native-theme/theme_palette';
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+
+.dropdown-menu {
+    width : auto !important;
+
+    @media (max-width : $collapse-first-width) {
+        right : 0;
+        left  : auto !important;
+    }
+
+    @media (max-width : $collapse-second-width) {
+        left : 0 !important;
+    }
+
+    & li > a {
+        @media (max-width : $collapse-first-width) {
+            text-align : right;
+        }
+    }
+}
+
+.popup {
+    &.arrow {
+        left : 18px;
+
+        @media (max-width : $collapse-first-width) {
+            right : 35px;
+            left  : auto;
+        }
+
+        @media (max-width : $collapse-second-width) {
+            right : 24px;
+            left  : auto;
+        }
+    }
+}
+
+.dropdown-toggle {
+    @media (max-width : $collapse-second-width) {
+        padding-right : 10px !important;
+    }
+
+    .glyphicon {
+        @media (max-width : $collapse-first-width) {
+            margin : 0 4px !important;
+        }
+    }
+
+    .nav-arrow {
+        display : none;
+        @media (min-width : $collapse-second-width + 1) {
+            display : block;
+        }
+    }
+
+    .ellipsis {
+        display : none;
+        @media (min-width : $collapse-first-width + 1) {
+            display : block;
+        }
+    }
+}

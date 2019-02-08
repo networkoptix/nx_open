@@ -1,4 +1,4 @@
-import yaml
+import json
 from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -90,7 +90,9 @@ class CustomContextForm(forms.Form):
 
             disabled = data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced'))
 
-            if data_structure.type == DataStructure.DATA_TYPES.long_text:
+            if data_structure.type in [DataStructure.DATA_TYPES.long_text,
+                                       DataStructure.DATA_TYPES.object,
+                                       DataStructure.DATA_TYPES.array]:
                 widget_type = forms.Textarea(attrs={'placeholder': data_structure.default})
 
             if data_structure.type == DataStructure.DATA_TYPES.html:
@@ -123,7 +125,8 @@ class CustomContextForm(forms.Form):
                 queryset = data_structure.meta_settings['options'] if 'options' in data_structure.meta_settings else []
                 queryset = [(choice, choice) for choice in queryset]
                 if 'multi' in data_structure.meta_settings and data_structure.meta_settings['multi']:
-                    record_value = yaml.safe_load(record_value)
+                    if record_value:
+                        record_value = json.loads(record_value)
                     self.fields[data_structure.name] = forms.MultipleChoiceField(label=ds_label,
                                                                                  help_text=ds_description,
                                                                                  initial=record_value,

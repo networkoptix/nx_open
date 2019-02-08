@@ -1,0 +1,22 @@
+#!/bin/sh -e
+#
+
+### BEGIN INIT INFO
+# Provides: root-tool
+# Required-Start: $local_fs $network $remote_fs
+# Required-Stop:
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop root-tool
+# Description: root-tool
+### END INIT INFO
+
+SERVICE=@deb.customization.company.name@-root-tool
+COMMAND=$1
+
+echo "Rather than invoking init scripts through /etc/init.d, use the service(8)" >&2
+echo "utility, e.g. service $SERVICE $COMMAND" >&2
+echo >&2
+
+service $SERVICE $COMMAND || exit $?
+

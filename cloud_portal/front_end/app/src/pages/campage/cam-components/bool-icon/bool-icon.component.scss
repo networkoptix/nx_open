@@ -1,0 +1,18 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+
+.icon-positive {
+    font-size : 1rem;
+    color     : $dark9;
+}
+
+.icon-negative {
+    font-size : 1rem;
+    color     : $light10;
+}
+
+.icon-unknown {
+    font-size   : 1rem;
+    font-family : $font-family-medium;
+    color       : $dark9;
+}

@@ -1,8 +1,8 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, SimpleChange, SimpleChanges, ViewEncapsulation } from '@angular/core';
 
 /* Usage
  <nx-right-layout>
-    <nx-block first>
+    <nx-block first-element>
          <header>
             Some data (TOP)
          </header>
@@ -12,7 +12,7 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
          </nx-section>
     </nx-block>
 
-    <nx-block side>
+    <nx-block side-element>
          <header>
             Menu (SIDE)
          </header>
@@ -43,10 +43,18 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 export class NxLayoutRightComponent implements OnInit {
 
     @Input('loading') loading: any;
+    @Input('toggle') toggle: any;
+    private _toggle: string;
 
     constructor() {
     }
 
     ngOnInit() {
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.toggle) {
+            this._toggle = changes.toggle.currentValue;
+        }
     }
 }

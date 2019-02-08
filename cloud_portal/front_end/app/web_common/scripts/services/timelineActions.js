@@ -78,11 +78,12 @@
             var intervalMs = Math.abs(self.scope.lastPlayedPosition - self.positionProvider.playedPosition);
             var duration = Math.min(self.timelineConfig.animationDuration, intervalMs);
             var largeJump = intervalMs > 2 * self.timelineConfig.animationDuration;
-            
+    
             if (intervalMs === 0) {
                 self.updatePlayingState(null); // No need to animate, update position
                 return;
             }
+            
             if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
                 // this animation makes scaleManager move smoothly while playing
                 self.animateScope.animate(self.scope, 'lastPlayedPosition', self.positionProvider.playedPosition,
@@ -115,7 +116,7 @@
         
         this.updatePlayingState(position); // Force set clicked position as playing
         
-        return window.timeManager.displayToServer(position);
+        return position;
     };
 
     // linear is for holding function

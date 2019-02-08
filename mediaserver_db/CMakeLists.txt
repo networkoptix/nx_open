@@ -1,1 +1,0 @@
-nx_add_target(mediaserver_db LIBRARY PUBLIC_LIBS common appserver2 nx_fusion nx_network)

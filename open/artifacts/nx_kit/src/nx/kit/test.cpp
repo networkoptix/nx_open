@@ -11,9 +11,17 @@
 #include <vector>
 #include <fstream>
 
+#if defined(_WIN32)
+    #include <direct.h> //< For mkdir().
+#else
+    #include <sys/stat.h> //< For mkdir().
+#endif
+
 namespace nx {
 namespace kit {
 namespace test {
+
+bool verbose = true;
 
 namespace detail {
 
@@ -155,8 +163,11 @@ int regTest(const Test& test)
 {
     allTests().push_back(test);
 
-    std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
-        << test.testCase << "." << test.testName << std::endl;
+    if (verbose)
+    {
+        std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
+            << test.testCase << "." << test.testName << std::endl;
+    }
 
     return 0; //< Return value is not used.
 }
@@ -191,8 +202,12 @@ static std::string systemTempDir()
 /** Create directory, issuing a fatal error on failure. */
 static void createDir(const std::string& dir)
 {
-    // NOTE: mkdir works in both Windows and Linux.
-    if (system(("mkdir \"" + dir + "\"").c_str()) != 0)
+#if defined(_WIN32)
+    const int resultCode = _mkdir(dir.c_str());
+#else
+        const int resultCode = mkdir(dir.c_str(), /*octal*/ 0777);
+#endif
+    if (resultCode != 0)
         fatalError("Unable to create dir: [%s]", dir.c_str());
 }
 
@@ -204,7 +219,8 @@ static std::string randAsString()
         auto seed = (unsigned int) std::chrono::steady_clock::now().time_since_epoch().count();
         srand(seed);
         randomized = true;
-        printNote("Randomized with seed %u", seed);
+        if (verbose)
+            printNote("Randomized with seed %u", seed);
     }
 
     std::ostringstream s;
@@ -303,10 +319,30 @@ const char* tempDir()
     {
         test->tempDir = baseTempDir() + test->testCase + "." + test->testName + kPathSeparator;
         createDir(test->tempDir);
-        printNote("Created temp dir: [%s]", test->tempDir.c_str());
+
+        if (verbose)
+            printNote("Created temp dir: [%s]", test->tempDir.c_str());
     }
 
     return test->tempDir.c_str();
+}
+
+const char* staticTempDir()
+{
+    Test* const test = currentTest();
+    if (test)
+        fatalError("tempDir() called inside a TEST() body.");
+
+    static std::string staticTempDir;
+    if (!staticTempDir.empty())
+        return staticTempDir.c_str();
+    staticTempDir = baseTempDir() + "static" + kPathSeparator;
+    createDir(staticTempDir);
+
+    if (verbose)
+        printNote("Created temp dir for static tests: [%s]", staticTempDir.c_str());
+
+    return staticTempDir.c_str();
 }
 
 static bool runTest(Test& test, int testNumber)
@@ -393,7 +429,8 @@ void createFile(const char* filename, const char* content)
     if (!(s << content))
         fatalError("Unable to write to temp file: [%s]", filename);
 
-    printNote("Created temp file: [%s]", filename);
+    if (verbose)
+        printNote("Created temp file: [%s]", filename);
 }
 
 } // namespace test

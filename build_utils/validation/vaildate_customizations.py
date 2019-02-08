@@ -13,7 +13,7 @@ customizable_projects = [
     'icons',
     'mediaserver_core',
     'wixsetup',
-    'nx_client_desktop'
+    'nx_vms_client_desktop'
 ]
 
 verbose = False
@@ -76,7 +76,7 @@ def validate_project(customized, project, mandatory_files, skipped_modules, skin
     for file in customized_files - mandatory_files:
         if is_intro(file):
             continue
-        if project == 'nx_client_desktop' and file.startswith('resources/skin/'):
+        if project == 'nx_vms_client_desktop' and file.startswith('resources/skin/'):
             icon = file[len('resources/skin/'):]
             if icon in skin_files:
                 continue
@@ -130,7 +130,7 @@ def validate_skins(root_dir):
     * every customized icon must exist either in the default skin or in static files
     '''
 
-    client_dir = os.path.join(root_dir, 'client', 'nx_client_desktop')
+    client_dir = os.path.join(root_dir, 'vms', 'client', 'nx_vms_client_desktop')
     client_skins_dir = os.path.join(client_dir, 'skins')
     client_static_dir = os.path.join(client_dir, 'static-resources', 'skin')
     default_skin_dir = os.path.join(client_skins_dir, DEFAULT_SKIN, 'skin')
@@ -161,7 +161,7 @@ def validate_skins(root_dir):
 
 
 def validate_desktop_client_icons(root_dir, skin_files):
-    client_dir = os.path.join(root_dir, 'client', 'nx_client_desktop')
+    client_dir = os.path.join(root_dir, 'vms', 'client', 'nx_vms_client_desktop')
     sources = [
         os.path.join(client_dir, 'src'),
         os.path.join(client_dir, 'static-resources', 'src', 'qml')

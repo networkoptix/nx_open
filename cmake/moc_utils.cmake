@@ -59,7 +59,13 @@ function(nx_add_qt_mocables target)
 
     set(moc_dirs)
 
+    get_target_property(target_dir ${target} SOURCE_DIR)
+
     foreach(file ${MOC_UNPARSED_ARGUMENTS})
+        if(NOT IS_ABSOLUTE ${file})
+            set(file ${target_dir}/${file})
+        endif()
+
         _get_moc_file_name(moc_file ${file})
         get_filename_component(path ${moc_file} PATH)
         list(APPEND moc_dirs ${path})
@@ -76,7 +82,7 @@ function(nx_add_qt_mocables target)
 
         if(moc_file MATCHES ".moc$")
             get_filename_component(path ${moc_file} PATH)
-            set_property(SOURCE ${file} APPEND PROPERTY COMPILE_FLAGS " -I${path}")
+            set_property(SOURCE ${file} APPEND_STRING PROPERTY COMPILE_FLAGS " -I${path}")
         endif()
     endforeach()
 

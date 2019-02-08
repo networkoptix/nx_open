@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Fragment Id="ClientMsiIntefaceFragment">
+        <UIRef Id="WixUI_Common" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+
+        <UI Id="ClientMsiUi">
+            <!-- These dialog references are needed for CloseApplication above to work correctly -->
+            <DialogRef Id="FilesInUse" />
+            <DialogRef Id="MsiRMFilesInUse" />
+
+            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+            <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+            <DialogRef Id="SelectionWarningDlg" />
+            <DialogRef Id="BrowseDlg" />
+            <DialogRef Id="DiskCostDlg" />
+            <DialogRef Id="ErrorDlg" />
+            <DialogRef Id="FatalError" />
+            <DialogRef Id="FilesInUse" />
+            <DialogRef Id="MsiRMFilesInUse" />
+            <DialogRef Id="PrepareDlg" />
+            <DialogRef Id="ProgressDlg" />
+            <DialogRef Id="ResumeDlg" />
+            <DialogRef Id="UserExit" />
+            <!--Width="260" Height="85"-->
+
+            <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
+
+            <Publish
+                Dialog="MyExitDialog"
+                Control="Finish"
+                Event="EndDialog"
+                Value="Return"
+                Order="999">1</Publish>
+            <Publish
+                Dialog="MyExitDialog"
+                Control="Finish"
+                Order="1"
+                Event="DoAction"
+                Value="LaunchClient">
+                WIXUI_EXITDIALOGOPTIONALCHECKBOX
+            </Publish>
+
+            <Publish
+                Dialog="WelcomeDlg"
+                Control="Next"
+                Event="NewDialog"
+                Value="LicenseAgreementDlg">
+                NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED
+            </Publish>
+            <Publish
+                Dialog="WelcomeDlg"
+                Control="Next"
+                Event="NewDialog"
+                Value="ClientDlg">
+                NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED
+            </Publish>
+            <Publish
+                Dialog="WelcomeDlg"
+                Control="Next"
+                Event="NewDialog"
+                Value="UpgradeDlg">
+                PREVIOUSVERSIONSINSTALLED
+            </Publish>
+
+            <Publish
+                Dialog="UpgradeDlg"
+                Control="Back"
+                Event="NewDialog"
+                Value="WelcomeDlg">1</Publish>
+            <Publish
+                Dialog="UpgradeDlg"
+                Control="Next"
+                Event="NewDialog"
+                Value="VerifyReadyDlg">1</Publish>
+
+            <Publish
+                Dialog="LicenseAgreementDlg"
+                Control="Back"
+                Event="NewDialog"
+                Value="WelcomeDlg">1</Publish>
+            <Publish
+                Dialog="LicenseAgreementDlg"
+                Control="Next"
+                Event="NewDialog"
+                Value="ClientDlg">
+                LicenseAccepted = "1"
+            </Publish>
+
+            <Publish
+                Dialog="ClientDlg"
+                Control="Back"
+                Event="NewDialog"
+                Value="LicenseAgreementDlg"
+                Order="2">
+                NOT LICENSE_ALREADY_ACCEPTED
+            </Publish>
+            <Publish
+                Dialog="ClientDlg"
+                Control="Back"
+                Event="NewDialog"
+                Value="WelcomeDlg"
+                Order="2">
+                LICENSE_ALREADY_ACCEPTED
+            </Publish>
+            <Publish
+                Dialog="ClientDlg"
+                Control="Next"
+                Event="NewDialog"
+                Value="VerifyReadyDlg"
+                Order="2">1</Publish>
+
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="Back"
+                Event="NewDialog"
+                Value="ClientDlg">1</Publish>
+
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="Install"
+                Event="AddLocal"
+                Value="ClientFeature">
+                INSTALL_CLIENT
+            </Publish>
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="Install"
+                Event="Remove"
+                Value="ClientFeature">
+                NOT INSTALL_CLIENT
+            </Publish>
+
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="InstallNoShield"
+                Event="AddLocal"
+                Value="ClientFeature">
+                INSTALL_CLIENT
+            </Publish>
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="InstallNoShield"
+                Event="Remove"
+                Value="ClientFeature">
+                NOT INSTALL_CLIENT
+            </Publish>
+
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="Change"
+                Event="AddLocal"
+                Value="ClientFeature">
+                INSTALL_CLIENT
+            </Publish>
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="Change"
+                Event="Remove"
+                Value="ClientFeature">
+                NOT INSTALL_CLIENT
+            </Publish>
+
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="ChangeNoShield"
+                Event="AddLocal"
+                Value="ClientFeature">
+                INSTALL_CLIENT
+            </Publish>
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="ChangeNoShield"
+                Event="Remove"
+                Value="ClientFeature">
+                NOT INSTALL_CLIENT
+            </Publish>
+
+            <Publish
+                Dialog="VerifyReadyDlg"
+                Control="Install"
+                Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT"
+                Value="Launch [ProductName] when setup exits.">1</Publish>
+        </UI>
+    </Fragment>
+</Wix>

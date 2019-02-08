@@ -1,9 +1,12 @@
 #include "cloud_system_fixture.h"
 
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 
 namespace test {
 
@@ -26,14 +29,22 @@ bool Cloud::initialize()
     return m_cdb.startAndWaitUntilStarted();
 }
 
-nx::cdb::AccountWithPassword Cloud::registerCloudAccount()
+void Cloud::installProxyBeforeCdb(
+    std::unique_ptr<nx::network::StreamProxy> proxy,
+    const nx::network::SocketAddress& proxyEndpoint)
+{
+    m_cdbProxy = std::move(proxy);
+    m_proxyEndpoint = proxyEndpoint;
+}
+
+nx::cloud::db::AccountWithPassword Cloud::registerCloudAccount()
 {
     return m_cdb.addActivatedAccount2();
 }
 
 bool Cloud::connectToCloud(
     VmsPeer& peerWrapper,
-    const nx::cdb::AccountWithPassword& ownerAccount)
+    const nx::cloud::db::AccountWithPassword& ownerAccount)
 {
     const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
     if (!peerWrapper.saveCloudSystemCredentials(
@@ -59,38 +70,43 @@ bool Cloud::connectToCloud(
     return true;
 }
 
-nx::cdb::CdbLauncher& Cloud::cdb()
+nx::cloud::db::CdbLauncher& Cloud::cdb()
 {
     return m_cdb;
 }
 
-const nx::cdb::CdbLauncher& Cloud::cdb() const
+const nx::cloud::db::CdbLauncher& Cloud::cdb() const
 {
     return m_cdb;
+}
+
+nx::network::SocketAddress Cloud::cdbEndpoint() const
+{
+    return m_proxyEndpoint ? *m_proxyEndpoint : m_cdb.endpoint();
 }
 
 bool Cloud::isSystemRegistered(
-    const nx::cdb::AccountWithPassword& account,
+    const nx::cloud::db::AccountWithPassword& account,
     const std::string& cloudSystemId) const
 {
-    nx::cdb::api::SystemDataEx system;
+    nx::cloud::db::api::SystemDataEx system;
     const auto resultCode =
         m_cdb.getSystem(account.email, account.password, cloudSystemId, &system);
-    return resultCode == nx::cdb::api::ResultCode::ok;
+    return resultCode == nx::cloud::db::api::ResultCode::ok;
 }
 
 bool Cloud::isSystemOnline(
-    const nx::cdb::AccountWithPassword& account,
+    const nx::cloud::db::AccountWithPassword& account,
     const std::string& cloudSystemId) const
 {
-    nx::cdb::api::SystemDataEx system;
+    nx::cloud::db::api::SystemDataEx system;
     if (m_cdb.getSystem(account.email, account.password, cloudSystemId, &system) !=
-            nx::cdb::api::ResultCode::ok)
+            nx::cloud::db::api::ResultCode::ok)
     {
         return false;
     }
 
-    return system.stateOfHealth == nx::cdb::api::SystemHealth::online;
+    return system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -152,14 +168,9 @@ std::unique_ptr<VmsSystem> VmsSystem::detachServer(int index)
 
 bool VmsSystem::connectToCloud(
     Cloud* cloud,
-    const nx::cdb::AccountWithPassword& cloudAccount)
+    const nx::cloud::db::AccountWithPassword& cloudAccount)
 {
-    if (!cloud->connectToCloud(peer(0), cloudAccount))
-        return false;
-
-    // TODO
-
-    return true;
+    return cloud->connectToCloud(peer(0), cloudAccount);
 }
 
 bool VmsSystem::isConnectedToCloud() const
@@ -196,7 +207,7 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
     systemMergeFixture.addSetting(
         "-cloudIntegration/cloudDbUrl",
         nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(m_cloud.cdb().endpoint()).toString().toStdString());
+            .setEndpoint(m_cloud.cdbEndpoint()).toString().toStdString());
 
     systemMergeFixture.addSetting(
         "-cloudIntegration/delayBeforeSettingMasterFlag",
@@ -218,7 +229,7 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
     const VmsPeer& vmsPeer,
     const std::string& cloudSystemId,
-    const nx::cdb::AccountWithPassword& account)
+    const nx::cloud::db::AccountWithPassword& account)
 {
     auto mediaServerClient = vmsPeer.mediaServerClient();
 
@@ -241,13 +252,16 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
         if (vmsTransactionLog == cloudTransactionLog)
             break;
 
+        NX_VERBOSE(this, "VMS transaction log: %1", QJson::serialized(vmsTransactionLog));
+        NX_VERBOSE(this, "Cloud transaction log: %1", QJson::serialized(cloudTransactionLog));
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
 void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
     VmsSystem* vmsSystem,
-    const nx::cdb::AccountWithPassword& account)
+    const nx::cloud::db::AccountWithPassword& account)
 {
     waitUntilVmsTransactionLogMatchesCloudOne(
         vmsSystem->peer(0),

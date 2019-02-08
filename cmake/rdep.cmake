@@ -1,4 +1,6 @@
-set(rdep_dir "${CMAKE_SOURCE_DIR}/build_utils/python")
+if(NOT rdep_dir)
+    set(rdep_dir "${CMAKE_SOURCE_DIR}/build_utils/python")
+endif()
 
 set(packagesDir "" CACHE STRING "Custom RDep repository directory")
 mark_as_advanced(packagesDir)

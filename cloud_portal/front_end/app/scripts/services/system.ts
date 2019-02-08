@@ -108,7 +108,7 @@ import * as angular from 'angular';
                             this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
                                     || CONFIG.allowDebugMode
                                     || CONFIG.allowBetaMode);
-                            this.mergeInfo = this.info.mergeInfo;
+                            this.mergeInfo = result.data[0].mergeInfo;
 
                             this.checkPermissions();
 
