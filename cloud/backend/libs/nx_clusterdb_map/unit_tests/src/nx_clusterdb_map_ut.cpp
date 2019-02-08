@@ -28,18 +28,71 @@ public:
     }
 
 protected:
-    void SetUp() override
+    void givenOneDb()
     {
-        ASSERT_TRUE(initializeQueryExecutor());
-
-        m_db = std::make_unique<map::Database>(
-            defaultDbSettings(),
-            m_queryExecutor.get());
+        addDbs(1);
     }
 
-    void whenSaveKeyValuePair()
+    void givenTwoDbs()
     {
-        m_db->dataManager().save(m_randomPair.key, m_randomPair.value,
+        addDbs(2);
+    }
+
+    void givenDbWithRandomKeyValuePair()
+    {
+        givenOneDb();
+        givenRandomKeyValuePair();
+        whenSaveKeyValuePair();
+        thenOperationSucceeded();
+    }
+
+    void givenTwoSynchronizedDbsWithRandomKeyValuePair()
+    {
+        givenTwoDbs();
+        whenSaveKeyValuePair();
+
+        thenOperationSucceeded();
+        andValueIsInDb();
+        andValueIsInSecondDb();
+    }
+
+    void givenEmptyDb()
+    {
+        givenOneDb();
+    }
+
+    void givenKeyValuePairWithEmptyKey()
+    {
+        randomPair()->value = randomString();
+    }
+
+    void givenRandomKeyValuePair()
+    {
+        randomPair()->key = randomString();
+        randomPair()->value = randomString();
+    }
+
+    void givenTwoKeyValuePairsWithSameKey()
+    {
+        std::string sameKey = "Same Key";
+
+        randomPair()->key = sameKey;
+        randomPair()->value = "A Value";
+
+        randomPair(1)->key = sameKey;
+        randomPair(1)->value = "A Different Value";
+    }
+
+    void givenAnotherRandomKeyValuePair()
+    {
+        givenRandomKeyValuePair();
+    }
+
+    void whenSaveKeyValuePair(size_t dbIndex = 0, size_t randomPairIndex = 0)
+    {
+        db(dbIndex)->dataManager().insertOrUpdate(
+            randomPair(randomPairIndex)->key,
+            randomPair(randomPairIndex)->value,
             [this](map::ResultCode result)
             {
                 m_result = result;
@@ -49,11 +102,42 @@ protected:
         waitForCallback();
     }
 
-    void whenSaveSameKeyValuePairTwice()
+    void whenSaveSecondKeyValuePair()
     {
-        whenSaveKeyValuePair();
-        thenOperationSucceeded();
-        whenSaveKeyValuePair();
+        whenSaveKeyValuePair(/*dbIndex*/ 0, /*randomPairIndex*/ 1);
+    }
+
+    void whenFetchValue(size_t dbIndex = 0, size_t randomPairIndex = 0)
+    {
+        db(dbIndex)->dataManager().get(
+            randomPair(randomPairIndex)->key,
+            [this](map::ResultCode result, std::string value)
+            {
+                m_result = result;
+                m_fetchedValue = value;
+                callbackFired();
+            });
+
+        waitForCallback();
+    }
+
+    void whenRemoveKey()
+    {
+        db()->dataManager().remove(randomPair()->key,
+            [this](map::ResultCode result)
+            {
+                m_result = result;
+                callbackFired();
+            });
+
+        waitForCallback();
+    }
+
+    void whenRemoveNonExistentKey()
+    {
+        randomPair()->key += "-NonExistentKey";
+        andValueIsNotInDb();
+        whenRemoveKey();
     }
 
     void thenOperationSucceeded()
@@ -66,81 +150,50 @@ protected:
         ASSERT_EQ(result, m_result);
     }
 
-    void givenDatabaseWithRandomKeyValuePair()
+    void andFetchedValueMatchesRandomValue(size_t randomPairIndex = 0)
     {
-        givenRandomKeyValuePair();
-        whenSaveKeyValuePair();
-        thenOperationSucceeded();
-    }
-
-    void givenEmptyDatabase()
-    {
-        givenRandomKeyValuePair();
-        // Don't insert random pair.
-    }
-
-    void givenKeyValuePairWithEmptyKey()
-    {
-        m_randomPair.value = randomString();
-    }
-
-    void givenRandomKeyValuePair()
-    {
-        m_randomPair.key = randomString();
-        m_randomPair.value = randomString();
-    }
-
-    void givenAnotherRandomKeyValuePair()
-    {
-        givenRandomKeyValuePair();
-    }
-
-    void whenFetchValue()
-    {
-        m_db->dataManager().get(m_randomPair.key,
-            [this](map::ResultCode result, std::string value)
-            {
-                m_result = result;
-                m_fetchedValue = value;
-                callbackFired();
-            });
-
-        waitForCallback();
-    }
-
-    void andFetchedValueMatchesRandomValue()
-    {
-        ASSERT_EQ(m_randomPair.value, m_fetchedValue);
-    }
-
-    void whenRemoveKey()
-    {
-        m_db->dataManager().remove(m_randomPair.key,
-            [this](map::ResultCode result)
-            {
-                m_result = result;
-                callbackFired();
-            });
-
-        waitForCallback();
-    }
-
-    void whenRemoveNonExistentKey()
-    {
-        m_randomPair.key = "mangledKey";
-        whenRemoveKey();
-    }
-
-    void andValueIsNotInDatabase()
-    {
-        whenFetchValue();
-        thenOperationFailed(map::ResultCode::notFound);
-        andFetchedValueIsEmpty();
+        ASSERT_EQ(randomPair(randomPairIndex)->value, m_fetchedValue);
     }
 
     void andFetchedValueIsEmpty()
     {
         ASSERT_TRUE(m_fetchedValue.empty());
+    }
+
+    void andValueIsInDb(size_t dbIndex = 0)
+    {
+        m_fetchedValue.clear();
+        whenFetchValue(dbIndex);
+        thenOperationSucceeded();
+        andFetchedValueMatchesRandomValue();
+    }
+
+    void andValueIsInSecondDb()
+    {
+        andValueIsInDb(/*dbIndex*/ 1);
+    }
+
+    void andValueIsNotInDb(size_t dbIndex = 0)
+    {
+        whenFetchValue(dbIndex);
+        thenOperationFailed(map::ResultCode::notFound);
+        andFetchedValueIsEmpty();
+    }
+
+    void andValueIsNotInSecondDb()
+    {
+        andValueIsNotInDb(/*dbIndex*/ 1);
+    }
+
+    void andSecondValueReplacedFirst()
+    {
+        std::string oldValue = m_fetchedValue;
+
+        // Search for value associated with first random pair, not second.
+        whenFetchValue(/*dbIndex*/ 0, /*randomPairIndex*/ 0);
+        thenOperationSucceeded();
+
+        ASSERT_NE(oldValue, m_fetchedValue);
     }
 
 private:
@@ -149,13 +202,6 @@ private:
         Settings settings;
         settings.dataSyncEngineSettings.maxConcurrentConnectionsFromSystem = 7;
         return settings;
-    }
-
-    bool initializeQueryExecutor()
-    {
-        m_queryExecutor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(
-            dbConnectionOptions());
-        return m_queryExecutor->init();
     }
 
     void waitForCallback()
@@ -171,11 +217,53 @@ private:
         m_wait.notify_all();
     }
 
-private:
-    std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_queryExecutor;
-    std::unique_ptr<map::Database> m_db;
+    map::Database* db(size_t index = 0)
+    {
+        return m_databases[index].db.get();
+    }
 
-    KeyValuePair m_randomPair;
+    void addDbs(int count)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            auto queryExecutor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(
+                dbConnectionOptions());
+
+            ASSERT_TRUE(queryExecutor->init());
+
+            m_databases.emplace_back(std::move(queryExecutor), defaultDbSettings());
+        }
+    }
+
+    KeyValuePair* randomPair(size_t index = 0)
+    {
+        NX_ASSERT(0 <= index && index <= m_randomPairs.size());
+
+        if (index == m_randomPairs.size())
+            m_randomPairs.emplace_back(KeyValuePair());
+
+        return &m_randomPairs[index];
+    }
+
+private:
+    struct DBContext
+    {
+        std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> queryExecutor;
+        std::unique_ptr<map::Database> db;
+
+        DBContext(
+            std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> queryExecutor,
+            const Settings& dbSettings)
+            :
+            queryExecutor(std::move(queryExecutor)),
+            db(std::make_unique<map::Database>(dbSettings, this->queryExecutor.get()))
+        {
+        }
+    };
+
+    std::vector<DBContext> m_databases;
+
+    std::vector<KeyValuePair> m_randomPairs;
     map::ResultCode m_result;
     std::string m_fetchedValue;
 
@@ -186,59 +274,69 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(Database, saves_key_value_pair)
-{
-    givenRandomKeyValuePair();
-    whenSaveKeyValuePair();
-
-    thenOperationSucceeded();
-}
-
 TEST_F(Database, fetches_key_value_pair)
 {
-    givenDatabaseWithRandomKeyValuePair();
+    givenDbWithRandomKeyValuePair();
     whenFetchValue();
 
     thenOperationSucceeded();
     andFetchedValueMatchesRandomValue();
 }
 
+TEST_F(Database, saves_key_value_pair)
+{
+    givenEmptyDb();
+    givenRandomKeyValuePair();
+    whenSaveKeyValuePair();
+
+    thenOperationSucceeded();
+    andValueIsInDb();
+}
+
 TEST_F(Database, removes_key_value_pair)
 {
-    givenDatabaseWithRandomKeyValuePair();
+    givenDbWithRandomKeyValuePair();
     whenRemoveKey();
 
     thenOperationSucceeded();
-    andValueIsNotInDatabase();
+    andValueIsNotInDb();
+}
+
+TEST_F(Database, updates_key_value_pair)
+{
+    givenEmptyDb();
+    givenTwoKeyValuePairsWithSameKey();
+
+    whenSaveKeyValuePair();
+    thenOperationSucceeded();
+    andValueIsInDb();
+
+    whenSaveSecondKeyValuePair();
+    thenOperationSucceeded();
+    andSecondValueReplacedFirst();
+}
+
+TEST_F(Database, handles_removing_non_existent_key)
+{
+    givenDbWithRandomKeyValuePair();
+    whenRemoveNonExistentKey();
+
+    thenOperationSucceeded();
 }
 
 TEST_F(Database, fails_to_fetch_non_existent_value)
 {
-    givenEmptyDatabase();
+    givenEmptyDb();
+    givenRandomKeyValuePair();
     whenFetchValue();
 
     thenOperationFailed(map::ResultCode::notFound);
     andFetchedValueIsEmpty();
 }
 
-TEST_F(Database, nothing_happens_when_removing_non_existent_key)
-{
-    givenDatabaseWithRandomKeyValuePair();
-    whenRemoveNonExistentKey();
-
-    thenOperationSucceeded();
-}
-
-TEST_F(Database, nothing_happens_when_saving_duplicate_key)
-{
-    givenRandomKeyValuePair();
-    whenSaveSameKeyValuePairTwice();
-
-    thenOperationSucceeded();
-}
-
 TEST_F(Database, rejects_save_with_empty_key)
 {
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
     whenSaveKeyValuePair();
 
@@ -247,6 +345,7 @@ TEST_F(Database, rejects_save_with_empty_key)
 
 TEST_F(Database, rejects_fetch_with_empty_string)
 {
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
     whenFetchValue();
 
@@ -255,10 +354,33 @@ TEST_F(Database, rejects_fetch_with_empty_string)
 
 TEST_F(Database, rejects_remove_with_empty_string)
 {
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
     whenRemoveKey();
 
     thenOperationFailed(map::ResultCode::logicError);
+}
+
+TEST_F(Database, DISABLED_multiple_databases_synchronize_save_operation)
+{
+    givenTwoDbs();
+    givenRandomKeyValuePair();
+    whenSaveKeyValuePair();
+
+    thenOperationSucceeded();
+    andValueIsInDb();
+    andValueIsInSecondDb();
+}
+
+TEST_F(Database, DISABLED_multiple_databases_synchronize_remove_operation)
+{
+    givenTwoSynchronizedDbsWithRandomKeyValuePair();
+
+    whenRemoveKey();
+    thenOperationSucceeded();
+
+    andValueIsNotInDb();
+    andValueIsNotInSecondDb();
 }
 
 } // namespace nx::clusterdb::map::test
