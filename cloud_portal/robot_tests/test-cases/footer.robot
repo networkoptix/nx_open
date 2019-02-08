@@ -24,23 +24,6 @@ About page is correctly displayed
     Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
 
-Known limitations Support link is clickable and lead to the proper site
-    [tags]    C41543    Threaded
-    Wait Until Element Is Visible    ${FOOTER KNOWN LIMITS LINK}
-    Click Link    ${FOOTER KNOWN LIMITS LINK}
-    Location Should Be    ${ENV}${KNOWN LIMITATIONS URL}
-    Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
-    Click Link    ${REMOTE CONNECTIVITY TILE LINK}
-   ${tabs}    Get Window Handles
-    Select Window    @{tabs}[1]
-    Location Should Contain    ${SUPPORT URL}
-    Select Window    @{tabs}[0]
-    Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
-    Click Link    ${SUPPORT TILE LINK}
-    ${tabs}    Get Window Handles
-    Select Window    @{tabs}[2]
-    Location Should Contain    ${SUPPORT URL}
-
 Support leads to the proper support site
     [tags]    C41544    Threaded
     Wait Until Element Is Visible    ${FOOTER SUPPORT LINK}
