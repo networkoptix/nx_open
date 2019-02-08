@@ -916,6 +916,9 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::updatePtzController()
 {
+    if (!item())
+        return;
+
     const auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
     const auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
@@ -2611,6 +2614,9 @@ void QnMediaResourceWidget::updateDewarpingParams()
 
 void QnMediaResourceWidget::updateFisheye()
 {
+    if (!item())
+        return;
+
     auto itemParams = item()->dewarpingParams();
 
     // Zoom windows have no own "dewarping" button, so counting it always pressed.
