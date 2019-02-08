@@ -40,7 +40,7 @@ protected:
 
 private:
     struct Private;
-    utils::ImplPtr<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

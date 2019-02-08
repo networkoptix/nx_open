@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
 #include <QtCore/QHash>
 #include <QtCore/QSharedPointer>
