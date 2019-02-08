@@ -639,11 +639,11 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 }
 
 nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
+    MotionStreamType streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto& capabilitiesList = (streamIndex == Qn::StreamIndex::primary)
+    const auto& capabilitiesList = (streamIndex == MotionStreamType::primary)
         ? m_primaryStreamCapabilitiesList : m_secondaryStreamCapabilitiesList;
 
     nx::vms::server::resource::StreamCapabilityMap result;
@@ -1958,14 +1958,13 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     _oasisWsnB2__Subscribe request;
-    std::string address = std::string("http://") + localAddress + std::string(":")
+    std::string address = std::string("http://") + localAddress + ":"
         + std::to_string(QnSoapServer::instance()->port())
         + QnSoapServer::instance()->path().toStdString();
     request.ConsumerReference.Address = address.data();
 
     std::string duration = std::string("PT")
-        + std::to_string(DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT)
-        + std::string("S");
+        + std::to_string(DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT) + "S";
     request.InitialTerminationTime = &duration;
 
     //creating filter
@@ -3224,7 +3223,7 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters()
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
     onvifXsd__VideoEncoderConfiguration& encoder,
-    Qn::StreamIndex /*streamIndex*/,
+    MotionStreamType /*streamIndex*/,
     const QnLiveStreamParams& /*params*/)
 {
     return sendVideoEncoderToCamera(encoder);
@@ -3232,7 +3231,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoder2ToCameraEx(
     onvifXsd__VideoEncoder2Configuration& encoder,
-    Qn::StreamIndex /*streamIndex*/,
+    MotionStreamType /*streamIndex*/,
     const QnLiveStreamParams& /*params*/)
 {
     return sendVideoEncoder2ToCamera(encoder);
@@ -4612,9 +4611,9 @@ void QnPlOnvifResource::setMaxChannels(int value)
 }
 
 QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderCapabilities(
-    SupportedVideoEncoding encoding, Qn::StreamIndex streamIndex)
+    SupportedVideoEncoding encoding, MotionStreamType streamIndex)
 {
-    const std::vector<VideoEncoderCapabilities>& list = (streamIndex == Qn::StreamIndex::primary)
+    const std::vector<VideoEncoderCapabilities>& list = (streamIndex == MotionStreamType::primary)
         ? m_primaryStreamCapabilitiesList
         : m_secondaryStreamCapabilitiesList;
 
@@ -4641,7 +4640,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
 
 void QnPlOnvifResource::updateVideoEncoder1(
     onvifXsd__VideoEncoderConfiguration& encoder,
-    Qn::StreamIndex streamIndex,
+    MotionStreamType streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     QnLiveStreamParams params = streamParams;
@@ -4738,7 +4737,7 @@ void QnPlOnvifResource::updateVideoEncoder1(
 
 void QnPlOnvifResource::updateVideoEncoder2(
     onvifXsd__VideoEncoder2Configuration& encoder,
-    Qn::StreamIndex streamIndex,
+    MotionStreamType streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     const QnResourceData resourceData = this->resourceData();

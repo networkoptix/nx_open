@@ -139,5 +139,5 @@ void QnMediaServerResourceSearchers::clear()
     for (auto searcher: m_searchers.values())
         delete searcher;
     m_searchers.clear();
-    // What about cleaning QnResourceDiscoveryManager::m_searchersList?
+    // TODO: Investigate if cleaning QnResourceDiscoveryManager::m_searchersList is needed.
 }

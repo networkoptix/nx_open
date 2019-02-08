@@ -35,7 +35,6 @@ OutputRedirector::OutputRedirector()
     redirectStdoutAndStderrIfNeeded();
 }
 
-
 /*static*/ void OutputRedirector::ensureOutputRedirection()
 {
     // Should be empty. The only purpose for it is to ensure that the linker will not optimize away
@@ -49,9 +48,11 @@ OutputRedirector::OutputRedirector()
     return redirector;
 }
 
-/*static*/ void OutputRedirector::redirectStdoutAndStderrIfNeeded(const char* overridingLogFilesDir/* = nullptr*/)
+/*static*/ void OutputRedirector::redirectStdoutAndStderrIfNeeded(
+    const char* overridingLogFilesDir /*= nullptr*/)
 {
-    const std::string logFilesDir = overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
+    const std::string logFilesDir =
+        overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
 
     const std::string processName = getProcessName();
 
@@ -77,10 +78,12 @@ OutputRedirector::OutputRedirector()
         const std::wstring wNameWithExt =
             wPath.substr((lastSeparatorPos == std::wstring::npos) ? 0 : (lastSeparatorPos + 1));
         const std::wstring exeExt = L".exe";
-        const std::wstring wName = (wNameWithExt.substr(wNameWithExt.size() - exeExt.size()) == exeExt)
+        const std::wstring wName =
+            (wNameWithExt.substr(wNameWithExt.size() - exeExt.size()) == exeExt)
             ? wNameWithExt.substr(0, wNameWithExt.size() - exeExt.size())
             : wNameWithExt;
-        const std::string name = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
+        const std::string name =
+            std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
         LocalFree(argv);
     #elif defined(__APPLE__)
         std::string path_s{(*_NSGetArgv())[0]}; //< Needed because basename() changes the string.

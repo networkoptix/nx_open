@@ -49,8 +49,7 @@ bool QnSoapServer::bind()
     {
         std::ostringstream ss;
         soap_stream_fault(m_service.soap, ss);
-        NX_WARNING(this,
-            "Error binding soap server to local port. %1", QString::fromStdString(ss.str()));
+        NX_WARNING(this, "Error binding soap server to local port. %1", ss.str());
         return false;
     }
 
@@ -153,7 +152,7 @@ void QnSoapServer::run()
                 break;
             std::ostringstream ss;
             soap_stream_fault(m_service.soap, ss);
-            NX_DEBUG(this, "Error serving soap request %1", QString::fromStdString(ss.str()));
+            NX_DEBUG(this, "Error serving soap request %1", ss.str());
         }
         soap_destroy(m_service.soap);
         soap_end(m_service.soap);

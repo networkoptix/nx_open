@@ -68,7 +68,7 @@ void QnUpdateUploader::sendPreambule() {
 
     if (!m_peers.isEmpty()) {
         NX_VERBOSE(this, lit("Update: Send preambule transaction [%1].").arg(getPeersString(m_peers)));
-        commonModule()->ec2Connection()->makeUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
@@ -144,7 +144,7 @@ void QnUpdateUploader::sendNextChunk() {
     if (!m_peers.isEmpty()) {
         NX_VERBOSE(this, lit("Update: Send chunk transaction [%1, %2, %3, %4].")
                .arg(m_updateId).arg(offset).arg(data.size()).arg(getPeersString(m_pendingPeers)));
-        commonModule()->ec2Connection()->makeUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         m_chunkTimer->start(data.isEmpty() ? lastChunkTimeout : chunkTimeout);
     }
 

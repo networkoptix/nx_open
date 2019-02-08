@@ -5,7 +5,7 @@
 #include <vector>
 #include <mutex>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
 
 #include <nx/sdk/analytics/i_engine.h>
@@ -31,8 +31,7 @@ namespace analytics {
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */
-class VideoFrameProcessingDeviceAgent:
-    public nxpt::CommonRefCounter<IConsumingDeviceAgent>
+class VideoFrameProcessingDeviceAgent: public RefCountable<IConsumingDeviceAgent>
 {
 protected:
     const LogUtils logUtils;
@@ -134,7 +133,6 @@ public:
 // Not intended to be used by the descendant.
 
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual Error setHandler(IDeviceAgent::IHandler* handler) override;
     virtual Error pushDataPacket(IDataPacket* dataPacket) override;
     virtual const IString* manifest(Error* error) const override;
@@ -143,6 +141,7 @@ public:
 
 private:
     void assertEngineCasted(void* engine) const;
+    void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
 
 private:
     mutable std::mutex m_mutex;

@@ -25,7 +25,7 @@ QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
 
 struct CameraMediaCapability
 {
-    QMap<Qn::StreamIndex, CameraStreamCapability> streamCapabilities;
+    QMap<nx::vms::api::MotionStreamType, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
     // TODO: move more fields to here like io port settings e.t.c

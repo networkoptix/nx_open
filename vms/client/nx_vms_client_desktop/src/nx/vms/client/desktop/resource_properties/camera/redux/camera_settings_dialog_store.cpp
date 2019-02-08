@@ -259,7 +259,7 @@ void CameraSettingsDialogStore::setIoPortDataList(const QnIOPortDataList& value)
         [&](State state) { return Reducer::setIoPortDataList(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value)
+void CameraSettingsDialogStore::setIoModuleVisualStyle(nx::vms::api::IoModuleVisualStyle value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setIoModuleVisualStyle(std::move(state), value); });
@@ -312,7 +312,7 @@ void CameraSettingsDialogStore::setForcedPtzZoomCapability(bool value)
         [&](State state) { return Reducer::setForcedPtzZoomCapability(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setRtpTransportType(vms::api::RtpTransportType value)
+void CameraSettingsDialogStore::setRtpTransportType(nx::vms::api::RtpTransportType value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setRtpTransportType(std::move(state), value); });
@@ -336,10 +336,10 @@ void CameraSettingsDialogStore::setTrustCameraTime(bool value)
         [&](State state) { return Reducer::setTrustCameraTime(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setMotionStreamType(vms::api::MotionStreamType value)
+void CameraSettingsDialogStore::setForcedMotionStreamType(nx::vms::api::MotionStreamType value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setMotionStreamType(std::move(state), value); });
+        [&](State state) { return Reducer::setForcedMotionStreamType(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setLogicalId(int value)

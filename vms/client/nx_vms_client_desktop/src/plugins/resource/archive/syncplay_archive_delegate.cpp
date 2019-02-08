@@ -136,6 +136,11 @@ nx::vms::api::StreamDataFilters QnSyncPlayArchiveDelegate::streamDataFilter() co
     return m_ownerDelegate->streamDataFilter();
 }
 
+int QnSyncPlayArchiveDelegate::protocol() const
+{
+    return m_ownerDelegate->protocol();
+}
+
 QnAbstractArchiveDelegate::ArchiveChunkInfo QnSyncPlayArchiveDelegate::getLastUsedChunkInfo() const
 {
     return m_ownerDelegate->getLastUsedChunkInfo();

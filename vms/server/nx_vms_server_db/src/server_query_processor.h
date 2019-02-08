@@ -251,8 +251,7 @@ public:
         const Qn::UserAccessData &userAccessData)
         :
         m_owner(owner),
-        m_db(owner->getDb(), userAccessData),
-        m_auditManager(nullptr)
+        m_db(owner->getDb(), userAccessData)
     {
     }
 
@@ -945,10 +944,9 @@ private:
     }
 
 private:
-
-    ServerQueryProcessorAccess* m_owner;
+    ServerQueryProcessorAccess* m_owner = nullptr;
     QnDbManagerAccess m_db;
-    ECConnectionAuditManager* m_auditManager;
+    ECConnectionAuditManager* m_auditManager = nullptr;
     QnAuthSession m_authSession;
 };
 

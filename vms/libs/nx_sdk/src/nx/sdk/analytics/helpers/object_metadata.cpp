@@ -4,26 +4,6 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-void* ObjectMetadata::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_ObjectMetadata)
-    {
-        addRef();
-        return static_cast<IObjectMetadata*>(this);
-    }
-    if (interfaceId == IID_Metadata)
-    {
-        addRef();
-        return static_cast<IMetadata*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 const char* ObjectMetadata::typeId() const
 {
     return m_typeId.c_str();

@@ -1,4 +1,5 @@
 #include "abstract_archive_resource.h"
+#include <nx/utils/log/log.h>
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
@@ -10,7 +11,6 @@ QnAbstractArchiveResource::QnAbstractArchiveResource()
 
 QnAbstractArchiveResource::~QnAbstractArchiveResource()
 {
-
 }
 
 QString QnAbstractArchiveResource::getUniqueId() const
@@ -48,7 +48,17 @@ Qn::ResourceStatus QnAbstractArchiveResource::getStatus() const
     return m_localStatus;
 }
 
-void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason /*reason*/)
+void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
+    if (m_localStatus == newStatus)
+        return;
+
     m_localStatus = newStatus;
+
+    // Null pointer if we are changing status in constructor. Signal is not needed in this case.
+    if (auto sharedThis = toSharedPointer(this))
+    {
+        NX_VERBOSE(this, "Signal status change for %1", newStatus);
+        emit statusChanged(sharedThis, reason);
+    }
 }

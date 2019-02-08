@@ -59,10 +59,8 @@ void initializeMetaTypes()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     QnCommonMetaTypes::initialize();
 

@@ -22,7 +22,7 @@ using Appserver2Ptr = std::unique_ptr<Appserver2>;
 static void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->makeResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
     ASSERT_EQ(ec2::ErrorCode::ok, errorCode);
     qnResTypePool->replaceResourceTypeList(resourceTypeList);
 }
@@ -75,7 +75,7 @@ static void createData(const Appserver2Ptr& server)
             break;
         }
 
-        //auto cameraManager = connection->makeCameraManager(Qn::kSystemAccess);
+        //auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
         //ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCameraSync(cameraData));
 
     }

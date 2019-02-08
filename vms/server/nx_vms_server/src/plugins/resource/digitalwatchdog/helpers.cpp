@@ -47,7 +47,6 @@ QString QSizeToJsonApiResolution(QSize resolution)
 
 } // namespace
 
-
 CproApiClient::CproApiClient(QnDigitalWatchdogResource* resource):
     m_resource(resource)
 {
@@ -71,7 +70,8 @@ bool CproApiClient::updateVideoConfig()
     return (bool) m_videoConfig;
 }
 
-boost::optional<QStringList> CproApiClient::getSupportedVideoCodecs(Qn::StreamIndex streamIndex)
+boost::optional<QStringList> CproApiClient::getSupportedVideoCodecs(
+    nx::vms::api::MotionStreamType streamIndex)
 {
     auto stream = indexOfStream(streamIndex);
     if (stream == -1)
@@ -103,7 +103,7 @@ boost::optional<QStringList> CproApiClient::getSupportedVideoCodecs(Qn::StreamIn
     return values;
 }
 
-boost::optional<QString> CproApiClient::getVideoCodec(Qn::StreamIndex streamIndex)
+boost::optional<QString> CproApiClient::getVideoCodec(nx::vms::api::MotionStreamType streamIndex)
 {
     auto stream = indexOfStream(streamIndex);
     if (stream == -1)
@@ -120,7 +120,7 @@ boost::optional<QString> CproApiClient::getVideoCodec(Qn::StreamIndex streamInde
     return QString::fromUtf8(m_videoConfig->mid(type->first, type->second));
 }
 
-bool CproApiClient::setVideoCodec(Qn::StreamIndex streamIndex, const QString &value)
+bool CproApiClient::setVideoCodec(nx::vms::api::MotionStreamType streamIndex, const QString &value)
 {
     auto stream = indexOfStream(streamIndex);
     if (stream == -1)
@@ -143,12 +143,12 @@ bool CproApiClient::setVideoCodec(Qn::StreamIndex streamIndex, const QString &va
     return requestHelper.post("SetVideoStreamConfig", *m_videoConfig);
 }
 
-int CproApiClient::indexOfStream(Qn::StreamIndex streamIndex)
+int CproApiClient::indexOfStream(nx::vms::api::MotionStreamType streamIndex)
 {
     if (!updateVideoConfig())
         return -1;
 
-    const auto i = m_videoConfig->indexOf(streamIndex == Qn::StreamIndex::primary
+    const auto i = m_videoConfig->indexOf(streamIndex == nx::vms::api::MotionStreamType::primary
         ? "<item id=\"1\"" : "<item id=\"3\"");
     if (i == -1)
     {
@@ -183,13 +183,13 @@ JsonApiClient::JsonApiClient(nx::network::SocketAddress address, QAuthenticator 
 }
 
 nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoCodecs(
-    int channelNumber, Qn::StreamIndex streamIndex)
+    int channelNumber, nx::vms::api::MotionStreamType streamIndex)
 {
-    NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
+    NX_ASSERT(streamIndex != nx::vms::api::MotionStreamType::undefined);
 
     ++channelNumber; //< Camera API channel numbers start with 1.
     const QJsonObject params = getParams(QString("All.VideoInput._%1._%2")
-        .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2));
+        .arg(channelNumber).arg(streamIndex == nx::vms::api::MotionStreamType::primary ? 1 : 2));
 
     if (params.isEmpty())
         return {};
@@ -212,13 +212,15 @@ nx::vms::server::resource::StreamCapabilityMap JsonApiClient::getSupportedVideoC
 }
 
 bool JsonApiClient::sendStreamParams(
-    int channelNumber, Qn::StreamIndex streamIndex, const QnLiveStreamParams& streamParams)
+    int channelNumber,
+    nx::vms::api::MotionStreamType streamIndex,
+    const QnLiveStreamParams& streamParams)
 {
-    NX_ASSERT(streamIndex != Qn::StreamIndex::undefined);
+    NX_ASSERT(streamIndex != nx::vms::api::MotionStreamType::undefined);
 
     ++channelNumber; //< Camera API channel numbers start with 1.
     QString paramBasename =  QString("All.VideoInput._%1._%2.")
-        .arg(channelNumber).arg(streamIndex == Qn::StreamIndex::primary ? 1 : 2);
+        .arg(channelNumber).arg(streamIndex == nx::vms::api::MotionStreamType::primary ? 1 : 2);
 
     const QString codec = streamParams.codec.toLower();
     const auto response = setParams({

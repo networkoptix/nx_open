@@ -33,7 +33,7 @@ public:
 
     virtual bool isSequential() const override { return true; }
 
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
 
     virtual QnResourceList findResources() override;
 

@@ -97,6 +97,13 @@ public:
     void requestStopAction();
 
     /**
+     * Asks mediaservers to finish update process.
+     * @param skipActivePeers - will force update completion even if there are
+     *     some servers installing.
+     */
+    void requestFinishUpdate(bool skipActivePeers);
+
+    /**
      * Asks mediaservers to start installation process.
      */
     void requestInstallAction(const QSet<QnUuid>& targets);
@@ -134,10 +141,11 @@ public:
      * Check if update info contains all the packages necessary to update the system.
      * @param contents - current update contents.
      * @param clientVersions - current client versions installed.
+     * @param checkClient - check if we should check client update.
      */
     bool verifyUpdateManifest(
         UpdateContents& contents,
-        const std::set<nx::utils::SoftwareVersion>& clientVersions) const;
+        const std::set<nx::utils::SoftwareVersion>& clientVersions, bool checkClient = true) const;
 
     // Start uploading local update packages to the servers.
     bool startUpload(const UpdateContents& contents);
@@ -297,7 +305,7 @@ private:
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
 
     // Time at which install command was issued.
-    TimePoint m_timeStartedInstall;
+    qint64 m_timeStartedInstall = 0;
     bool m_protoProblemDetected = false;
     QSet<rest::Handle> m_requestingInstall;
 

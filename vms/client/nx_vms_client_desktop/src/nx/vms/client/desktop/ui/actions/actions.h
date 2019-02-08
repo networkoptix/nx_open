@@ -239,6 +239,34 @@ enum IDType
     SelectTimeServerAction,
 
 
+    /* Right panel actions */
+
+    /**
+     * Opens Notifications tab in the right panel.
+     */
+    NotificationsTabAction,
+
+    /**
+     * Toggles Motion tab in the right panel.
+     */
+    MotionTabAction,
+
+    /**
+     * Opens Bookmarks tab in the right panel.
+     */
+    BookmarksTabAction,
+
+    /**
+     * Opens Events tab in the right panel.
+     */
+    EventsTabAction,
+
+    /**
+     * Opens Objects tab in the right panel.
+     */
+    ObjectsTabAction,
+
+
     /* Main menu actions. */
 
     /**

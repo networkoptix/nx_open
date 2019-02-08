@@ -84,7 +84,7 @@ public:
         server->authenticator()->setLdapManager(std::make_unique<LdapManager>(server->commonModule()));
 
         auto ec2Connection = server->commonModule()->ec2Connection();
-        ec2::AbstractUserManagerPtr userManager = ec2Connection->makeUserManager(Qn::kSystemAccess);
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.name = "Vasja pupkin@gmail.com";
         userData.id = guidFromArbitraryData(userData.name);
@@ -127,7 +127,7 @@ public:
     void addLocalUser(QString userName, QString password, bool isEnabled = true)
     {
         auto ec2Connection = server->commonModule()->ec2Connection();
-        ec2::AbstractUserManagerPtr userManager = ec2Connection->makeUserManager(Qn::kSystemAccess);
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
         userData.name = userName;

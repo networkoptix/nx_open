@@ -51,7 +51,7 @@ public:
     const AVFormatContext * formatContext() const;
     const AVInputFormat * inputFormat() const;
 
-    AVStream * stream(int index) const;
+    AVStream * stream(uint32_t index) const;
     AVStream * findStream(AVMediaType type, int *streamIndex = nullptr) const;
 
     int setFps(float fps);

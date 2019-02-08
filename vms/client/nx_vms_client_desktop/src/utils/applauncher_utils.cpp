@@ -22,12 +22,10 @@ namespace {
 
 static const int kZipInstallationTimeoutMs = 30000;
 
-ResultType::Value isVersionInstalled(nx::utils::SoftwareVersion version, bool* const installed)
+ResultType::Value isVersionInstalled(
+    const nx::utils::SoftwareVersion& version,
+    bool* const installed)
 {
-    NX_ASSERT(!version.isNull());
-    if (version.isNull())
-        return ResultType::invalidVersionFormat;
-
     IsVersionInstalledRequest request;
     request.version = version;
     IsVersionInstalledResponse response;
@@ -40,12 +38,10 @@ ResultType::Value isVersionInstalled(nx::utils::SoftwareVersion version, bool* c
     return ResultType::ok;
 }
 
-ResultType::Value restartClient(nx::utils::SoftwareVersion version, const QString& auth)
+ResultType::Value restartClient(
+    nx::utils::SoftwareVersion version,
+    const QString& auth)
 {
-    NX_ASSERT(!version.isNull());
-    if (version.isNull())
-        return ResultType::invalidVersionFormat;
-
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
     if (!auth.isEmpty())

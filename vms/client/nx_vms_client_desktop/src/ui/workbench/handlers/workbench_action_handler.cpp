@@ -2430,8 +2430,10 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (!watcher->hasMismatches())
         return;
 
+    constexpr auto kServerComponent = QnWorkbenchVersionMismatchWatcher::Component::server;
+
     const auto latestVersion = watcher->latestVersion();
-    auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    auto latestMsVersion = watcher->latestVersion(kServerComponent);
 
     // if some component is newer than the newest mediaserver, focus on its version
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
@@ -2439,13 +2441,13 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
 
     QnResourceList mismatched;
 
-    for (const QnAppInfoMismatchData &data : watcher->mismatchData())
+    for (const auto& data: watcher->components())
     {
-        if (data.component == Qn::ServerComponent)
+        if (data.component == kServerComponent)
         {
-            QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            if (resource)
-                mismatched << data.resource;
+            NX_ASSERT(data.server);
+            if (data.server)
+                mismatched << data.server;
         }
     }
 

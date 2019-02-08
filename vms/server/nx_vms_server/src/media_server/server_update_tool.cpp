@@ -137,7 +137,7 @@ QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString& u
 void QnServerUpdateTool::sendReply(int code)
 {
     NX_VERBOSE(this, lit("Update chunk reply [id = %1, code = %2].").arg(m_updateId).arg(code));
-    ec2Connection()->makeUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
+    ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
                 m_updateId, moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 

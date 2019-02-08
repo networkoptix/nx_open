@@ -31,8 +31,6 @@ public:
     FcResource(QnMediaServerModule* serverModule);
     virtual ~FcResource();
 
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual void startInputPortStatesMonitoring() override;

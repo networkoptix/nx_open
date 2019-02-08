@@ -50,7 +50,7 @@ namespace detail {
 thread::thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false):
     m_threadFunc(std::move(threadFunc))
 {
-    setObjectName("nx::utils::detail::thread : QThread");
+    setObjectName("nx::utils::detail::thread: QThread");
     start();
 
     // NOTE: m_threadCanBeStarted is used to make sure that thread does not exit before we check

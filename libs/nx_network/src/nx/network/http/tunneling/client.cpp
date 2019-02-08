@@ -33,7 +33,13 @@ void Client::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 void Client::setTimeout(std::chrono::milliseconds timeout)
 {
+    m_timeout = timeout;
     m_actualClient->setTimeout(timeout);
+}
+
+void Client::setCustomHeaders(HttpHeaders headers)
+{
+    m_actualClient->setCustomHeaders(std::move(headers));
 }
 
 void Client::openTunnel(
@@ -68,6 +74,8 @@ void Client::handleOpenTunnelCompletion(OpenTunnelResult result)
 
     m_validator = m_validatorFactory(std::exchange(result.connection, nullptr));
     m_validator->bindToAioThread(getAioThread());
+    if (m_timeout)
+        m_validator->setTimeout(*m_timeout);
     m_validator->validate(
         [this](ResultCode result) { handleTunnelValidationResult(result); });
 

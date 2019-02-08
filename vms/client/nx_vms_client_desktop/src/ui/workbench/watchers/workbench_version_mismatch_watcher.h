@@ -9,19 +9,6 @@
 
 #include <nx/utils/software_version.h>
 
-struct QnAppInfoMismatchData
-{
-    QnAppInfoMismatchData() = default;
-    QnAppInfoMismatchData(Qn::SystemComponent component, const nx::utils::SoftwareVersion& version):
-        component(component), version(version){}
-
-    Qn::SystemComponent component = Qn::AnyComponent;
-    nx::utils::SoftwareVersion version;
-    QnResourcePtr resource;
-
-    bool isValid() const { return component != Qn::AnyComponent; }
-};
-
 class QnWorkbenchVersionMismatchWatcher:
     public Connective<QObject>,
     public QnWorkbenchContextAware
@@ -30,12 +17,32 @@ class QnWorkbenchVersionMismatchWatcher:
     using base_type = Connective<QObject>;
 
 public:
+    enum class Component
+    {
+        server,
+        client,
+        any
+    };
+
+    struct Data
+    {
+        Data() = default;
+        Data(Component component, const nx::utils::SoftwareVersion& version):
+            component(component), version(version){}
+
+        Component component = Component::any;
+        nx::utils::SoftwareVersion version;
+        QnMediaServerResourcePtr server;
+
+        bool isValid() const { return component != Component::any; }
+    };
+
     QnWorkbenchVersionMismatchWatcher(QObject* parent = nullptr);
-    virtual ~QnWorkbenchVersionMismatchWatcher();
+    virtual ~QnWorkbenchVersionMismatchWatcher() override;
 
     bool hasMismatches() const;
-    QList<QnAppInfoMismatchData> mismatchData() const;
-    nx::utils::SoftwareVersion latestVersion(Qn::SystemComponent component = Qn::AnyComponent) const;
+    QList<Data> components() const;
+    nx::utils::SoftwareVersion latestVersion(Component component = Component::any) const;
 
     static bool versionMismatches(const nx::utils::SoftwareVersion& left,
         const nx::utils::SoftwareVersion& right, bool concernBuild = false);
@@ -43,11 +50,11 @@ public:
 signals:
     bool mismatchDataChanged();
 
-private slots:
-    void updateMismatchData();
+private:
+    void updateComponents();
     void updateHasMismatches();
 
 private:
-    QList<QnAppInfoMismatchData> m_mismatchData;
-    bool m_hasMismatches;
+    QList<Data> m_components;
+    bool m_hasMismatches = false;
 };

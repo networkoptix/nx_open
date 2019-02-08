@@ -24,7 +24,7 @@ QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid& resourc
     return QnArchiveCamResourcePtr();
 }
 
-QString QnArchiveCamResourceSearcher::manufacture() const  { return kArchiveCamName; }
+QString QnArchiveCamResourceSearcher::manufacturer() const  { return kArchiveCamName; }
 
 QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const nx::utils::Url & /*url*/,
     const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
@@ -57,13 +57,6 @@ QString QnArchiveCamResource::getDriverName() const
 
 void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
-}
-
-nx::vms::server::resource::StreamCapabilityMap QnArchiveCamResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnArchiveCamResource::initializeCameraDriver()

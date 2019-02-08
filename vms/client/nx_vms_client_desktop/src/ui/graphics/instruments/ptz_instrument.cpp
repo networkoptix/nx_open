@@ -393,13 +393,13 @@ void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
 
 void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 {
-    bool hasCrosshair = widget->options().testFlag(QnResourceWidget::DisplayCrosshair);
+    const bool ptzModeEnabled = widget->options().testFlag(QnResourceWidget::ControlPtz);
     const bool animate = display()->animationAllowed();
 
-    if (hasCrosshair)
+    if (ptzModeEnabled)
         ensureOverlayWidget(widget);
 
-    QnResourceWidget::OverlayVisibility visibility = hasCrosshair
+    const QnResourceWidget::OverlayVisibility visibility = ptzModeEnabled
         ? QnResourceWidget::AutoVisible
         : QnResourceWidget::Invisible;
 
@@ -476,15 +476,35 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
     if (const auto camera = widget->resource().dynamicCast<QnClientCameraResource>();
         camera->isPtzRedirected())
     {
-        // And target camera is not on the current layout already...
-        if (const auto ptzTarget = camera->ptzRedirectedTo();
-            workbench()->currentLayout()->items(ptzTarget).empty())
+        const auto ptzTarget = camera->ptzRedirectedTo();
+        if (ptzTarget)
         {
-            // Drop it as near to source camera as possible.
-            ui::action::Parameters parameters(ptzTarget);
-            parameters.setArgument(Qn::ItemPositionRole,
-                qVariantFromValue(QRectF(widget->item()->geometry()).center()));
-            menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+            // And target camera is not on the current layout already...
+            if (workbench()->currentLayout()->items(ptzTarget).empty())
+            {
+                // Drop it as near to source camera as possible.
+                ui::action::Parameters parameters(ptzTarget);
+                parameters.setArgument(Qn::ItemPositionRole,
+                    qVariantFromValue(QRectF(widget->item()->geometry()).center()));
+                menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+            }
+
+            // Switch actual sensor widget to the PTZ mode.
+            for (const auto ptzTargetWidget: display()->widgets(ptzTarget))
+			{
+                auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(ptzTargetWidget);
+                NX_ASSERT(mediaWidget);
+                if (mediaWidget)
+                    mediaWidget->setPtzMode(true);
+			}
+
+            // If current widget is zoomed, zoom target widget instead.
+            if (display()->widget(Qn::ZoomedRole) == widget)
+            {
+                const auto ptzTargetItems = workbench()->currentLayout()->items(ptzTarget);
+                if (!ptzTargetItems.empty())
+                    workbench()->setItem(Qn::ZoomedRole, *ptzTargetItems.cbegin());
+            }
         }
     }
 

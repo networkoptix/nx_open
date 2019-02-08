@@ -20,6 +20,11 @@ void ClientConnectionValidator::bindToAioThread(
     m_messagePipeline.bindToAioThread(aioThread);
 }
 
+void ClientConnectionValidator::setTimeout(std::chrono::milliseconds timeout)
+{
+    m_timeout = timeout;
+}
+
 void ClientConnectionValidator::validate(
     http::tunneling::ValidateTunnelCompletionHandler handler)
 {
@@ -37,7 +42,7 @@ void ClientConnectionValidator::validate(
                 [this](auto message) { processMessage(std::move(message)); });
             m_messagePipeline.setOnConnectionClosed(
                 [this](auto resultCode) { processConnectionClosure(resultCode); });
-            m_messagePipeline.startReadingConnection();
+            m_messagePipeline.startReadingConnection(m_timeout);
         });
 }
 

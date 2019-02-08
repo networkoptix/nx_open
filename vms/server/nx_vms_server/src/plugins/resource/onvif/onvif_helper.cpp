@@ -323,10 +323,10 @@ NameHelper::NameHelper()
 
     for(const QnResourceTypePtr& rt: typeMap) {
 
-        if (rt->getParentId().isNull() || rt->getManufacture() == lit("OnvifDevice"))
+        if (rt->getParentId().isNull() || rt->getManufacturer() == lit("OnvifDevice"))
             continue;
 
-        QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
+        QString normalizedManufacturer = rt->getManufacturer().toLower().replace(UNNEEDED_CHARACTERS, QString());
         QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString());
 
         // todo: refactor it. it should be a pair with vendor + camera model here

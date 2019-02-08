@@ -116,7 +116,7 @@ void ServerFileCache::getFileList() {
     }
 
     auto connection = commonModule()->ec2Connection();
-    connection->makeStoredFileManager(Qn::kSystemAccess)->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
+    connection->getStoredFileManager(Qn::kSystemAccess)->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
         Q_UNUSED(handle);
         bool ok = errorCode == ec2::ErrorCode::ok;
         emit fileListReceived(filenames, ok ? OperationResult::ok : OperationResult::serverError);
@@ -151,7 +151,7 @@ void ServerFileCache::downloadFile(const QString &filename) {
       return;
 
     auto connection = commonModule()->ec2Connection();
-    int handle = connection->makeStoredFileManager(Qn::kSystemAccess)->getStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
                 &ServerFileCache::at_fileLoaded );
@@ -220,7 +220,7 @@ void ServerFileCache::uploadFile(const QString &filename) {
     file.close();
 
     auto connection = commonModule()->ec2Connection();
-    int handle = connection->makeStoredFileManager(Qn::kSystemAccess)->addStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kSystemAccess)->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
@@ -273,7 +273,7 @@ void ServerFileCache::deleteFile(const QString &filename) {
       return;
 
     auto connection = commonModule()->ec2Connection();
-    int handle = connection->makeStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
                     &ServerFileCache::at_fileDeleted );

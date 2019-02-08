@@ -79,16 +79,18 @@ void QnEnumLexicalSerializerData::setCaseSensitivity(Qt::CaseSensitivity caseSen
     m_caseSensitivity = caseSensitivity;
 }
 
-void QnEnumLexicalSerializerData::serializeEnum(int value, QString *target) const {
-    if(m_numeric) {
+void QnEnumLexicalSerializerData::serializeEnum(int value, QString* target) const
+{
+    if (m_numeric)
+    {
         QnLexical::serialize(value, target);
         return;
     }
 
-    /* Return empty string in case of failure. */
-    *target = m_nameByValue.value(value);
-    /* Try numeric second. */
-    if (target->isEmpty())
+    auto iter = m_nameByValue.find(value);
+    if (iter != m_nameByValue.cend())
+        *target = iter.value();
+    else
         *target = QString::number(value);
 }
 

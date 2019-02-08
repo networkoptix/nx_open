@@ -8,7 +8,6 @@
 #include "acs_codec.h"
 #include "nalconstructor.h"
 
-
 class QnSleep : public QThread
 {
 public:
@@ -18,7 +17,6 @@ public:
         QThread::msleep(msecs);
     }
 };
-
 
 static const int CHANNEL_TIMEOUT = 1000 * 5;
 
@@ -111,17 +109,16 @@ int create_vmax_sps_pps(
 
 }
 
-
 QDateTime QnVMax480Provider::fromNativeTimestamp(int mDate, int mTime, int mMillisec)
 {
-    int _year	= mDate / 10000;
-    int _month  = (mDate % 10000) / 100;
-    int _day	= (mDate % 10000) % 100;
+    int _year = mDate / 10000;
+    int _month = (mDate % 10000) / 100;
+    int _day = (mDate % 10000) % 100;
 
-    int hour	=	mTime /10000;
-    int min		=	(mTime%10000)/100;
-    int sec		=	(mTime%10000)%100;
-    int milli	=	(mMillisec);
+    int hour = mTime /10000;
+    int min = (mTime%10000)/100;
+    int sec = (mTime%10000)%100;
+    int milli = (mMillisec);
 
     return QDateTime(QDate(_year, _month, _day), QTime(hour, min, sec, milli));
 }
@@ -170,7 +167,6 @@ bool QnVMax480Provider::waitForConnected(int timeoutMs)
     return m_connectedInternal;
 }
 
-
 void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bool isLive)
 {
     if (m_connected)
@@ -192,13 +188,13 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
     //m_channelNum = params.value("channel").toInt();
     m_channelMask = params.value("channel").toInt();
 
-    S_CONNECT_PARAM	connectParam;
-    connectParam.mUrl	=	url.host().toStdWString();
-    connectParam.mTcpPort	=	url.port(80);
-    connectParam.mUserID	=	QString::fromUtf8(params.value("login")).toStdWString();
-    connectParam.mUserPwd	=	QString::fromUtf8(params.value("password")).toStdWString();
+    S_CONNECT_PARAM connectParam;
+    connectParam.mUrl = url.host().toStdWString();
+    connectParam.mTcpPort = url.port(80);
+    connectParam.mUserID = QString::fromUtf8(params.value("login")).toStdWString();
+    connectParam.mUserPwd = QString::fromUtf8(params.value("password")).toStdWString();
 
-    connectParam.mIsLive	=	isLive;
+    connectParam.mIsLive = isLive;
 
     //call connect function
     m_reqSequence = m_curSequence = sequence;
@@ -232,9 +228,7 @@ void QnVMax480Provider::disconnect()
         m_callbackCond.wait(&m_callbackMutex, 200);
     }
 
-
     m_ACSStream->disconnect();
-
 
     if (m_connectedInternal) {
         m_callbackCond.wait(&m_callbackMutex, 200);
@@ -295,7 +289,6 @@ void QnVMax480Provider::pointsPlay(const VMaxParamList& params, quint8 sequence)
     QList<QByteArray> points = params.value("points").split(';'); // points at seconds
     m_playPoints.clear();
 
-    
     QMutexLocker lock(&m_callbackMutex);
 
     m_pointsPlayMode = true;
@@ -317,7 +310,7 @@ void QnVMax480Provider::pointsPlay(const VMaxParamList& params, quint8 sequence)
 void QnVMax480Provider::playPointsInternal()
 {
     //m_pointsNeedFrame = true;
-    if (!m_playPoints.isEmpty()) 
+    if (!m_playPoints.isEmpty())
     {
         quint32 playDate, playTime;
         toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(m_playPoints.dequeue()), &playDate, &playTime, 0);
@@ -340,7 +333,6 @@ void QnVMax480Provider::addChannel(const VMaxParamList& params)
 
     int channel = params.value("channel").toInt();
     qDebug() << "m_ACSStream->openChannel=" << channel;
-
 
     QMutexLocker lock(&m_channelMutex);
     m_channelProcessed = false;
@@ -533,7 +525,6 @@ QString codeToString(int code)
     return "Unknown";
 }
 
-
 void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
 {
     QMutexLocker lock(&m_callbackMutex);
@@ -579,15 +570,15 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
             {
                 PS_ERROR_PARAM error = (PS_ERROR_PARAM)(_result->mData1);
 
-                if( error->mErrorCode	== 0xE0000001 )
+                if( error->mErrorCode == 0xE0000001 )
                     ; //OutputDebugString(_T("Unregister user\n"));
-                if( error->mErrorCode	== 0xE0000002 )
+                if( error->mErrorCode == 0xE0000002 )
                     ; //OutputDebugString(_T("Incorrect password\n"));
-                if( error->mErrorCode	== 0xE0000003 )
+                if( error->mErrorCode == 0xE0000003 )
                     ;
-                if( error->mErrorCode	== 0xE0000004 )
+                if( error->mErrorCode == 0xE0000004 )
                     ; //OutputDebugString(_T("Exceeded visitor\n"));
-                if( error->mErrorCode	== 0xEFFFFFFF ) 
+                if( error->mErrorCode == 0xEFFFFFFF )
                 {
                     m_connectedInternal = false;
                     m_callbackCond.wakeOne();
@@ -599,7 +590,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     case RESULT_OPEN_VIDEO:
         m_connectedInternal = true;
         m_callbackCond.wakeAll();
-        
+
         m_channelProcessed = true;
         m_channelCond.wakeAll();
         break;
@@ -650,7 +641,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                 quint8 vMaxHeader[16];
                 vMaxHeader[0] = m_curSequence;
                 vMaxHeader[1] = VMAXDT_GotArchiveRange;
-                
+
                 vMaxHeader[2] = 0;
                 vMaxHeader[3] = 0;
                 *(quint32*)(vMaxHeader+4) = 0;
@@ -729,7 +720,7 @@ void QnVMax480Provider::receiveAudioStream(S_ACS_AUDIO_STREAM* _stream)
     VMaxHeader[3] = _stream->mCh << 4;
     *(quint32*)(VMaxHeader+4) = _stream->mSrcSize;
     *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
-    
+
     quint8 VMaxAudioHeader[4];
 
     VMaxAudioHeader[0] = (quint8) _stream->mChannels;

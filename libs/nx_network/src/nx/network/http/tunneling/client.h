@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <optional>
 #include <memory>
 #include <tuple>
 
@@ -42,6 +43,9 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     void setTimeout(std::chrono::milliseconds timeout);
+
+    void setCustomHeaders(HttpHeaders headers);
+
     void openTunnel(OpenTunnelCompletionHandler completionHandler);
 
     const Response& response() const;
@@ -56,6 +60,7 @@ private:
     OpenTunnelCompletionHandler m_completionHandler;
     OpenTunnelResult m_lastResult;
     std::unique_ptr<AbstractTunnelValidator> m_validator;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     void handleOpenTunnelCompletion(OpenTunnelResult result);
     void handleTunnelValidationResult(ResultCode result);

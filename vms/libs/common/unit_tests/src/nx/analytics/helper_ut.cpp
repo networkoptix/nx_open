@@ -568,12 +568,16 @@ protected:
 
     QnVirtualCameraResourcePtr givenDeviceWhichSupportsEventTypes(QSet<QString> eventTypeIds)
     {
+#if 0 //< TODO: #dmishin reimplement this method.
         auto device = makeDevice();
         device->setSupportedAnalyticsEventTypeIds(
             /*engineId*/ QnUuid::createUuid(),
             std::move(eventTypeIds));
 
         return device;
+#else
+        return  QnVirtualCameraResourcePtr();
+#endif
     }
 
 protected:

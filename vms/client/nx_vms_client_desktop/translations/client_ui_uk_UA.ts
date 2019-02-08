@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Тип бажаного налаштування PTZ:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Система</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Оригінальне</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Ця камера підтримує панорамування і нахил</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Ця камера підтримує масштабування</translation>
     </message>
   </context>
   <context>
@@ -1539,6 +1539,11 @@
       <location/>
       <source>Search Filter</source>
       <translation>Фільтр пошуку</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation>Залишилося часу (с)</translation>
     </message>
   </context>
   <context>

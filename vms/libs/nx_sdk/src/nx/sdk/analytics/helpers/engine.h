@@ -4,7 +4,7 @@
 #include <map>
 #include <mutex>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/i_string_map.h>
@@ -25,7 +25,7 @@ namespace analytics {
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */
-class Engine: public nxpt::CommonRefCounter<IEngine>
+class Engine: public RefCountable<IEngine>
 {
 protected:
     LogUtils logUtils;
@@ -109,7 +109,6 @@ public:
 // Not intended to be used by a descendant.
 
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
     virtual const IString* manifest(Error* error) const override;

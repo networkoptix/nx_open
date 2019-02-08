@@ -38,7 +38,7 @@ FcResourceSearcher::FcResourceSearcher(QnMediaServerModule* serverModule)
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     vms::server::ServerModuleAware(serverModule),
-    m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
+    m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacturer(), kFlirFcResourceTypeName, true)),
     m_terminated(false)
 {
     QnMutexLocker lock(&m_mutex);
@@ -146,7 +146,7 @@ bool FcResourceSearcher::isSequential() const
     return true;
 }
 
-QString FcResourceSearcher::manufacture() const
+QString FcResourceSearcher::manufacturer() const
 {
     return kFlirFcManufacture;
 }
@@ -181,7 +181,7 @@ QnResourcePtr FcResourceSearcher::createResource(
     if (resourceType.isNull())
         return result;
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     result.reset(new FcResource(serverModule()));

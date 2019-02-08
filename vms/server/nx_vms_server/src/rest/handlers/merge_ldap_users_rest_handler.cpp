@@ -29,7 +29,7 @@ int QnMergeLdapUsersRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    ec2::AbstractUserManagerPtr userManager = owner->commonModule()->ec2Connection()->makeUserManager(owner->accessRights());
+    ec2::AbstractUserManagerPtr userManager = owner->commonModule()->ec2Connection()->getUserManager(owner->accessRights());
 
     nx::vms::api::UserDataList dbUsers;
     userManager->getUsersSync(&dbUsers);

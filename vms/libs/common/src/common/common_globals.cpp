@@ -15,7 +15,6 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TTHeaderFlag)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortTypes)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
@@ -122,7 +121,7 @@ QString toErrorMessage(AuthResult value)
     switch (value)
     {
         case Auth_OK:
-            NX_ASSERT(false, "This value is not an error.");
+            NX_ASSERT(false, "This value is not an error");
             break;
 
         case Auth_WrongLogin:
@@ -152,6 +151,7 @@ QString toErrorMessage(AuthResult value)
             return "This authorization method is forbidden. Please, contact your system administrator.";
     }
 
+    NX_ASSERT(false, lm("Unhandled value: %1").arg(value));
     return lm("Internal server error (%1). Please, contact your system administrator.").arg(value);
 }
 
@@ -172,18 +172,6 @@ QString toString(MediaStreamEvent value)
         default:
             return lit("Unknown error");
     }
-}
-
-QString toString(StreamIndex value)
-{
-    switch (value)
-    {
-        case StreamIndex::undefined: return "undefined";
-        case StreamIndex::primary: return "primary";
-        case StreamIndex::secondary: return "secondary";
-    }
-    NX_ASSERT(false, lm("Unexpected value %1").arg((int) value));
-    return lm("unexpected_value_%1").arg((int) value);
 }
 
 QString toString(ResourceStatus status)

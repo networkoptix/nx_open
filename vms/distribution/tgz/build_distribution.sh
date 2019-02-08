@@ -18,7 +18,6 @@ TEGRA_VIDEO_SOURCE_DIR="$SOURCE_DIR/artifacts/tx1/tegra_multimedia_api"
 NVIDIA_MODELS_SOURCE_DIR="$TEGRA_VIDEO_SOURCE_DIR/data/model" #< Demo neural networks.
 NVIDIA_MODELS_INSTALL_PATH="$MEDIASERVER_INSTALL_PATH/nvidia_models"
 
-PACKAGE_QT="qt-5.11.1"
 PACKAGE_SIGAR="sigar-1.7"
 PACKAGE_FFMPEG="ffmpeg-3.1.1"
 
@@ -134,7 +133,7 @@ buildDistribution()
         echo "  Copying (Qt plugin) $PLUGIN"
 
         mkdir -p "$QT_PLUGINS_INSTALL_DIR/$(dirname $PLUGIN)"
-        cp -r "$PACKAGES_DIR/$PACKAGE_QT/plugins/$PLUGIN" "$QT_PLUGINS_INSTALL_DIR/$PLUGIN"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$QT_PLUGINS_INSTALL_DIR/$PLUGIN"
     done
 
     echo "Copying qt.conf"
@@ -150,10 +149,10 @@ buildDistribution()
     cp_desktop_client_bins "$DESKTOP_CLIENT_BIN"
     cp_desktop_client_bins "fonts" "vox" "help"
     ln -s "../lib" "$WORK_DIR/$DESKTOP_CLIENT_INSTALL_PATH/lib" #< rpath: [$ORIGIN/..lib]
-    cp_files "$PACKAGES_DIR/$PACKAGE_QT/plugins" \
+    cp_files "$QT_DIR/plugins" \
         "{imageformats,platforminputcontexts,platforms,xcbglintegrations,audio}" \
         "$DESKTOP_CLIENT_INSTALL_PATH/bin"
-    cp_files "$PACKAGES_DIR/$PACKAGE_QT" "qml" "$DESKTOP_CLIENT_INSTALL_PATH/bin"
+    cp_files "$QT_DIR" "qml" "$DESKTOP_CLIENT_INSTALL_PATH/bin"
 
     echo "Copying qt.conf and creating Qt symlinks"
     # TODO: Remove these symlinks when cmake build is improved accordingly.
@@ -180,7 +179,7 @@ buildDistribution()
     #         audio/ imageformats/ platforminputcontexts/ platforms/ xcbglintegrations/
 
     echo "Copying package libs"
-    cp_package_libs "$PACKAGE_QT" "$PACKAGE_FFMPEG" "$PACKAGE_SIGAR"
+    cp_package_libs "$(basename "$QT_DIR")" "$PACKAGE_FFMPEG" "$PACKAGE_SIGAR"
 
     echo "Copying compiler (system) libs"
     distrib_copySystemLibs "$WORK_DIR/$LIB_INSTALL_PATH" \

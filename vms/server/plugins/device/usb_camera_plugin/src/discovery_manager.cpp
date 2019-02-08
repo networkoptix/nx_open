@@ -68,7 +68,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     std::vector<DeviceDataWithNxId> devices = findCamerasInternal();
 
     int i;
-    for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
+    for (i = 0; i < (int)devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
         strncpy(
             cameras[i].modelName,

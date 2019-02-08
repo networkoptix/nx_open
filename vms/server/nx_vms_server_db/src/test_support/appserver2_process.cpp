@@ -513,7 +513,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     apiServer.typeId = nx::vms::api::MediaServerData::kResourceTypeId;
 
     ec2::fromResourceToApi(server, apiServer);
-    if (ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
+    if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
     {
     }
@@ -523,7 +523,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
 bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->makeResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
     if (errorCode != ec2::ErrorCode::ok)
         return false;
     qnResTypePool->replaceResourceTypeList(resourceTypeList);
@@ -534,7 +534,7 @@ bool initUsers(ec2::AbstractECConnection* ec2Connection)
 {
     nx::vms::api::UserDataList users;
     const ec2::ErrorCode errorCode =
-        ec2Connection->makeUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
     auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
     if (errorCode != ec2::ErrorCode::ok)
         return false;
@@ -564,7 +564,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     //read server list
     nx::vms::api::MediaServerDataList mediaServerList;
     auto resultCode =
-        connection->makeMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList);
+        connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList);
     if (resultCode != ec2::ErrorCode::ok)
         return false;
     for (const auto &mediaServer : mediaServerList)
@@ -573,7 +573,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     //read camera list
     nx::vms::api::CameraDataList cameraList;
     resultCode =
-        connection->makeCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList);
+        connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList);
     if (resultCode != ec2::ErrorCode::ok)
         return false;
 

@@ -12,8 +12,8 @@ QnFlirResourceSearcher::QnFlirResourceSearcher(QnMediaServerModule* serverModule
     base_type(serverModule),
     m_serverModule(serverModule)
 {
-    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
-    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
+    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacturer(), lit("FLIR-AX8"), true);
+    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacturer(), lit("FLIR_COMMON"), true);
     m_flirIoExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
 }
 
@@ -34,7 +34,7 @@ QnResourcePtr QnFlirResourceSearcher::createResource(
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
         return result;
     }
@@ -176,7 +176,7 @@ QString QnFlirResourceSearcher::getFirmwareFromDevice(SimpleEIPClient &eipClient
     return QString(QString::fromLatin1(data.data.mid(1)));
 }
 
-QString QnFlirResourceSearcher::manufacture() const
+QString QnFlirResourceSearcher::manufacturer() const
 {
     return QnFlirEIPResource::MANUFACTURE;
 }
@@ -197,9 +197,9 @@ void QnFlirResourceSearcher::createResource(
 {
     QnFlirEIPResourcePtr resource(new QnFlirEIPResource(m_serverModule));
 
-    resource->setName(manufacture() + lit("-") + info.model);
+    resource->setName(manufacturer() + lit("-") + info.model);
     resource->setModel(info.model);
-    resource->setVendor(manufacture());
+    resource->setVendor(manufacturer());
     resource->setTypeId(m_eipFlirResTypeId);
     resource->setUrl(info.url.toString());
     resource->setMAC(nx::utils::MacAddress(info.mac));

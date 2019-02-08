@@ -11,8 +11,7 @@
 
 #include "ec_api_impl.h"
 
-namespace ec2::impl
-{
+namespace ec2::impl {
 
 //!Allows executing ec api methods synchronously
 class SyncHandler

@@ -814,11 +814,9 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     {
         auto actionCopy(aggregatedActionIter->action);
         actionCopy->getRuntimeParams().eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-        if (eventCount > 0)
-        {
+        if (eventCount > 1)
             actionCopy->getRuntimeParams().eventResourceId = QnUuid();
-            actionCopy->setAggregationCount(eventCount);
-        }
+        actionCopy->setAggregationCount(eventCount);
         serverModule()->serverDb()->saveActionToDB(actionCopy);
     }
     else

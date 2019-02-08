@@ -47,14 +47,14 @@ protected:
 
 private:
     void initCapabilities();
-    void processPluginEvents();
+    void generatePluginEvents();
 
 private:
     mutable std::mutex m_pluginEventGenerationLoopMutex;
     mutable std::condition_variable m_pluginEventGenerationLoopCondition;
 
     std::unique_ptr<std::thread> m_thread;
-    std::atomic<bool> m_terminated{false};
+    bool m_terminated = false;
 
     std::string m_capabilities;
     bool m_needUncompressedVideoFrames = false;

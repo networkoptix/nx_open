@@ -69,6 +69,13 @@ public:
 
     void setPlayNowModeAllowed(bool value);
 
+    /**
+     * Get currently used network protocol. See the predefined values in the nx::network::Protocol
+     * namespace (nx/network/abstract_socket.h).
+     * @return 0 if connection is not opened yet, IANA protocol number otherwise.
+     */
+    virtual int protocol() const override;
+
     virtual int getSequence() const override;
 
     virtual void pleaseStop() override;

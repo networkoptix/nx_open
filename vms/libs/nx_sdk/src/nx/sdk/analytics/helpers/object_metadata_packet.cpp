@@ -6,22 +6,6 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-void* ObjectMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_ObjectMetadataPacket)
-    {
-        addRef();
-        return static_cast<IObjectMetadataPacket*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 int64_t ObjectMetadataPacket::timestampUs() const
 {
     return m_timestampUs;

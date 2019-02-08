@@ -10,9 +10,7 @@ if(doxygen_directory)
         COMMENT "Generating documentation..."
         COMMAND ${doxygen_directory}/bin/doxygen
     )
-endif()
 
-if(TARGET documentation)
     set(documentation_zip_file "${distribution_output_dir}/doc.zip")
 
     add_custom_target(documentation_zip
@@ -22,5 +20,4 @@ if(TARGET documentation)
             "${CMAKE_CURRENT_BINARY_DIR}/index.html"
             "${CMAKE_CURRENT_BINARY_DIR}/html"
     )
-
 endif()

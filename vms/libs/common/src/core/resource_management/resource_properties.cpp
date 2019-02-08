@@ -28,7 +28,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     // TODO: #GDM SafeMode
-    ec2::ErrorCode rez = conn->makeResourceManager(Qn::kSystemAccess)->saveSync(params);
+    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
     {
@@ -65,7 +65,7 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
     //TODO #ak m_requestInProgress is redundant here, data can be saved to
     //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
     // TODO: #GDM SafeMode
-    int requestId = conn->makeResourceManager(Qn::kSystemAccess)->save(
+    int requestId = conn->getResourceManager(Qn::kSystemAccess)->save(
         data,
         this,
         &QnResourcePropertyDictionary::onRequestDone);

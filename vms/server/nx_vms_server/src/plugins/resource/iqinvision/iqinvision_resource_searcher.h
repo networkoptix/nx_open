@@ -13,7 +13,7 @@ public:
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
 
     virtual QnResourceList findResources() override;
 

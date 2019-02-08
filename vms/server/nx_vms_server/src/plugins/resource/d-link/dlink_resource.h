@@ -63,8 +63,6 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override; // does a lot of physical work
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCroppingPhysical(QRect cropping);

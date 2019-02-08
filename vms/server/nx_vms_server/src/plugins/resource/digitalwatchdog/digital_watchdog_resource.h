@@ -46,11 +46,11 @@ protected:
     virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
 
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
+        MotionStreamType streamIndex) override;
 
     virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
         VideoEncoder& encoder,
-        Qn::StreamIndex streamIndex,
+        MotionStreamType streamIndex,
         const QnLiveStreamParams& streamParams) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
