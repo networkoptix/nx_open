@@ -24,18 +24,14 @@ Item
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
     // Shows preloader
-    function start(immediate)
+    function start()
     {
-        if (immediate)
-            d.preloader = true
-        else
-            startDelayTimer.restart()
+        d.preloader = true
     }
 
     // Shows selection
     function show()
     {
-        startDelayTimer.stop()
         d.visible = true
         d.preloader = false
     }
@@ -43,18 +39,8 @@ Item
     // Hides whatever it shows.
     function hide()
     {
-        startDelayTimer.stop()
         d.preloader = false
         d.visible = false
-    }
-
-    Timer
-    {
-        id: startDelayTimer
-
-        interval: 200
-        repeat: false
-        onTriggered: d.preloader = true
     }
 
     RoiSelectionPreloader

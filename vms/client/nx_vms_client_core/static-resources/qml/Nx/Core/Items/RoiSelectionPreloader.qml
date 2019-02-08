@@ -19,8 +19,8 @@ Item
     property bool enableAnimation: true
     property int animationDuration: 400
 
-    property real expandedSize: 103
-    property real expandedDashSize: 32
+    property real expandedSize: 91
+    property real expandedDashSize: 24
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
     property real centerCircleRadius: 2.5
