@@ -109,9 +109,13 @@ signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
     void compatibleAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
+    void deviceAgentManifestsChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void emitPropertyChanged(const QString& key) override;
+
+private:
+    using DeviceAgentManifestMap = std::map<QnUuid, nx::vms::api::analytics::DeviceAgentManifest>;
 
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
@@ -119,6 +123,8 @@ private:
     QSet<QnUuid> calculateUserEnabledAnalyticsEngines();
 
     QSet<QnUuid> calculateCompatibleAnalyticsEngines();
+
+    DeviceAgentManifestMap fetchDeviceAgentManifests();
 
 private:
     int m_issueCounter;
@@ -128,6 +134,7 @@ private:
 
     CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
     CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
+    CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
     mutable QnMutex m_cacheMutex;
 };
 

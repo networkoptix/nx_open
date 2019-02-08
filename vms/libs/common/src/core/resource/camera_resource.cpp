@@ -65,7 +65,9 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     m_cachedUserEnabledAnalyticsEngines(
         [this]() { return calculateUserEnabledAnalyticsEngines(); }, &m_cacheMutex),
     m_cachedCompatibleAnalyticsEngines(
-        [this]() { return calculateCompatibleAnalyticsEngines(); }, &m_cacheMutex)
+        [this]() { return calculateCompatibleAnalyticsEngines(); }, &m_cacheMutex),
+    m_cachedDeviceAgentManifests(
+        [this]() { return fetchDeviceAgentManifests(); }, &m_cacheMutex)
 {
     connect(
         this,
@@ -83,6 +85,12 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
             {
                 m_cachedCompatibleAnalyticsEngines.reset();
                 emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
+            }
+
+            if (key == kDeviceAgentManifestsProperty)
+            {
+                m_cachedDeviceAgentManifests.reset();
+                emit deviceAgentManifestsChanged(toSharedPointer(this));
             }
         });
 }
@@ -608,6 +616,13 @@ QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines()
         getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
 }
 
+QnVirtualCameraResource::DeviceAgentManifestMap
+    QnVirtualCameraResource::fetchDeviceAgentManifests()
+{
+    return QJson::deserialized<DeviceAgentManifestMap>(
+        getProperty(kDeviceAgentManifestsProperty).toUtf8());
+}
+
 QHash<QnUuid, QVariantMap> QnVirtualCameraResource::deviceAgentSettingsValues() const
 {
     const auto values = QJson::deserialized<QHash<QnUuid, QJsonObject>>(
@@ -646,34 +661,21 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
     QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId)
 {
-    using namespace nx::vms::api::analytics;
-    auto manifestsStr = getProperty(kDeviceAgentManifestsProperty);
-
-    bool success = false;
-    auto manifests = QJson::deserialized<std::map<QnUuid, DeviceAgentManifest>>(
-        manifestsStr.toUtf8(), std::map<QnUuid, DeviceAgentManifest>(), &success);
-
-    if (!success)
+    const auto manifests = m_cachedDeviceAgentManifests.get();
+    auto it = manifests.find(engineId);
+    if (it == manifests.cend())
         return std::nullopt;
 
-    auto itr = manifests.find(engineId);
-    if (itr == manifests.cend())
-        return std::nullopt;
-
-    return itr->second;
+    return it->second;
 }
 
 void QnVirtualCameraResource::setDeviceAgentManifest(
     const QnUuid& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
-    using namespace nx::vms::api::analytics;
-    auto manifestsStr = getProperty(kDeviceAgentManifestsProperty);
-
-    auto manifests = QJson::deserialized<std::map<QnUuid, DeviceAgentManifest>>(
-        manifestsStr.toUtf8(), std::map<QnUuid, DeviceAgentManifest>());
-
+    auto manifests = m_cachedDeviceAgentManifests.get();
     manifests[engineId] = manifest;
+
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(QJson::serialized(manifests)));
