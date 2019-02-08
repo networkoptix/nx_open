@@ -42,6 +42,10 @@ TEST(debug, disabledOutput)
     sideEffect = false;
     LL NX_PRINT << "LL NX_PRINT, side effect: " << (sideEffect = true);
     ASSERT_TRUE(sideEffect);
+
+    // Compiling the code below should not produce a warning about "dangling else".
+    if (!sideEffect) //< ATTENTION: No braces should be written around NX_OUTPUT inside this `if`.
+        NX_OUTPUT << "Should not be executed.";
 }
 
 TEST(debug, overrideStreamStatic)
@@ -78,21 +82,49 @@ TEST(debug, overrideStreamPreproc)
 
 TEST(debug, assertSuccess)
 {
-    static const bool trueCondition = true;
-    NX_KIT_ASSERT(trueCondition);
-    NX_KIT_ASSERT(trueCondition, "This assertion with a message should not fail.");
+    bool trueCondition = true;
+    NX_KIT_ASSERT(trueCondition); //< Test NX_KIT_ASSERT() without message.
+    NX_KIT_ASSERT(trueCondition,
+        "This assertion with a message should not fail."); //< Test NX_KIT_ASSERT() with message.
+
+    //< Test NX_KIT_ASSERT() without message inside `if`.
+    if (!NX_KIT_ASSERT(trueCondition))
+        ASSERT_TRUE(false);
+
+    //< Test NX_KIT_ASSERT() with message inside `if`.
+    if (!NX_KIT_ASSERT(trueCondition, "This assertion should not fail."))
+        ASSERT_TRUE(false);
 }
 
+/**
+ * Tests that assertions fail when they should, but tests it only in Release, because there is no
+ * way to test assertion failures when built in Debug.
+ */
 TEST(debug, assertFailureInRelease)
 {
     #if defined(NDEBUG)
-        static const bool condition = false;
+        static const bool isDebug = false;
     #else
-        static const bool condition = true;
+        static const bool isDebug = true;
     #endif
 
-    NX_KIT_ASSERT(condition, "This and the next assertions should fail in Debug.");
-    NX_KIT_ASSERT(condition);
+    NX_PRINT << "isDebug: " << nx::kit::utils::toString(isDebug);
+
+    const char shouldFailInDebug[] = "This and the next assertion should fail in Release.";
+    NX_KIT_ASSERT(isDebug, shouldFailInDebug); //< Test NX_KIT_ASSERT with message.
+    NX_KIT_ASSERT(isDebug); //< Test NX_KIT_ASSERT without message.
+
+    //< Test NX_KIT_ASSERT() with message inside `if`.
+    if (NX_KIT_ASSERT(isDebug, shouldFailInDebug))
+        ASSERT_TRUE(isDebug);
+    else
+        ASSERT_FALSE(isDebug);
+
+    //< Test NX_KIT_ASSERT() without message inside `if`.
+    if (NX_KIT_ASSERT(isDebug))
+        ASSERT_TRUE(isDebug);
+    else
+        ASSERT_FALSE(isDebug);
 }
 
 TEST(debug, printValue)
