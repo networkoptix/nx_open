@@ -76,10 +76,10 @@ bool QnIOModuleMonitor::open()
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(std::make_shared<QnMessageBodyParser>(this));
 
-    QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = m_camera->getParentServer();
     if (!server)
         return false;
-    if (m_camera->getStatus() < Qn::Online)
+    if (!m_camera->isOnline())
         return false;
 
     m_httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
@@ -95,7 +95,7 @@ bool QnIOModuleMonitor::open()
         if (route.addr.isNull())
         {
             NX_WARNING(this, "Can't detect server IP address to open IO monitor connection.");
-            return false; //< Client is not connected to the server now.
+            return false; //< No primary interface have found for media server yet. Try to connect later.
         }
         requestUrl.setHost(route.addr.address.toString());
         requestUrl.setPort(route.addr.port);
