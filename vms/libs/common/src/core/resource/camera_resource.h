@@ -92,6 +92,9 @@ public:
     nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources();
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
+    std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
+    std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
+
     QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
     void setDeviceAgentSettingsValues(const QHash<QnUuid, QVariantMap>& settingsValues);
 
@@ -116,6 +119,8 @@ protected:
 
 private:
     using DeviceAgentManifestMap = std::map<QnUuid, nx::vms::api::analytics::DeviceAgentManifest>;
+    using ManifestItemIdsFetcher =
+        std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
 
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
@@ -123,6 +128,11 @@ private:
     QSet<QnUuid> calculateUserEnabledAnalyticsEngines();
 
     QSet<QnUuid> calculateCompatibleAnalyticsEngines();
+
+    std::map<QnUuid, std::set<QString>> calculateSupportedEntities(
+        ManifestItemIdsFetcher fetcher) const;
+    std::map<QnUuid, std::set<QString>> calculateSupportedEventTypes() const;
+    std::map<QnUuid, std::set<QString>> calculateSupportedObjectTypes() const;
 
     DeviceAgentManifestMap fetchDeviceAgentManifests();
 
@@ -135,6 +145,9 @@ private:
     CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
     CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
     CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
+    CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
+    CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
+
     mutable QnMutex m_cacheMutex;
 };
 

@@ -11,12 +11,14 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 
 #include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_data_structures.h>
+#include <api/runtime_info_manager.h>
 #include <nx_ec/ec_api.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
@@ -45,7 +47,24 @@ bool storeUrlForRole(Qn::ConnectionRole role)
     return false;
 }
 
-} //anonymous namespace
+std::map<QnUuid, std::set<QString>> filterByActiveEngines(
+    std::map<QnUuid, std::set<QString>> entitiesByEngine,
+    const QnPeerRuntimeInfo& runtimeData)
+{
+    const auto& activeEngines = runtimeData.data.activeAnalyticsEngines;
+    for (auto it = entitiesByEngine.cbegin(); it != entitiesByEngine.cend();)
+    {
+        const auto engineId = it->first;
+        if (activeEngines.contains(engineId))
+            ++it;
+        else
+            it = entitiesByEngine.erase(it);
+    }
+
+    return entitiesByEngine;
+}
+
+} // namespace
 
 const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
     "userEnabledAnalyticsEngines");
@@ -67,7 +86,11 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     m_cachedCompatibleAnalyticsEngines(
         [this]() { return calculateCompatibleAnalyticsEngines(); }, &m_cacheMutex),
     m_cachedDeviceAgentManifests(
-        [this]() { return fetchDeviceAgentManifests(); }, &m_cacheMutex)
+        [this]() { return fetchDeviceAgentManifests(); }, &m_cacheMutex),
+    m_cachedSupportedEventTypes(
+        [this]() { return calculateSupportedEventTypes(); }, &m_cacheMutex),
+    m_cachedSupportedObjectTypes(
+        [this]() { return calculateSupportedObjectTypes(); }, &m_cacheMutex)
 {
     connect(
         this,
@@ -90,6 +113,8 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
             if (key == kDeviceAgentManifestsProperty)
             {
                 m_cachedDeviceAgentManifests.reset();
+                m_cachedSupportedEventTypes.reset();
+                m_cachedSupportedObjectTypes.reset();
                 emit deviceAgentManifestsChanged(toSharedPointer(this));
             }
         });
@@ -604,6 +629,22 @@ void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& 
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 
+std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedEventTypes() const
+{
+    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
+    const auto runtimeInfo = runtimeInfoManager->item(getParentServer()->getId());
+
+    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), runtimeInfo);
+}
+
+std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectTypes() const
+{
+    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
+    const auto runtimeInfo = runtimeInfoManager->item(getParentServer()->getId());
+
+    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), runtimeInfo);
+}
+
 QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines()
 {
     return QJson::deserialized<QSet<QnUuid>>(
@@ -614,6 +655,51 @@ QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines()
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
+}
+
+std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedEntities(
+     ManifestItemIdsFetcher fetcher) const
+{
+    std::map<QnUuid, std::set<QString>> result;
+    auto deviceAgentManifests = m_cachedDeviceAgentManifests.get();
+    for (const auto&[engineId, deviceAgentManifest] : deviceAgentManifests)
+        result[engineId] = fetcher(deviceAgentManifest);
+
+    return result;
+}
+
+std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedEventTypes() const
+{
+    return calculateSupportedEntities(
+        [this](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
+        {
+            std::set<QString> result;
+            result.insert(
+                deviceAgentManifest.supportedEventTypeIds.cbegin(),
+                deviceAgentManifest.supportedEventTypeIds.cend());
+
+            for (const auto eventType : deviceAgentManifest.eventTypes)
+                result.insert(eventType.id);
+
+            return result;
+        });
+}
+
+std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedObjectTypes() const
+{
+    return calculateSupportedEntities(
+        [this](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
+        {
+            std::set<QString> result;
+            result.insert(
+                deviceAgentManifest.supportedObjectTypeIds.cbegin(),
+                deviceAgentManifest.supportedObjectTypeIds.cend());
+
+            for (const auto objectType : deviceAgentManifest.objectTypes)
+                result.insert(objectType.id);
+
+            return result;
+        });
 }
 
 QnVirtualCameraResource::DeviceAgentManifestMap
