@@ -6,18 +6,18 @@ namespace nx::utils {
 
 // Const-aware pointer to a private implementation.
 template<typename T>
-class PImpl final
+class ImplPtr final
 {
 public:
-    explicit PImpl(T* ptr): m_ptr(ptr) {}
-    ~PImpl() = default;
+    explicit ImplPtr(T* ptr): m_ptr(ptr) {}
+    ~ImplPtr() = default;
 
-    PImpl() = delete;
-    PImpl(std::nullptr_t) = delete;
-    PImpl(const PImpl&) = delete;
-    PImpl(PImpl&&) = delete;
-    PImpl& operator=(const PImpl&) = delete;
-    PImpl& operator=(PImpl&&) = delete;
+    ImplPtr() = delete;
+    ImplPtr(std::nullptr_t) = delete;
+    ImplPtr(const ImplPtr&) = delete;
+    ImplPtr(ImplPtr&&) = delete;
+    ImplPtr& operator=(const ImplPtr&) = delete;
+    ImplPtr& operator=(ImplPtr&&) = delete;
 
     const T* get() const { return m_ptr.get(); }
     T* get() { return m_ptr.get(); }

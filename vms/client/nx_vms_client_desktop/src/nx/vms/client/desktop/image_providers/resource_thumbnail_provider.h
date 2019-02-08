@@ -5,7 +5,7 @@
 #include <client/client_globals.h>
 
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/utils/pimpl.h>
+#include <nx/utils/impl_ptr.h>
 
 #include "image_provider.h"
 
@@ -40,7 +40,7 @@ protected:
 
 private:
     struct Private;
-    utils::PImpl<Private> d;
+    utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop
