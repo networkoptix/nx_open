@@ -88,27 +88,36 @@ protected:
         givenRandomKeyValuePair();
     }
 
-    void givenRecordInsertedSubscrption()
+    void givenRecordInsertedEventWasAlreadyTriggered()
     {
-        db()->eventProvider().subscribeToRecordInserted(
-            [this](nx::sql::QueryContext* /*queryContext*/, std::string key, std::string value)
-            {
-                m_eventTriggered = true;
-                m_eventRecievedKey = key;
-                m_eventRecievedValue = value;
-            },
-            &m_eventSubscriptionId);
+        givenEmptyDb();
+        givenRandomKeyValuePair();
+
+        whenSubscribeToRecordInsertedEvent();
+        whenInsertKeyValuePair();
+
+        thenEventTriggered();
+        andEventRecievedKeyMatchesInsertionKey();
+        andEventRecievedValueMatchesInsertionValue();
+
+        m_eventTriggered = false;
+        m_eventRecievedKey.clear();
+        m_eventRecievedValue.clear();
     }
 
-    void givenRecordRemovedSubscription()
+    void givenRecordRemovedEventWasAlreadyTriggered()
     {
-        db()->eventProvider().subscribeToRecordRemoved(
-            [this](nx::sql::QueryContext* /*queryContext*/, std::string key)
-            {
-                m_eventTriggered = true;
-                m_eventRecievedKey = key;
-            },
-            &m_eventSubscriptionId);
+        givenDbWithRandomKeyValuePair();
+
+        whenSubscribeToRecordRemovedEvent();
+        whenRemoveKey();
+
+        thenOperationSucceeded();
+        thenEventTriggered();
+        andEventRecievedKeyMatchesRemovalKey();
+
+        m_eventTriggered = false;
+        m_eventRecievedKey.clear();
     }
 
     void whenInsertKeyValuePair(size_t dbIndex = 0, size_t randomPairIndex = 0)
@@ -163,6 +172,39 @@ protected:
         whenRemoveKey();
     }
 
+    void whenSubscribeToRecordInsertedEvent()
+    {
+        db()->eventProvider().subscribeToRecordInserted(
+            [this](nx::sql::QueryContext* /*queryContext*/, std::string key, std::string value)
+            {
+                m_eventTriggered = true;
+                m_eventRecievedKey = key;
+                m_eventRecievedValue = value;
+            },
+            &m_eventSubscriptionId);
+    }
+
+    void whenSubscribeToRecordRemovedEvent()
+    {
+        db()->eventProvider().subscribeToRecordRemoved(
+            [this](nx::sql::QueryContext* /*queryContext*/, std::string key)
+            {
+                m_eventTriggered = true;
+                m_eventRecievedKey = key;
+            },
+            &m_eventSubscriptionId);
+    }
+
+    void whenUnsubscribeFromRecordInsertedEvent()
+    {
+        db()->eventProvider().unsubscribeFromRecordInserted(m_eventSubscriptionId);
+    }
+
+    void whenUnsubscribeFromRecordRemovedEvent()
+    {
+        db()->eventProvider().unsubscribeFromRecordRemoved(m_eventSubscriptionId);
+    }
+
     void thenOperationSucceeded()
     {
         ASSERT_EQ(map::ResultCode::ok, m_result);
@@ -176,6 +218,11 @@ protected:
     void thenEventTriggered()
     {
         ASSERT_TRUE(m_eventTriggered.load());
+    }
+
+    void thenEventIsNotTriggered()
+    {
+        ASSERT_FALSE(m_eventTriggered.load());
     }
 
     void andFetchedValueMatchesRandomValue(size_t randomPairIndex = 0)
@@ -237,6 +284,16 @@ protected:
     void andEventRecievedValueMatchesInsertionValue()
     {
         ASSERT_EQ(m_eventRecievedValue, randomPair()->value);
+    }
+
+    void andEventRecievedKeyDoesNotMatchInsertionKey()
+    {
+        ASSERT_NE(m_eventRecievedKey, randomPair()->key);
+    }
+
+    void andEventRecievedKeyDoesNotMatchRemovalKey()
+    {
+        ASSERT_NE(m_eventRecievedKey, randomPair()->key);
     }
 
 private:
@@ -409,24 +466,47 @@ TEST_F(Database, rejects_remove_with_empty_string)
     thenOperationFailed(map::ResultCode::logicError);
 }
 
-TEST_F(Database, eventprovider_provides_record_inserted_event)
+TEST_F(Database, eventprovider_triggers_record_inserted_event)
 {
     givenEmptyDb();
     givenRandomKeyValuePair();
-    givenRecordInsertedSubscrption();
+    whenSubscribeToRecordInsertedEvent();
     whenInsertKeyValuePair();    thenOperationSucceeded();    thenEventTriggered();    andEventRecievedKeyMatchesInsertionKey();    andEventRecievedValueMatchesInsertionValue();
 }
 
-TEST_F(Database, eventprovider_provides_record_removed_event)
+TEST_F(Database, eventprovider_triggers_record_removed_event)
 {
     givenDbWithRandomKeyValuePair();
-    givenRecordRemovedSubscription();
+    whenSubscribeToRecordRemovedEvent();
     whenRemoveKey();
 
     thenOperationSucceeded();
     thenEventTriggered();
 
     andEventRecievedKeyMatchesRemovalKey();
+}
+
+TEST_F(Database, eventprovider_does_not_trigger_record_inserted_event_after_unsubscribing)
+{
+    givenRecordInsertedEventWasAlreadyTriggered();
+    givenRandomKeyValuePair();
+
+    whenUnsubscribeFromRecordInsertedEvent();
+    whenInsertKeyValuePair();
+
+    thenEventIsNotTriggered();
+    andEventRecievedKeyDoesNotMatchInsertionKey();
+}
+
+TEST_F(Database, eventprovider_does_not_trigger_record_removed_event_after_unsubscribing)
+{
+    givenRecordRemovedEventWasAlreadyTriggered();
+
+    whenUnsubscribeFromRecordRemovedEvent();
+    whenRemoveKey();
+
+    thenEventIsNotTriggered();
+    andEventRecievedKeyDoesNotMatchRemovalKey();
 }
 
 TEST_F(Database, DISABLED_multiple_databases_synchronize_insert_operation)
