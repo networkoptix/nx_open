@@ -1,16 +1,10 @@
 import {
     Component, Input, Output, EventEmitter,
-    OnChanges, SimpleChanges, SimpleChange,
-    OnInit, ViewEncapsulation } from '@angular/core';
-import { PagerService }         from '../../../../services/pager-service.service';
-import { NxConfigService }      from '../../../../services/nx-config';
-import { TranslateService }     from '@ngx-translate/core';
-import { _ }                    from '@biesbjerg/ngx-translate-extract';
-
-// _('Unknown');
-// _('Yes');
-// _('No');
-// _('Camera List');
+    OnChanges, SimpleChanges,
+    OnInit, ViewEncapsulation }   from '@angular/core';
+import { PagerService }           from '../../../../services/pager-service.service';
+import { NxConfigService }        from '../../../../services/nx-config';
+import { TranslateService }       from '@ngx-translate/core';
 
 @Component({
   selector: 'nx-cam-table',
@@ -224,10 +218,10 @@ export class CamTableComponent implements OnChanges, OnInit {
       this.csvCameraData = this.getCsvData();
   }
 
-  setClickedRow (index, element) {
-      this.selectedRow = index;
-      this.onRowClick.emit(element);
-  }
+    setClickedRow(index, element) {
+        this.selectedRow = index;
+        this.onRowClick.emit(element);
+    }
 
   setPage(page: number) {
       // get pager object from service

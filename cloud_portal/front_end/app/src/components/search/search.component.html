@@ -5,11 +5,12 @@
             <div class="btn-group w-100">
                 <span class="glyphicon glyphicon-search icon-search"></span>
                 <input [(ngModel)]="localFilter.query"
-                       [ngModelOptions]="{debounceTime : 500}"
+                       [ngModelOptions]="{debounceTime : config.search.debounceTime}"
                        (ngModelChange)="modelChanged()"
+                       [ngClass]="{'non-empty': localFilter.query != ''}"
+                       [maxlength]="config.search.maxLength"
                        type="text"
                        class="form-control w-100 search-input"
-                       [ngClass]="{'non-empty': localFilter.query != ''}"
                        name="query"
                        autocomplete="off"
                        placeholder="Search"/>
@@ -52,7 +53,7 @@
                                     <nx-tag
                                             [name]="tag.label"
                                             [(ngModel)]="tag.value"
-                                            (onClick)="selectBooleanFilter($event)"
+                                            (onClick)="selectBooleanFilter()"
                                             [value]="tag.value === null ? false : tag.value">
                                         {{ tag.label }}
                                     </nx-tag>
@@ -90,7 +91,7 @@
                         <a href class="btn-text has-icon position-relative"
                            (click)="resetFilters()">
                             <span class="close"></span>
-                            <span translete>Clear All</span>
+                            <span translate>Clear All</span>
                         </a>
                     </div>
                     <span>)</span>

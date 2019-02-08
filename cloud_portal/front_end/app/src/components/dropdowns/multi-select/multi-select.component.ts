@@ -113,7 +113,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     }
 
     updateLabel() {
-        switch (this.innerValue.length) {
+        switch (this.innerValue && this.innerValue.length) {
             case 0:
             case this.items.length: {
                 this.numSelected = 'Any';

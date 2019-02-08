@@ -298,6 +298,10 @@ export class NxConfigService {
             },
             campage: {
                 vendorGroups: 4
+            },
+            search: {
+                maxLength   : 200,
+                debounceTime: 500 // ms
             }
         };
     }
