@@ -80,7 +80,6 @@ void DataManager::insertOrUpdate(
         [this, key, value](nx::sql::QueryContext* queryContext)
         {
             insertToOrUpdateDb(queryContext, key, value);
-            m_eventProvider->notifyRecordInserted(queryContext, key, value);
             return nx::sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
@@ -102,7 +101,6 @@ void DataManager::remove(
         [this, key](nx::sql::QueryContext* queryContext)
         {
             removeFromDb(queryContext, key);
-            m_eventProvider->notifyRecordRemoved(queryContext, key);
             return nx::sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
@@ -147,6 +145,7 @@ void DataManager::insertToOrUpdateDb(
     const std::string& value)
 {
     m_keyValueDao.insertOrUpdate(queryContext, key, value);
+    m_eventProvider->notifyRecordInserted(queryContext, key, value);
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveKeyValuePair>(
@@ -165,6 +164,7 @@ void DataManager::removeFromDb(
     const std::string& key)
 {
     m_keyValueDao.remove(queryContext, key);
+    m_eventProvider->notifyRecordRemoved(queryContext, key);
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
@@ -177,6 +177,7 @@ void DataManager::saveRecievedRecord(
     clusterdb::engine::Command<KeyValuePair> command)
 {
     m_keyValueDao.insertOrUpdate(queryContext, command.params.key, command.params.value);
+    m_eventProvider->notifyRecordInserted(queryContext, command.params.key, command.params.value);
 }
 
 void DataManager::removeRecievedRecord(
@@ -185,6 +186,7 @@ void DataManager::removeRecievedRecord(
     clusterdb::engine::Command<Key> command)
 {
     m_keyValueDao.remove(queryContext, command.params.key);
+    m_eventProvider->notifyRecordRemoved(queryContext, command.params.key);
 }
 
 } // namespace nx::clusterdb::map
