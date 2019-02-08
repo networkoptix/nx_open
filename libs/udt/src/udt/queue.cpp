@@ -375,7 +375,7 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
     std::shared_ptr<CUDT> u = m_nodeHeap[0]->socket.lock();
     remove_(u.get());
 
-    if (!u->connected() || u->broken())
+    if (!u || !u->connected() || u->broken())
         return -1;
 
     // pack a packet from the socket
