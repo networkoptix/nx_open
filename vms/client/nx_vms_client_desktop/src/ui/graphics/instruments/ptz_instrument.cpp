@@ -23,6 +23,7 @@
 #include <ui/animation/animation_event.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -47,6 +48,9 @@ const int speedUpdateIntervalMSec = 500;
 const double minPtzZoomRectSize = 0.08;
 
 const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
+
+// Key to store if we already displayed ptz redirect warning on the current layout.
+static const char* kPtzRedirectLockedLayoutWarningKey = "__ptz_redirect_locked_warning";
 
 nx::core::ptz::Vector truncate(const nx::core::ptz::Vector& value)
 {
@@ -266,6 +270,70 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     return overlay;
 }
 
+void PtzInstrument::handlePtzRedirect(QnMediaResourceWidget* widget)
+{
+    const auto camera = widget->resource().dynamicCast<QnClientCameraResource>();
+    if (!camera || !camera->isPtzRedirected())
+        return;
+
+    const auto dynamicSensor = camera->ptzRedirectedTo();
+    if (!dynamicSensor)
+        return;
+
+    // Add dynamic sensor on the current layout if possible (near the static one).
+    if (!ensurePtzRedirectedCameraIsOnLayout(widget, dynamicSensor))
+        return;
+
+    // Switch actual sensor widget to the PTZ mode.
+    for (const auto ptzTargetWidget: display()->widgets(dynamicSensor))
+	{
+        auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(ptzTargetWidget);
+        NX_ASSERT(mediaWidget);
+        if (mediaWidget)
+            mediaWidget->setPtzMode(true);
+	}
+
+    // If current widget is zoomed, zoom target widget instead.
+    if (display()->widget(Qn::ZoomedRole) == widget)
+    {
+        const auto ptzTargetItems = workbench()->currentLayout()->items(dynamicSensor);
+        if (!ptzTargetItems.empty())
+            workbench()->setItem(Qn::ZoomedRole, *ptzTargetItems.cbegin());
+    }
+
+}
+
+bool PtzInstrument::ensurePtzRedirectedCameraIsOnLayout(
+    QnMediaResourceWidget* staticSensor,
+	const QnVirtualCameraResourcePtr& dynamicSensor)
+{
+    const auto currentLayout = workbench()->currentLayout();
+    if (!currentLayout->items(dynamicSensor).empty())
+        return true;
+
+    if (!currentLayout->resource())
+        return false;
+
+    // Check if layout is locked and show warning if needed.
+    if (currentLayout->locked())
+    {
+        const bool warned = currentLayout->property(kPtzRedirectLockedLayoutWarningKey).toBool();
+        if (!warned)
+        {
+            QnGraphicsMessageBox::information(tr("Layout is locked"));
+            currentLayout->setProperty(kPtzRedirectLockedLayoutWarningKey, true);
+        }
+        return false;
+    }
+
+    // Drop it as near to source camera as possible.
+    ui::action::Parameters parameters(dynamicSensor);
+    parameters.setArgument(Qn::ItemPositionRole,
+        qVariantFromValue(QRectF(staticSensor->item()->geometry()).center()));
+
+    return menu()->triggerIfPossible(ui::action::OpenInCurrentLayoutAction, parameters);
+}
+
 bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event)
 {
     m_clickTimer.stop();
@@ -472,42 +540,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos)
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
 {
-    // If ptz is redirected to another camera...
-    if (const auto camera = widget->resource().dynamicCast<QnClientCameraResource>();
-        camera->isPtzRedirected())
-    {
-        const auto ptzTarget = camera->ptzRedirectedTo();
-        if (ptzTarget)
-        {
-            // And target camera is not on the current layout already...
-            if (workbench()->currentLayout()->items(ptzTarget).empty())
-            {
-                // Drop it as near to source camera as possible.
-                ui::action::Parameters parameters(ptzTarget);
-                parameters.setArgument(Qn::ItemPositionRole,
-                    qVariantFromValue(QRectF(widget->item()->geometry()).center()));
-                menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
-            }
-
-            // Switch actual sensor widget to the PTZ mode.
-            for (const auto ptzTargetWidget: display()->widgets(ptzTarget))
-			{
-                auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(ptzTargetWidget);
-                NX_ASSERT(mediaWidget);
-                if (mediaWidget)
-                    mediaWidget->setPtzMode(true);
-			}
-
-            // If current widget is zoomed, zoom target widget instead.
-            if (display()->widget(Qn::ZoomedRole) == widget)
-            {
-                const auto ptzTargetItems = workbench()->currentLayout()->items(ptzTarget);
-                if (!ptzTargetItems.empty())
-                    workbench()->setItem(Qn::ZoomedRole, *ptzTargetItems.cbegin());
-            }
-        }
-    }
-
+    handlePtzRedirect(widget);
     const qreal aspectRatio = Geometry::aspectRatio(widget->size());
     const QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
     widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
