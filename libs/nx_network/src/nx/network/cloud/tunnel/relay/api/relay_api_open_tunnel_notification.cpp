@@ -8,7 +8,8 @@ namespace cloud {
 namespace relay {
 namespace api {
 
-static const nx::String kClientEndpoint("X-Nx-Client-Endpoint");
+static constexpr char kClientEndpoint[] = "X-Nx-Client-Endpoint";
+static constexpr char kOpenTunnel[] = "OPEN_TUNNEL";
 
 void OpenTunnelNotification::setClientPeerName(nx::String name)
 {
@@ -33,9 +34,8 @@ const network::SocketAddress& OpenTunnelNotification::clientEndpoint() const
 nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
 {
     nx::network::http::Message message(nx::network::http::MessageType::request);
-    message.request->requestLine.method = "OPEN_TUNNEL";
-    message.request->requestLine.version.protocol = "NXRELAY";
-    message.request->requestLine.version.version = "0.1";
+    message.request->requestLine.method = kOpenTunnel;
+    message.request->requestLine.version = {kRelayProtocolName, kRelayProtocolVersion};
     message.request->requestLine.url = nx::network::url::joinPath(
         nx::cloud::relay::api::kRelayClientPathPrefix,
         m_clientPeerName.toStdString());
@@ -47,6 +47,9 @@ nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
 bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
 {
     if (message.type != nx::network::http::MessageType::request)
+        return false;
+
+    if (message.request->requestLine.method != kOpenTunnel)
         return false;
 
     auto path = message.request->requestLine.url.path().toUtf8();

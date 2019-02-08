@@ -25,7 +25,7 @@ void ListeningPeerConnectionTunnelingServer::registerHandlers(
         nx::network::http::tunneling::detail::ConnectionUpgradeTunnelServer>();
 
     compatibilityTunnelServer.setProtocolName(
-        relay::api::kRelayProtocolName);
+        relay::api::kRelayProtocol);
     compatibilityTunnelServer.setRequestPath(
         relay::api::kServerIncomingConnectionsPath);
     compatibilityTunnelServer.setUpgradeRequestMethod(

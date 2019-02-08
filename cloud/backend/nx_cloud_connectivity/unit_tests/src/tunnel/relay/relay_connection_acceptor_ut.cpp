@@ -197,22 +197,42 @@ protected:
             [this](auto&&... args) { onConnectionActivated(std::move(args)...); });
     }
 
+    void whenSendUnknownNotification()
+    {
+        if (!m_serverConnection)
+            m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
+
+        http::Message notification(http::MessageType::request);
+        notification.request->requestLine.method = "UKNKNOWN";
+        notification.request->requestLine.url = "/unknown";
+        notification.request->requestLine.version = {"unknown", "unknown"};
+
+        m_notificationBuffers.push_back(notification.toString());
+        m_serverConnection->sendAsync(
+            m_notificationBuffers.back(),
+            [](SystemError::ErrorCode, std::size_t) {});
+    }
+
     void whenRelayActivatesConnection()
     {
-        m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
+        if (!m_serverConnection)
+            m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
 
         api::OpenTunnelNotification openTunnelNotification;
         openTunnelNotification.setClientPeerName("test_client_name");
         openTunnelNotification.setClientEndpoint(m_clientEndpoint);
-        m_openTunnelNotificationBuffer = openTunnelNotification.toHttpMessage().toString();
+
+        m_notificationBuffers.push_back(openTunnelNotification.toHttpMessage().toString());
         m_serverConnection->sendAsync(
-            m_openTunnelNotificationBuffer,
+            m_notificationBuffers.back(),
             [](SystemError::ErrorCode, std::size_t) {});
     }
 
     void whenRelayClosesConnection()
     {
-        m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
+        if (!m_serverConnection)
+            m_serverConnection = m_listeningPeerConnectionsToRelay.pop();
+
         m_serverConnection->pleaseStopSync();
         m_serverConnection.reset();
     }
@@ -303,7 +323,7 @@ private:
     utils::SyncQueue<SystemError::ErrorCode> m_activateConnectionResult;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_serverConnection;
     nx::network::SocketAddress m_clientEndpoint;
-    nx::Buffer m_openTunnelNotificationBuffer;
+    std::vector<nx::Buffer> m_notificationBuffers;
     std::unique_ptr<detail::ReverseConnection> m_connection;
 
     virtual void SetUp() override
@@ -394,6 +414,17 @@ TEST_F(
     thenNotificationIsIgnored();
 
     whenWaitingForConnectionActivation();
+    thenConnectionIsActivated();
+}
+
+TEST_F(RelayReverseConnection, ignores_unknown_notification)
+{
+    givenEstablishedConnection();
+    whenWaitingForConnectionActivation();
+
+    whenSendUnknownNotification();
+    whenRelayActivatesConnection();
+
     thenConnectionIsActivated();
 }
 
