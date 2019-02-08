@@ -237,7 +237,7 @@ private:
 
     KeyValuePair* randomPair(size_t index = 0)
     {
-        NX_ASSERT(0 <= index && index <= m_randomPairs.size());
+        NX_ASSERT((size_t)0 <= index && index <= m_randomPairs.size());
 
         if (index == m_randomPairs.size())
             m_randomPairs.emplace_back(KeyValuePair());
