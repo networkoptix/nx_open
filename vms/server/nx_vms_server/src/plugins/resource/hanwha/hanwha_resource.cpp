@@ -1043,13 +1043,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
     m_hasSerialPort = (hasRs485 != boost::none && *hasRs485)
         || (hasRs422 != boost::none && *hasRs422);
 
-    if (isAnalogEncoder() || isProxiedAnalogEncoder() || hasSerialPort())
-    {
-        // We can't reliably determine if there's PTZ caps for analogous cameras
-        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
-        setIsUserAllowedToModifyPtzCapabilities(true);
-    }
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1394,6 +1387,17 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
     }
+
+    const bool hasContinuousMovemement = m_ptzCapabilities[core::ptz::Type::operational] &
+        Ptz::ContinuousPtrzCapabilities;
+
+    // We can't reliably determine if there's PTZ caps for analogous cameras
+    // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+    const bool userIsAllowedToModifyCapabilities = (!hasContinuousMovemement && hasSerialPort())
+        || isAnalogEncoder()
+        || isProxiedAnalogEncoder();
+
+    setIsUserAllowedToModifyPtzCapabilities(userIsAllowedToModifyCapabilities);
 
     return CameraDiagnostics::NoErrorResult();
 }
