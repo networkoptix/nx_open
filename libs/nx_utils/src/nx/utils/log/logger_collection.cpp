@@ -69,16 +69,16 @@ std::shared_ptr<AbstractLogger> LoggerCollection::get(const Tag& tag, bool exact
     if (exactMatch)
     {
         const Filter filter(tag);
-        auto it = m_loggersByFilters.find(filter);
-        return it == m_loggersByFilters.cend()
+        auto it = m_loggersByFilter.find(filter);
+        return it == m_loggersByFilter.cend()
             ? m_mainLogger
-            : it->second;
+            : it->second.logger;
     }
 
-    for (auto& it: m_loggersByFilters)
+    for (auto& it: m_loggersByFilter)
     {
         if (it.first.accepts(tag))
-            return it.second;
+            return it.second.logger;
     }
     return m_mainLogger;
 }
