@@ -42,14 +42,14 @@ protected:
     {
         givenOneDb();
         givenRandomKeyValuePair();
-        whenSaveKeyValuePair();
+        whenInsertKeyValuePair();
         thenOperationSucceeded();
     }
 
     void givenTwoSynchronizedDbsWithRandomKeyValuePair()
     {
         givenTwoDbs();
-        whenSaveKeyValuePair();
+        whenInsertKeyValuePair();
 
         thenOperationSucceeded();
         andValueIsInDb();
@@ -88,7 +88,30 @@ protected:
         givenRandomKeyValuePair();
     }
 
-    void whenSaveKeyValuePair(size_t dbIndex = 0, size_t randomPairIndex = 0)
+    void givenRecordInsertedSubscrption()
+    {
+        db()->eventProvider().subscribeToRecordInserted(
+            [this](nx::sql::QueryContext* /*queryContext*/, std::string key, std::string value)
+            {
+                m_eventTriggered = true;
+                m_eventRecievedKey = key;
+                m_eventRecievedValue = value;
+            },
+            &m_eventSubscriptionId);
+    }
+
+    void givenRecordRemovedSubscription()
+    {
+        db()->eventProvider().subscribeToRecordRemoved(
+            [this](nx::sql::QueryContext* /*queryContext*/, std::string key)
+            {
+                m_eventTriggered = true;
+                m_eventRecievedKey = key;
+            },
+            &m_eventSubscriptionId);
+    }
+
+    void whenInsertKeyValuePair(size_t dbIndex = 0, size_t randomPairIndex = 0)
     {
         db(dbIndex)->dataManager().insertOrUpdate(
             randomPair(randomPairIndex)->key,
@@ -102,9 +125,9 @@ protected:
         waitForCallback();
     }
 
-    void whenSaveSecondKeyValuePair()
+    void whenInsertSecondKeyValuePair()
     {
-        whenSaveKeyValuePair(/*dbIndex*/ 0, /*randomPairIndex*/ 1);
+        whenInsertKeyValuePair(/*dbIndex*/ 0, /*randomPairIndex*/ 1);
     }
 
     void whenFetchValue(size_t dbIndex = 0, size_t randomPairIndex = 0)
@@ -148,6 +171,11 @@ protected:
     void thenOperationFailed(map::ResultCode result)
     {
         ASSERT_EQ(result, m_result);
+    }
+
+    void thenEventTriggered()
+    {
+        ASSERT_TRUE(m_eventTriggered.load());
     }
 
     void andFetchedValueMatchesRandomValue(size_t randomPairIndex = 0)
@@ -194,6 +222,21 @@ protected:
         thenOperationSucceeded();
 
         ASSERT_NE(oldValue, m_fetchedValue);
+    }
+
+    void andEventRecievedKeyMatchesInsertionKey()
+    {
+        ASSERT_EQ(m_eventRecievedKey, randomPair()->key);
+    }
+
+    void andEventRecievedKeyMatchesRemovalKey()
+    {
+        ASSERT_EQ(m_eventRecievedKey, randomPair()->key);
+    }
+
+    void andEventRecievedValueMatchesInsertionValue()
+    {
+        ASSERT_EQ(m_eventRecievedValue, randomPair()->value);
     }
 
 private:
@@ -270,6 +313,11 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_wait;
     std::atomic_bool m_callbackFired = false;
+
+    nx::utils::SubscriptionId m_eventSubscriptionId = nx::utils::kInvalidSubscriptionId;
+    std::atomic_bool m_eventTriggered = false;
+    std::string m_eventRecievedKey;
+    std::string m_eventRecievedValue;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -283,11 +331,11 @@ TEST_F(Database, fetches_key_value_pair)
     andFetchedValueMatchesRandomValue();
 }
 
-TEST_F(Database, saves_key_value_pair)
+TEST_F(Database, inserts_key_value_pair)
 {
     givenEmptyDb();
     givenRandomKeyValuePair();
-    whenSaveKeyValuePair();
+    whenInsertKeyValuePair();
 
     thenOperationSucceeded();
     andValueIsInDb();
@@ -307,11 +355,11 @@ TEST_F(Database, updates_key_value_pair)
     givenEmptyDb();
     givenTwoKeyValuePairsWithSameKey();
 
-    whenSaveKeyValuePair();
+    whenInsertKeyValuePair();
     thenOperationSucceeded();
     andValueIsInDb();
 
-    whenSaveSecondKeyValuePair();
+    whenInsertSecondKeyValuePair();
     thenOperationSucceeded();
     andSecondValueReplacedFirst();
 }
@@ -334,11 +382,11 @@ TEST_F(Database, fails_to_fetch_non_existent_value)
     andFetchedValueIsEmpty();
 }
 
-TEST_F(Database, rejects_save_with_empty_key)
+TEST_F(Database, rejects_insert_with_empty_key)
 {
     givenOneDb();
     givenKeyValuePairWithEmptyKey();
-    whenSaveKeyValuePair();
+    whenInsertKeyValuePair();
 
     thenOperationFailed(map::ResultCode::logicError);
 }
@@ -361,11 +409,31 @@ TEST_F(Database, rejects_remove_with_empty_string)
     thenOperationFailed(map::ResultCode::logicError);
 }
 
-TEST_F(Database, DISABLED_multiple_databases_synchronize_save_operation)
+TEST_F(Database, eventprovider_provides_record_inserted_event)
+{
+    givenEmptyDb();
+    givenRandomKeyValuePair();
+    givenRecordInsertedSubscrption();
+    whenInsertKeyValuePair();    thenOperationSucceeded();    thenEventTriggered();    andEventRecievedKeyMatchesInsertionKey();    andEventRecievedValueMatchesInsertionValue();
+}
+
+TEST_F(Database, eventprovider_provides_record_removed_event)
+{
+    givenDbWithRandomKeyValuePair();
+    givenRecordRemovedSubscription();
+    whenRemoveKey();
+
+    thenOperationSucceeded();
+    thenEventTriggered();
+
+    andEventRecievedKeyMatchesRemovalKey();
+}
+
+TEST_F(Database, DISABLED_multiple_databases_synchronize_insert_operation)
 {
     givenTwoDbs();
     givenRandomKeyValuePair();
-    whenSaveKeyValuePair();
+    whenInsertKeyValuePair();
 
     thenOperationSucceeded();
     andValueIsInDb();
