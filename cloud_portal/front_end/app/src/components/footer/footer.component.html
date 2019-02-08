@@ -8,7 +8,9 @@
                 <li *ngFor="let item of footerItems"><a *ngIf="item.enabled" [href]="item.url" [attr.target]="item.newWindow ? '_blank': '_self'">{{ item.name | translate }}</a></li>
             </ul>
             <ul class="nav navbar-nav col-6 col-md-4 justify-content-end">
-                <li><a href="%COMPANY_LINK%" target="_blank" class="company">&copy; %COPYRIGHT_YEAR% %COMPANY_NAME%</a></li>
+                <li><a [href]="companyLink" target="_blank" class="company">
+                    &copy;&nbsp;{{ copyrightYear }}&nbsp;{{ companyName }}</a>
+                </li>
             </ul>
         </div>
     </div>

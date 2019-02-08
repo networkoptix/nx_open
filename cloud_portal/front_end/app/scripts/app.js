@@ -90,14 +90,17 @@ window.L = {};
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.companyLink = response.companyLink;
+                    appState.companyName = response.companyName;
+                    appState.copyrightYear = response.copyrightYear;
+                    appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
                     appState.sortSupportedDevices = response.sortSupportedDevices;
                     appState.supportedResolutions = response.supportedResolutions;
                     appState.supportedHardwareTypes = response.supportedHardwareTypes;
-                    appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.searchTags = response.searchTags;
+                    appState.trafficRelayHost = response.trafficRelayHost;
                     
                     angular.extend(CONFIG, appState);
                 });

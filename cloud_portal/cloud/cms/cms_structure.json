@@ -648,7 +648,7 @@
         "is_global": true,
         "description": "Footer Menu",
         "hidden": true,
-        "translatable": true,
+        "translatable": false,
         "values": [
           {
             "label": "Footer Items",

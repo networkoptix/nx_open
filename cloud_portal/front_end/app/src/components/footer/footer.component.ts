@@ -9,6 +9,9 @@ import { NxAppStateService } from '../../services/nx-app-state.service';
     styleUrls: [ 'footer.component.scss' ]
 })
  export class NxFooterComponent implements OnInit {
+    companyLink: string;
+    companyName: string;
+    copyrightYear: string;
     config: any;
     footerItems: any;
     viewFooter: boolean;
@@ -20,6 +23,9 @@ import { NxAppStateService } from '../../services/nx-app-state.service';
     }
 
     ngOnInit() {
+        this.companyLink = this.config.companyLink;
+        this.companyName = this.config.companyName;
+        this.copyrightYear = this.config.copyrightYear;
         this.footerItems = this.config.footerItems;
         this.appState.footerVisibleObservable.subscribe((visible) => {
             this.viewFooter = visible;

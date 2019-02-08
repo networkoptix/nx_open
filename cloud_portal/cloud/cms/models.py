@@ -44,28 +44,42 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
         force = check_update_cache(customization_name, data['version_id'])[0]
 
     if not data or force:
+        from cms.controllers.filldata import process_context_structure
         customization = Customization.objects.get(name=customization_name)
         custom_config = get_config(customization.name)
+
+        footer_items = product.read_global_value('%FOOTER_ITEMS%')
+        if footer_items:
+            for context in Context.objects.filter(is_global=True):
+                footer_items = process_context_structure(product, context, footer_items,
+                                                         None, product.version_id(), False, True)
 
         data = {
             'version_id': product.version_id(),
             'languages': customization.languages_list,
             'default_language': customization.default_language.code,
-            'mail_from_name': product.read_global_value('%MAIL_FROM_NAME%'),
-            'mail_from_email': product.read_global_value('%MAIL_FROM_EMAIL%'),
-            'portal_url': custom_config['cloud_portal']['url'],
-            'smtp_host': product.read_global_value('%SMTP_HOST%'),
-            'smtp_port': product.read_global_value('%SMTP_PORT%'),
-            'smtp_user': product.read_global_value('%SMTP_USER%'),
-            'smtp_password': product.read_global_value('%SMTP_PASSWORD%'),
-            'smtp_tls': product.read_global_value('%SMTP_TLS%'),
-            'footer_items': product.read_global_value("%FOOTER_ITEMS%"),
-            'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
-            'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
-            'sort_supported_devices': product.read_global_value("%SORT_SUPPORTED_DEVICES%"),
-            'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
-            'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
-            'search_tags': product.read_global_value("%SEARCH_TAGS%")
+            'email': {
+                'mail_from_name': product.read_global_value('%MAIL_FROM_NAME%'),
+                'mail_from_email': product.read_global_value('%MAIL_FROM_EMAIL%'),
+                'portal_url': custom_config['cloud_portal']['url'],
+                'smtp_host': product.read_global_value('%SMTP_HOST%'),
+                'smtp_port': product.read_global_value('%SMTP_PORT%'),
+                'smtp_user': product.read_global_value('%SMTP_USER%'),
+                'smtp_password': product.read_global_value('%SMTP_PASSWORD%'),
+                'smtp_tls': product.read_global_value('%SMTP_TLS%')
+            },
+            'config': {
+                'copyright_year': product.read_global_value("%COPYRIGHT_YEAR%"),
+                'company_name': product.read_global_value("%COMPANY_NAME%"),
+                'company_link': product.read_global_value("%COMPANY_LINK%"),
+                'footer_items': footer_items,
+                'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
+                'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
+                'sort_supported_devices': product.read_global_value("%SORT_SUPPORTED_DEVICES%"),
+                'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
+                'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
+                'search_tags': product.read_global_value("%SEARCH_TAGS%")
+            }
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])
