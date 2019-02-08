@@ -2,7 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Core.Items 1.0
 import nx.client.core 1.0
-
+import "utils.js" as Utils
 Item
 {
     id: controller
@@ -19,17 +19,13 @@ Item
     readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
 
-
     signal requestDrawing()
     signal emptyRoiCleared()
 
     onAllowDrawingChanged:
     {
-        if (!allowDrawing || !d.customInitialPoint)
-            return
-
-        d.selectionRoi.start(true)
-        handleLongPressed()
+        if (allowDrawing && d.customInitialPoint && d.selectionRoi)
+            Utils.executeLater(function() { d.selectionRoi.start() }, this)
     }
 
     function clearCustomRoi()
@@ -61,6 +57,12 @@ Item
             rect ? d.toRelative(Qt.vector2d(rect.right, rect.bottom)) : undefined)
     }
 
+    function handleLongPressed()
+    {
+        if (!controller.allowDrawing)
+            controller.requestDrawing()
+    }
+
     function handlePositionChanged(pos)
     {
         var relativePos = d.toRelative(pos)
@@ -74,23 +76,6 @@ Item
         {
             handleCancelled()
         }
-    }
-
-    function handleLongPressed()
-    {
-        if (!controller.allowDrawing)
-        {
-            controller.requestDrawing()
-            return
-        }
-
-        d.customFirstPoint = d.customInitialPoint
-        d.customSecondPoint = d.customInitialPoint
-        d.selectionRoi.show()
-        if (d.customRoi)
-            d.customRoi.hide()
-
-        makeShortVibration()
     }
 
     function handlePressed(pos)
@@ -198,11 +183,28 @@ Item
     onDrawingRoiChanged:
     {
         if (drawingRoi)
-            return
+        {
+            // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
+            // Since it's value depends on MotionRoi state, we have to use executeLater to
+            // break direct dependencies and avoid binding loop.
+            Utils.executeLater(
+                function()
+                {
+                    d.customFirstPoint = d.customInitialPoint
+                    d.customSecondPoint = d.customInitialPoint
+                    d.selectionRoi.show()
+                    if (d.customRoi)
+                        d.customRoi.hide()
 
-        d.customRoi = d.selectionRoi
-        d.selectionRoi = null
-        d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+                    makeShortVibration()
+                }, this)
+        }
+        else
+        {
+            d.customRoi = d.selectionRoi
+            d.selectionRoi = null
+            d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+        }
     }
 
     onCameraRotationChanged: updateDefaultRoi()
@@ -264,6 +266,8 @@ Item
 
             var horizontalRange = 44
             var verticalRange = 32
+            var maxHorizontalValue = horizontalRange - 1
+            var maxVerticalValue = verticalRange - 1
 
             var left = Math.floor(topLeft.x * horizontalRange)
             var right = Math.floor(bottomRight.x * horizontalRange)
@@ -271,15 +275,15 @@ Item
             var bottom = Math.floor(bottomRight.y * verticalRange)
 
             result.correctBounds =
-                left <= horizontalRange
+                left < horizontalRange
                 && right >= 0
-                && top <= verticalRange
+                && top < verticalRange
                 && bottom >= 0
 
             left = result.correctBounds ? Math.max(left, 0) : 0
-            right = result.correctBounds ? Math.min(right, horizontalRange) : horizontalRange
+            right = result.correctBounds ? Math.min(right, maxHorizontalValue) : maxHorizontalValue
             top = result.correctBounds ? Math.max(top, 0) : 0
-            bottom = result.correctBounds ? Math.min(bottom, verticalRange) : verticalRange
+            bottom = result.correctBounds ? Math.min(bottom, maxVerticalValue) : maxVerticalValue
 
             result.filter = JSON.stringify([[
                 { "x": left, "y": top, "width": right - left + 1, "height": bottom - top + 1 }
@@ -340,4 +344,3 @@ Item
         }
     }
 }
-

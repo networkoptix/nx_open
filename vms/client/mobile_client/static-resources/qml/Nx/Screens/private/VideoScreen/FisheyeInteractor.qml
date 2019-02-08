@@ -58,9 +58,8 @@ Object
         updateScaleCenter(x, y)
     }
 
-    function updateZoom(x, y, deltaPower, animated)
+    function updateZoom(x, y, deltaPower)
     {
-        scalePowerAnimationBehavior.enabled = animated
         scalePower = Math.min(4.0, Math.max(0.0, previousScalePower + deltaPower))
 
         if (viewMode != MediaDewarpingParams.Horizontal && fisheyeShader.fov(currentScale) >= 90.0)

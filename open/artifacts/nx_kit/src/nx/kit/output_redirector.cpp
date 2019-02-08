@@ -75,7 +75,7 @@ OutputRedirector::OutputRedirector()
         const std::string name = (strlen(path_s) == 0) ? "" : basename(path_s);
         free(path_s);
     #elif defined(__APPLE__)
-        const auto name = processName();
+        const std::string name = processName();
     #elif defined(_WIN32)
         int argc;
         LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
