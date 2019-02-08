@@ -108,14 +108,14 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &BookmarkSearchWidget::updateAllowance);
 
-    connect(model(), &AbstractSearchListModel::isOnlineChanged,
-        this, &BookmarkSearchWidget::updateAllowance);
-
     // Signals that can potentially be emitted during this widget destruction must be
     // disconnected in ~Private, so store the connections in d->connections.
 
     d->connections << connect(this, &AbstractSearchWidget::textFilterChanged,
         d->model, &BookmarkSearchListModel::setFilterText);
+
+    d->connections << connect(model(), &AbstractSearchListModel::isOnlineChanged,
+        this, &BookmarkSearchWidget::updateAllowance);
 
     d->connections << connect(view(), &EventRibbon::visibleRangeChanged, this,
         [this]() { d->sinceViewUpdated.restart(); });
