@@ -926,7 +926,14 @@ QString QnSecurityCamResource::getFirmware() const
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty(ResourcePropertyKey::kFirmware, firmware);
+    QString fixedFirmware;
+    for (const QChar symbol: firmware)
+    {
+        if (symbol.toLatin1() < 32) //< non-printable symbols
+            continue;
+        fixedFirmware.append(symbol);
+    }
+    setProperty(ResourcePropertyKey::kFirmware, fixedFirmware);
 }
 
 bool QnSecurityCamResource::trustCameraTime() const
