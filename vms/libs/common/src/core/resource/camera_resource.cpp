@@ -49,9 +49,8 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 std::map<QnUuid, std::set<QString>> filterByActiveEngines(
     std::map<QnUuid, std::set<QString>> entitiesByEngine,
-    const QnPeerRuntimeInfo& runtimeData)
+    const QSet<QnUuid>& activeEngines)
 {
-    const auto& activeEngines = runtimeData.data.activeAnalyticsEngines;
     for (auto it = entitiesByEngine.cbegin(); it != entitiesByEngine.cend();)
     {
         const auto engineId = it->first;
@@ -631,18 +630,12 @@ void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& 
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedEventTypes() const
 {
-    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
-    const auto runtimeInfo = runtimeInfoManager->item(getParentServer()->getId());
-
-    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), runtimeInfo);
+    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), activeAnalyticsEngines());
 }
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectTypes() const
 {
-    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
-    const auto runtimeInfo = runtimeInfoManager->item(getParentServer()->getId());
-
-    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), runtimeInfo);
+    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), activeAnalyticsEngines());
 }
 
 QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines()
@@ -707,6 +700,13 @@ QnVirtualCameraResource::DeviceAgentManifestMap
 {
     return QJson::deserialized<DeviceAgentManifestMap>(
         getProperty(kDeviceAgentManifestsProperty).toUtf8());
+}
+
+QSet<QnUuid> QnVirtualCameraResource::activeAnalyticsEngines() const
+{
+    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
+    const auto runtimeInfo = runtimeInfoManager->item(getParentServer()->getId());
+    return runtimeInfo.data.activeAnalyticsEngines;
 }
 
 QHash<QnUuid, QVariantMap> QnVirtualCameraResource::deviceAgentSettingsValues() const

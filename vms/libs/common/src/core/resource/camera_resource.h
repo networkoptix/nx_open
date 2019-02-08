@@ -136,6 +136,8 @@ private:
 
     DeviceAgentManifestMap fetchDeviceAgentManifests();
 
+    QSet<QnUuid> activeAnalyticsEngines() const;
+
 private:
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
