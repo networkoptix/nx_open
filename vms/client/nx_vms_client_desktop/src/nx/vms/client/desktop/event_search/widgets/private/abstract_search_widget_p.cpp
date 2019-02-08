@@ -481,7 +481,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         tr("Devices on layout"), tr("Cameras on layout"));
 
     addDeviceDependentAction(addMenuAction("<current camera>", Cameras::current, true),
-        tr("Current device"), tr("Current camera"));
+        tr("Selected device"), tr("Selected camera"));
 
     cameraMenu->addSeparator();
 
@@ -554,10 +554,10 @@ QString AbstractSearchWidget::Private::currentDeviceText() const
 
     const auto camera = m_mainModel->cameraSet()->singleCamera();
     if (!camera)
-        return kTemplate.arg(tr("Current camera"), tr("none", "No currently selected camera"));
+        return kTemplate.arg(tr("Selected camera"), tr("none", "No currently selected camera"));
 
     const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
-        QnCameraDeviceStringSet("<unused>", tr("Current camera"), tr("Current device")), camera);
+        QnCameraDeviceStringSet("<unused>", tr("Selected camera"), tr("Selected device")), camera);
 
     return kTemplate.arg(baseText, camera->getName());
 };
