@@ -8,26 +8,6 @@ int QnAppInfo::ec2ProtoVersion()
     return ${nxec.ec2ProtoVersion};
 }
 
-QString QnAppInfo::organizationName()
-{
-    return QStringLiteral("${company.name}");
-}
-
-QString QnAppInfo::linuxOrganizationName()
-{
-    return QStringLiteral("${deb.customization.company.name}");
-}
-
-QString QnAppInfo::applicationVersion()
-{
-    return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
-}
-
-QString QnAppInfo::applicationRevision()
-{
-    return QStringLiteral("${changeSet}");
-}
-
 QString QnAppInfo::applicationPlatformModification()
  {
     return QStringLiteral("${modification}");
@@ -46,11 +26,6 @@ QString QnAppInfo::applicationCompiler()
     #endif
 }
 
-QString QnAppInfo::engineVersion()
- {
-    return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
-}
-
 QString QnAppInfo::ffmpegVersion()
  {
     return QStringLiteral("${ffmpeg.version}");
@@ -64,26 +39,6 @@ QString QnAppInfo::sigarVersion()
 QString QnAppInfo::boostVersion()
 {
     return QStringLiteral("${boost.version}");
-}
-
-bool QnAppInfo::beta()
-{
-    return ${beta};
-}
-
-QString QnAppInfo::productNameShort()
-{
-    return QStringLiteral("${product.name.short}");
-}
-
-QString QnAppInfo::productNameLong()
-{
-    return QStringLiteral("${display.product.name}");
-}
-
-QString QnAppInfo::customizationName()
-{
-    return QStringLiteral("${customization}");
 }
 
 QString QnAppInfo::defaultLanguage()
