@@ -24,7 +24,8 @@ public:
         noResourceDiscovery = 1 << 0,
         noMonitorStatistics = 1 << 1,
         noStorageDiscovery  = 1 << 2,
-        count = 1 << 3,
+        noPlugins  = 1 << 3,
+        count = 1 << 4,
         all = count - 1
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)

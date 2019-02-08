@@ -254,6 +254,7 @@ public:
     };
     Option<int> maxConnections{this, "maxConnections", 2000, ""};
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
+    Option<bool> noPlugins{this, "noPlugins", false, "Turn off all plugins"};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
     Option<QString> rtspTransport{this, "rtspTransport", "tcp", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
