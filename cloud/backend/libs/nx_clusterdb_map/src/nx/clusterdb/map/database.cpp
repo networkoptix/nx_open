@@ -24,8 +24,7 @@ Database::Database(
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         dbManager),
     m_structureUpdater(dbManager),
-    m_dataManager(&m_syncEngine, dbManager, kSystemId),
-    m_eventProvider(dbManager)
+    m_dataManager(&m_syncEngine, dbManager, kSystemId, &m_eventProvider)
 {
 }
 

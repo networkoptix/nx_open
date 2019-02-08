@@ -6,6 +6,7 @@
 
 #include "key_value_pair.h"
 #include "dao/key_value_dao.h"
+#include "event_provider.h"
 
 namespace nx::clusterdb::map {
 
@@ -32,11 +33,13 @@ ResultCode toResultCode(nx::sql::DBResult dbResult)
 DataManager::DataManager(
     nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-    const std::string& systemId)
+    const std::string& systemId,
+    EventProvider* eventProvider)
     :
     m_syncEngine(syncronizationEngine),
     m_queryExecutor(queryExecutor),
-    m_systemId(systemId)
+    m_systemId(systemId),
+    m_eventProvider(eventProvider)
 {
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(
@@ -77,6 +80,7 @@ void DataManager::insertOrUpdate(
         [this, key, value](nx::sql::QueryContext* queryContext)
         {
             insertToOrUpdateDb(queryContext, key, value);
+            m_eventProvider->notifyRecordInserted(queryContext, key, value);
             return nx::sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
@@ -98,6 +102,7 @@ void DataManager::remove(
         [this, key](nx::sql::QueryContext* queryContext)
         {
             removeFromDb(queryContext, key);
+            m_eventProvider->notifyRecordRemoved(queryContext, key);
             return nx::sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](

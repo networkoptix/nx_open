@@ -18,6 +18,8 @@ namespace nx::clusterdb::engine { class SyncronizationEngine; }
 
 namespace nx::clusterdb::map {
 
+class EventProvider;
+
 enum ResultCode
 {
     ok = 0,
@@ -40,7 +42,8 @@ public:
     DataManager(
         nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
         nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-        const std::string& systemId);
+        const std::string& systemId,
+        EventProvider* eventProvider);
     ~DataManager();
 
     /**
@@ -111,6 +114,7 @@ private:
     nx::clusterdb::engine::SyncronizationEngine* m_syncEngine = nullptr;
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     std::string m_systemId;
+    EventProvider * m_eventProvider;
 
     dao::KeyValueDao m_keyValueDao;
 };

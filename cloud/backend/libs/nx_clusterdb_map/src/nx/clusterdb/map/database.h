@@ -34,8 +34,8 @@ private:
     nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
     dao::StructureUpdater m_structureUpdater;
     dao::KeyValueDao m_keyValueDao;
-    DataManager m_dataManager;
     EventProvider m_eventProvider;
+    DataManager m_dataManager;
 };
 
 } // namespace nx::clusterdb::map
