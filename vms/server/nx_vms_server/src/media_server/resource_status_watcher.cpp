@@ -128,7 +128,7 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr& res
 
     m_setStatusInProgress.insert(resource->getId());
     auto connection = commonModule()->ec2Connection();
-    auto resourceManager = connection->makeResourceManager(Qn::kSystemAccess);
+    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
     resourceManager->setResourceStatus(
         resource->getId(),
         resource->getStatus(),

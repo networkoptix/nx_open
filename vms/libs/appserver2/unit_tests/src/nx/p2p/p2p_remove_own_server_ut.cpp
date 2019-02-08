@@ -71,7 +71,7 @@ public:
     void whenOneServerForgetsAnother()
     {
         auto connection = m_servers[0]->moduleInstance()->ecConnection();
-        auto manager = connection->makeMediaServerManager(Qn::kSystemAccess);
+        auto manager = connection->getMediaServerManager(Qn::kSystemAccess);
         manager->removeSync(m_servers[1]->moduleInstance()->commonModule()->moduleGUID());
     }
 

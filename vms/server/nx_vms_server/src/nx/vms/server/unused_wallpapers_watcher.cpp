@@ -28,14 +28,14 @@ void UnusedWallpapersWatcher::update()
         return;
     auto connection = dynamic_cast<ec2::Ec2DirectConnection*> (connectionPtr.get());
 
-    auto fileManager = connection->makeStoredFileManager(Qn::kSystemAccess);
+    auto fileManager = connection->getStoredFileManager(Qn::kSystemAccess);
     QStringList fileList;
     auto result = fileManager->listDirectorySync(Qn::kWallpapersFolder, &fileList);
     if (result != ec2::ErrorCode::ok)
         return;
     std::sort(fileList.begin(), fileList.end());
 
-    auto layoutManager = connection->makeLayoutManager(Qn::kSystemAccess);
+    auto layoutManager = connection->getLayoutManager(Qn::kSystemAccess);
     nx::vms::api::LayoutDataList layoutList;
     result = layoutManager->getLayoutsSync(&layoutList);
     if (result != ec2::ErrorCode::ok)
@@ -56,7 +56,7 @@ void UnusedWallpapersWatcher::update()
         m_previousData.begin(), m_previousData.end(),
         std::inserter(intersection, intersection.begin()));
 
-    auto manager = commonModule()->ec2Connection()->makeStoredFileManager(Qn::kSystemAccess);
+    auto manager = commonModule()->ec2Connection()->getStoredFileManager(Qn::kSystemAccess);
     // Remove unused files from database if no layout have been found for some period of time.
     for (const auto& fileName: intersection)
     {

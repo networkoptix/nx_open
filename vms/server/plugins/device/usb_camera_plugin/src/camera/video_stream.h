@@ -15,7 +15,6 @@
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
 #include "codec_parameters.h"
-#include "fps_counter.h"
 #include "stream_consumer_manager.h"
 #include "abstract_stream_consumer.h"
 
@@ -37,27 +36,6 @@ public:
      * Get the url used by ffmpeg to open the video stream.
      */
     std::string ffmpegUrl() const;
-
-    /**
-     * The target frames per second the video stream was opened with.
-     */
-    float fps() const;
-
-    /**
-     * The number of frames per second the video stream is actually producing, updated every
-     *    second. Some cameras run at a lower fps than it actually reports.
-     */
-    float actualFps() const;
-
-    /**
-     * The amount of time it takes to produce a video frame at the target frame rate.
-     */
-    std::chrono::milliseconds timePerFrame() const;
-
-    /**
-     * The amount of time it takes to produce a video frame based on actualFps().
-     */
-    std::chrono::milliseconds actualTimePerFrame() const;
 
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
@@ -90,10 +68,7 @@ private:
     std::weak_ptr<Camera> m_camera;
     CodecParameters m_codecParams;
     nxpl::TimeProvider * const m_timeProvider;
-    FpsCounter m_fpsCounter;
-
     std::atomic<CameraState> m_streamState = csOff;
-
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
 
     mutable std::mutex m_mutex;
@@ -103,16 +78,12 @@ private:
     std::thread m_videoThread;
     std::atomic_bool m_terminated = true;
     std::atomic_bool m_ioError = false;
-    int m_initCode = 0;
 
 private:
     /**
      * Get the url of the video stream, modified appropriately based on platform.
      */
     std::string ffmpegUrlPlatformDependent() const;
-    bool waitForConsumers();
-    bool noConsumers() const;
-    void tryToStartIfNotStarted();
     void start();
     void stop();
     void run();
@@ -121,10 +92,9 @@ private:
     void uninitialize();
     int initializeInputFormat();
     void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
-    std::shared_ptr<ffmpeg::Packet> readFrame();
+    int readFrame(std::shared_ptr<ffmpeg::Packet>& result);
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
-    void setCameraState(CameraState cameraState);
 
     bool checkIoError(int ffmpegError);
     void setLastError(int ffmpegError);

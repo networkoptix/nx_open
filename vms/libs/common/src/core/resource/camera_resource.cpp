@@ -161,7 +161,7 @@ int QnVirtualCameraResource::saveAsync()
     ec2::fromResourceToApi(toSharedPointer(this), apiCamera);
 
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
-    return conn->makeCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
+    return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
 }
 
 void QnVirtualCameraResource::issueOccured() {
@@ -352,8 +352,8 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
         auto secondStreamIter = std::find_if(
             supportedMediaStreams.streams.begin(),
             supportedMediaStreams.streams.end(),
-            [](const CameraMediaStreamInfo& mediaInfo) 
-		    {
+            [](const CameraMediaStreamInfo& mediaInfo)
+            {
                 return mediaInfo.getEncoderIndex() == StreamIndex::secondary;
             });
         if (secondStreamIter != supportedMediaStreams.streams.end())
@@ -630,4 +630,3 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
         QString::fromUtf8(QJson::serialized(manifests)));
     saveProperties();
 }
-

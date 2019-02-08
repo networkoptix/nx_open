@@ -32,13 +32,15 @@ void Codec::close()
         avcodec_free_context(&m_codecContext);
 }
 
-int Codec::sendPacket(const AVPacket *packet) const
+int Codec::sendPacket(const AVPacket *packet)
 {
+    m_needFlush = packet != nullptr;
     return avcodec_send_packet(m_codecContext, packet);
 }
 
-int Codec::sendFrame(const AVFrame * frame) const
+int Codec::sendFrame(const AVFrame * frame)
 {
+    m_needFlush = frame != nullptr;
     return avcodec_send_frame(m_codecContext, frame);
 }
 
@@ -192,7 +194,7 @@ int Codec::frameSize() const
 
 void Codec::flush()
 {
-    if (!avcodec_is_open(m_codecContext))
+    if (!avcodec_is_open(m_codecContext) || !m_needFlush)
         return;
 
     if (av_codec_is_decoder(m_codec))
@@ -209,6 +211,7 @@ void Codec::flush()
         while (returnCode != AVERROR_EOF)
             returnCode = receivePacket(packet.packet());
     }
+    m_needFlush = false;
 }
 
 } // namespace ffmpeg

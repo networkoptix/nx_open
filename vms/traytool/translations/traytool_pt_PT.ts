@@ -59,11 +59,11 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation>Server has been stopped</translation>
+      <translation>O servidor parou</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation>Server has been started</translation>
+      <translation type="unfinished">Server has been started</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
@@ -71,47 +71,47 @@
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation>Show Server Log</translation>
+      <translation type="unfinished">Show Server Log</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation>Start Server</translation>
+      <translation type="unfinished">Start Server</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation>Stop Server</translation>
+      <translation type="unfinished">Stop Server</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Server Web Page</translation>
+      <translation type="unfinished">Server Web Page</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation>stopped</translation>
+      <translation type="unfinished">stopped</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation>starting</translation>
+      <translation type="unfinished">starting</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation>stopping</translation>
+      <translation type="unfinished">stopping</translation>
     </message>
     <message>
       <source>started</source>
-      <translation>started</translation>
+      <translation type="unfinished">started</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation>resuming</translation>
+      <translation type="unfinished">resuming</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation>paused</translation>
+      <translation>pausado</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation>pausing</translation>
+      <translation type="unfinished">pausing</translation>
     </message>
   </context>
 </TS>

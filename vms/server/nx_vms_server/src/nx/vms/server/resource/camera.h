@@ -223,7 +223,7 @@ protected:
      * CameraStreamCapability could be null. That case it is auto-filled with default values.
      */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(
-		nx::vms::api::StreamIndex streamIndex);
+        nx::vms::api::StreamIndex streamIndex);
 
     /**
      * @return stream capability traits
@@ -246,7 +246,7 @@ protected:
 
 private:
     using StreamCapabilityAdvancedParameterProviders = std::map<
-		nx::vms::api::StreamIndex, 
+        nx::vms::api::StreamIndex, 
         std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
 
     int m_channelNumber; // video/audio source number

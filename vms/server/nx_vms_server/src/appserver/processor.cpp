@@ -172,7 +172,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
      */
 
     ec2::ErrorCode errorCode = commonModule->ec2Connection()
-        ->makeResourceManager(Qn::kSystemAccess)
+        ->getResourceManager(Qn::kSystemAccess)
         ->saveSync(apiCameraData.id, properties);
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -181,7 +181,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     }
 
     errorCode = commonModule->ec2Connection()
-        ->makeCameraManager(Qn::kSystemAccess)
+        ->getCameraManager(Qn::kSystemAccess)
         ->addCameraSync(apiCameraData);
     if (errorCode != ec2::ErrorCode::ok)
         NX_WARNING(typeid(QnAppserverResourceProcessor), QString::fromLatin1("Can't add camera to database. DB error code %1").arg(ec2::toString(errorCode)));
@@ -226,7 +226,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         nx::vms::api::CameraAttributesDataList attrsList;
         ec2::fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
-        errCode =  ec2Connection()->makeCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
+        errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
             NX_WARNING (this, QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)));

@@ -145,7 +145,7 @@ private:
     ec2::QnDistributedMutexManager* m_mutexManager;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
-    qint64 m_recordingStopTime;
+    qint64 m_recordingStopTimeMs;
     WriteBufferMultiplierManager m_writeBufferManager;
 
     mutable QnMutex m_resourceConnectionMutex;

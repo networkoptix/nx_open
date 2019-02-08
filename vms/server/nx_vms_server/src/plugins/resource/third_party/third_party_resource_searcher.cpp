@@ -70,7 +70,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         return result;
     }
 
-    if( resourceType->getManufacture() != manufacture() )
+    if( resourceType->getManufacturer() != manufacturer() )
         return result;
 
     nxcip::CameraInfo cameraInfo;
@@ -114,7 +114,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     return result;
 }
 
-QString ThirdPartyResourceSearcher::manufacture() const
+QString ThirdPartyResourceSearcher::manufacturer() const
 {
     return THIRD_PARTY_MANUFACTURER_NAME;
 }
@@ -297,7 +297,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         return QnThirdPartyResourcePtr();
     }
 
-    QnUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
+    QnUuid typeId = qnResTypePool->getResourceTypeId(manufacturer(), THIRD_PARTY_MODEL_NAME);
     if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 

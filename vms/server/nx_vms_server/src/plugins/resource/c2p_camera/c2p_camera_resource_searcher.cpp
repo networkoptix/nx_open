@@ -11,7 +11,7 @@
 namespace {
 
 static const QString kC2pScheme("c2p");
-static const QString kManufacture("C2P");
+static const QString kManufacturer("C2P");
 
 class QnC2pCameraResource: public nx::vms::server::resource::Camera
 {
@@ -53,7 +53,7 @@ QnResourceList QnPlC2pCameraResourceSearcher::findResources()
     return QnResourceList();
 }
 
-QString QnPlC2pCameraResourceSearcher::manufacture() const
+QString QnPlC2pCameraResourceSearcher::manufacturer() const
 {
     return QnResourceTypePool::kC2pCameraTypeId;
 }
@@ -66,7 +66,7 @@ QList<QnResourcePtr> QnPlC2pCameraResourceSearcher::checkHostAddr(
     {
         QnC2pCameraResourcePtr resource(new QnC2pCameraResource(serverModule()));
         QnUuid resourceTypeId = qnResTypePool->getResourceTypeId(
-            kManufacture /*manufacture*/,
+            kManufacturer /*manufacturer*/,
             QnResourceTypePool::kC2pCameraTypeId /*name*/);
         resource->setTypeId(resourceTypeId);
         resource->setUrl(url.toString());

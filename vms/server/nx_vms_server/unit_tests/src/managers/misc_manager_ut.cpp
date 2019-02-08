@@ -33,7 +33,7 @@ protected:
         m_originalRecords.back().signature = nx::utils::generateRandomName(7);
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
-            m_appserver2.ecConnection()->makeMiscManager(Qn::kSystemAccess)->
+            m_appserver2.ecConnection()->getMiscManager(Qn::kSystemAccess)->
                 saveSystemMergeHistoryRecord(m_originalRecords.back()));
     }
 
@@ -54,7 +54,7 @@ protected:
         nx::vms::api::SystemMergeHistoryRecordList mergeHistory;
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
-            m_appserver2.ecConnection()->makeMiscManager(Qn::kSystemAccess)->
+            m_appserver2.ecConnection()->getMiscManager(Qn::kSystemAccess)->
                 getSystemMergeHistorySync(&mergeHistory));
 
         ASSERT_EQ(m_originalRecords.size(), mergeHistory.size());

@@ -327,7 +327,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode =
-                        connect->makeCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
+                        connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if (errorCode != ec2::ErrorCode::ok)
                         NX_WARNING(this, "Can't add camera to ec2. %1",ec2::toString(errorCode));
                     existCamRes->saveProperties();
@@ -369,9 +369,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
 
-    // If resource is not discovered last minute
-    // and we do not record it
-    // and do not see live => readers not running.
+    // If resource is not discovered last minute and we do not record it and do not see live
+    // than readers are not running.
     if (searchType == SearchType::Full)
         markOfflineIfNeeded(discoveredResources);
 

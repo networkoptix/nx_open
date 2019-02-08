@@ -181,7 +181,7 @@ int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     ec2::AbstractECConnectionPtr connect = owner->commonModule()->ec2Connection();
     QnLicenseList licenses;
     licenses << license;
-    auto licenseManager = connect->makeLicenseManager(owner->accessRights());
+    auto licenseManager = connect->getLicenseManager(owner->accessRights());
 
     const ec2::ErrorCode errorCode = licenseManager->addLicensesSync(licenses);
     if (errorCode == ec2::ErrorCode::forbidden)

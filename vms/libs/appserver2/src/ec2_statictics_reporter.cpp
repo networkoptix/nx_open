@@ -67,14 +67,14 @@ namespace ec2
         ErrorCode errCode;
 
         api::MediaServerDataExList mediaServers;
-        errCode = m_ec2Connection->makeMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
+        errCode = m_ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
         if (errCode != ErrorCode::ok)
             return errCode;
 
         for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
 
         nx::vms::api::CameraDataExList cameras;
-        errCode = m_ec2Connection->makeCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
+        errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
         if (errCode != ErrorCode::ok)
             return errCode;
 
@@ -82,7 +82,7 @@ namespace ec2
             outData->cameras.emplace_back(std::move(cam));
 
         QnLicenseList licenses;
-        errCode = m_ec2Connection->makeLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
+        errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
         if (errCode != ErrorCode::ok)
             return errCode;
 
@@ -97,7 +97,7 @@ namespace ec2
         }
 
         nx::vms::api::EventRuleDataList eventRules;
-        errCode = m_ec2Connection->makeEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
+        errCode = m_ec2Connection->getEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
             &eventRules);
         if (errCode != ErrorCode::ok)
             return errCode;
@@ -105,18 +105,18 @@ namespace ec2
         for (auto& rule: eventRules)
             outData->businessRules.emplace_back(std::move(rule));
 
-        errCode = m_ec2Connection->makeLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
+        errCode = m_ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
         if (errCode != ErrorCode::ok)
             return errCode;
 
         nx::vms::api::UserDataList users;
-        errCode = m_ec2Connection->makeUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+        errCode = m_ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         if (errCode != ErrorCode::ok)
             return errCode;
 
         for (auto& u : users) outData->users.push_back(std::move(u));
 
-        errCode = m_ec2Connection->makeVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&outData->videowalls);
+        errCode = m_ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&outData->videowalls);
         if (errCode != ErrorCode::ok)
             return errCode;
 

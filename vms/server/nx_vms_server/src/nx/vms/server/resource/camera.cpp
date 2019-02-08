@@ -437,7 +437,7 @@ void Camera::initializationDone()
 StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
 {
     // Implementation may be overloaded in a driver.
-	return StreamCapabilityMap();
+    return StreamCapabilityMap();
 }
 
 nx::media::CameraTraits Camera::mediaTraits() const

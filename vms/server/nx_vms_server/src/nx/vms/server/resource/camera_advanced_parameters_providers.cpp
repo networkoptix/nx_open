@@ -508,8 +508,8 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
 
 static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
     const StreamCapabilityMap& capabilities,
-	nx::vms::api::StreamIndex streamIndex,
-	Camera* const camera)
+    nx::vms::api::StreamIndex streamIndex,
+    Camera* const camera)
 {
     std::map<QString, std::vector<QnLiveStreamParams>> optionsByCodec;
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)

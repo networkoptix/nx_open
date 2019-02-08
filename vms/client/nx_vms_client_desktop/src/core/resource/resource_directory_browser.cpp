@@ -68,7 +68,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid& resourceT
     return result;
 }
 
-QString QnResourceDirectoryBrowser::manufacture() const {
+QString QnResourceDirectoryBrowser::manufacturer() const {
     return lit("DirectoryBrowser");
 }
 

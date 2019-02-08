@@ -38,7 +38,7 @@ public:
         const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const;
 
     nx::vms::api::StreamIndex determineStreamIndex(
-		const nx::api::CameraImageRequest& request) const;
+        const nx::api::CameraImageRequest& request) const;
 
 private:
     CLVideoDecoderOutputPtr readFrame(
@@ -50,7 +50,7 @@ private:
 
     CLVideoDecoderOutputPtr getImageWithCertainQuality(
         nx::vms::api::StreamIndex streamIndex,
-		const nx::api::CameraImageRequest& request) const;
+        const nx::api::CameraImageRequest& request) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromCaches(
         QnVideoCameraPtr camera,
@@ -65,11 +65,11 @@ private:
 
     CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
         nx::vms::api::StreamIndex streamIndex,
-		qint64 timestampUs,
-		QnVideoCameraPtr camera) const;
+        qint64 timestampUs,
+        QnVideoCameraPtr camera) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
         nx::vms::api::StreamIndex streamIndex,
-		qint64 timestampUs,
-		QnVideoCameraPtr camera) const;
+        qint64 timestampUs,
+        QnVideoCameraPtr camera) const;
 };

@@ -6,10 +6,17 @@ nx_add_target(nx_onvif LIBRARY LIBRARY_TYPE STATIC NO_MOC
 
 set_source_files_properties(${c_files} PROPERTIES LANGUAGE CXX)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/onvif)
-add_definitions(-DWITH_OPENSSL -DWITH_PURE_VIRTUAL)
+target_compile_definitions(nx_onvif
+    PUBLIC 
+        WITH_OPENSSL=
+        WITH_PURE_VIRTUAL=
+)
 
-target_include_directories(nx_onvif PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/gsoap)
+target_include_directories(nx_onvif 
+    PUBLIC 
+    	${CMAKE_CURRENT_SOURCE_DIR}/src/onvif
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gsoap
+)    
 
 if(NOT WINDOWS)
     target_link_libraries(nx_onvif PUBLIC pthread)

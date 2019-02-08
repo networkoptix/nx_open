@@ -30,7 +30,7 @@ public:
         const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams& params) override;
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
     nx::plugins::flir::IoExecutor* ioExecutor() const;
 private:
     virtual QList<QnNetworkResourcePtr> processPacket(

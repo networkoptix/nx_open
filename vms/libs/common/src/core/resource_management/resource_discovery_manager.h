@@ -92,7 +92,7 @@ public:
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
-    QnAbstractResourceSearcher* searcherByManufacture(const QString& manufacture) const;
+    QnAbstractResourceSearcher* searcherByManufacturer(const QString& manufacturer) const;
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 

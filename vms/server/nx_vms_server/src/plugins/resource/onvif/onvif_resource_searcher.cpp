@@ -86,36 +86,27 @@ QnResourcePtr OnvifResourceSearcher::createResource(
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())
     {
-        NX_DEBUG(this, "createResource: no resource type for ID = %1", resourceTypeId);
+        NX_DEBUG(this, "createResource: no resource type for type id = %1", resourceTypeId);
         return result;
     }
 
-    //if (resourceType->getManufacture() != manufacture())
-    /*
-    if (!resourceType->getAllManufacturesIncludeAncessor().contains(manufacture()))
-    {
-        qDebug() << "createResource: manufacture " << resourceType->getManufacture()
-                 << " != " << manufacture();
-        return result;
-    }
-    */
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacturer(
         serverModule(),
-        resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
+        resourceType->getName() == QString("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
-        : resourceType->getName()); // use name instead of manufacture to instantiate child onvif resource
+        : resourceType->getName()); //< We use name instead of manufacturer on purpose.
     if (!result)
-        return result; // not found
+        return result; //< Not found.
 
     result->setTypeId(resourceTypeId);
 
-    NX_DEBUG(this, "createResource: create ONVIF camera resource. TypeID: %1.", resourceTypeId);
+    NX_DEBUG(this, "createResource: create ONVIF camera resource, type id: %1.", resourceTypeId);
 
     result->setCommonModule(serverModule()->commonModule());
     return result;
 }
 
-QString OnvifResourceSearcher::manufacture() const
+QString OnvifResourceSearcher::manufacturer() const
 {
     return QnPlOnvifResource::MANUFACTURE;
 }
