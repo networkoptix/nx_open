@@ -800,6 +800,14 @@ Handle ServerConnection::getUpdateInfo(Result<nx::update::Information>::type&& c
     return executeGet("/ec2/updateInformation", params, callback, targetThread);
 }
 
+Handle ServerConnection::checkForUpdates(const QString& changeset,
+    Result<QnJsonRestResult>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params {{"version", changeset}};
+    return executeGet("/ec2/updateInformation", params, callback, targetThread);
+}
+
 Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
     auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
