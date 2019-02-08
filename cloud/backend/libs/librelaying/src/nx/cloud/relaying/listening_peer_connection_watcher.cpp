@@ -5,9 +5,11 @@
 namespace nx::cloud::relaying {
 
 ListeningPeerConnectionWatcher::ListeningPeerConnectionWatcher(
-    std::unique_ptr<network::AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection,
+    const std::string& peerProtocolVersion)
     :
-    m_connection(std::move(connection))
+    m_connection(std::move(connection)),
+    m_peerProtocolVersion(peerProtocolVersion)
 {
     bindToAioThread(m_connection->getAioThread());
 }

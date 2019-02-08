@@ -24,7 +24,8 @@ public:
         std::unique_ptr<network::AbstractStreamSocket>)>;
 
     ListeningPeerConnectionWatcher(
-        std::unique_ptr<network::AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection,
+        const std::string& peerProtocolVersion);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -37,6 +38,7 @@ protected:
 
 private:
     std::unique_ptr<network::AbstractStreamSocket> m_connection;
+    const std::string m_peerProtocolVersion;
     nx::Buffer m_readBuffer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
 

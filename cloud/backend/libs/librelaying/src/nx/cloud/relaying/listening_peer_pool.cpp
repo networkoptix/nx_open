@@ -42,9 +42,13 @@ ListeningPeerPool::~ListeningPeerPool()
 
 void ListeningPeerPool::addConnection(
     const std::string& originalPeerName,
+    const std::string& peerProtocolVersion,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     auto peerName = convertHostnameToInternalFormat(originalPeerName);
+
+    NX_VERBOSE(this, "Added connection from %1, protocol version %2",
+        originalPeerName, peerProtocolVersion);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -70,7 +74,9 @@ void ListeningPeerPool::addConnection(
     auto connectionContext = std::make_unique<ConnectionContext>();
     connectionContext->peerEndpoint = connection->getForeignAddress();
     connectionContext->connectionWatcher =
-        std::make_unique<ListeningPeerConnectionWatcher>(std::move(connection));
+        std::make_unique<ListeningPeerConnectionWatcher>(
+            std::move(connection),
+            peerProtocolVersion);
 
     m_statisticsCalculator.connectionAccepted();
 
