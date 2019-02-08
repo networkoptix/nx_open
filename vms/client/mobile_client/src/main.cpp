@@ -176,9 +176,24 @@ int runUi(QtSingleGuiApplication* application)
 
     const bool forceSoftwareOnlyDecoderForIPhone =
         #if defined(Q_OS_IOS)
-            ini().forceSoftwareDecoderForIPhoneXs
-            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXs
-            && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
+            []()
+            {
+                if (!ini().forceSoftwareDecoderForA12XBionicChip)
+                    return false;
+
+                const auto majorVersion = iosDeviceInformation().majorVersion;
+                const auto deviceType = iosDeviceInformation().type;
+
+                if (majorVersion == IosDeviceInformation::iPadProA12XBionic
+                     && deviceType == IosDeviceInformation::Type::iPad)
+                {
+                    return true;
+                }
+
+                return majorVersion == IosDeviceInformation::iPhoneXs
+                    && deviceType == IosDeviceInformation::Type::iPhone;
+            }();
+
         #else
             false;
         #endif

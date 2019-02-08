@@ -267,7 +267,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
     CGuard sendguard(m_SendLock);
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     switch (optName)
     {
@@ -896,7 +896,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
-    // Uses the smaller MSS between the peers        
+    // Uses the smaller MSS between the peers
     if (hs->m_iMSS > m_iMSS)
         hs->m_iMSS = m_iMSS;
     else
@@ -993,6 +993,24 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     delete[] buffer;
 }
 
+int CUDT::shutdown(int /*how*/)
+{
+    m_bBroken = true;
+
+    // signal a waiting "recv" call if there is any data available
+#ifndef _WIN32
+    pthread_mutex_lock(&m_RecvDataLock);
+    if (m_bSynRecving)
+        pthread_cond_signal(&m_RecvDataCond);
+    pthread_mutex_unlock(&m_RecvDataLock);
+#else
+    if (m_bSynRecving)
+        SetEvent(m_RecvDataCond);
+#endif
+
+    return 0;
+}
+
 void CUDT::close()
 {
     if (!m_bOpened)
@@ -1082,7 +1100,7 @@ void CUDT::close()
 
     // waiting all send and recv calls to stop
     CGuard sendguard(m_SendLock);
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     // CLOSED.
     m_bOpened = false;
@@ -1206,7 +1224,7 @@ int CUDT::recv(char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     if (0 == m_pRcvBuffer->getRcvDataSize())
     {
@@ -1384,7 +1402,7 @@ int CUDT::recvmsg(char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     if (m_bBroken || isClosing())
     {
@@ -1572,7 +1590,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
     if (size <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     int64_t torecv = size;
     int unitsize = block;
@@ -1720,7 +1738,6 @@ void CUDT::initSynch()
     pthread_mutex_init(&m_RecvDataLock, NULL);
     pthread_cond_init_monotonic(&m_RecvDataCond);
     pthread_mutex_init(&m_SendLock, NULL);
-    pthread_mutex_init(&m_RecvLock, NULL);
     pthread_mutex_init(&m_AckLock, NULL);
 #else
     m_SendBlockLock = CreateMutex(NULL, false, NULL);
@@ -1728,7 +1745,6 @@ void CUDT::initSynch()
     m_RecvDataLock = CreateMutex(NULL, false, NULL);
     m_RecvDataCond = CreateEvent(NULL, false, false, NULL);
     m_SendLock = CreateMutex(NULL, false, NULL);
-    m_RecvLock = CreateMutex(NULL, false, NULL);
     m_AckLock = CreateMutex(NULL, false, NULL);
 #endif
 }
@@ -1741,7 +1757,6 @@ void CUDT::destroySynch()
     pthread_mutex_destroy(&m_RecvDataLock);
     pthread_cond_destroy(&m_RecvDataCond);
     pthread_mutex_destroy(&m_SendLock);
-    pthread_mutex_destroy(&m_RecvLock);
     pthread_mutex_destroy(&m_AckLock);
 #else
     CloseHandle(m_SendBlockLock);
@@ -1749,7 +1764,6 @@ void CUDT::destroySynch()
     CloseHandle(m_RecvDataLock);
     CloseHandle(m_RecvDataCond);
     CloseHandle(m_SendLock);
-    CloseHandle(m_RecvLock);
     CloseHandle(m_AckLock);
 #endif
 }
@@ -1768,17 +1782,15 @@ void CUDT::releaseSynch()
     pthread_mutex_lock(&m_RecvDataLock);
     pthread_cond_signal(&m_RecvDataCond);
     pthread_mutex_unlock(&m_RecvDataLock);
-
-    pthread_mutex_lock(&m_RecvLock);
-    pthread_mutex_unlock(&m_RecvLock);
 #else
     SetEvent(m_SendBlockCond);
     WaitForSingleObject(m_SendLock, INFINITE);
     ReleaseMutex(m_SendLock);
     SetEvent(m_RecvDataCond);
-    WaitForSingleObject(m_RecvLock, INFINITE);
-    ReleaseMutex(m_RecvLock);
 #endif
+
+    m_RecvLock.lock();
+    m_RecvLock.unlock();
 }
 
 void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int size)
@@ -2487,8 +2499,8 @@ int CUDT::processData(CUnit* unit)
         m_iRcvLossTotal += loss;
     }
 
-    // This is not a regular fixed size packet...   
-    //an irregular sized packet usually indicates the end of a message, so send an ACK immediately   
+    // This is not a regular fixed size packet...
+    //an irregular sized packet usually indicates the end of a message, so send an ACK immediately
     if (packet.getLength() != m_iPayloadSize)
         CTimer::rdtsc(m_ullNextACKTime);
 
@@ -2564,7 +2576,7 @@ void CUDT::checkTimers(bool forceAck)
         if ((m_iEXPCount > 16) && (currtime - m_ullLastRspTime > 5000000 * m_ullCPUFrequency))
         {
             //
-            // Connection is broken. 
+            // Connection is broken.
             // UDT does not signal any information about this instead of to stop quietly.
             // Application will detect this when it calls any UDT methods next time.
             //
@@ -2751,7 +2763,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             }
             else
             {
-                // a new connection has been created, enable epoll for write 
+                // a new connection has been created, enable epoll for write
                 CUDT::s_UDTUnited->m_EPoll.update_events(m_SocketId, m_pollIds, UDT_EPOLL_OUT, true);
             }
         }

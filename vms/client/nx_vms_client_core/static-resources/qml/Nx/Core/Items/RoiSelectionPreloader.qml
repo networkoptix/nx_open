@@ -17,19 +17,23 @@ Item
     property real normalThickness: 1
 
     property bool enableAnimation: true
-    property int animationDuration: 600
-    property real expandedSize: 63
+    property int animationDuration: 400
+
+    property real expandedSize: 103
+    property real expandedDashSize: 32
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
     property real centerCircleRadius: 2.5
+    readonly property bool expandingFinished: state == "normal"
+        || (d.circleRadius == expandedCircleRadius && state == "expanded")
 
     layer.enabled: true
 
     x: centerPoint.x - width / 2
     y: centerPoint.y - height / 2
 
-    width: d.size
-    height: width
+    width: d.size + shadow.radius * 2
+    height: width + shadow.radius * 2
     visible: opacity > 0
 
     Item
@@ -39,6 +43,11 @@ Item
         anchors.fill: parent
         visible: false
 
+        x: shadow.radius
+        y: shadow.radius
+        width: parent.width - x * 2
+        height: parent.height - y * 2
+
         Rectangle
         {
             id: leftDash
@@ -46,7 +55,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: d.thickness
             color: item.mainColor
-            width: item.dashSize - d.thickness
+            width: d.dashSize + d.thickness
             height: d.thickness
         }
 
@@ -57,7 +66,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             x: parent.width - width - d.thickness
             color: item.mainColor
-            width: item.dashSize - d.thickness
+            width: d.dashSize
             height: d.thickness
         }
 
@@ -69,7 +78,7 @@ Item
             y: d.thickness
             color: item.mainColor
             width: d.thickness
-            height: item.dashSize - d.thickness
+            height: d.dashSize + d.thickness
         }
 
         Rectangle
@@ -80,7 +89,7 @@ Item
             y: parent.height - height - d.thickness
             color: item.mainColor
             width: d.thickness
-            height: item.dashSize - d.thickness
+            height: d.dashSize + d.thickness
         }
 
         Circle
@@ -109,6 +118,7 @@ Item
 
         anchors.fill: visualHolder
         radius: 1
+        spread: 1
         color: item.shadowColor
         source: visualHolder
     }
@@ -127,6 +137,7 @@ Item
                 size: item.normalSize
                 thickness: item.normalThickness
                 circleRadius: item.normalCircleRadius
+                dashSize: item.dashSize
             }
         },
         State
@@ -141,6 +152,7 @@ Item
                 size: item.normalSize
                 thickness: item.normalThickness
                 circleRadius: item.normalCircleRadius
+                dashSize: item.dashSize
             }
         },
         State
@@ -155,6 +167,7 @@ Item
                 size: item.expandedSize
                 thickness: item.expandedThickness
                 circleRadius: item.expandedCircleRadius
+                dashSize: item.expandedDashSize
             }
         }
     ]
@@ -167,6 +180,7 @@ Item
         property real size: item.normalSize
         property real thickness: item.normalThickness
         property real circleRadius: item.normalCircleRadius
+        property real dashSize: item.dashSize
 
         Behavior on circleRadius
         {
@@ -187,6 +201,15 @@ Item
         }
 
         Behavior on size
+        {
+            NumberAnimation
+            {
+                duration: d.animationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on dashSize
         {
             NumberAnimation
             {

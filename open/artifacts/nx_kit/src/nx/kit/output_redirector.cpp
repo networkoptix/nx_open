@@ -14,8 +14,7 @@
     #include <codecvt>
     #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
 #elif defined(__APPLE__)
-    #include <libgen.h>
-    #include <crt_externs.h>
+    #include <nx/kit/apple_utils.h>
 #else //< Assuming Linux-like OS.
     #include <libgen.h>
     #include <memory.h>
@@ -86,8 +85,7 @@ OutputRedirector::OutputRedirector()
             std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
         LocalFree(argv);
     #elif defined(__APPLE__)
-        std::string path_s{(*_NSGetArgv())[0]}; //< Needed because basename() changes the string.
-        const std::string name = path_s.empty() ? "" : basename(&path_s[0]);
+        const auto name = processName();
     #else //< Assuming Linux-like OS.
         std::ifstream inputStream("/proc/self/cmdline");
         std::string path;

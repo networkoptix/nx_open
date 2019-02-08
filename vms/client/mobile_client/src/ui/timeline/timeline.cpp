@@ -1406,7 +1406,7 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     chunkPainter.setColors(colors);
     chunkPainter.start(
-        value, QRectF(0, y, liveX - 1, height() - y),
+        value, QRectF(0, y, std::max<qreal>(liveX - 1, 0), height() - y),
         chunkCount, minimumValue, std::min(liveMs, maximumValue));
 
     while (value < kRightChunksBound)

@@ -460,6 +460,7 @@ TEST_F(HttpTunnelingValidation, validation_is_performed)
     whenRequestTunnel();
 
 
+
     thenTunnelIsEstablished();
     andValidationIsCompleted();
 }

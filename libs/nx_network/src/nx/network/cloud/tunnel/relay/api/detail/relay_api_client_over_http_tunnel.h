@@ -6,7 +6,7 @@
 
 #include "relay_api_basic_client.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 class NX_NETWORK_API ClientOverHttpTunnel:
     public BasicClient
@@ -32,7 +32,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    using TunnelingClients = 
+    using TunnelingClients =
         std::list<std::unique_ptr<network::http::tunneling::Client>>;
 
     using OpenTrafficRelayTunnelHandler = nx::utils::MoveOnlyFunc<void(
@@ -68,4 +68,4 @@ private:
         const network::http::tunneling::Client& tunnelingClient);
 };
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

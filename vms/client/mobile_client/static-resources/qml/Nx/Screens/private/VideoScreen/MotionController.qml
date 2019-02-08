@@ -7,6 +7,7 @@ Item
 {
     id: controller
 
+    property bool allowDrawing: true
     property int cameraRotation: 0
     property Item viewport: null
 
@@ -15,8 +16,21 @@ Item
     property string motionFilter
 
     readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingRoi
-    readonly property bool drawingRoi: d.toBool(
-        d.customInitialPoint && d.nearPositions(d.customInitialPoint, d.customFirstPoint))
+    readonly property bool drawingRoi: allowDrawing && d.toBool(
+        d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
+
+
+    signal requestDrawing()
+    signal emptyRoiCleared()
+
+    onAllowDrawingChanged:
+    {
+        if (!allowDrawing || !d.customInitialPoint)
+            return
+
+        d.selectionRoi.start(true)
+        handleLongPressed()
+    }
 
     function clearCustomRoi()
     {
@@ -64,6 +78,12 @@ Item
 
     function handleLongPressed()
     {
+        if (!controller.allowDrawing)
+        {
+            controller.requestDrawing()
+            return
+        }
+
         d.customFirstPoint = d.customInitialPoint
         d.customSecondPoint = d.customInitialPoint
         d.selectionRoi.show()
@@ -90,7 +110,8 @@ Item
         d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.singlePoint = true
-        d.selectionRoi.start()
+        if (allowDrawing)
+            d.selectionRoi.start()
     }
 
     function handleReleased()
@@ -103,7 +124,7 @@ Item
         d.handleMouseReleased()
     }
 
-    MaskedUniformGrid
+    RoundedMask
     {
         // TODO: turn off motion area data gethering when not visible.
         visible: controller.motionSearchMode
@@ -113,7 +134,8 @@ Item
         opacity: 1
         cellCountX: 44
         cellCountY: 32
-        color: "red"
+        fillColor: ColorTheme.transparent(ColorTheme.red_l2, 0.15)
+        lineColor: ColorTheme.transparent(ColorTheme.red_l2, 0.5)
 
         MediaPlayerMotionProvider
         {
@@ -176,16 +198,13 @@ Item
     onDrawingRoiChanged:
     {
         if (drawingRoi)
-        {
-            controller.motionSearchMode = true
-        }
-        else
-        {
-            d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
-            d.customRoi = d.selectionRoi
-            d.selectionRoi = null
-        }
+            return
+
+        d.customRoi = d.selectionRoi
+        d.selectionRoi = null
+        d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
     }
+
     onCameraRotationChanged: updateDefaultRoi()
 
     QtObject
@@ -231,8 +250,10 @@ Item
 
         function getMotionFilter(first, second)
         {
+            var result = { filter: "", correctBounds: true }
+
             if (!first|| !second)
-                return "";
+                return result
 
             var topLeft = Qt.point(
                 Math.min(first.x, second.x),
@@ -241,16 +262,30 @@ Item
                 Math.max(first.x, second.x),
                 Math.max(first.y, second.y))
 
-            var horizontalRange = 43
-            var verticalRange = 31
+            var horizontalRange = 44
+            var verticalRange = 32
 
             var left = Math.floor(topLeft.x * horizontalRange)
-            var right = Math.ceil(bottomRight.x * horizontalRange)
+            var right = Math.floor(bottomRight.x * horizontalRange)
             var top = Math.floor(topLeft.y * verticalRange)
-            var bottom = Math.ceil(bottomRight.y * verticalRange)
+            var bottom = Math.floor(bottomRight.y * verticalRange)
 
-            return "[[{\"x\": %1, \"y\": %2, \"width\": %3, \"height\": %4}]]"
-                .arg(left).arg(top).arg(right - left + 1).arg(bottom - top + 1)
+            result.correctBounds =
+                left <= horizontalRange
+                && right >= 0
+                && top <= verticalRange
+                && bottom >= 0
+
+            left = result.correctBounds ? Math.max(left, 0) : 0
+            right = result.correctBounds ? Math.min(right, horizontalRange) : horizontalRange
+            top = result.correctBounds ? Math.max(top, 0) : 0
+            bottom = result.correctBounds ? Math.min(bottom, verticalRange) : verticalRange
+
+            result.filter = JSON.stringify([[
+                { "x": left, "y": top, "width": right - left + 1, "height": bottom - top + 1 }
+                ]])
+
+            return result
         }
 
         function getRectangle(first, second)
@@ -294,7 +329,14 @@ Item
         {
             currentFirstPoint = first
             currentSecondPoint = second
-            controller.motionFilter = getMotionFilter(first, second)
+
+            var filterResult = getMotionFilter(first, second)
+            controller.motionFilter = filterResult.filter
+            if (!filterResult.correctBounds)
+            {
+                controller.clearCustomRoi()
+                controller.emptyRoiCleared()
+            }
         }
     }
 }

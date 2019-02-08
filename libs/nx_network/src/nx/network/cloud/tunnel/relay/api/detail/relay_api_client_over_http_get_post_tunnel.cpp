@@ -4,7 +4,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 static constexpr char kHttpTunnelMessageBodySize[] = "10000000000";
 
@@ -187,4 +187,4 @@ void ClientOverHttpGetPostTunnel::reportSuccess(
     tunnelContext->invokeUserHandler(api::ResultCode::ok);
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

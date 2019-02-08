@@ -248,7 +248,7 @@ void ProxyHandler::onRelayInstanceSearchCompleted(
 
     nx::utils::swapAndCall(
         m_detectProxyTargetHandler,
-        network::http::StatusCode::found,
+        network::http::StatusCode::temporaryRedirect,
         TargetHost());
 }
 

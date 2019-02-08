@@ -5,7 +5,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "api/relay_api_client_factory.h"
 #include "../../protocol_type.h"
 
 namespace nx::network::cloud::relay {
@@ -49,7 +48,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 ReverseConnection::ReverseConnection(const nx::utils::Url& relayUrl):
-    m_relayClient(api::ClientFactory::instance().create(relayUrl)),
+    m_relayClient(std::make_unique<api::Client>(relayUrl)),
     m_peerName(relayUrl.userName().toStdString())
 {
     bindToAioThread(getAioThread());

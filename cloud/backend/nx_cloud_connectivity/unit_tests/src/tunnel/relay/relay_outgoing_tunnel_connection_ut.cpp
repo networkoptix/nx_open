@@ -247,8 +247,7 @@ private:
 
         const auto relayUrl = nx::utils::Url("http://127.0.0.1:12345");
 
-        auto clientToRelayConnection =
-            api::ClientFactory::instance().create(relayUrl);
+        auto clientToRelayConnection = std::make_unique<api::Client>(relayUrl);
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
             relayUrl,

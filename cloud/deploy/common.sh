@@ -59,8 +59,6 @@ function pack()
 
 function pushns()
 {
-    docker login -u registry -p 225653 la.hdw.mx:5000
-
     echo "Pushing $MODULE:$VERSION to the private registry"
     docker tag $MODULE:$VERSION la.hdw.mx:5000/$MODULE:$VERSION
     docker push la.hdw.mx:5000/$MODULE:$VERSION
@@ -82,6 +80,14 @@ function push()
     docker tag $MODULE:$VERSION $REPOSITORY/$MODULE:latest
     docker push $REPOSITORY/$MODULE:latest
 
+    pushns
+}
+
+function publish()
+{
+    stage
+    pack
+    push
     pushns
 }
 
@@ -113,7 +119,7 @@ function main()
         func=$1; shift
         args=""
 
-        if [ "$func" = "publish" -o "$func" = "build" ]
+        if [ "$func" = "build" ]
         then
             args="$1"; shift; n=$((n+1))
         fi

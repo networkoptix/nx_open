@@ -42,6 +42,9 @@ void StreamSocketStub::readSomeAsync(
         {
             m_readBuffer = buffer;
             m_readHandler = std::move(handler);
+
+            if (m_connectionClosed)
+                reportConnectionClosure();
         });
 }
 
@@ -98,9 +101,10 @@ void StreamSocketStub::setConnectionToClosedState()
     base_type::post(
         [this]()
         {
-            m_readBuffer->append("h");
-            if (m_readHandler)
-                nx::utils::swapAndCall(m_readHandler, SystemError::noError, 0);
+            m_connectionClosed = true;
+
+            if (m_readHandler) //< We have a pending read.
+                reportConnectionClosure();
         });
 }
 
@@ -112,6 +116,13 @@ void StreamSocketStub::setForeignAddress(const SocketAddress& endpoint)
 void StreamSocketStub::setPostDelay(std::optional<std::chrono::milliseconds> postDelay)
 {
     m_postDelay = postDelay;
+}
+
+void StreamSocketStub::reportConnectionClosure()
+{
+    m_readBuffer->append(
+        "Just checking that buffer is always alive when completion handler is triggered");
+    nx::utils::swapAndCall(m_readHandler, SystemError::noError, 0);
 }
 
 } // namespace test

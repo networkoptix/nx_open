@@ -8,16 +8,19 @@ import Nx 1.0
 
 ZoomableFlickable
 {
-    id: zf
+    id: control
+
+    readonly property bool fisheyeMode: fisheyeModeController.fisheyeMode
 
     property alias mediaPlayer: content.mediaPlayer
     property alias resourceHelper: content.resourceHelper
-    property MotionController motionSearchController: null
+    property alias motionController: motionSearchController
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
     property size fitSize: content.boundedSize(width, height)
-    property rect videoRect
+
+    interactive: !fisheyeMode
 
     function getMoveViewportData(position)
     {
@@ -32,7 +35,7 @@ ZoomableFlickable
         onResourceIdChanged: to1xScale()
     }
 
-    allowCompositeEvents: !motionSearchController || !motionSearchController.drawingRoi
+    allowCompositeEvents: !motionController.drawingRoi && !fisheyeMode
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
@@ -77,44 +80,73 @@ ZoomableFlickable
 
         var twiceTargetScale = 2
         var eps = 0.000001
-        var zoomIn = zf.contentScale < twiceTargetScale - eps
+        var zoomIn = control.contentScale < twiceTargetScale - eps
 
         d.toggleScale(zoomIn, mouseX, mouseY)
     }
 
     Object
     {
+        id: fisheyeModeController
+
+        property bool fisheyeModeInternal:
+            !motionController.motionSearchMode
+            && resourceHelper.fisheyeParams.enabled
+
+        property bool fisheyeMode: false
+        Component.onCompleted: fisheyeMode = fisheyeModeInternal
+
+        Connections
+        {
+            target: control
+            onMovingChanged:
+            {
+                if (!moving && fisheyeModeController.fisheyeModeInternal)
+                    fisheyeModeController.fisheyeMode = true
+            }
+        }
+
+        Connections
+        {
+            target: interactor
+            onAnimatingChanged:
+            {
+                if (!interactor.animating && !fisheyeModeController.fisheyeModeInternal)
+                    fisheyeModeController.fisheyeMode = false
+            }
+        }
+
+        onFisheyeModeInternalChanged:
+        {
+            if (fisheyeModeInternal)
+            {
+                // Try to rollback scalable video picture
+                if (control.contentWidth > control.width || control.contentHeight > control.height)
+                    control.fitToBounds(true)
+                else
+                    fisheyeMode = true
+            }
+            else
+            {
+                // Rollback fisheye video picture
+                if (interactor.scalePower != 0 || interactor.unconstrainedRotation != Qt.vector2d(0, 0))
+                {
+                    interactor.enableAnimation = true
+                    interactor.scalePower = 0
+                    interactor.unconstrainedRotation = Qt.vector2d(0, 0)
+                    interactor.enableAnimation = false
+                }
+                else
+                {
+                    fisheyeMode = false
+                }
+            }
+        }
+    }
+
+    Object
+    {
         id: d
-
-        Connections
-        {
-            target: content.videoOutput
-            onXChanged: d.updateVideoRect()
-            onYChanged: d.updateVideoRect()
-            onHeightChanged: d.updateVideoRect()
-            onWidthChanged: d.updateVideoRect()
-        }
-
-        Connections
-        {
-            target: zf
-            onContentRectChanged: d.updateVideoRect()
-        }
-
-        function updateVideoRect()
-        {
-            var output = content.videoOutput
-            var x = output.x
-            var y = output.y
-
-            var topLeft = parent.mapFromItem(content, x, y)
-            var bottomRight = parent.mapFromItem(content, x + output.width, y + output.height)
-            var width = Math.abs(bottomRight.x - topLeft.x)
-            var height = Math.abs(bottomRight.y - topLeft.y)
-
-            videoRect = Qt.rect(topLeft.x, topLeft.y, width, height)
-        }
-
 
         function allowedMargin(targetWidth, targetHeight, size, padding, factor)
         {
@@ -146,15 +178,15 @@ ZoomableFlickable
         {
             var targetScale = to2x ? 2 : 1
 
-            var baseWidth = contentWidth / zf.contentScale
-            var baseHeight = contentHeight / zf.contentScale
+            var baseWidth = contentWidth / control.contentScale
+            var baseHeight = contentHeight / control.contentScale
 
             flickable.animating = true
             flickable.fixMargins()
 
             var point = mapToItem(content, mouseX, mouseY)
-            var dx = point.x / zf.contentScale
-            var dy = point.y / zf.contentScale
+            var dx = point.x / control.contentScale
+            var dy = point.y / control.contentScale
 
             var newContentWidth = baseWidth * targetScale
             var newContentHeight = baseHeight * targetScale
@@ -182,24 +214,13 @@ ZoomableFlickable
         }
     }
 
-    MultiVideoPositioner
-    {
-        id: content
-
-        resourceHelper: zf.resourceHelper
-
-        width: contentWidth
-        height: contentHeight
-
-        onSourceSizeChanged: fitToBounds()
-    }
-
     onWidthChanged: fitToBounds()
+
     onHeightChanged: fitToBounds()
 
-    function fitToBounds()
+    function fitToBounds(animated)
     {
-        resizeContent(width, height, false, true)
+        resizeContent(width, height, animated, true)
     }
 
     function clear()
@@ -207,5 +228,77 @@ ZoomableFlickable
         content.videoOutput.clear()
     }
 
-    Component.onCompleted: d.updateVideoRect()
+    FisheyeShaderItem
+    {
+        id: shader
+
+        visible: control.fisheyeMode
+        sourceItem: visible ? content.videoOutput : null
+        helper: control.resourceHelper
+        anchors.fill: content
+    }
+
+    FisheyeInteractor
+    {
+        id: interactor
+
+        fisheyeShader: shader
+        enableAnimation: fisheyeController.enableAnimation
+    }
+
+    FisheyeController
+    {
+        id: fisheyeController
+
+        enabled: control.fisheyeMode
+        interactor: interactor
+        mouseArea: control.mouseArea
+        pinchArea: control.pinchArea
+        onClicked: control.clicked()
+    }
+
+    MultiVideoPositioner
+    {
+        id: content
+
+        resourceHelper: control.resourceHelper
+
+        width: contentWidth
+        height: contentHeight
+
+        onSourceSizeChanged: fitToBounds()
+
+        MotionController
+        {
+            id: motionSearchController
+
+            parent: content.videoOutput
+            anchors.fill: parent
+            viewport: control
+
+            allowDrawing: !control.fisheyeMode
+            cameraRotation: control.resourceHelper.customRotation
+            motionProvider.mediaPlayer: content.mediaPlayer
+
+            Connections
+            {
+                target: control.mouseArea
+                enabled: motionSearchController.enabled
+
+                onPressed: motionSearchController.handlePressed(
+                    control.mapToItem(motionSearchController, mouse.x, mouse.y))
+                onReleased: motionSearchController.handleReleased()
+                onPositionChanged: motionSearchController.handlePositionChanged(
+                    control.mapToItem(motionSearchController, mouse.x, mouse.y))
+                onCanceled: motionSearchController.handleCancelled()
+                onDoubleClicked: motionSearchController.handleCancelled()
+            }
+
+            Connections
+            {
+                target: control
+                onMovementEnded: motionSearchController.updateDefaultRoi()
+            }
+        }
+    }
 }

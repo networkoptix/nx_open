@@ -1,8 +1,10 @@
 #pragma once
 
+#include <future>
+
 #include <QtCore>
 #include <QString>
-#include <future>
+
 #include <nx/update/update_information.h>
 #include <nx/vms/api/data/system_information.h>
 #include <common/common_module.h>

@@ -5,9 +5,9 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/type_utils.h>
 
-#include "relay_api_http_paths.h"
+#include "../relay_api_http_paths.h"
 
-namespace nx::cloud::relay::api {
+namespace nx::cloud::relay::api::detail {
 
 ClientOverHttpUpgrade::ClientOverHttpUpgrade(
     const nx::utils::Url& baseUrl,
@@ -71,4 +71,4 @@ void ClientOverHttpUpgrade::openConnectionToTheTargetHost(
             });
 }
 
-} // namespace nx::cloud::relay::api
+} // namespace nx::cloud::relay::api::detail

@@ -191,6 +191,8 @@ enum Value
     seeOther = 303,
     notModified = 304,
     useProxy = 305,
+    temporaryRedirect = 307,
+    permanentRedirect = 308,
 
     badRequest = 400,
     unauthorized = 401,
