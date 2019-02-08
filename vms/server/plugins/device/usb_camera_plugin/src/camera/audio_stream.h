@@ -2,15 +2,11 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <thread>
 #include <mutex>
 #include <atomic>
-#include <chrono>
-#include <condition_variable>
 
 #include "stream_consumer_manager.h"
-#include "timestamp_mapper.h"
 #include "ffmpeg/input_format.h"
 #include "ffmpeg/audio_transcoder.h"
 

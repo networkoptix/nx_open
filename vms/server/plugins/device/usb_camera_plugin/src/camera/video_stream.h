@@ -1,19 +1,13 @@
 #pragma once
 
 #include <string>
-#include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <vector>
-#include <deque>
 #include <thread>
 #include <atomic>
-#include <map>
 
 #include "ffmpeg/input_format.h"
-#include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
-#include "ffmpeg/frame.h"
 #include "codec_parameters.h"
 #include "stream_consumer_manager.h"
 #include "abstract_stream_consumer.h"
