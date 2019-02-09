@@ -28,9 +28,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     private params: any = {};
     private config: any;
 
-    advSearch = false;
-    showAdvancedOptions = false;
-
+    public advSearch = false;
+    public showAdvancedOptions = false;
 
     constructor(private _elementRef: ElementRef,
                 private _router: Router,

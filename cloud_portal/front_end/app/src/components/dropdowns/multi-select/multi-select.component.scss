@@ -1,3 +1,5 @@
+@import '../variables';
+
 nx-multi-select {
     width   : 100%;
     display : block;
@@ -8,7 +10,7 @@ nx-multi-select {
     
     .dropdown-menu {
         &--list {
-            max-height : 277px !important; // 312px - list header height
+            max-height : $dropdown-multi-list-height !important;
             margin     : 0;
         }
         
