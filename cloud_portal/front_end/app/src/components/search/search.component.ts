@@ -43,6 +43,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     ngOnInit() {
         this.expandable = (this.expandable !== undefined);  // optional param
 
+        // Example URI (pipe will be URIEncoded to %7C)
+        // /campage?search=Axis&tags=isAptzSupported&selects=resolution|SVGA&multiselects=vendors|Axis,30X,Sony
         this._route
             .queryParams
             .subscribe(params => {
