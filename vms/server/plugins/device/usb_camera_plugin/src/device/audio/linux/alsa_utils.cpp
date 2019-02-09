@@ -4,14 +4,11 @@
 #include <limits.h>
 #include <algorithm>
 #include <map>
+#include <vector>
 
 #include <alsa/asoundlib.h>
 
-namespace nx {
-namespace usb_cam {
-namespace device {
-namespace audio {
-namespace detail {
+namespace nx::usb_cam::device::audio::detail {
 
 namespace {
 
@@ -168,7 +165,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
     std::vector<DeviceDescriptor*> defaults;
     std::vector<nxcip::CameraInfo*> muteCameras;
 
-    for (int i = 0; i < devices.size(); ++i)
+    for (int i = 0; i < (int)devices.size(); ++i)
     {
         audioTaken.emplace(&devices[i], false);
 
@@ -179,7 +176,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
     for (auto camera = cameras; camera < cameras + cameraCount; ++camera)
     {
         bool mute = true;
-        for (int j = 0; j < devices.size(); ++j)
+        for (int j = 0; j < (int)devices.size(); ++j)
         {
             DeviceDescriptor * device = &devices[j];
             if (!audioTaken[device] && device->isCameraAudioInput(*camera) && device->sysDefault)
@@ -220,10 +217,6 @@ bool pluggedIn(const std::string& devicePath)
     return false;
 }
 
-} // namespace detail
-} // namespace audio
-} // namespace device
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam::device::audio::detail
 
 #endif

@@ -21,6 +21,9 @@ public:
 
     void givenListeningServerSocket();
     void startAcceptingAsync();
+    void whenAcceptConnection();
+    void thenConnectionIsAccepted();
+    void thenServerReceives(const std::string& data);
     const struct sockaddr_in& serverAddress() const;
     void closeServerSocket();
 
@@ -28,15 +31,22 @@ public:
     void givenConnectedClientSocket();
     void setRecvTimeout(std::chrono::milliseconds timeout);
     int readClientSocketSync();
+    void whenClientSends(const std::string& data);
+    void whenClientSendsAsync(const std::string& data);
     void whenShutdownClientSocket();
     void closeClientSocket();
 
+    void givenTwoConnectedSockets();
+
 private:
     UDTSOCKET m_serverSocket = -1;
+    UDTSOCKET m_acceptedConnection = -1;
     struct sockaddr_in m_serverAddress;
     UDTSOCKET m_clientSocket = -1;
 
     void connectToServer();
+
+    void enableNonBlockingMode(UDTSOCKET handle);
 };
 
 } // namespace udt::test

@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-struct AVStream;
 struct AVIOContext;
 struct AVFormatContext;
 
@@ -22,7 +21,6 @@ public:
 
 private:
     AVFormatContext * m_formatContext = nullptr;
-    AVStream * m_outputStream = nullptr;
     AVIOContext * m_ioContext = nullptr;
     uint8_t * m_ioBuffer = nullptr;
     int m_ioBufferSize = 0;

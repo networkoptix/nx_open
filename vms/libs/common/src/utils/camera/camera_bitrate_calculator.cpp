@@ -2,6 +2,9 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <QString>
+#include <QMap>
+
 namespace {
 
 static constexpr float kKbpsInMbps = 1000.0f;
@@ -12,6 +15,9 @@ static constexpr float kResolutionFactorMultiplier = 0.009f;
 static constexpr float kFpsFactorMultiplier = 1.0f;
 static constexpr float kMaxSuggestedBitrateKbps = 192.0f;
 static constexpr float kDefaultBitratePerGop = 30.0f;
+
+static const QMap<QString, float> kBitrateMultiplyerByCodec =
+    { { "MJPEG", 2.0f }, { "H264", 1.0f }, { "H265", 0.8 } };
 
 constexpr float bitrateCoefficient(Qn::StreamQuality quality)
 {
@@ -40,7 +46,8 @@ namespace core {
 float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     Qn::StreamQuality quality,
     QSize resolution,
-    int fps)
+    int fps,
+    const QString& codec)
 {
     const float qualityLevel =
         static_cast<int>(quality) - static_cast<int>(Qn::StreamQuality::lowest);
@@ -55,7 +62,9 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
 
     const float frameRateFactor = kFpsFactorMultiplier * fps;
 
-    const float result = qualityFactor * resolutionFactor * frameRateFactor;
+    const float bitrateMultiplyer = kBitrateMultiplyerByCodec.value(codec, 1.0f);
+
+    const float result = qualityFactor * resolutionFactor * frameRateFactor * bitrateMultiplyer;
 
     return std::max(kMaxSuggestedBitrateKbps, result);
 }
@@ -64,6 +73,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     Qn::StreamQuality quality,
     QSize resolution,
     int fps,
+    const QString& codec,
     media::CameraStreamCapability streamCapability,
     bool useBitratePerGop)
 {
@@ -77,7 +87,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
             (float)streamCapability.maxBitrateKbps);
     }
 
-    auto result = suggestBitrateForQualityKbps(quality, resolution, fps);
+    auto result = suggestBitrateForQualityKbps(quality, resolution, fps, codec);
 
     if (useBitratePerGop && fps > 0)
         result = result * (kDefaultBitratePerGop / (float)fps);
@@ -108,13 +118,15 @@ float CameraBitrateCalculator::roundMbpsToKbps(float mbps, int decimals)
 float CameraBitrateCalculator::getBitrateForQualityMbps(
     const QnVirtualCameraResourcePtr& camera,
     Qn::StreamQuality quality,
-    int fps)
+    int fps,
+    const QString& codec)
 {
     const auto resolution = camera->streamInfo().getResolution();
     const auto bitrateKbps = camera->suggestBitrateForQualityKbps(
         quality,
         resolution,
         fps,
+        codec,
         Qn::CR_LiveVideo);
 
     return roundKbpsToMbps(bitrateKbps, kBitrateKbpsPrecisionDecimals);

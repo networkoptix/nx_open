@@ -59,11 +59,16 @@ protected:
         setUpdateInformation(participants);
     }
 
-    void thenItShouldBeRetrievable()
+    void thenTargetUpdateInformationShouldBeRetrievable(
+        bool shouldBeEmpty = false,
+        const QString& versionKey = QString())
     {
-        update::Information receivedUpdateInfo;
-        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
-        ASSERT_EQ(m_updateInformation, receivedUpdateInfo);
+        issueAndCheckUpdateInformationRequest(shouldBeEmpty, versionKey);
+    }
+
+    void thenInstalledtUpdateInformationShouldBeRetrievable(bool isEmpty)
+    {
+        issueAndCheckUpdateInformationRequest(isEmpty, "installed");
     }
 
     void thenPeersUpdateStatusShouldBe(
@@ -195,7 +200,7 @@ protected:
         issueFinishUpdateRequestAndAssertResponse(false, expectedCode);
     }
 
-    void thenFinishUpdateWithignorePendingPeersShouldSucceed()
+    void thenFinishUpdateWithIgnorePendingPeersShouldSucceed()
     {
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
@@ -241,6 +246,23 @@ private:
                 m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+    }
+
+    void issueAndCheckUpdateInformationRequest(
+        bool shouldBeEmpty = false,
+        const QString& versionKey = QString())
+    {
+        update::Information receivedUpdateInfo;
+        QString path = "/ec2/updateInformation";
+        if (!versionKey.isNull())
+            path += "?version=" + versionKey;
+
+        NX_TEST_API_GET(m_peers[0].get(), path, &receivedUpdateInfo);
+
+        if (shouldBeEmpty)
+            ASSERT_TRUE(receivedUpdateInfo.isEmpty());
+        else
+            ASSERT_EQ(m_updateInformation.version, receivedUpdateInfo.version);
     }
 
     void setUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())
@@ -387,7 +409,7 @@ TEST_F(Updates, updateInformation_onePeer_correctlySet)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall}};
@@ -398,7 +420,7 @@ TEST_F(Updates, installUpdate_wontWorkWithoutPeersParameter)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall} };
@@ -411,7 +433,7 @@ TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -428,7 +450,7 @@ TEST_F(Updates, installUpdate_timestampCorrectlySet)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall} };
@@ -442,7 +464,7 @@ TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
 {
     givenConnectedPeers(3);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -464,7 +486,7 @@ TEST_F(Updates, installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2
     whenServersConnected();
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{};
     thenPeersUpdateStatusShouldBe(expectedStatuses);
@@ -480,7 +502,7 @@ TEST_F(Updates, installUpdate_participantViaNewerPeerReceiveRequest)
     whenServersConnected();
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0), peerId(1)});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(1), update::Status::Code::readyToInstall}};
@@ -494,7 +516,7 @@ TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
 {
     givenConnectedPeers(3);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -528,7 +550,7 @@ TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0)});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall}};
@@ -539,7 +561,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0), peerId(1)});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -551,7 +573,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonPartic
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(1), update::Status::Code::readyToInstall} };
@@ -562,7 +584,7 @@ TEST_F(Updates, updateStatus_nonParticipantInList_requestisLocal)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::idle} };
@@ -573,7 +595,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -585,7 +607,7 @@ TEST_F(Updates, updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     whenServerRestartedWithNewVersion(1, "4.0.0.2");
     whenServersConnected();
@@ -603,7 +625,7 @@ TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
     whenServersConnected();
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{};
     thenPeersUpdateStatusShouldBe(expectedStatuses);
@@ -617,7 +639,7 @@ TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLo
     whenServersConnected();
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::error}};
@@ -638,7 +660,7 @@ TEST_F(Updates, finishUpdate_success_updateInformationCleared)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -654,7 +676,7 @@ TEST_F(Updates, finishUpdate_fail_notAllUpdated)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -672,7 +694,7 @@ TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -690,7 +712,7 @@ TEST_F(Updates, finishUpdate_success_participantWithNewVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -709,7 +731,7 @@ TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(0), update::Status::Code::readyToInstall},
@@ -720,7 +742,7 @@ TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
     whenServerRestartedWithNewVersion(0);
     whenServerRestartedWithOldVersion(1);
     whenServersConnected();
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+    thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
@@ -731,14 +753,14 @@ TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
     whenServersConnected();
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{};
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 
     thenInstallUpdateWithPeersParameterShouldFail({ peerId(0), peerId(1) });
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0) });
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+    thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
 TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
@@ -748,7 +770,7 @@ TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
     whenServersConnected();
 
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
-    thenItShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable();
 
     QMap<QnUuid, update::Status::Code> expectedStatuses{
         {peerId(1), update::Status::Code::readyToInstall}};
@@ -756,7 +778,32 @@ TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
 
     thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0), peerId(1) });
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0), peerId(1) });
-    thenFinishUpdateWithignorePendingPeersShouldSucceed();
+    thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
+}
+
+TEST_F(Updates, finishUpdate_success_installedUpdateInformationSetCorrectly)
+{
+    givenConnectedPeers(2);
+
+    whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
+    thenTargetUpdateInformationShouldBeRetrievable();
+    thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false, "target");
+    thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true);
+
+    QMap<QnUuid, update::Status::Code> expectedStatuses{
+        {peerId(0), update::Status::Code::readyToInstall},
+        {peerId(1), update::Status::Code::readyToInstall}};
+    thenPeersUpdateStatusShouldBe(expectedStatuses);
+
+    thenInstallUpdateWithPeersParameterShouldSucceed({ peerId(0), peerId(1) });
+    thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0), peerId(1) });
+
+    whenServersRestartedWithNewVersions();
+
+    thenFinishUpdateShouldSucceed();
+    thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
+    thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
+    thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
 }
 
 } // namespace nx::vms::server::test

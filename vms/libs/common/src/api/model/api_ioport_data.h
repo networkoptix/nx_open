@@ -23,6 +23,8 @@ struct QnIOPortData
     int autoResetTimeoutMs; // for output only. Keep output state on during timeout if non zero
 };
 
+QString toString(const QnIOPortData& portData);
+
 typedef std::vector<QnIOPortData> QnIOPortDataList;
 #define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(iDefaultState)(oDefaultState)(autoResetTimeoutMs)
 

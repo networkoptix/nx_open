@@ -1,5 +1,6 @@
 {
     "__comment__": [
+    "Version number is global.",
     "Get width from here:                                            ",
     "http://en.wikipedia.org/wiki/Image_sensor_format                ",
     "Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          ",
@@ -15,12 +16,8 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.8",
+    "version": "1.0.1.10",
     "data": [
-        {
-            "keys": ["Hanwha|*"],
-            "canShareLicenseGroup": true
-        },
         {
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
@@ -3298,6 +3295,34 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 1],
                         "logical": [1, 2.5, 4.06, 7.5, 10.63, 14.38, 15, 16.25],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27",
+            "keys": [
+                "Dahua|DH-SD59430U-HNI"
+            ],
+            "forceONVIF": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.033333, 0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 1.43, 2, 2.86, 4.14, 5.57, 8, 10.57, 12, 13.57, 15, 15.7, 17.1, 18.57],
                         "logicalMultiplier": 35,
                         "space": "35MmEquiv"
                     }

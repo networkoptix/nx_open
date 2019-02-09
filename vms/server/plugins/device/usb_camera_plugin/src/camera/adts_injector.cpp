@@ -32,10 +32,10 @@ int AdtsInjector::initialize(ffmpeg::Codec * codec)
     if (!outputCodec)
         return AVERROR_ENCODER_NOT_FOUND;
 
-    m_outputStream = avformat_new_stream(m_formatContext, outputCodec);
-    m_outputStream->id = m_formatContext->nb_streams - 1;
+    AVStream* outputStream = avformat_new_stream(m_formatContext, outputCodec);
+    outputStream->id = m_formatContext->nb_streams - 1;
 
-    result = avcodec_parameters_from_context(m_outputStream->codecpar, codec->codecContext());
+    result = avcodec_parameters_from_context(outputStream->codecpar, codec->codecContext());
     if (result < 0)
         return result;
 
@@ -53,10 +53,6 @@ void AdtsInjector::uninitialize()
     // Write trailer before doing actual uninitialization.
     if (m_formatContext)
         av_write_trailer(m_formatContext);
-
-    if (m_outputStream)
-        avcodec_close(m_outputStream->codec);
-    m_outputStream = nullptr;
 
     if (m_formatContext)
         avformat_free_context(m_formatContext);

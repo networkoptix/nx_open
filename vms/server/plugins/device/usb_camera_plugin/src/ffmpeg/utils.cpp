@@ -4,10 +4,7 @@
 
 #include <camera/camera_plugin.h>
 
-namespace nx {
-namespace usb_cam {
-namespace ffmpeg{
-namespace utils{
+namespace nx::usb_cam::ffmpeg::utils {
 
 namespace {
 
@@ -287,7 +284,4 @@ AVRational toFraction(float number, int precision)
     return {numerator, denominator};
 }
 
-} // namespace utils
-} // namespace ffmpeg
-} // namespace usb_cam
-} // namesapce nx
+} // namespace nx::usb_cam::ffmpeg::utils

@@ -25,7 +25,7 @@
 
 namespace {
 
-static const QString kPublicationKeyParamName = "publicationKey";
+static const QString kVersionParamName = "version";
 }
 
 struct UpdateInformationRequestData: public QnMultiserverRequestData
@@ -37,19 +37,19 @@ struct UpdateInformationRequestData: public QnMultiserverRequestData
         const QnRequestParamList& params) override
     {
         QnMultiserverRequestData::loadFromParams(resourcePool, params);
-        if (params.contains(kPublicationKeyParamName))
-            publicationId = params.value(kPublicationKeyParamName);
+        if (params.contains(kVersionParamName))
+            version = params.value(kVersionParamName);
     }
 
     virtual QnRequestParamList toParams() const override
     {
         auto result = QnMultiserverRequestData::toParams();
-        if (!publicationId.isNull())
-            result.insert(kPublicationKeyParamName, publicationId);
+        if (!version.isNull())
+            result.insert(kVersionParamName, version);
         return result;
     }
 
-    QString publicationId;
+    QString version;
 };
 
 qint64 QnUpdateInformationRestHandler::freeSpaceForUpdate() const
@@ -138,9 +138,7 @@ static int checkForUpdateInformationRemotely(
     bool done = false;
     auto mergeFunction =
         [&done](
-            const QnUuid& serverId,
-            bool success,
-            const nx::update::Information& reply,
+            const QnUuid& serverId, bool success, const nx::update::Information& reply,
             nx::update::Information& outputReply)
         {
             if (done)
@@ -158,7 +156,8 @@ static int checkForUpdateInformationRemotely(
 
     if (done)
     {
-        QnFusionRestHandlerDetail::serialize(outputReply, *result, *contentType, context->request().format);
+        QnFusionRestHandlerDetail::serialize(
+            outputReply, *result, *contentType, context->request().format);
         return nx::network::http::StatusCode::ok;
     }
 
@@ -169,14 +168,14 @@ static int checkForUpdateInformationRemotely(
         QnRestResult::CantProcessRequest);
 }
 
-static int getUpdateInformationFromGlobalSettings(
-    QnCommonModule* commonModule,
+static int makeUpdateInformationResponse(
+    const QByteArray& updateInformationData,
     QByteArray* result,
     QByteArray* contentType,
     const UpdateInformationRequestData& request)
 {
     *contentType = Qn::serializationFormatToHttpContentType(request.format);
-    *result = commonModule->globalSettings()->updateInformation();
+    *result = updateInformationData;
     if (result->isEmpty())
         *result = "{}";
 
@@ -200,14 +199,11 @@ int QnUpdateInformationRestHandler::executeGet(
     const QnRestConnectionProcessor* processor)
 {
     auto commonModule = processor->commonModule();
-
     const auto request = QnMultiserverRequestData::fromParams<UpdateInformationRequestData>(
-        processor->resourcePool(),
-        params);
+        processor->resourcePool(), params);
 
     QnMultiserverRequestContext<UpdateInformationRequestData> context(
-        request,
-        processor->owner()->getPort());
+        request, processor->owner()->getPort());
 
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
@@ -221,7 +217,8 @@ int QnUpdateInformationRestHandler::executeGet(
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
         return nx::network::http::StatusCode::ok;
     }
-    else if (path.endsWith(lit("/checkCloudHost")))
+
+    if (path.endsWith(lit("/checkCloudHost")))
     {
         QnCloudHostCheckReply reply;
         reply.cloudHost = processor->globalSettings()->cloudHost();
@@ -237,17 +234,24 @@ int QnUpdateInformationRestHandler::executeGet(
         commonModule->moduleGUID());
 
     NX_CRITICAL(mediaServer);
-    if (params.contains(kPublicationKeyParamName))
-    {
-        if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
-        {
-            return checkInternetForUpdate(
-                params.value(kPublicationKeyParamName), &result, &contentType, request);
-        }
+    const auto versionValue = params.value(kVersionParamName);
 
-        return checkForUpdateInformationRemotely(
-            commonModule, path, &result, &contentType, &context);
+    if (versionValue.isNull() || versionValue == "target")
+    {
+        return makeUpdateInformationResponse(
+            commonModule->globalSettings()->targetUpdateInformation(), &result, &contentType,
+            request);
     }
 
-    return getUpdateInformationFromGlobalSettings(commonModule, &result, &contentType, request);
+    if (versionValue == "installed")
+    {
+        return makeUpdateInformationResponse(
+            commonModule->globalSettings()->installedUpdateInformation(), &result, &contentType,
+            request);
+    }
+
+    if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
+        return checkInternetForUpdate(versionValue, &result, &contentType, request);
+
+    return checkForUpdateInformationRemotely(commonModule, path, &result, &contentType, &context);
 }

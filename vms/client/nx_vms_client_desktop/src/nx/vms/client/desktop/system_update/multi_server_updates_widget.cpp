@@ -698,9 +698,8 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
     QString updateUrl = qnSettings->updateFeedUrl();
-    m_updateCheck = nx::update::checkSpecificChangeset(
+    m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(
         updateUrl,
-        commonModule()->engineVersion(),
         dialog.changeset());
     loadDataToUi();
 }
@@ -740,7 +739,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
+        m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
         // Maybe we should call loadDataToUi instead.
         syncUpdateCheckToUi();
     }

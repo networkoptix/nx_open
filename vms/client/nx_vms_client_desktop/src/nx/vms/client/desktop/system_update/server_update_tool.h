@@ -130,12 +130,17 @@ public:
         error,
     };
 
+    /**
+     * Checks latest update in the internet. It will reqest mediaserver for updates if client
+     * has no connection to the internet. GET /ec2/updateInformation?version=latest
+     * @return future with update information
+     */
+    std::future<UpdateContents> checkLatestUpdate(const QString& updateUrl);
+    std::future<UpdateContents> checkSpecificChangeset(
+        const QString& updateUrl, const QString& build);
+
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
     std::future<UpdateContents> checkRemoteUpdateInfo();
-    // It is used to obtain future to update check that was started
-    // inside loadInternalState method
-    // TODO: move all state restoration logic to widget.
-    std::future<UpdateContents> getUpdateCheck();
 
     /**
      * Check if update info contains all the packages necessary to update the system.
@@ -290,7 +295,7 @@ private:
     // requestStartUpdate(...) method.
     nx::update::Information m_updateManifest;
 
-    std::future<UpdateContents> m_updateCheck;
+    std::future<UpdateContents> m_checkFileUpdate;
 
     // Path to a remote folder with update packages.
     QString m_uploadDestination;

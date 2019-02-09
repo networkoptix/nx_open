@@ -116,7 +116,8 @@ nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::Cam
         return nullptr;
 
     if (!cameraData->camera)
-        cameraData->camera = std::make_shared<Camera>(this, info, m_timeProvider);
+        cameraData->camera = std::make_shared<Camera>(
+            cameraData->deviceData.device.path, info, m_timeProvider);
 
     return new CameraManager(cameraData->camera);
 }
@@ -148,6 +149,8 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
                 device.toString());
 
             it->second.deviceData = device;
+            if (it->second.camera)
+                it->second.camera->setUrl(it->second.deviceData.device.path);
         }
         else
         {
@@ -156,13 +159,6 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
                 "Device already found");
         }
     }
-}
-
-std::string DiscoveryManager::getFfmpegUrl(const std::string& nxId) const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_cameras.find(nxId);
-    return it != m_cameras.end() ? it->second.deviceData.device.path : std::string();
 }
 
 std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasInternal()

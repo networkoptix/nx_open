@@ -9,7 +9,7 @@ QnAxisOnvifResource::QnAxisOnvifResource(QnMediaServerModule* serverModule):
 }
 
 int QnAxisOnvifResource::suggestBitrateForQualityKbps(Qn::StreamQuality, QSize /*resolution*/,
-    int /*fps*/, Qn::ConnectionRole) const
+    int /*fps*/, const QString& /*codec*/, Qn::ConnectionRole) const
 {
     return 0;
 }

@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Você está prestes a fazer "merge" de Sistemas com licenças Starter.</translation>
+      <translation>Você está prestes a fazer &quot;merge&quot; de Sistemas com licenças Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>Avançar com o "merge" mesmo assim?</translation>
+      <translation>Avançar com o &quot;merge&quot; mesmo assim?</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -64,12 +64,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Novo Sistema</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>O sistema descoberto %1 é incompatível com o sistema atual.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -104,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -304,15 +304,15 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -412,15 +412,15 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -542,7 +542,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Licença expirada</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -569,7 +569,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Novo servidor</translation>
     </message>
   </context>
   <context>
@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Marca d'água: %1</translation>
+      <translation>Marca d&apos;água: %1</translation>
     </message>
     <message>
       <source>Time License</source>
@@ -716,7 +716,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -725,7 +725,7 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -735,29 +735,29 @@
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Não foi encontrado o 'container' correspondente na biblioteca FFMPEG.</translation>
+      <translation>Não foi encontrado o &apos;container&apos; correspondente na biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
@@ -803,7 +803,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -831,37 +831,37 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>sem</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
@@ -881,12 +881,12 @@
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>hrs</translation>
     </message>
     <message>
       <source>days</source>
@@ -1055,7 +1055,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1303,7 +1303,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
@@ -1316,7 +1316,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Trigger: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1417,7 +1417,7 @@
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>Falhou o backup do arquivo: Erro em 'Catálogo' de ficheiros</translation>
+      <translation>Falhou o backup do arquivo: Erro em &apos;Catálogo&apos; de ficheiros</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
@@ -1465,13 +1465,13 @@
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Função</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Usuários</numerusform>
+        <numerusform>%n Usuários</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1487,7 +1487,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Todos os usuários</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1495,7 +1495,7 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
@@ -1511,7 +1511,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Reconhecer</translation>
     </message>
     <message>
       <source>Analytics Event</source>
@@ -1532,11 +1532,11 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Definir para modo "FullScreen"</translation>
+      <translation>Definir para modo &quot;FullScreen&quot;</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation>Sair do "Full Screen"</translation>
+      <translation>Sair do &quot;Full Screen&quot;</translation>
     </message>
   </context>
   <context>
