@@ -204,7 +204,7 @@ public:
 
 private:
     void insert_(int64_t ts, std::shared_ptr<CUDT> u);
-    void remove_(CUDT* u);
+    void remove_(CSNode* n);
 
 private:
     // The heap array
