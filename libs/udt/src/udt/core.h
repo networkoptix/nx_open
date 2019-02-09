@@ -92,7 +92,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class CUDT:
-    private std::enable_shared_from_this<CUDT>
+    public std::enable_shared_from_this<CUDT>
 {
 public: //API
     CUDT();
