@@ -6,22 +6,20 @@
 
 class QnArchiveCamResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
     QnArchiveCamResourceSearcher(QnMediaServerModule* serverModule);
 
-    virtual void pleaseStop() override;
-
-    bool isProxy() const;
-
-    virtual QnResourceList findResources() override;
-
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
 
-    virtual QString manufacture() const override;
+    virtual void pleaseStop() override;
+
+    virtual QString manufacturer() const override;
+
+    virtual QnResourceList findResources() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth, bool doMultichannelCheck) override;
@@ -43,8 +41,6 @@ public:
     static QString cameraName();
 
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };

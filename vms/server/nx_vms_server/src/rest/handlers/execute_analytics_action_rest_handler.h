@@ -9,7 +9,7 @@
 
 class QnExecuteAnalyticsActionRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnExecuteAnalyticsActionRestHandler(QnMediaServerModule* serverModule);

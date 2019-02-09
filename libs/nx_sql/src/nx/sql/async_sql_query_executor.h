@@ -271,7 +271,7 @@ private:
     const ConnectionOptions m_connectionOptions;
     mutable QnMutex m_mutex;
     detail::QueryQueue m_queryQueue;
-    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadPool;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadList;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated;

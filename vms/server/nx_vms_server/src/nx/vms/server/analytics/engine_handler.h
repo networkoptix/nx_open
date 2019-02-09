@@ -11,7 +11,7 @@ namespace nx::vms::server::analytics {
 
 class EngineHandler:
     public QObject,
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public nx::sdk::analytics::IEngine::IHandler
 {
     Q_OBJECT

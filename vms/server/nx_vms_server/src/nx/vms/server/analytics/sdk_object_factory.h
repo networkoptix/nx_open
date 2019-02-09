@@ -15,7 +15,7 @@ namespace nx::vms::server::analytics {
 
 class SdkObjectFactory:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

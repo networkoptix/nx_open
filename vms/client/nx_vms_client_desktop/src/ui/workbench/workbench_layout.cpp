@@ -270,12 +270,8 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 
     if (item->isPinned())
     {
-        const auto options = item->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
-        if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
-        {
-            m_itemMap.fill(item->geometry(), item);
-            NX_VERBOSE(this, lm("Add item to cell %1").arg(item->geometry()));
-        }
+        m_itemMap.fill(item->geometry(), item);
+        NX_VERBOSE(this, lm("Add item to cell %1").arg(item->geometry()));
     }
     m_rectSet.insert(item->geometry());
     m_itemsByResource[item->resource()].insert(item);
@@ -300,12 +296,8 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
     /* Update internal data structures. */
     if (item->isPinned())
     {
-        const auto options = item->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
-        if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
-        {
-            m_itemMap.clear(item->geometry());
-            NX_VERBOSE(this, lm("Item removed from cell %1").arg(item->geometry()));
-        }
+        m_itemMap.clear(item->geometry());
+        NX_VERBOSE(this, lm("Item removed from cell %1").arg(item->geometry()));
     }
 
     m_rectSet.remove(item->geometry());

@@ -25,24 +25,26 @@ namespace nx::vms::client::desktop {
 
 struct ResourceThumbnailProvider::Private
 {
-    bool updateRequest(const nx::api::ResourceImageRequest& value)
+    bool updateRequest(ResourceThumbnailProvider* q, const nx::api::ResourceImageRequest& value)
     {
+        // TODO: #vkutin #gdm Recreate base provider only if its type has changed.
+
+        baseProvider.reset();
         request = value;
 
-        QnResourcePtr resource = value.resource;
+        if (!NX_ASSERT(value.resource))
+            return false;
 
-        NX_ASSERT(resource);
-
-        QnMediaResourcePtr mediaResource = value.resource.dynamicCast<QnMediaResource>();
-        bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo();
+        const auto mediaResource = value.resource.dynamicCast<QnMediaResource>();
+        const bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo();
 
         QString placeholderIconPath;
 
-        if (resource->hasFlags(Qn::server))
+        if (value.resource->hasFlags(Qn::server))
         {
             placeholderIconPath = lit("item_placeholders/videowall_server_placeholder.png");
         }
-        else if (resource->hasFlags(Qn::web_page))
+        else if (value.resource->hasFlags(Qn::web_page))
         {
             placeholderIconPath = lit("item_placeholders/videowall_webpage_placeholder.png");
         }
@@ -51,14 +53,15 @@ struct ResourceThumbnailProvider::Private
             // Some cameras are actually provide only sound stream. So we draw sound icon for this.
             placeholderIconPath = lit("item_placeholders/sound.png");
         }
-        else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        else if (const auto camera = value.resource.dynamicCast<QnVirtualCameraResource>())
         {
             nx::api::CameraImageRequest cameraRequest(camera, request);
+            cameraRequest.streamSelectionMode = streamSelectionMode;
             baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
         }
-        else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
+        else if (const auto aviResource = value.resource.dynamicCast<QnAviResource>())
         {
-            baseProvider.reset(new FfmpegImageProvider(resource,
+            baseProvider.reset(new FfmpegImageProvider(value.resource,
                 std::chrono::microseconds(request.usecSinceEpoch), request.size));
         }
         else
@@ -87,11 +90,22 @@ struct ResourceThumbnailProvider::Private
             baseProvider.reset(new BasicImageProvider(dst.toImage()));
         }
 
+        if (baseProvider)
+        {
+            QObject::connect(baseProvider.data(), &ImageProvider::imageChanged,
+                q, &ImageProvider::imageChanged);
+            QObject::connect(baseProvider.data(), &ImageProvider::statusChanged,
+                q, &ImageProvider::statusChanged);
+            QObject::connect(baseProvider.data(), &ImageProvider::sizeHintChanged,
+                q, &ImageProvider::sizeHintChanged);
+        }
+
         return true;
     }
 
     QScopedPointer<ImageProvider> baseProvider;
     nx::api::ResourceImageRequest request;
+    nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode;
 };
 
 ResourceThumbnailProvider::ResourceThumbnailProvider(
@@ -116,22 +130,7 @@ nx::api::ResourceImageRequest ResourceThumbnailProvider::requestData() const
 void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageRequest& request)
 {
     const bool wasValid = status() != Qn::ThumbnailStatus::Invalid;
-    if (d->baseProvider)
-    {
-        d->baseProvider->disconnect(this);
-        d->baseProvider.reset();
-    }
-
-    if (!d->updateRequest(request))
-    {
-        d->baseProvider.reset();
-    }
-    else if (auto p = d->baseProvider.data())
-    {
-        connect(p, &ImageProvider::imageChanged, this, &ImageProvider::imageChanged);
-        connect(p, &ImageProvider::statusChanged, this, &ImageProvider::statusChanged);
-        connect(p, &ImageProvider::sizeHintChanged, this, &ImageProvider::sizeHintChanged);
-    }
+    d->updateRequest(this, request);
 
     if (wasValid)
     {
@@ -139,6 +138,24 @@ void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageReque
         emit sizeHintChanged(sizeHint());
         emit statusChanged(status());
     }
+}
+
+nx::api::CameraImageRequest::StreamSelectionMode
+    ResourceThumbnailProvider::streamSelectionMode() const
+{
+    return d->streamSelectionMode;
+}
+
+void ResourceThumbnailProvider::setStreamSelectionMode(
+    nx::api::CameraImageRequest::StreamSelectionMode value)
+{
+    if (d->streamSelectionMode == value)
+        return;
+
+    d->streamSelectionMode = value;
+
+    if (d->request.resource.dynamicCast<QnVirtualCameraResource>())
+        d->updateRequest(this, d->request);
 }
 
 QImage ResourceThumbnailProvider::image() const

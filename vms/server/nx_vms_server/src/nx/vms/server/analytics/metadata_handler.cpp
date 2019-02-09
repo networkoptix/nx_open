@@ -3,7 +3,6 @@
 #include <nx/kit/debug.h>
 #include <nx/utils/log/log.h>
 
-#include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
@@ -55,15 +54,13 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     }
 
     bool handled = false;
-    if (const auto eventsPacket = nxpt::queryInterfacePtr<IEventMetadataPacket>(metadataPacket,
-        IID_EventMetadataPacket))
+    if (const auto eventsPacket = queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
     {
         handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = nxpt::queryInterfacePtr<IObjectMetadataPacket>(metadataPacket,
-        IID_ObjectMetadataPacket))
+    if (const auto objectsPacket = queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
     {
         handleObjectMetadataPacket(objectsPacket);
         handled = true;
@@ -78,7 +75,7 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 }
 
 void MetadataHandler::handleEventMetadataPacket(
-    nx::sdk::Ptr<IEventMetadataPacket> eventMetadataPacket)
+    const Ptr<IEventMetadataPacket>& eventMetadataPacket)
 {
     if (eventMetadataPacket->count() <= 0)
     {
@@ -88,22 +85,20 @@ void MetadataHandler::handleEventMetadataPacket(
 
     for (int i = 0; i < eventMetadataPacket->count(); ++i)
     {
-        nx::sdk::Ptr<const IEventMetadata> eventMetadata(eventMetadataPacket->at(i));
-        if (!eventMetadata)
+        if (const auto eventMetadata = toPtr(eventMetadataPacket->at(i)))
+            handleEventMetadata(eventMetadata, eventMetadataPacket->timestampUs());
+        else
             break;
-
-        const int64_t timestampUsec = eventMetadataPacket->timestampUs();
-        handleEventMetadata(eventMetadata, timestampUsec);
     }
 }
 
 void MetadataHandler::handleObjectMetadataPacket(
-    nx::sdk::Ptr<IObjectMetadataPacket> objectMetadataPacket)
+    const Ptr<IObjectMetadataPacket>& objectMetadataPacket)
 {
     nx::common::metadata::DetectionMetadataPacket data;
     for (int i = 0; i < objectMetadataPacket->count(); ++i)
     {
-        nx::sdk::Ptr<const IObjectMetadata> item(objectMetadataPacket->at(i));
+        const auto item = toPtr(objectMetadataPacket->at(i));
         if (!item)
             break;
 
@@ -146,7 +141,7 @@ void MetadataHandler::handleObjectMetadataPacket(
 }
 
 void MetadataHandler::handleEventMetadata(
-    nx::sdk::Ptr<const IEventMetadata> eventMetadata,
+    const Ptr<const IEventMetadata>& eventMetadata,
     qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;

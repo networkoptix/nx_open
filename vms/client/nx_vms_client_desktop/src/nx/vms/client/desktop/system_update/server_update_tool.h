@@ -97,6 +97,13 @@ public:
     void requestStopAction();
 
     /**
+     * Asks mediaservers to finish update process.
+     * @param skipActivePeers - will force update completion even if there are
+     *     some servers installing.
+     */
+    void requestFinishUpdate(bool skipActivePeers);
+
+    /**
      * Asks mediaservers to start installation process.
      */
     void requestInstallAction(const QSet<QnUuid>& targets);
@@ -123,21 +130,27 @@ public:
         error,
     };
 
+    /**
+     * Checks latest update in the internet. It will reqest mediaserver for updates if client
+     * has no connection to the internet. GET /ec2/updateInformation?version=latest
+     * @return future with update information
+     */
+    std::future<UpdateContents> checkLatestUpdate(const QString& updateUrl);
+    std::future<UpdateContents> checkSpecificChangeset(
+        const QString& updateUrl, const QString& build);
+
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
     std::future<UpdateContents> checkRemoteUpdateInfo();
-    // It is used to obtain future to update check that was started
-    // inside loadInternalState method
-    // TODO: move all state restoration logic to widget.
-    std::future<UpdateContents> getUpdateCheck();
 
     /**
      * Check if update info contains all the packages necessary to update the system.
      * @param contents - current update contents.
      * @param clientVersions - current client versions installed.
+     * @param checkClient - check if we should check client update.
      */
     bool verifyUpdateManifest(
         UpdateContents& contents,
-        const std::set<nx::utils::SoftwareVersion>& clientVersions) const;
+        const std::set<nx::utils::SoftwareVersion>& clientVersions, bool checkClient = true) const;
 
     // Start uploading local update packages to the servers.
     bool startUpload(const UpdateContents& contents);
@@ -216,6 +229,12 @@ public:
 
     TimePoint::duration getInstallDuration() const;
 
+    /**
+     * Get a set of servers participating in the installation process.
+     * This data is extracted from /ec2/updateInformation
+     */
+    QSet<QnUuid> getServersInstalling() const;
+
 signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
@@ -276,7 +295,7 @@ private:
     // requestStartUpdate(...) method.
     nx::update::Information m_updateManifest;
 
-    std::future<UpdateContents> m_updateCheck;
+    std::future<UpdateContents> m_checkFileUpdate;
 
     // Path to a remote folder with update packages.
     QString m_uploadDestination;
@@ -291,7 +310,7 @@ private:
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
 
     // Time at which install command was issued.
-    TimePoint m_timeStartedInstall;
+    qint64 m_timeStartedInstall = 0;
     bool m_protoProblemDetected = false;
     QSet<rest::Handle> m_requestingInstall;
 
@@ -303,6 +322,12 @@ private:
     QList<nx::update::Package> m_manualPackages;
     /** Direct connection to the mediaserver. */
     rest::QnConnectionPtr m_serverConnection;
+
+    /**
+     * A set of servers that were participating in update.
+     * This information is extracted from ec2/updateInformation request.
+     */
+    QSet<QnUuid> m_serversAreInstalling;
 };
 
 /**
@@ -311,6 +336,7 @@ private:
  * to a single zip archive.
  */
 QUrl generateUpdatePackageUrl(
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const nx::update::UpdateContents& contents,
     const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 

@@ -57,6 +57,8 @@ public:
     void readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount, quint16* outTransactionId);
     void writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data, quint16* outTransactionId);
 
+    QString idForToStringFromPtr() const;
+
     QString getLastErrorString() const;
 
     // Impl of BasicPollable::stopWhileInAioThread

@@ -12,7 +12,8 @@
 
 #include <nx/network/url/url_builder.h>
 
-unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
+unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
 
 char DCS[] = {'D', 'C', 'S', '-'};
@@ -28,7 +29,8 @@ QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnMediaServerModule* server
 {
 }
 
-QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlDlinkResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -41,16 +43,16 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnUuid &resourceTy
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufacture " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufacturer " << resourceType->getManufacturer() << " != " << manufacturer();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr(new QnPlDlinkResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString();
 
     //result->deserialize(parameters);
 
@@ -61,9 +63,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    std::unique_ptr<nx::network::AbstractDatagramSocket> recvSocket( nx::network::SocketFactory::createDatagramSocket() );
+    std::unique_ptr<nx::network::AbstractDatagramSocket> recvSocket(
+        nx::network::SocketFactory::createDatagramSocket());
 #ifdef Q_OS_WIN
-    if (!recvSocket->bind(nx::network::SocketAddress( nx::network::HostAddress::anyHost, 0 )))
+    if (!recvSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, 0)))
 #else
     if (!recvSocket->bind(nx::network::BROADCAST_ADDRESS, 0))
 #endif
@@ -75,17 +78,18 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         if (shouldStop())
             return QnResourceList();
 
-        std::unique_ptr<nx::network::AbstractDatagramSocket> sock( nx::network::SocketFactory::createDatagramSocket() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> sock(
+            nx::network::SocketFactory::createDatagramSocket());
         sock->setReuseAddrFlag(true);
 
         if (!sock->bind(iface.address.toString(), recvSocket->getLocalAddress().port))
             continue;
 
         // Sending broadcast.
-
+        constexpr qint16 kPort = 62976;
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock->sendTo(barequest.data(), barequest.size(), nx::network::BROADCAST_ADDRESS, 62976);
+            sock->sendTo(barequest.data(), barequest.size(), nx::network::BROADCAST_ADDRESS, kPort);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -96,12 +100,13 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         while (recvSocket->hasData())
         {
             QByteArray datagram;
-            datagram.resize( nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
+            datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
             nx::network::SocketAddress remoteEndpoint;
-            int readed = recvSocket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
+            const int bytesRead = recvSocket->recvFrom(
+                datagram.data(), datagram.size(), &remoteEndpoint);
 
-            if (remoteEndpoint.port != 62976 || readed < 32) // minimum response size
+            if (remoteEndpoint.port != kPort || bytesRead < 32) // minimum response size
                 continue;
 
             QString name  = QLatin1String("DCS-");
@@ -113,7 +118,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             iqpos+=name.length();
 
-            while (iqpos < readed && datagram[iqpos] != (char)0)
+            while (iqpos < bytesRead && datagram[iqpos] != (char)0)
             {
                 name += QLatin1Char(datagram[iqpos]);
                 ++iqpos;
@@ -140,11 +145,11 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             QnPlDlinkResourcePtr resource (new QnPlDlinkResource(serverModule()));
 
-            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
             if (rt.isNull())
                 continue;
 
-            QnResourceData resourceData = dataPool()->data(manufacture(), name);
+            QnResourceData resourceData = dataPool()->data(manufacturer(), name);
             if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
                 continue; // model forced by ONVIF
 
@@ -163,7 +168,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
     return result;
 }
 
-QString QnPlDlinkResourceSearcher::manufacture() const
+QString QnPlDlinkResourceSearcher::manufacturer() const
 {
     return QnPlDlinkResource::MANUFACTURE;
 }
@@ -230,11 +235,11 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
-    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

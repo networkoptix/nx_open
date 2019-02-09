@@ -51,7 +51,7 @@ public:
 
     static std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
         createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress);
-
+    virtual void stop() override;
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
@@ -59,7 +59,6 @@ protected:
         bool sslNeeded,
         const nx::network::SocketAddress& localAddress) override;
     virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
-
 private:
     std::unique_ptr<nx::vms::server::Authenticator> m_authenticator;
     nx::network::MultipleServerSocket* m_multipleServerSocket = nullptr;

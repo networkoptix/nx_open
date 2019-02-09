@@ -265,21 +265,6 @@ void DeviceAgent::onReceive(SystemError::ErrorCode code, size_t size)
     readNextNotificationAsync();
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<DeviceAgent*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 /**
  * This DeviceAgent has received the alarm message from the camera and should send the
  * corresponding event messages to the server.

@@ -10,7 +10,7 @@ namespace nx::vms::common::p2p::downloader {
 /**
  * Peer manager to be used in Downloader class. It is intended for client-only usage.
  */
-class SingleConnectionPeerManager: public AbstractPeerManager, public QnCommonModuleAware
+class SingleConnectionPeerManager: public AbstractPeerManager, public /*mixin*/ QnCommonModuleAware
 {
 public:
     SingleConnectionPeerManager(
@@ -50,6 +50,7 @@ public:
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
+    virtual void cancel() override {}
 
     // Sets internal connection
     void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);

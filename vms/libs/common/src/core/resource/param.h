@@ -68,9 +68,6 @@ namespace ResourcePropertyKey
     // Contains QnCameraAdvancedParams in ubjson-serialized state.
     static const QString kCameraAdvancedParams("cameraAdvancedParams");
 
-    // TODO: Rename to supportedAnalyticsEventTypeIds.
-    static const QString kAnalyticsDriversParamName("analyticsDrivers");
-
     static const QString kFirmware("firmware");
     static const QString kDeviceType("deviceType");
     static const QString kIoConfigCapability("ioConfigCapability");
@@ -119,7 +116,7 @@ namespace ResourcePropertyKey
  * Specific data is read-only information of a resource that is taken from "resource_data.json".
  * Different specific data pieces have different types.
  * Usually the data is received like this:
- *     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
+ *     QnResourceData resData = commonModule->resourceDataPool()->data(manufacturer, model);
  *     auto maxFps = resourceData.value<float>(ResourceDataKey::kMaxFps, 0.0);
  * Sometimes (seldom) keys are absent in "resource_data.json", but are used in code, this means,
  * that such keys are reserved for future.

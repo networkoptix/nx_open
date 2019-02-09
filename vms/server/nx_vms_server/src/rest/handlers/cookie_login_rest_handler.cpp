@@ -14,7 +14,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
-#include <nx/network/app_info.h>
 #include "cookie_logout_rest_handler.h"
 #include "current_user_rest_handler.h"
 #include <common/common_module.h>
@@ -44,24 +43,11 @@ int QnCookieLoginRestHandler::executePost(
         &accessRights);
 
     const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
-    if (authResult == Qn::Auth_CloudConnectError)
+    if (authResult == Qn::Auth_CloudConnectError
+        || authResult == Qn::Auth_LDAPConnectError
+        || authResult == Qn::Auth_LockedOut)
     {
-        result.setError(QnRestResult::CantProcessRequest,
-            nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
-        return nx::network::http::StatusCode::ok;
-    }
-
-    if (authResult == Qn::Auth_LDAPConnectError)
-    {
-        result.setError(QnRestResult::CantProcessRequest,
-            "LDAP server is not accessible yet. Please try again later.");
-        return nx::network::http::StatusCode::ok;
-    }
-
-    if (authResult == Qn::Auth_LockedOut)
-    {
-        result.setError(QnRestResult::CantProcessRequest,
-            "This user on your IP is locked out due to many filed attempts. Please, try again later.");
+        result.setError(QnRestResult::CantProcessRequest, Qn::toErrorMessage(authResult));
         return nx::network::http::StatusCode::ok;
     }
 
@@ -72,7 +58,7 @@ int QnCookieLoginRestHandler::executePost(
         auto auditManager = owner->commonModule()->auditManager();
         auditManager->addAuditRecord(auditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
 
-        result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
+        result.setError(QnRestResult::CantProcessRequest, Qn::toErrorMessage(authResult));
         return nx::network::http::StatusCode::ok;
     }
 

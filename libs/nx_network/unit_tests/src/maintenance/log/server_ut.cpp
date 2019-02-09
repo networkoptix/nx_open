@@ -21,7 +21,7 @@ namespace {
 
 static constexpr char kBasePath[] = "/log";
 
-} // namespace 
+} // namespace
 
 class LogServer:
     public ::testing::Test
@@ -68,7 +68,7 @@ protected:
         for (std::size_t i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
         {
             assertLoggerEquality(
-                loggers[i], 
+                loggers[i],
                 loggersReturnedByServer.loggers[i],
                 /*compareId*/ true,
                 /*comparePath*/ true);
@@ -232,13 +232,13 @@ protected:
 
         for (int i = 0; i < logsToProduce; ++i)
         {
-            if (auto logger = loggerCollection()->get(tag, true))
+            if (auto logger = loggerCollection()->get(tag, false))
                 logger->log(level, tag, QString::number(i) + '\n');
         }
 
         if (!logThisString.empty())
         {
-            if (auto logger = loggerCollection()->get(tag, true))
+            if (auto logger = loggerCollection()->get(tag, false))
                 logger->log(level, tag, QString(logThisString.c_str()) + '\n');
         }
     }
@@ -372,7 +372,7 @@ TEST_F(LogServer, server_accepts_new_logger)
     thenRequestSucceeded(http::StatusCode::created);
     andNewLoggerConfigurationIsProvided(
         loggerToAdd,
-        /*compareFilters*/ true, 
+        /*compareFilters*/ true,
         &loggerReturnedByServer);
 }
 
@@ -391,7 +391,7 @@ TEST_F(
 
     thenRequestSucceeded(http::StatusCode::created);
     andNewLoggerConfigurationIsProvided(
-        loggerToAdd1, 
+        loggerToAdd1,
         /*compareFilters*/ true,
         &loggerReturnedByServer1);
 
@@ -400,7 +400,7 @@ TEST_F(
 
     thenRequestSucceeded(http::StatusCode::created);
     andNewLoggerConfigurationIsProvided(
-        loggerToAdd2, 
+        loggerToAdd2,
         /*compareFilters*/ false,
         &loggerReturnedByServer2);
 
@@ -410,7 +410,7 @@ TEST_F(
 }
 
 TEST_F(LogServer, server_rejects_logger_configuration_with_duplicate_tags)
-{    
+{
     Logger loggerToAdd = getDefaultLogger();
     Logger duplicateLoggerToAdd = loggerToAdd;
 
@@ -421,7 +421,7 @@ TEST_F(LogServer, server_rejects_logger_configuration_with_duplicate_tags)
 
 
     whenAddLoggerConfiguration(duplicateLoggerToAdd);
-    
+
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
@@ -437,10 +437,10 @@ TEST_F(LogServer, server_deletes_existing_logger_configuration)
         loggerToAdd,
         /*compareFilters*/ true,
         &loggerReturnedByServer);
-    
+
     whenDeleteLoggerConfiguration(loggerReturnedByServer.id);
     thenRequestSucceeded(http::StatusCode::ok);
-}                                    
+}
 
 TEST_F(LogServer, server_fails_to_delete_non_existing_logger_configuration)
 {
@@ -467,7 +467,7 @@ TEST_F(LogServer, server_streams_logs_by_adding_custom_logging_configuration)
 TEST_F(LogServer, server_rejects_malformated_json_when_adding_logger_configuration)
 {
     whenAddLoggingConfigurationWithMalformedJson();
-    
+
     thenRequestFailed(http::StatusCode::badRequest);
 }
 

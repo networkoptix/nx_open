@@ -77,7 +77,7 @@ public:
      */
     int processConnectionRequest(sockaddr* addr, CPacket& packet);
 
-    void addEPoll(const int eid, int eventsToReport);
+    void addEPoll(const int eid);
     void removeEPoll(const int eid);
 
 private:
@@ -171,13 +171,13 @@ public: // internal API
     const CHandShake& connReq() const { return m_ConnReq; }
     const CHandShake& connRes() const { return m_ConnRes; }
 
-    UDTSOCKET socketId() const { return m_SocketID; }
+    UDTSOCKET socketId() const { return m_SocketId; }
     UDTSockType sockType() const { return m_iSockType; }
     int ipVersion() const { return m_iIPversion; }
 
     void setSocket(UDTSOCKET socketId, UDTSockType sockType, int ipVersion)
     {
-        m_SocketID = socketId;
+        m_SocketId = socketId;
         m_iSockType = sockType;
         m_iIPversion = ipVersion;
     }
@@ -387,7 +387,7 @@ public:
     static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Identification
-    UDTSOCKET m_SocketID;                        // UDT socket number
+    UDTSOCKET m_SocketId;                        // UDT socket number
     UDTSockType m_iSockType;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
     UDTSOCKET m_PeerID;                // peer id, for multiplexer
 

@@ -97,7 +97,6 @@ public:
     }
 };
 
-
 TEST_F(P2pSpecialTransactionTest, two_servers_still_abel_to_reconnect_when_one_server_forgets_another_while_offline)
 {
     givenTwoSynchronizedServers();

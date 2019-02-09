@@ -14,7 +14,7 @@ namespace
 {
     const QString kOnvifResourceTypeName("ONVIF");
 
-    const QString kManufacture("PelcoOptera");
+    const QString kManufacturer("PelcoOptera");
     const QString kOpteraDefaultLogin("admin");
     const QString kOpteraDefaultPassword("admin");
 
@@ -68,17 +68,11 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
 
     auto resourceId = getId();
 
-    commonModule()->propertyDictionary()->setValue(resourceId, ResourcePropertyKey::kVideoLayout,
+    commonModule()->resourcePropertyDictionary()->setValue(resourceId, ResourcePropertyKey::kVideoLayout,
         m_videoLayout->toString());
-    commonModule()->propertyDictionary()->saveParams(resourceId);
+    commonModule()->resourcePropertyDictionary()->saveParams(resourceId);
 
     return m_videoLayout;
-}
-
-nx::vms::server::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
-{
-    return base_type::getStreamCapabilityMapFromDriver(streamIndex);
 }
 
 CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()

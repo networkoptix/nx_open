@@ -14,6 +14,17 @@ class CameraSettingsDialogStateReducerTest: public testing::Test
 public:
     using State = CameraSettingsDialogState;
     using Reducer = CameraSettingsDialogStateReducer;
+
+protected:
+    static State makeWearableCameraState()
+    {
+        State s;
+        s.devicesCount = 1;
+        s.deviceType = QnCameraDeviceType::Camera;
+        s.devicesDescription.isWearable = CombinedValue::All;
+        s.readOnly = false;
+        return s;
+    }
 };
 
 TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)

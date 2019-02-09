@@ -493,14 +493,18 @@ QnVideoCamera::QnVideoCamera(
     m_lastActivityTimer.invalidate();
 }
 
-QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(Qn::StreamIndex streamIndex) const
+QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(MotionStreamType streamIndex) const
 {
     switch (streamIndex)
     {
-        case Qn::StreamIndex::primary: return m_primaryGopKeeper;
-        case Qn::StreamIndex::secondary: return m_secondaryGopKeeper;
+        case MotionStreamType::primary:
+            return m_primaryGopKeeper;
+        case MotionStreamType::secondary:
+            return m_secondaryGopKeeper;
+        default:
+            break;
     }
-    NX_ASSERT(false, lm("Unsupported StreamIndex %1").arg((int) streamIndex));
+    NX_ASSERT(false, lm("Unsupported stream index %1").arg((int) streamIndex));
     return nullptr; //< Fallback for the failed assertion.
 }
 
@@ -574,12 +578,12 @@ void QnVideoCamera::at_camera_resourceChanged()
 
 void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 {
-    const Qn::StreamIndex streamIndex = (catalog == QnServer::HiQualityCatalog)
-        ? Qn::StreamIndex::primary
-        : Qn::StreamIndex::secondary;
+    const MotionStreamType streamIndex = (catalog == QnServer::HiQualityCatalog)
+        ? MotionStreamType::primary
+        : MotionStreamType::secondary;
 
     const Qn::ConnectionRole role =
-        (streamIndex == Qn::StreamIndex::primary) ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
+        (streamIndex == MotionStreamType::primary) ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
 
     const QnSecurityCamResource* cameraResource =
         dynamic_cast<QnSecurityCamResource*>(m_resource.data());
@@ -588,11 +592,11 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
         return;
 
     QnLiveStreamProviderPtr &reader =
-        (streamIndex == Qn::StreamIndex::primary) ? m_primaryReader : m_secondaryReader;
+        (streamIndex == MotionStreamType::primary) ? m_primaryReader : m_secondaryReader;
     if (!reader)
     {
         QnAbstractStreamDataProvider* dataProvider = nullptr;
-        if (streamIndex == Qn::StreamIndex::primary
+        if (streamIndex == MotionStreamType::primary
             || (cameraResource && cameraResource->hasDualStreaming()))
         {
             dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
@@ -621,7 +625,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
                 QnVideoCameraGopKeeper* gopKeeper =
                     new QnVideoCameraGopKeeper(this, m_resource, catalog);
-                if (streamIndex == Qn::StreamIndex::primary)
+                if (streamIndex == MotionStreamType::primary)
                     m_primaryGopKeeper = gopKeeper;
                 else
                     m_secondaryGopKeeper = gopKeeper;
@@ -691,12 +695,12 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog cat
 }
 
 int QnVideoCamera::copyLastGop(
-    Qn::StreamIndex streamIndex,
+    MotionStreamType streamIndex,
     qint64 skipTime,
     QnDataPacketQueue& dstQueue,
     bool iFramesOnly)
 {
-    if (streamIndex == Qn::StreamIndex::primary && m_primaryGopKeeper)
+    if (streamIndex == MotionStreamType::primary && m_primaryGopKeeper)
         return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, iFramesOnly);
     if (m_secondaryGopKeeper)
         return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, iFramesOnly);
@@ -704,7 +708,7 @@ int QnVideoCamera::copyLastGop(
 }
 
 std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
-    Qn::StreamIndex streamIndex,
+    MotionStreamType streamIndex,
     qint64 time,
     int channel,
     ImageRequest::RoundMethod roundMethod) const
@@ -718,14 +722,14 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
 }
 
 QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(
-    Qn::StreamIndex streamIndex, int channel) const
+    MotionStreamType streamIndex, int channel) const
 {
     if (auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastVideoFrame(channel);
     return nullptr;
 }
 
-QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(Qn::StreamIndex streamIndex) const
+QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(MotionStreamType streamIndex) const
 {
     if (auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrame();

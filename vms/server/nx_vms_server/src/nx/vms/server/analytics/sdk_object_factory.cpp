@@ -6,18 +6,15 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/sdk_support/utils.h>
-
-#include <nx/vms/server/interactive_settings/json_engine.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
-#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_manager.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/i_string_map.h>
 #include <plugins/settings.h>
 
 #include <plugins/plugin_manager.h>
@@ -30,7 +27,8 @@
 
 namespace nx::vms::server::analytics {
 
-using namespace nx::vms::common;
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 class SdkObjectFactory;
 
@@ -64,7 +62,7 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
         return nullptr;
     }
 
-    auto commonModule = serverModule->commonModule();
+    const auto commonModule = serverModule->commonModule();
     if (!commonModule)
     {
         NX_ASSERT(false, "Can't access the common module");
@@ -131,26 +129,21 @@ bool SdkObjectFactory::initPluginResources()
         return false;
 
     nx::vms::api::AnalyticsPluginDataList databaseAnalyticsPlugins;
-    auto error = analyticsManager->getAnalyticsPluginsSync(&databaseAnalyticsPlugins);
-    if (error != ec2::ErrorCode::ok)
+    if (analyticsManager->getAnalyticsPluginsSync(&databaseAnalyticsPlugins) != ec2::ErrorCode::ok)
         return false;
 
     std::map<QnUuid, nx::vms::api::AnalyticsPluginData> pluginDataById;
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::IPlugin>(
-        nx::sdk::analytics::IID_Plugin);
+    const auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::IPlugin>();
 
-    std::map<QnUuid, nx::sdk::Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
-    for (const auto analyticsPlugin: analyticsPlugins)
+    std::map<QnUuid, Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
+    for (const auto& analyticsPlugin: analyticsPlugins)
     {
-        auto analyticsPluginPtr =
-            nx::sdk::Ptr<nx::sdk::analytics::IPlugin>(analyticsPlugin);
-
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
-            makeLogger(analyticsPlugin));
+            makeLogger(analyticsPlugin.get()));
 
         if (!pluginManifest)
         {
@@ -160,7 +153,7 @@ bool SdkObjectFactory::initPluginResources()
         }
 
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
-        sdkPluginsById.emplace(id, analyticsPluginPtr);
+        sdkPluginsById.emplace(id, analyticsPlugin);
 
         NX_DEBUG(this, "Creating an analytics plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
@@ -173,7 +166,7 @@ bool SdkObjectFactory::initPluginResources()
         data.url = QString();
     }
 
-    auto resPool = resourcePool();
+    const auto resPool = resourcePool();
     if (!resPool)
     {
         NX_ERROR(this, "Can't access the resource pool");
@@ -255,7 +248,7 @@ bool SdkObjectFactory::initEngineResources()
             pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
-    std::map<QnUuid, nx::sdk::Ptr<nx::sdk::analytics::IEngine>> sdkEnginesById;
+    std::map<QnUuid, Ptr<IEngine>> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
         const auto& engineList = entry.second;
@@ -297,10 +290,8 @@ bool SdkObjectFactory::initEngineResources()
                 continue;
             }
 
-            nx::sdk::Error error = nx::sdk::Error::noError;
-            nx::sdk::Ptr<nx::sdk::analytics::IEngine> sdkEngine(
-                sdkPlugin->createEngine(&error));
-
+            Error error = Error::noError;
+            const auto sdkEngine = toPtr(sdkPlugin->createEngine(&error));
             if (!sdkEngine)
             {
                 NX_WARNING(this, "Unable to create a SDK engine %1 (%2)",
@@ -308,7 +299,7 @@ bool SdkObjectFactory::initEngineResources()
                 continue;
             }
 
-            if (error != nx::sdk::Error::noError)
+            if (error != Error::noError)
             {
                 NX_WARNING(this,
                     "Error '%1' occured while creating a SDK engine. "

@@ -26,18 +26,25 @@ bool QuickItemMouseTracker::eventFilter(QObject* object, QEvent* event)
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:
         {
-            QMouseEvent* me = static_cast<QMouseEvent*>(event);
-            setMousePosition(me->pos());
+            const auto mouse = static_cast<QMouseEvent*>(event);
+            setMousePosition(mouse->pos());
             break;
         }
 
         case QEvent::HoverEnter:
-            setContainsMouse(true);
-            break;
-
         case QEvent::HoverLeave:
-            setContainsMouse(false);
+        case QEvent::HoverMove:
+        {
+            const auto hover = static_cast<QHoverEvent*>(event);
+            setMousePosition(hover->pos());
+
+            if (event->type() == QEvent::HoverEnter)
+                setContainsMouse(true);
+            else if (event->type() == QEvent::HoverLeave)
+                setContainsMouse(false);
+
             break;
+        }
 
         default:
             break;

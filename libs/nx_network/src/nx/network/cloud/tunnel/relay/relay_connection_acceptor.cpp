@@ -5,13 +5,14 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "../../protocol_type.h"
+
 namespace nx::network::cloud::relay {
 
 using namespace nx::cloud::relay;
 
 namespace detail {
 
-// TODO: #ak Replace this class with something more general.
 class ServerSideReverseStreamSocket:
     public StreamSocketDelegate
 {
@@ -26,6 +27,12 @@ public:
         m_streamSocket(std::move(streamSocket)),
         m_remotePeerAddress(std::move(remotePeerAddress))
     {
+    }
+
+    virtual bool getProtocol(int* protocol) const override
+    {
+        *protocol = Protocol::relay;
+        return true;
     }
 
     virtual SocketAddress getForeignAddress() const override

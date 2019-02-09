@@ -29,7 +29,7 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     qint64 startTimeMs)
     :
     base_type(serverModule),
-    m_resource(resource),
+    m_camera(resource),
     m_file(file.release()),
     m_startTimeMs(startTimeMs)
 {
@@ -47,7 +47,7 @@ WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 
 QnUuid WearableArchiveSynchronizationTask::id() const
 {
-    return m_resource->getId();
+    return m_camera->getId();
 }
 
 void WearableArchiveSynchronizationTask::setDoneHandler(nx::utils::MoveOnlyFunc<void()> /*handler*/)
@@ -66,7 +66,7 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
-    m_withMotion = m_resource->getMotionType() == Qn::MotionType::MT_SoftwareGrid;
+    m_withMotion = m_camera->isRemoteArchiveMotionDetectionEnabled();
 
     createArchiveReader(m_startTimeMs, &m_state.duration);
     createStreamRecorder(m_startTimeMs, m_state.duration);
@@ -105,7 +105,7 @@ QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate(
 
     std::unique_ptr<AviMotionArchiveDelegate> result = std::make_unique<AviMotionArchiveDelegate>();
     QnMotionRegion region;
-    result->setMotionRegion(m_resource->getMotionRegion(0));
+    result->setMotionRegion(m_camera->getMotionRegion(0));
     return result.release();
 }
 
@@ -132,7 +132,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs,
     if(delegate->endTime() != AV_NOPTS_VALUE)
         *durationMs = (delegate->endTime() - delegate->startTime()) / 1000;
 
-    m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
+    m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_camera);
     m_archiveReader->setObjectName(lit("WearableCameraArchiveReader"));
     m_archiveReader->setArchiveDelegate(delegate.release());
     //m_archiveReader->setPlaybackMask(timePeriod);
@@ -163,7 +163,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
         serverModule(),
-        m_resource,
+        m_camera,
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
 

@@ -1,5 +1,5 @@
 {
-    "capabilities": "deviceModelDependent",
+    "capabilities": "deviceDependent",
     "supportedCameraModels": [
         "DWC-MVT4Wi28",
         "DWC-MVT4Wi36",

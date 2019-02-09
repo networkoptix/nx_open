@@ -8,7 +8,6 @@
 
 #include "settings.h"
 #include <plugins/resource/mdns/mdns_listener.h>
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/manager.h>
@@ -74,9 +73,8 @@ namespace nx::vms::server {
 
 namespace nx::vms::server::resource { class SharedContextPool; }
 namespace nx::vms::server::camera { class ErrorProcessor; }
-namespace nx { class CommonUpdateManager; }
 
-class QnMediaServerModule : public QObject, public QnInstanceStorage
+class QnMediaServerModule : public QObject, public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT;
 
@@ -86,7 +84,6 @@ public:
         std::unique_ptr<MSSettings> serverSettings = nullptr,
         QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
-
 
     void stop();
     using QnInstanceStorage::instance;
@@ -118,12 +115,12 @@ public:
     nx::vms::server::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::CommonUpdateManager* updateManager() const;
+    nx::vms::server::ServerUpdateManager* updateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     QnResourcePool* resourcePool() const;
-    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
 
     nx::vms::server::RootFileSystem* rootFileSystem() const;
@@ -176,7 +173,6 @@ private:
     };
     std::unique_ptr<UniquePtrContext> m_context;
 
-    CommonPluginContainer m_pluginContainer;
     PluginManager* m_pluginManager = nullptr;
     nx::vms::server::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::vms::server::LicenseWatcher* m_licenseWatcher = nullptr;
@@ -191,7 +187,7 @@ private:
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
-    nx::CommonUpdateManager* m_updateManager = nullptr;
+    nx::vms::server::ServerUpdateManager* m_updateManager = nullptr;
     QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;

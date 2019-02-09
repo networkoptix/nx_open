@@ -43,7 +43,7 @@ bool ServerUpdateInstaller::initializeUpdateLog(const QString& targetVersion, QS
     QByteArray preface;
     preface.append("================================================================================\n");
     preface.append(lit(" [%1] Starting system update:\n").arg(QDateTime::currentDateTime().toString()));
-    preface.append(lit("    Current version: %1\n").arg(qnStaticCommon->engineVersion().toString()));
+    preface.append(lit("    Current version: %1\n").arg(serverModule()->commonModule()->engineVersion().toString()));
     preface.append(lit("    Target version: %1\n").arg(targetVersion));
     preface.append("================================================================================\n");
 

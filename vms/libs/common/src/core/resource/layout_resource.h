@@ -145,8 +145,9 @@ public:
      * No checking because data roles are inaccessible here.
      */
     void usePasswordForRecordings(const QString& password);
+
     /**
-     * Makes layout children to forget its password.
+     * Makes layout children to forget its password AND removes freshly added cameras.
      * Layout password is kept because it in data roles that are inaccessible here
      */
     void forgetPasswordForRecordings();

@@ -31,7 +31,7 @@ QnActivityPtzController::QnActivityPtzController(
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
         [this](const QnResourcePtr& resource)
         {
-            propertyDictionary()->saveParamsAsync(resource->getId());
+            resourcePropertyDictionary()->saveParamsAsync(resource->getId());
         });
 }
 
@@ -151,4 +151,3 @@ bool QnActivityPtzController::getData(
         ? baseController()->getData(query, data, options)
         : base_type::getData(query, data, options);
 }
-

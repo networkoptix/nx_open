@@ -18,14 +18,18 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(IPlugin* plugin): nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
+    nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
 
 Engine::~Engine()
 {
-    m_terminated.store(true);
+    {
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_terminated = true;
+    }
     m_pluginEventGenerationLoopCondition.notify_all();
     if (m_thread)
         m_thread->join();
@@ -39,8 +43,8 @@ IDeviceAgent* Engine::obtainDeviceAgent(
 
 void Engine::initCapabilities()
 {
-    if (ini().deviceModelDependent)
-        m_capabilities += "|deviceModelDependent";
+    if (ini().deviceDependent)
+        m_capabilities += "|deviceDependent";
 
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
@@ -62,7 +66,7 @@ void Engine::initCapabilities()
         m_capabilities.erase(0, 1);
 }
 
-void Engine::processPluginEvents()
+void Engine::generatePluginEvents()
 {
     while (!m_terminated)
     {
@@ -86,9 +90,13 @@ void Engine::processPluginEvents()
         // Sleep until the next event pack needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether the
         // timeout has occurred) and spurious wake-ups are ignored.
-        static const std::chrono::seconds kEventGenerationPeriod{10};
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-        m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+        {
+            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            if (m_terminated)
+                break;
+            static const std::chrono::seconds kEventGenerationPeriod{7};
+            m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+        }
     }
 }
 
@@ -261,7 +269,7 @@ void Engine::settingsReceived()
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation thread";
         if (!m_thread)
-            m_thread.reset(new std::thread([this]() { processPluginEvents(); }));
+            m_thread.reset(new std::thread([this]() { generatePluginEvents(); }));
     }
     else
     {
@@ -323,6 +331,7 @@ void Engine::executeAction(
 namespace {
 
 static const std::string kLibName = "stub_analytics_plugin";
+
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.stub",
@@ -383,7 +392,7 @@ static const std::string kPluginManifest = R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

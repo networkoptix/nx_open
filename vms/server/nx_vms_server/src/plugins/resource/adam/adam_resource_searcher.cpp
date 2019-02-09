@@ -58,9 +58,9 @@ QnAdamResourceSearcher::~QnAdamResourceSearcher()
 {
 }
 
-QString QnAdamResourceSearcher::manufacture() const
+QString QnAdamResourceSearcher::manufacturer() const
 {
-    return QnAdamResource::kManufacture;
+    return QnAdamResource::kManufacturer;
 }
 
 QString QnAdamResourceSearcher::generatePhysicalId(const QString& url) const
@@ -294,7 +294,7 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     result.reset(new QnAdamResource(serverModule()));

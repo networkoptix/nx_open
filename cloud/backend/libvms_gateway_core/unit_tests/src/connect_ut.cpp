@@ -14,7 +14,7 @@ namespace test {
 
 
 const constexpr std::chrono::milliseconds kNetworkTimeout(5000);
-const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
+const QByteArray successResponse = "HTTP/1.1 200 OK";
 
 class VmsGatewayConnectTest:
     public BasicComponentTest
@@ -49,24 +49,22 @@ public:
         // Send CONNECT request to proxy.
         ASSERT_EQ(socket->send(connectRequest, connectRequest.size()), connectRequest.size());
 
+        // Checking that CONNECT was successfull.
+        QByteArray fullResponse;
         QByteArray responseReceiveBuffer;
-        responseReceiveBuffer.resize(connectResponse.size());
+        responseReceiveBuffer.resize(network::test::TestConnection::kReadBufferSize);
 
-        // Check that CONNECT was successfull.
-        ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(),
-            MSG_WAITALL), responseReceiveBuffer.size())
-                << "CONNECT response failure: " << SystemError::getLastOSErrorText().toStdString();
+        // Read whole HTTP message.
+        do {
+            int receivedCount =
+                socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0);
+            ASSERT_GT(receivedCount, 0);
+            fullResponse += responseReceiveBuffer.left(receivedCount);
 
-        // We want to check only the first response line.
-        ASSERT_TRUE(responseReceiveBuffer.startsWith(connectResponse));
+        } while (!fullResponse.endsWith("\r\n\r\n"));
 
-        // Clean http options which can be left in socket buffer.
-        while(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(),
-            MSG_DONTWAIT) > 0);
-        ASSERT_TRUE(
-            SystemError::getLastOSErrorCode() == SystemError::again ||
-            SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
-            << SystemError::getLastOSErrorCode();
+        // Check only response line, as headers are optional.
+        ASSERT_TRUE(fullResponse.startsWith(connectResponse));
     }
 
     network::test::RandomDataTcpServer server;
@@ -154,7 +152,7 @@ TEST_F(VmsGatewayConnectTest, WrongAddressConnect)
     ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
         /*connectSupport*/ true, std::chrono::seconds(1), std::chrono::seconds(1)));
     std::unique_ptr<network::TCPSocket> clientSocket;
-    connectProxySocket("127.0.0.1:1", clientSocket, "HTTP/1.1 503 Service Unavailable\r\n");
+    connectProxySocket("127.0.0.1:1", clientSocket, "HTTP/1.1 503 Service Unavailable");
     server.pleaseStopSync();
 }
 
@@ -163,7 +161,7 @@ TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
     ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
         /*connectSupport*/ false));
     std::unique_ptr<network::TCPSocket> clientSocket;
-    connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden\r\n");
+    connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden");
     server.pleaseStopSync();
 }
 
@@ -172,7 +170,7 @@ TEST_F(VmsGatewayConnectTest, IpForbidden)
     ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ false, /*proxyTargetPort*/ false,
         /*connectSupport*/ true));
     std::unique_ptr<network::TCPSocket> clientSocket;
-    connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden\r\n");
+    connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden");
     server.pleaseStopSync();
 }
 

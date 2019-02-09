@@ -43,7 +43,7 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
+const int kLongInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
 // Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
 const quint32 kProcessTerminateTimeoutMs = 15000;
 
@@ -181,7 +181,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     updateTimer->start(kAutoCheckIntervalMs);
     connect(updateTimer, &QTimer::timeout, this, &QnServerUpdatesWidget::autoCheckForUpdates);
 
-    m_longUpdateWarningTimer->setInterval(kLongInstallWarningTimeoutMs);
+    m_longUpdateWarningTimer->setInterval(kLongInstallWarningTimeout);
     m_longUpdateWarningTimer->setSingleShot(true);
     connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
@@ -268,7 +268,7 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             setMode(Mode::SpecificBuild);
-            const auto version = qnStaticCommon->engineVersion();
+            const auto version = commonModule()->engineVersion();
             m_targetVersion = nx::utils::SoftwareVersion(
                 version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_targetChangeset = dialog.changeset();
@@ -864,7 +864,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
         {
             case QnUpdateResult::Successful:
             {
-                const bool clientUpdated = (result.targetVersion != qnStaticCommon->engineVersion());
+                const bool clientUpdated = (result.targetVersion != commonModule()->engineVersion());
                 if (clientUpdated)
                 {
                     if (result.clientInstallerRequired)

@@ -4,7 +4,7 @@
 #include <memory>
 #include <mutex>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -17,7 +17,7 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace deepstream {
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IConsumingDeviceAgent>
+class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::analytics::IConsumingDeviceAgent>
 {
 public:
     DeviceAgent(Engine* engine, const std::string& id);
@@ -25,8 +25,6 @@ public:
     virtual ~DeviceAgent() override;
 
     virtual Engine* engine() const override { return m_engine; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 

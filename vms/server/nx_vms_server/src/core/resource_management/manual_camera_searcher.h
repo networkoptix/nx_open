@@ -13,7 +13,7 @@
 #include "manual_camera_search_task_manager.h"
 
 //! Scans different addresses simultaneously (using aio or concurrent operations).
-class QnManualCameraSearcher: public QnCommonModuleAware, public nx::network::QnStoppableAsync
+class QnManualCameraSearcher: public /*mixin*/ QnCommonModuleAware, public nx::network::QnStoppableAsync
 {
     using SearchDoneCallback = nx::utils::MoveOnlyFunc<void(QnManualCameraSearcher*)>;
 

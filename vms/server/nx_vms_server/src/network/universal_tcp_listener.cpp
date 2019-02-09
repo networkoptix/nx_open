@@ -62,7 +62,12 @@ void QnUniversalTcpListener::setCloudConnectionManager(
 QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
+}
+
+void QnUniversalTcpListener::stop()
+{
     directDisconnectAll();
+    QnHttpConnectionListener::stop();
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(

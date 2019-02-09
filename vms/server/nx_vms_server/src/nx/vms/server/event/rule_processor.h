@@ -87,7 +87,7 @@ private:
 */
 class RuleProcessor:
     public QThread,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

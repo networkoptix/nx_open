@@ -1,8 +1,8 @@
 #include "common_globals.h"
 
-#include <nx/fusion/model_functions.h>
-
 #include <core/ptz/ptz_constants.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzObjectType)
@@ -15,7 +15,6 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TTHeaderFlag)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortTypes)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
@@ -117,6 +116,45 @@ QString toString(AuthResult value)
     return QnLexical::serialized(value);
 }
 
+QString toErrorMessage(AuthResult value)
+{
+    switch (value)
+    {
+        case Auth_OK:
+            NX_ASSERT(false, "This value is not an error");
+            break;
+
+        case Auth_WrongLogin:
+        case Auth_WrongInternalLogin:
+        case Auth_WrongDigest:
+        case Auth_WrongPassword:
+            return "Wrong username or password.";
+
+        case Auth_PasswordExpired:
+            return "The password is expired. Please, contact your system administrator.";
+
+        case Auth_LDAPConnectError:
+            return "The LDAP server is not accessible. Please, try again later.";
+
+        case Auth_CloudConnectError:
+            return nx::network::AppInfo::cloudName()
+                + " is not accessible yet. Please, try again later.";
+
+        case Auth_DisabledUser:
+            return "The user is disabled. Please, contact your system administrator.";
+
+        case Auth_LockedOut:
+            return "The user is locked out due to several failed attempts. Please, try again later.";
+
+        case Auth_Forbidden:
+        case Auth_InvalidCsrfToken:
+            return "This authorization method is forbidden. Please, contact your system administrator.";
+    }
+
+    NX_ASSERT(false, lm("Unhandled value: %1").arg(value));
+    return lm("Internal server error (%1). Please, contact your system administrator.").arg(value);
+}
+
 QString toString(MediaStreamEvent value)
 {
     switch (value)
@@ -134,18 +172,6 @@ QString toString(MediaStreamEvent value)
         default:
             return lit("Unknown error");
     }
-}
-
-QString toString(StreamIndex value)
-{
-    switch (value)
-    {
-        case StreamIndex::undefined: return "undefined";
-        case StreamIndex::primary: return "primary";
-        case StreamIndex::secondary: return "secondary";
-    }
-    NX_ASSERT(false, lm("Unexpected value %1").arg((int) value));
-    return lm("unexpected_value_%1").arg((int) value);
 }
 
 QString toString(ResourceStatus status)

@@ -30,7 +30,7 @@ class QnTimePeriodList;
 struct QnTimePeriod;
 class QnStorageManager;
 
-class DeviceFileCatalog: public QObject, public nx::vms::server::ServerModuleAware
+class DeviceFileCatalog: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -56,7 +56,6 @@ public:
         bool isInfinite() const { return durationMs == -1; }
 
         QString fileName() const;
-
 
         qint64 startTimeMs; // chunk startTime at ms
         int durationMs; // chunk duration at ms
@@ -226,7 +225,6 @@ public:
             isBackup(isBackup)
         {}
     };
-
 
     typedef std::set<UniqueChunk> UniqueChunkCont;
 

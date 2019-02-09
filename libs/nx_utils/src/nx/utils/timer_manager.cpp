@@ -94,12 +94,13 @@ bool StandaloneTimerManager::TimerGuard::operator!=(
 
 //-------------------------------------------------------------------------------------------------
 
-StandaloneTimerManager::StandaloneTimerManager():
+StandaloneTimerManager::StandaloneTimerManager(const char* threadName):
     m_terminated(false),
     m_runningTaskID(0)
 {
     m_monotonicClock.restart();
-    setObjectName("StandaloneTimerManager");
+    if (threadName)
+        setObjectName(threadName);
 
     start();
 }

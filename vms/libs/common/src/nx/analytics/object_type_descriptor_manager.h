@@ -11,7 +11,7 @@
 
 namespace nx::analytics {
 
-class ObjectTypeDescriptorManager : public QnCommonModuleAware
+class ObjectTypeDescriptorManager : public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 

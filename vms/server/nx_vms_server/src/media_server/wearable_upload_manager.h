@@ -17,9 +17,9 @@ struct QnWearableStorageStats
     bool haveStorages = false;
 };
 
-class QnWearableUploadManager: 
-    public Connective<QObject>, 
-    public nx::vms::server::ServerModuleAware
+class QnWearableUploadManager:
+    public Connective<QObject>,
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

@@ -14,7 +14,7 @@
 
 class QnGlobalPermissionsManager:
     public Connective<QObject>,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

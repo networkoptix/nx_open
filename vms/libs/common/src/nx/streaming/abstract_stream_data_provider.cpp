@@ -2,6 +2,7 @@
 
 #include <core/resource/resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/utils/log/log.h>
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
@@ -17,6 +18,8 @@ QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 {
+    NX_VERBOSE(this, "Check if data can be accepted");
+
     // need to read only if all queues has more space and at least one queue is exist
     QnMutexLocker mutex( &m_mutex );
     for (int i = 0; i < m_dataprocessors.size(); ++i)
@@ -36,14 +39,17 @@ int QnAbstractStreamDataProvider::processorsCount() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractMediaDataReceptor* dp)
 {
-    NX_ASSERT(dp);
-    QnMutexLocker mutex( &m_mutex );
+    NX_CRITICAL(dp);
 
+    QnMutexLocker mutex (&m_mutex);
     if (!m_dataprocessors.contains(dp))
     {
+        NX_DEBUG(this, "Add data processor: %1", dp);
         m_dataprocessors.push_back(dp);
-
-
+    }
+    else
+    {
+        NX_WARNING(this, "Data processor is already added: %1", dp);
     }
 }
 
@@ -60,8 +66,11 @@ bool QnAbstractStreamDataProvider::needConfigureProvider() const
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractMediaDataReceptor* dp)
 {
-    QnMutexLocker mutex( &m_mutex );
-    m_dataprocessors.removeOne(dp);
+    QnMutexLocker mutex (&m_mutex);
+    if (m_dataprocessors.removeOne(dp))
+        NX_DEBUG(this, "Remove data processor: %1", dp);
+    else
+        NX_WARNING(this, "Remove not added data processor: %1", dp);
 }
 
 void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)

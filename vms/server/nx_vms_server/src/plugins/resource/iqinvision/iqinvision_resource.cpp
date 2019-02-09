@@ -29,13 +29,6 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
     // Do nothing.
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);

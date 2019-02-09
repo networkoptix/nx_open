@@ -1,9 +1,9 @@
 #include "media_encoder.h"
 
-#include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
+#include <nx/utils/app_info.h>
 
 #include "camera/default_audio_encoder.h"
 #include "camera_manager.h"
@@ -12,12 +12,13 @@
 #include "ffmpeg/utils.h"
 #include "stream_reader.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace {
 
 static constexpr int kBytesInOneKilobyte = 1000;
+static constexpr int kDefaultSecondaryFps = 5;
+static constexpr int kDefaultSecondaryWidth = 640;
 
 }
 
@@ -26,10 +27,13 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     const std::shared_ptr<Camera>& camera)
     :
     m_refManager(parentRefManager),
-    m_encoderIndex(encoderIndex),
-    m_camera(camera),
-    m_codecParams(camera->defaultVideoParameters())
+    m_isSecondaryStream(encoderIndex != 0),
+    m_camera(camera)
 {
+    m_streamReader.reset(new StreamReader(
+        &m_refManager,
+        m_camera,
+        m_isSecondaryStream));
 }
 
 void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
@@ -56,6 +60,12 @@ void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
+nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
+{
+    m_streamReader->addRef();
+    return m_streamReader.get();
+}
+
 int MediaEncoder::addRef() const
 {
     return m_refManager.addRef();
@@ -74,7 +84,7 @@ int MediaEncoder::getMediaUrl(char* urlBuf) const
 
 int MediaEncoder::getMaxBitrate(int* maxBitrate) const
 {
-    if(!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
 
     int bitrate =
@@ -90,9 +100,7 @@ int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
     if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    m_codecParams.resolution = resolution;
-    if (m_streamReader)
-        m_streamReader->setResolution(resolution);
+    m_streamReader->setResolution(resolution);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -100,6 +108,13 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
 {
     if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
+
+    if (m_isSecondaryStream)
+    {
+        m_streamReader->setFps(fps);
+        *selectedFps = fps;
+        return nxcip::NX_NO_ERROR;
+    }
 
     auto resolutionList = m_camera->resolutionList();
     if (resolutionList.empty())
@@ -111,7 +126,7 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
         });
 
     float actualFps = 0;
-    for (const auto& resolutionData : resolutionList)
+    for (const auto& resolutionData: resolutionList)
     {
         if (resolutionData.fps >= fps)
         {
@@ -125,10 +140,7 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
         actualFps = 30;
 
     *selectedFps = actualFps;
-    m_codecParams.fps = actualFps;
-    if (m_streamReader)
-        m_streamReader->setFps(actualFps);
-
+     m_streamReader->setFps(actualFps);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -139,12 +151,11 @@ int MediaEncoder::setBitrate(int bitrateKbps, int* selectedBitrateKbps)
 
     // the plugin uses bits per second internally, so convert to that first
     int bitrate = bitrateKbps * 1000;
-    m_codecParams.bitrate = bitrate;
-    if (m_streamReader)
-        m_streamReader->setBitrate(bitrate);
+    m_streamReader->setBitrate(bitrate);
     *selectedBitrateKbps = bitrateKbps;
     return nxcip::NX_NO_ERROR;
 }
+
 int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 {
     if (!m_camera->videoStream()->pluggedIn())
@@ -157,8 +168,7 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 
     AVCodecContext* context = encoder->codecContext();
 
-    auto nxSampleType =
-        ffmpeg::utils::toNxSampleType(context->sample_fmt);
+    auto nxSampleType = ffmpeg::utils::toNxSampleType(context->sample_fmt);
     if (!nxSampleType.has_value())
         return nxcip::NX_UNSUPPORTED_CODEC;
 
@@ -181,6 +191,46 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
     return nxcip::NX_NO_ERROR;
 }
 
+int MediaEncoder::getResolutionList(
+    nxcip::ResolutionInfo* infoList,
+    int* infoListCount) const
+{
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
+    auto list = m_camera->resolutionList();
+    if (list.empty())
+    {
+        *infoListCount = 0;
+        return nxcip::NX_IO_ERROR;
+    }
+
+    fillResolutionList(list, infoList, infoListCount);
+    if (m_isSecondaryStream)
+    {
+        int index = list.size() < nxcip::MAX_RESOLUTION_LIST_SIZE
+            ? (int)list.size()
+            : nxcip::MAX_RESOLUTION_LIST_SIZE - 1;
+
+        const auto& resolution = list.back();
+        float aspectRatio = (float) resolution.width / resolution.height;
+        infoList[index].resolution =
+            { kDefaultSecondaryWidth, (int)(kDefaultSecondaryWidth / aspectRatio) };
+        infoList[index].maxFps = kDefaultSecondaryFps;
+
+        *infoListCount = index + 1;
+        if (nx::utils::AppInfo::isRaspberryPi())
+        {
+            int width = kDefaultSecondaryWidth / 2;
+            infoList[0].resolution = { width, (int)(width / aspectRatio) };
+            infoList[0].maxFps = kDefaultSecondaryFps;
+            *infoListCount = 1;
+        }
+    }
+
+    return nxcip::NX_NO_ERROR;
+}
+
 void MediaEncoder::fillResolutionList(
     const std::vector<device::video::ResolutionData>& list,
     nxcip::ResolutionInfo* outInfoList,
@@ -191,7 +241,7 @@ void MediaEncoder::fillResolutionList(
         int startIndex,
         int width, int height) -> int {
         int maxFps = 0;
-        for (int i = startIndex; i < list.size(); ++i)
+        for (uint32_t i = startIndex; i < list.size(); ++i)
         {
             const device::video::ResolutionData& resolution = list[i];
             if (resolution.width * resolution.height == width * height)
@@ -205,7 +255,7 @@ void MediaEncoder::fillResolutionList(
 
     int j = 0;
     device::video::ResolutionData previous(0, 0, 0);
-    for (int i = 0; i < list.size() && j < nxcip::MAX_RESOLUTION_LIST_SIZE; ++i)
+    for (uint32_t i = 0; i < list.size() && j < nxcip::MAX_RESOLUTION_LIST_SIZE; ++i)
     {
         if (previous.width * previous.height == list[i].width * list[i].height)
             continue;
@@ -218,5 +268,4 @@ void MediaEncoder::fillResolutionList(
     *outInfoListCount = j;
 }
 
-} // namespace nx
-} // namespace usb_cam
+} // namespace nx::usb_cam

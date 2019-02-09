@@ -748,7 +748,7 @@ Quer apagar mesmo assim?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation>QT_LAYOUT_DIRECTION</translation>
+      <translation>LTR</translation>
     </message>
   </context>
   <context>
@@ -1104,7 +1104,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation>Runtime</translation>
+      <translation>Tempo de execução</translation>
     </message>
     <message>
       <source>Configuration</source>

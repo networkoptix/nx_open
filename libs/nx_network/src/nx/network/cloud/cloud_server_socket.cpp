@@ -87,6 +87,12 @@ bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
     return true;
 }
 
+bool CloudServerSocket::getProtocol(int* protocol) const
+{
+    *protocol = nx::network::Protocol::unassigned;
+    return true;
+}
+
 AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 {
     NX_ASSERT(false);

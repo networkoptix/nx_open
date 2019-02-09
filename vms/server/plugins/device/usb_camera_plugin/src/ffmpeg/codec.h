@@ -18,8 +18,8 @@ public:
     int open();
     void close();
 
-    int sendPacket(const AVPacket *packet) const;
-    int sendFrame(const AVFrame * frame) const;
+    int sendPacket(const AVPacket *packet);
+    int sendFrame(const AVFrame * frame);
 
     int receivePacket(AVPacket * outPacket) const;
     int receiveFrame(AVFrame * outFrame) const;
@@ -54,6 +54,7 @@ public:
     void flush();
 
 private:
+    bool m_needFlush = false;
     AVCodecContext *m_codecContext = nullptr;
     AVCodec *m_codec = nullptr;
 };

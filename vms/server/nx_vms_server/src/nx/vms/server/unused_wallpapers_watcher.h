@@ -13,7 +13,7 @@ namespace vms::server {
 /**
  * Monitor unused layout's wallpapers in the database and remove it.
  */
-class UnusedWallpapersWatcher: public QObject, public QnCommonModuleAware
+class UnusedWallpapersWatcher: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT;
     using base_type = QnCommonModuleAware;

@@ -96,8 +96,7 @@ const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 } // namespace <anonymous>
 
-
-class ArchiveScanPosition: public nx::vms::server::ServerModuleAware
+class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
@@ -193,8 +192,11 @@ private:
     std::atomic<bool> m_fullScanCanceled;
 
 public:
-    ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
+    ScanMediaFilesTask(QnStorageManager* owner, const char* threadName = nullptr):
+        QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
     {
+        if (threadName)
+            setObjectName(threadName);
     }
 
     virtual ~ScanMediaFilesTask()
@@ -410,10 +412,17 @@ public:
 class TestStorageThread: public QnLongRunnable
 {
 public:
-    TestStorageThread(QnStorageManager* owner, const nx::vms::server::Settings* settings):
+    TestStorageThread(
+        QnStorageManager* owner,
+        const nx::vms::server::Settings* settings,
+        const char* threadName = nullptr)
+        :
         m_owner(owner),
         m_settings(settings)
-    {}
+    {
+        if (threadName)
+            setObjectName(threadName);
+    }
     virtual void run() override
     {
         for (const auto& storage: storagesToTest())
@@ -442,7 +451,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
-                    m_owner->propertyDictionary()->saveParams(storage->getId());
+                    m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
         }
 
@@ -486,7 +495,8 @@ private:
 QnStorageManager::QnStorageManager(
     QnMediaServerModule* serverModule,
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
-    QnServer::StoragePool role)
+    QnServer::StoragePool role,
+    const char* threadName)
 :
     nx::vms::server::ServerModuleAware(serverModule),
     m_analyticsEventsStorage(analyticsEventsStorage),
@@ -499,11 +509,20 @@ QnStorageManager::QnStorageManager(
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(serverModule->settings().disableRename()),
     m_camInfoWriterHandler(this, serverModule->resourcePool()),
-    m_camInfoWriter(&m_camInfoWriterHandler)
+    m_camInfoWriter(&m_camInfoWriterHandler),
+    m_auxTasksTimerManager(
+        threadName
+        ? (std::string(threadName) + std::string("::auxTasksTimerManager")).c_str()
+        : nullptr)
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
-    m_testStorageThread = new TestStorageThread(this, &serverModule->settings());
+    m_testStorageThread = new TestStorageThread(
+        this,
+        &serverModule->settings(),
+        threadName
+        ? (std::string(threadName) + std::string("::TestStorageThread")).c_str()
+        : nullptr);
 
     m_oldStorageIndexes = deserializeStorageFile();
 
@@ -534,10 +553,14 @@ QnStorageManager::QnStorageManager(
     if (m_role == QnServer::StoragePool::Backup)
     {
         m_scheduleSync.reset(new QnScheduleSync(serverModule));
-        connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+        connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished,
+            this, &QnStorageManager::backupFinished, Qt::DirectConnection);
     }
 
-    m_rebuildArchiveThread = new ScanMediaFilesTask(this);
+    m_rebuildArchiveThread = new ScanMediaFilesTask(this,
+        threadName
+        ? (std::string(threadName) + std::string("::ScanMediaFilesTask")).c_str()
+        : nullptr);
     m_rebuildArchiveThread->start();
 
     m_clearMotionTimer.restart();
@@ -641,8 +664,6 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
     }
-    if (sdb)
-        sdb->flushRecords();
     // merge chunks
     {
         QnMutexLocker lk(&m_mutexStorages);
@@ -1783,9 +1804,6 @@ void QnStorageManager::clearSpace(bool forced)
                             << endl;
         NX_VERBOSE(this, clearSpaceLogMessage);
     }
-
-    // 4. DB cleanup
-    storageDbPool()->flush();
 
     if (m_role != QnServer::StoragePool::Normal)
         return;
@@ -2978,7 +2996,6 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                     notMigratedChunks << chunk;
                 }
             }
-            storageDbPool()->flush();
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
                 writeCSVCatalog(catalogName, notMigratedChunks);
@@ -3116,4 +3133,3 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     return result | storage->statusFlag();
 }
-

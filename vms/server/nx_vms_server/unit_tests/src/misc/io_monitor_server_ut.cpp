@@ -170,7 +170,7 @@ TEST(IoServerMonitorTest, main)
         ->getResourceByUniqueId<nx::vms::server::resource::Camera>(kTestCamPhysicalId);
 
     ASSERT_TRUE(camera);
-    launcher.commonModule()->statusDictionary()->setValue(camera->getId(), Qn::Online);
+    launcher.commonModule()->resourceStatusDictionary()->setValue(camera->getId(), Qn::Online);
     httpClient->doGet(url);
 
     ASSERT_EQ(

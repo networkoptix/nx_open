@@ -7,6 +7,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/match/wildcard.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
@@ -146,19 +147,25 @@ Authenticator::Result Authenticator::tryAllMethods(
     return result;
 }
 
-bool Authenticator::isPasswordCorrect(const Qn::UserAccessData& access, const QString& password)
+Qn::AuthResult Authenticator::verifyPassword(
+    const nx::network::HostAddress& clientIp,
+    const Qn::UserAccessData& access,
+    const QString& password)
 {
     const auto user = commonModule()->resourcePool()
         ->getResourceById<QnUserResource>(access.userId);
     if (!user)
-        return false;
+        return Qn::Auth_WrongLogin;
+
+    NX_VERBOSE(this, "Check %1 password '%2' for correctness...", user,
+        nx::utils::log::showPasswords() ? password : QString("******"));
 
     // TODO: Refactor and use direct checks instead of full HTTP authorization.
     namespace http = nx::network::http;
 
-    const nx::Buffer requestLine("GET / HTTP/1.1");
-    http::RequestLine request;
-    request.parse(requestLine);
+    static const nx::Buffer kRequestLine("GET / HTTP/1.1");
+    http::Request request;
+    request.requestLine.parse(kRequestLine);
 
     http::Response response;
     addAuthHeader(response);
@@ -166,21 +173,30 @@ bool Authenticator::isPasswordCorrect(const Qn::UserAccessData& access, const QS
     http::header::WWWAuthenticate unauthorized;
     if (!unauthorized.parse(http::getHeaderValue(response.headers, unauthorized.NAME)))
     {
-        return false;
+        NX_ASSERT(false, user);
+        return Qn::Auth_Forbidden;
     }
 
     http::header::DigestAuthorization digestAuthorization;
     digestAuthorization.digest->userid = user->getName().toUtf8();
     if (!http::calcDigestResponse(
-        request.method, {user->getName(), {password.toUtf8(), http::AuthTokenType::password}},
-        request.url.toString().toUtf8(), unauthorized, &digestAuthorization))
+        request.requestLine.method, {user->getName(), {password.toUtf8(), http::AuthTokenType::password}},
+        request.requestLine.url.toString().toUtf8(), unauthorized, &digestAuthorization))
     {
-        return false;
+        NX_ASSERT(false, user);
+        return Qn::Auth_Forbidden;
     }
 
-    const auto result = tryHttpDigest(
-        request, digestAuthorization, response, /*isProxy*/ false, nullptr);
-    return result == Qn::Auth_OK;
+    request.headers.emplace(digestAuthorization.NAME, digestAuthorization.serialized());
+
+    // Address is changed so lockout through authorized requests still happen but does not affect
+    // user connections.
+    const nx::network::HostAddress clientIpForLockout(clientIp.toString() + "_API");
+    const auto result = tryHttpMethods(
+        clientIpForLockout, request, response, /*isProxy*/ false, nullptr, nullptr);
+
+    NX_VERBOSE(this, "Check %1 password result: %2", user, result);
+    return result;
 }
 
 static const auto kCookieRuntimeGuid = Qn::EC2_RUNTIME_GUID_HEADER_NAME.toLower();
@@ -601,6 +617,10 @@ bool Authenticator::isLoginLockedOut(
     const auto ipIt = userData.find(address);
     if (ipIt == userData.end() || !ipIt->second.lockedOut)
         return false;
+
+    NX_VERBOSE(this, "User '%1' from %2 is locked out for about %3", name, address,
+        std::chrono::duration_cast<std::chrono::seconds>(
+            ipIt->second.failures.front() + m_lockoutOptions->lockoutTime - now));
 
     return true;
 }

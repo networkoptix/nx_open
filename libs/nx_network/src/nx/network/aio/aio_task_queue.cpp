@@ -3,18 +3,19 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/time.h>
 
 namespace nx::network::aio::detail {
 
 AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
     m_pollSet(pollSet)
 {
-    m_monotonicClock.restart();
 }
 
 qint64 AioTaskQueue::getSystemTimerVal() const
 {
-    return m_monotonicClock.elapsed();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        nx::utils::monotonicTime().time_since_epoch()).count();
 }
 
 void AioTaskQueue::addTask(SocketAddRemoveTask task)

@@ -38,13 +38,6 @@ QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
         0x01);
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);

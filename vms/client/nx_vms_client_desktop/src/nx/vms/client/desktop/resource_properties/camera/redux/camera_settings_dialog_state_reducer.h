@@ -12,7 +12,6 @@ public:
     using State = CameraSettingsDialogState;
     using ScheduleTasks = State::RecordingSettings::ScheduleTasks;
 
-    static State applyChanges(State state);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setGlobalPermissions(State state, GlobalPermissions value);
@@ -55,7 +54,7 @@ public:
     static State setForcedPtzPanTiltCapability(State state, bool value);
     static State setForcedPtzZoomCapability(State state, bool value);
     static State setRtpTransportType(State state, vms::api::RtpTransportType value);
-    static State setMotionStreamType(State state, vms::api::MotionStreamType value);
+    static State setForcedMotionStreamType(State state, vms::api::MotionStreamType value);
     static State setCustomMediaPortUsed(State state, bool value);
     static State setCustomMediaPort(State state, int value);
     static State setTrustCameraTime(State state, bool value);

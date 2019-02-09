@@ -59,13 +59,13 @@ private:
         const QString& eventTypeId) const;
 
     void handleEventMetadataPacket(
-        nx::sdk::Ptr<nx::sdk::analytics::IEventMetadataPacket> eventMetadataPacket);
+        const nx::sdk::Ptr<nx::sdk::analytics::IEventMetadataPacket>& eventMetadataPacket);
 
     void handleObjectMetadataPacket(
-        nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket> objectMetadataPacket);
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>& objectMetadataPacket);
 
     void handleEventMetadata(
-        nx::sdk::Ptr<const nx::sdk::analytics::IEventMetadata> eventMetadata,
+        const nx::sdk::Ptr<const nx::sdk::analytics::IEventMetadata>& eventMetadata,
         qint64 timestampUsec);
 
 private:

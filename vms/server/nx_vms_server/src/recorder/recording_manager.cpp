@@ -54,8 +54,8 @@ QnRecordingManager::QnRecordingManager(
     connect(
         this, &QnRecordingManager::recordingDisabled,
         serverModule->eventConnector(), &nx::vms::server::event::EventConnector::at_licenseIssueEvent);
-    m_recordingStopTime = serverModule->settings().forceStopRecordingTime();
-    m_recordingStopTime *= 1000 * 60;
+    m_recordingStopTimeMs = serverModule->settings().forceStopRecordingTime();
+    m_recordingStopTimeMs *= 1000;
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnRecordingManager::onNewResource, Qt::QueuedConnection);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnRecordingManager::onRemoveResource, Qt::QueuedConnection);
@@ -574,7 +574,7 @@ void QnRecordingManager::at_checkLicenses()
             if (errCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(licenseOverflowTime);
         }
-        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTime)
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTimeMs)
             return; // not enough license, but timeout not reached yet
 
         // Too many licenses. check if server has own recording cameras and force to disable recording

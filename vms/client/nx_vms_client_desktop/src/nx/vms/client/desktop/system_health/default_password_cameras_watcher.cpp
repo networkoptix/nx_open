@@ -15,8 +15,7 @@ struct DefaultPasswordCamerasWatcher::Private
 
     void handleCameraChanged(const QnVirtualCameraResourcePtr& camera)
     {
-        const auto status = camera->getStatus();
-        const bool canChangePassword = (status == Qn::Online) || (status == Qn::Recording);
+        const bool canChangePassword = camera->isOnline();
 
         bool changed = false;
         if (canChangePassword && camera->needsToChangeDefaultPassword())

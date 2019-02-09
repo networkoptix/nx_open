@@ -13,7 +13,7 @@
 
 namespace ec2 {
 
-class QnRuntimeTransactionLog: public QObject, public QnCommonModuleAware
+class QnRuntimeTransactionLog: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:
