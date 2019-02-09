@@ -399,7 +399,10 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     m_tcpSock->setSendTimeout(m_tcpTimeout);
 
     if (m_playNowMode)
+    {
+        m_contentBase = m_url.toString();
         return CameraDiagnostics::NoErrorResult();
+    }
 
     QByteArray response;
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
