@@ -33,6 +33,9 @@ MediaServerLauncher::MediaServerLauncher(
     if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
         addSetting(QnServer::kNoInitStoragesOnStartup, "1");
 
+    if (disabledFeatures.testFlag(DisabledFeature::noPlugins))
+        addSetting(QnServer::kNoPlugins, "1");
+
     m_cmdOptions.push_back("");
     m_cmdOptions.push_back("-e");
 }

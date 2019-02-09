@@ -1043,13 +1043,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
     m_hasSerialPort = (hasRs485 != boost::none && *hasRs485)
         || (hasRs422 != boost::none && *hasRs422);
 
-    if (isAnalogEncoder() || isProxiedAnalogEncoder() || hasSerialPort())
-    {
-        // We can't reliably determine if there's PTZ caps for analogous cameras
-        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
-        setIsUserAllowedToModifyPtzCapabilities(true);
-    }
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1291,8 +1284,8 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
         HanwhaRequestHelper helper(sharedContext());
         helper.set(
-            lit("eventsources/alarminput"),
-            {{lit("AlarmInput.%1.Enable").arg(getChannel()), kHanwhaTrue}});
+            "eventsources/alarminput",
+            {{lm("AlarmInput.%1.Enable").args(getChannel() + 1), kHanwhaTrue}});
     }
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
@@ -1394,6 +1387,17 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
     }
+
+    const bool hasContinuousMovemement = m_ptzCapabilities[core::ptz::Type::operational] &
+        Ptz::ContinuousPtrzCapabilities;
+
+    // We can't reliably determine if there's PTZ caps for analogous cameras
+    // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+    const bool userIsAllowedToModifyCapabilities = (!hasContinuousMovemement && hasSerialPort())
+        || isAnalogEncoder()
+        || isProxiedAnalogEncoder();
+
+    setIsUserAllowedToModifyPtzCapabilities(userIsAllowedToModifyCapabilities);
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -2502,7 +2506,10 @@ int HanwhaResource::streamBitrate(
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
-    streamParams.resolution = streamResolution(role);
+    if (streamParams.resolution.isEmpty())
+        streamParams.resolution = streamResolution(role); //< Set default value if empty.
+    if (streamParams.codec.isEmpty())
+        streamParams.codec = toHanwhaString(streamCodec(role)); //< Set default value if empty.
     if (bitrateKbps == 0)
     {
         // Since we can't fully control bitrate on the NVRs that don't have bypass

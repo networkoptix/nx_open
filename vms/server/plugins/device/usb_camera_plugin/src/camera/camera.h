@@ -12,16 +12,13 @@
 #include "device/video/resolution_data.h"
 #include "device/abstract_compression_type_descriptor.h"
 
-namespace nx {
-namespace usb_cam {
-
-class DiscoveryManager;
+namespace nx::usb_cam {
 
 class Camera: public std::enable_shared_from_this<Camera>
 {
 public:
     Camera(
-        DiscoveryManager* m_discoveryManager,
+        const std::string& url,
         const nxcip::CameraInfo& cameraInfo,
         nxpl::TimeProvider * const timeProvider);
     virtual ~Camera() = default;
@@ -39,6 +36,7 @@ public:
     bool hasAudio() const;
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
+    void setUrl(const std::string& url);
 
     bool ioError() const;
 
@@ -57,10 +55,11 @@ public:
 private:
     static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList;
 
-    DiscoveryManager * m_discoveryManager;
+    std::string m_url;
     nxcip::CameraInfo m_cameraInfo;
     nxpl::TimeProvider * const m_timeProvider;
     CodecParameters m_defaultVideoParams;
+    mutable std::mutex m_mutex;
 
     std::shared_ptr<AudioStream> m_audioStream;
     std::shared_ptr<VideoStream> m_videoStream;
@@ -76,5 +75,4 @@ private:
     CodecParameters getDefaultVideoParameters();
 };
 
-} // namespace usb_cams
-} // namespace nx
+} // namespace nx::usb_cams

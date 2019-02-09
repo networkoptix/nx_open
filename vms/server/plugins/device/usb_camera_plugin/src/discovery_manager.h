@@ -95,7 +95,6 @@ public:
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
     virtual int getReservedModelList( char** modelList, int* count ) override;
     void addOrUpdateCamera(const DeviceDataWithNxId& nxDevice);
-    std::string getFfmpegUrl(const std::string& nxId) const;
 
 private:
     nxpt::CommonRefManager m_refManager;

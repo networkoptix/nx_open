@@ -13,12 +13,14 @@ struct CameraBitrateCalculator
     static float suggestBitrateForQualityKbps(
         Qn::StreamQuality quality,
         QSize resolution,
-        int fps);
+        int fps,
+        const QString& codec);
 
     static float suggestBitrateForQualityKbps(
         Qn::StreamQuality quality,
         QSize resolution,
         int fps,
+        const QString& codec,
         media::CameraStreamCapability streamCapability,
         bool useBitratePerGop);
 
@@ -30,7 +32,8 @@ struct CameraBitrateCalculator
     static float getBitrateForQualityMbps(
         const QnVirtualCameraResourcePtr& camera,
         Qn::StreamQuality quality,
-        int fps);
+        int fps,
+        const QString& codec);
 
     static constexpr int kBitrateKbpsPrecisionDecimals = 1;
 };

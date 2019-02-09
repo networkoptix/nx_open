@@ -18,6 +18,7 @@ static const uint32_t kNxBasicSsrc = 20000;
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics)
     :
+    m_config(config),
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),

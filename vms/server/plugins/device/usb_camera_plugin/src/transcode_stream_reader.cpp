@@ -1,7 +1,5 @@
 #include "transcode_stream_reader.h"
 
-#include <set>
-
 namespace nx::usb_cam {
 
 TranscodeStreamReader::TranscodeStreamReader(const std::shared_ptr<Camera>& camera):

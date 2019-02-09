@@ -818,9 +818,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
     for (; i < numVideo + numAudio; ++i)
     {
         AbstractRtspEncoderPtr encoder;
+        bool isVideoTrack = (i < numVideo);
         if (d->useProprietaryFormat)
         {
-            bool isVideoTrack = (i < numVideo);
             QnRtspFfmpegEncoder* ffmpegEncoder = createRtspFfmpegEncoder(isVideoTrack);
             if (!isVideoTrack)
             {
@@ -831,7 +831,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
         }
         else
         {
-            QnAbstractMediaData::DataType dataType = i < numVideo ?
+            QnAbstractMediaData::DataType dataType = isVideoTrack ?
                 QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO;
             QnConstAbstractMediaDataPtr mediaHigh = getCameraData(dataType, MEDIA_Quality_High);
             QnConstAbstractMediaDataPtr mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
@@ -848,6 +848,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
         sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
         trackInfo->setEncoder(std::move(encoder));
+        trackInfo->mediaType = isVideoTrack ?
+            RtspServerTrackInfo::MediaType::Video : RtspServerTrackInfo::MediaType::Audio;
         d->trackInfo.insert(i, trackInfo);
     }
 

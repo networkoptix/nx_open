@@ -11,10 +11,7 @@ extern "C" {
 #include <camera/camera_plugin.h>
 #include <camera/camera_plugin_types.h>
 
-namespace nx {
-namespace usb_cam {
-namespace ffmpeg {
-namespace utils {
+namespace nx::usb_cam::ffmpeg::utils {
 
 std::string errorToString(int errorCode);
 std::string codecIdToName(AVCodecID codecId);
@@ -37,8 +34,4 @@ int suggestSampleRate(const AVCodec * codec);
 
 AVRational toFraction(float number, int precision = 100);
 
-} // namespace utils
-} // namespace ffmpeg
-} // namespace usb_cam
-} // namespace nx
-
+} // namespace nx::usb_cam::ffmpeg::utils

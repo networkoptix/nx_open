@@ -688,7 +688,8 @@ qreal LegacyCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) c
     }
 
     return core::CameraBitrateCalculator::getBitrateForQualityMbps(m_cameras.front(), quality,
-        ui->fpsSpinBox->value());
+        ui->fpsSpinBox->value(),
+        QString()); //< Calculate bitrate for default codec.
 }
 
 void LegacyCameraScheduleWidget::updateMotionAvailable()
@@ -1230,14 +1231,16 @@ void LegacyCameraScheduleWidget::at_exportScheduleButton_clicked()
                         core::CameraBitrateCalculator::getBitrateForQualityMbps(
                             sourceCamera,
                             task.streamQuality,
-                            task.fps);
+                            task.fps,
+                            QString()); //< Calculate bitrate for default codec.
 
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
                     const auto targetNormalBitrate =
                         core::CameraBitrateCalculator::getBitrateForQualityMbps(
                             camera,
                             task.streamQuality,
-                            task.fps);
+                            task.fps,
+                            QString()); //< Calculate bitrate for default codec.
 
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;

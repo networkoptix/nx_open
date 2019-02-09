@@ -4,7 +4,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "discovery_manager.h"
 #include "device/video/utils.h"
 
 namespace nx {
@@ -54,10 +53,10 @@ const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList =
 };
 
 Camera::Camera(
-    DiscoveryManager * discoveryManager,
+    const std::string& url,
     const nxcip::CameraInfo& cameraInfo,
     nxpl::TimeProvider* const timeProvider):
-    m_discoveryManager(discoveryManager),
+    m_url(url),
     m_cameraInfo(cameraInfo),
     m_timeProvider(timeProvider)
 {
@@ -177,15 +176,20 @@ CodecParameters Camera::defaultVideoParameters() const
     return m_defaultVideoParams;
 }
 
+void Camera::setUrl(const std::string& url)
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    m_url = url;
+}
+
 std::string Camera::ffmpegUrl() const
 {
-    //return m_cameraManager->ffmpegUrl();
-    return m_discoveryManager->getFfmpegUrl(m_cameraInfo.uid);
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    return m_url;
 }
 
 const nxcip::CameraInfo& Camera::info() const
 {
-    //return m_cameraManager->info();
     return m_cameraInfo;
 }
 

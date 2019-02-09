@@ -51,7 +51,7 @@ public:
 
     nxpt::CommonRefManager* refManager();
 
-protected:
+private:
     std::shared_ptr<Camera> m_camera;
 
     nxpt::CommonRefManager m_refManager;

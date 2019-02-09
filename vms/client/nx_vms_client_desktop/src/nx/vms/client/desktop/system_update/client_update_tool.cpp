@@ -156,12 +156,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::Package clientPackage;
-    nx::update::findPackage(
-        commonModule()->moduleGUID(),
-        commonModule()->engineVersion(),
-        systemInfo,
-        updateInformation,
-        /*isClient=*/true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
+    nx::update::findPackage(*commonModule(), &clientPackage, &errorMessage);
 
     if (getState() == State::initial)
     {

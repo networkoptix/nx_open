@@ -63,7 +63,7 @@ protected:
         const T& operator()() const { return m_value; }
         T& operator()() { return m_value; }
 
-        virtual QJsonValue toJson(bool brief) const override
+        virtual QJsonValue toJson([[maybe_unused]] bool brief) const override
         {
             if constexpr(isMap<T>::value)
             {

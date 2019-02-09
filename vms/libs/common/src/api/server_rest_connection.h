@@ -413,6 +413,15 @@ public:
         Result<nx::update::Information>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Asks mediaserver to run check for updates.
+     * @param changeset - changeset to be checked. It is usually a build number
+     * @param callback
+     */
+    Handle checkForUpdates(const QString& changeset,
+        Result<QnJsonRestResult>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle updateActionStop(
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
