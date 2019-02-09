@@ -579,7 +579,7 @@
               },
               {
                 "id": "Multi-Sensor Camera",
-                "label": "multi_sensor_camera"
+                "label": "multiSensorCamera"
               },
               {
                 "id": "Encoder",

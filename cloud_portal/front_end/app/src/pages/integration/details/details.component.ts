@@ -4,8 +4,8 @@ import { IntegrationService }                  from '../integration.service';
 import { DomSanitizer }                        from '@angular/platform-browser';
 import { NxRibbonService }                     from '../../../components/ribbon/ribbon.service';
 import { NxConfigService }                     from '../../../services/nx-config';
-import { TranslateService }                    from '@ngx-translate/core';
 import { NxModalMessageComponent }             from '../../../dialogs/message/message.component';
+import { NxLanguageProviderService }           from '../../../services/nx-language-provider';
 
 @Component({
     selector   : 'integration-detail-component',
@@ -16,12 +16,16 @@ import { NxModalMessageComponent }             from '../../../dialogs/message/me
 export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
 
     plugin: any;
-    config: any;
-    lang: any;
+    config: any = {};
+    lang: any = {};
 
     private setupDefaults() {
-        this.lang = this.translate.translations[this.translate.currentLang];
         this.config = this.configService.getConfig();
+        this.language
+            .translationsSubject
+            .subscribe((lang) => {
+                this.lang = lang;
+            });
     }
 
     constructor(public sanitizer: DomSanitizer,
@@ -31,17 +35,13 @@ export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
                 private configService: NxConfigService,
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
-                private translate: TranslateService) {
+                private language: NxLanguageProviderService) {
 
         this.setupDefaults();
     }
 
     ngAfterViewInit(): void {
         setTimeout(() => {
-            // on reload language service is initialized later
-            if (!this.lang) {
-                this.lang = this.translate.translations[this.translate.currentLang];
-            }
             this.integrationService
                 .pluginsSubject
                 .subscribe(res => {
@@ -52,8 +52,8 @@ export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
 
                             if (this.plugin && this.plugin.pending) {
                                 this.ribbonService.show(
-                                        this.lang.integration_preview,
-                                        this.lang.integration_back_to_edit,
+                                        this.lang.integrationPreviewRibbonText,
+                                        this.lang.integrationBackToEditText,
                                         this.config.links.admin.product.replace('%ID%', this.plugin.id)
                                 );
                             }
