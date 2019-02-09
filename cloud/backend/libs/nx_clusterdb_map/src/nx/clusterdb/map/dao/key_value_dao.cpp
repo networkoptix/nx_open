@@ -38,9 +38,17 @@ SELECT key, value FROM data
 
 )sql";
 
+
 static constexpr char kfetchValue[] = R"sql(
 
 SELECT value FROM data where key=:key
+
+)sql";
+
+
+static constexpr char kFetchKeys[] = R"sql(
+
+SELECT key from data
 
 )sql";
 
@@ -87,6 +95,19 @@ std::optional<std::string> KeyValueDao::get(
         return std::nullopt;
 
     return query->value(kValue).toString().toStdString();
+}
+
+std::set<std::string> KeyValueDao::getKeys(nx::sql::QueryContext * queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kFetchKeys);
+    query->exec();
+
+    std::set<std::string> keys;
+    while (query->next())
+        keys.emplace(query->value(kKey).toString().toStdString());
+
+    return keys;
 }
 
 } // namespace nx::clusterdb::map::dao

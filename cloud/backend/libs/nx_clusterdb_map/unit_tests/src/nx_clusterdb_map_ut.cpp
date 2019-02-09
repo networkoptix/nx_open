@@ -46,6 +46,19 @@ protected:
         thenOperationSucceeded();
     }
 
+    void givenDbWithTwoKnownKeyValuePairs()
+    {
+        givenOneDb();
+        givenKnownKeyValuePair();
+        givenSecondKnownKeyValuePair();
+
+        whenInsertKeyValuePair();
+        thenOperationSucceeded();
+
+        whenInsertSecondKeyValuePair();
+        thenOperationSucceeded();
+    }
+
     void givenTwoSynchronizedDbsWithRandomKeyValuePair()
     {
         givenTwoDbs();
@@ -66,10 +79,22 @@ protected:
         randomPair()->value = randomString();
     }
 
-    void givenRandomKeyValuePair()
+    void givenRandomKeyValuePair(size_t randomPairIndex = 0)
     {
-        randomPair()->key = randomString();
-        randomPair()->value = randomString();
+        randomPair(randomPairIndex)->key = randomString();
+        randomPair(randomPairIndex)->value = randomString();
+    }
+
+    void givenKnownKeyValuePair()
+    {
+        randomPair()->key = "A key";
+        randomPair()->value = "A value";
+    }
+
+    void givenSecondKnownKeyValuePair()
+    {
+        randomPair(1)->key = "B key";
+        randomPair(1)->value = "B value";
     }
 
     void givenTwoKeyValuePairsWithSameKey()
@@ -205,14 +230,36 @@ protected:
         db()->eventProvider().unsubscribeFromRecordRemoved(m_eventSubscriptionId);
     }
 
+    void whenRequestLowerBoundForFirstKey()
+    {
+        whenRequestLowerBoundForKey();
+    }
+
+    void whenRequestLowerBoundForSecondKey()
+    {
+        whenRequestLowerBoundForKey(/*randomPairIndex*/ 1);
+    }
+
+    void whenRequestUpperBoundForFirstKey()
+    {
+        requestUpperBoundForKey();
+    }
+
+    void whenRequestUpperBoundForSecondKey()
+    {
+        requestUpperBoundForKey(/*randomPairIndex*/ 1);
+    }
+
     void thenOperationSucceeded()
     {
         ASSERT_EQ(map::ResultCode::ok, m_result);
+        m_result = map::ResultCode::unknownError;
     }
 
     void thenOperationFailed(map::ResultCode result)
     {
         ASSERT_EQ(result, m_result);
+        m_result = map::ResultCode::unknownError;
     }
 
     void thenEventTriggered()
@@ -233,6 +280,31 @@ protected:
     void andFetchedValueIsEmpty()
     {
         ASSERT_TRUE(m_fetchedValue.empty());
+    }
+
+    void thenLowerBoundMatchesFirstKey()
+    {
+        thenLowerBoundMatchesKey();
+    }
+
+    void thenLowerBoundMatchesSecondKey()
+    {
+        thenLowerBoundMatchesKey(/*ranomdPairIndex*/ 1);
+    }
+
+    void thenUpperBoundMatchesKey(size_t randomPairIndex = 0)
+    {
+        ASSERT_EQ(m_upperBound, randomPair(randomPairIndex)->key);
+    }
+
+    void thenUpperBoundMatchesFirstKey()
+    {
+        thenUpperBoundMatchesKey();
+    }
+
+    void thenUpperBoundMatchesSecondKey()
+    {
+        thenUpperBoundMatchesKey(/*ranomnPairIndex*/ 1);
     }
 
     void andValueIsInDb(size_t dbIndex = 0)
@@ -345,6 +417,41 @@ private:
         return &m_randomPairs[index];
     }
 
+
+    void whenRequestLowerBoundForKey(size_t randomPairIndex = 0)
+    {
+        db()->dataManager().lowerBound(
+            randomPair(randomPairIndex)->key,
+            [this](map::ResultCode result, std::string key)
+        {
+            m_result = result;
+            m_lowerBound = key;
+            callbackFired();
+        });
+
+        waitForCallback();
+    }
+
+    void requestUpperBoundForKey(size_t randomPairIndex = 0)
+    {
+        db()->dataManager().upperBound(
+            randomPair(randomPairIndex)->key,
+            [this](map::ResultCode result, std::string key)
+        {
+            m_result = result;
+            m_upperBound = key;
+            callbackFired();
+        });
+
+        waitForCallback();
+    }
+
+    void thenLowerBoundMatchesKey(size_t randomPairIndex = 0)
+    {
+        ASSERT_EQ(m_lowerBound, randomPair(randomPairIndex)->key);
+    }
+
+
 private:
     struct DBContext
     {
@@ -375,6 +482,9 @@ private:
     std::atomic_bool m_eventTriggered = false;
     std::string m_eventReceivedKey;
     std::string m_eventReceivedValue;
+
+    std::string m_lowerBound;
+    std::string m_upperBound;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -466,15 +576,21 @@ TEST_F(Database, rejects_remove_with_empty_string)
     thenOperationFailed(map::ResultCode::logicError);
 }
 
-TEST_F(Database, eventprovider_triggers_record_inserted_event)
+TEST_F(Database, triggers_record_inserted_event)
 {
     givenEmptyDb();
     givenRandomKeyValuePair();
     whenSubscribeToRecordInsertedEvent();
-    whenInsertKeyValuePair();    thenOperationSucceeded();    thenEventTriggered();    andEventReceivedKeyMatchesInsertionKey();    andEventReceivedValueMatchesInsertionValue();
+    whenInsertKeyValuePair();
+
+    thenOperationSucceeded();
+    thenEventTriggered();
+
+    andEventReceivedKeyMatchesInsertionKey();
+    andEventReceivedValueMatchesInsertionValue();
 }
 
-TEST_F(Database, eventprovider_triggers_record_removed_event)
+TEST_F(Database, triggers_record_removed_event)
 {
     givenDbWithRandomKeyValuePair();
     whenSubscribeToRecordRemovedEvent();
@@ -486,7 +602,7 @@ TEST_F(Database, eventprovider_triggers_record_removed_event)
     andEventReceivedKeyMatchesRemovalKey();
 }
 
-TEST_F(Database, eventprovider_does_not_trigger_record_inserted_event_after_unsubscribing)
+TEST_F(Database, does_not_trigger_record_inserted_event_after_unsubscribing)
 {
     givenRecordInsertedEventWasAlreadyTriggered();
 
@@ -497,7 +613,7 @@ TEST_F(Database, eventprovider_does_not_trigger_record_inserted_event_after_unsu
     andEventReceivedKeyDoesNotMatchInsertionKey();
 }
 
-TEST_F(Database, eventprovider_does_not_trigger_record_removed_event_after_unsubscribing)
+TEST_F(Database, does_not_trigger_record_removed_event_after_unsubscribing)
 {
     givenRecordRemovedEventWasAlreadyTriggered();
 
@@ -508,10 +624,55 @@ TEST_F(Database, eventprovider_does_not_trigger_record_removed_event_after_unsub
     andEventReceivedKeyDoesNotMatchRemovalKey();
 }
 
+TEST_F(Database, provides_lowerbound)
+{
+    givenDbWithTwoKnownKeyValuePairs();
+
+    whenRequestLowerBoundForFirstKey();
+
+    thenOperationSucceeded();
+    thenLowerBoundMatchesFirstKey();
+
+
+    whenRequestLowerBoundForSecondKey();
+
+    thenOperationSucceeded();
+    thenLowerBoundMatchesSecondKey();
+}
+
+TEST_F(Database, provides_upperbound)
+{
+    givenDbWithTwoKnownKeyValuePairs();
+
+    whenRequestUpperBoundForFirstKey();
+
+    thenOperationSucceeded();
+    thenUpperBoundMatchesSecondKey();
+}
+
+TEST_F(Database, fails_to_provide_lowerbound)
+{
+    givenEmptyDb();
+
+    whenRequestLowerBoundForFirstKey();
+
+    thenOperationFailed(map::ResultCode::notFound);
+}
+
+TEST_F(Database, fails_to_provide_upperbound)
+{
+    givenDbWithTwoKnownKeyValuePairs();
+
+    whenRequestUpperBoundForSecondKey();
+
+    thenOperationFailed(map::ResultCode::notFound);
+}
+
 TEST_F(Database, DISABLED_multiple_databases_synchronize_insert_operation)
 {
     givenTwoDbs();
     givenRandomKeyValuePair();
+
     whenInsertKeyValuePair();
 
     thenOperationSucceeded();

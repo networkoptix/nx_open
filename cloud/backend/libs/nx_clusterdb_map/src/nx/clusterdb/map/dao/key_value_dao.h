@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <string>
 #include <optional>
 
@@ -22,6 +23,9 @@ public:
     std::optional<std::string> get(
         nx::sql::QueryContext* queryContext,
         const std::string& key);
+
+    std::set<std::string> getKeys(
+        nx::sql::QueryContext* queryContext);
 };
 
 } // namespace nx::clusterdb::map::dao

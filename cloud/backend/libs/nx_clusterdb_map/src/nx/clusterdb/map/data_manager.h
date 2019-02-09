@@ -68,6 +68,27 @@ public:
         const std::string& key,
         LookupCompletionHandler completionHandler);
 
+    /**
+     * Retrieves the first key that does not compare lexicographically lower than the given key
+     * (either it is equivalent or goes lexicographically after the key).
+     *
+     * ResultCode will returned through completionHandler will be ResultCode::notfound
+     * if no lowerbound is determined, ResultCode::ok otherwise.
+     */
+    void lowerBound(
+        const std::string& key,
+        LookupCompletionHandler completionHandler);
+
+    /**
+     * Retrieves the first key that does compares lexicographically higher than the given key.
+     *
+     * ResultCode will returned through completionHandler will be ResultCode::notfound
+     * if no upperbound is determined, ResultCode::ok otherwise.
+     */
+    void upperBound(
+        const std::string& key,
+        LookupCompletionHandler completionHandler);
+
 private:
     /**
      * Inserts/updates key/value within existing transaction.
@@ -117,6 +138,8 @@ private:
     EventProvider * m_eventProvider;
 
     dao::KeyValueDao m_keyValueDao;
+
+    QnMutex m_mutex;
 };
 
 } // namespace nx::clusterdb::map

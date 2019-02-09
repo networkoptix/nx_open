@@ -41,10 +41,13 @@ DataManager::DataManager(
     m_systemId(systemId),
     m_eventProvider(eventProvider)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(
             [this](auto&&... args)
             {
+                QnMutexLocker lock(&m_mutex);
                 insertOrUpdateReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
             });
@@ -53,6 +56,7 @@ DataManager::DataManager(
         .registerCommandHandler<command::RemoveKeyValuePair>(
             [this](auto&&... args)
             {
+                QnMutexLocker lock(&m_mutex);
                 removeReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
             });
@@ -60,6 +64,8 @@ DataManager::DataManager(
 
 DataManager::~DataManager()
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_syncEngine->incomingCommandDispatcher()
         .removeHandler<command::SaveKeyValuePair>();
 
@@ -72,6 +78,8 @@ void DataManager::insertOrUpdate(
     const std::string& value,
     UpdateCompletionHandler completionHandler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
@@ -93,6 +101,8 @@ void DataManager::remove(
     const std::string& key,
     UpdateCompletionHandler completionHandler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
@@ -114,6 +124,8 @@ void DataManager::get(
     const std::string& key,
     LookupCompletionHandler completionHandler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (key.empty())
         return completionHandler(ResultCode::logicError, std::string());
 
@@ -137,6 +149,54 @@ void DataManager::get(
                 value->has_value() ? std::move(*(*value)) : std::string());
         }
     );
+}
+
+void DataManager::lowerBound(const std::string& key, LookupCompletionHandler completionHandler)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto sharedKey = std::make_shared<std::string>();
+
+    m_queryExecutor->executeSelect(
+        [this, key, sharedKey](nx::sql::QueryContext* queryContext) mutable
+        {
+            auto keys = m_keyValueDao.getKeys(queryContext);
+            auto it = keys.lower_bound(key);
+            if (it != keys.end())
+                *sharedKey = *it;
+            return sharedKey->empty()
+                ? nx::sql::DBResult::notFound
+                : nx::sql::DBResult::ok;
+        },
+        [this, sharedKey, completionHandler = std::move(completionHandler)](
+            nx::sql::DBResult dbResult)
+        {
+            completionHandler(toResultCode(dbResult), std::move(*sharedKey));
+        });
+}
+
+void DataManager::upperBound(const std::string & key, LookupCompletionHandler completionHandler)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto sharedKey = std::make_shared<std::string>();
+
+    m_queryExecutor->executeSelect(
+        [this, key, sharedKey](nx::sql::QueryContext* queryContext) mutable
+        {
+            auto keys = m_keyValueDao.getKeys(queryContext);
+            auto it = keys.upper_bound(key);
+            if (it != keys.end())
+                *sharedKey = *it;
+            return sharedKey->empty()
+                ? nx::sql::DBResult::notFound
+                : nx::sql::DBResult::ok;
+        },
+            [this, sharedKey, completionHandler = std::move(completionHandler)](
+                nx::sql::DBResult dbResult)
+        {
+            completionHandler(toResultCode(dbResult), std::move(*sharedKey));
+        });
 }
 
 void DataManager::insertToOrUpdateDb(
