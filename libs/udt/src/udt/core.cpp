@@ -158,7 +158,8 @@ CUDT::CUDT()
     m_ullLingerExpiration = 0;
 }
 
-CUDT::CUDT(const CUDT& ancestor)
+CUDT::CUDT(const CUDT& ancestor):
+    std::enable_shared_from_this<CUDT>()
 {
     m_pSndBuffer = NULL;
     m_pRcvBuffer = NULL;
@@ -2634,7 +2635,7 @@ void CUDT::addEPoll(const int eid, int eventsToReport)
     }
 
     if (auto synPacketHandler = m_synPacketHandler)
-        synPacketHandler->addEPoll(eid, eventsToReport);
+        synPacketHandler->addEPoll(eid);
 
     if (m_bConnected && !m_bBroken && !isClosing())
     {
@@ -2772,9 +2773,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
     return hs.m_iReqType;
 }
 
-void ServerSideConnectionAcceptor::addEPoll(
-    const int eid,
-    int eventsToReport)
+void ServerSideConnectionAcceptor::addEPoll(const int eid)
 {
     CGuard lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
     m_pollIds.insert(eid);

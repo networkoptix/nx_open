@@ -646,7 +646,7 @@ int CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namelen)
     {
         s->m_pUDT->connect(name);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s->m_Status = OPENED;
         throw e;
@@ -1562,7 +1562,7 @@ int CUDT::connect(UDTSOCKET u, const sockaddr* name, int namelen)
     {
         return s_UDTUnited->connect(u, name, namelen);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1585,7 +1585,7 @@ int CUDT::shutdown(UDTSOCKET u, int how)
     {
         return s_UDTUnited->shutdown(u, how);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1603,7 +1603,7 @@ int CUDT::close(UDTSOCKET u)
     {
         return s_UDTUnited->close(u);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         // For a broken connection, there's no way to close it normally, UDT
         // will remove all the UDTSOCKET file descriptor internally there and
@@ -1625,7 +1625,7 @@ int CUDT::getpeername(UDTSOCKET u, sockaddr* name, int* namelen)
     {
         return s_UDTUnited->getpeername(u, name, namelen);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1643,7 +1643,7 @@ int CUDT::getsockname(UDTSOCKET u, sockaddr* name, int* namelen)
     {
         return s_UDTUnited->getsockname(u, name, namelen);;
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1663,7 +1663,7 @@ int CUDT::getsockopt(UDTSOCKET u, int, UDTOpt optname, void* optval, int* optlen
         udt->getOpt(optname, optval, *optlen);
         return 0;
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1683,7 +1683,7 @@ int CUDT::setsockopt(UDTSOCKET u, int, UDTOpt optname, const void* optval, int o
         udt->setOpt(optname, optval, optlen);
         return 0;
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1702,7 +1702,7 @@ int CUDT::send(UDTSOCKET u, const char* buf, int len, int)
         auto udt = s_UDTUnited->lookup(u);
         return udt->send(buf, len);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1731,7 +1731,7 @@ int CUDT::recv(UDTSOCKET u, char* buf, int len, int)
         }
         return ret;
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         // This deletion is needed since library doesn't
         // take care of the EPOLL notification properly
@@ -1756,7 +1756,7 @@ int CUDT::sendmsg(UDTSOCKET u, const char* buf, int len, int ttl, bool inorder)
         auto udt = s_UDTUnited->lookup(u);
         return udt->sendmsg(buf, len, ttl, inorder);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1780,7 +1780,7 @@ int CUDT::recvmsg(UDTSOCKET u, char* buf, int len)
         auto udt = s_UDTUnited->lookup(u);
         return udt->recvmsg(buf, len);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1799,7 +1799,7 @@ int64_t CUDT::sendfile(UDTSOCKET u, fstream& ifs, int64_t& offset, int64_t size,
         auto udt = s_UDTUnited->lookup(u);
         return udt->sendfile(ifs, offset, size, block);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1823,7 +1823,7 @@ int64_t CUDT::recvfile(UDTSOCKET u, fstream& ofs, int64_t& offset, int64_t size,
         auto udt = s_UDTUnited->lookup(u);
         return udt->recvfile(ofs, offset, size, block);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1847,7 +1847,7 @@ int CUDT::select(int, ud_set* readfds, ud_set* writefds, ud_set* exceptfds, cons
     {
         return s_UDTUnited->select(readfds, writefds, exceptfds, timeout);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1876,7 +1876,7 @@ int CUDT::selectEx(const vector<UDTSOCKET>& fds, vector<UDTSOCKET>* readfds, vec
     {
         return s_UDTUnited->selectEx(fds, readfds, writefds, exceptfds, msTimeOut);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1899,7 +1899,7 @@ int CUDT::epoll_create()
     {
         return s_UDTUnited->epoll_create();
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1917,7 +1917,7 @@ int CUDT::epoll_add_usock(const int eid, const UDTSOCKET u, const int* events)
     {
         return s_UDTUnited->epoll_add_usock(eid, u, events);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1935,7 +1935,7 @@ int CUDT::epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events)
     {
         return s_UDTUnited->epoll_add_ssock(eid, s, events);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1953,7 +1953,7 @@ int CUDT::epoll_remove_usock(const int eid, const UDTSOCKET u)
     {
         return s_UDTUnited->epoll_remove_usock(eid, u);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1971,7 +1971,7 @@ int CUDT::epoll_remove_ssock(const int eid, const SYSSOCKET s)
     {
         return s_UDTUnited->epoll_remove_ssock(eid, s);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -1992,7 +1992,7 @@ int CUDT::epoll_wait(
     {
         return s_UDTUnited->epoll_wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -2010,7 +2010,7 @@ int CUDT::epoll_interrupt_wait(const int eid)
     {
         return s_UDTUnited->epoll_interrupt_wait(eid);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -2028,7 +2028,7 @@ int CUDT::epoll_release(const int eid)
     {
         return s_UDTUnited->epoll_release(eid);
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;
@@ -2053,7 +2053,7 @@ int CUDT::perfmon(UDTSOCKET u, CPerfMon* perf, bool clear)
         udt->sample(perf, clear);
         return 0;
     }
-    catch (CUDTException e)
+    catch (const CUDTException& e)
     {
         s_UDTUnited->setError(new CUDTException(e));
         return ERROR;

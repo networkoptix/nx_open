@@ -806,7 +806,6 @@ CRcvQueue::CRcvQueue(
     int size,
     int payload,
     int ipVersion,
-    int hsize,
     UdpChannel* c,
     CTimer* t)
     :
@@ -952,7 +951,7 @@ void CRcvQueue::worker()
                 }
             }
         }
-        catch (CUDTException /*e*/)
+        catch (const CUDTException& /*e*/)
         {
             //socket has been removed before connect finished? ignoring error...
         }

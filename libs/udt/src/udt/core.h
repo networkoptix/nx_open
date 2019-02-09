@@ -77,7 +77,7 @@ public:
      */
     int processConnectionRequest(sockaddr* addr, CPacket& packet);
 
-    void addEPoll(const int eid, int eventsToReport);
+    void addEPoll(const int eid);
     void removeEPoll(const int eid);
 
 private:
@@ -92,7 +92,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class CUDT:
-    public std::enable_shared_from_this<CUDT>
+    private std::enable_shared_from_this<CUDT>
 {
 public: //API
     CUDT();
