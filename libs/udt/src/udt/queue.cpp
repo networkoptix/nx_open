@@ -353,7 +353,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
             return;
         }
 
-        remove_(u.get());
+        remove_(n);
     }
 
     insert_(1, u);
@@ -373,9 +373,9 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
         return -1;
 
     std::shared_ptr<CUDT> u = m_nodeHeap[0]->socket.lock();
-    remove_(u.get());
+    remove_(m_nodeHeap[0]);
 
-    if (!u->connected() || u->broken())
+    if (!u || !u->connected() || u->broken())
         return -1;
 
     // pack a packet from the socket
@@ -395,7 +395,7 @@ void CSndUList::remove(CUDT* u)
 {
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
-    remove_(u);
+    remove_(u->sNode());
 }
 
 uint64_t CSndUList::getNextProcTime()
@@ -451,10 +451,8 @@ void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
     }
 }
 
-void CSndUList::remove_(CUDT* u)
+void CSndUList::remove_(CSNode* n)
 {
-    CSNode* n = u->sNode();
-
     if (n->locationOnHeap >= 0)
     {
         // remove the node from heap
@@ -808,7 +806,6 @@ CRcvQueue::CRcvQueue(
     int size,
     int payload,
     int ipVersion,
-    int hsize,
     UdpChannel* c,
     CTimer* t)
     :
@@ -954,7 +951,7 @@ void CRcvQueue::worker()
                 }
             }
         }
-        catch (CUDTException /*e*/)
+        catch (const CUDTException& /*e*/)
         {
             //socket has been removed before connect finished? ignoring error...
         }

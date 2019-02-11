@@ -41,7 +41,8 @@ int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
         {
             QnLiveStreamParams p(params);
             p.quality = (Qn::StreamQuality) i;
-            int bitrate = m_actiRes->suggestBitrateForQualityKbps((Qn::StreamQuality) i, params.resolution, params.fps, getRole());
+            int bitrate = m_actiRes->suggestBitrateForQualityKbps((Qn::StreamQuality) i,
+                params.resolution, params.fps, params.codec, getRole());
             if (abs(bitrate - srcBitrate) < bitrateDelta)
             {
                 quality = p.quality;
@@ -165,7 +166,6 @@ bool QnActiStreamReader::isStreamOpened() const
 {
     return m_multiCodec.isStreamOpened();
 }
-
 
 void QnActiStreamReader::pleaseStop()
 {

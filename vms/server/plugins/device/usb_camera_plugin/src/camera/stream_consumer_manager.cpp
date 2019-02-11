@@ -59,7 +59,6 @@ void PacketConsumerManager::pushPacket(const std::shared_ptr<ffmpeg::Packet>& pa
         if (consumerLocked == consumer.lock())
             consumerLocked->pushPacket(packet);
     }
-
 }
 
 } // namespace nx::usb_cam

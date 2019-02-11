@@ -1,3 +1,5 @@
+#include <future>
+
 #include <QtCore/QThread>
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
@@ -129,7 +131,7 @@ void ServerUpdateTool::loadInternalState()
                 // We have no idea whether update files are still good on server.
                 // The most simple solution - to restart upload process.
                 // TODO: Check if we really need more robust state restoration.
-                m_updateCheck = checkUpdateFromFile(stored.file);
+                m_checkFileUpdate = checkUpdateFromFile(stored.file);
                 break;
             default:
                 m_offlineUpdaterState = OfflineUpdateState::initial;
@@ -146,11 +148,6 @@ void ServerUpdateTool::saveInternalState()
     QByteArray raw;
     QJson::serialize(stored, &raw);
     qnSettings->setSystemUpdaterState(raw);
-}
-
-std::future<nx::update::UpdateContents> ServerUpdateTool::getUpdateCheck()
-{
-    return std::move(m_updateCheck);
 }
 
 std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(const QString& file)
@@ -676,12 +673,7 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
-    nx::update::findPackage(
-        commonModule()->moduleGUID(),
-        commonModule()->engineVersion(),
-        systemInfo,
-        m_updateManifest,
-        /*isClient=*/true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
+    nx::update::findPackage(*commonModule(), &contents.clientPackage, &errorMessage);
     // TODO: Should move this to Widget somehow.
     verifyUpdateManifest(contents, {});
     return contents;
@@ -1037,6 +1029,58 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
     return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
 }
+
+std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(
+    const QString& updateUrl)
+{
+    return checkSpecificChangeset(updateUrl, "latest");
+}
+
+std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificChangeset(
+    const QString& updateUrl,
+    const QString& changeset)
+{
+    auto connection = getServerConnection(commonModule()->currentServer());
+    auto engineVersion = commonModule()->engineVersion();
+
+    return std::async(
+        [updateUrl, connection, engineVersion, changeset]() -> UpdateContents
+        {
+            UpdateContents contents;
+
+            contents.info = nx::update::updateInformation(updateUrl, engineVersion,
+                nx::update::kLatestVersion, &contents.error);
+            contents.sourceType = nx::update::UpdateSourceType::internet;
+            contents.source = lit("%1 for build=%2").arg(updateUrl, changeset);
+
+            if ((contents.error == nx::update::InformationError::httpError
+                || contents.error == nx::update::InformationError::networkError)
+                && connection)
+            {
+                NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
+                auto promise = std::make_shared<std::promise<bool>>();
+                contents.source = lit("%1 for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
+                contents.info = {};
+                auto proxyCheck = promise->get_future();
+                connection->checkForUpdates(changeset,
+                    [promise = std::move(promise), &contents](bool success,
+                        rest::Handle /*handle*/, const QnJsonRestResult& response)
+                    {
+                        if (success)
+                            contents.info = response.deserialized<nx::update::Information>();
+                        else
+                            contents.error = nx::update::InformationError::networkError;
+                        QnLexical::deserialize(response.errorString, &contents.error);
+                        promise->set_value(success);
+                    });
+
+                proxyCheck.wait();
+            }
+
+            return contents;
+        });
+}
+
 
 nx::utils::SoftwareVersion getCurrentVersion(
     const nx::vms::api::SoftwareVersion& engineVersion,

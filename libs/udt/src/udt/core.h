@@ -77,7 +77,7 @@ public:
      */
     int processConnectionRequest(sockaddr* addr, CPacket& packet);
 
-    void addEPoll(const int eid, int eventsToReport);
+    void addEPoll(const int eid);
     void removeEPoll(const int eid);
 
 private:
@@ -108,6 +108,7 @@ public: //API
     static int listen(UDTSOCKET u, int backlog);
     static UDTSOCKET accept(UDTSOCKET u, sockaddr* addr, int* addrlen);
     static int connect(UDTSOCKET u, const sockaddr* name, int namelen);
+    static int shutdown(UDTSOCKET u, int how);
     static int close(UDTSOCKET u);
     static int getpeername(UDTSOCKET u, sockaddr* name, int* namelen);
     static int getsockname(UDTSOCKET u, sockaddr* name, int* namelen);
@@ -145,7 +146,7 @@ public: // internal API
     bool connected() const { return m_bConnected; }
     bool listening() const { return m_bListening; }
     bool shutdown() const { return m_bShutdown; }
-    
+
     int decrementBrokenCounter() { return m_iBrokenCounter--; }
 
     void setIsClosing(bool val);
@@ -170,13 +171,13 @@ public: // internal API
     const CHandShake& connReq() const { return m_ConnReq; }
     const CHandShake& connRes() const { return m_ConnRes; }
 
-    UDTSOCKET socketId() const { return m_SocketID; }
+    UDTSOCKET socketId() const { return m_SocketId; }
     UDTSockType sockType() const { return m_iSockType; }
     int ipVersion() const { return m_iIPversion; }
 
     void setSocket(UDTSOCKET socketId, UDTSockType sockType, int ipVersion)
     {
-        m_SocketID = socketId;
+        m_SocketId = socketId;
         m_iSockType = sockType;
         m_iIPversion = ipVersion;
     }
@@ -187,7 +188,7 @@ public: // internal API
     CRcvQueue& rcvQueue();
 
     void setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer);
-    
+
     CSndBuffer* sndBuffer() { return m_pSndBuffer; }
     CRcvBuffer* rcvBuffer() { return m_pRcvBuffer; }
 
@@ -258,6 +259,8 @@ public: // internal API
     //    None.
 
     void connect(const sockaddr* peer, CHandShake* hs);
+
+    int shutdown(int how);
 
     // Functionality:
     //    Close the opened UDT entity.
@@ -384,7 +387,7 @@ public:
     static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Identification
-    UDTSOCKET m_SocketID;                        // UDT socket number
+    UDTSOCKET m_SocketId;                        // UDT socket number
     UDTSockType m_iSockType;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
     UDTSOCKET m_PeerID;                // peer id, for multiplexer
 
@@ -487,7 +490,7 @@ private: // synchronization: mutexes and conditions
     pthread_mutex_t m_RecvDataLock;              // lock associated to m_RecvDataCond
 
     pthread_mutex_t m_SendLock;                  // used to synchronize "send" call
-    pthread_mutex_t m_RecvLock;                  // used to synchronize "recv" call
+    std::mutex m_RecvLock;                  // used to synchronize "recv" call
 
     void initSynch();
     void destroySynch();

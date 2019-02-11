@@ -291,14 +291,16 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                         nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
                             sourceCamera,
                             task.streamQuality,
-                            task.fps);
+                            task.fps,
+                            QString()); //< Bitrate for default codec.
 
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
                     const auto targetNormalBitrate =
                         nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
                             camera,
                             task.streamQuality,
-                            task.fps);
+                            task.fps,
+                            QString()); //< Bitrate for default codec.
 
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;
@@ -359,4 +361,3 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     }
     menu()->triggerIfPossible(action::SaveLayoutAction, layout);
 }
-

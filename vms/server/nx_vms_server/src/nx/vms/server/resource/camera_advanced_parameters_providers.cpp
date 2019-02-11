@@ -536,7 +536,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
         }
 
         option.bitrateKbps = static_cast<int>(QnSecurityCamResource::rawSuggestBitrateKbps(
-            Qn::StreamQuality::normal, option.resolution, option.fps));
+            Qn::StreamQuality::normal, option.resolution, option.fps, option.codec));
 
         optionsByCodec[option.codec].push_back(option);
     }

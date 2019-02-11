@@ -3,8 +3,7 @@
 #include <map>
 #include <optional>
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 class TimestampMapper
 {
@@ -48,5 +47,4 @@ private:
     static constexpr int kTimestampMaxSize = 30;
 };
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam
