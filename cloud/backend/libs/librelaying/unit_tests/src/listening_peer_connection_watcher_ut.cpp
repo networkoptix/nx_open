@@ -99,7 +99,7 @@ private:
         m_watcher->start([this](auto errorCode) { saveConnectionClosure(errorCode); });
     }
 
-    void saveConnectionClosure(SystemError::ErrorCode errorCode)
+    void saveConnectionClosure(SystemError::ErrorCode /*errorCode*/)
     {
         // TODO
     }
