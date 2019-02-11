@@ -101,21 +101,12 @@ SdkObjectFactory::SdkObjectFactory(QnMediaServerModule* serverModule):
 
 bool SdkObjectFactory::init()
 {
-    clearActionDescriptorList();
-
     if (!initPluginResources())
         return false;
 
     if (!initEngineResources())
         return false;
 
-    return true;
-}
-
-bool SdkObjectFactory::clearActionDescriptorList()
-{
-    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
-    descriptorManager.clearRuntimeInfo();
     return true;
 }
 
