@@ -394,7 +394,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     contents.verified = true;
 
-    return contents.isValid();
+    return contents.isValidToInstall();
 }
 
 } // namespace nx::vms::client::desktop

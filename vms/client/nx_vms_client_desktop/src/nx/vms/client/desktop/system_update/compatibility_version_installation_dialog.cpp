@@ -208,7 +208,7 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
     {
         m_statusCheckTimer->stop();
 
-        if (m_private->updateContents.isValid())
+        if (m_private->updateContents.isValidToInstall())
         {
             m_private->clientUpdateTool->setUpdateTarget(m_private->updateContents);
         }

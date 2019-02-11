@@ -459,7 +459,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     using Error = nx::update::InformationError;
     using SourceType = nx::update::UpdateSourceType;
 
-    bool validUpdate = contents.isValid();
+    bool validUpdate = contents.isValidToInstall();
     auto source = contents.sourceType;
 
     QString internalError = nx::update::toString(contents.error);
