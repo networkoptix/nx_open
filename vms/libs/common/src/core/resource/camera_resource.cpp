@@ -98,12 +98,16 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
             if (key == kUserEnabledAnalyticsEnginesProperty)
             {
                 m_cachedUserEnabledAnalyticsEngines.reset();
+                m_cachedSupportedEventTypes.reset();
+                m_cachedSupportedObjectTypes.reset();
                 emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
             }
 
             if (key == kCompatibleAnalyticsEnginesProperty)
             {
                 m_cachedCompatibleAnalyticsEngines.reset();
+                m_cachedSupportedEventTypes.reset();
+                m_cachedSupportedObjectTypes.reset();
                 emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
             }
 
