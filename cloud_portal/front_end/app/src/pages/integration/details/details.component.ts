@@ -52,8 +52,8 @@ export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
 
                             if (this.plugin && this.plugin.pending) {
                                 this.ribbonService.show(
-                                        this.lang.integrationPreviewRibbonText,
-                                        this.lang.integrationBackToEditText,
+                                        this.lang.integration.previewRibbonText,
+                                        this.lang.integration.backToEditText,
                                         this.config.links.admin.product.replace('%ID%', this.plugin.id)
                                 );
                             }

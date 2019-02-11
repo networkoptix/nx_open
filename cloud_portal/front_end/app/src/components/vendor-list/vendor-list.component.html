@@ -1,4 +1,4 @@
-<nx-pre-loader *ngIf="vendors == undefined"></nx-pre-loader>
+<nx-pre-loader *ngIf="!vendors"></nx-pre-loader>
 
 <div class="row pl-3 pr-3 pb-2 m-0 campage-info" [hidden]="filter.query" *ngIf="vendors && vendors.length">
     <div class="col-12 col-sm-6 row">
