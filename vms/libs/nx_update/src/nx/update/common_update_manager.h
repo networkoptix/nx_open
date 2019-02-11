@@ -35,7 +35,15 @@ public:
     vms::api::SoftwareVersion targetVersion() const;
 
 private:
-    std::atomic<bool> m_downloaderFailed = false;
+    enum class DownloaderFailDetail
+    {
+        noError,
+        internalError,
+        noFreeSpace,
+        downloadFailed
+    };
+
+    std::atomic<DownloaderFailDetail> m_downloaderFailDetail = DownloaderFailDetail::noError;
 
     void onGlobalUpdateSettingChanged();
     void onDownloaderFailed(const QString& fileName);
