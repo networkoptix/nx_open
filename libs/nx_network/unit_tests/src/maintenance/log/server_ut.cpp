@@ -76,9 +76,7 @@ protected:
         {
             assertLoggerEquality(
                 loggers[i], 
-                loggersReturnedByServer.loggers[i],
-                /*compareId*/ true,
-                /*comparePath*/ true);
+                loggersReturnedByServer.loggers[i]);
         }
     }
 
