@@ -9,9 +9,10 @@ namespace nx {
 class CameraResourceStub: public QnVirtualCameraResource
 {
     using base_type = QnVirtualCameraResource;
+
 public:
     CameraResourceStub(Qn::LicenseType licenseType = Qn::LC_Professional);
-    ~CameraResourceStub();
+    virtual ~CameraResourceStub() override;
 
     virtual Qn::ResourceStatus getStatus() const override;
 
