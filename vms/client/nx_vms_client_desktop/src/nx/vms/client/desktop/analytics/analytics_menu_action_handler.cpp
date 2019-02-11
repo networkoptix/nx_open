@@ -2,26 +2,21 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
-
 #include <QtWidgets/QAction>
 
 #include <api/global_settings.h>
-
 #include <client/client_module.h>
-
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
 #include <ui/graphics/items/resource/media_resource_widget.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include "analytics_objects_visualization_manager.h"
 

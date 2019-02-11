@@ -11,10 +11,9 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
 #include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
-
-#include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
 
