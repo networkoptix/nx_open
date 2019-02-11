@@ -21,9 +21,11 @@ fi
 # Use Ninja for Linux and Cygwin, if it is available on PATH.
 if which ninja >/dev/null
 then
-    GEN_OPTIONS=( -GNinja ) #< Generate for Ninja and gcc. Use all available CPU cores.
+    GEN_OPTIONS=( -GNinja ) #< Generate for Ninja and gcc; Ninja uses all available CPU cores.
+    BUILD_OPTIONS=()
 else
-    GEN_OPTIONS=() #< Generate for GNU make and gcc. ATTENTION: Uses 1 CPU core only.
+    GEN_OPTIONS=() #< Generate for GNU make and gcc.
+    BUILD_OPTIONS=( -- -j ) #< Use all available CPU cores.
 fi
 
 case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
@@ -35,6 +37,7 @@ case "$(uname -s)" in #< Check if running in Windows from Cygwin/MinGW.
         else # Assuming Windows-native cmake is on PATH.
             GEN_OPTIONS=( -Ax64 -Tv140,host=x64 ) #< Generate for Visual Studio 2015 compiler.
             SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows-native cmake requires Windows path.
+            BUILD_OPTIONS=()
         fi
         ;;
 esac
@@ -44,8 +47,8 @@ esac
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-    cmake "$SOURCE_DIR" ${GEN_OPTIONS[@]+"${GEN_OPTIONS[@]}"} "$@"
-    cmake --build .
+    cmake "$SOURCE_DIR" `# allow empty array #` ${GEN_OPTIONS[@]+"${GEN_OPTIONS[@]}"} "$@"
+    cmake --build . `# allow empty array #` ${BUILD_OPTIONS[@]+"${BUILD_OPTIONS[@]}"}
 )
 cd "$BUILD_DIR" #< Restore the required current directory after exiting the subshell.
 
