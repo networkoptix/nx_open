@@ -275,15 +275,16 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     m_objectTypeMenu->clear();
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
-    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(q->commonModule());
-    const auto enabledEngines = deviceDescriptorManager.enabledEngineIds(cameras);
+    QSet<QnUuid> enabledEngines;
+    for (const auto& camera: cameras)
+        enabledEngines.unite(camera->enabledAnalyticsEngines());
 
     if (!objectTypeDescriptors.empty())
     {
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
-            if (enabledEngines.find(engineId) != enabledEngines.cend())
+            if (enabledEngines.contains(engineId))
                 engineById[engineId].name = engineDescriptor.name;
         }
 
@@ -291,7 +292,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
         {
             for (const auto& scope: objectTypeDescriptor.scopes)
             {
-                if (enabledEngines.find(scope.engineId) != enabledEngines.cend())
+                if (enabledEngines.contains(scope.engineId))
                 {
                     engineById[scope.engineId].objectTypes
                         .emplace(objectTypeId, objectTypeDescriptor);
