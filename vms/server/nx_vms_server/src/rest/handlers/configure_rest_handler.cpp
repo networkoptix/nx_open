@@ -28,6 +28,7 @@
 #include <nx/vms/utils/system_merge_processor.h>
 
 #include "private/multiserver_request_helper.h"
+#include <media_server/new_system_flag_watcher.h>
 
 namespace
 {
@@ -119,6 +120,8 @@ int QnConfigureRestHandler::execute(
     {
         owner->globalSettings()->setSystemName(data.systemName);
         owner->globalSettings()->synchronizeNowSync();
+        //< Update it now to prevent race condition. Normally it is updated with delay.
+        serverModule()->findInstance<QnNewSystemServerFlagWatcher>()->update();
     }
 
     /* set system id and move tran log time */
