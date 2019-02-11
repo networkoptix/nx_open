@@ -54,16 +54,15 @@ class ErrorCodes(Enum):
     not_acceptable = 'notAcceptable'
 
     def log_level(self):
-        if self in (ErrorCodes.ok,
+        if self in (ErrorCodes.account_exists,
+                    ErrorCodes.account_not_activated,
+                    ErrorCodes.bad_username,
+                    ErrorCodes.ok,
                     ErrorCodes.not_authorized,
                     ErrorCodes.not_found,
-                    ErrorCodes.account_activated,
-                    ErrorCodes.account_exists,
-                    ErrorCodes.wrong_old_password,
-                    ErrorCodes.account_not_activated):
+                    ErrorCodes.wrong_old_password):
             return logging.INFO
         if self in (ErrorCodes.account_blocked,
-                    ErrorCodes.bad_username,
                     ErrorCodes.forbidden,
                     ErrorCodes.invalid_nonce,
                     ErrorCodes.wrong_code,
