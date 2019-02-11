@@ -11,32 +11,21 @@ namespace usb_cam {
 
 namespace {
 
-static size_t getPriorityCodecIndex(
-    const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
-    const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
-{
-    for (const auto codecId : videoCodecPriorityList)
-    {
-        size_t index = 0;
-        for (const auto& descriptor : codecDescriptorList)
-        {
-            if (codecId == descriptor->toNxCompressionType())
-                return index;
-            ++index;
-        }
-    }
-    return codecDescriptorList.size();
-}
-
 static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
     const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
     const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
 {
-    size_t index = getPriorityCodecIndex(videoCodecPriorityList, codecDescriptorList);
-    if (index < codecDescriptorList.size())
-        return codecDescriptorList[index];
-    else if (codecDescriptorList.size() > 0)
+    for (const auto codecId: videoCodecPriorityList)
+    {
+        for (const auto& descriptor: codecDescriptorList)
+        {
+            if (codecId == descriptor->toNxCompressionType())
+                return descriptor;
+        }
+    }
+    if (!codecDescriptorList.empty())
         return codecDescriptorList[0];
+
     return nullptr;
 }
 
@@ -70,7 +59,7 @@ void Camera::setCredentials(const char * username, const char * password)
 
 bool Camera::initialize()
 {
-    if (isInitialized())
+    if (m_compressionTypeDescriptor)
         return true;
 
     auto codecList = device::video::getSupportedCodecs(ffmpegUrl().c_str());
@@ -100,12 +89,12 @@ bool Camera::initialize()
         weak_from_this(),
         m_audioEnabled);
 
-    return isInitialized();
+    return true;
 }
 
 bool Camera::isInitialized() const
 {
-    return m_compressionTypeDescriptor && m_videoStream && m_audioStream;
+    return m_compressionTypeDescriptor != nullptr;
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()

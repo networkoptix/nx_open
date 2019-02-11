@@ -20,7 +20,7 @@ public:
     Camera(
         const std::string& url,
         const nxcip::CameraInfo& cameraInfo,
-        nxpl::TimeProvider * const timeProvider);
+        nxpl::TimeProvider* const timeProvider);
     virtual ~Camera() = default;
 
     virtual void setCredentials( const char* username, const char* password );
@@ -44,7 +44,7 @@ public:
     int lastError() const;
 
     uint64_t millisSinceEpoch() const;
-    nxpl::TimeProvider * const timeProvider() const;
+    nxpl::TimeProvider* const timeProvider() const;
 
     const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
     CodecParameters defaultVideoParameters() const;
@@ -57,7 +57,7 @@ private:
 
     std::string m_url;
     nxcip::CameraInfo m_cameraInfo;
-    nxpl::TimeProvider * const m_timeProvider;
+    nxpl::TimeProvider* const m_timeProvider;
     CodecParameters m_defaultVideoParams;
     mutable std::mutex m_mutex;
 

@@ -8,7 +8,6 @@
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
 
-
 namespace nx::usb_cam {
 
 namespace  {
