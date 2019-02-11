@@ -13,7 +13,7 @@ struct ClientInfo
     std::string peerName;
 };
 
-class ListeningPeerConnectionWatcher:
+class NX_RELAYING_API ListeningPeerConnectionWatcher:
     public nx::network::aio::BasicPollable
 {
     using base_type = nx::network::aio::BasicPollable;
