@@ -2224,7 +2224,9 @@ void MultiServerUpdatesWidget::syncStatusVisibility()
 
     if (m_stateTracker->hasVerificationErrors())
         statusMode = StatusMode::reportErrors;
-    if (m_updateInfo.alreadyInstalled)
+    else if (m_stateTracker->hasStatusErrors())
+        statusMode = StatusMode::remoteStatus;
+    else if (m_updateInfo.alreadyInstalled)
         statusMode = StatusMode::hidden;
 
     m_statusItemDelegate->setStatusMode(statusMode);

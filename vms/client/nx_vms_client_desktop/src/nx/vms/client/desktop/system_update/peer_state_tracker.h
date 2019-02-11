@@ -113,6 +113,7 @@ public:
     void clearVerificationErrors();
 
     bool hasVerificationErrors() const;
+    bool hasStatusErrors() const;
 
 public:
     std::map<QnUuid, nx::update::Status::Code> getAllPeerStates() const;
