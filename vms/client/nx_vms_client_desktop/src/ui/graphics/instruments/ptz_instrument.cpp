@@ -300,7 +300,6 @@ void PtzInstrument::handlePtzRedirect(QnMediaResourceWidget* widget)
         if (!ptzTargetItems.empty())
             workbench()->setItem(Qn::ZoomedRole, *ptzTargetItems.cbegin());
     }
-
 }
 
 bool PtzInstrument::ensurePtzRedirectedCameraIsOnLayout(
