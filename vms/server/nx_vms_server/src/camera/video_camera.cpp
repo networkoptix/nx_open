@@ -678,19 +678,13 @@ void QnVideoCamera::startLiveCacheIfNeeded()
     }
 }
 
-QnLiveStreamProviderPtr QnVideoCamera::getPrimaryReader()
-{
-    return getLiveReader(QnServer::HiQualityCatalog);
-}
-
-QnLiveStreamProviderPtr QnVideoCamera::getSecondaryReader()
-{
-    return getLiveReader(QnServer::LowQualityCatalog);
-}
-
-QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog, bool ensureInitialized)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(
+    QnServer::ChunksCatalog catalog, bool ensureInitialized, bool createIfNotExist)
 {
     QnMutexLocker lock( &m_getReaderMutex );
+    if (!createIfNotExist)
+        return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
+
     return getLiveReaderNonSafe( catalog, ensureInitialized);
 }
 

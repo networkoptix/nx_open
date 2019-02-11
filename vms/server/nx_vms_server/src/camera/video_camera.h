@@ -40,10 +40,10 @@ public:
 
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
-        bool ensureInitialized = true) = 0;
+        bool ensureInitialized = true, bool createIfNotExist = true) = 0;
 
-    virtual QnLiveStreamProviderPtr getPrimaryReader() = 0;
-    virtual QnLiveStreamProviderPtr getSecondaryReader() = 0;
+    QnLiveStreamProviderPtr getPrimaryReader() { return getLiveReader(QnServer::HiQualityCatalog); }
+    QnLiveStreamProviderPtr getSecondaryReader() { return getLiveReader(QnServer::LowQualityCatalog); }
 
     virtual int copyLastGop(
         MotionStreamType streamIndex,
@@ -109,9 +109,7 @@ public:
 
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
-        bool ensureInitialized = true) override;
-    virtual QnLiveStreamProviderPtr getPrimaryReader() override;
-    virtual QnLiveStreamProviderPtr getSecondaryReader() override;
+        bool ensureInitialized = true, bool createIfNotExist = true) override;
 
     virtual int copyLastGop(
         MotionStreamType streamIndex,
