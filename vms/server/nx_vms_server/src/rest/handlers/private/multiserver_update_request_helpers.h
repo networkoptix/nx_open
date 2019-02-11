@@ -5,7 +5,7 @@
 #include <nx/update/common_update_manager.h>
 #include "multiserver_request_helper.h"
 
-class QnCommonModule;
+class QnMediaServerModule;
 class QnEmptyRequestData;
 
 namespace nx::update { struct Status; };
@@ -14,7 +14,7 @@ namespace detail {
 
 void checkUpdateStatusRemotely(
     const IfParticipantPredicate& ifParticipantPredicate,
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     const QString& path,
     QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
