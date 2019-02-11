@@ -20,7 +20,7 @@ Server to be stored in its database and visualized in the Client.
 From the developers' point of view, an Analytics Plugin is a dynamic library (`.dll` on Windows,
 `.so` on Linux) which exports a single `extern "C"` entry point function. Such function is a
 factory for objects inherited from a dedicated SDK abstract class (in other words, implementing a
-dedicated interface) `class nx::sdk::Analytics::IPlugin` (`src/nx/sdk/analytics/i_plugin.h`),
+dedicated interface) `class nx::sdk::analytics::IPlugin` (`src/nx/sdk/analytics/i_plugin.h`),
 derived from `class nx::sdk::IPlugin` (`src/nx/sdk/i_plugin.h`). This base interface also defines
 the name and the prototype of the entry point function.
 
