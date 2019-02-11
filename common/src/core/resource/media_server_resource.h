@@ -117,6 +117,7 @@ public:
 
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isArmServer(const QnResourcePtr &resource);
+    static bool requiresEdgeLicense(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;

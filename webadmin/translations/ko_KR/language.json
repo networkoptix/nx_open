@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "업데이트 알림 활성화",
         "upnpPortMappingEnabled": "UPNP 포트 매핑 사용",
         "useTextEmailFormat": "일반 텍스트로 이메일 보내기",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "이메일에 Windows 줄넘김 사용"
     },
     "info": {
         "tabs": {

@@ -679,11 +679,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable native presets, use system presets instead</source>
-      <translation>Відключити власні налаштування, натомість використовувати системні</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>Попередження. Власні пресети камери стануть недоступними.</translation>
     </message>
@@ -761,6 +756,31 @@
       <location/>
       <source>Logical ID</source>
       <translation>Логічний ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Preferred PTZ preset type:</source>
+      <translation>Тип бажаного налаштування PTZ:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation>Система</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native</source>
+      <translation>Оригінальне</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports pan and tilt</source>
+      <translation>Ця камера підтримує панорамування і нахил</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports zoom</source>
+      <translation>Ця камера підтримує масштабування</translation>
     </message>
   </context>
   <context>
@@ -1519,6 +1539,11 @@
       <location/>
       <source>Search Filter</source>
       <translation>Фільтр пошуку</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation>Залишилося часу (с)</translation>
     </message>
   </context>
   <context>

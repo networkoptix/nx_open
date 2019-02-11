@@ -679,11 +679,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable native presets, use system presets instead</source>
-      <translation>Отключить собственные настройки, вместо этого использовать системные</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>Предупреждение. Собственные пресеты камеры не будут доступны.</translation>
     </message>
@@ -761,6 +756,31 @@
       <location/>
       <source>Logical ID</source>
       <translation>Логический ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Preferred PTZ preset type:</source>
+      <translation>Предпочтительный тип позиции PTZ:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation>Система</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native</source>
+      <translation>Оригинальный</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports pan and tilt</source>
+      <translation>Эта камера поддерживает поворот и наклон</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports zoom</source>
+      <translation>Эта камера поддерживает масштабирование</translation>
     </message>
   </context>
   <context>
@@ -900,7 +920,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Адреса потоков</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1103,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>На раскладке</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1231,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>На раскладке</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камера</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Исходная камера</translation>
     </message>
   </context>
   <context>
@@ -1422,17 +1442,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Заблокирован</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Ширина</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Высота</translation>
     </message>
     <message>
       <location/>
@@ -1452,7 +1472,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>Минимальный размер</translation>
     </message>
   </context>
   <context>
@@ -1460,12 +1480,12 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Выберите раскладку</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Раскладки с общим доступом</translation>
     </message>
     <message>
       <location/>
@@ -1519,6 +1539,11 @@
       <location/>
       <source>Search Filter</source>
       <translation>Фильтр поиска</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation type="unfinished">Search Timeout (s)</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2335,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Включить временную шкалу на видеостене</translation>
     </message>
   </context>
   <context>
@@ -2991,12 +3016,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Отображать водяной знак с именем пользователя на видео</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Предпросмотр водяного знака</translation>
     </message>
   </context>
   <context>
@@ -3215,7 +3240,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Предпросмотр водяного знака</translation>
     </message>
     <message>
       <location/>
@@ -3225,7 +3250,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Частота</translation>
     </message>
   </context>
 </TS>

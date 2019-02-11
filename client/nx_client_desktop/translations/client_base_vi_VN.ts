@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>Không cài đặt được</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Không thể hủy bỏ cài đặt</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Cài đặt hoàn tất</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation type="unfinished">Screen Settings...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5396,6 +5396,10 @@ to %1</source>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8390,6 +8394,16 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>Không thể xuất thời gian đã chọn cho máy ảnh hiện tại.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

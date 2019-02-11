@@ -139,7 +139,7 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
 {
     RequestObject object = static_cast<RequestObject>(obj);
-    NX_VERBOSE("QnMediaServerConnection", lm("QnMediaServerConnection %1 <%2>: %3 %4")
+    NX_VERBOSE(typeid(QnMediaServerConnection), lm("%1 <%2>: %3 %4")
         .arg(serverId)
         .arg(handle)
         .arg(message)
@@ -391,10 +391,14 @@ int QnMediaServerConnection::sendAsyncGetRequestLogged(
     const QnRequestParamList& params,
     const char* replyTypeName,
     QObject* target,
-    const char* slot)
+    const char* slot,
+    std::optional<std::chrono::milliseconds> timeout)
 {
-    int handle = sendAsyncGetRequest(object, params, replyTypeName, target, slot);
-    trace(handle, object);
+    int handle = sendAsyncGetRequest(object, params, replyTypeName, target, slot, timeout);
+
+    trace(handle, object, lm("GET %1 with timeout %2").args(
+        replyTypeName, timeout ? *timeout : std::chrono::milliseconds{0}));
+
     return handle;
 }
 
@@ -405,12 +409,15 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
     const QByteArray& data,
     const char* replyTypeName,
     QObject* target,
-    const char* slot)
+    const char* slot,
+    std::optional<std::chrono::milliseconds> timeout)
 {
     int handle = sendAsyncPostRequest(
-        object, std::move(headers), params, data, replyTypeName, target, slot);
+        object, std::move(headers), params, data, replyTypeName, target, slot, timeout);
 
-    trace(handle, object);
+    trace(handle, object, lm("POST %1 with timeout %2").args(
+        replyTypeName, timeout ? *timeout : std::chrono::milliseconds{0}));
+
     return handle;
 }
 
@@ -976,9 +983,10 @@ int QnMediaServerConnection::testLdapSettingsAsync(
 {
     nx_http::HttpHeaders headers;
     headers.emplace(nx_http::header::kContentType, "application/json");
+    std::chrono::seconds timeout(settings.searchTimeoutS);
     return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
         QnRequestParamList(), QJson::serialized(settings),
-        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
+        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

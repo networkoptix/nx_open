@@ -43,7 +43,7 @@
                     <div ng-if="user.isOwner">
                         <h3>נתק את השרת מן המערכת</h3>
                         <p>פעולה זו תנתק שרת מהמערכת תוך שמירה על מסד הנתונים, משתמשים מקומיים ותצורה.
-                            ארכיון הווידאו יישאר שלם. כל משתמשי הענן יימחקו.</p>
+                            ארכיון הווידאו יישאר שלם. <b>כל משתמשי הענן יימחקו.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>
                     </div>
                     <div>
@@ -115,7 +115,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>הגדרות רשת להתקן.</h3>
+                        <h3>הגדרות רשת להתקן</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
                         <button class="btn btn-default" ng-click="saveNetworkSettings()">שמור הגדרות ואתחל את ההתקן</button>
                     </div>

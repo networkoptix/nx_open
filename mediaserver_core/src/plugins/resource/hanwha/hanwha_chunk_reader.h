@@ -157,6 +157,7 @@ private:
     qint64 m_startTimeUs = AV_NOPTS_VALUE;
     qint64 m_endTimeUs = AV_NOPTS_VALUE;
     qint64 m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
+    qint64 m_lastParsedEndTimeMs = AV_NOPTS_VALUE;
 
     OverlappedId m_lastNvrOverlappedId = -1;
     OverlappedIdList m_overlappedIds;

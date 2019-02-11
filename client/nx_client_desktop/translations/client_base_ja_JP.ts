@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>インストールに失敗しました。</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>インストールをキャンセルできません</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>インストール終了</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>スクリーン設定...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation>ブックマークのエクスポート...</translation>
     </message>
   </context>
   <context>
@@ -5345,7 +5345,7 @@ to %1</source>
     </message>
     <message>
       <source>Information</source>
-      <translation>情報</translation>
+      <translation>情報（ビデオテクニカ株式会社ローカライズ版）</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -5395,6 +5395,10 @@ to %1</source>
     <message>
       <source>Search</source>
       <translation>検索</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation>ブックマークのエクスポート...</translation>
     </message>
   </context>
   <context>
@@ -8391,6 +8395,16 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>選択した期間は現在のカメラではエクスポートできません</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n ブックマーク</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation>いくつかのブックマークはレイアウトのみエクスポートされます</translation>
     </message>
   </context>
   <context>

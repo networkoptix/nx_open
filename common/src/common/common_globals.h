@@ -316,6 +316,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_SupportsTranscoding = 0x200,
         SF_HasLiteClient = 0x400,
         SF_P2pSyncDone = 0x1000000, //< For UT purpose only
+        SF_RequiresEdgeLicense = 0x2000000, //< Will be removed as soon as all arm server use professional licenses.
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 

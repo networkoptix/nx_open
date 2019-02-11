@@ -79,10 +79,6 @@ to view more bookmarks</translation>
       <translation>Installation failed</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Could not cancel installation</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Installation completed</translation>
     </message>
@@ -895,6 +891,10 @@ to view more bookmarks</translation>
     <message>
       <source>Screen Settings...</source>
       <translation type="unfinished">Screen Settings...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
   </context>
   <context>
@@ -5467,6 +5467,10 @@ to %1</translation>
       <source>Search</source>
       <translation>Search</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation type="unfinished">Export Bookmarks...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8512,6 +8516,17 @@ to %1</translation>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmarks</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
   </context>
   <context>

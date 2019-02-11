@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>Не вдалося встановити</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Не вдалося скасувати встановлення</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Установку завершено</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>Налаштування екрана...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation>Експортувати закладки...</translation>
     </message>
   </context>
   <context>
@@ -5598,6 +5598,10 @@ to %1</source>
       <source>Search</source>
       <translation>Пошук</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation>Експортувати закладки...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8743,6 +8747,19 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>Вибраний період не можна експортувати для поточної камери.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладки</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation>Деякі закладки можна експортувати лише як макет.</translation>
     </message>
   </context>
   <context>

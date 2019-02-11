@@ -37,8 +37,10 @@ public:
     Qn::LdapResult fetchUsers(QnLdapUsers &users);
 
     Qn::AuthResult authenticate(const QString &login, const QString &password);
+
 private slots:
     void clearCache();
+
 private:
     mutable QMap<QString, QString> m_dnCache;
     mutable QnMutex m_cacheMutex;

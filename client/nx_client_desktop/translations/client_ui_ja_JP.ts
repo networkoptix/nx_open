@@ -679,11 +679,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable native presets, use system presets instead</source>
-      <translation>カメラのプリセットを無効にし、システムプリセットを使用</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>警告！カメラのプリセットは使用できません</translation>
     </message>
@@ -761,6 +756,31 @@
       <location/>
       <source>Logical ID</source>
       <translation>論理ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Preferred PTZ preset type:</source>
+      <translation>PTZプリセットタイプ：</translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation>システム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native</source>
+      <translation>ネイティブ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports pan and tilt</source>
+      <translation>このカメラはパンとチルトをサポートします</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports zoom</source>
+      <translation>このカメラはズームをサポートしています</translation>
     </message>
   </context>
   <context>
@@ -1452,7 +1472,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>最小サイズ</translation>
     </message>
   </context>
   <context>
@@ -1519,6 +1539,11 @@
       <location/>
       <source>Search Filter</source>
       <translation>検索フィルター</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation type="unfinished">Search Timeout (s)</translation>
     </message>
   </context>
   <context>

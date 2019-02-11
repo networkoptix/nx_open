@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
         "useTextEmailFormat": "Düz metin e-postaları gönder",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "E-postalarda windows satır beslemesini kulllan"
     },
     "info": {
         "tabs": {

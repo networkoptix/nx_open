@@ -66,7 +66,8 @@ bool isSpecialTimeValue(qint64 value)
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
     :
     QnAbstractArchiveDelegate(),
-	m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
+    m_rtspSession(new QnRtspClient(
+        QnRtspClient::Config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false })),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -222,7 +223,8 @@ struct ArchiveTimeCheckInfo
 
 void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
 {
-    QnRtspClient otherRtspSession(true);
+    QnRtspClient otherRtspSession(
+        QnRtspClient::Config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false });
     QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession, false);
     if (otherRtspSession.open(QnRtspClientArchiveDelegate::getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError)
         return;

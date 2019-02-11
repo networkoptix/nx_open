@@ -1,6 +1,7 @@
 #ifndef QN_CONNECTION_H
 #define QN_CONNECTION_H
 
+#include <optional>
 #include <cassert>
 
 #ifndef Q_MOC_RUN
@@ -131,24 +132,24 @@ protected:
     const QnRequestParamList &extraQueryParameters() const;
     void setExtraQueryParameters(const QnRequestParamList &extraQueryParameters);
 
-    int sendAsyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
-    int sendAsyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
-    int sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
-    int sendAsyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
-    int sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendAsyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendAsyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
-    int sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
-    int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply);
-    int sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply);
-    int sendSyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
-    int sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply);
+    int sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendSyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+    int sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     template<class T>
-    int sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, T *reply) {
+    int sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, T *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt) {
         NX_ASSERT(reply);
 
         QVariant replyVariant;
-        int status = sendSyncRequest(method, object, std::move(headers), params, std::move(msgBody), &replyVariant);
+        int status = sendSyncRequest(method, object, std::move(headers), params, std::move(msgBody), &replyVariant, timeout);
 
         if (status)
             return status;
@@ -162,13 +163,13 @@ protected:
     }
 
     template<class T>
-    int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, T *reply) {
-        return sendSyncRequest(nx_http::Method::get, object, headers, params, QByteArray(), reply);
+    int sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, T *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt) {
+        return sendSyncRequest(nx_http::Method::get, object, headers, params, QByteArray(), reply, timeout);
     }
 
     template<class T>
-    int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply) {
-        return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
+    int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt) {
+        return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply, timeout);
     }
 
     QnResourcePtr targetResource() const;

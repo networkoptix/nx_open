@@ -45,7 +45,7 @@ public:
     ModbusResponse writeSingleHoldingRegister(quint16 registerAddress, const QByteArray& data, bool* outStatus);
 
 private:
-    bool initSocket();
+    bool reinitSocket();
     ModbusMBAPHeader buildHeader(const ModbusRequest& request);
 
 private:

@@ -679,11 +679,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable native presets, use system presets instead</source>
-      <translation>Disabilita i preset nativi, usa invece i preset di sistema</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>Avvertimento! I preset a bordo delle telecamere non saranno disponibili.</translation>
     </message>
@@ -761,6 +756,31 @@
       <location/>
       <source>Logical ID</source>
       <translation>ID logico</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Preferred PTZ preset type:</source>
+      <translation type="unfinished">Preferred PTZ preset type:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation type="unfinished">System</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native</source>
+      <translation type="unfinished">Native</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports pan and tilt</source>
+      <translation type="unfinished">This camera supports pan and tilt</translation>
+    </message>
+    <message>
+      <location/>
+      <source>This camera supports zoom</source>
+      <translation type="unfinished">This camera supports zoom</translation>
     </message>
   </context>
   <context>
@@ -1519,6 +1539,11 @@
       <location/>
       <source>Search Filter</source>
       <translation>Filtro di ricerca</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation type="unfinished">Search Timeout (s)</translation>
     </message>
   </context>
   <context>

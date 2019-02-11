@@ -74,7 +74,7 @@
         "emailFrom": "אי מייל מ",
         "emailSignature": "חתימת דוא\"ל",
         "emailSupportEmail": "דוא\"ל תמיכה",
-        "enableEdgeRecording": "אפשר הקלטות  edge",
+        "enableEdgeRecording": "אפשר הקלטות edge",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
         "hanwhaDeleteProfilesOnInitIfNeeded": "מחק פרופילי מצלמה ב- init אם יש צורך",
         "ldapAdminDn": "מנהל LDAP DN",
@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "גודל תור מרבי של רשומות (בתים)",
         "maxRecordQueueSizeElements": "גודל תור מרבי של רשומות (אלמנטים)",
         "maxRemoteArchiveSynchronizationThreads": "סינכרון מרבי של אשכולות סינכרון מרחוק",
-        "maxRtspConnectDurationSeconds": "משך התחברות Rstp מקסימלית בשניות.",
+        "maxRtspConnectDurationSeconds": "משך התחברות Rstp מקסימלית בשניות",
         "maxSceneItems": "פריטי סצנה מקסימליים (0 פירושו ברירת מחדל)",
         "proxyConnectTimeoutSec": "זמן קצוב לחיבור של שרת proxy (שניות)",
         "rtpTimeoutMs": "RTP פסק זמן (אלפיות השנייה)",
@@ -113,7 +113,7 @@
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
         "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "השתמש במעבר שורה של חלונות בהודעות דוא\"ל"
     },
     "info": {
         "tabs": {

@@ -78,10 +78,6 @@ to view more bookmarks</source>
       <translation>Installation fehlgeschlagen</translation>
     </message>
     <message>
-      <source>Could not cancel installation</source>
-      <translation>Installation konnte nicht abgebrochen werden</translation>
-    </message>
-    <message>
       <source>Installation completed</source>
       <translation>Installation abgeschlossen</translation>
     </message>
@@ -894,6 +890,10 @@ to view more bookmarks</source>
     <message>
       <source>Screen Settings...</source>
       <translation>Bildschirmeinstellungen...</translation>
+    </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation>Lesezeichen exportieren...</translation>
     </message>
   </context>
   <context>
@@ -5462,6 +5462,10 @@ to %1</source>
       <source>Search</source>
       <translation>Suche</translation>
     </message>
+    <message>
+      <source>Export Bookmarks...</source>
+      <translation>Lesezeichen exportieren...</translation>
+    </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
@@ -8507,6 +8511,17 @@ to %1</source>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>Ausgewählter Zeitraum kann für die aktuelle Kamera nicht exportiert werden.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n Lesezeichen</numerusform>
+        <numerusform>%n Lesezeichen</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Several bookmarks can be exported as layout only.</source>
+      <translation>Mehrere Lesezeichen können nur als Layout exportiert werden.</translation>
     </message>
   </context>
   <context>

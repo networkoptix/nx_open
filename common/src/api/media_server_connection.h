@@ -343,7 +343,8 @@ protected:
         const QnRequestParamList& params,
         const char* replyTypeName,
         QObject* target,
-        const char* slot);
+        const char* slot,
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     int sendAsyncPostRequestLogged(
         int object,
@@ -352,7 +353,8 @@ protected:
         const QByteArray& data,
         const char* replyTypeName,
         QObject* target,
-        const char* slot);
+        const char* slot,
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     void trace(int handle, int obj, const QString& message = QString());
 
