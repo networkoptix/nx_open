@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <map>
 #include <string>
 #include <optional>
 
@@ -24,7 +25,7 @@ public:
         nx::sql::QueryContext* queryContext,
         const std::string& key);
 
-    std::set<std::string> getKeys(
+    std::map<std::string, std::string> getPairs(
         nx::sql::QueryContext* queryContext);
 };
 

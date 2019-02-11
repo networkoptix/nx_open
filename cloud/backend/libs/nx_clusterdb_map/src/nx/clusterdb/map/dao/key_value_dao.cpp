@@ -52,6 +52,12 @@ SELECT key from data
 
 )sql";
 
+static constexpr char kFetchPairs[] = R"sql(
+
+SELECT key, value from data
+
+)sql";
+
 
 std::string hash(const std::string& key)
 {
@@ -97,17 +103,21 @@ std::optional<std::string> KeyValueDao::get(
     return query->value(kValue).toString().toStdString();
 }
 
-std::set<std::string> KeyValueDao::getKeys(nx::sql::QueryContext * queryContext)
+std::map<std::string, std::string> KeyValueDao::getPairs(nx::sql::QueryContext * queryContext)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(kFetchKeys);
+    query->prepare(kFetchPairs);
     query->exec();
 
-    std::set<std::string> keys;
+    std::map<std::string, std::string> pairs;
     while (query->next())
-        keys.emplace(query->value(kKey).toString().toStdString());
+    {
+        pairs.emplace(
+            query->value(kKey).toString().toStdString(),
+            query->value(kValue).toString().toStdString());
+    }
 
-    return keys;
+    return pairs;
 }
 
 } // namespace nx::clusterdb::map::dao

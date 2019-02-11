@@ -76,41 +76,48 @@ protected:
 
     void givenKeyValuePairWithEmptyKey()
     {
-        randomPair()->value = randomString();
+        keyValuePair()->value = randomString();
     }
 
-    void givenRandomKeyValuePair(size_t randomPairIndex = 0)
+    void givenRandomKeyValuePair(size_t keyValuePairIndex = 0)
     {
-        randomPair(randomPairIndex)->key = randomString();
-        randomPair(randomPairIndex)->value = randomString();
+        keyValuePair(keyValuePairIndex)->key = randomString();
+        keyValuePair(keyValuePairIndex)->value = randomString();
     }
 
     void givenKnownKeyValuePair()
     {
-        randomPair()->key = "A key";
-        randomPair()->value = "A value";
+        keyValuePair()->key = "B";
+        keyValuePair()->value = "B";
     }
 
     void givenSecondKnownKeyValuePair()
     {
-        randomPair(1)->key = "B key";
-        randomPair(1)->value = "B value";
+        keyValuePair(1)->key = "C";
+        keyValuePair(1)->value = "C";
+    }
+
+    void givenNewLowerLexicographicKeyValuePair()
+    {
+        keyValuePair(2)->key = "A";
+        keyValuePair(2)->value = "A";
+    }
+
+    void givenNewHigherLexicographicKeyValuePair()
+    {
+        keyValuePair(2)->key = "D";
+        keyValuePair(2)->value = "D";
     }
 
     void givenTwoKeyValuePairsWithSameKey()
     {
         std::string sameKey = "Same Key";
 
-        randomPair()->key = sameKey;
-        randomPair()->value = "A Value";
+        keyValuePair()->key = sameKey;
+        keyValuePair()->value = "A Value";
 
-        randomPair(1)->key = sameKey;
-        randomPair(1)->value = "A Different Value";
-    }
-
-    void givenAnotherRandomKeyValuePair()
-    {
-        givenRandomKeyValuePair();
+        keyValuePair(1)->key = sameKey;
+        keyValuePair(1)->value = "A Different Value";
     }
 
     void givenRecordInsertedEventWasAlreadyTriggered()
@@ -145,11 +152,11 @@ protected:
         m_eventReceivedKey.clear();
     }
 
-    void whenInsertKeyValuePair(size_t dbIndex = 0, size_t randomPairIndex = 0)
+    void whenInsertKeyValuePair(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
         db(dbIndex)->dataManager().insertOrUpdate(
-            randomPair(randomPairIndex)->key,
-            randomPair(randomPairIndex)->value,
+            keyValuePair(keyValuePairIndex)->key,
+            keyValuePair(keyValuePairIndex)->value,
             [this](map::ResultCode result)
             {
                 m_result = result;
@@ -161,13 +168,13 @@ protected:
 
     void whenInsertSecondKeyValuePair()
     {
-        whenInsertKeyValuePair(/*dbIndex*/ 0, /*randomPairIndex*/ 1);
+        whenInsertKeyValuePair(/*dbIndex*/ 0, /*keyValuePairIndex*/ 1);
     }
 
-    void whenFetchValue(size_t dbIndex = 0, size_t randomPairIndex = 0)
+    void whenFetchValue(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
         db(dbIndex)->dataManager().get(
-            randomPair(randomPairIndex)->key,
+            keyValuePair(keyValuePairIndex)->key,
             [this](map::ResultCode result, std::string value)
             {
                 m_result = result;
@@ -180,7 +187,7 @@ protected:
 
     void whenRemoveKey()
     {
-        db()->dataManager().remove(randomPair()->key,
+        db()->dataManager().remove(keyValuePair()->key,
             [this](map::ResultCode result)
             {
                 m_result = result;
@@ -192,7 +199,7 @@ protected:
 
     void whenRemoveNonExistentKey()
     {
-        randomPair()->key += "-NonExistentKey";
+        keyValuePair()->key += "-NonExistentKey";
         andValueIsNotInDb();
         whenRemoveKey();
     }
@@ -237,17 +244,22 @@ protected:
 
     void whenRequestLowerBoundForSecondKey()
     {
-        whenRequestLowerBoundForKey(/*randomPairIndex*/ 1);
+        whenRequestLowerBoundForKey(/*keyValuePairIndex*/ 1);
+    }
+
+    void whenRequestLowerBoundForNewestKey()
+    {
+        whenRequestLowerBoundForKey(/*keyValuePairIndex*/ 2);
     }
 
     void whenRequestUpperBoundForFirstKey()
     {
-        requestUpperBoundForKey();
+        whenRequestUpperBoundForKey();
     }
 
-    void whenRequestUpperBoundForSecondKey()
+    void whenRequestUpperBoundForHighestKey()
     {
-        requestUpperBoundForKey(/*randomPairIndex*/ 1);
+        whenRequestUpperBoundForKey(/*keyValuePairIndex*/ 1);
     }
 
     void thenOperationSucceeded()
@@ -272,9 +284,9 @@ protected:
         ASSERT_FALSE(m_eventTriggered.load());
     }
 
-    void andFetchedValueMatchesRandomValue(size_t randomPairIndex = 0)
+    void andFetchedValueMatchesRandomValue(size_t keyValuePairIndex = 0)
     {
-        ASSERT_EQ(randomPair(randomPairIndex)->value, m_fetchedValue);
+        ASSERT_EQ(keyValuePair(keyValuePairIndex)->value, m_fetchedValue);
     }
 
     void andFetchedValueIsEmpty()
@@ -292,9 +304,9 @@ protected:
         thenLowerBoundMatchesKey(/*ranomdPairIndex*/ 1);
     }
 
-    void thenUpperBoundMatchesKey(size_t randomPairIndex = 0)
+    void thenUpperBoundMatchesKey(size_t keyValuePairIndex = 0)
     {
-        ASSERT_EQ(m_upperBound, randomPair(randomPairIndex)->key);
+        ASSERT_EQ(m_upperBound, keyValuePair(keyValuePairIndex)->key);
     }
 
     void thenUpperBoundMatchesFirstKey()
@@ -337,7 +349,7 @@ protected:
         std::string oldValue = m_fetchedValue;
 
         // Search for value associated with first random pair, not second.
-        whenFetchValue(/*dbIndex*/ 0, /*randomPairIndex*/ 0);
+        whenFetchValue(/*dbIndex*/ 0, /*keyValuePairIndex*/ 0);
         thenOperationSucceeded();
 
         ASSERT_NE(oldValue, m_fetchedValue);
@@ -345,27 +357,27 @@ protected:
 
     void andEventReceivedKeyMatchesInsertionKey()
     {
-        ASSERT_EQ(m_eventReceivedKey, randomPair()->key);
+        ASSERT_EQ(m_eventReceivedKey, keyValuePair()->key);
     }
 
     void andEventReceivedKeyMatchesRemovalKey()
     {
-        ASSERT_EQ(m_eventReceivedKey, randomPair()->key);
+        ASSERT_EQ(m_eventReceivedKey, keyValuePair()->key);
     }
 
     void andEventReceivedValueMatchesInsertionValue()
     {
-        ASSERT_EQ(m_eventReceivedValue, randomPair()->value);
+        ASSERT_EQ(m_eventReceivedValue, keyValuePair()->value);
     }
 
     void andEventReceivedKeyDoesNotMatchInsertionKey()
     {
-        ASSERT_NE(m_eventReceivedKey, randomPair()->key);
+        ASSERT_NE(m_eventReceivedKey, keyValuePair()->key);
     }
 
     void andEventReceivedKeyDoesNotMatchRemovalKey()
     {
-        ASSERT_NE(m_eventReceivedKey, randomPair()->key);
+        ASSERT_NE(m_eventReceivedKey, keyValuePair()->key);
     }
 
 private:
@@ -407,7 +419,7 @@ private:
         }
     }
 
-    KeyValuePair* randomPair(size_t index = 0)
+    KeyValuePair* keyValuePair(size_t index = 0)
     {
         NX_ASSERT(0 <= (int)index && index <= m_randomPairs.size());
 
@@ -418,10 +430,10 @@ private:
     }
 
 
-    void whenRequestLowerBoundForKey(size_t randomPairIndex = 0)
+    void whenRequestLowerBoundForKey(size_t keyValuePairIndex = 0)
     {
         db()->dataManager().lowerBound(
-            randomPair(randomPairIndex)->key,
+            keyValuePair(keyValuePairIndex)->key,
             [this](map::ResultCode result, std::string key)
         {
             m_result = result;
@@ -432,10 +444,10 @@ private:
         waitForCallback();
     }
 
-    void requestUpperBoundForKey(size_t randomPairIndex = 0)
+    void whenRequestUpperBoundForKey(size_t keyValuePairIndex = 0)
     {
         db()->dataManager().upperBound(
-            randomPair(randomPairIndex)->key,
+            keyValuePair(keyValuePairIndex)->key,
             [this](map::ResultCode result, std::string key)
         {
             m_result = result;
@@ -446,9 +458,9 @@ private:
         waitForCallback();
     }
 
-    void thenLowerBoundMatchesKey(size_t randomPairIndex = 0)
+    void thenLowerBoundMatchesKey(size_t keyValuePairIndex = 0)
     {
-        ASSERT_EQ(m_lowerBound, randomPair(randomPairIndex)->key);
+        ASSERT_EQ(m_lowerBound, keyValuePair(keyValuePairIndex)->key);
     }
 
 
@@ -650,20 +662,51 @@ TEST_F(Database, provides_upperbound)
     thenUpperBoundMatchesSecondKey();
 }
 
-TEST_F(Database, fails_to_provide_lowerbound)
+TEST_F(Database, rejects_lowerbound_request_with_empty_key)
 {
-    givenEmptyDb();
+    givenOneDb();
+    givenKeyValuePairWithEmptyKey();
 
     whenRequestLowerBoundForFirstKey();
+
+    thenOperationFailed(map::ResultCode::logicError);
+}
+
+TEST_F(Database, rejects_upperbound_request_with_empty_key)
+{
+    givenOneDb();
+    givenKeyValuePairWithEmptyKey();
+
+    whenRequestLowerBoundForFirstKey();
+
+    thenOperationFailed(map::ResultCode::logicError);
+}
+
+TEST_F(Database, provides_lowerbound_when_key_goes_before_all_db_keys)
+{
+    givenDbWithTwoKnownKeyValuePairs();
+    givenNewLowerLexicographicKeyValuePair();
+
+    whenRequestLowerBoundForNewestKey();
+
+    thenOperationSucceeded();
+}
+
+TEST_F(Database, fails_to_provide_lower_bound_when_key_goes_after_all_db_keys)
+{
+    givenDbWithTwoKnownKeyValuePairs();
+    givenNewHigherLexicographicKeyValuePair();
+
+    whenRequestLowerBoundForNewestKey();
 
     thenOperationFailed(map::ResultCode::notFound);
 }
 
-TEST_F(Database, fails_to_provide_upperbound)
+TEST_F(Database, fails_to_provide_upperbound_for_highest_key_in_db)
 {
     givenDbWithTwoKnownKeyValuePairs();
 
-    whenRequestUpperBoundForSecondKey();
+    whenRequestUpperBoundForHighestKey();
 
     thenOperationFailed(map::ResultCode::notFound);
 }

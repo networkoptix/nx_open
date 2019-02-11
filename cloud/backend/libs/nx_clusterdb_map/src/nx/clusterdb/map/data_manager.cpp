@@ -153,49 +153,81 @@ void DataManager::get(
 
 void DataManager::lowerBound(const std::string& key, LookupCompletionHandler completionHandler)
 {
+    if (key.empty())
+        return completionHandler(ResultCode::logicError, std::string());
+
     QnMutexLocker lock(&m_mutex);
 
-    auto sharedKey = std::make_shared<std::string>();
+    auto sharedKey = std::make_shared<std::optional<std::string>>();
 
     m_queryExecutor->executeSelect(
         [this, key, sharedKey](nx::sql::QueryContext* queryContext) mutable
         {
-            auto keys = m_keyValueDao.getKeys(queryContext);
-            auto it = keys.lower_bound(key);
-            if (it != keys.end())
-                *sharedKey = *it;
-            return sharedKey->empty()
-                ? nx::sql::DBResult::notFound
-                : nx::sql::DBResult::ok;
+            *sharedKey = getLowerBoundFromDb(queryContext, key);
+            return sharedKey->has_value()
+                ? nx::sql::DBResult::ok
+                : nx::sql::DBResult::notFound;
         },
         [this, sharedKey, completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult), std::move(*sharedKey));
+            completionHandler(
+                toResultCode(dbResult),
+                sharedKey->has_value() ? std::move(*(*sharedKey)) : std::string());
         });
 }
 
-void DataManager::upperBound(const std::string & key, LookupCompletionHandler completionHandler)
+void DataManager::upperBound(const std::string& key, LookupCompletionHandler completionHandler)
 {
+    if (key.empty())
+        return completionHandler(ResultCode::logicError, std::string());
+
     QnMutexLocker lock(&m_mutex);
 
-    auto sharedKey = std::make_shared<std::string>();
+    auto sharedKey = std::make_shared<std::optional<std::string>>();
 
     m_queryExecutor->executeSelect(
         [this, key, sharedKey](nx::sql::QueryContext* queryContext) mutable
         {
-            auto keys = m_keyValueDao.getKeys(queryContext);
-            auto it = keys.upper_bound(key);
-            if (it != keys.end())
-                *sharedKey = *it;
-            return sharedKey->empty()
+            *sharedKey = getUpperBoundFromDb(queryContext, key);
+            return sharedKey->has_value()
+                ? nx::sql::DBResult::ok
+                : nx::sql::DBResult::notFound;
+        },
+        [this, sharedKey, completionHandler = std::move(completionHandler)](
+                nx::sql::DBResult dbResult)
+        {
+            completionHandler(
+                toResultCode(dbResult),
+                sharedKey->has_value() ? std::move(*(*sharedKey)) : std::string());
+        });
+}
+
+void DataManager::getRange(
+    const std::string& keyLowerBound,
+    const std::string& keyUpperBound,
+    GetRangeCompletionHandler completionHandler)
+{
+    if (keyLowerBound > keyUpperBound)
+        return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
+
+    QnMutexLocker lock(&m_mutex);
+
+    auto sharedPairs = std::make_shared<std::map<std::string, std::string>>();
+
+    m_queryExecutor->executeSelect(
+        [this, keyLowerBound, keyUpperBound, sharedPairs](
+            nx::sql::QueryContext* queryContext) mutable
+        {
+            *sharedPairs = getRangeFromDb(queryContext, keyLowerBound, keyUpperBound);
+            return sharedPairs->empty()
                 ? nx::sql::DBResult::notFound
                 : nx::sql::DBResult::ok;
         },
-            [this, sharedKey, completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResult)
+        [this, sharedPairs, completionHandler = std::move(completionHandler)](
+            nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult), std::move(*sharedKey));
+            completionHandler(toResultCode(dbResult), std::move(*sharedPairs));
         });
 }
 
@@ -217,6 +249,39 @@ std::optional<std::string> DataManager::getFromDb(
     const std::string& key)
 {
    return m_keyValueDao.get(queryContext, key);
+}
+
+
+std::optional<std::string> DataManager::getLowerBoundFromDb(
+    nx::sql::QueryContext * queryContext,
+    const std::string& key)
+{
+    auto pairs = m_keyValueDao.getPairs(queryContext);
+    auto it = pairs.lower_bound(key);
+    return it != pairs.end() ? std::optional(std::move(it->first)) : std::nullopt;
+}
+
+
+std::optional<std::string> DataManager::getUpperBoundFromDb(
+    nx::sql::QueryContext* queryContext,
+    const std::string& key)
+{
+    auto pairs = m_keyValueDao.getPairs(queryContext);
+    auto it = pairs.upper_bound(key);
+    return it != pairs.end() ? std::optional(std::move(it->first)) : std::nullopt;
+}
+
+std::map<std::string, std::string> DataManager::getRangeFromDb(
+    nx::sql::QueryContext* queryContext,
+    const std::string& keyLowerBound,
+    const std::string& keyUpperBound)
+{
+    auto pairs = m_keyValueDao.getPairs(queryContext);
+
+    auto itLower = pairs.lower_bound(keyLowerBound);
+    auto itUpper = pairs.upper_bound(keyUpperBound);
+
+    return std::map(itLower, itUpper);
 }
 
 void DataManager::removeFromDb(
