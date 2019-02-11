@@ -36,14 +36,18 @@ public:
         m_secondaryProvider->setOwner(toSharedPointer());
     }
 
-    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() override
+    QnLiveStreamProviderPtr getLiveReader(
+        QnServer::ChunksCatalog catalog,
+        bool /*ensureInitialized*/, bool /*createIfNotExist*/)
     {
-        return m_primaryProvider;
-    }
+        switch (catalog)
+        {
+            case QnServer::HiQualityCatalog: return m_primaryProvider;
+            case QnServer::LowQualityCatalog: return m_secondaryProvider;
+        }
 
-    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() override
-    {
-        return m_secondaryProvider;
+        NX_ASSERT(false);
+        return nullptr;
     }
 
     virtual void inUse(void* /*user*/) override {}
