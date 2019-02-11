@@ -167,6 +167,16 @@ bool PeerStateTracker::hasVerificationErrors() const
     return false;
 }
 
+bool PeerStateTracker::hasStatusErrors() const
+{
+    for (auto& item: m_items)
+    {
+        if (item->state == StatusCode::error && !item->statusMessage.isEmpty())
+            return true;
+    }
+    return false;
+}
+
 void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)

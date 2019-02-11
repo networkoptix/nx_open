@@ -158,7 +158,7 @@ bool CommonUpdateManager::canDownloadFile(
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::error,
-            "Downloader failed to download update file");
+            "Failed to download update");
         return true;
     }
 

@@ -417,7 +417,7 @@ bool QnAviArchiveDelegate::open(
         if (m_storage == nullptr)
         {
             const auto commonModule = resource->commonModule();
-            if (!commonModule)
+            if (!NX_ASSERT(commonModule))
                 return false;
 
             m_storage = QnStorageResourcePtr(commonModule->storagePluginFactory()->createStorage(

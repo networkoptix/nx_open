@@ -102,7 +102,9 @@ QString QnLicenseValidator::errorMessage(QnLicenseErrorCode errCode)
         case QnLicenseErrorCode::InvalidType:
             return tr("Invalid type");
         case QnLicenseErrorCode::TooManyLicensesPerDevice:
-            return tr("Only single license is allowed for this device");
+            return tr("Only one starter license is allowed per System.")
+                + '\n'
+                + tr("You already have one active starter license.");
         case QnLicenseErrorCode::FutureLicense:
             return tr("This license type requires higher software version");
         default:
