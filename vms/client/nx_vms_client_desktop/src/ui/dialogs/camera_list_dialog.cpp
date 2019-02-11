@@ -76,9 +76,10 @@ QnCameraListDialog::QnCameraListDialog(QWidget* parent):
         | Qt::WindowMaximizeButtonHint
         | Qt::MaximizeUsingFullscreenGeometryHint);
 
-    const auto verticalScrollBar = new SnappedScrollBar(Qt::Vertical, this);
+    const auto verticalScrollBar = new SnappedScrollBar(Qt::Vertical, ui->tableContainer);
     ui->camerasView->setVerticalScrollBar(verticalScrollBar->proxyScrollBar());
-    const auto horizontalScrollBar = new SnappedScrollBar(Qt::Horizontal, this);
+    const auto horizontalScrollBar = new SnappedScrollBar(Qt::Horizontal, ui->tableContainer);
+    horizontalScrollBar->setUseMaximumSpace(true);
     horizontalScrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->camerasView->setHorizontalScrollBar(horizontalScrollBar->proxyScrollBar());
 
