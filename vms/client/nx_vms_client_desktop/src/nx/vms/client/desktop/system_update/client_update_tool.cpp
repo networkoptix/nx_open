@@ -213,8 +213,6 @@ bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
 void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 {
     m_clientPackage = contents.clientPackage;
-    NX_ASSERT(m_clientPackage.isValid());
-
     m_updateVersion = contents.getVersion();
 
     auto installedVersions = getInstalledVersions(true);

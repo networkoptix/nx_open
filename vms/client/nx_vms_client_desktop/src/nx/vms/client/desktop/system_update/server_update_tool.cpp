@@ -1047,7 +1047,7 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
             UpdateContents contents;
 
             contents.info = nx::update::updateInformation(updateUrl, engineVersion,
-                nx::update::kLatestVersion, &contents.error);
+                changeset, &contents.error);
             contents.sourceType = nx::update::UpdateSourceType::internet;
             contents.source = lit("%1 for build=%2").arg(updateUrl, changeset);
 
