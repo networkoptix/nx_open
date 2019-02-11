@@ -28,26 +28,4 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
     return result;
 }
 
-std::map<EngineId, std::set<EventTypeId>> eventTypeIdsSupportedByDevice(
-    const DeviceDescriptorContainer& container,
-    const DeviceId& deviceId)
-{
-    auto descriptor = container.mergedDescriptors(deviceId);
-    if (!descriptor)
-        return {};
-
-    return descriptor->supportedEventTypeIds;
-}
-
-std::map<EngineId, std::set<ObjectTypeId>> objectTypeIdsSupportedByDevice(
-    const DeviceDescriptorContainer& container,
-    const DeviceId& deviceId)
-{
-    auto descriptor = container.mergedDescriptors(deviceId);
-    if (!descriptor)
-        return {};
-
-    return descriptor->supportedObjectTypeIds;
-}
-
 } // namespace nx::analytics
