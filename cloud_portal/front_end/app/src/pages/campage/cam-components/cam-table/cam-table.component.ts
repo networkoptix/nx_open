@@ -64,24 +64,24 @@ export class CamTableComponent implements OnChanges, OnInit {
 
       this.paramsShown = 6;
       this.cameraHeaders = [
-          this.lang.vendor,
-          this.lang.model,
-          this.lang.hardwareType,
-          this.lang.maxResolution,
-          this.lang.maxFps,
-          this.lang.primaryCodecamera,
-          this.lang.isAudioSupported,
-          this.lang.isAptzSupportedShort,
-          this.lang.isFisheye,
-          this.lang.isMdSupported,
-          this.lang.isIoSupported
+          this.lang.campage.vendor,
+          this.lang.campage.model,
+          this.lang.campage.hardwareType,
+          this.lang.campage.maxResolution,
+          this.lang.campage.maxFps,
+          this.lang.campage.primaryCodecamera,
+          this.lang.campage.isAudioSupported,
+          this.lang.campage.isAptzSupportedShort,
+          this.lang.campage.isFisheye,
+          this.lang.campage.isMdSupported,
+          this.lang.campage.isIoSupported
       ];
 
       this.sortables = [
-          this.lang.vendor,
-          this.lang.model,
-          this.lang.hardwareType,
-          this.lang.maxResolution
+          this.lang.campage.vendor,
+          this.lang.campage.model,
+          this.lang.campage.hardwareType,
+          this.lang.campage.maxResolution
       ];
   }
 
@@ -133,14 +133,14 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         let filter;
-        for (const [key, value] of Object.entries(this.lang)) {
+        for (const [key, value] of Object.entries(this.lang.campage)) {
             if (value === param) {
                 filter = key;
                 break;
             }
         }
 
-        this.sortOrderASC = (this.lang[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
+        this.sortOrderASC = (this.lang.campage[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
         this.toggleSort(filter);
     }
 
@@ -160,7 +160,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         this.setPage(1);
 
         this.selectedHeader = this.cameraHeaders.find(x => {
-            return x === this.lang[param];
+            return x === this.lang.campage[param];
         });
     }
 
@@ -202,8 +202,8 @@ export class CamTableComponent implements OnChanges, OnInit {
 
         if (changes.allowedParameters) {
             this.filterAllowedParams();
-            this.toggleHeaderCaption('isTwAudioSupported', this.lang.isAudioSupported, this.lang.isTwAudioSupported);
-            this.toggleHeaderCaption('isAptzSupported', this.lang.isPtzSupported, this.lang.isAptzSupportedShort);
+            this.toggleHeaderCaption('isTwAudioSupported', this.lang.campage.isAudioSupported, this.lang.campage.isTwAudioSupported);
+            this.toggleHeaderCaption('isAptzSupported', this.lang.campage.isPtzSupported, this.lang.campage.isAptzSupportedShort);
 
             this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
             this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;

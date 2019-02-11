@@ -43,24 +43,15 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     ngOnInit() {
         this.expandable = (this.expandable !== undefined);  // optional param
 
-        // Example URI (pipe will be URIEncoded to %7C)
-        // /campage?search=Axis&tags=isAptzSupported&selects=resolution|SVGA&multiselects=vendors|Axis,30X,Sony
+        // Example URI
+        // /campage?search=Axis&tags=isAptzSupported&resolution=SVGA&vendors=Axis,30X,Sony
         this._route
             .queryParams
             .subscribe(params => {
+                this.params = { ...params };
                 this.params.search = params.search || '';
-
-                if (params.tags) {
-                    this.params.tags = params.tags.split(',');
-                }
-
-                if (params.selects) {
-                    this.params.selects = isArray(params.selects) ? params.selects : [params.selects];
-                }
-
-                if (params.multiselects) {
-                    this.params.multiselects = isArray(params.multiselects) ? params.multiselects : [params.multiselects];
-                }
+                this.params.selects = [];
+                this.params.multiselects = [];
             });
     }
 
@@ -88,45 +79,52 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     (this.localFilter.tags && this.localFilter.tags.length);
 
             // Update model with query params
-            if (this.params.search !== '') {
-                this.localFilter.query = this.params.search;
-            }
+            Object.keys(this.params).forEach((key) => {
+                if (key === 'search' && this.params.search !== '') {
+                    this.localFilter.query = this.params.search;
+                    return;
+                }
 
-            if (this.params.tags && this.localFilter.tags.length) {
-                this.params.tags.forEach((tagName) => {
-                    this.localFilter.tags.find((tag) => tag.id === tagName).value = true;
-                    this.showAdvancedOptions = true;
-                });
-            }
+                if (key === 'tags' && this.localFilter.tags.length) {
+                    this.params[key]
+                            .split(',')
+                            .forEach((tagName) => {
+                                this.localFilter.tags.find((tag) => {
+                                    if (tag.id === tagName) {
+                                        tag.value = true;
+                                        this.showAdvancedOptions = true;
+                                    }
+                                });
+                            });
+                    return;
+                }
 
-            if (this.params.selects && this.localFilter.selects.length) {
-                this.params.selects.forEach((selectParam) => {
-                    const selected = selectParam.split('|');
-                    const selectedDropdown = this.localFilter
-                                                 .selects
-                                                 .find((select) => select.id === selected[0]);
-                    const selectedItem = selectedDropdown.items
-                                                         .find((item) => item.name === selected[1]);
+                if (this.localFilter.selects.length) {
+                    this.localFilter
+                        .selects
+                        .find((select) => {
+                            if (select.id === key) {
+                                const selectedItem = select.items.find((item) => item.name === this.params[key]);
+                                select.selected = selectedItem;
+                                this.showAdvancedOptions = true;
+                            }
+                        });
+                }
 
-                    selectedDropdown.selected = selectedItem;
+                if (this.localFilter.multiselects.length) {
+                    this.localFilter
+                        .multiselects
+                        .find((select) => {
+                            if (select.id === key) {
+                                select.selected = this.params[key].split(',');
 
-                    this.showAdvancedOptions = true;
-                });
-            }
-
-            if (this.params.multiselects && this.localFilter.multiselects.length) {
-                this.params.multiselects.forEach((selectParam) => {
-                    const selected = selectParam.split('|');
-                    const selectedDropdown = this.localFilter
-                                                 .multiselects
-                                                 .find((select) => select.id === selected[0]);
-
-                    selectedDropdown.selected = selected[1].split(',');
-
-                    this.showAdvancedOptions = true;
-                });
-            }
+                                this.showAdvancedOptions = true;
+                            }
+                        });
+                }
+            });
         }
+
         const normalizedValue = this.isBlank(value) ? '' : value;
         this._renderer.setProperty(this._elementRef.nativeElement, 'value', normalizedValue);
     }
@@ -216,43 +214,29 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             }
         }
 
-        let selectedOptions = [];
-        queryParams.selects = undefined;
         if (this.localFilter.selects && this.localFilter.selects.length) {
-            selectedOptions = this.localFilter.selects.filter((select) => {
-                return +select.selected.value !== 0;
+            this.localFilter.selects.forEach((select) => {
+                if (+select.selected.value !== 0) {
+                    queryParams[select.id] = select.selected.name;
+                }
             });
-
-            if (selectedOptions.length) {
-                queryParams.selects = selectedOptions.map((option) => {
-                    return option.id + '|' + option.selected.name;
-                });
-            }
         }
 
-        const selectedMultiOptions = [];
-        queryParams.multiselects = undefined;
         if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
             this.localFilter.multiselects.forEach((select) => {
                 if (select.selected && select.selected.length) {
-                    selectedMultiOptions.push({ id: select.id, selected : select.selected });
+                    queryParams[select.id] = select.selected.join(',');
                 }
             });
-
-            if (selectedMultiOptions.length) {
-                queryParams.multiselects = selectedMultiOptions.map((option) => {
-                    return option.id + '|' + option.selected;
-                });
-            }
         }
 
         // changes the route without moving from the current view or
         // triggering a navigation event,
         this._router.navigate(['/campage'], {
             queryParams,
-            relativeTo         : this._route,
-            replaceUrl         : true,
-            queryParamsHandling: 'merge',
+            relativeTo: this._route,
+            replaceUrl: true,
+            // queryParamsHandling: 'merge',
             // do not trigger navigation
             // skipLocationChange : true
         });
