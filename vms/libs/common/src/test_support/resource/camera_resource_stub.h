@@ -1,9 +1,8 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
+#include <nx/utils/impl_ptr.h>
 
 namespace nx {
 
@@ -22,14 +21,15 @@ public:
     void markCameraAsVMax();
 
     void setLicenseType(Qn::LicenseType licenseType);
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
-
     virtual Qn::LicenseType calculateLicenseType() const override;
+    virtual QnCameraUserAttributePool* userAttributesPool() const override;
 
 private:
-    Qn::LicenseType m_licenseType;
-    boost::optional<bool> m_hasDualStreaming;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 using CameraResourceStubPtr = QnSharedResourcePointer<CameraResourceStub>;
