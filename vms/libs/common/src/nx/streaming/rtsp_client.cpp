@@ -139,6 +139,8 @@ void QnRtspIoDevice::shutdown()
 
 void QnRtspIoDevice::setTransport(RtspTransport rtspTransport)
 {
+    if (m_transport == rtspTransport)
+        return;
     m_transport = rtspTransport;
     if (m_transport == RtspTransport::tcp)
     {
@@ -654,6 +656,7 @@ bool QnRtspClient::sendSetup()
             transportStr += m_prefferedTransport == RtspTransport::tcp ? "TCP" : "UDP";
             transportStr += m_prefferedTransport == RtspTransport::multicast ? ";multicast;" : ";unicast;";
 
+            track.ioDevice->setTransport(m_prefferedTransport);
             if (m_prefferedTransport == RtspTransport::multicast)
             {
                 track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
@@ -684,7 +687,7 @@ bool QnRtspClient::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == RtspTransport::notDefined && m_prefferedTransport == RtspTransport::tcp)
+            if (m_transport == RtspTransport::tcp && m_prefferedTransport == RtspTransport::tcp)
             {
                 m_prefferedTransport = RtspTransport::udp;
                 if (!sendSetup()) //< Try UDP transport.
