@@ -1,41 +1,74 @@
 #include "camera_list_dialog.h"
 #include "ui_camera_list_dialog.h"
 
-#include <QtGui/QClipboard>
+#include <chrono>
+
+#include <QtCore/QScopedPointer>
 #include <QtWidgets/QMenu>
-#include <QtCore/QMimeData>
 
 #include <common/common_module.h>
-
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-
-#include <ui/models/camera_list_model.h>
-#include <ui/models/resource_search_proxy_model.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
-#include <ui/utils/table_export_helper.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-#include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-
+#include <ui/models/camera_list_model.h>
+#include <ui/models/resource_search_proxy_model.h>
+#include <ui/utils/table_export_helper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+#include <nx/utils/pending_operation.h>
+#include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+
+using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
-QnCameraListDialog::QnCameraListDialog(QWidget *parent):
+struct QnCameraListDialog::Private
+{
+    QnCameraListModel* const model;
+    QnResourceSearchProxyModel* const resourceSearch;
+    const QScopedPointer<nx::utils::PendingOperation> updateTitle;
+    QAction* const clipboardAction;
+    QAction* const exportAction;
+    QAction* const selectAllAction;
+
+    Private(QnCameraListDialog* q):
+        model(new QnCameraListModel(q)),
+        resourceSearch(new QnResourceSearchProxyModel(q)),
+        updateTitle(new nx::utils::PendingOperation()),
+        clipboardAction(new QAction(tr("Copy Selection to Clipboard"), q)),
+        exportAction(new QAction(tr("Export Selection to File..."), q)),
+        selectAllAction(new QAction(tr("Select All"), q))
+    {
+        resourceSearch->setSourceModel(model);
+        resourceSearch->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+        clipboardAction->setShortcut(QKeySequence::Copy);
+        selectAllAction->setShortcut(QKeySequence::SelectAll);
+
+        updateTitle->setInterval(1ms);
+        updateTitle->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+        updateTitle->setCallback([q]() { q->updateWindowTitle(); });
+
+        connect(resourceSearch, &QAbstractItemModel::rowsInserted,
+            updateTitle.data(), &nx::utils::PendingOperation::requestOperation);
+        connect(resourceSearch, &QAbstractItemModel::rowsRemoved,
+            updateTitle.data(), &nx::utils::PendingOperation::requestOperation);
+        connect(resourceSearch, &QAbstractItemModel::modelReset,
+            updateTitle.data(), &nx::utils::PendingOperation::requestOperation);
+    }
+};
+
+QnCameraListDialog::QnCameraListDialog(QWidget* parent):
     base_type(parent),
-    ui(new Ui::CameraListDialog),
-    m_model(new QnCameraListModel(this)),
-    m_resourceSearch(new QnResourceSearchProxyModel(this)),
-    m_pendingWindowTitleUpdate(false)
+    d(new Private(this)),
+    ui(new Ui::CameraListDialog)
 {
     ui->setupUi(this);
 
@@ -43,27 +76,22 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
         | Qt::WindowMaximizeButtonHint
         | Qt::MaximizeUsingFullscreenGeometryHint);
 
-    SnappedScrollBar* verticalScrollBar = new SnappedScrollBar(Qt::Vertical, this);
+    const auto verticalScrollBar = new SnappedScrollBar(Qt::Vertical, this);
     ui->camerasView->setVerticalScrollBar(verticalScrollBar->proxyScrollBar());
-    SnappedScrollBar* horizontalScrollBar = new SnappedScrollBar(Qt::Horizontal, this);
+    const auto horizontalScrollBar = new SnappedScrollBar(Qt::Horizontal, this);
     horizontalScrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->camerasView->setHorizontalScrollBar(horizontalScrollBar->proxyScrollBar());
 
-    m_resourceSearch->setSourceModel(m_model);
-    m_resourceSearch->setFilterCaseSensitivity(Qt::CaseInsensitive);
-
     updateCriterion();
 
-    connect(m_resourceSearch,   &QAbstractItemModel::rowsInserted,              this,   &QnCameraListDialog::updateWindowTitleLater);
-    connect(m_resourceSearch,   &QAbstractItemModel::rowsRemoved,               this,   &QnCameraListDialog::updateWindowTitleLater);
-    connect(m_resourceSearch,   &QAbstractItemModel::modelReset,                this,   &QnCameraListDialog::updateWindowTitleLater);
-    connect(this,               &QnCameraListDialog::updateWindowTitleQueued,   this,   &QnCameraListDialog::updateWindowTitle, Qt::QueuedConnection);
-
     ui->camerasView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->camerasView->setModel(m_resourceSearch);
-    connect(ui->filterLineEdit, &SearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
-    connect(ui->camerasView,    &QTableView::customContextMenuRequested,        this,   &QnCameraListDialog::at_camerasView_customContextMenuRequested);
-    connect(ui->camerasView,    &QTableView::doubleClicked,                     this,   &QnCameraListDialog::at_camerasView_doubleClicked);
+    ui->camerasView->setModel(d->resourceSearch);
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged,
+        this, &QnCameraListDialog::updateCriterion);
+    connect(ui->camerasView, &QTableView::customContextMenuRequested,
+        this, &QnCameraListDialog::at_camerasView_customContextMenuRequested);
+    connect(ui->camerasView, &QTableView::doubleClicked,
+        this, &QnCameraListDialog::at_camerasView_doubleClicked);
 
     connect(ui->addDeviceButton, &QPushButton::clicked, this,
         [this]
@@ -73,19 +101,14 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
             menu()->trigger(action::AddDeviceManuallyAction, parameters);
         });
 
+    connect(d->clipboardAction, &QAction::triggered,
+        this, &QnCameraListDialog::at_clipboardAction_triggered);
+    connect(d->exportAction, &QAction::triggered,
+        this, &QnCameraListDialog::at_exportAction_triggered);
+    connect(d->selectAllAction, &QAction::triggered,
+        ui->camerasView, &QTableView::selectAll);
 
-    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_clipboardAction->setShortcut(QKeySequence::Copy);
-    ui->camerasView->addAction(m_clipboardAction);
-
-    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
-    m_selectAllAction   = new QAction(tr("Select All"), this);
-    m_selectAllAction->setShortcut(QKeySequence::SelectAll);
-
-    connect(m_clipboardAction,  &QAction::triggered,                            this,   &QnCameraListDialog::at_clipboardAction_triggered);
-    connect(m_exportAction,     &QAction::triggered,                            this,   &QnCameraListDialog::at_exportAction_triggered);
-    connect(m_selectAllAction,  &QAction::triggered,                            ui->camerasView, &QTableView::selectAll);
-
+    ui->camerasView->addAction(d->clipboardAction);
     ui->camerasView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->camerasView->horizontalHeader()->setSectionResizeMode(QnCameraListModel::NameColumn,
         QHeaderView::Interactive); //< Name may be of any length
@@ -95,10 +118,13 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     ItemViewAutoHider::create(ui->camerasView, tr("No cameras"));
 }
 
-QnCameraListDialog::~QnCameraListDialog() { }
+QnCameraListDialog::~QnCameraListDialog()
+{
+}
 
-void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server) {
-    m_model->setServer(server);
+void QnCameraListDialog::setServer(const QnMediaServerResourcePtr& server)
+{
+    d->model->setServer(server);
     // This fix is for the first time, the user open the camera list that doesn't see
     // the title of that dialog to indicate the camera numbers. I've noticed that the
     // message/signal that invoke this updateWindowTitle slot will not be triggered
@@ -107,56 +133,49 @@ void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server) {
     updateWindowTitle();
 }
 
-QnMediaServerResourcePtr QnCameraListDialog::server() const {
-    return m_model->server();
+QnMediaServerResourcePtr QnCameraListDialog::server() const
+{
+    return d->model->server();
 }
 
-void QnCameraListDialog::updateWindowTitleLater() {
-    if(m_pendingWindowTitleUpdate)
-        return;
-
-    m_pendingWindowTitleUpdate = true;
-    updateWindowTitleQueued();
-}
-
-void QnCameraListDialog::updateWindowTitle() {
-    m_pendingWindowTitleUpdate = false;
-
+void QnCameraListDialog::updateWindowTitle()
+{
     QnVirtualCameraResourceList cameras;
-    for (int row = 0; row < m_resourceSearch->rowCount(); ++row) {
-        QModelIndex index = m_resourceSearch->index(row, 0);
+    for (int row = 0; row < d->resourceSearch->rowCount(); ++row)
+    {
+        const auto index = d->resourceSearch->index(row, 0);
         if (!index.isValid())
             continue;
-        if (QnVirtualCameraResourcePtr camera = index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>())
+        const auto camera = index.data(Qn::ResourceRole).value<QnResourcePtr>()
+            .dynamicCast<QnVirtualCameraResource>();
+        if (camera)
             cameras << camera;
     }
-    NX_ASSERT(cameras.size() == m_resourceSearch->rowCount(), "Make sure all found resources are cameras");
 
-    const QString titleServerPart = m_model->server()
-        ? QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-                //: Devices List for Server (192.168.0.1)
-                tr("Devices List for %1"),
+    NX_ASSERT(cameras.size() == d->resourceSearch->rowCount(),
+        "Make sure all found resources are cameras");
 
-                //: Cameras List for Server (192.168.0.1)
-                tr("Cameras List for %1")
-            ).arg(QnResourceDisplayInfo(m_model->server()).toString(Qn::RI_WithUrl))
-        : QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-            tr("Devices List"),
-            tr("Cameras List")
-            );
+    const QString titleServerPart =
+        [this]()
+        {
+            if (server())
+            {
+                return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+                    tr("Devices List for %1", "%1 will be substituted with a server name"),
+                    tr("Cameras List for %1", "%1 will be substituted with a server name"))
+                        .arg(QnResourceDisplayInfo(d->model->server()).toString(Qn::RI_WithUrl));
+            }
 
+            return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+                tr("Devices List"), tr("Cameras List"));
+        }();
 
-    const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(
-        resourcePool(),
+    const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(resourcePool(),
         QnCameraDeviceStringSet(
             tr("%n devices found",      "", cameras.size()),
             tr("%n cameras found",      "", cameras.size()),
-            tr("%n I/O modules found",  "", cameras.size())
-        ),
-        cameras
-     );
+            tr("%n I/O modules found",  "", cameras.size())),
+        cameras);
 
     const QString title = lit("%1 - %2").arg(titleServerPart).arg(titleCamerasPart);
     setWindowTitle(title);
@@ -167,27 +186,30 @@ void QnCameraListDialog::updateWindowTitle() {
 
 void QnCameraListDialog::updateCriterion()
 {
-    m_resourceSearch->setQuery(ui->filterLineEdit->text());
+    d->resourceSearch->setQuery(ui->filterLineEdit->text());
 }
 
-void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {
+void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex& index)
+{
     if (!index.isValid())
         return;
 
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource)
+    if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
         context()->menu()->trigger(action::CameraSettingsAction, resource);
 }
 
-void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {
+void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint& /*point*/)
+{
     QnResourceList resources;
-    foreach(QModelIndex idx, ui->camerasView->selectionModel()->selectedRows())
-        if (QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>())
+    for (const auto& index: ui->camerasView->selectionModel()->selectedRows())
+    {
+        if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
             resources.push_back(resource);
-
+    }
 
     QScopedPointer<QMenu> menu;
-    if (!resources.isEmpty()) {
+    if (!resources.isEmpty())
+    {
         action::Parameters parameters(resources);
         parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
@@ -195,36 +217,34 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
         menu.reset(context()->menu()->newMenu(action::TreeScope, nullptr,
             parameters, action::Manager::DontReuseActions));
 
-        foreach(QAction *action, menu->actions())
-            action->setShortcut(QKeySequence());
+        for (const auto action: menu->actions())
+            action->setShortcut({});
     }
 
-    if (menu) {
+    if (menu)
         menu->addSeparator();
-    } else {
+    else
         menu.reset(new QMenu(this));
-    }
 
-    m_clipboardAction->setEnabled(ui->camerasView->selectionModel()->hasSelection());
-    m_exportAction->setEnabled(ui->camerasView->selectionModel()->hasSelection());
+    d->clipboardAction->setEnabled(ui->camerasView->selectionModel()->hasSelection());
+    d->exportAction->setEnabled(ui->camerasView->selectionModel()->hasSelection());
 
-    menu->addAction(m_selectAllAction);
-    menu->addAction(m_exportAction);
-    menu->addAction(m_clipboardAction);
+    menu->addAction(d->selectAllAction);
+    menu->addAction(d->exportAction);
+    menu->addAction(d->clipboardAction);
 
     QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
-void QnCameraListDialog::at_exportAction_triggered() {
+void QnCameraListDialog::at_exportAction_triggered()
+{
     QnTableExportHelper::exportToFile(ui->camerasView, true, this,
-        QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
+        QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
             tr("Export selected devices to a file."),
-            tr("Export selected cameras to a file.")
-            ));
+            tr("Export selected cameras to a file.")));
 }
 
-void QnCameraListDialog::at_clipboardAction_triggered() {
+void QnCameraListDialog::at_clipboardAction_triggered()
+{
     QnTableExportHelper::copyToClipboard(ui->camerasView);
 }
-
