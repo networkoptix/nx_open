@@ -26,8 +26,6 @@
 #include <utils/math/math.h>
 #include <nx/utils/log/log_main.h>
 
-#include <nx/analytics/device_descriptor_manager.h>
-
 namespace {
 
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
@@ -554,19 +552,17 @@ const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
         return {};
 
     auto enabledEngines = userEnabledAnalyticsEngines();
-    const auto engineResources = resPool->getResources<nx::vms::common::AnalyticsEngineResource>();
 
-    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
-    const auto compatibleEngines =
-        deviceDescriptorManager.compatibleEngineIds(toSharedPointer(this));
+    const auto activeEngines = activeAnalyticsEngines();
+    const auto compatibleEngineResources = compatibleAnalyticsEngineResources();
 
-    for (const auto& engineResource: engineResources)
+    for (const auto& engineResource: compatibleEngineResources)
     {
-        if (!engineResource->isDeviceDependent())
+        const auto engineId = engineResource->getId();
+        if (!activeEngines.contains(engineId))
             continue;
 
-        const auto engineId = engineResource->getId();
-        if (compatibleEngines.find(engineResource->getId()) != compatibleEngines.cend())
+        if (engineResource->isDeviceDependent())
             enabledEngines.insert(engineId);
     }
 
@@ -613,7 +609,7 @@ const QSet<QnUuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const
 }
 
 nx::vms::common::AnalyticsEngineResourceList
-    QnVirtualCameraResource::compatibleAnalyticsEngineResources()
+    QnVirtualCameraResource::compatibleAnalyticsEngineResources() const
 {
     const auto resPool = resourcePool();
     if (!resPool)

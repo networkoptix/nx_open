@@ -89,7 +89,7 @@ public:
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
     const QSet<QnUuid> compatibleAnalyticsEngines() const;
-    nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources();
+    nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
