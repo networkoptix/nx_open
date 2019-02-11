@@ -614,7 +614,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             m_targetVersion = nx::utils::SoftwareVersion(checkResponse.info.version);
             m_targetChangeset = m_targetVersion.build();
 
-            if (checkResponse.isValid() && !checkResponse.alreadyInstalled)
+            if (checkResponse.isValidToInstall() && !checkResponse.alreadyInstalled)
                 m_haveValidUpdate = true;
         }
         else
@@ -1119,7 +1119,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
          */
         auto installedVersions = m_clientUpdateTool->getInstalledVersions();
         if (!m_serverUpdateTool->verifyUpdateManifest(updateInfo, installedVersions)
-            || !updateInfo.isValid())
+            || !updateInfo.isValidToInstall())
         {
             // We can reach here when we reconnect to the server with complete updates.
             NX_INFO(NX_SCOPE_TAG,
