@@ -20,6 +20,6 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
-    std::list<std::pair<QnUuid, std::future<Qn::ResourceStatus>>> m_wathchedResources;
+    std::list<std::pair<QnUuid, std::future<Qn::ResourceStatus>>> m_watchedResources;
     std::optional<int> m_timerId;
 };

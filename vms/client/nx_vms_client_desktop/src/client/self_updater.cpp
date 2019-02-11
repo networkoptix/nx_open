@@ -646,7 +646,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
             QnAppInfo::productNameLong(),
             QnClientAppInfo::applicationDisplayName(),
             iconName,
-            SoftwareVersion(QnAppInfo::engineVersion()));
+            SoftwareVersion(QnAppInfo::applicationVersion()));
     #endif // defined(Q_OS_LINUX)
 
     return true;

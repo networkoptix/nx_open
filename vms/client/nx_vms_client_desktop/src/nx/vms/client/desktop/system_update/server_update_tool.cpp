@@ -1124,7 +1124,7 @@ QUrl generateUpdatePackageUrl(
         QString password = passwordForBuild(key);
         // Changeset will contain either full version like "4.0.0.28340",
         // or only build number like "28340".
-        query.addQueryItem("version", changeset);
+        query.addQueryItem("version", key);
         query.addQueryItem("password", password);
     }
 

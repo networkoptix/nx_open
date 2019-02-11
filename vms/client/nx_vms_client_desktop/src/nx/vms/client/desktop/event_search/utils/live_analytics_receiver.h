@@ -2,12 +2,12 @@
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
 
 #include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/streaming/media_data_packet.h>
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,7 +32,7 @@ signals:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

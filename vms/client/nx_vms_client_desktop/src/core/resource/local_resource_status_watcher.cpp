@@ -30,9 +30,9 @@ QnLocalResourceStatusWatcher::~QnLocalResourceStatusWatcher()
 
 void QnLocalResourceStatusWatcher::onResourceAdded(const QnResourcePtr& resource)
 {
-    if (auto aviResource = resource.template dynamicCast<QnAviResource>())
+    if (auto aviResource = resource.dynamicCast<QnAviResource>())
     {
-        m_wathchedResources.emplace_back(std::make_pair(aviResource->getId(),
+        m_watchedResources.emplace_back(std::make_pair(aviResource->getId(),
             std::async(std::launch::async,
             [aviResource]() { return getAviResourceStatus(aviResource); })));
     }
@@ -41,7 +41,7 @@ void QnLocalResourceStatusWatcher::onResourceAdded(const QnResourcePtr& resource
 void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
 {
     const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    for (auto it = m_wathchedResources.begin(); it != m_wathchedResources.end();)
+    for (auto it = m_watchedResources.begin(); it != m_watchedResources.end();)
     {
         NX_ASSERT(it->second.valid());
         if (it->second.wait_for(std::chrono::milliseconds::zero()) != std::future_status::ready)
@@ -59,7 +59,7 @@ void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
         }
         else
         {
-            it = m_wathchedResources.erase(it);
+            it = m_watchedResources.erase(it);
         }
     }
 }

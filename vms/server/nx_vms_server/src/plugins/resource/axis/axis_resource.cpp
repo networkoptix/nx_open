@@ -426,7 +426,7 @@ bool resolutionGreaterThan(
 }
 
 nx::vms::server::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDriver(
-    MotionStreamType streamIndex)
+    StreamIndex streamIndex)
 {
     using namespace nx::vms::server::resource;
 

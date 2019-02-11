@@ -96,19 +96,19 @@ private:
             if (isCamera)
             {
                 const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
-                    QnCameraDeviceStringSet("<unused>", tr("Current camera"), tr("Current device")),
+                    QnCameraDeviceStringSet("<unused>", tr("Selected camera"), tr("Selected device")),
                     camera);
 
                 m_resourceButton->setText(kTemplate.arg(baseText, name));
             }
             else
             {
-                m_resourceButton->setText(kTemplate.arg(tr("Current media"), name));
+                m_resourceButton->setText(kTemplate.arg(tr("Selected media"), name));
             }
         }
         else
         {
-            m_resourceButton->setText(kTemplate.arg(tr("Current camera"),
+            m_resourceButton->setText(kTemplate.arg(tr("Selected camera"),
                 tr("none", "No currently selected camera")));
         }
     }

@@ -37,11 +37,11 @@ public:
     static const int kDefaultSecondStreamFpsHigh;
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
-    using MotionStreamType = nx::vms::api::MotionStreamType;
+    using StreamIndex = nx::vms::api::StreamIndex;
 
     struct MotionStreamIndex
     {
-        MotionStreamType index = MotionStreamType::undefined;
+        StreamIndex index = StreamIndex::undefined;
         bool isForced = false;
     };
 public:
@@ -349,8 +349,8 @@ public:
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps,
         const QString& codec, Qn::ConnectionRole role = Qn::CR_Default) const;
 
-    static Qn::ConnectionRole toConnectionRole(MotionStreamType index);
-    static MotionStreamType toStreamIndex(Qn::ConnectionRole role);
+    static Qn::ConnectionRole toConnectionRole(StreamIndex index);
+    static StreamIndex toStreamIndex(Qn::ConnectionRole role);
 
     nx::core::ptz::PresetType preferredPtzPresetType() const;
 

@@ -916,6 +916,9 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::updatePtzController()
 {
+    if (!item())
+        return;
+
     const auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
     const auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
@@ -1894,21 +1897,7 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, 
 void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect)
 {
     ensureMotionSensitivity();
-
-    if (options() & DisplayMotionSensitivity)
-    {
-        NX_ASSERT(m_motionSensitivityColors.size() == QnMotionRegion::kSensitivityLevelCount);
-        for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; ++i)
-        {
-            QColor color = i < m_motionSensitivityColors.size() ? m_motionSensitivityColors[i] : QColor(Qt::darkRed);
-            color.setAlphaF(kMotionRegionAlpha);
-            QPainterPath path = m_motionSensitivity[channel].getRegionBySensPath(i);
-            paintFilledRegionPath(painter, rect, path, color, Qt::black);
-        }
-
-        paintMotionSensitivityIndicators(painter, channel, rect);
-    }
-    else if (m_motionSensitivity.size() > channel)
+    if (m_motionSensitivity.size() > channel)
     {
         paintFilledRegionPath(painter,
             rect,
@@ -1984,9 +1973,6 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
 
     if (isZoomWindow())
         return Qn::MainWindow_MediaItem_ZoomWindows_Help;
-
-    if (options().testFlag(DisplayMotionSensitivity))
-        return Qn::CameraSettings_Motion_Help;
 
     if (options().testFlag(DisplayMotion))
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
@@ -2079,11 +2065,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         if (switchedToPtzMode)
         {
             titleBar()->rightButtonsBar()->setButtonsChecked(
-				Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
-            titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, true);
-
-            // TODO: #gdm evil hack! Won't work if SYNC is off and this item is not selected.
-            action(action::JumpToLiveAction)->trigger();
+	        Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
         }
     }
 
@@ -2109,6 +2091,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         codecString = codecContext->getCodecName();
 
     QString hqLqString;
+    QString protocolString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
     {
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
@@ -2120,12 +2103,12 @@ QString QnMediaResourceWidget::calculateDetailsText() const
             {
                 case nx::network::Protocol::udt:
                     // aka UDP hole punching.
-                    hqLqString += " (N)";
+                    protocolString = " (N)";
                     break;
 
                 case nx::network::cloud::Protocol::relay:
                     // relayed connection (aka proxy).
-                    hqLqString += " (P)";
+                    protocolString = " (P)";
                     break;
 
                 default:
@@ -2138,22 +2121,29 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     static const int kDetailsTextPixelSize = 11;
 
     QString result;
+    const auto addDetailsString =
+		[&result](const QString& value)
+        {
+            if (!value.isEmpty())
+                result.append(htmlFormattedParagraph(value, kDetailsTextPixelSize, /*bold*/ true));
+        };
+
     if (hasVideo())
     {
         const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
         const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
         const QSize actualResolution = Geometry::cwiseMul(channelResolution, videoLayout);
 
-        result.append(
-            htmlFormattedParagraph(
-                lit("%1x%2").arg(actualResolution.width()).arg(actualResolution.height()),
-                kDetailsTextPixelSize,
-                true));
-        result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
+        addDetailsString(QString("%1x%2")
+			.arg(actualResolution.width())
+			.arg(actualResolution.height()));
+        addDetailsString(QString("%1fps").arg(fps, 0, 'f', 2));
     }
-    result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
-    result.append(htmlFormattedParagraph(codecString, kDetailsTextPixelSize, true));
-    result.append(htmlFormattedParagraph(hqLqString, kDetailsTextPixelSize, true));
+
+    const QString bandwidthString = QString("%1Mbps").arg(mbps, 0, 'f', 2);
+    addDetailsString(bandwidthString + protocolString);
+    addDetailsString(codecString);
+    addDetailsString(hqLqString);
 
     return result;
 }
@@ -2624,6 +2614,9 @@ void QnMediaResourceWidget::updateDewarpingParams()
 
 void QnMediaResourceWidget::updateFisheye()
 {
+    if (!item())
+        return;
+
     auto itemParams = item()->dewarpingParams();
 
     // Zoom windows have no own "dewarping" button, so counting it always pressed.
@@ -2863,6 +2856,14 @@ bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
 void QnMediaResourceWidget::setPtzMode(bool value)
 {
     const bool ptzEnabled = value && d->canControlPtz();
+    if (ptzEnabled)
+    {
+        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, true);
+
+        // TODO: #gdm evil hack! Won't work if SYNC is off and this item is not selected.
+        action(action::JumpToLiveAction)->trigger();
+    }
+
     setOption(ControlPtz, ptzEnabled);
 }
 

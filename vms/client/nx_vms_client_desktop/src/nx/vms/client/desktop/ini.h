@@ -28,7 +28,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, allowCustomArZoomWindows, "Allow zoom windows to have custom aspect ratio.");
     NX_INI_INT(500, analyticsVideoBufferLengthMs, "Video buffer length when analytics mode is enabled on a camera.");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hide enhanced video from the scene.");
-    NX_INI_FLAG(1, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
     NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree, "Display analytics engine items in the resource tree.");

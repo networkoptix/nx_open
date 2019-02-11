@@ -186,8 +186,9 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 {
                     contents.filesToUpload.push_back(pkg.file);
                     pkg.url = "";
-                    // This was breaking offline updates for client.
-                    //pkg.file = uploadDestination + file.fileName();
+                    // dkargin: This was breaking offline updates for client.
+                    // dkargin: Why was it?
+                    pkg.file = uploadDestination + file.fileName();
                     checked.push_back(pkg);
                 }
                 else

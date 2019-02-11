@@ -151,7 +151,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     }
 }
 
-nx::vms::api::MotionStreamType QnLiveStreamProvider::encoderIndex() const
+nx::vms::api::StreamIndex QnLiveStreamProvider::encoderIndex() const
 {
     return QnSecurityCamResource::toStreamIndex(getRole());
 }
@@ -291,9 +291,9 @@ bool QnLiveStreamProvider::needAnalyzeMotion()
     switch (getRole())
     {
         case Qn::CR_LiveVideo:
-            return motionStreamIndex == nx::vms::api::MotionStreamType::primary;
+            return motionStreamIndex == nx::vms::api::StreamIndex::primary;
         case Qn::CR_SecondaryLiveVideo:
-            return motionStreamIndex == nx::vms::api::MotionStreamType::secondary;
+            return motionStreamIndex == nx::vms::api::StreamIndex::secondary;
         default:
             break;
     }
@@ -579,7 +579,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
 
     //no secondary stream and no motion, may be primary stream is now OK for motion?
     bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION
-        || m_cameraRes->motionStreamIndex().index == nx::vms::api::MotionStreamType::primary;
+        || m_cameraRes->motionStreamIndex().index == nx::vms::api::StreamIndex::primary;
 
     bool cameraValue = m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability;
     if (newValue != cameraValue)

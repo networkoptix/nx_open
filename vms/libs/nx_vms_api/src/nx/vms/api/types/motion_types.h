@@ -17,13 +17,13 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
 Q_DECLARE_FLAGS(MotionTypes, MotionType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 
-enum class MotionStreamType
+enum class StreamIndex
 {
     undefined = -1,
     primary = 0,
     secondary = 1
 };
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionStreamType)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
 } // namespace nx::vms::api
 

@@ -77,7 +77,7 @@ public:
     void setCustomMediaPortUsed(bool value);
     void setTrustCameraTime(bool value);
     void setCustomMediaPort(int value);
-    void setForcedMotionStreamType(nx::vms::api::MotionStreamType value);
+    void setForcedMotionStreamType(nx::vms::api::StreamIndex value);
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();

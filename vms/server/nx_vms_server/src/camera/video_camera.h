@@ -34,7 +34,7 @@ namespace nx { namespace vms::server { class Settings; } }
 class QnAbstractMediaServerVideoCamera: public QnAbstractVideoCamera
 {
 public:
-    using MotionStreamType = nx::vms::api::MotionStreamType;
+    using StreamIndex = nx::vms::api::StreamIndex;
 
     virtual ~QnAbstractMediaServerVideoCamera() override = default;
 
@@ -46,22 +46,22 @@ public:
     virtual QnLiveStreamProviderPtr getSecondaryReader() = 0;
 
     virtual int copyLastGop(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         bool iFramesOnly) = 0;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         int channel) const = 0;
-    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(MotionStreamType streamIndex) const = 0;
+    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(StreamIndex streamIndex) const = 0;
 
     /**
      * @return I-frame and the following P-frames up to the desired frame. Can be null but not
      * empty.
      */
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
@@ -114,20 +114,20 @@ public:
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
     virtual int copyLastGop(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         bool iFramesOnly) override;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         int channel) const override;
 
     virtual QnConstCompressedAudioDataPtr getLastAudioFrame(
-        MotionStreamType streamIndex) const override;
+        StreamIndex streamIndex) const override;
 
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const;
@@ -174,7 +174,7 @@ private:
     QElapsedTimer m_lastActivityTimer;
 
 private:
-    QnVideoCameraGopKeeper* getGopKeeper(MotionStreamType streamIndex) const;
+    QnVideoCameraGopKeeper* getGopKeeper(StreamIndex streamIndex) const;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(
         QnServer::ChunksCatalog catalog, bool ensureInitialized);

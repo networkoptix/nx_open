@@ -471,7 +471,6 @@ bool QnAviArchiveDelegate::open(
         getVideoLayout();
     }
     m_keyFrameFound.resize(m_formatContext->nb_streams, false);
-    m_resource->setStatus(Qn::Online);
     return m_initialized;
 }
 

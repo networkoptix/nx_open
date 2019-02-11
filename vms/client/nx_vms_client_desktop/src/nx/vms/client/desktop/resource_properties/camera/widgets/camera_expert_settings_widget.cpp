@@ -159,13 +159,13 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
             if (ui->checkBoxForceMotionDetection->isChecked())
             {
                 const auto type = ui->comboBoxForcedMotionStream->currentData();
-                store->setForcedMotionStreamType(type.canConvert<vms::api::MotionStreamType>()
-                    ? type.value<vms::api::MotionStreamType>()
-                    : vms::api::MotionStreamType::primary);
+                store->setForcedMotionStreamType(type.canConvert<vms::api::StreamIndex>()
+                    ? type.value<vms::api::StreamIndex>()
+                    : vms::api::StreamIndex::primary);
             }
             else
             {
-                store->setForcedMotionStreamType(vms::api::MotionStreamType::undefined);
+                store->setForcedMotionStreamType(vms::api::StreamIndex::undefined);
             }
         };
 
@@ -301,13 +301,13 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             combo_box_utils::insertMultipleValuesItem(ui->comboBoxForcedMotionStream);
             ui->comboBoxForcedMotionStream->addItem(
 			    tr("Primary", "Primary stream for motion detection"),
-                QVariant::fromValue(nx::vms::api::MotionStreamType::primary));
+                QVariant::fromValue(nx::vms::api::StreamIndex::primary));
 
             if (state.devicesDescription.hasDualStreamingCapability == CombinedValue::All)
             {
                 ui->comboBoxForcedMotionStream->addItem(
 				    tr("Secondary", "Secondary stream for motion detection"),
-                    QVariant::fromValue(nx::vms::api::MotionStreamType::secondary));
+                    QVariant::fromValue(nx::vms::api::StreamIndex::secondary));
             }
 
             if (state.expert.forcedMotionStreamType.hasValue())

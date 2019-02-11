@@ -49,7 +49,14 @@ nx_rdep_configure()
 
 include(cmake/mercurial.cmake)
 hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
+if(NOT changeSet)
+    message(FATAL_ERROR "Hg changeset cannot be calculated.")
+endif()
+
 hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
+if(NOT branch)
+    message(FATAL_ERROR "Hg branch cannot be calculated.")
+endif()
 
 include(cmake/dependencies.cmake)
 
