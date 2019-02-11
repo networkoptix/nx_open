@@ -14,7 +14,6 @@
 
 #include <nx/analytics/types.h>
 #include <nx/analytics/utils.h>
-#include <nx/analytics/device_descriptor_manager.h>
 
 namespace nx::vms::common {
 
@@ -101,10 +100,7 @@ bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePt
     if (!isDeviceDependent())
         return false;
 
-    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
-    const auto compatibleEngines = deviceDescriptorManager.compatibleEngineIds(device);
-
-    return compatibleEngines.find(getId()) != compatibleEngines.cend();
+    return device->compatibleAnalyticsEngines().contains(getId());
 }
 
 } // namespace nx::vms::common
