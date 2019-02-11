@@ -52,7 +52,7 @@ Qn::ResourceStatus CameraResourceStub::getStatus() const
 bool CameraResourceStub::hasDualStreamingInternal() const
 {
     if (d->hasDualStreaming.has_value())
-        return d->hasDualStreaming.value();
+        return *d->hasDualStreaming;
 
     return base_type::hasDualStreamingInternal();
 }
