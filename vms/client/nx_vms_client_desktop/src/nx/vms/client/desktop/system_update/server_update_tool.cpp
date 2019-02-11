@@ -668,12 +668,10 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     contents.sourceType = nx::update::UpdateSourceType::mediaservers;
     contents.source = "mediaservers";
     contents.info = m_updateManifest;
-    auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
-    bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
-    nx::update::findPackage(*commonModule(), &contents.clientPackage, &errorMessage);
+    nx::update::findPackage(
+        *commonModule(), m_updateManifest, &contents.clientPackage, &errorMessage);
     // TODO: Should move this to Widget somehow.
     verifyUpdateManifest(contents, {});
     return contents;

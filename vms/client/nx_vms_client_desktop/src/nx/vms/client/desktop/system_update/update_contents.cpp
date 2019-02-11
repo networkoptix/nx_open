@@ -225,8 +225,11 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (checkClient)
     {
         auto systemInfo = QnAppInfo::currentSystemInformation();
-        if (nx::update::findPackage(*commonModule, &contents.clientPackage, &errorMessage)
-            != nx::update::FindPackageResult::ok)
+        if (nx::update::findPackage(
+                *commonModule,
+                contents.info,
+                &contents.clientPackage,
+                &errorMessage) != nx::update::FindPackageResult::ok)
         {
             NX_ERROR(typeid(UpdateContents))
                 << "verifyUpdateManifest(" << contents.info.version
