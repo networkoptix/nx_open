@@ -503,9 +503,12 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 
 const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
+    const auto resourcePool = this->resourcePool();
+    if (!resourcePool)
+        return {};
+
     auto enabledEngines = userEnabledAnalyticsEngines();
-    const auto engineResources = commonModule()
-        ->resourcePool()
+    const auto engineResources = resourcePool
         ->getResources<nx::vms::common::AnalyticsEngineResource>();
 
     nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
