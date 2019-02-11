@@ -49,8 +49,6 @@ set(ios.group_identifier "group.jp.co.systemk.SkMobile")
 set(ios.sign.identity "iPhone Distribution: SYSTEMK CORPORATION (22S3ZFXRW5)")
 
 set(mac.sign.identity "Developer ID Application: SYSTEMK CORPORATION (22S3ZFXRW5)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: SYSTEMK CORPORATION (22S3ZFXRW5)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: SYSTEMK CORPORATION (22S3ZFXRW5)")
 set(mac.bundle.identifier "jp.co.systemk.SkVms2")
 set(mac.protocol_handler_bundle.identifier "jp.co.systemk.SkVms2.protocol_handler")
 

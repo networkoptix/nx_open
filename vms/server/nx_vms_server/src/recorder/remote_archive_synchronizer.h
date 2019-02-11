@@ -25,7 +25,7 @@ namespace recorder {
 
 class RemoteArchiveSynchronizer:
     public QObject,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     using TaskMap = nx::utils::Lockable<std::map<QnUuid, RemoteArchiveTaskPtr>>;
@@ -54,7 +54,6 @@ private:
     std::unique_ptr<RemoteArchiveWorkerPool> m_workerPool;
     std::atomic<bool> m_terminated{false};
 };
-
 
 } // namespace recorder
 } // namespace vms::server

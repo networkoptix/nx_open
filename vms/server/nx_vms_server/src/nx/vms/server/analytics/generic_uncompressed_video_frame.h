@@ -3,13 +3,13 @@
 #include <vector>
 
 #include <nx/utils/log/assert.h>
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx::vms::server::analytics {
 
 class GenericUncompressedVideoFrame:
-    public nxpt::CommonRefCounter<nx::sdk::analytics::IUncompressedVideoFrame>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IUncompressedVideoFrame>
 {
 public:
     GenericUncompressedVideoFrame(
@@ -30,8 +30,6 @@ public:
         NX_ASSERT(!m_data.empty());
         NX_ASSERT(m_lineSizes.size() == m_data.size());
     }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual int64_t timestampUs() const override { return m_timestampUs; }
     virtual int width() const override { return m_width; }

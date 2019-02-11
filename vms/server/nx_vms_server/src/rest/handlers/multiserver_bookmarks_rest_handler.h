@@ -6,7 +6,7 @@
 
 class QnMultiserverBookmarksRestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnMultiserverBookmarksRestHandler(QnMediaServerModule* serverModule, const QString& path);

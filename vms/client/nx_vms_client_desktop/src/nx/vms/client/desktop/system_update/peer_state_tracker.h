@@ -62,7 +62,13 @@ class PeerStateTracker:
 
 public:
     PeerStateTracker(QObject* parent = nullptr);
-    void setResourceFeed(QnResourcePool* pool);
+
+    /**
+     * Attaches state tracker to a resource pool. All previous attachments are discarded.
+     * @param pool Pointer to the resource pool.
+     * @return False if got empty resource pool or systemId.
+     */
+    bool setResourceFeed(QnResourcePool* pool);
 
     UpdateItemPtr findItemById(QnUuid id) const;
     UpdateItemPtr findItemByRow(int row) const;

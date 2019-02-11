@@ -9,39 +9,20 @@
 namespace nx {
 namespace usb_cam {
 
-NativeStreamReader::NativeStreamReader(
-    int encoderIndex,
-    const CodecParameters& codecParams,
-    const std::shared_ptr<Camera>& camera)
-    :
-    StreamReaderPrivate(encoderIndex, camera)
+NativeStreamReader::NativeStreamReader(const std::shared_ptr<Camera>& camera):
+    m_camera(camera)
 {
-    m_camera->videoStream()->setResolution(codecParams.resolution);
-    m_camera->videoStream()->setFps(codecParams.fps);
-    m_camera->videoStream()->setBitrate(codecParams.bitrate);
+    CodecParameters codecParams = camera->defaultVideoParameters();
+    camera->videoStream()->setResolution(codecParams.resolution);
+    camera->videoStream()->setFps(codecParams.fps);
+    camera->videoStream()->setBitrate(codecParams.bitrate);
 }
 
-NativeStreamReader::~NativeStreamReader()
+int NativeStreamReader::processPacket(
+    const std::shared_ptr<ffmpeg::Packet>& source, std::shared_ptr<ffmpeg::Packet>& result)
 {
-    m_avConsumer->interrupt();
-    // Avoid virtual removeVideoConsumer()
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
-}
-
-int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
-{
-    *lpPacket = nullptr;
-
-    ensureConsumerAdded();
-
-    auto packet = nextPacket();
-
-    if (!packet)
-        return handleNxError();
-
-    *lpPacket = toNxPacket(packet.get()).release();
-
-    return nxcip::NX_NO_ERROR;
+    result = source;
+    return 0;
 }
 
 void NativeStreamReader::setFps(float fps)
@@ -56,42 +37,6 @@ void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 void NativeStreamReader::setBitrate(int bitrate)
 {
     m_camera->videoStream()->setBitrate(bitrate);
-}
-
-void NativeStreamReader::ensureConsumerAdded()
-{
-    if (!m_audioConsumerAdded)
-        StreamReaderPrivate::ensureConsumerAdded();
-
-    if(! m_videoConsumerAdded)
-    {
-        m_camera->videoStream()->addPacketConsumer(m_avConsumer);
-        m_videoConsumerAdded = true;
-    }
-}
-
-std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
-{
-    if (m_camera->audioEnabled() && !m_avConsumer->waitForTimespan(kStreamDelay, kWaitTimeout))
-        return nullptr;
-
-    for (;;)
-    {
-        auto popped = m_avConsumer->popOldest(kWaitTimeout);
-        if (!popped)
-        {
-            if (shouldStopWaitingForData())
-                return nullptr;
-            continue;
-        }
-        return popped;
-    }
-}
-
-void NativeStreamReader::removeVideoConsumer()
-{
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
-    m_videoConsumerAdded = false;
 }
 
 } // namespace usb_cam

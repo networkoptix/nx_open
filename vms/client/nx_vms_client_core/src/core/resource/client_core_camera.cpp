@@ -42,7 +42,6 @@ void Camera::setName(const QString& name)
     emit nameChanged(toSharedPointer(this));
 }
 
-
 Qn::ResourceFlags Camera::flags() const {
     Qn::ResourceFlags result = base_type::flags();
     if (isIOModule())
@@ -55,7 +54,7 @@ Qn::ResourceStatus Camera::getStatus() const
     if (auto context = commonModule())
     {
         Qn::ResourceStatus serverStatus =
-            context->statusDictionary()->value(getParentId());
+            context->resourceStatusDictionary()->value(getParentId());
         if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
             return Qn::Offline;
     }

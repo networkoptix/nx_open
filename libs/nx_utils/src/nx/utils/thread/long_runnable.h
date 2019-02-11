@@ -16,13 +16,8 @@ class NX_UTILS_API QnLongRunnable:
     Q_OBJECT
 
 public:
-    enum class Tracking
-    {
-        disabled,
-        enabled,
-    };
 
-    QnLongRunnable(Tracking tracking = Tracking::enabled);
+    QnLongRunnable(const char* threadName = nullptr);
     ~QnLongRunnable();
 
 protected:

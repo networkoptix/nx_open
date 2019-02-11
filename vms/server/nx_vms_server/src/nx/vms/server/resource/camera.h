@@ -45,11 +45,11 @@ struct StreamCapabilityKey
     }
 };
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
-using StreamCapabilityMaps = QMap<Qn::StreamIndex, StreamCapabilityMap>;
+using StreamCapabilityMaps = QMap<nx::vms::api::MotionStreamType, StreamCapabilityMap>;
 
 class Camera:
     public QnVirtualCameraResource,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     using base_type = QnVirtualCameraResource;
@@ -95,7 +95,7 @@ public:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
 
     /** Gets supported codecs and their resolution list. */
-    StreamCapabilityMap getStreamCapabilityMap(Qn::StreamIndex streamIndex);
+    StreamCapabilityMap getStreamCapabilityMap(nx::vms::api::MotionStreamType streamIndex);
 
     /**
      * @param resolution Resolution for which we want to find the closest one.
@@ -190,7 +190,6 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
 
-
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -223,7 +222,8 @@ protected:
      * For each key optional CameraStreamCapability could be provided.
      * CameraStreamCapability could be null. That case it is auto-filled with default values.
      */
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex) = 0;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(
+        nx::vms::api::MotionStreamType streamIndex);
 
     /**
      * @return stream capability traits
@@ -245,8 +245,9 @@ protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 
 private:
-    using StreamCapabilityAdvancedParameterProviders
-        = std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
+    using StreamCapabilityAdvancedParameterProviders = std::map<
+        nx::vms::api::MotionStreamType,
+        std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
 
     int m_channelNumber; // video/audio source number
     nx::streaming::rtp::TimeOffsetPtr m_timeOffset;
@@ -254,7 +255,7 @@ private:
     QAuthenticator m_lastCredentials;
     AdvancedParametersProvider* m_defaultAdvancedParametersProvider = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
-    std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
+    StreamCapabilityAdvancedParameterProviders m_streamCapabilityAdvancedProviders;
     CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
     nx::media::CameraTraits m_mediaTraits;
 

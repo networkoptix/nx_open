@@ -16,7 +16,7 @@ namespace ffmpeg {
 class Frame
 {
 public:
-    Frame(const std::shared_ptr<std::atomic_int>& frameCount = nullptr);
+    Frame();
     ~Frame();
 
     uint64_t timestamp() const;
@@ -44,7 +44,6 @@ public:
 private:
     uint64_t m_timestamp = 0;
     AVFrame * m_frame = nullptr;
-    std::shared_ptr<std::atomic_int> m_frameCount;
 };
 
 } // namespace ffmpeg

@@ -9,7 +9,7 @@
 #include "../details/node_view_model.h"
 #include "../details/node_view_state_patch.h"
 #include "../details/node/view_node_helpers.h"
-#include "../node_view/sorting/node_view_numeric_sort_model.h"
+#include "../node_view/sorting_filtering/node_view_numeric_sort_model.h"
 
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>

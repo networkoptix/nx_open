@@ -11,9 +11,9 @@
 
 class GenericUserDataProvider:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public nx::vms::auth::AbstractUserDataProvider,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

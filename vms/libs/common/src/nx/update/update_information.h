@@ -31,7 +31,7 @@ struct Package
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
-QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json))
+QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json)(eq))
 
 struct Information
 {
@@ -44,6 +44,8 @@ struct Information
     /** We need to be able to show this data without internet. */
     QString description;
     QList<Package> packages;
+    QList<QnUuid> participants;
+    qint64 lastInstallationRequestTime = -1;
 
     /** Release date - in msecs since epoch. */
     qint64 releaseDateMs = 0;
@@ -54,8 +56,10 @@ struct Information
     bool isEmpty() const { return packages.isEmpty(); }
 };
 
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(description)(packages)
-QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
+    (description)(packages)(participants)(lastInstallationRequestTime)
+
+QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
 
 enum class InformationError
 {
@@ -188,7 +192,8 @@ struct UpdateContents
      * Maps system information to a set of packages. We use this cache to find and check
      * if a specific OS variant is supported.
      */
-    PackageCache packageCache;
+    PackageCache serverPackageCache;
+    PackageCache clientPackageCache;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;

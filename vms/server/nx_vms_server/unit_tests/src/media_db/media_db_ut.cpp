@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <sstream>
+#include <boost/variant/multivisitors.hpp>
 
 #include <QtCore>
 #include <QtSql>
@@ -34,41 +35,9 @@
 #include <media_server/media_server_module.h>
 
 #include "../media_server_module_fixture.h"
+#include <nx/utils/std/thread.h>
 
-struct ErrorStream
-{
-    QnMutex mutex;
-    std::unique_ptr<std::stringstream> stream;
-
-    void reset()
-    {
-        QnMutexLocker lock(&mutex);
-        stream.reset(new std::stringstream);
-    }
-
-    ErrorStream(): stream(new std::stringstream) {}
-};
-
-template<class _Elem, class _Traits>
-using EndlType = std::basic_ostream<_Elem, _Traits>& (*)(std::basic_ostream<_Elem, _Traits>&);
-
-ErrorStream& operator<<(ErrorStream& stream, EndlType<char, std::char_traits<char>>)
-{
-    QnMutexLocker lock(&stream.mutex);
-    *(stream.stream) << std::endl;
-    return stream;
-}
-
-template<typename T>
-ErrorStream& operator<<(ErrorStream& stream, T&& t)
-{
-    QnMutexLocker lock(&stream.mutex);
-    *(stream.stream) << std::forward<T>(t);
-    return stream;
-}
-
-ErrorStream errorStream;
-
+namespace nx::media_db::test {
 void generateCameraUid(QByteArray *camUid, size_t n)
 {
     for (size_t i = 0; i < n; i++)
@@ -89,7 +58,7 @@ struct TestFileOperation
 {
     qint64 startTime;
     qint64 fileSize;
-    int code;
+    RecordType type;
     int cameraId;
     int duration;
     int timeZone;
@@ -100,18 +69,18 @@ struct TestFileOperation
 bool operator == (const TestFileOperation &lhs, const TestFileOperation &rhs)
 {
     return lhs.startTime == rhs.startTime && lhs.fileSize == rhs.fileSize &&
-        lhs.code == rhs.code && lhs.cameraId == rhs.cameraId &&
+        lhs.type == rhs.type && lhs.cameraId == rhs.cameraId &&
         lhs.timeZone == rhs.timeZone && lhs.duration == rhs.duration &&
         lhs.chunksCatalog == rhs.chunksCatalog && lhs.fileIndex == rhs.fileIndex;
 }
 
-TestFileOperation generateFileOperation(int code)
+TestFileOperation generateFileOperation(RecordType type)
 {
     TestFileOperation result;
 
     result.startTime = nx::utils::random::number(1000LL, 439804651110LL);
     result.fileSize = nx::utils::random::number(0LL, 54975581388LL);
-    result.code = code;
+    result.type = type;
     result.cameraId = nx::utils::random::number(0, 65535);
     result.duration = nx::utils::random::number(0, 1048575);
 
@@ -134,17 +103,23 @@ TestFileOperation generateFileOperation(int code)
         ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
         : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
 
-    errorStream
-        << "result.startTime: " << result.startTime << std::endl
-        << "result.fileSize: " << result.fileSize << std::endl
-        << "result.code: " << result.code << std::endl
-        << "result.cameraId: " << result.cameraId << std::endl
-        << "result.duration: " << result.duration << std::endl
-        << "result.timezone: " << result.timeZone << std::endl
-        << "result.catalog: " << result.chunksCatalog << std::endl
-        << "result.fileIndex: " << result.fileIndex << std::endl;
-
     return result;
+}
+
+nx::media_db::MediaFileOperation fromTestFileOperation(const TestFileOperation& testFileOperation)
+{
+    nx::media_db::MediaFileOperation mfop;
+
+    mfop.setCameraId(testFileOperation.cameraId);
+    mfop.setCatalog(testFileOperation.chunksCatalog);
+    mfop.setDuration(testFileOperation.duration);
+    mfop.setTimeZone(testFileOperation.timeZone);
+    mfop.setFileSize(testFileOperation.fileSize);
+    mfop.setFileTypeIndex(testFileOperation.fileIndex);
+    mfop.setStartTime(testFileOperation.startTime);
+    mfop.setRecordType(nx::media_db::RecordType(testFileOperation.type));
+
+    return mfop;
 }
 
 struct TestCameraOperation
@@ -173,47 +148,20 @@ TestCameraOperation generateCameraOperation()
     return result;
 }
 
-typedef boost::variant<TestFileHeader, TestFileOperation, TestCameraOperation> TestRecord;
-
-class RecordWriteVisitor : public boost::static_visitor<>
+nx::media_db::CameraOperation fromTestCameraOperation(
+    const TestCameraOperation& testCameraOperation)
 {
-public:
-    RecordWriteVisitor(nx::media_db::DbHelper *helper) : m_helper(helper) {}
+    nx::media_db::CameraOperation result;
 
-    void operator() (const TestFileHeader &tfh) const
-    {
-        m_helper->writeFileHeader(tfh.dbVersion);
-    }
+    result.setCameraId(testCameraOperation.id);
+    result.setCameraUniqueId(testCameraOperation.camUniqueId);
+    result.setCameraUniqueIdLen(testCameraOperation.uuidLen);
+    result.setRecordType(nx::media_db::RecordType(testCameraOperation.code));
 
-    void operator() (const TestFileOperation &tfo) const
-    {
-        nx::media_db::MediaFileOperation fileOp;
-        fileOp.setCameraId(tfo.cameraId);
-        fileOp.setCatalog(tfo.chunksCatalog);
-        fileOp.setDuration(tfo.duration);
-        fileOp.setTimeZone(tfo.timeZone);
-        fileOp.setFileSize(tfo.fileSize);
-        fileOp.setFileTypeIndex(tfo.fileIndex);
-        fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
-        fileOp.setStartTime(tfo.startTime);
+    return result;
+}
 
-        m_helper->writeRecord(fileOp);
-    }
-
-    void operator() (const TestCameraOperation &tco) const
-    {
-        nx::media_db::CameraOperation camOp;
-        camOp.setCameraId(tco.id);
-        camOp.setCameraUniqueIdLen(tco.uuidLen);
-        camOp.setRecordType(tco.code);
-        camOp.setCameraUniqueId(tco.camUniqueId);
-
-        m_helper->writeRecord(camOp);
-    }
-
-private:
-    nx::media_db::DbHelper *m_helper;
-};
+typedef boost::variant<TestFileHeader, TestFileOperation, TestCameraOperation> TestRecord;
 
 struct TestData
 {
@@ -237,10 +185,10 @@ struct TestDataManager
                 switch (nx::utils::random::number(0, 1))
                 {
                 case 0:
-                    dataVector.emplace_back(generateFileOperation(0), false);
+                    dataVector.emplace_back(generateFileOperation(RecordType::FileOperationAdd), false);
                     break;
                 case 1:
-                    dataVector.emplace_back(generateFileOperation(1), false);
+                    dataVector.emplace_back(generateFileOperation(RecordType::FileOperationDelete), false);
                     break;
                 }
                 break;
@@ -265,6 +213,10 @@ struct TestDataManager
         {
             it->visited = true;
             return true;
+        }
+        else
+        {
+            qDebug() << "record not found";
         }
         return false;
     }
@@ -298,7 +250,7 @@ public:
     typedef std::vector<Catalog> CatalogCont;
 
 public:
-    TestChunkManager(int cameraCount)
+    TestChunkManager(int cameraCount, int storageIndex): m_storageIndex(storageIndex)
     {
         for (int i = 0; i < cameraCount; ++i)
         {
@@ -315,13 +267,12 @@ public:
     boost::optional<TestChunk> generateAddOperation()
     {
         Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
-        errorStream << "catalog: " << catalog->cameraUniqueId.constData() << std::endl;
-        TestFileOperation fileOp = generateFileOperation(0);
+        TestFileOperation fileOp = generateFileOperation(RecordType::FileOperationAdd);
 
         if (chunkExists(fileOp.startTime))
             return boost::none;
 
-        DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,  fileOp.fileIndex,
+        DeviceFileCatalog::Chunk chunk(fileOp.startTime, m_storageIndex,  fileOp.fileIndex,
             fileOp.duration, fileOp.timeZone, (quint16)(fileOp.fileSize >> 32),
             (quint32)(fileOp.fileSize));
 
@@ -331,24 +282,21 @@ public:
         ret.isVisited = false;
         ret.chunk = chunk;
 
-        m_chunks.insert(ret);
+        m_unremovedChunks.push_back((TestChunk*) &(*m_chunks.insert(ret).first));
 
         return ret;
     }
 
     TestChunk* generateRemoveOperation()
     {
-        std::vector<TestChunk *> unremovedChunks;
-        for (auto& chunk: m_chunks)
-        {
-            if (chunk.isDeleted == false)
-                unremovedChunks.push_back((TestChunk*)&chunk);
-        }
-        if (unremovedChunks.empty())
+        if (m_unremovedChunks.empty())
             return nullptr;
 
-        TestChunk *chunk = unremovedChunks[nx::utils::random::number((size_t)0, unremovedChunks.size() - 1)];
+        auto indexToRemove = nx::utils::random::number((size_t)0, m_unremovedChunks.size() - 1);
+        TestChunk* chunk = m_unremovedChunks[indexToRemove];
         chunk->isDeleted = true;
+        m_unremovedChunks.erase(m_unremovedChunks.cbegin() + indexToRemove);
+
         return chunk;
     }
 
@@ -367,11 +315,11 @@ public:
         std::deque<DeviceFileCatalog::Chunk> ret;
         for (int i = 0; i < size; ++i)
         {
-            TestFileOperation fileOp = generateFileOperation(0);
+            TestFileOperation fileOp = generateFileOperation(RecordType::FileOperationAdd);
             if (chunkExists(fileOp.startTime))
                 continue;
 
-            DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1, fileOp.fileIndex,
+            DeviceFileCatalog::Chunk chunk(fileOp.startTime, m_storageIndex, fileOp.fileIndex,
                 fileOp.duration, fileOp.timeZone, (quint16)((fileOp.fileSize) >> 32),
                 (quint32)(fileOp.fileSize));
 
@@ -393,6 +341,8 @@ public:
 private:
     TestChunkCont m_chunks;
     CatalogCont m_catalogs;
+    std::vector<TestChunk*> m_unremovedChunks;
+    const int m_storageIndex;
 
     bool chunkExists(qint64 startTime) const
     {
@@ -406,98 +356,38 @@ private:
     }
 };
 
-std::string dbErrorToString(nx::media_db::Error error)
-{
-    switch (error)
-    {
-        case nx::media_db::Error::NoError: return "No Error";
-        case nx::media_db::Error::ReadError: return "Read Error";
-        case nx::media_db::Error::WriteError: return "Write Error";
-        case nx::media_db::Error::ParseError: return "Parse Error";
-        case nx::media_db::Error::Eof: return "EOF";
-        case nx::media_db::Error::WrongMode: return "Wrong DB Mode";
-    }
-    return "Unknown error";
-}
-
-class TestDbHelperHandler : public nx::media_db::DbHelperHandler
+class TestDbHelperHandler: boost::static_visitor<>
 {
 public:
-    TestDbHelperHandler(nx::media_db::Error *error, TestDataManager *tdm)
-        : m_error(error),
-          m_tdm(tdm)
-    {}
+    TestDbHelperHandler(TestDataManager *tdm): m_tdm(tdm) {}
 
-    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
-                        nx::media_db::Error error) override
+    void operator()(const nx::media_db::CameraOperation &cameraOp)
     {
-        if ((*m_error = error) == nx::media_db::Error::ReadError)
-            return;
-
         TestCameraOperation top;
         top.camUniqueId = cameraOp.getCameraUniqueId();
         top.code = cameraOp.getRecordType();
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
 
-        if (!m_tdm->seekAndSet(top))
-            initErrorString("Camera operation not found in the test data");
+        ASSERT_TRUE(m_tdm->seekAndSet(top));
     }
 
-    void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
-                           nx::media_db::Error error) override
+    void operator()(const nx::media_db::MediaFileOperation &mediaFileOp)
     {
-        if ((*m_error = error) == nx::media_db::Error::ReadError)
-            return;
-
         TestFileOperation tfop;
         tfop.cameraId = mediaFileOp.getCameraId();
         tfop.chunksCatalog = mediaFileOp.getCatalog();
-        tfop.code = (int)mediaFileOp.getRecordType();
+        tfop.type = mediaFileOp.getRecordType();
         tfop.duration = mediaFileOp.getDuration();
         tfop.timeZone = mediaFileOp.getTimeZone();
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.fileIndex = mediaFileOp.getFileTypeIndex();
         tfop.startTime = mediaFileOp.getStartTime();
 
-        if (!m_tdm->seekAndSet(tfop))
-            initErrorString("Media file operation not found in the test data");
-    }
-
-    void handleError(nx::media_db::Error error) override
-    {
-        *m_error = error;
-    }
-
-    void handleRecordWrite(nx::media_db::Error error) override
-    {
-        *m_error = error;
-        if (error != nx::media_db::Error::NoError &&
-            error != nx::media_db::Error::Eof)
-        {
-            initErrorString(dbErrorToString(error));
-        }
-    }
-
-    const std::string* const getErrorString() const
-    {
-        return m_errorString.get();
-    }
-
-    void resetErrorString()
-    {
-        m_errorString.reset();
+        ASSERT_TRUE(m_tdm->seekAndSet(tfop));
     }
 
 private:
-    void initErrorString(const std::string& errorString)
-    {
-        if (!m_errorString)
-            m_errorString = std::unique_ptr<std::string>(new std::string(errorString));
-    }
-
-private:
-    nx::media_db::Error *m_error;
     TestDataManager *m_tdm;
     std::unique_ptr<std::string> m_errorString;
 };
@@ -533,56 +423,36 @@ public:
         platformAbstraction = std::make_unique<QnPlatformAbstraction>();
     }
 
+    virtual void SetUp() override
+    {
+        MediaServerModuleFixture::SetUp();
+
+        workDirResource = std::make_unique<nx::ut::utils::WorkDirResource>();
+        ASSERT_TRUE((bool)workDirResource->getDirName());
+
+        const QString workDirPath = *workDirResource->getDirName();
+
+        storage.reset(new QnFileStorageResource(&serverModule()));
+        storage->setUrl(workDirPath);
+        auto result = storage->initOrUpdate() == Qn::StorageInit_Ok;
+        ASSERT_TRUE(result);
+    }
+
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+
+    std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
+    QnFileStorageResourcePtr storage;
 };
 
-TEST_F(MediaDbTest, SimpleFileWriteTest)
+TEST(MediaFileOperations, BitsTwiddling)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
-
-    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.tst");
-    QFile file(fileName);
-    file.open(QIODevice::ReadWrite);
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-
-    quint64 tmp;
-    const size_t kMaxWrites = 10 * 1000 * 1000l;
-
-    for (size_t i = 0; i < kMaxWrites; ++i)
-    {
-        tmp = i;
-        stream << tmp;
-        ASSERT_NE(stream.status(), QDataStream::WriteFailed)
-            << "Stream status: "
-            << stream.status();
-    }
-
-    stream.resetStatus();
-    file.close();
-    file.open(QIODevice::ReadWrite);
-    stream.setDevice(&file);
-
-    for (size_t i = 0; i < kMaxWrites; ++i)
-    {
-        stream >> tmp;
-        ASSERT_EQ(tmp, i);
-        ASSERT_EQ(stream.status(), QDataStream::Ok)
-            << "Stream status: "
-            << stream.status();
-    }
-}
-
-TEST_F(MediaDbTest, BitsTwiddling)
-{
-    const size_t kTestBufSize = 10000;
+    const size_t iterations = 10000;
     std::vector<TestFileHeader> fhVector;
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
         fhVector.push_back(generateFileHeader());
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
     {
         nx::media_db::FileHeader fh;
         fh.setDbVersion(fhVector[i].dbVersion);
@@ -591,10 +461,14 @@ TEST_F(MediaDbTest, BitsTwiddling)
 
     std::vector<TestFileOperation> fopVector;
 
-    for (size_t i = 0; i < kTestBufSize;  ++i)
-        fopVector.push_back(generateFileOperation(i % 2));
+    for (size_t i = 0; i < iterations;  ++i)
+    {
+        fopVector.push_back(
+            generateFileOperation(
+                i % 2 == 0 ? RecordType::FileOperationAdd : RecordType::FileOperationDelete));
+    }
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
     {
         nx::media_db::MediaFileOperation mfop;
         const TestFileOperation &tfop = fopVector[i];
@@ -606,24 +480,24 @@ TEST_F(MediaDbTest, BitsTwiddling)
         mfop.setFileSize(tfop.fileSize);
         mfop.setFileTypeIndex(tfop.fileIndex);
         mfop.setStartTime(tfop.startTime);
-        mfop.setRecordType(nx::media_db::RecordType(tfop.code));
+        mfop.setRecordType(tfop.type);
 
         ASSERT_TRUE(mfop.getCameraId() == tfop.cameraId);
         ASSERT_TRUE(mfop.getCatalog() == tfop.chunksCatalog);
         ASSERT_TRUE(mfop.getDuration() == tfop.duration);
         ASSERT_TRUE(mfop.getFileSize() == tfop.fileSize);
         ASSERT_TRUE(mfop.getFileTypeIndex() == tfop.fileIndex);
-        ASSERT_TRUE(mfop.getRecordType() == nx::media_db::RecordType(tfop.code));
+        ASSERT_TRUE(mfop.getRecordType() == tfop.type);
         ASSERT_TRUE(mfop.getStartTime() == tfop.startTime);
         ASSERT_TRUE(mfop.getTimeZone() == tfop.timeZone);
     }
 
     std::vector<TestCameraOperation> copVector;
 
-    for (size_t i = 0; i < kTestBufSize;  ++i)
+    for (size_t i = 0; i < iterations;  ++i)
         copVector.push_back(generateCameraOperation());
 
-    for (size_t i = 0; i < kTestBufSize; ++i)
+    for (size_t i = 0; i < iterations; ++i)
     {
         nx::media_db::CameraOperation cop;
         const TestCameraOperation &tcop = copVector[i];
@@ -640,7 +514,7 @@ TEST_F(MediaDbTest, BitsTwiddling)
     }
 }
 
-TEST_F(MediaDbTest, MediaFileOP_ResetValues)
+TEST(MediaFileOperations, MediaFileOP_ResetValues)
 {
     nx::media_db::MediaFileOperation mfop;
     mfop.setCameraId(65535);
@@ -674,9 +548,12 @@ TEST_F(MediaDbTest, MediaFileOP_ResetValues)
     quint64 newStartTime = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 42) - 1));
     mfop.setStartTime(newStartTime);
     ASSERT_EQ(newStartTime, mfop.getStartTime());
+
+    mfop.setStartTime(-1);
+    ASSERT_EQ(-1, mfop.getStartTime());
 }
 
-TEST_F(MediaDbTest, CameraOP_ResetValues)
+TEST(MediaFileOperations, CameraOP_ResetValues)
 {
     nx::media_db::CameraOperation cop;
     cop.setCameraId(std::pow(2, 16));
@@ -690,276 +567,237 @@ TEST_F(MediaDbTest, CameraOP_ResetValues)
     ASSERT_EQ(newCameraUniqueIdLen, cop.getCameraUniqueIdLen());
 }
 
-TEST_F(MediaDbTest, ReadWrite_Simple)
+class MediaDbWriteRead: public ::testing::Test
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
+protected:
+    virtual void SetUp() override
+    {
+        const auto path = *m_workDirResource.getDirName();
+        m_fileName = path + "/test.nxdb";
+        reopenFile();
+        m_writer.setDevice(m_ioDevice.get());
+        ASSERT_TRUE(media_db::MediaDbWriter::writeFileHeader(m_ioDevice.get(), 1));
+    }
 
-    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
-    QFile dbFile;
-    initDbFile(&dbFile, fileName);
+    void whenSomeRecordsAreWrittenToTheDb()
+    {
+        for (int i = 0; i < iterations; ++i)
+        {
+            RecordType recordType =
+                i % 2 == 0 ? RecordType::FileOperationAdd : RecordType::FileOperationDelete;
+            const auto fileOp = fromTestFileOperation(generateFileOperation(recordType));
 
-    nx::media_db::Error error;
-    TestDataManager tdm(10000);
-    TestDbHelperHandler testHandler(&error, &tdm);
-    nx::media_db::DbHelper dbHelper(&testHandler);
-    dbHelper.setDevice(&dbFile);
+            int index = fileOp.getCameraId() * 2 + fileOp.getCatalog();
+            if (recordType == RecordType::FileOperationAdd)
+                m_dbData.addRecords[index].push_back(fileOp);
+            else
+                 m_dbData.removeRecords[index].push_back(DbReader::RemoveData
+                   {fileOp.getHashInCatalog(), m_dbData.addRecords[index].size()});
 
-    // Wrong mode test
-    error = dbHelper.writeFileHeader(
-        boost::get<TestFileHeader>(
-            tdm.dataVector[0].data).dbVersion);
+            m_writer.writeRecord(fileOp);
 
-    ASSERT_TRUE(error == nx::media_db::Error::WrongMode);
+            const auto camOp = fromTestCameraOperation(generateCameraOperation());
+            m_dbData.cameras.push_back(camOp);
+            m_writer.writeRecord(camOp);
+        }
+    }
 
-    dbHelper.setMode(nx::media_db::Mode::Write);
+    void thenAllShouldBeRetrievedCorrectly()
+    {
+        reopenFile();
 
-    for (auto &data : tdm.dataVector)
-        boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
+        DbReader::Data readData;
+        const auto rawData = m_ioDevice->readAll();
+        ASSERT_TRUE(DbReader::parse(rawData, &readData));
+        ASSERT_EQ(1, readData.header.getDbVersion());
+        ASSERT_EQ(m_dbData.addRecords, readData.addRecords);
+        ASSERT_EQ(m_dbData.cameras, readData.cameras);
 
-    dbHelper.setMode(nx::media_db::Mode::Read);
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
+        for (auto& catalog : readData.removeRecords)
+            std::sort(catalog.second.begin(), catalog.second.end());
 
-    dbHelper.reset();
-    reopenDbFile(&dbFile, fileName);
+        ASSERT_EQ(readData.removeRecords, m_dbData.removeRecords);
+    }
 
-    uint8_t dbVersion;
+    void whenLastRecordIsCorrupted()
+    {
+    }
 
-    error = dbHelper.readFileHeader(&dbVersion);
+    void thenAllButLastRecordShouldBeRetrievedCorrectly()
+    {
+    }
 
-    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
-    tdm.dataVector[0].visited = true;
-    ASSERT_TRUE(error == nx::media_db::Error::NoError);
+private:
+    ut::utils::WorkDirResource m_workDirResource;
+    QString m_fileName;
+    MediaDbWriter m_writer;
+    std::unique_ptr<QFile> m_ioDevice;
+    DbReader::Data m_dbData;
+    const int iterations = 10;
 
-    while (error == nx::media_db::Error::NoError)
-        dbHelper.readRecord();
+    void reopenFile()
+    {
+        m_ioDevice.reset(new QFile(m_fileName));
+        ASSERT_TRUE(m_ioDevice->open(QIODevice::ReadWrite));
+    }
 
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
-    dbFile.close();
+    //void checkCorrectness(size_t recordCount)
+    //{
+    //    reopenFile();
+    //    MediaDbReader reader(m_ioDevice.get());
 
-    size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
-                                       [](const TestData &td) { return td.visited; });
-    ASSERT_TRUE(readRecords == tdm.dataVector.size());
+    //    uint8_t dbVersion;
+    //    ASSERT_TRUE(reader.readFileHeader(&dbVersion));
+    //    ASSERT_EQ(1, dbVersion);
+
+    //    DBRecordQueue records;
+    //    while (true)
+    //    {
+    //        const auto record = reader.readRecord();
+    //        if (record.which() == 0)
+    //            break;
+
+    //        records.push(record);
+    //    }
+
+    //    ASSERT_EQ(m_dbRecords.size(), records.size());
+    //    EqVisitor eqVisitor;
+
+    //    for (size_t i = 0; i < m_dbRecords.size(); ++i)
+    //    {
+    //        const auto savedRecord = m_dbRecords.front();
+    //        m_dbRecords.pop();
+    //        const auto readRecord = records.front();
+    //        records.pop();
+
+    //        boost::apply_visitor(eqVisitor, savedRecord, readRecord);
+    //    }
+    //}
+};
+
+TEST_F(MediaDbWriteRead, WrittenReadConsistency)
+{
+    whenSomeRecordsAreWrittenToTheDb();
+    thenAllShouldBeRetrievedCorrectly();
 }
 
-TEST_F(MediaDbTest, DbFileTruncate)
+//TEST_F(MediaDbWriteRead, corruptedFile)
+//{
+//    whenSomeRecordsAreWrittenToTheDb();
+//    whenLastRecordIsCorrupted();
+//    thenAllButLastRecordShouldBeRetrievedCorrectly();
+//}
+
+TEST_F(MediaDbTest, Migration_from_sqlite)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
+    const QString workDirPath = *workDirResource->getDirName();
+    QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
+    QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+    auto sdb = serverModule().storageDbPool()->getSDB(storage);
+    sdb->loadFullFileCatalog();
 
-    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
-    QFile::remove(fileName);
-    int truncateCount = 1000;
+    auto sqlDb = QSqlDatabase::addDatabase(
+        lit("QSQLITE"),
+        QString("QnStorageManager_%1").arg(fileName));
 
-    while (truncateCount-- >= 0)
+    sqlDb.setDatabaseName(fileName);
+    ASSERT_TRUE(sqlDb.open());
+    ASSERT_TRUE(nx::sql::SqlQueryExecutionHelper::execSQLFile(lit(":/01_create_storage_db.sql"), sqlDb));
+
+    const size_t kMaxCatalogs = 4;
+    const size_t kMaxChunks = 50;
+    const size_t k23MaxChunks = kMaxChunks * 2 / 3;
+    const size_t k13MaxChunks = kMaxChunks / 3;
+    std::vector<DeviceFileCatalogPtr> referenceCatalogs;
+
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
-        QFile dbFile;
-        initDbFile(&dbFile, fileName);
+        auto catalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+            &serverModule(),
+            QString::number(i),
+            i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
+            QnServer::StoragePool::Normal));
+        std::deque<DeviceFileCatalog::Chunk> chunks;
+        for (size_t j = 0; j < kMaxChunks; ++j)
+            chunks.push_back(DeviceFileCatalog::Chunk((j + 10) * j + 10, 0, DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 1, 0, 1, 1));
+        catalog->addChunks(chunks);
 
-        nx::media_db::Error error;
-        TestDataManager tdm(1);
-        TestDbHelperHandler testHandler(&error, &tdm);
-        nx::media_db::DbHelper dbHelper(&testHandler);
-
-        dbHelper.setDevice(&dbFile);
-        dbHelper.setMode(nx::media_db::Mode::Write);
-
-        for (auto &data : tdm.dataVector)
-            boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
-
-        dbHelper.setMode(nx::media_db::Mode::Read);
-        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-        testHandler.resetErrorString();
-
-        reopenDbFile(&dbFile, fileName);
-
-        QByteArray content = dbFile.readAll();
-        ASSERT_NE(content.size(), 0);
-        dbFile.close();
-        ASSERT_TRUE(QFile::remove(fileName)) << "DB file "
-                                     << fileName.toLatin1().constData()
-                                     << " remove failed";
-        // truncating randomly last record
-        content.truncate((int)content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 1));
-
-        initDbFile(&dbFile, fileName);
-        dbFile.write(content);
-
-        reopenDbFile(&dbFile, fileName);
-        dbHelper.setDevice(&dbFile);
-
-        uint8_t dbVersion;
-        error = dbHelper.readFileHeader(&dbVersion);
-
-        ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
-        tdm.dataVector[0].visited = true;
-        ASSERT_TRUE(error == nx::media_db::Error::NoError) << (int)error;
-
-        while (error == nx::media_db::Error::NoError)
-            dbHelper.readRecord();
-
-        ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-        testHandler.resetErrorString();
-
-        dbFile.close();
-        ASSERT_TRUE(error == nx::media_db::Error::ReadError) << (int)error;
-        ASSERT_TRUE(QFile::remove(fileName));
-
-        size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
-                                           [](const TestData &td) { return td.visited; });
-        // we've read all except the very last record
-        ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords;
+        referenceCatalogs.push_back(catalog);
     }
-}
 
-TEST_F(MediaDbTest, ReadWrite_MT)
-{
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
+    /*  Two thirds of reference chunks (from the beginning) we will write to sqlite db and two thirds (from the end) - to the new media db.
+    *   After migration routine executed, result should be equal to the reference catalogs.
+    */
 
-    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
-    QFile dbFile;
-    initDbFile(&dbFile, fileName);
-
-    const size_t threadsNum = 4;
-    const size_t recordsCount = 1000;
-
-    nx::media_db::Error error;
-    TestDataManager tdm(threadsNum * recordsCount);
-    TestDbHelperHandler testHandler(&error, &tdm);
-    nx::media_db::DbHelper dbHelper(&testHandler);
-
-    dbHelper.setDevice(&dbFile);
-    dbHelper.setMode(nx::media_db::Mode::Write);
-
-    //write header explicitely
-    boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
-
-    std::vector<nx::utils::thread> threads;
-    for (size_t i = 0; i < threadsNum; ++i)
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
-        threads.emplace_back(
-            nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
-                        {
-                            size_t j = i * recordsCount + 1;
-                            for (; j < (i + 1) * recordsCount + 1; ++j)
-                                boost::apply_visitor(RecordWriteVisitor(&dbHelper),
-                                                     tdm.dataVector[j].data);
-                        }));
+        for (size_t j = 0; j < k23MaxChunks; ++j)
+        {
+            QSqlQuery query(sqlDb);
+            ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
+            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunksUnsafe().at(j);
+
+            query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
+            query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
+            query.addBindValue(chunk.startTimeMs); // start_time
+            query.addBindValue(chunk.timeZone); // timezone
+            query.addBindValue(chunk.fileIndex); // file_index
+            query.addBindValue(chunk.durationMs); // duration
+            query.addBindValue(chunk.getFileSize()); // filesize
+
+            ASSERT_TRUE(query.exec());
+        }
     }
 
-    for (size_t i = 0; i < threadsNum; ++i)
-        if (threads[i].joinable())
-            threads[i].join();
+    auto connectionName = sqlDb.connectionName();
+    sqlDb.close();
+    sqlDb = QSqlDatabase();
+    QSqlDatabase::removeDatabase(connectionName);
 
-
-    dbHelper.setMode(nx::media_db::Mode::Read);
-    dbHelper.reset();
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
-    reopenDbFile(&dbFile, fileName);
-
-    uint8_t dbVersion;
-    error = dbHelper.readFileHeader(&dbVersion);
-
-    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
-    tdm.dataVector[0].visited = true;
-    ASSERT_TRUE(error == nx::media_db::Error::NoError);
-
-    while (error == nx::media_db::Error::NoError)
-        dbHelper.readRecord();
-
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
-
-    size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
-                                       [](const TestData &td) { return td.visited; });
-    ASSERT_TRUE(readRecords == tdm.dataVector.size());
-
-    // Write again after we've read till the end
-    dbHelper.setMode(nx::media_db::Mode::Write);
-
-    threads.clear();
-    for (size_t i = 0; i < threadsNum; ++i)
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
-            threads.emplace_back(
-                nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
-                            {
-                                size_t j = i * recordsCount + 1;
-                                for (; j < (i + 1) * recordsCount + 1; ++j)
-                                    boost::apply_visitor(RecordWriteVisitor(&dbHelper),
-                                                         tdm.dataVector[j].data);
-                            }));
+        for (size_t j = k13MaxChunks; j < kMaxChunks; ++j)
+        {
+            sdb->addRecord(referenceCatalogs[i]->cameraUniqueId(),
+                           referenceCatalogs[i]->getCatalog(),
+                           referenceCatalogs[i]->getChunksUnsafe().at(j));
+        }
     }
 
-    for (size_t i = 0; i < threadsNum; ++i)
-        if (threads[i].joinable())
-            threads[i].join();
+    serverModule().normalStorageManager()->migrateSqliteDatabase(storage);
+    auto mergedCatalogs = sdb->loadFullFileCatalog();
 
-    // and now read again from the beginning
-    dbHelper.setMode(nx::media_db::Mode::Read); // wait for writer here
-    reopenDbFile(&dbFile, fileName);
-
-    error = dbHelper.readFileHeader(&dbVersion);
-    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
-    tdm.dataVector[0].visited = true;
-    ASSERT_TRUE(error == nx::media_db::Error::NoError);
-
-    size_t copySize = tdm.dataVector.size();
-    for (size_t i = 1; i < copySize; ++i)
-    {   // double test data. we should find every record
-        tdm.dataVector[i].visited = false;
-        tdm.dataVector.push_back(tdm.dataVector[i]);
-    }
-
-    size_t readCount = 0;
-    while (error == nx::media_db::Error::NoError)
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
-        ++readCount;
-        dbHelper.readRecord();
+        auto mergedIt = std::find_if(mergedCatalogs.cbegin(), mergedCatalogs.cend(),
+                                     [&referenceCatalogs, i](const DeviceFileCatalogPtr &c)
+                                     { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() &&
+                                              c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
+        ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
+        auto left = (*mergedIt)->getChunksUnsafe();
+        auto right = referenceCatalogs[i]->getChunksUnsafe();
+        ASSERT_TRUE(left == right);
+
     }
-
-    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
-    testHandler.resetErrorString();
-
-    readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
-                                [](const TestData &td) { return td.visited; });
-    ASSERT_TRUE(readRecords == tdm.dataVector.size()) << readRecords;
-    dbFile.close();
-    QFile::remove(fileName);
 }
 
 TEST_F(MediaDbTest, StorageDB)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
-
-    const QString workDirPath = *workDirResource.getDirName();
-
-    bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
-    storage->setUrl(workDirPath);
-    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
+    auto sdb  = serverModule().storageDbPool()->getSDB(storage);
+    auto result = sdb->open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
-    QnStorageDb sdb(&serverModule(), storage, 1);
-    result = sdb.open(workDirPath + lit("/test.nxdb"));
-    ASSERT_TRUE(result);
-
-    sdb.loadFullFileCatalog();
+    sdb->loadFullFileCatalog();
 
     QnMutex mutex;
     std::vector<nx::utils::thread> threads;
-    TestChunkManager tcm(128);
+    TestChunkManager tcm(100, serverModule().storageDbPool()->getStorageIndex(storage));
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < 500; ++i)
         {
             int diceRoll = nx::utils::random::number(0, 10);
-            errorStream << "dice rolled: " << diceRoll << std::endl;
             switch (diceRoll)
             {
             case 0:
@@ -967,7 +805,7 @@ TEST_F(MediaDbTest, StorageDB)
                 std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
                 QnMutexLocker lk(&mutex);
                 p = tcm.generateReplaceOperation(nx::utils::random::number(10, 100));
-                sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
+                sdb->replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
                 break;
             }
             case 1:
@@ -978,7 +816,7 @@ TEST_F(MediaDbTest, StorageDB)
                 chunk = tcm.generateRemoveOperation();
                 if (chunk)
                 {
-                    sdb.deleteRecords(
+                    sdb->deleteRecords(
                         chunk->catalog->cameraUniqueId,
                         chunk->catalog->quality, chunk->chunk.startTimeMs);
                 }
@@ -991,7 +829,7 @@ TEST_F(MediaDbTest, StorageDB)
                 chunk = tcm.generateAddOperation();
                 if (!(bool)chunk)
                     break;
-                sdb.addRecord(
+                sdb->addRecord(
                     chunk->catalog->cameraUniqueId,
                     chunk->catalog->quality, chunk->chunk);
                 break;
@@ -1004,10 +842,10 @@ TEST_F(MediaDbTest, StorageDB)
     QVector<DeviceFileCatalogPtr> dbChunkCatalogs;
     auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         for (size_t i = 0; i < 10; ++i)
         {
-            sdb.loadFullFileCatalog();
+            sdb->loadFullFileCatalog();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };
@@ -1020,7 +858,7 @@ TEST_F(MediaDbTest, StorageDB)
     for (auto &t : threads)
         t.join();
 
-    dbChunkCatalogs = sdb.loadFullFileCatalog();
+    dbChunkCatalogs = sdb->loadFullFileCatalog();
 
     for (auto catalogIt = dbChunkCatalogs.cbegin();
          catalogIt != dbChunkCatalogs.cend();
@@ -1052,8 +890,6 @@ TEST_F(MediaDbTest, StorageDB)
                                    });
     if (!allVisited)
     {
-//        std::cout << errorStream.stream->str() << std::endl;
-//        errorStream.reset();
         size_t notVisited = std::count_if(
                 tcm.get().cbegin(),
                 tcm.get().cend(),
@@ -1065,109 +901,170 @@ TEST_F(MediaDbTest, StorageDB)
     ASSERT_EQ(allVisited, true);
 }
 
-TEST_F(MediaDbTest, Migration_from_sqlite)
+TEST_F(MediaDbTest, startWithNonEmptyDb_merge)
 {
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
+    // #TODO: #akulikov implement
+}
 
-    const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
-    QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
-    //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
-    auto sqlDb = std::unique_ptr<QSqlDatabase>(
-            new QSqlDatabase(
-                QSqlDatabase::addDatabase(
-                    lit("QSQLITE"),
-                    QString("QnStorageManager_%1").arg(fileName))));
+TEST_F(MediaDbTest, ReplaceRecord)
+{
+    using namespace nx::media_db;
 
-    sqlDb->setDatabaseName(fileName);
-    ASSERT_TRUE(sqlDb->open());
-    ASSERT_TRUE(nx::sql::SqlQueryExecutionHelper::execSQLFile(lit(":/01_create_storage_db.sql"), *sqlDb));
-
-    const size_t kMaxCatalogs = 4;
-    const size_t kMaxChunks = 50;
-    const size_t k23MaxChunks = kMaxChunks * 2 / 3;
-    const size_t k13MaxChunks = kMaxChunks / 3;
-    std::vector<DeviceFileCatalogPtr> referenceCatalogs;
-
-    for (size_t i = 0; i < kMaxCatalogs; ++i)
-    {
-        auto catalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
-            &serverModule(),
-            QString::number(i),
-            i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
-            QnServer::StoragePool::Normal));
-        std::deque<DeviceFileCatalog::Chunk> chunks;
-        for (size_t j = 0; j < kMaxChunks; ++j)
-            chunks.push_back(DeviceFileCatalog::Chunk((j + 10) * j + 10, 0, DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 1, 0, 1, 1));
-        catalog->addChunks(chunks);
-
-        referenceCatalogs.push_back(catalog);
-    }
-
-    /*  Two thirds of reference chunks (from the beginning) we will write to sqlite db and two thirds (from the end) - to the new media db.
-    *   After migration routine executed, result should be equal to the reference catalogs.
-    */
-
-    for (size_t i = 0; i < kMaxCatalogs; ++i)
-    {
-        for (size_t j = 0; j < k23MaxChunks; ++j)
-        {
-            QSqlQuery query(*sqlDb);
-            ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
-            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunksUnsafe().at(j);
-
-            query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
-            query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
-            query.addBindValue(chunk.startTimeMs); // start_time
-            query.addBindValue(chunk.timeZone); // timezone
-            query.addBindValue(chunk.fileIndex); // file_index
-            query.addBindValue(chunk.durationMs); // duration
-            query.addBindValue(chunk.getFileSize()); // filesize
-
-            ASSERT_TRUE(query.exec());
-        }
-    }
-
-    bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
-    storage->setUrl(workDirPath);
-    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
+    auto sdb  = serverModule().storageDbPool()->getSDB(storage);
+    auto result = sdb->open(*workDirResource->getDirName() + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
-    auto connectionName = sqlDb->connectionName();
-    sqlDb->close();
-    sqlDb.reset();
-    QSqlDatabase::removeDatabase(connectionName);
-
-    auto sdb = serverModule().storageDbPool()->getSDB(storage);
-    ASSERT_TRUE(result);
     sdb->loadFullFileCatalog();
 
-    for (size_t i = 0; i < kMaxCatalogs; ++i)
-    {
-        for (size_t j = k13MaxChunks; j < kMaxChunks; ++j)
-        {
-            sdb->addRecord(referenceCatalogs[i]->cameraUniqueId(),
-                           referenceCatalogs[i]->getCatalog(),
-                           referenceCatalogs[i]->getChunksUnsafe().at(j));
-        }
-    }
+    const QString id1("1");
+    const QString id2("2");
+    const QString id3("3");
 
-    serverModule().normalStorageManager()->migrateSqliteDatabase(storage);
-    auto mergedCatalogs = sdb->loadFullFileCatalog();
+    DeviceFileCatalog::Chunk chunk;
+    chunk.startTimeMs = 10;
+    chunk.durationMs = 5;
+    chunk.fileIndex = DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+    chunk.storageIndex = serverModule().storageDbPool()->getStorageIndex(storage);
 
-    for (size_t i = 0; i < kMaxCatalogs; ++i)
-    {
-        auto mergedIt = std::find_if(mergedCatalogs.cbegin(), mergedCatalogs.cend(),
-                                     [&referenceCatalogs, i](const DeviceFileCatalogPtr &c)
-                                     { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() &&
-                                              c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
-        ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
-        auto left = (*mergedIt)->getChunksUnsafe();
-        auto right = referenceCatalogs[i]->getChunksUnsafe();
-        ASSERT_TRUE(left == right);
+    sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->deleteRecords(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->addRecord(id1, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
 
-    }
+    sdb->addRecord(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id2, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+
+    sdb->addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+    sdb->addRecord(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk);
+    sdb->deleteRecords(id3, QnServer::ChunksCatalog::LowQualityCatalog, chunk.startTimeMs);
+
+    auto dbChunkCatalogs = sdb->loadFullFileCatalog();
+
+    ASSERT_EQ(1, dbChunkCatalogs.size());
+    ASSERT_EQ(1, dbChunkCatalogs[0]->size());
 }
+
+} // namespace nx::media_db::test
+
+
+//TEST_F(MediaDbTest, ReadWrite_MT)
+//{
+//    nx::ut::utils::WorkDirResource workDirResource;
+//    ASSERT_TRUE((bool)workDirResource.getDirName());
+//
+//    QString fileName = QDir(*workDirResource.getDirName()).absoluteFilePath("file.mdb");
+//    QFile dbFile;
+//    initDbFile(&dbFile, fileName);
+//
+//    const size_t threadsNum = 4;
+//    const size_t recordsCount = 1000;
+//
+//    nx::media_db::Error error;
+//    TestDataManager tdm(threadsNum * recordsCount);
+//    TestDbHelperHandler testHandler(&error, &tdm);
+//    nx::media_db::DbHelper dbHelper(&testHandler);
+//
+//    dbHelper.setDevice(&dbFile);
+//    dbHelper.setMode(nx::media_db::Mode::Write);
+//
+//    // write header explicitly
+//    boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
+//
+//    std::vector<nx::utils::thread> threads;
+//    for (size_t i = 0; i < threadsNum; ++i)
+//    {
+//        threads.emplace_back(
+//            nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
+//                        {
+//                            size_t j = i * recordsCount + 1;
+//                            for (; j < (i + 1) * recordsCount + 1; ++j)
+//                                boost::apply_visitor(RecordWriteVisitor(&dbHelper),
+//                                                     tdm.dataVector[j].data);
+//                        }));
+//    }
+//
+//    for (size_t i = 0; i < threadsNum; ++i)
+//        if (threads[i].joinable())
+//            threads[i].join();
+//
+//
+//    dbHelper.setMode(nx::media_db::Mode::Read);
+//    dbHelper.reset();
+//    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+//    testHandler.resetErrorString();
+//    reopenDbFile(&dbFile, fileName);
+//
+//    uint8_t dbVersion;
+//    error = dbHelper.readFileHeader(&dbVersion);
+//
+//    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
+//    tdm.dataVector[0].visited = true;
+//    ASSERT_TRUE(error == nx::media_db::Error::NoError);
+//
+//    while (error == nx::media_db::Error::NoError)
+//    {
+//        const auto dbRecord = dbHelper.readRecord(&error);
+//        boost::apply_visitor(testHandler, dbRecord);
+//    }
+//
+//    ASSERT_TRUE(testHandler.getErrorString() == nullptr) << *testHandler.getErrorString();
+//    testHandler.resetErrorString();
+//
+//    size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
+//                                       [](const TestData &td) { return td.visited; });
+//    ASSERT_TRUE(readRecords == tdm.dataVector.size());
+//
+//    // Write again after we've read till the end
+//    dbHelper.setMode(nx::media_db::Mode::Write);
+//
+//    threads.clear();
+//    for (size_t i = 0; i < threadsNum; ++i)
+//    {
+//            threads.emplace_back(
+//                nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
+//                            {
+//                                size_t j = i * recordsCount + 1;
+//                                for (; j < (i + 1) * recordsCount + 1; ++j)
+//                                    boost::apply_visitor(RecordWriteVisitor(&dbHelper),
+//                                                         tdm.dataVector[j].data);
+//                            }));
+//    }
+//
+//    for (size_t i = 0; i < threadsNum; ++i)
+//        if (threads[i].joinable())
+//            threads[i].join();
+//
+//    // and now read again from the beginning
+//    dbHelper.setMode(nx::media_db::Mode::Read); // wait for writer here
+//    reopenDbFile(&dbFile, fileName);
+//
+//    error = dbHelper.readFileHeader(&dbVersion);
+//    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
+//    tdm.dataVector[0].visited = true;
+//    ASSERT_TRUE(error == nx::media_db::Error::NoError);
+//
+//    size_t copySize = tdm.dataVector.size();
+//    for (size_t i = 1; i < copySize; ++i)
+//    {   // double test data. we should find every record
+//        tdm.dataVector[i].visited = false;
+//        tdm.dataVector.push_back(tdm.dataVector[i]);
+//    }
+//
+//    size_t readCount = 0;
+//    while (error == nx::media_db::Error::NoError)
+//    {
+//        ++readCount;
+//        const auto dbRecord = dbHelper.readRecord(&error);
+//        boost::apply_visitor(testHandler, dbRecord);
+//    }
+//
+//    readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
+//                                [](const TestData &td) { return td.visited; });
+//    ASSERT_TRUE(readRecords == tdm.dataVector.size()) << readRecords;
+//    dbFile.close();
+//    QFile::remove(fileName);
+//}
+//
+
 

@@ -27,7 +27,7 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
 class QnLiveStreamProvider:
     public QnAbstractMediaStreamDataProvider,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     class MetadataDataReceptor;
@@ -36,7 +36,7 @@ public:
     virtual ~QnLiveStreamProvider();
 
     virtual void setRole(Qn::ConnectionRole role) override;
-    Qn::StreamIndex encoderIndex() const;
+    nx::vms::api::MotionStreamType encoderIndex() const;
 
     void setPrimaryStreamParams(const QnLiveStreamParams& params);
 

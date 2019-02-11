@@ -490,7 +490,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
-    params.addQueryItem(lit("version"), qnStaticCommon->engineVersion().toString());
+    params.addQueryItem(lit("version"), commonModule()->engineVersion().toString());
     params.addQueryItem(lit("lang"), qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())
@@ -1074,7 +1074,6 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                     break;
             }
         }
-
 
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }

@@ -4,6 +4,8 @@
 #include <atomic>
 #include <memory>
 #include <condition_variable>
+#include <vector>
+#include <string>
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
@@ -48,7 +50,7 @@ private:
 
     int64_t usSinceEpoch() const;
 
-    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) const;
+    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* frame) const;
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
@@ -61,7 +63,7 @@ private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_terminated{false};
+    bool m_terminated = false;
 
     std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;

@@ -82,7 +82,6 @@ private:
     std::chrono::milliseconds m_rtt{0};
 };
 
-
 class TestSystemClock:
     public AbstractSystemClock
 {
@@ -171,7 +170,6 @@ public:
                         globalSettings->setPrimaryTimeServer(QnUuid());
                     else if (globalSettings->primaryTimeServer().isNull())
                         globalSettings->setPrimaryTimeServer(commonModule->moduleGUID());
-
 
                     auto timeSyncManager = dynamic_cast<nx::vms::time_sync::ServerTimeSyncManager*>
                         (m_appserver->moduleInstance()->ecConnection()->timeSyncManager());

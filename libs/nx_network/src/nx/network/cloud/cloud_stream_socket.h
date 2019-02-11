@@ -38,6 +38,8 @@ public:
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    virtual bool getProtocol(int* protocol) const override;
+
     virtual bool bind(const SocketAddress& localAddress) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool close() override;

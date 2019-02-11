@@ -200,6 +200,11 @@ void QnAdamModbusIOManager::terminate()
     m_client.pleaseStopSync();
 }
 
+QString QnAdamModbusIOManager::idForToStringFromPtr() const
+{
+    return m_resource->getId().toString();
+}
+
 quint32 QnAdamModbusIOManager::getPortCoil(const QString& ioPortId, bool& success) const
 {
     auto split = ioPortId.split("_");
@@ -292,8 +297,7 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx::modbus::Modbu
 
     if (response.isException())
     {
-        NX_DEBUG(this, "QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1",
-            m_client.getLastErrorString());
+        NX_DEBUG(this, "Modbus exception has occured %1", m_client.getLastErrorString());
         return;
     }
 

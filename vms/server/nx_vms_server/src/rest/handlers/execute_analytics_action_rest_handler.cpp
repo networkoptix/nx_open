@@ -14,10 +14,10 @@
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/uuid.h>
 
 #include <plugins/settings.h>
-#include <plugins/plugin_tools.h>
 
 using namespace nx::vms::server;
 
@@ -45,7 +45,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
     if (!success)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid Json object provided"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid JSON object provided"));
         return nx::network::http::StatusCode::ok;
     }
 
@@ -89,24 +89,9 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
 
 namespace {
 
-class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::IAction>
+class Action: public nx::sdk::RefCountable<nx::sdk::analytics::IAction>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
-    {
-        if (interfaceId == nx::sdk::analytics::IID_Action)
-        {
-            addRef();
-            return static_cast<nx::sdk::analytics::IAction*>(this);
-        }
-        if (interfaceId == nxpl::IID_PluginInterface)
-        {
-            addRef();
-            return static_cast<nxpl::PluginInterface*>(this);
-        }
-        return nullptr;
-    }
-
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
         m_params(nx::vms::server::sdk_support::toIStringMap(actionData.params)),
         m_actionResult(actionResult)

@@ -31,7 +31,6 @@ protected:
         base_type::SetUp();
 
         givenListeningServerSocket();
-        startAcceptingAsync();
     }
 
     virtual void TearDown() override
@@ -71,15 +70,38 @@ protected:
         closeClientSocket();
     }
 
+    void whenSendData()
+    {
+        m_data.resize(129);
+        std::generate(
+            m_data.begin(), m_data.end(),
+            []() { return (char)(rand() % 128); });
+
+        whenClientSends(m_data);
+    }
+
     void thenRecvCompleted()
     {
         m_recvResultQueue.pop();
     }
 
+    void thenDataIsReceivedOnTheOtherSide()
+    {
+        thenServerReceives(m_data);
+    }
+
 private:
     std::thread m_recvThread;
     nx::utils::SyncQueue<int> m_recvResultQueue;
+    std::string m_data;
 };
+
+TEST_F(Io, ping)
+{
+    givenTwoConnectedSockets();
+    whenSendData();
+    thenDataIsReceivedOnTheOtherSide();
+}
 
 TEST_F(Io, closing_socket_while_reading_in_another_thread_is_supported)
 {

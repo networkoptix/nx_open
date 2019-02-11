@@ -13,7 +13,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     connect(commonModule(), &QnCommonModule::remoteIdChanged, this, &QnWorkbenchServerSafemodeWatcher::updateCurrentServer);
     connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnWorkbenchServerSafemodeWatcher::updateServerFlags);
 
-    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
+    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         updateCurrentServer();
         updateServerFlags();
     });
@@ -25,7 +25,6 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
         m_currentServer = resource.dynamicCast<QnMediaServerResource>();
         updateServerFlags();
     });
-
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
         if (!m_currentServer || m_currentServer != resource)

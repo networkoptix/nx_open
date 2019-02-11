@@ -21,7 +21,7 @@ class UDPSocket;
 }   //nx
 struct QnCameraConflictList;
 
-class QnMServerResourceSearcher: public QnLongRunnable, public nx::vms::server::ServerModuleAware
+class QnMServerResourceSearcher: public QnLongRunnable, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnMServerResourceSearcher(QnMediaServerModule* serverModule);

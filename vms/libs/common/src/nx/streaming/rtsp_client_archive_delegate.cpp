@@ -1031,6 +1031,17 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
     m_rtspSession->setPlayNowModeAllowed(value);
 }
 
+int QnRtspClientArchiveDelegate::protocol() const
+{
+    int result = 0;
+    if (m_rtspDevice)
+    {
+        if (const auto socket = m_rtspDevice->getMediaSocket())
+            socket->getProtocol(&result);
+    }
+    return result;
+}
+
 bool QnRtspClientArchiveDelegate::hasVideo() const
 {
     return m_camera && m_camera->hasVideo(nullptr);

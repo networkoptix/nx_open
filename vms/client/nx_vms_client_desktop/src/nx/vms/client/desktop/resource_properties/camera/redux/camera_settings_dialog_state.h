@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QList>
 
 #include <api/model/api_ioport_data.h>
@@ -14,10 +16,10 @@
 
 #include <nx/vms/client/desktop/common/data/rotation.h>
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
+#include <nx/vms/client/desktop/common/redux/redux_types.h>
 #include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
 #include <nx/vms/client/desktop/resource_properties/camera/data/schedule_cell_params.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
-#include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
 
@@ -25,49 +27,6 @@ namespace nx::vms::client::desktop {
 
 struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 {
-    template<class T>
-    struct UserEditable
-    {
-        T get() const { return m_user.value_or(m_base); }
-        bool hasUser() const { return m_user.has_value(); }
-        void setUser(T value) { m_user = value; }
-        T getBase() const { return m_base; }
-        void setBase(T value) { m_base = value; }
-        void resetUser() { m_user = {}; }
-
-        T operator()() const { return get(); }
-
-    private:
-        T m_base = T();
-        std::optional<T> m_user;
-    };
-
-    template<class T>
-    struct UserEditableMultiple
-    {
-        bool hasValue() const { return m_user || m_base; }
-        T get() const { return m_user.value_or(*m_base); }
-        T valueOr(T value) const { return m_user.value_or(m_base.value_or(value)); }
-        void setUser(T value) { m_user = value; }
-        void setBase(T value) { m_base = value; }
-        void resetUser() { m_user = {}; }
-        void resetBase() { m_base = {}; }
-
-        T operator()() const { return get(); }
-        operator std::optional<T>() const { return m_user ? m_user : m_base; }
-
-    private:
-        std::optional<T> m_base;
-        std::optional<T> m_user;
-    };
-
-    enum class CombinedValue
-    {
-        None,
-        Some,
-        All
-    };
-
     enum class RecordingHint
     {
         // Brush was changed (mode, fps, quality).
@@ -162,21 +121,21 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     struct CombinedProperties
     {
-        CombinedValue isDtsBased;
-        CombinedValue isWearable;
-        CombinedValue isIoModule;
-        CombinedValue isArecontCamera;
-        CombinedValue supportsAudio;
-        CombinedValue supportsVideo;
-        CombinedValue isAudioForced;
-        CombinedValue hasMotion;
-        CombinedValue hasDualStreamingCapability;
-        CombinedValue hasRemoteArchiveCapability;
-        CombinedValue canSwitchPtzPresetTypes;
-        CombinedValue canForcePtzCapabilities;
-        CombinedValue supportsMotionStreamOverride;
-        CombinedValue hasCustomMediaPortCapability;
-        CombinedValue supportsRecording;
+        CombinedValue isDtsBased = CombinedValue::None;
+        CombinedValue isWearable = CombinedValue::None;
+        CombinedValue isIoModule = CombinedValue::None;
+        CombinedValue isArecontCamera = CombinedValue::None;
+        CombinedValue supportsAudio = CombinedValue::None;
+        CombinedValue supportsVideo = CombinedValue::None;
+        CombinedValue isAudioForced = CombinedValue::None;
+        CombinedValue hasMotion = CombinedValue::None;
+        CombinedValue hasDualStreamingCapability = CombinedValue::None;
+        CombinedValue hasRemoteArchiveCapability = CombinedValue::None;
+        CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;
+        CombinedValue canForcePtzCapabilities = CombinedValue::None;
+        CombinedValue supportsMotionStreamOverride = CombinedValue::None;
+        CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
+        CombinedValue supportsRecording = CombinedValue::None;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
@@ -201,8 +160,9 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
-        UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
-        CombinedValue motionStreamOverridden; //< Read-only informational value.
+        UserEditableMultiple<vms::api::MotionStreamType> forcedMotionStreamType;
+        CombinedValue motionStreamOverridden = CombinedValue::None;
+        UserEditableMultiple<bool> remoteMotionDetectionEnabled;
 
         static constexpr int kDefaultRtspPort = 554;
         UserEditableMultiple<int> customMediaPort;

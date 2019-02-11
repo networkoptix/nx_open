@@ -13,6 +13,7 @@ namespace ec2
 
     Ec2ThreadPool::Ec2ThreadPool()
     {
+        setObjectName("ec2::ThreadPool");
         setMaxThreadCount( std::max(QThread::idealThreadCount(), kMinimalThreadCount) );
     }
 

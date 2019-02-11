@@ -42,21 +42,6 @@ DeviceAgent::~DeviceAgent()
     NX_PRINT << "Axis DeviceAgent destroyed";
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<DeviceAgent*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;

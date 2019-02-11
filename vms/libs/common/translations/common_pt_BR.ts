@@ -64,12 +64,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation>New System</translation>
+      <translation>Novo Sistema</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation>The discovered System %1 is incompatible with the current System.</translation>
+      <translation>O sistema descoberto %1 é incompatível com o sistema atual.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Só pode ser feito merge do sistema %1 com não-%1. O nome do sistema e a senha são obtidos do Sistema %1.</translation>
+      <translation>O sistema %1 só pode ser mesclado com não-%1. O nome do sistema e a senha são retirados do sistema %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -304,19 +304,19 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>Por favor, actualize o firmware. Versão suportada mais antiga é %1. A versão actual é %2</translation>
+      <translation>Por favor, atualize o firmware. A versão mínima suportada é %1. A versão atual é %2</translation>
     </message>
   </context>
   <context>
@@ -428,7 +428,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>Start</translation>
+      <translation>Começar</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation>Bridge</translation>
+      <translation>Ponte</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>

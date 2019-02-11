@@ -87,7 +87,6 @@ public:
     virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     State state() const;
-    virtual void setState(State state);
 
     void sendMessage(MessageType messageType, const nx::Buffer& data);
     void sendMessage(const nx::Buffer& data);
@@ -108,6 +107,8 @@ public:
     const IP2PTransport& p2pTransport() const { return *m_p2pTransport; }
     IP2PTransport& p2pTransport() { return *m_p2pTransport; }
 
+    QString idForToStringFromPtr() const;
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -116,6 +117,7 @@ signals:
 protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    virtual void setState(State state);
   private:
     void cancelConnecting(State state, const QString& reason);
 

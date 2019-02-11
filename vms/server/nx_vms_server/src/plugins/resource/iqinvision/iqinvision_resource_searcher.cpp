@@ -52,9 +52,9 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufature " << resourceType->getManufacturer() << " != " << manufacturer();
         return result;
     }
 
@@ -69,7 +69,7 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(
     return result;
 }
 
-QString QnPlIqResourceSearcher::manufacture() const
+QString QnPlIqResourceSearcher::manufacturer() const
 {
     return QnPlIqResource::MANUFACTURE;
 }
@@ -105,7 +105,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     if (vendor != plugins::kIqInvisionManufacturer)
         return QList<QnResourcePtr>();
 
-    resource->setVendor(manufacture());
+    resource->setVendor(manufacturer());
 
     const auto macAddressResponse = helper.oid(plugins::kIqInvisionOidMacAddress);
     if (!macAddressResponse.isSuccessful())
@@ -122,7 +122,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
         return QList<QnResourcePtr>();
 
     const auto model = modelResponse.toString().trimmed();
-    QnResourceData resourceData = dataPool()->data(manufacture(), model);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), model);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>();
 
@@ -200,7 +200,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
             return localResults; //< Already found.
     }
 
-    QnResourceData resourceData = dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacturer(), name);
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return localResults; //< Model forced by ONVIF.
 
@@ -270,12 +270,12 @@ void QnPlIqResourceSearcher::processNativePacket(
 
 QnUuid QnPlIqResourceSearcher::resourceType(const QString& model) const
 {
-    QnUuid resourceType = qnResTypePool->getResourceTypeId(manufacture(), model, false);
+    QnUuid resourceType = qnResTypePool->getResourceTypeId(manufacturer(), model, false);
     if (!resourceType.isNull())
         return resourceType;
 
     // Try with default camera name.
-    return qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
+    return qnResTypePool->getResourceTypeId(manufacturer(), kDefaultResourceType);
 }
 
 QnResourceList QnPlIqResourceSearcher::findResources()

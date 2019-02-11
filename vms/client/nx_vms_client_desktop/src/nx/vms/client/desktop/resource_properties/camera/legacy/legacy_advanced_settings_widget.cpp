@@ -21,15 +21,6 @@
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_advanced_settings_web_page.h>
 
-namespace {
-
-bool isStatusValid(Qn::ResourceStatus status)
-{
-    return status == Qn::Online || status == Qn::Recording;
-}
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
 LegacyAdvancedSettingsWidget::LegacyAdvancedSettingsWidget(QWidget* parent /* = 0*/):
@@ -94,7 +85,6 @@ void LegacyAdvancedSettingsWidget::updateFromResource()
         : tr("This camera has no advanced settings"));
 }
 
-
 bool LegacyAdvancedSettingsWidget::hasManualPage() const
 {
     if (!m_camera)
@@ -104,15 +94,15 @@ bool LegacyAdvancedSettingsWidget::hasManualPage() const
     if (params.groups.empty())
         return false;
 
-     return isStatusValid(m_camera->getStatus())
+     return m_camera->isOnline()
         || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
 }
 
 bool LegacyAdvancedSettingsWidget::hasWebPage() const
 {
-    if (!m_camera || !isStatusValid(m_camera->getStatus()))
+    if (!m_camera || !m_camera->isOnline())
         return false;
-    QnResourceData resourceData = m_camera->commonModule()->dataPool()->data(m_camera);
+    QnResourceData resourceData = m_camera->commonModule()->resourceDataPool()->data(m_camera);
     return resourceData.value<bool>(lit("showUrl"), false);
 }
 
@@ -130,7 +120,6 @@ void LegacyAdvancedSettingsWidget::updatePage()
         ui->tabWidget->addTab(ui->noSettingsPage, tr("No settings"));
 }
 
-
 void LegacyAdvancedSettingsWidget::reloadData()
 {
     updatePage();
@@ -141,7 +130,7 @@ void LegacyAdvancedSettingsWidget::reloadData()
         if (!m_camera)
             return;
 
-        QnResourceData resourceData = m_camera->commonModule()->dataPool()->data(m_camera);
+        QnResourceData resourceData = m_camera->commonModule()->resourceDataPool()->data(m_camera);
         auto urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
         while (urlPath.startsWith(lit("/")))
             urlPath = urlPath.mid(1); //< VMS Gateway does not like several slashes at the beginning.

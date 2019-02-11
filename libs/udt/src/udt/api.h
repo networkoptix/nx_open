@@ -66,31 +66,31 @@ public:
     void addEPoll(const int eid);
     void removeEPoll(const int eid);
 
-    UDTSTATUS m_Status;                       // current socket state
+    UDTSTATUS m_Status = INIT;                       // current socket state
 
-    uint64_t m_TimeStamp;                     // time when the socket is closed
+    uint64_t m_TimeStamp = 0;                     // time when the socket is closed
 
-    int m_iIPversion;                         // IP version
-    sockaddr* m_pSelfAddr;                    // pointer to the local address of the socket
+    int m_iIPversion = 0;                         // IP version
+    sockaddr* m_pSelfAddr = nullptr;                    // pointer to the local address of the socket
     struct sockaddr m_pPeerAddr;                    // pointer to the peer address of the socket
 
-    UDTSOCKET m_SocketID;                     // socket ID
-    UDTSOCKET m_ListenSocket;                 // ID of the listener socket; 0 means this is an independent socket
+    UDTSOCKET m_SocketId = 0;                     // socket ID
+    UDTSOCKET m_ListenSocket = 0;                 // ID of the listener socket; 0 means this is an independent socket
 
-    UDTSOCKET m_PeerID;                       // peer socket ID
-    int32_t m_iISN;                           // initial sequence number, used to tell different connection from same IP:port
+    UDTSOCKET m_PeerID = 0;                       // peer socket ID
+    int32_t m_iISN = 0;                           // initial sequence number, used to tell different connection from same IP:port
 
     std::shared_ptr<CUDT> m_pUDT;                             // pointer to the UDT entity
 
-    std::set<UDTSOCKET>* m_pQueuedSockets;    // set of connections waiting for accept()
-    std::set<UDTSOCKET>* m_pAcceptSockets;    // set of accept()ed connections
+    std::set<UDTSOCKET> m_pQueuedSockets;    // set of connections waiting for accept()
+    std::set<UDTSOCKET> m_pAcceptSockets;    // set of accept()ed connections
 
     std::condition_variable m_AcceptCond;     // used to block "accept" call
     std::mutex m_AcceptLock;                  // mutex associated to m_AcceptCond
 
-    unsigned int m_uiBackLog;                 // maximum number of connections in queue
+    unsigned int m_uiBackLog = 0;                 // maximum number of connections in queue
 
-    int m_multiplexerId;                             // multiplexer ID
+    int m_multiplexerId = -1;                             // multiplexer ID
 
     std::mutex m_ControlLock;            // lock this socket exclusively for control APIs: bind/listen/connect
 
@@ -222,7 +222,7 @@ private:
     std::mutex m_ControlLock;                    // used to synchronize UDT API
 
     std::mutex m_IDLock;                         // used to synchronize ID generation
-    UDTSOCKET m_SocketID;                             // seed to generate a new unique socket ID
+    UDTSOCKET m_SocketId = 0;                             // seed to generate a new unique socket ID
 
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
@@ -248,16 +248,16 @@ private:
     pthread_mutex_t m_MultiplexerLock;
 
 private:
-    CCache<CInfoBlock>* m_pCache;            // UDT network information cache
+    std::unique_ptr<CCache<CInfoBlock>> m_cache;            // UDT network information cache
 
 private:
-    volatile bool m_bClosing;
+    volatile bool m_bClosing = false;
     std::mutex m_GCStopLock;
     std::condition_variable m_GCStopCond;
 
     std::mutex m_InitLock;
-    int m_iInstanceCount;                // number of startup() called by application
-    bool m_bGCStatus;                    // if the GC thread is working (true)
+    int m_iInstanceCount = 0;                // number of startup() called by application
+    bool m_bGCStatus = false;                    // if the GC thread is working (true)
 
     std::thread m_GCThread;
 

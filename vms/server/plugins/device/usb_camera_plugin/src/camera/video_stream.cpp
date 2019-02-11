@@ -19,7 +19,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-static const char * ffmpegDeviceTypePlatformDependent()
+static const char* ffmpegDeviceTypePlatformDependent()
 {
     return
 #ifdef _WIN32
@@ -30,12 +30,12 @@ static const char * ffmpegDeviceTypePlatformDependent()
 }
 
 #ifdef _WIN32
-static bool isKeyFrame(const ffmpeg::Packet * packet)
+static bool isKeyFrame(const ffmpeg::Packet* packet)
 {
-    if(!packet)
+    if (!packet)
         return false;
 
-    const quint8 * udata = static_cast<const quint8 *>(packet->data());
+    const quint8* udata = static_cast<const quint8*>(packet->data());
 
     FrameTypeExtractor extractor(packet->codecId());
 
@@ -51,9 +51,7 @@ VideoStream::VideoStream(
     :
     m_camera(camera),
     m_codecParams(codecParams),
-    m_timeProvider(camera.lock()->timeProvider()),
-    m_packetCount(std::make_shared<std::atomic_int>(0)),
-    m_frameCount(std::make_shared<std::atomic_int>(0))
+    m_timeProvider(camera.lock()->timeProvider())
 {
 }
 
@@ -70,31 +68,12 @@ std::string VideoStream::ffmpegUrl() const
     return {};
 }
 
-float VideoStream::fps() const
-{
-    return m_codecParams.fps;
-}
-
-float VideoStream::actualFps() const
-{
-    return m_fpsCounter.actualFps > 0 ? m_fpsCounter.actualFps.load() : m_codecParams.fps;
-}
-
-std::chrono::milliseconds VideoStream::timePerFrame() const
-{
-    return std::chrono::milliseconds((int)(1.0f / fps() * kMsecInSec));
-}
-
-std::chrono::milliseconds VideoStream::actualTimePerFrame() const
-{
-    return std::chrono::milliseconds((int)(1.0f / actualFps() * kMsecInSec));
-}
-
 void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_threadStartMutex);
     m_packetConsumerManager.addConsumer(consumer);
-    tryToStartIfNotStarted();
+    if (pluggedIn() && m_terminated)
+        start();
 }
 
 void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
@@ -102,28 +81,12 @@ void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
     std::lock_guard<std::mutex> lock(m_threadStartMutex);
     m_packetConsumerManager.removeConsumer(consumer);
 
-    if (m_packetConsumerManager.empty() && m_frameConsumerManager.empty())
+    if (m_packetConsumerManager.empty())
         stop();
-}
-
-void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
-{
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    m_frameConsumerManager.addConsumer(consumer);
-    tryToStartIfNotStarted();
-}
-
-void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
-{
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    m_frameConsumerManager.removeConsumer(consumer);
 
     // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
-    if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
-        setCameraState(csModified);
-
-    if (m_packetConsumerManager.empty() && m_frameConsumerManager.empty())
-        stop();
+    if (nx::utils::AppInfo::isRaspberryPi())
+        m_streamState = csModified;
 }
 
 bool VideoStream::ioError() const
@@ -146,31 +109,18 @@ std::string VideoStream::ffmpegUrlPlatformDependent() const
 #endif
 }
 
-void VideoStream::tryToStartIfNotStarted()
-{
-    if (m_terminated)
-    {
-        if (pluggedIn())
-            start();
-    }
-}
-
 void VideoStream::start()
 {
     stop();
-
     m_terminated = false;
     m_videoThread = std::thread(&VideoStream::run, this);
 }
 
 void VideoStream::stop()
 {
-    if (!m_terminated)
-    {
-        m_terminated = true;
-        if (m_videoThread.joinable())
-            m_videoThread.join();
-    }
+    m_terminated = true;
+    if (m_videoThread.joinable())
+        m_videoThread.join();
 }
 
 void VideoStream::run()
@@ -180,16 +130,20 @@ void VideoStream::run()
         if (!ensureInitialized())
             continue;
 
-        auto packet = readFrame();
+        std::shared_ptr<ffmpeg::Packet> packet;
+        int status = readFrame(packet);
+        checkIoError(status);
+        if (status < 0)
+        {
+            setLastError(status);
+            if (m_ioError)
+                break;
+        }
+
         if (!packet)
             continue;
 
-        auto frame = maybeDecode(packet.get());
-
-        m_fpsCounter.update(std::chrono::milliseconds(m_timeProvider->millisSinceEpoch()));
-        m_packetConsumerManager.givePacket(packet);
-        if (frame)
-            m_frameConsumerManager.giveFrame(frame);
+        m_packetConsumerManager.pushPacket(packet);
     }
     uninitialize();
 }
@@ -208,11 +162,11 @@ bool VideoStream::ensureInitialized()
 
     if (needInit)
     {
-        m_initCode = initialize();
-        checkIoError(m_initCode);
-        if(m_initCode < 0)
+        int status = initialize();
+        checkIoError(status);
+        if (status < 0)
         {
-            setLastError(m_initCode);
+            setLastError(status);
             if (m_ioError)
                 m_terminated = true;
         }
@@ -229,45 +183,31 @@ int VideoStream::initialize()
     if (result < 0)
         return result;
 
-    result = initializeDecoder();
-    if (result < 0)
-        return result;
-
-    setCameraState(csInitialized);
-
+    m_streamState = csInitialized;
     return 0;
 }
 
 void VideoStream::uninitialize()
 {
-    // Flushing to reduce m_packetCount and m_frameCount before sleepy loop below.
+    // Some cameras segfault if they are unintialized while there are still packets, so need flush
     m_packetConsumerManager.flush();
-    m_frameConsumerManager.flush();
-
-    // Make sure not to keep m_mutex locked while sleeping here.
-
-    // Some cameras segfault if they are unintialized while there are still packets and / or frames
-    // allocated. They own the memory being referred to by the packet, so the packets / frames
-    // need to be deallocated first. Beware, any strong references to the packets should be
-    // released ASAP to avoid endless spinning here.
-    while (*m_packetCount > 0 || *m_frameCount > 0)
-    {
-        static constexpr std::chrono::milliseconds kSleep(30);
-        std::this_thread::sleep_for(kSleep);
-    }
-
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-
-        // flush the decoder to avoid memory ownership problems described above.
-        if (m_decoder)
-            m_decoder->flush();
-
-        m_decoder.reset(nullptr);
         m_inputFormat.reset(nullptr);
 
-        setCameraState(csOff);
+        m_streamState = csOff;
     }
+}
+
+AVCodecParameters* VideoStream::getCodecParameters()
+{
+    if (!m_inputFormat)
+        return nullptr;
+    AVStream* stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
+    if (!stream)
+        return nullptr;
+
+    return stream->codecpar;
 }
 
 int VideoStream::initializeInputFormat()
@@ -285,7 +225,6 @@ int VideoStream::initializeInputFormat()
         return result;
 
     m_inputFormat = std::move(inputFormat);
-
     return 0;
 }
 
@@ -310,7 +249,9 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     context->flags |= AVFMT_FLAG_NOBUFFER; //< Could be helpful for Linux too.
 
     if (m_codecParams.fps > 0)
+    {
         inputFormat->setFps(m_codecParams.fps);
+    }
 
     if (m_codecParams.resolution.width * m_codecParams.resolution.height > 0)
     {
@@ -322,7 +263,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
-        if(auto cam = m_camera.lock())
+        if (auto cam = m_camera.lock())
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::video::setBitrate(
@@ -333,112 +274,41 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     }
 }
 
-int VideoStream::initializeDecoder()
+int VideoStream::readFrame(std::shared_ptr<ffmpeg::Packet>& result)
 {
-    auto decoder = std::make_unique<ffmpeg::Codec>();
+    auto packetTemp = std::make_shared<ffmpeg::Packet>(
+        m_inputFormat->videoCodecId(), AVMEDIA_TYPE_VIDEO);
 
-    int result;
-    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecId == AV_CODEC_ID_H264)
-    {
-        result = decoder->initializeDecoder("h264_mmal");
-    }
-    else
-    {
-        AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
-        result = stream
-            ? decoder->initializeDecoder(stream->codecpar)
-            : AVERROR_DECODER_NOT_FOUND; //< Using as stream not found.
-    }
-    if (result < 0)
-        return result;
-
-    result = decoder->open();
-    if (result < 0)
-        return result;
-
-    m_skipUntilNextKeyPacket = true;
-    m_decoder = std::move(decoder);
-    return 0;
-}
-
-std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
-{
-    auto packet = std::make_shared<ffmpeg::Packet>(
-        m_inputFormat->videoCodecId(),
-        AVMEDIA_TYPE_VIDEO);
-
-    int result;
+    int status;
     if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
     {
         using namespace std::chrono_literals;
-        result = m_inputFormat->readFrameNonBlock(packet->packet(), 1000ms);
-        if (result == AVERROR(EAGAIN))
-            result = AVERROR(EIO); //< Treating a one second timeout as an io error.
+        status = m_inputFormat->readFrameNonBlock(packetTemp->packet(), 1000ms);
+        if (status == AVERROR(EAGAIN))
+            status = AVERROR(EIO); //< Treating a one second timeout as an io error.
     }
     else
     {
-        result = m_inputFormat->readFrame(packet->packet());
+        status = m_inputFormat->readFrame(packetTemp->packet());
     }
+    if (status < 0)
+        return status;
 
-    checkIoError(result); // < Need to reset m_ioError if readFrame was successful.
-
-    if (result < 0)
-    {
-        setLastError(result);
-        if (m_ioError)
-            m_terminated = true;
-        return nullptr;
-    }
+    result = std::make_shared<ffmpeg::Packet>(
+        m_inputFormat->videoCodecId(), AVMEDIA_TYPE_VIDEO);
+    status = result->copy(*(packetTemp->packet()));
+    if (status < 0)
+        return status;
 
 #ifdef _WIN32
     // Dshow input format does not set h264 key packet flag correctly, so do it manually
-    if (packet->codecId() == AV_CODEC_ID_H264 && isKeyFrame(packet.get()))
-        packet->packet()->flags |= AV_PKT_FLAG_KEY;
+    if (result->codecId() == AV_CODEC_ID_H264 && isKeyFrame(result.get()))
+        result->packet()->flags |= AV_PKT_FLAG_KEY;
 #endif
 
     // Setting timestamp here because primary stream needs it even if there is no decoding.
-    packet->setTimestamp(m_timeProvider->millisSinceEpoch());
-
-    return packet;
-}
-
-std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * packet)
-{
-    if (m_frameConsumerManager.empty())
-        return nullptr;
-
-    if (m_skipUntilNextKeyPacket)
-    {
-        if (!packet->keyPacket())
-            return nullptr;
-        m_skipUntilNextKeyPacket = false;
-    }
-
-    auto frame = std::make_shared<ffmpeg::Frame>(m_frameCount);
-    int result = decode(packet, frame.get());
-    if (result < 0)
-        return nullptr;
-
-    if (frame->pts() == AV_NOPTS_VALUE)
-        frame->frame()->pts = frame->packetPts();
-
-    m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
-
-    auto nxTimestamp = m_timestamps.takeNxTimestamp(frame->packetPts());
-    if (!nxTimestamp.has_value())
-        nxTimestamp.emplace(m_timeProvider->millisSinceEpoch());
-
-    frame->setTimestamp(nxTimestamp.value());
-
-    return frame;
-}
-
-int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
-{
-    int result = m_decoder->sendPacket(packet->packet());
-    if(result == 0 || result == AVERROR(EAGAIN))
-        return m_decoder->receiveFrame(frame->frame());
-    return result;
+    result->setTimestamp(m_timeProvider->millisSinceEpoch());
+    return status;
 }
 
 void VideoStream::setFps(float fps)
@@ -473,12 +343,12 @@ void VideoStream::setBitrate(int bitrate)
         return;
 
     m_codecParams.bitrate = bitrate;
-    setCameraState(csModified);
+    m_streamState = csModified;
 }
 
 CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParameters& params) const
 {
-    std::vector<device::video::ResolutionData>resolutionList;
+    std::vector<device::video::ResolutionData> resolutionList;
 
     // Assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())
@@ -501,7 +371,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
 
     // Then a match with similar aspect ratio whose resolution and fps are higher than requested
     float aspectRatio = (float) params.resolution.width / params.resolution.height;
-    for (const auto & resolution : resolutionList)
+    for (const auto& resolution: resolutionList)
     {
         if (aspectRatio == resolution.aspectRatio())
         {
@@ -519,7 +389,7 @@ CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParamet
     }
 
     // Any resolution or fps higher than requested
-    for (const auto & resolution : resolutionList)
+    for (const auto& resolution: resolutionList)
     {
         bool actualResolutionGreater = resolution.width * resolution.height >=
             params.resolution.width * params.resolution.height;
@@ -546,20 +416,16 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
         AVCodecID codecId = m_codecParams.codecId;
         m_codecParams = codecParams;
         m_codecParams.codecId = codecId;
-        setCameraState(csModified);
+        m_streamState = csModified;
     }
-}
-
-void VideoStream::setCameraState(CameraState cameraState)
-{
-    m_streamState = cameraState;
 }
 
 bool VideoStream::checkIoError(int ffmpegError)
 {
-    m_ioError = ffmpegError == AVERROR(ENODEV) //< Linux.
-        || ffmpegError == AVERROR(EIO) //< Windows.
-        || ffmpegError == AVERROR(EBUSY); //< Device is busy during initialization.
+    m_ioError =
+        ffmpegError == AVERROR(ENODEV) || //< Linux.
+        ffmpegError == AVERROR(EIO) || //< Windows.
+        ffmpegError == AVERROR(EBUSY); //< Device is busy during initialization.
     return m_ioError;
 }
 

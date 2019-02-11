@@ -29,7 +29,7 @@ public:
     const QString& getName() const { return m_name;}
 
     void setManufacture(const QString& value) { m_manufacture = value; }
-    const QString& getManufacture() const { return m_manufacture;}
+    const QString& getManufacturer() const { return m_manufacture;}
 
     bool isCamera() const;
 
@@ -76,10 +76,10 @@ public:
     void replaceResourceTypeList(const QnResourceTypeList& resourceType);
 
     /* exact match name */
-    QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
+    QnUuid getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning = true) const;
 
     /* match name using like operation */
-    QnUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
+    QnUuid getLikeResourceTypeId(const QString& manufacturer, const QString& name) const;
 
     QnResourceTypeMap getResourceTypeMap() const;
 

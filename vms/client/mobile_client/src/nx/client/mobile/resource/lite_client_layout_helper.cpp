@@ -101,7 +101,7 @@ void LiteClientLayoutHelper::setDisplayCell(const QPoint& cell)
 
     layout->setProperty(kDisplayCellProperty, pointToString(cell));
 
-    propertyDictionary()->saveParams(layout->getId());
+    resourcePropertyDictionary()->saveParams(layout->getId());
 }
 
 LiteClientLayoutHelper::DisplayMode LiteClientLayoutHelper::displayMode() const

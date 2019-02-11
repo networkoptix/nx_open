@@ -120,13 +120,6 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& id, const QStrin
     return false;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnArecontPanoramicResource::initializeCameraDriver()
 {
     const CameraDiagnostics::Result result = QnPlAreconVisionResource::initializeCameraDriver();
@@ -179,14 +172,14 @@ void QnArecontPanoramicResource::updateFlipState()
 
     // Get from kvpairs directly. Do not read default value from resourceTypes.
     QString oldVideoLayoutString = commonModule()
-        ->propertyDictionary()
+        ->resourcePropertyDictionary()
         ->value(getId(), ResourcePropertyKey::kVideoLayout);
     if (newVideoLayoutString != oldVideoLayoutString)
     {
         commonModule()
-            ->propertyDictionary()
+            ->resourcePropertyDictionary()
             ->setValue(getId(), ResourcePropertyKey::kVideoLayout, newVideoLayoutString);
-        commonModule()->propertyDictionary()->saveParams(getId());
+        commonModule()->resourcePropertyDictionary()->saveParams(getId());
     }
 }
 

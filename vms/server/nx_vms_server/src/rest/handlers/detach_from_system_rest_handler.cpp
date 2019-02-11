@@ -5,7 +5,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <media_server/serverutil.h>
-#include <network/universal_tcp_listener.h>
 #include <nx/cloud/db/api/connection.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
@@ -15,6 +14,8 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
+
+#include "private/multiserver_request_helper.h"
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
     QnMediaServerModule* serverModule,
@@ -50,12 +51,8 @@ int QnDetachFromSystemRestHandler::executePost(
 int QnDetachFromSystemRestHandler::execute(
     CurrentPasswordData data, const QnRestConnectionProcessor* owner, QnJsonRestResult& result)
 {
-    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
-    if (!authenticator->isPasswordCorrect(owner->accessRights(), data.currentPassword))
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
+    if (!detail::verifyPasswordOrSetError(owner, data.currentPassword, &result))
         return nx::network::http::StatusCode::ok;
-    }
 
     using namespace nx::cloud::db;
     const Qn::UserAccessData& accessRights = owner->accessRights();

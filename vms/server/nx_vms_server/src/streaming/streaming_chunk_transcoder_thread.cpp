@@ -43,9 +43,9 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
 {
 }
 
-StreamingChunkTranscoderThread::StreamingChunkTranscoderThread()
+StreamingChunkTranscoderThread::StreamingChunkTranscoderThread():
+    QnLongRunnable("StreamingChunkTranscoderThread")
 {
-    setObjectName(QLatin1String("StreamingChunkTranscoderThread"));
     m_monotonicClock.restart();
 }
 

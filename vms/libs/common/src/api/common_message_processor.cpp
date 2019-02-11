@@ -80,7 +80,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (!connection)
         return;
 
-    qnSyncTime->setTimeNotificationManager(connection->getTimeNotificationManager());
+    qnSyncTime->setTimeNotificationManager(connection->timeNotificationManager());
     connectToConnection(connection);
     connection->startReceivingNotifications();
 }
@@ -136,7 +136,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::runtimeInfoRemoved,
         connectionType);
 
-    const auto resourceManager = connection->getResourceNotificationManager();
+    const auto resourceManager = connection->resourceNotificationManager();
     connect(
         resourceManager,
         &ec2::AbstractResourceNotificationManager::statusChanged,
@@ -168,7 +168,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_resourceStatusRemoved,
         connectionType);
 
-    const auto mediaServerManager = connection->getMediaServerNotificationManager();
+    const auto mediaServerManager = connection->mediaServerNotificationManager();
     connect(
         mediaServerManager,
         &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,
@@ -206,7 +206,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved,
         connectionType);
 
-    const auto cameraManager = connection->getCameraNotificationManager();
+    const auto cameraManager = connection->cameraNotificationManager();
     connect(
         cameraManager,
         &ec2::AbstractCameraNotificationManager::addedOrUpdated,
@@ -238,7 +238,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
 
-    const auto userManager = connection->getUserNotificationManager();
+    const auto userManager = connection->userNotificationManager();
     connect(
         userManager,
         &ec2::AbstractUserNotificationManager::addedOrUpdated,
@@ -270,7 +270,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_userRoleRemoved,
         connectionType);
 
-    const auto layoutManager = connection->getLayoutNotificationManager();
+    const auto layoutManager = connection->layoutNotificationManager();
     connect(
         layoutManager,
         &ec2::AbstractLayoutNotificationManager::addedOrUpdated,
@@ -284,7 +284,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
 
-    const auto videowallManager = connection->getVideowallNotificationManager();
+    const auto videowallManager = connection->videowallNotificationManager();
     connect(
         videowallManager,
         &ec2::AbstractVideowallNotificationManager::addedOrUpdated,
@@ -304,7 +304,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::videowallControlMessageReceived,
         connectionType);
 
-    const auto webPageManager = connection->getWebPageNotificationManager();
+    const auto webPageManager = connection->webPageNotificationManager();
     connect(
         webPageManager,
         &ec2::AbstractWebPageNotificationManager::addedOrUpdated,
@@ -318,7 +318,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
 
-    const auto licenseManager = connection->getLicenseNotificationManager();
+    const auto licenseManager = connection->licenseNotificationManager();
     connect(
         licenseManager,
         &ec2::AbstractLicenseNotificationManager::licenseChanged,
@@ -332,7 +332,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_licenseRemoved,
         connectionType);
 
-    const auto eventManager = connection->getBusinessEventNotificationManager();
+    const auto eventManager = connection->businessEventNotificationManager();
     connect(
         eventManager,
         &ec2::AbstractBusinessEventNotificationManager::addedOrUpdated,
@@ -370,7 +370,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::on_execBusinessAction,
         connectionType);
 
-    const auto storedFileManager = connection->getStoredFileNotificationManager();
+    const auto storedFileManager = connection->storedFileNotificationManager();
     connect(
         storedFileManager,
         &ec2::AbstractStoredFileNotificationManager::added,
@@ -390,7 +390,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::fileRemoved,
         connectionType);
 
-    const auto timeManager = connection->getTimeNotificationManager();
+    const auto timeManager = connection->timeNotificationManager();
     connect(
         timeManager,
         &ec2::AbstractTimeNotificationManager::timeChanged,
@@ -398,7 +398,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::syncTimeChanged,
         connectionType);
 
-    const auto discoveryManager = connection->getDiscoveryNotificationManager();
+    const auto discoveryManager = connection->discoveryNotificationManager();
     connect(
         discoveryManager,
         &ec2::AbstractDiscoveryNotificationManager::discoveryInformationChanged,
@@ -412,7 +412,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::discoveredServerChanged,
         connectionType);
 
-    const auto layoutTourManager = connection->getLayoutTourNotificationManager();
+    const auto layoutTourManager = connection->layoutTourNotificationManager();
     connect(
         layoutTourManager,
         &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
@@ -426,7 +426,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnLayoutTourManager::removeTour,
         connectionType);
 
-    const auto analyticsManager = connection->getAnalyticsNotificationManager();
+    const auto analyticsManager = connection->analyticsNotificationManager();
     connect(
         analyticsManager,
         &ec2::AbstractAnalyticsNotificationManager::analyticsPluginAddedOrUpdated,
@@ -456,18 +456,18 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     connection->disconnect(this);
-    connection->getResourceNotificationManager()->disconnect(this);
-    connection->getMediaServerNotificationManager()->disconnect(this);
-    connection->getCameraNotificationManager()->disconnect(this);
-    connection->getLicenseNotificationManager()->disconnect(this);
-    connection->getBusinessEventNotificationManager()->disconnect(this);
-    connection->getUserNotificationManager()->disconnect(this);
-    connection->getLayoutNotificationManager()->disconnect(this);
-    connection->getStoredFileNotificationManager()->disconnect(this);
-    connection->getDiscoveryNotificationManager()->disconnect(this);
-    connection->getTimeNotificationManager()->disconnect(this);
-    connection->getMiscNotificationManager()->disconnect(this);
-    connection->getLayoutTourNotificationManager()->disconnect(this);
+    connection->resourceNotificationManager()->disconnect(this);
+    connection->mediaServerNotificationManager()->disconnect(this);
+    connection->cameraNotificationManager()->disconnect(this);
+    connection->licenseNotificationManager()->disconnect(this);
+    connection->businessEventNotificationManager()->disconnect(this);
+    connection->userNotificationManager()->disconnect(this);
+    connection->layoutNotificationManager()->disconnect(this);
+    connection->storedFileNotificationManager()->disconnect(this);
+    connection->discoveryNotificationManager()->disconnect(this);
+    connection->timeNotificationManager()->disconnect(this);
+    connection->miscNotificationManager()->disconnect(this);
+    connection->layoutTourNotificationManager()->disconnect(this);
 
     layoutTourManager()->resetTours();
 }
@@ -559,12 +559,12 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     if (resource)
         resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
     else
-        propertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
+        resourcePropertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
 
     if (param.name == Qn::kResourceDataParamName)
     {
         const bool loaded = param.value.isEmpty()
-            || commonModule()->dataPool()->loadData(param.value.toUtf8());
+            || commonModule()->resourceDataPool()->loadData(param.value.toUtf8());
         NX_ASSERT(loaded, "Invalid json received");
     }
 }
@@ -572,7 +572,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
 void QnCommonMessageProcessor::on_resourceParamRemoved(
     const ResourceParamWithRefData& param)
 {
-    propertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
+    resourcePropertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
@@ -885,7 +885,7 @@ void QnCommonMessageProcessor::resetPropertyList(
     const ResourceParamWithRefDataList& params)
 {
     // Store existing parameter keys.
-    auto existingProperties = propertyDictionary()->allPropertyNamesByResource();
+    auto existingProperties = resourcePropertyDictionary()->allPropertyNamesByResource();
 
     // Update changed values.
     for (const auto& param: params)

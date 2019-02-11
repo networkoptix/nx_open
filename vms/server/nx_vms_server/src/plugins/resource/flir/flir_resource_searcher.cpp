@@ -12,8 +12,8 @@ QnFlirResourceSearcher::QnFlirResourceSearcher(QnMediaServerModule* serverModule
     base_type(serverModule),
     m_serverModule(serverModule)
 {
-    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
-    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
+    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacturer(), lit("FLIR-AX8"), true);
+    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacturer(), lit("FLIR_COMMON"), true);
     m_flirIoExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
 }
 
@@ -21,7 +21,8 @@ QnFlirResourceSearcher::~QnFlirResourceSearcher()
 {
 }
 
-QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnFlirResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -33,7 +34,7 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
         return result;
     }
@@ -47,7 +48,8 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 
 }
 
-QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(
+    const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
@@ -97,7 +99,8 @@ quint16 QnFlirResourceSearcher::getVendorIdFromDevice(SimpleEIPClient& eipClient
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occurred when retrieving vendor."
+            << data.generalStatus << data.additionalStatus;
         return 0;
     }
 
@@ -116,7 +119,8 @@ QString QnFlirResourceSearcher::getMACAdressFromDevice(SimpleEIPClient& eipClien
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving vendor."
+            << data.generalStatus << data.additionalStatus;
         return QString();
     }
 
@@ -135,7 +139,8 @@ QString QnFlirResourceSearcher::getModelFromDevice(SimpleEIPClient& eipClient) c
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured when retrieving model." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving model."
+            << data.generalStatus << data.additionalStatus;
         return QString();
     }
 
@@ -163,14 +168,15 @@ QString QnFlirResourceSearcher::getFirmwareFromDevice(SimpleEIPClient &eipClient
     if(data.generalStatus != CIPGeneralStatus::kSuccess &&
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qWarning() << "Flir plugin. Error occured while retrieving firmware." << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured while retrieving firmware."
+            << data.generalStatus << data.additionalStatus;
         return QString();
     }
 
     return QString(QString::fromLatin1(data.data.mid(1)));
 }
 
-QString QnFlirResourceSearcher::manufacture() const
+QString QnFlirResourceSearcher::manufacturer() const
 {
     return QnFlirEIPResource::MANUFACTURE;
 }
@@ -186,14 +192,14 @@ QList<QnNetworkResourcePtr> QnFlirResourceSearcher::processPacket(
     return localRes;
 }
 
-
-void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result)
+void QnFlirResourceSearcher::createResource(
+    const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result)
 {
     QnFlirEIPResourcePtr resource(new QnFlirEIPResource(m_serverModule));
 
-    resource->setName(manufacture() + lit("-") + info.model);
+    resource->setName(manufacturer() + lit("-") + info.model);
     resource->setModel(info.model);
-    resource->setVendor(manufacture());
+    resource->setVendor(manufacturer());
     resource->setTypeId(m_eipFlirResTypeId);
     resource->setUrl(info.url.toString());
     resource->setMAC(nx::utils::MacAddress(info.mac));

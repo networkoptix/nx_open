@@ -223,7 +223,7 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             }
             break;
         case Qn::RemoveTourPtzCommand:
-            if (m_data.fields & Qn::PresetsPtzField) {
+            if (m_data.fields & Qn::ToursPtzField) {
                 QString tourId = data.value<QString>();
                 int idx = nx::utils::algorithm::index_of(m_data.tours,
                     [&](const QnPtzTour &old) { return old.id == tourId; });

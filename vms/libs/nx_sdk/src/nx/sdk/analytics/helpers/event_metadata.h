@@ -2,23 +2,23 @@
 
 #include <string>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_event_metadata.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class NX_SDK_API EventMetadata: public nxpt::CommonRefCounter<IEventMetadata>
+class EventMetadata: public RefCountable<IEventMetadata>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual const char* typeId() const override;
     virtual float confidence() const override;
     virtual const char* caption() const override;
     virtual const char* description() const override;
     virtual const char* auxiliaryData() const override;
     virtual bool isActive() const override;
+
     virtual void setTypeId(std::string typeId);
     virtual void setConfidence(float confidence);
     virtual void setCaption(const std::string& caption);

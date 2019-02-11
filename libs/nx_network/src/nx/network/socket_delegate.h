@@ -156,6 +156,11 @@ public:
         return m_target->setIpv6Only(val);
     }
 
+    virtual bool getProtocol(int* protocol) const override
+    {
+        return m_target->getProtocol(protocol);
+    }
+
     virtual Pollable* pollable() override
     {
         return m_target->pollable();

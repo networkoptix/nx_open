@@ -109,13 +109,16 @@ private:
     void pleaseStopUnsafe();
     bool haveChunksToDownloadUnsafe();
     virtual qint64 delayMs() const;
+    bool hasNotDownloadingChunks() const;
 
 protected:
     FileInformation fileInformation() const;
 
     QList<QnUuid> peersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
-        int count = -1, QList<QnUuid> peers = QList<QnUuid>()) const;
+        int count = -1,
+        QList<QnUuid> peers = QList<QnUuid>(),
+        bool skipPeersWithMinimalRank = true) const;
     void revivePeersWithMinimalRank();
     int selectNextChunk() const;
 

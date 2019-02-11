@@ -44,13 +44,18 @@ public:
         bool progressHidden = true;
 
         m_animated = false;
+        if (data->component == UpdateItem::Component::client)
+        {
+            int w = 0;
+        }
 
+        /*
         if (!m_owner->isStatusVisible())
         {
             m_left->setHidden(true);
             progressHidden = true;
-        }
-        else if (m_owner->isVerificationErrorVisible())
+        }*/
+        if (m_owner->isVerificationErrorVisible())
         {
             // Not showing any other statuses if there are any verification errors.
             if (!data->verificationMessage.isEmpty())

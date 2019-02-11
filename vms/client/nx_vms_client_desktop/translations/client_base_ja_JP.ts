@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>ブックマークのエクスポート...</translation>
     </message>
   </context>
   <context>
@@ -5398,7 +5398,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>ブックマークのエクスポート...</translation>
     </message>
   </context>
   <context>
@@ -8404,7 +8404,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>いくつかのブックマークはレイアウトのみエクスポートされます</translation>
     </message>
   </context>
   <context>

@@ -36,7 +36,7 @@ ILPMediaPacket::ILPMediaPacket(
 
 ILPMediaPacket::~ILPMediaPacket()
 {
-    if( m_buffer )
+    if ( m_buffer )
     {
         using namespace std::placeholders;
         nx::kit::utils::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
@@ -47,17 +47,17 @@ ILPMediaPacket::~ILPMediaPacket()
 
 void* ILPMediaPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if( memcmp( &interfaceID, &nxcip::IID_VideoDataPacket, sizeof(nxcip::IID_VideoDataPacket) ) == 0 )
+    if ( memcmp( &interfaceID, &nxcip::IID_VideoDataPacket, sizeof(nxcip::IID_VideoDataPacket) ) == 0 )
     {
         addRef();
         return this;
     }
-    if( memcmp( &interfaceID, &nxcip::IID_MediaDataPacket, sizeof(nxcip::IID_MediaDataPacket) ) == 0 )
+    if ( memcmp( &interfaceID, &nxcip::IID_MediaDataPacket, sizeof(nxcip::IID_MediaDataPacket) ) == 0 )
     {
         addRef();
         return static_cast<nxcip::MediaDataPacket*>(this);
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if ( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -122,7 +122,7 @@ nxcip::Picture* ILPMediaPacket::getMotionData() const
 
 void ILPMediaPacket::resizeBuffer( size_t bufSize )
 {
-    if( bufSize < m_bufSize && bufSize > 0 )
+    if ( bufSize < m_bufSize && bufSize > 0 )
     {
         m_bufSize = bufSize;
         return;
@@ -134,9 +134,9 @@ void ILPMediaPacket::resizeBuffer( size_t bufSize )
         nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
         std::bind( &CyclicAllocator::alloc, m_allocator, _1 ) );
 
-    if( m_bufSize > 0 )
+    if ( m_bufSize > 0 )
     {
-        if( newBuffer )
+        if ( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
         nx::kit::utils::freeAligned(
             m_buffer,
@@ -146,7 +146,7 @@ void ILPMediaPacket::resizeBuffer( size_t bufSize )
     }
 
     m_buffer = newBuffer;
-    if( m_buffer )
+    if ( m_buffer )
         m_bufSize = bufSize;
 }
 

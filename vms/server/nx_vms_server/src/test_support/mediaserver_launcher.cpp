@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <test_support/utils.h>
 #include <transaction/message_bus_adapter.h>
+#include <nx/p2p/p2p_message_bus.h>
 
 namespace {
 
@@ -31,7 +32,15 @@ MediaServerLauncher::MediaServerLauncher(
 
     if (disabledFeatures.testFlag(DisabledFeature::noStorageDiscovery))
         addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+
+    if (disabledFeatures.testFlag(DisabledFeature::noPlugins))
+        addSetting(QnServer::kNoPlugins, "1");
+
+    m_cmdOptions.push_back("");
+    m_cmdOptions.push_back("-e");
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(MediaServerLauncher::DisabledFeatures)
 
 void MediaServerLauncher::fillDefaultSettings()
 {
@@ -89,6 +98,11 @@ void MediaServerLauncher::addSetting(const std::string& name, const QVariant& va
     m_settings[name] = value.toString();
 }
 
+void MediaServerLauncher::addCmdOption(const std::string& option)
+{
+    m_cmdOptions.push_back(option);
+}
+
 void MediaServerLauncher::prepareToStart()
 {
     m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
@@ -98,18 +112,42 @@ void MediaServerLauncher::prepareToStart()
     for (const auto& p: m_settings)
         m_configFile << p.first << " = " << p.second.toStdString() << std::endl;
 
-    QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
-    const char* argv[] = { "", "-e", configFileOption.data() };
-    const int argc = 3;
+    m_cmdOptions.push_back("--conf-file=" + m_configFilePath.toUtf8().toStdString());
+
+    std::vector<const char*> argv;
+    std::transform(m_cmdOptions.cbegin(), m_cmdOptions.cend(), std::back_inserter(argv),
+        [](const std::string& s) { return s.data(); });
+    argv.push_back(nullptr);
 
     m_configFile.flush();
     m_configFile.close();
 
     m_mediaServerProcess.reset();
-    m_mediaServerProcess.reset(new MediaServerProcess(argc, (char**) argv));
-    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this, &MediaServerLauncher::started);
+    m_mediaServerProcess.reset(new MediaServerProcess(argv.size() - 1, (char**) argv.data()));
+    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this,
+        &MediaServerLauncher::started);
 
     m_firstStartup = false;
+
+    m_mediaServerProcess->setSetupModuleCallback(
+        [](QnMediaServerModule* server)
+    {
+        const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
+        server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
+        server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
+    });
+
+    connect(
+        m_mediaServerProcess.get(),
+        &MediaServerProcess::started,
+        this,
+        [this]()
+        {
+            setLowDelayIntervals();
+            m_processStartedPromise->set_value(true);
+        }, Qt::DirectConnection);
+
+    m_processStartedPromise = std::make_unique<nx::utils::promise<bool>>();
 }
 
 void MediaServerLauncher::run()
@@ -118,30 +156,33 @@ void MediaServerLauncher::run()
     m_mediaServerProcess->run();
 }
 
+void MediaServerLauncher::setLowDelayIntervals()
+{
+    const auto connection = serverModule()->ec2Connection();
+    auto bus = connection->messageBus()->dynamicCast<nx::p2p::MessageBus*>();
+    if (bus)
+    {
+        auto intervals = bus->delayIntervals();
+        intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
+        intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+        intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
+        bus->setDelayIntervals(intervals);
+    }
+}
+
 bool MediaServerLauncher::start()
 {
     prepareToStart();
-    m_mediaServerProcess->setSetupModuleCallback(
-        [](QnMediaServerModule* server)
-        {
-            const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
-            server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
-            server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
-        });
-
-    nx::utils::promise<bool> processStartedPromise;
-    auto future = processStartedPromise.get_future();
-
-    connect(
-        m_mediaServerProcess.get(),
-        &MediaServerProcess::started,
-        this,
-        [&processStartedPromise]() { processStartedPromise.set_value(true); },
-        Qt::DirectConnection);
     m_mediaServerProcess->start();
+    return waitForStarted();
+}
+
+bool MediaServerLauncher::waitForStarted()
+{
 
     //waiting for server to come up
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
+    auto future = m_processStartedPromise->get_future();
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
     if (result != std::future_status::ready)
         return false;

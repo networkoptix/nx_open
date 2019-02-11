@@ -30,9 +30,10 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
             widget->setOption(QnResourceWidget::DisplayMotion, active());
 
             connect(widget, &QnResourceWidget::optionsChanged, this,
-                [this, widget]()
+                [this, widget](QnResourceWidget::Options changedOptions)
                 {
-                    setActive(widget->options().testFlag(QnResourceWidget::DisplayMotion));
+                    if (changedOptions.testFlag(QnResourceWidget::DisplayMotion))
+                        setActive(widget->options().testFlag(QnResourceWidget::DisplayMotion));
                 });
 
             const auto mediaWidget = static_cast<QnMediaResourceWidget*>(widget);

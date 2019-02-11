@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/streaming/video_data_packet.h>
 
@@ -12,43 +12,13 @@ namespace analytics {
  * Wrapper owning a QnCompressedVideoData.
  */
 class CompressedVideoPacket:
-    public nxpt::CommonRefCounter<nx::sdk::analytics::ICompressedVideoPacket>
+    public nx::sdk::RefCountable<nx::sdk::analytics::ICompressedVideoPacket>
 {
 public:
     CompressedVideoPacket(QnConstCompressedVideoDataPtr frame):
         m_frame(std::move(frame)),
         m_codec(toString(m_frame->compressionType).toStdString())
     {
-    }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
-    {
-        if (interfaceId == nx::sdk::analytics::IID_CompressedVideoPacket)
-        {
-            addRef();
-            return static_cast<ICompressedVideoPacket*>(this);
-        }
-        if (interfaceId == nx::sdk::analytics::IID_CompressedMediaPacket)
-        {
-            addRef();
-            return static_cast<ICompressedMediaPacket*>(this);
-        }
-        if (interfaceId == nx::sdk::analytics::IID_CompressedMediaPacket)
-        {
-            addRef();
-            return static_cast<ICompressedMediaPacket*>(this);
-        }
-        if (interfaceId == nx::sdk::analytics::IID_DataPacket)
-        {
-            addRef();
-            return static_cast<IDataPacket*>(this);
-        }
-        if (interfaceId == nxpl::IID_PluginInterface)
-        {
-            addRef();
-            return static_cast<nxpl::PluginInterface*>(this);
-        }
-        return nullptr;
     }
 
     virtual int64_t timestampUs() const override { return m_frame->timestamp; }

@@ -26,11 +26,13 @@ public:
 
     static const quint16 kFlirVendorId = 1161;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
-    virtual QString manufacture() const override;
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QString manufacturer() const override;
     nx::plugins::flir::IoExecutor* ioExecutor() const;
-protected:
+private:
     virtual QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& result,
         const QByteArray& responseData,
@@ -43,7 +45,8 @@ private:
 
     QMap<QString, QString> m_sessionMapByHostname;
 
-    void createResource(const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result);
+    void createResource(
+        const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result);
 
     QString getMACAdressFromDevice(SimpleEIPClient& eipClient) const;
     QString getModelFromDevice(SimpleEIPClient& eipClient) const;

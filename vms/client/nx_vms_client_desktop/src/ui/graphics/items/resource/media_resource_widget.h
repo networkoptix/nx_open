@@ -158,6 +158,8 @@ public:
     void setMotionSearchModeEnabled(bool enabled);
     bool isMotionSearchModeEnabled() const;
 
+    void setPtzMode(bool value);
+
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
 
@@ -291,7 +293,6 @@ protected:
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_screenshotButton_clicked();
-    void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
     void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);

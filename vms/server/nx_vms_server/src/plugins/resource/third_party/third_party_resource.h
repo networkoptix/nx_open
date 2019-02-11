@@ -38,7 +38,7 @@ public:
     virtual bool ping() override;
     //!Implementation of QnNetworkResource::mergeResourcesIfNeeded
     virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
-    //!Implementation of QnSecurityCamResource::manufacture
+    //!Implementation of QnSecurityCamResource::manufacturer
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -82,17 +82,15 @@ public:
         int newState,
         unsigned long int timestamp ) override;
 
-    const QList<nxcip::Resolution>& getEncoderResolutionList(Qn::StreamIndex encoderNumber) const;
+    const QList<nxcip::Resolution>& getEncoderResolutionList(MotionStreamType encoderNumber) const;
 
-    nxcip::Resolution getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex ) const;
+    nxcip::Resolution getSelectedResolutionForEncoder(MotionStreamType encoderIndex ) const;
 
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual void startInputPortStatesMonitoring() override;
@@ -122,9 +120,10 @@ private:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
-    nxcip::Resolution getMaxResolution(Qn::StreamIndex encoderNumber) const;
+    nxcip::Resolution getMaxResolution(MotionStreamType encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution(Qn::StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const;
+    nxcip::Resolution getNearestResolution(MotionStreamType encoderNumber,
+        const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);
 };

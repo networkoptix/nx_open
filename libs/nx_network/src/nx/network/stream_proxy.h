@@ -38,6 +38,8 @@ public:
      * NOTE: "Upstream" is the stream from the source to the target.
      */
     template<typename T>
+    //requires std::is_same<std::invoke_result_t<T>::type,
+    //    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>>::value
     void setUpStreamConverterFactory(T func)
     {
         m_upStreamConverterFactory = std::move(func);
@@ -47,6 +49,8 @@ public:
      * NOTE: "Downstream" is the stream from the target to the source.
      */
     template<typename T>
+    //requires std::is_same<std::invoke_result_t<T>::type,
+    //    std::unique_ptr<nx::utils::bstream::AbstractOutputConverter>>::value
     void setDownStreamConverterFactory(T func)
     {
         m_downStreamConverterFactory = std::move(func);
