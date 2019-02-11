@@ -21,6 +21,10 @@ CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
     addFlags(Qn::server_live_cam);
 }
 
+CameraResourceStub::~CameraResourceStub()
+{
+}
+
 QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
 {
     NX_ASSERT(false);
