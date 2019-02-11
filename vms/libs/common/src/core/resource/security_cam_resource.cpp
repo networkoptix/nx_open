@@ -929,9 +929,8 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
     QString fixedFirmware;
     for (const QChar symbol: firmware)
     {
-        if (symbol.toLatin1() < 32) //< non-printable symbols
-            continue;
-        fixedFirmware.append(symbol);
+        if (symbol.isPrint())
+            fixedFirmware.append(symbol);
     }
     setProperty(ResourcePropertyKey::kFirmware, fixedFirmware);
 }
