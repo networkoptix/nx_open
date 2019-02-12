@@ -370,7 +370,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // If resource is not discovered last minute and we do not record it and do not see live
-    // than readers are not running.
+    // then readers are not running.
     if (searchType == SearchType::Full)
         markOfflineIfNeeded(discoveredResources);
 
