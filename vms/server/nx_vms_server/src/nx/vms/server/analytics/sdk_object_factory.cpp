@@ -317,16 +317,16 @@ bool SdkObjectFactory::initEngineResources()
         }
     }
 
-    updateActiveEngines(activeEngines);
+    updateActiveEngines(std::move(activeEngines));
     return true;
 }
 
-void SdkObjectFactory::updateActiveEngines(const QSet<QnUuid> activeEngines)
+void SdkObjectFactory::updateActiveEngines(QSet<QnUuid> activeEngines)
 {
     auto runtimeInfoManager = serverModule()->commonModule()->runtimeInfoManager();
     auto localRuntimeInfo = runtimeInfoManager->localInfo();
 
-    localRuntimeInfo.data.activeAnalyticsEngines = activeEngines;
+    localRuntimeInfo.data.activeAnalyticsEngines = std::move(activeEngines);
     runtimeInfoManager->updateLocalItem(localRuntimeInfo);
 }
 
