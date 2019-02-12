@@ -923,6 +923,30 @@ to view more bookmarks</source>
         <source>Files...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Switch to Notifications tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Motion tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Bookmarks tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Events tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Objects tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Objects Frames and Info...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1299,6 +1323,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>PtzInstrument</name>
+    <message>
+        <source>Layout is locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -1377,10 +1408,6 @@ to view more bookmarks</source>
         <source>Built for %1-%2 with %3.</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Customer Support</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
@@ -1441,29 +1468,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnArchiveLengthWidget</name>
-    <message>
-        <source>High minimum value can lead to archive length decrease on other devices.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>High minimum value can lead to archive length decrease on other cameras.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Archive can be deleted in case if there are no space for new recording.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
         <translation></translation>
     </message>
 </context>
@@ -2250,16 +2254,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Devices List for %1</source>
-        <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cameras List for %1</source>
-        <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation></translation>
     </message>
@@ -2300,6 +2294,16 @@ to view more bookmarks</source>
         <source>No cameras</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Devices List for %1</source>
+        <comment>%1 will be substituted with a server name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras List for %1</source>
+        <comment>%1 will be substituted with a server name</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraListModel</name>
@@ -2338,6 +2342,10 @@ to view more bookmarks</source>
     <message>
         <source>ID</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Logical ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2776,6 +2784,14 @@ to %1</source>
     <message>
         <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Server API</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To generate Generic Event, please refer to %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3765,14 +3781,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Only one starter license is allowed per System.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You already have one active starter license.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Every license can be deactivated only a few times.</source>
         <translation></translation>
     </message>
@@ -3818,37 +3826,6 @@ to %1</source>
     <message>
         <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-        <source>Use licenses for selected %n devices</source>
-        <translation>
-            <numerusform>Use licenses for selected device</numerusform>
-            <numerusform>Use licenses for selected %n devices</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Use licenses for selected %n cameras</source>
-        <translation>
-            <numerusform>Use licenses for selected camera</numerusform>
-            <numerusform>Use licenses for selected %n cameras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Use licenses for selected %n I/O modules</source>
-        <translation>
-            <numerusform>Use licenses for selected I/O module</numerusform>
-            <numerusform>Use licenses for selected %n I/O modules</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Use licenses to view these %n cameras</source>
-        <translation>
-            <numerusform>Use a license to view this camera</numerusform>
-            <numerusform>Use licenses to view these %n cameras</numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -5705,6 +5682,10 @@ to %1</source>
         <source>Longest period available</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Forecast available only for cameras with enabled recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
@@ -6671,32 +6652,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnWearableProgressWidget</name>
-    <message>
-        <source>(%1 of %2)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Uploading %1...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Finalizing %1...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnWearableUploadWidget</name>
-    <message>
-        <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Another user is currently uploading footage to this camera.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnWebResourceWidget</name>
     <message>
         <source>Fullscreen mode</source>
@@ -7591,21 +7546,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop</name>
-    <message>
-        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Custom number that can be assigned to a camera for quick identification and access</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
         <source>Hide information</source>
@@ -7657,20 +7597,31 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Current device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Current camera</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Any device</source>
         <translation></translation>
     </message>
     <message>
         <source>Any camera</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Selected device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
+    <message>
+        <source>Show Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Only with &quot;Objects&quot; Tab</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7681,10 +7632,6 @@ to %1</source>
     </message>
     <message>
         <source>deleted camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to execute plugin action</source>
         <translation></translation>
     </message>
 </context>
@@ -7710,10 +7657,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>unnamed analytics plugin</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select area</source>
         <translation></translation>
     </message>
@@ -7724,6 +7667,22 @@ to %1</source>
     <message>
         <source>In selected area</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>unnamed analytics engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to execute plugin action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action requires some parameters to be filled.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7833,11 +7792,6 @@ to %1</source>
     <message>
         <source>Secondary</source>
         <comment>Secondary stream for motion detection</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edge</source>
-        <comment>Edge stream for motion detection</comment>
         <translation></translation>
     </message>
     <message numerus="yes">
@@ -8061,25 +8015,6 @@ to %1</source>
             <numerusform>%n more required</numerusform>
             <numerusform>%n more required</numerusform>
         </translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::CameraSettingsWidget</name>
-    <message>
-        <source>Cannot edit properties for items of different types.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No device selected.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cannot edit properties for several virtual and non-virtual cameras.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cannot edit properties for several virtual cameras.</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -8353,10 +8288,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>unnamed analytics plugin</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Any analytics event</source>
         <translation></translation>
     </message>
@@ -8374,6 +8305,10 @@ to %1</source>
             <numerusform>%n event</numerusform>
             <numerusform>%n events</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>unnamed analytics engine</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8526,10 +8461,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
         <translation></translation>
     </message>
@@ -8540,6 +8471,10 @@ to %1</source>
     <message>
         <source>Local files, server monitor widgets and webpages will not be exported.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8658,6 +8593,17 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::LabelSelectionManager</name>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Link Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
         <source>cells</source>
@@ -8722,299 +8668,6 @@ to %1</source>
     </message>
     <message>
         <source>NOT A CAMERA</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyAdvancedSettingsWidget</name>
-    <message>
-        <source>This I/O module has no advanced settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This camera has no advanced settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Web</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Loading...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyCameraMotionMaskWidget</name>
-    <message>
-        <source>Too many motion windows</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Too many motion sensitivity settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Too many motion areas</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyCameraScheduleWidget</name>
-    <message>
-        <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Mbit/s</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording Schedule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>based on server time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Less Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>More Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled or not supported</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming not supported for this camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not enough licenses to enable recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>License limit exceeded, recording will not be enabled.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select areas on the schedule to apply chosen parameters to.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Turn on selector at the top of the window to enable recording.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyCameraSettingsDialog</name>
-    <message>
-        <source>Show on Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Event Log...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Devices Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cameras Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Modules Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Devices Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cameras Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Modules Rules...</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n devices are not saved:</source>
-        <translation>
-            <numerusform>Changes to the following %n device are not saved:</numerusform>
-            <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n cameras are not saved:</source>
-        <translation>
-            <numerusform>Changes to the following %n camera are not saved:</numerusform>
-            <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Changes to the following %n I/O Modules are not saved:</source>
-        <translation>
-            <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-            <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Apply changes before switching to another camera?</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyCameraSettingsStreamsPanel</name>
-    <message>
-        <source>Secondary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Audio Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Primary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open stream and try again.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open video stream and try again.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O module has no audio stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyExpertSettingsWidget</name>
-    <message>
-        <source>Primary</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Secondary</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edge</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>This ID is already used on the following %n cameras: %1</source>
-        <translation>
-            <numerusform>This ID is already used on the following camera: %1</numerusform>
-            <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LegacyImageControlWidget</name>
-    <message>
-        <source>Auto</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>multiple values</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 degrees</source>
         <translation></translation>
     </message>
 </context>
@@ -9216,10 +8869,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Failed to install client package</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to install updates to servers:</source>
         <translation></translation>
     </message>
@@ -9326,28 +8975,21 @@ to %1</source>
         <source>Missing update package for the client</source>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::MultipleCameraSettingsWidget</name>
     <message>
-        <source>Secondary stream disabled for these cameras</source>
-        <translation></translation>
+        <source>Finish Update</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation></translation>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set Recording to &quot;Always&quot;</source>
-        <translation></translation>
+        <source>The latest version is already installed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable Secondary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>multiple values</source>
-        <translation></translation>
+        <source>This version is already installed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9589,10 +9231,6 @@ to %1</source>
 <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
-        <source>Server</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Current Version</source>
         <translation></translation>
     </message>
@@ -9611,6 +9249,10 @@ to %1</source>
     <message>
         <source>Client</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Component</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9635,14 +9277,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>none</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Current media</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No motion</source>
         <translation></translation>
     </message>
@@ -9657,68 +9291,22 @@ to %1</source>
             <numerusform>%n motion events</numerusform>
         </translation>
     </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::SingleCameraSettingsWidget</name>
     <message>
-        <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-        <translation></translation>
+        <source>Selected camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device Settings</source>
-        <translation></translation>
+        <source>Selected device</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera Settings</source>
-        <translation></translation>
+        <source>Selected media</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>FPS too high</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>FPS in the schedule was lowered from %1 to %2.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Secondary stream disabled for this camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set Recording to &quot;Always&quot;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable Secondary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Reset motion regions to default?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This action cannot be undone.</source>
-        <translation></translation>
+        <source>none</source>
+        <comment>No currently selected camera</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9745,22 +9333,22 @@ to %1</source>
 <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
-        <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab.</source>
-        <translation>
-            <numerusform>Double click to add camera to the current layout or ctrl+click to open in a new tab.</numerusform>
-            <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>No available archive.</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
         <source>... and %n more</source>
         <translation>
             <numerusform>... and %n more</numerusform>
             <numerusform>... and %n more</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>No available archive</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9853,6 +9441,17 @@ to %1</source>
     <message>
         <source>File was corrupted while being uploaded to the server</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
+    <message>
+        <source>Motion is being detected only during video uploading.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9949,6 +9548,10 @@ to %1</source>
         <source>Please remove all local files from the layout and try again.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Starting export...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
@@ -9989,6 +9592,13 @@ to %1</source>
     <message>
         <source>Drag layout or camera here to add it to the showreel</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <message>
+        <source>Any Plugin</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10271,10 +9881,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Warning! This build is for testing purposes only!</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Please upgrade to a next available patch or release version once available.</source>
         <translation></translation>
     </message>
@@ -10301,6 +9907,10 @@ to %1</source>
             <numerusform>Failed to change password on %n camera of %1</numerusform>
             <numerusform>Failed to change password on %n cameras of %1</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This build is for testing purposes only.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -108,35 +108,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Requested feature is not implemented.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown realm.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Bad request.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid nonce.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Credentials are no longer valid.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid data received.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown error.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unexpected network error. Please check your Internet connection and try again.</source>
         <translation></translation>
     </message>
     <message>
@@ -144,20 +116,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Requested object is not found.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Object already exists.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Internal %1 error. Please contact support team.</source>
-        <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
     </message>
@@ -169,6 +128,10 @@
         <source>%1 is temporary unavailable. Please try again later.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Network error. Please check your Internet connection and try again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
