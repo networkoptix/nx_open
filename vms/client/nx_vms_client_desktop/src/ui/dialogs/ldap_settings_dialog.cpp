@@ -64,41 +64,24 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
     connect(timeoutTimer, &QTimer::timeout, this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
 }
 
-void QnLdapSettingsDialogPrivate::testSettings() {
-    /* Make sure stopTesting() will work well. */
+void QnLdapSettingsDialogPrivate::testSettings()
+{
+    // Make sure stopTesting() will work well.
     testHandle = kTestPrepareHandle;
 
     QnLdapSettings settings = this->settings();
 
-    if (!settings.isValid()) {
-        stopTesting(tr("The provided settings are not valid.") + lit("\n") + tr("Could not perform a test."));
+    if (!settings.isValid())
+    {
+        stopTesting(tr("The provided settings are not valid.")
+			+ '\n'
+			+ tr("Could not perform a test."));
         return;
     }
 
-    // TODO: #dklychkov #3.0 testLdapSettings rest request (on server side) should check all servers.
-    QnMediaServerConnectionPtr serverConnection;
-    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for (const QnMediaServerResourcePtr server: onlineServers)
-    {
-        if (!server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
-            continue;
-
-        serverConnection = server->apiConnection();
-        break;
-    }
-
-    if (!serverConnection)
-    {
-        QnMediaServerResourcePtr server = commonModule()->currentServer();
-
-        if (!server)
-        {
-            stopTesting(tr("Could not perform a test."));
-            return;
-        }
-
-        serverConnection = server->apiConnection();
-    }
+    const auto server = commonModule()->currentServer();
+    if (!NX_ASSERT(server))
+        return;
 
     Q_Q(QnLdapSettingsDialog);
 
@@ -113,7 +96,10 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     timeoutTimer->setInterval(settings.searchTimeoutS * 1000 / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
+    testHandle = server->apiConnection()->testLdapSettingsAsync(
+        settings,
+        q,
+        SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
