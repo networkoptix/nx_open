@@ -1027,6 +1027,21 @@ QnResourceWidgetRenderer* QnMediaResourceWidget::renderer() const
     return m_renderer;
 }
 
+int QnMediaResourceWidget::defaultRotation() const
+{
+    return d->resource->getProperty(QnMediaResource::rotationKey()).toInt();
+}
+
+int QnMediaResourceWidget::defaultFullRotation() const
+{
+    const bool fisheyeEnabled = (isZoomWindow() || item() && item()->dewarpingParams().enabled)
+        && dewarpingParams().enabled;
+    const int fisheyeRotation = fisheyeEnabled
+        && dewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown ? 180 : 0;
+
+    return (defaultRotation() + fisheyeRotation) % 360;
+}
+
 bool QnMediaResourceWidget::hasVideo() const
 {
     return d->hasVideo;
@@ -1917,7 +1932,22 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
 {
-    m_watermarkPainter->drawWatermark(painter, rect);
+    const auto imageRotation = defaultFullRotation();
+    if (imageRotation == 0)
+    {
+        m_watermarkPainter->drawWatermark(painter, rect);
+    }
+    else
+    {
+        // We have implicit camera rotation due to default rotation and/or dewarping procedure.
+        // We should rotate watermark to make it appear in appropriate orientation.
+        const auto& oldTransform = painter->transform();
+        const auto transform =
+            QTransform().translate(rect.center().x(), rect.center().y()).rotate(-imageRotation);
+        painter->setTransform(transform, true);
+        m_watermarkPainter->drawWatermark(painter, transform.inverted().mapRect(rect));
+        painter->setTransform(oldTransform);
+    }
 }
 
 QnPtzControllerPtr QnMediaResourceWidget::ptzController() const

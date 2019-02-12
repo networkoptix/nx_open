@@ -88,6 +88,12 @@ public:
 
     QnResourceWidgetRenderer* renderer() const;
 
+    /** Returns default camera rotation angle or 0 if does not exist or invalid. */
+    int defaultRotation() const;
+
+    /** Returns default camera rotation plus fisheye rotation if needed. */
+    int defaultFullRotation() const;
+
     /**
      * @param itemPos Point in item coordinates to map to grid coordinates.
      * @return Coordinates of the motion cell that the given point belongs to. Note that motion
