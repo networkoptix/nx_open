@@ -76,7 +76,8 @@ void ListeningPeerPool::addConnection(
     connectionContext->connectionWatcher =
         std::make_unique<ListeningPeerConnectionWatcher>(
             std::move(connection),
-            peerProtocolVersion);
+            peerProtocolVersion,
+            m_settings.tcpKeepAlive.probeSendPeriod);
 
     m_statisticsCalculator.connectionAccepted();
 

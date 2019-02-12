@@ -2,12 +2,17 @@
 
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relaying/listening_peer_connection_watcher.h>
 
 namespace nx::cloud::relaying::test {
 
+static constexpr std::chrono::milliseconds kKeepAliveProbePeriod =
+    std::chrono::milliseconds(1);
+
+template<typename PeerCapabilities>
 class ListeningPeerConnectionWatcher:
     public ::testing::Test
 {
@@ -29,6 +34,16 @@ public:
     }
 
 protected:
+    constexpr bool peerSupportsKeepAlive() const
+    {
+        return PeerCapabilities::keepAliveSupported;
+    }
+
+    constexpr std::chrono::milliseconds keepAliveProbePeriod() const
+    {
+        return kKeepAliveProbePeriod;
+    }
+
     virtual void SetUp() override
     {
         base_type::SetUp();
@@ -62,11 +77,15 @@ protected:
             [this](auto&&... args) { saveStartTunnelResult(std::forward<decltype(args)>(args)...); });
     }
 
-    void thenOpenTunnelNotificationIsSent()
+    void thenOpenTunnelNotificationIsReceived()
     {
-        auto message = m_receivedNotifications.pop();
-        relay::api::OpenTunnelNotification notification;
-        ASSERT_TRUE(notification.parse(message));
+        for (;;)
+        {
+            auto message = m_receivedNotifications.pop();
+            relay::api::OpenTunnelNotification notification;
+            if (notification.parse(message))
+                return;
+        }
     }
 
     void thenTunnelConnectionIsProvided()
@@ -74,6 +93,18 @@ protected:
         auto result = m_startTunnelResults.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(result));
         ASSERT_NE(nullptr, std::get<1>(result));
+    }
+
+    void thenKeepAliveNotificationIsReceived()
+    {
+        auto message = m_receivedNotifications.pop();
+        relay::api::KeepAliveNotification notification;
+        ASSERT_TRUE(notification.parse(message));
+    }
+
+    void thenKeepAliveNotificationIsNotReceived()
+    {
+        ASSERT_FALSE(m_receivedNotifications.pop(keepAliveProbePeriod() * 3));
     }
 
 private:
@@ -94,7 +125,8 @@ private:
 
         m_watcher = std::make_unique<relaying::ListeningPeerConnectionWatcher>(
             std::exchange(m_acceptedConnection, nullptr),
-            "" /*peerProtocolVersion*/);
+            PeerCapabilities::protocolVersion,
+            kKeepAliveProbePeriod);
 
         m_watcher->start([this](auto errorCode) { saveConnectionClosure(errorCode); });
     }
@@ -117,12 +149,61 @@ private:
     }
 };
 
-TEST_F(ListeningPeerConnectionWatcher, sends_open_tunnel_notification)
-{
-    whenStartTunnel();
+TYPED_TEST_CASE_P(ListeningPeerConnectionWatcher);
 
-    thenOpenTunnelNotificationIsSent();
-    thenTunnelConnectionIsProvided();
+TYPED_TEST_P(ListeningPeerConnectionWatcher, sends_open_tunnel_notification)
+{
+    this->whenStartTunnel();
+
+    this->thenOpenTunnelNotificationIsReceived();
+    this->thenTunnelConnectionIsProvided();
 }
+
+TYPED_TEST_P(ListeningPeerConnectionWatcher, keep_alive_probes_are_sent_to_peer_with_support)
+{
+    if (this->peerSupportsKeepAlive())
+        this->thenKeepAliveNotificationIsReceived();
+    else
+        this->thenKeepAliveNotificationIsNotReceived();
+}
+
+TYPED_TEST_P(ListeningPeerConnectionWatcher, no_keep_alive_is_sent_after_open_tunnel)
+{
+    this->whenStartTunnel();
+
+    this->thenOpenTunnelNotificationIsReceived();
+    this->thenKeepAliveNotificationIsNotReceived();
+}
+
+REGISTER_TYPED_TEST_CASE_P(ListeningPeerConnectionWatcher,
+    sends_open_tunnel_notification,
+    keep_alive_probes_are_sent_to_peer_with_support,
+    no_keep_alive_is_sent_after_open_tunnel);
+
+//-------------------------------------------------------------------------------------------------
+
+struct CurrentVersionPeerTypes
+{
+    static constexpr bool keepAliveSupported = true;
+    static constexpr auto protocolVersion = nx::cloud::relay::api::kRelayProtocolVersion;
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    CurrentVersionPeer,
+    ListeningPeerConnectionWatcher,
+    CurrentVersionPeerTypes);
+
+//-------------------------------------------------------------------------------------------------
+
+struct OldVersionPeerTypes
+{
+    static constexpr bool keepAliveSupported = false;
+    static constexpr char protocolVersion[] = "";
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    OldVersionPeer,
+    ListeningPeerConnectionWatcher,
+    OldVersionPeerTypes);
 
 } // namespace nx::cloud::relaying::test

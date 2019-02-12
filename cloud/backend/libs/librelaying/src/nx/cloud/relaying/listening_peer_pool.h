@@ -36,6 +36,9 @@ class NX_RELAYING_API AbstractListeningPeerPool
 public:
     virtual ~AbstractListeningPeerPool() = default;
 
+    /**
+     * @param protocolVersion E.g., "0.1".
+     */
     virtual void addConnection(
         const std::string& peerName,
         const std::string& protocolVersion,
