@@ -8,6 +8,8 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/core/watermark/watermark_images.h>
 
+#include <ui/style/helper.h>
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -20,6 +22,11 @@ WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     m_baseImage(new QPixmap(":/skin/system_settings/watermark_preview.png"))
 {
     ui->setupUi(this);
+
+    ui->opacitySlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
+    ui->frequencySlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
 
     connect(ui->opacitySlider, &QSlider::valueChanged,
         this, &WatermarkPreviewDialog::updateDataFromControls);
