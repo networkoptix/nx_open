@@ -198,6 +198,7 @@ void QnStorageAnalyticsWidget::setupTableView(TableView* table, TableView* total
     header->setMinimumSectionSize(kMinimumColumnWidth);
     header->setSectionResizeMode(QHeaderView::Fixed);
     header->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
+    header->setDefaultAlignment(Qt::AlignLeft);
     header->setSortIndicatorShown(true);
 
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
