@@ -7,7 +7,7 @@
 #include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_factory.h>
 #include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_upgrade.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/optional.h>

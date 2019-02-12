@@ -1,4 +1,4 @@
-#include "relay_api_open_tunnel_notification.h"
+#include "relay_api_notifications.h"
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/url/url_parse_helper.h>

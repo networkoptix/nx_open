@@ -3,7 +3,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 
 namespace nx::cloud::relaying {
 

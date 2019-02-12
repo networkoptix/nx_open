@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <nx/network/abstract_stream_socket_acceptor.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/reverse_connection_acceptor.h>
