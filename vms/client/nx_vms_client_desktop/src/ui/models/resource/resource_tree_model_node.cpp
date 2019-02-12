@@ -1225,7 +1225,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         case NodeType::sharedLayouts:
         {
             if (m_parent && m_parent->type() == NodeType::role)
-                return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
+                return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
         }

@@ -5,8 +5,6 @@
 #include <nx/utils/singleton.h>
 
 #include "camera_user_attributes.h"
-#include "common/common_module_aware.h"
-
 
 //!Pool of \a QnCameraUserAttributes
 /*!
@@ -23,12 +21,11 @@
 
 class QnCameraUserAttributePool:
     public QObject,
-    public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>,
-    public /*mixin*/ QnCommonModuleAware
+    public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>
 {
     Q_OBJECT
 public:
-    QnCameraUserAttributePool(QObject* parent);
+    explicit QnCameraUserAttributePool(QObject* parent = nullptr);
     virtual ~QnCameraUserAttributePool();
 
     QnCameraUserAttributesList getAttributesList( const QList<QnUuid>& idList );
