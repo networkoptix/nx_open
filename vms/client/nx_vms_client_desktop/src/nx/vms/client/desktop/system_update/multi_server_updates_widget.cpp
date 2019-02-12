@@ -559,6 +559,8 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
 
     if (report.versionMode == VersionReport::VersionMode::empty)
         report.version = kNoVersionNumberText;
+    else if (contents.info.version.isEmpty())
+        report.version = contents.changeset;
     else
         report.version = contents.info.version;
 
@@ -1792,8 +1794,12 @@ void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
             else
                 resetStyle(label);
         };
+
     ui->errorLabel->setText(report.statusMessages.join("<br>"));
-    ui->targetVersionLabel->setText(report.version);
+    if (report.version.isEmpty())
+        ui->targetVersionLabel->setText(kNoVersionNumberText);
+    else
+        ui->targetVersionLabel->setText(report.version);
 
     setHighlightMode(ui->targetVersionLabel, report.versionHighlight);
     setHighlightMode(ui->errorLabel, report.statusHighlight);
