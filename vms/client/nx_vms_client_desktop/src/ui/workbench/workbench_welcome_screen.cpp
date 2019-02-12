@@ -519,16 +519,36 @@ void QnWorkbenchWelcomeScreen::createAccount()
     menu()->trigger(action::OpenCloudRegisterUrl);
 }
 
-//
-
 void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString& localSystemId)
 {
-    qnForgottenSystemsManager->forgetSystem(systemId);
-    qnForgottenSystemsManager->forgetSystem(localSystemId);
-}
+    const auto localSystemUuid = QnUuid::fromStringSafe(localSystemId);
+    NX_ASSERT(!localSystemUuid.isNull());
+    if (localSystemUuid.isNull())
+        return;
 
-void QnWorkbenchWelcomeScreen::moveToBack(const QUuid& localSystemId)
-{
-    qnSystemWeightsManager->setWeight(localSystemId, 0); //< Moves system to the end of tile's list.
+    qnSystemWeightsManager->setWeight(localSystemUuid, 0); //< Moves system to the end of tile's list.
+    nx::vms::client::core::helpers::removeCredentials(localSystemUuid);
+    nx::vms::client::core::helpers::removeConnection(localSystemUuid);
+
+    if (const auto system = qnSystemsFinder->getSystem(systemId))
+    {
+        auto knownConnections = qnClientCoreSettings->knownServerConnections();
+        const auto moduleManager = commonModule()->moduleDiscoveryManager();
+        const auto servers = system->servers();
+        for (const auto info: servers)
+        {
+            const auto moduleId = info.id;
+            moduleManager->forgetModule(moduleId);
+
+            const auto itEnd = std::remove_if(knownConnections.begin(), knownConnections.end(),
+                [moduleId](const QnClientCoreSettings::KnownServerConnection& connection)
+                {
+                    return moduleId == connection.serverId;
+                });
+            knownConnections.erase(itEnd, knownConnections.end());
+        }
+        qnClientCoreSettings->setKnownServerConnections(knownConnections);
+    }
+
     qnClientCoreSettings->save();
 }

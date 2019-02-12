@@ -116,7 +116,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::SystemIsReadOnly:
-        case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::DefaultCameraPasswords:
         case QnSystemHealth::NoInternetForTimeSync:
@@ -126,6 +125,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         // Red notifications.
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::ArchiveIntegrityFailed:
+        case QnSystemHealth::StoragesNotConfigured:
             return QnNotificationLevel::Value::CriticalNotification;
 
         default:

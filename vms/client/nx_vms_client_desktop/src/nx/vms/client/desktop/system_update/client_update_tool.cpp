@@ -213,8 +213,6 @@ bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
 void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 {
     m_clientPackage = contents.clientPackage;
-    NX_ASSERT(m_clientPackage.isValid());
-
     m_updateVersion = contents.getVersion();
 
     auto installedVersions = getInstalledVersions(true);
@@ -267,7 +265,12 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         info.size = m_clientPackage.size;
         info.name = m_clientPackage.file;
         info.url = m_clientPackage.url;
-        NX_ASSERT(info.isValid());
+
+        if (!info.isValid())
+        {
+            setError("There is no valid client package to download");
+            return;
+        }
         auto code = m_downloader->addFile(info);
         m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;

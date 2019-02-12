@@ -8,9 +8,49 @@ QnAppInfo::QnAppInfo(QObject* parent):
 {
 }
 
+QString QnAppInfo::organizationName()
+{
+    return nx::utils::AppInfo::organizationName();
+}
+
+QString QnAppInfo::linuxOrganizationName()
+{
+    return nx::utils::AppInfo::linuxOrganizationName();
+}
+
+QString QnAppInfo::applicationVersion()
+{
+    return nx::utils::AppInfo::applicationVersion();
+}
+
+QString QnAppInfo::applicationRevision()
+{
+    return nx::utils::AppInfo::applicationRevision();
+}
+
 QString QnAppInfo::armBox()
 {
     return nx::utils::AppInfo::armBox();
+}
+
+bool QnAppInfo::beta()
+{
+    return nx::utils::AppInfo::beta();
+}
+
+QString QnAppInfo::productNameShort()
+{
+    return nx::utils::AppInfo::productNameShort();
+}
+
+QString QnAppInfo::productNameLong()
+{
+    return nx::utils::AppInfo::productNameLong();
+}
+
+QString QnAppInfo::customizationName()
+{
+    return nx::utils::AppInfo::customizationName();
 }
 
 QString QnAppInfo::applicationPlatform()

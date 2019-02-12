@@ -37,24 +37,24 @@ public:
     QByteArray encodeImage(
         const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const;
 
-    nx::vms::api::MotionStreamType determineStreamIndex(
+    nx::vms::api::StreamIndex determineStreamIndex(
         const nx::api::CameraImageRequest& request) const;
 
 private:
     CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,
-        nx::vms::api::MotionStreamType streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         QnAbstractArchiveDelegate* archiveDelegate,
         int prefferedChannel,
         bool& isOpened) const;
 
     CLVideoDecoderOutputPtr getImageWithCertainQuality(
-        nx::vms::api::MotionStreamType streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         const nx::api::CameraImageRequest& request) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromCaches(
         QnVideoCameraPtr camera,
-        nx::vms::api::MotionStreamType streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
         int preferredChannel,
         nx::api::ImageRequest::RoundMethod roundMethod) const;
@@ -64,12 +64,12 @@ private:
         std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
-        nx::vms::api::MotionStreamType streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
         QnVideoCameraPtr camera) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
-        nx::vms::api::MotionStreamType streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
         QnVideoCameraPtr camera) const;
 };

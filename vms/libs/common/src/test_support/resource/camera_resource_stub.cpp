@@ -1,12 +1,28 @@
 #include "camera_resource_stub.h"
 
+#include <optional>
+
+#include <core/resource/camera_user_attribute_pool.h>
+
 namespace nx {
 
-CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
-    m_licenseType(licenseType)
+struct CameraResourceStub::Private
 {
+    mutable QnCameraUserAttributePool attributes;
+    Qn::LicenseType licenseType = Qn::LicenseType::LC_Count; //< TODO: #GDM Replace with optional.
+    std::optional<bool> hasDualStreaming;
+};
+
+CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
+    d(new Private())
+{
+    d->licenseType = licenseType;
     setId(QnUuid::createUuid());
     addFlags(Qn::server_live_cam);
+}
+
+CameraResourceStub::~CameraResourceStub()
+{
 }
 
 QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
@@ -17,9 +33,15 @@ QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
 
 Qn::LicenseType CameraResourceStub::calculateLicenseType() const
 {
-    if (m_licenseType == Qn::LC_Count)
+    if (d->licenseType == Qn::LC_Count)
         return base_type::calculateLicenseType();
-    return m_licenseType;
+
+    return d->licenseType;
+}
+
+QnCameraUserAttributePool* CameraResourceStub::userAttributesPool() const
+{
+    return &d->attributes;
 }
 
 Qn::ResourceStatus CameraResourceStub::getStatus() const
@@ -29,15 +51,15 @@ Qn::ResourceStatus CameraResourceStub::getStatus() const
 
 bool CameraResourceStub::hasDualStreamingInternal() const
 {
-    if (m_hasDualStreaming.is_initialized())
-        return m_hasDualStreaming.value();
+    if (d->hasDualStreaming.has_value())
+        return *d->hasDualStreaming;
 
     return base_type::hasDualStreamingInternal();
 }
 
 void CameraResourceStub::setHasDualStreaming(bool value)
 {
-    m_hasDualStreaming = value;
+    d->hasDualStreaming = value;
     setProperty(ResourcePropertyKey::kHasDualStreaming, 1); //< to reset cached values;
 }
 
@@ -48,13 +70,13 @@ void CameraResourceStub::markCameraAsNvr()
 
 void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)
 {
-    m_licenseType = licenseType;
+    d->licenseType = licenseType;
     emit licenseTypeChanged(toSharedPointer(this));
 }
 
 void CameraResourceStub::markCameraAsVMax()
 {
-    m_licenseType = Qn::LC_VMAX;
+    d->licenseType = Qn::LC_VMAX;
     setProperty(ResourcePropertyKey::kDts, 1); //< to reset cached values;
     emit licenseTypeChanged(toSharedPointer(this));
 }

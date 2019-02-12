@@ -459,7 +459,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     using Error = nx::update::InformationError;
     using SourceType = nx::update::UpdateSourceType;
 
-    bool validUpdate = contents.isValid();
+    bool validUpdate = contents.isValidToInstall();
     auto source = contents.sourceType;
 
     QString internalError = nx::update::toString(contents.error);
@@ -614,7 +614,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             m_targetVersion = nx::utils::SoftwareVersion(checkResponse.info.version);
             m_targetChangeset = m_targetVersion.build();
 
-            if (checkResponse.isValid() && !checkResponse.alreadyInstalled)
+            if (checkResponse.isValidToInstall() && !checkResponse.alreadyInstalled)
                 m_haveValidUpdate = true;
         }
         else
@@ -1119,7 +1119,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
          */
         auto installedVersions = m_clientUpdateTool->getInstalledVersions();
         if (!m_serverUpdateTool->verifyUpdateManifest(updateInfo, installedVersions)
-            || !updateInfo.isValid())
+            || !updateInfo.isValidToInstall())
         {
             // We can reach here when we reconnect to the server with complete updates.
             NX_INFO(NX_SCOPE_TAG,
@@ -2224,7 +2224,9 @@ void MultiServerUpdatesWidget::syncStatusVisibility()
 
     if (m_stateTracker->hasVerificationErrors())
         statusMode = StatusMode::reportErrors;
-    if (m_updateInfo.alreadyInstalled)
+    else if (m_stateTracker->hasStatusErrors())
+        statusMode = StatusMode::remoteStatus;
+    else if (m_updateInfo.alreadyInstalled)
         statusMode = StatusMode::hidden;
 
     m_statusItemDelegate->setStatusMode(statusMode);

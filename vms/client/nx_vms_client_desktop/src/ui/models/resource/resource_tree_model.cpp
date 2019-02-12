@@ -1035,7 +1035,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
 
     if (const auto aviResource = resource.dynamicCast<QnAviResource>())
     {
-        connect(aviResource, &QnWebPageResource::statusChanged, this,
+        connect(aviResource, &QnAviResource::statusChanged, this,
             [this, aviResource]()
             {
                 for (auto node: m_nodesByResource.value(aviResource))

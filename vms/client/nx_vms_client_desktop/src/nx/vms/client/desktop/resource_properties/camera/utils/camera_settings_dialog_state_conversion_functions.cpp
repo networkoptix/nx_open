@@ -213,9 +213,9 @@ void setTrustCameraTime(bool value, const Cameras& cameras)
         camera->setTrustCameraTime(value);
 }
 
-void setForcedMotionStreamType(nx::vms::api::MotionStreamType value, const Cameras& cameras)
+void setForcedMotionStreamType(nx::vms::api::StreamIndex value, const Cameras& cameras)
 {
-    const bool isMotionDetectionForced = (value != nx::vms::api::MotionStreamType::undefined);
+    const bool isMotionDetectionForced = (value != nx::vms::api::StreamIndex::undefined);
     const QnSecurityCamResource::MotionStreamIndex index{value, isMotionDetectionForced};
     for (const auto& camera: cameras)
         camera->setMotionStreamIndex(index);

@@ -13,7 +13,7 @@ enum class FailoverPriority;
 enum class IoModuleVisualStyle;
 enum class ConnectionType;
 enum class RtpTransportType;
-enum class MotionStreamType;
+enum class StreamIndex;
 enum class PeerType;
 enum class DayOfWeek;
 enum class BackupType;
@@ -33,7 +33,7 @@ NX_VMS_API_DECLARE_TYPE(FailoverPriority)
 NX_VMS_API_DECLARE_TYPE(IoModuleVisualStyle)
 NX_VMS_API_DECLARE_TYPE(ConnectionType)
 NX_VMS_API_DECLARE_TYPE(RtpTransportType)
-NX_VMS_API_DECLARE_TYPE(MotionStreamType)
+NX_VMS_API_DECLARE_TYPE(StreamIndex)
 NX_VMS_API_DECLARE_TYPE(PeerType)
 NX_VMS_API_DECLARE_TYPE(BackupType)
 NX_VMS_API_DECLARE_TYPE(UserRole)

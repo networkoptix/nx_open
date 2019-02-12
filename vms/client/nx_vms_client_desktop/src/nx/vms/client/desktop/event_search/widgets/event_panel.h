@@ -1,10 +1,11 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <nx/utils/impl_ptr.h>
 
 namespace QnNotificationLevel { enum class Value; }
 
@@ -52,7 +53,7 @@ private:
     virtual void mousePressEvent(QMouseEvent *event) override;
 
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

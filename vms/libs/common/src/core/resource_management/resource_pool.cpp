@@ -206,8 +206,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
                 appendRemovedResource(resource);
             }
         }
-
-        resource->setResourcePool(nullptr);
     }
 
     /* Remove layout resources. */

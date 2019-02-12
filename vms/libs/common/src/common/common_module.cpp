@@ -198,7 +198,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();
-    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::engineVersion());
+    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::applicationVersion());
     m_moduleInformation.type = clientMode
         ? nx::vms::api::ModuleInformation::nxClientId()
         : nx::vms::api::ModuleInformation::nxMediaServerId();
@@ -206,7 +206,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.realm = nx::network::AppInfo::realm();
 
     m_resourceDataPool = instance<QnResourceDataPool>();
-    m_engineVersion = nx::vms::api::SoftwareVersion(QnAppInfo::engineVersion());
+    m_engineVersion = nx::vms::api::SoftwareVersion(QnAppInfo::applicationVersion());
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
