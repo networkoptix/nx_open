@@ -77,7 +77,10 @@ void QnLdapSettingsDialogPrivate::testSettings()
 
     const auto server = commonModule()->currentServer();
     if (!NX_ASSERT(server))
+    {
+        stopTesting(tr("Could not perform a test."));
         return;
+    }
 
     Q_Q(QnLdapSettingsDialog);
 
