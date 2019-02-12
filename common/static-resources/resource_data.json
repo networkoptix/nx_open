@@ -2981,7 +2981,8 @@
             "axis|axis p3717*",
             "vivotek|ma9321-ehtv",
             "avigilon|32c-h4a-4mh-360",
-            "dahua|psd81602-a360"
+            "dahua|psd81602-a360",
+            "dahua|IPC-HDBW4231F-E2-M"
             ],
             "canShareLicenseGroup": true
         },
