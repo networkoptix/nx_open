@@ -10,7 +10,7 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class PluginEventModel: public QnCommonModuleAware, public QStandardItemModel
+class PluginEventModel: public QStandardItemModel, public QnCommonModuleAware
 {
     Q_OBJECT
 
