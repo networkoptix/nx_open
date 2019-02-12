@@ -4,13 +4,10 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/utils/uuid.h>
-#include <common/common_module_aware.h>
-
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class PluginEventModel: public QStandardItemModel, public QnCommonModuleAware
+class PluginEventModel: public QStandardItemModel
 {
     Q_OBJECT
 

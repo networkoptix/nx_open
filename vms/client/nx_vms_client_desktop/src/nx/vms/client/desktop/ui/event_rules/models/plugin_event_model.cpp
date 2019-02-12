@@ -11,7 +11,6 @@ namespace nx::vms::client::desktop {
 namespace ui {
 
 PluginEventModel::PluginEventModel(QObject* parent):
-    QnCommonModuleAware(parent),
     QStandardItemModel(parent)
 {
 }
