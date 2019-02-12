@@ -121,7 +121,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->averagingPeriodCombobox->addItem(tr("Last 24 hours"),
         QVariant::fromValue<qint64>(milliseconds(24h).count()));
     ui->averagingPeriodCombobox->addItem(tr("Longest period available"), 0);
-    ui->averagingPeriodCombobox->setCurrentIndex(0); // 5 min.
+    ui->averagingPeriodCombobox->setCurrentIndex(2); // 24h.
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, //< Inactive tab may be not updated.
         this, [this](int) { atPageChanged(); });
