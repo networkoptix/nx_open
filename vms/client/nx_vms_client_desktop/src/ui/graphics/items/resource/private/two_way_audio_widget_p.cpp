@@ -111,11 +111,11 @@ void normalizeData(VisualizerData& source)
 
     const auto max = std::max_element(source.cbegin(), source.cend());
 
-    /* Do not normalize if silence */
+    // Do not normalize if silence.
     if (*max < kNormalizerSilenceValue)
         return;
 
-    /* Do not normalize if there is bigger value, so normalizing will always only increase values. */
+    // Do not normalize if there is bigger value, so normalizing will always only increase values.
     if (*max > kNormalizerIncreaseValue)
         return;
 
@@ -365,7 +365,7 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
 
     // TODO: #GDM What should we do if we cannot stop streaming?
 
-    /* Sending stop anyway, because we can get here in 'Streaming is not ready' error state. */
+    // Sending stop anyway, because we can get here in 'Streaming is not ready' error state.
     server->restConnection()->twoWayAudioCommand(m_sourceId, m_camera->getId(), false,
         rest::ServerConnection::GetCallback());
 }
