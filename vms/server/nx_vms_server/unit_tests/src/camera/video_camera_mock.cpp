@@ -9,19 +9,9 @@ MediaServerVideoCameraMock::MediaServerVideoCameraMock():
 {
 }
 
-QSharedPointer<QnLiveStreamProvider> MediaServerVideoCameraMock::getPrimaryReader()
-{
-    return QSharedPointer<QnLiveStreamProvider>();
-}
-
-QSharedPointer<QnLiveStreamProvider> MediaServerVideoCameraMock::getSecondaryReader()
-{
-    return QSharedPointer<QnLiveStreamProvider>();
-}
-
 QnLiveStreamProviderPtr MediaServerVideoCameraMock::getLiveReader(
     QnServer::ChunksCatalog /*catalog*/,
-    bool /*ensureInitialized*/)
+    bool /*ensureInitialized*/, bool /*createIfNotExist*/)
 {
     return QnLiveStreamProviderPtr();
 }

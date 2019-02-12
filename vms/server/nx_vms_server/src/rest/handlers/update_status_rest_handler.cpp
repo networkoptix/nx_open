@@ -30,7 +30,7 @@ int QnUpdateStatusRestHandler::executeGet(
     {
         detail::checkUpdateStatusRemotely(
             detail::makeIfParticipantPredicate(serverModule()->updateManager()),
-            processor->commonModule(), path, &reply, &context);
+            serverModule(), path, &reply, &context);
     }
 
     QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);

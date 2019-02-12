@@ -76,8 +76,6 @@
 
 #include <nx/streaming/abstract_data_packet.h>
 
-#include <core/onvif/onvif_config_data.h>
-
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -254,8 +252,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::StatusChangeReason>();
 
-    qRegisterMetaType<QnOnvifConfigDataPtr>();
-
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOStateData>();
     qRegisterMetaType<QnAuditRecord>();
@@ -315,7 +311,6 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<Ptz::Capabilities>();
     QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
-    QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
     QnJsonSerializer::registerSerializer<QnIOPortData>();
     QnJsonSerializer::registerSerializer<QnIOPortDataList>();
     QnJsonSerializer::registerSerializer<nx::vms::common::Credentials>();

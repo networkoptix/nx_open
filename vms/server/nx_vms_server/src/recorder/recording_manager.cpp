@@ -109,29 +109,36 @@ void QnRecordingManager::stopRecorder(const Recorders& recorders)
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
     QnVideoCameraPtr camera;
-    if (recorders.recorderHiRes) {
+    if (recorders.recorderHiRes)
+    {
         recorders.recorderHiRes->stop();
         camera = videoCameraPool()->getVideoCamera(recorders.recorderHiRes->getResource());
     }
-    if (recorders.recorderLowRes) {
+    if (recorders.recorderLowRes)
+    {
         recorders.recorderLowRes->stop();
         if (!camera)
             camera = videoCameraPool()->getVideoCamera(recorders.recorderLowRes->getResource());
     }
     if (camera)
     {
-        if (recorders.recorderHiRes) {
-            const QnAbstractMediaStreamDataProviderPtr& reader = camera->getLiveReader(QnServer::HiQualityCatalog);
+        if (recorders.recorderHiRes)
+        {
+            const auto reader = camera->getLiveReader(QnServer::HiQualityCatalog,
+                /*ensureInitialized*/ false, /*createIfNotExist*/ false);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderHiRes);
         }
 
-        if (recorders.recorderLowRes) {
-            const QnAbstractMediaStreamDataProviderPtr& reader = camera->getLiveReader(QnServer::LowQualityCatalog);
+        if (recorders.recorderLowRes)
+        {
+            const auto reader = camera->getLiveReader(QnServer::LowQualityCatalog,
+                /*ensureInitialized*/ false, /*createIfNotExist*/ false);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderLowRes);
         }
     }
+
     delete recorders.recorderHiRes;
     delete recorders.recorderLowRes;
 }

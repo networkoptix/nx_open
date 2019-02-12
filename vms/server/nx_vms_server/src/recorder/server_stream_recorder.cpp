@@ -87,6 +87,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_canDropPackets(true),
     m_serverModule(serverModule)
 {
+    NX_VERBOSE(this, "New");
+
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
@@ -118,6 +120,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
+    NX_VERBOSE(this, "Delete");
     m_resource->disconnect(this);
     disconnect();
     stop();

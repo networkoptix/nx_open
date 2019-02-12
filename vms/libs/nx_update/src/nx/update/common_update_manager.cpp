@@ -45,7 +45,7 @@ update::Status CommonUpdateManager::start()
     bool shouldDownload = statusAppropriateForDownload(&package, &updateStatus);
     if (shouldDownload || !package.isValid())
     {
-        m_downloaderFailed = false;
+        m_downloaderFailDetail = DownloaderFailDetail::noError;
         for (const auto& file : downloader()->files())
         {
             if (file.startsWith("updates/"))
@@ -96,16 +96,14 @@ update::Status CommonUpdateManager::start()
     case downloader::ResultCode::invalidFileSize:
     case downloader::ResultCode::invalidChunkIndex:
     case downloader::ResultCode::invalidChunkSize:
-        m_downloaderFailed = true;
+        m_downloaderFailDetail = DownloaderFailDetail::internalError;
         return update::Status(
             peerId,
             update::Status::Code::error,
             "Downloader experienced internal error");
     case downloader::ResultCode::noFreeSpace:
-        m_downloaderFailed = true;
-        return update::Status(peerId,
-            update::Status::Code::error,
-            "Downloader experienced internal error");
+        m_downloaderFailDetail = DownloaderFailDetail::noFreeSpace;
+        return update::Status(peerId, update::Status::Code::error, "Not enough free space");
     default:
         NX_ASSERT(false, "Unexpected Downloader::addFile() result");
         return update::Status(peerId, update::Status::Code::error, "Unknown error");
@@ -153,13 +151,28 @@ bool CommonUpdateManager::canDownloadFile(
     auto fileInformation = downloader()->fileInformation(fileName);
     const auto peerId = commonModule()->moduleGUID();
 
-    if (m_downloaderFailed)
+    switch (m_downloaderFailDetail)
     {
-        *outUpdateStatus = update::Status(
-            peerId,
-            update::Status::Code::error,
-            "Failed to download update");
-        return true;
+        case DownloaderFailDetail::noError:
+            break;
+        case DownloaderFailDetail::internalError:
+            *outUpdateStatus = update::Status(
+                peerId,
+                update::Status::Code::error,
+                "The downloader experienced internal error");
+            return true;
+        case DownloaderFailDetail::downloadFailed:
+            *outUpdateStatus = update::Status(
+                peerId,
+                update::Status::Code::error,
+                "The downloader failed to get update files");
+            return true;
+        case DownloaderFailDetail::noFreeSpace:
+            *outUpdateStatus = update::Status(
+                peerId,
+                update::Status::Code::error,
+                "Not enough free space for keeping update files");
+            return true;
     }
 
     if (fileInformation.isValid())
@@ -378,7 +391,7 @@ void CommonUpdateManager::onDownloaderFailed(const QString& fileName)
     if (findPackage(&package) != update::FindPackageResult::ok || package.file != fileName)
         return;
 
-    m_downloaderFailed = true;
+    m_downloaderFailDetail = DownloaderFailDetail::downloadFailed;
     downloader()->deleteFile(fileName);
 }
 

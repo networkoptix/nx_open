@@ -51,7 +51,6 @@ bool UpdateContents::isValidToInstall() const
         && unsuportedSystemsReport.empty()
         && !info.version.isEmpty()
         && invalidVersion.empty()
-        && clientPackage.isValid()
         && error == nx::update::InformationError::noError;
 }
 

@@ -99,6 +99,7 @@ private:
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
+    bool m_readingCeased = false;
 
     virtual void stopWhileInAioThread() override;
 
