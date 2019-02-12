@@ -118,7 +118,7 @@ BaseTile
             leftPadding: 16;
             rightPadding: 16;
 
-            onTriggered: context.moveToBack(control.localId);
+            onTriggered: context.hideSystem(control.systemId, control.localId);
         }
     }
 

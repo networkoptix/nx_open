@@ -57,6 +57,8 @@ protected:
     virtual QItemSelectionModel::SelectionFlags selectionCommand(
         const QModelIndex& index, const QEvent* event = nullptr) const override;
 
+    virtual void updateGeometries() override;
+
 private:
     QRect rowRect(int row) const;
     void openEditorsForColumn(int column, int firstRow, int lastRow);
@@ -64,6 +66,7 @@ private:
 private:
     ItemViewHoverTracker* const m_tracker = nullptr;
     bool m_isDefauldSpacePressIgnored = false;
+    bool m_updating = false;
     using ColumnDelegateHash = QHash<int, QPointer<QAbstractItemDelegate>>;
     ColumnDelegateHash m_delegates;
 };

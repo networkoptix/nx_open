@@ -53,7 +53,7 @@ QString HikvisionResource::defaultCodec() const
 }
 
 nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDriver(
-    MotionStreamType streamIndex)
+    StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
     const auto capabilities = channelCapabilities(toConnectionRole(streamIndex));

@@ -17,7 +17,7 @@ QnLiveStreamProviderPtr MediaServerVideoCameraMock::getLiveReader(
 }
 
 int MediaServerVideoCameraMock::copyLastGop(
-    MotionStreamType /*streamIndex*/,
+    StreamIndex /*streamIndex*/,
     qint64 /*skipTime*/,
     QnDataPacketQueue& /*dstQueue*/,
     bool /*iFramesOnly*/)
@@ -26,20 +26,20 @@ int MediaServerVideoCameraMock::copyLastGop(
 }
 
 QnConstCompressedVideoDataPtr MediaServerVideoCameraMock::getLastVideoFrame(
-    MotionStreamType /*streamIndex*/,
+    StreamIndex /*streamIndex*/,
     int /*channel*/) const
 {
     return QnConstCompressedVideoDataPtr();
 }
 
 QnConstCompressedAudioDataPtr MediaServerVideoCameraMock::getLastAudioFrame(
-    MotionStreamType /*streamIndex*/) const
+    StreamIndex /*streamIndex*/) const
 {
     return QnConstCompressedAudioDataPtr();
 }
 
 std::unique_ptr<QnConstDataPacketQueue> MediaServerVideoCameraMock::getFrameSequenceByTime(
-    MotionStreamType /*streamIndex*/,
+    StreamIndex /*streamIndex*/,
     qint64 /*time*/,
     int /*channel*/,
     nx::api::ImageRequest::RoundMethod /*roundMethod*/) const

@@ -160,7 +160,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
-        UserEditableMultiple<vms::api::MotionStreamType> forcedMotionStreamType;
+        UserEditableMultiple<vms::api::StreamIndex> forcedMotionStreamType;
         CombinedValue motionStreamOverridden = CombinedValue::None;
         UserEditableMultiple<bool> remoteMotionDetectionEnabled;
 

@@ -52,8 +52,8 @@ QSet<QString> CameraMock::setApiParameters(const QnCameraAdvancedParamValueMap& 
 
 void CameraMock::setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary)
 {
-    m_streamCapabilityMaps[MotionStreamType::primary] = std::move(primary);
-    m_streamCapabilityMaps[MotionStreamType::secondary] = std::move(secondary);
+    m_streamCapabilityMaps[StreamIndex::primary] = std::move(primary);
+    m_streamCapabilityMaps[StreamIndex::secondary] = std::move(secondary);
 }
 
 void CameraMock::setMediaTraits(nx::media::CameraTraits traits)
@@ -138,7 +138,7 @@ std::vector<Camera::AdvancedParametersProvider*> CameraMock::advancedParametersP
     return rawPointers;
 }
 
-StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDriver(MotionStreamType streamIndex)
+StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDriver(StreamIndex streamIndex)
 {
     return m_streamCapabilityMaps.value(streamIndex);
 }

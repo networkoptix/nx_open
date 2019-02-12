@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
-    <height>377</height>
+    <width>288</width>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,6 +88,13 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="finishNextDayLabel">
+           <property name="text">
+            <string>on the next day</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

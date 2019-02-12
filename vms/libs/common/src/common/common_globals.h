@@ -23,7 +23,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent
-    ResourceStatus StatusChangeReason
+    StatusChangeReason
     Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields

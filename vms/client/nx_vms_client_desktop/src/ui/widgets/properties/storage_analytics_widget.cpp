@@ -1,10 +1,8 @@
 #include "storage_analytics_widget.h"
 #include "ui_storage_analytics_widget.h"
 
-#include <set>
 #include <chrono>
 
-#include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
 #include <QtGui/QShowEvent>
@@ -34,13 +32,12 @@
 #include <ui/utils/table_export_helper.h>
 #include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/event_processors.h>
-
-#include <common/common_module.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -86,7 +83,7 @@ const int kTicksPerInterval = 100;
 QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::StorageAnalyticsWidget),
+    ui(new ::Ui::StorageAnalyticsWidget),
     m_model(new QnRecordingStatsModel(false, this)),
     m_forecastModel(new QnRecordingStatsModel(true, this)),
     m_selectAllAction(new QAction(tr("Select All"), this)),
@@ -94,6 +91,10 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this))
 {
     ui->setupUi(this);
+
+    m_hintButton = new HintButton(tr("Forecast available only for cameras with enabled recording."),
+        ui->forecastTotalsTable);
+
     setWarningStyle(ui->warningLabel);
     ui->extraSpaceSlider->setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
@@ -105,12 +106,13 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     refreshButton->resize(refreshButton->sizeHint());
 
     anchorWidgetToParent(refreshButton, Qt::RightEdge | Qt::TopEdge);
+    m_hintAnchor = anchorWidgetToParent(m_hintButton, Qt::LeftEdge | Qt::TopEdge);
 
     ui->tabWidget->tabBar()->setProperty(style::Properties::kTabShape,
         static_cast<int>(style::TabShape::Compact));
 
-    setupTableView(ui->statsTable, m_model);
-    setupTableView(ui->forecastTable, m_forecastModel);
+    setupTableView(ui->statsTable, ui->statsTotalsTable, m_model);
+    setupTableView(ui->forecastTable, ui->forecastTotalsTable, m_forecastModel);
 
     ui->averagingPeriodCombobox->addItem(tr("Last 5 minutes"),
         QVariant::fromValue<qint64>(milliseconds(5min).count()));
@@ -121,6 +123,8 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->averagingPeriodCombobox->addItem(tr("Longest period available"), 0);
     ui->averagingPeriodCombobox->setCurrentIndex(0); // 5 min.
 
+    connect(ui->tabWidget, &QTabWidget::currentChanged, //< Inactive tab may be not updated.
+        this, [this](int) { atPageChanged(); });
     connect(ui->averagingPeriodCombobox, qOverload<int>(&QComboBox::currentIndexChanged),
         this, [this](int) { atAveragingPeriodChanged(); });
 
@@ -149,9 +153,14 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes",
         qRound(ui->extraSizeSpinBox->maximum())));
 
-    const auto scrollBar = new SnappedScrollBar(this);
-    scrollBar->setUseMaximumSpace(true);
-    ui->forecastTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    m_statsTableScrollbar = new SnappedScrollBar(this);
+    m_statsTableScrollbar->setUseMaximumSpace(true);
+    ui->statsTable->setVerticalScrollBar(m_statsTableScrollbar->proxyScrollBar());
+    m_forecastTableScrollbar = new SnappedScrollBar(this);
+    m_forecastTableScrollbar->setUseMaximumSpace(true);
+    ui->forecastTable->setVerticalScrollBar(m_forecastTableScrollbar->proxyScrollBar());
+
+    atPageChanged();
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
@@ -170,8 +179,10 @@ qint64 QnStorageAnalyticsWidget::currentForecastAveragingPeriod()
     return ui->averagingPeriodCombobox->currentData().toLongLong();
 }
 
-void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemModel* model)
+void QnStorageAnalyticsWidget::setupTableView(TableView* table, TableView* totalsTable,
+    QAbstractItemModel* model)
 {
+    // Setting main table.
     auto sortModel = new QnSortedRecordingStatsModel(this);
     sortModel->setSourceModel(model);
     table->setModel(sortModel);
@@ -198,7 +209,17 @@ void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemMod
     table->addAction(m_clipboardAction);
     table->addAction(m_exportAction);
 
-    connect(table, &QTableView::customContextMenuRequested, this, &QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested);
+    connect(table, &QTableView::customContextMenuRequested,
+        this, &QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested);
+
+    // Setting totals table.
+    auto totalsModel = new QnTotalRecordingStatsModel(this);
+    totalsModel->setSourceModel(model);
+    totalsTable->setModel(totalsModel);
+    totalsTable->setItemDelegate(new QnRecordingStatsItemDelegate(this));
+    totalsTable->verticalHeader()->setMinimumSectionSize(kTableRowHeight);
+    totalsTable->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    totalsTable->setProperty(style::Properties::kSuppressHoverPropery, true);
 }
 
 QnMediaServerResourcePtr QnStorageAnalyticsWidget::server() const
@@ -246,8 +267,10 @@ void QnStorageAnalyticsWidget::updateDataFromServer()
     // update UI
     if (requestsInProgress())
     {
-        ui->statsTable->setDisabled(true);
-        ui->forecastTable->setDisabled(true);
+        ui->statsTable->setEnabled(false);
+        ui->statsTotalsTable->setEnabled(false);
+        ui->forecastTable->setEnabled(false);
+        ui->forecastTotalsTable->setEnabled(false);
         ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
     }
@@ -351,9 +374,13 @@ void QnStorageAnalyticsWidget::processRequestFinished()
     m_model->setModelData(QnRecordingStats::transformStatsToModelData(
         m_recordingsStatData[kDefaultBitrateAveragingPeriod], m_server, resourcePool()));
 
-    ui->statsTable->setDisabled(false);
-    ui->forecastTable->setDisabled(false);
+    ui->statsTable->setEnabled(true);
+    ui->statsTotalsTable->setEnabled(true);
+    ui->forecastTable->setEnabled(true);
+    ui->forecastTotalsTable->setEnabled(true);
+
     atForecastParamsChanged(); //< Forecast model is set here.
+
     setCursor(Qt::ArrowCursor);
 }
 
@@ -420,15 +447,15 @@ qint64 QnStorageAnalyticsWidget::sliderPositionToBytes(int value) const
     if (value == 0)
         return 0;
 
-    int idx = value / kTicksPerInterval;
+    const int idx = value / kTicksPerInterval;
     if (idx >= (qint64) kExtraDataBase.size() - 1)
         return (qint64) kExtraDataBase.back();
 
-    qint64 k1 = kExtraDataBase[idx];
-    qint64 k2 = kExtraDataBase[idx+1];
-    int intervalTicks = value % kTicksPerInterval;
+    const qint64 k1 = kExtraDataBase[idx];
+    const qint64 k2 = kExtraDataBase[idx+1];
+    const int intervalTicks = value % kTicksPerInterval;
 
-    qint64 step = (k2 - k1) / kTicksPerInterval;
+    const qint64 step = (k2 - k1) / kTicksPerInterval;
     return k1 + step * intervalTicks;
 }
 
@@ -456,6 +483,7 @@ void QnStorageAnalyticsWidget::atForecastParamsChanged()
         return;
 
     ui->forecastTable->setEnabled(false);
+    ui->forecastTotalsTable->setEnabled(false);
 
     qint64 additionalSpace = 0;
     if (sender() == ui->extraSpaceSlider)
@@ -477,6 +505,8 @@ void QnStorageAnalyticsWidget::atForecastParamsChanged()
             m_server, resourcePool()));
 
     ui->forecastTable->setEnabled(true);
+    ui->forecastTotalsTable->setEnabled(true);
+    updateTotalTablesGeometry();
 }
 
 void QnStorageAnalyticsWidget::atAveragingPeriodChanged()
@@ -486,6 +516,43 @@ void QnStorageAnalyticsWidget::atAveragingPeriodChanged()
         updateDataFromServer();
     else
         atForecastParamsChanged();
+}
+
+void QnStorageAnalyticsWidget::atPageChanged()
+{
+    // Show right scrollbar.
+    m_statsTableScrollbar->setVisible(currentTable() == ui->statsTable
+        && m_statsTableScrollbar->maximum() > m_statsTableScrollbar->minimum());
+    m_forecastTableScrollbar->setVisible(currentTable() == ui->forecastTable
+        && m_forecastTableScrollbar->maximum() > m_forecastTableScrollbar->minimum());
+
+    updateTotalTablesGeometry();
+}
+
+void QnStorageAnalyticsWidget::updateTotalTablesGeometry()
+{
+    // Stats table.
+    for (int i = 0; i < m_model->columnCount(); i++)
+        ui->statsTotalsTable->setColumnWidth(i, ui->statsTable->columnWidth(i));
+    // Forecast table.
+    for (int i = 0; i < m_forecastModel->columnCount(); i++)
+        ui->forecastTotalsTable->setColumnWidth(i, ui->forecastTable->columnWidth(i));
+    positionHintButton();
+}
+
+void QnStorageAnalyticsWidget::positionHintButton()
+{
+    const auto cellSize = ui->forecastTotalsTable-> sizeHintForIndex(
+        ui->forecastTotalsTable->model()->index(0,0));
+
+    if(cellSize.isValid())
+    {
+        // Top = 12 is magic, but looks good.
+        m_hintAnchor->setMargins(cellSize.width(), 12, 0, 0);
+        m_hintButton->setVisible(true);
+    }
+    else
+        m_hintButton->setVisible(false);
 }
 
 void QnStorageAnalyticsWidget::resizeEvent(QResizeEvent*)
@@ -503,6 +570,8 @@ void QnStorageAnalyticsWidget::resizeEvent(QResizeEvent*)
     // First column will stretch.
     ui->forecastTable->setColumnWidth(1, (3 * tableWidth) / 10);
     ui->forecastTable->setColumnWidth(2, (3 * tableWidth) / 10);
+
+    updateTotalTablesGeometry();
 }
 
 void QnStorageAnalyticsWidget::showEvent(QShowEvent*)

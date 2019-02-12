@@ -140,6 +140,7 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
     }
 
     QnAviResourcePtr resource(new QnAviResource(payload.path));
+    resource->setCommonModule(commonModule());
     QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
     bool opened = delegate->open(resource) && delegate->findStreams();
 

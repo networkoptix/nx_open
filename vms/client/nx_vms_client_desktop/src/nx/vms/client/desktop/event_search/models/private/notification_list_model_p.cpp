@@ -450,7 +450,6 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
     switch (params.eventType)
     {
-        case EventType::cameraMotionEvent:
         case EventType::cameraInputEvent:
         case EventType::cameraIpConflictEvent:
         case EventType::analyticsSdkEvent:
@@ -467,6 +466,9 @@ QPixmap NotificationListModel::Private::pixmapForAction(
                 action->getRuntimeParams().description,
                 color.isValid() ? color : QPalette().light().color());
         }
+
+        case EventType::cameraMotionEvent:
+            return qnSkin->pixmap("events/motion.svg");
 
         case EventType::storageFailureEvent:
             return qnSkin->pixmap("events/storage.png");

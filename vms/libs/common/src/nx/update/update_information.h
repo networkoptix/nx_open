@@ -212,8 +212,9 @@ struct UpdateContents
     bool alreadyInstalled = false;
 
     nx::utils::SoftwareVersion getVersion() const;
+
     /** Check if we can apply this update. */
-    bool isValid() const;
+    bool isValidToInstall() const;
 
     /**
      * Check if this update info is completely empty.

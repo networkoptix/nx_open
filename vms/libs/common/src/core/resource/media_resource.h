@@ -85,7 +85,7 @@ public:
 
 protected:
     void initMediaResource();
-    QnCameraUserAttributePool* userAttributesPool() const;
+    virtual QnCameraUserAttributePool* userAttributesPool() const;
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     mutable QnMutex m_layoutMutex;

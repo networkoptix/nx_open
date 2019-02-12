@@ -36,7 +36,7 @@ public:
     virtual ~QnLiveStreamProvider();
 
     virtual void setRole(Qn::ConnectionRole role) override;
-    nx::vms::api::MotionStreamType encoderIndex() const;
+    nx::vms::api::StreamIndex encoderIndex() const;
 
     void setPrimaryStreamParams(const QnLiveStreamParams& params);
 

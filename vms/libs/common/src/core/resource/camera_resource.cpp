@@ -204,7 +204,7 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(MotionStreamType index) const
+CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(StreamIndex index) const
 {
     const auto streams = mediaStreams().streams;
     auto stream = std::find_if(streams.cbegin(), streams.cend(),
@@ -231,12 +231,12 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
     // changed on the fly and a camera may not have a primary stream. In this case natural
     // secondary stream AS should be used.
-    const auto stream = streamInfo(MotionStreamType::primary);
+    const auto stream = streamInfo(StreamIndex::primary);
     QSize size = stream.getResolution();
     if (size.isEmpty())
     {
         // Trying to use size from secondary stream
-        const auto secondary = streamInfo(MotionStreamType::secondary);
+        const auto secondary = streamInfo(StreamIndex::secondary);
         size = secondary.getResolution();
     }
 
@@ -354,7 +354,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
             supportedMediaStreams.streams.end(),
             [](const CameraMediaStreamInfo& mediaInfo)
             {
-                return mediaInfo.getEncoderIndex() == MotionStreamType::secondary;
+                return mediaInfo.getEncoderIndex() == StreamIndex::secondary;
             });
         if (secondStreamIter != supportedMediaStreams.streams.end())
         {
@@ -503,9 +503,12 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 
 const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
+    const auto resourcePool = this->resourcePool();
+    if (!resourcePool)
+        return {};
+
     auto enabledEngines = userEnabledAnalyticsEngines();
-    const auto engineResources = commonModule()
-        ->resourcePool()
+    const auto engineResources = resourcePool
         ->getResources<nx::vms::common::AnalyticsEngineResource>();
 
     nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());

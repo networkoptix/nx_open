@@ -118,6 +118,7 @@ private:
     static QString getContactSupportMessage();
     static QString getProblemPersistMessage();
 
+    void showFailedToActivateLicenseLater(QnLicenseErrorCode errorCode);
     void showFailedToActivateLicenseLater(const QString& extras);
     void showIncompatibleLicenceMessageLater();
     void showActivationMessageLater(const QJsonObject& errorMessage);

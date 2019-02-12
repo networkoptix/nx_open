@@ -1957,13 +1957,22 @@ ConditionWrapper currentLayoutIsVideowallScreen()
 
 ConditionWrapper canForgetPassword()
 {
-    using namespace nx::vms::client::desktop;
     return new CustomBoolCondition(
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
             const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
             return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
     });
+}
+
+ConditionWrapper canMakeShowreel()
+{
+    return new ResourceCondition(
+        [](const QnResourcePtr& resource)
+        {
+            const auto layout = resource.dynamicCast<QnLayoutResource>();
+            return layout && !layout::isEncrypted(layout);
+        }, MatchMode::All);
 }
 
 } // namespace condition

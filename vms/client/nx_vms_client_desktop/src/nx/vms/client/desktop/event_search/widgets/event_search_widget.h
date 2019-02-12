@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
-
 #include "abstract_search_widget.h"
+
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 
@@ -26,7 +26,7 @@ private:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

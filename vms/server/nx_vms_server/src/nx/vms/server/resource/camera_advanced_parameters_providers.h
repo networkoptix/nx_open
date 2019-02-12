@@ -69,14 +69,14 @@ class StreamCapabilityAdvancedParametersProvider: public Camera::AdvancedParamet
 {
     using CodecString = QString;
     using ResolutionString = QString;
-    using MotionStreamType = nx::vms::api::MotionStreamType;
+    using StreamIndex = nx::vms::api::StreamIndex;
 
 public:
     StreamCapabilityAdvancedParametersProvider(
         Camera* camera,
         const StreamCapabilityMaps& capabilities,
         const nx::media::CameraTraits& traits,
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         const QSize& baseResolution);
 
     QnLiveStreamParams getParameters() const;
@@ -99,7 +99,7 @@ private:
 
     QString proprtyName() const;
     QString parameterName(const QString& baseName) const;
-    static QString streamParameterName(MotionStreamType stream, const QString& baseName);
+    static QString streamParameterName(StreamIndex stream, const QString& baseName);
 
     boost::optional<QString> getValue(
         const QnCameraAdvancedParamValueMap& values,
@@ -107,7 +107,7 @@ private:
     void updateMediaCapabilities();
 
     QSet<QString> filterResolutions(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         std::function<bool(const QString&)> filterFunc) const;
 
     boost::optional<nx::media::CameraTraitAttributes> trait(
@@ -117,7 +117,7 @@ private:
     Camera* const m_camera;
     const StreamCapabilityMaps m_capabilities;
     nx::media::CameraTraits m_traits;
-    const MotionStreamType m_streamIndex;
+    const StreamIndex m_streamIndex;
     const QnCameraAdvancedParams m_descriptions;
     const QnLiveStreamParams m_defaults;
 

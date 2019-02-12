@@ -1102,10 +1102,11 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
-
-    const auto aviResources = resourcePool()->getResources<QnAviResource>();
-    std::copy_if(aviResources.cbegin(), aviResources.cend(), std::back_inserter(resourcesToRemove),
-        [](auto aviResource) { return aviResource->getStatus() != Qn::Online; });
+    for (const auto aviResource: resourcePool()->getResources<QnAviResource>())
+    {
+        if (!aviResource->isOnline())
+            resourcesToRemove.push_back(aviResource);
+    }
 
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();

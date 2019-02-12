@@ -26,7 +26,6 @@ public:
     static Q_INVOKABLE QString applicationPlatformModification();
     static Q_INVOKABLE QString applicationCompiler();
 
-    static Q_INVOKABLE QString engineVersion();
     static Q_INVOKABLE QString ffmpegVersion();
     static Q_INVOKABLE QString sigarVersion();
     static Q_INVOKABLE QString boostVersion();
