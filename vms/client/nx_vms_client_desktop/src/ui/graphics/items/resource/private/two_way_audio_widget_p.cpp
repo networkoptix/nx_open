@@ -372,10 +372,15 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
 
 void QnTwoWayAudioWidget::Private::setFixedHeight(qreal height)
 {
-    const qreal leftMargin = height / 2;
+    const auto size = qnSkin->maximumSize(button->icon());
+    const QPointF excess(qMax(height - size.width(), 0.0), qMax(height - size.height(), 0.0));
     button->setFixedSize(height);
+    button->setImageMargins({excess.x() / 2, excess.y() / 2, excess.x() / 2, excess.y() / 2});
+
     hint->setMinimumHeight(height);
     hint->setMaximumHeight(height);
+
+    const qreal leftMargin = height / 2;
     q->setContentsMargins(leftMargin, 0.0, 0.0, 0.0);
     q->updateGeometry();
 }
@@ -394,43 +399,45 @@ void QnTwoWayAudioWidget::Private::paint(
     rect.setLeft(minLeftValue + maxHintWidth - targetHintWidth);
     NX_ASSERT(rect.width() >= minSize);
 
-    qreal roundness = minSize / 2;
+    const qreal roundness = minSize / 2;
     QPainterPath path;
     path.addRoundedRect(rect, roundness, roundness);
 
-    QBrush bgColor = m_state == HintState::Pressed
+    const auto background = m_state == HintState::Pressed
         ? colors.background
-        : palette.window();
+        : (q->isUnderMouse() ? palette.midlight() : palette.window());
 
-    painter->fillPath(path, bgColor);
+    painter->fillPath(path, background);
 
     if (m_state == HintState::Pressed && qFuzzyEquals(m_hintVisibility, kVisible))
     {
         NX_ASSERT(m_stateTimer.isValid());
-        const QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize, 0.0));
+        const auto visualizerRect = rect.adjusted(roundness, 0.0, -minSize, 0.0);
         NX_ASSERT(visualizerRect.isValid());
         if (!visualizerRect.isValid())
             return;
 
-        qint64 oldTimeStamp = m_paintTimeStamp;
+        const auto oldTimeStamp = m_paintTimeStamp;
         m_paintTimeStamp = m_stateTimer.elapsed();
-        qint64 timeStepMs = m_paintTimeStamp - oldTimeStamp;
+        const auto timeStepMs = m_paintTimeStamp - oldTimeStamp;
 
         auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
         if (data.isEmpty())
         {
-            paintVisualizer(painter, visualizerRect, generateEmptyData(m_paintTimeStamp), colors.visualizer);
-            return;
+            paintVisualizer(painter, visualizerRect, generateEmptyData(m_paintTimeStamp),
+                colors.visualizer);
         }
+        else
+        {
+            normalizeData(data);
 
-        normalizeData(data);
+            // Calculate size hint when first time receiving analyzed data.
+            if (m_visualizerData.isEmpty() && !data.isEmpty())
+                q->updateGeometry();
 
-        /* Calculate size hint when first time receiving analyzed data. */
-        if (m_visualizerData.isEmpty() && !data.isEmpty())
-            q->updateGeometry();
-
-        m_visualizerData = animateData(m_visualizerData, data, timeStepMs);
-        paintVisualizer(painter, visualizerRect, m_visualizerData, colors.visualizer);
+            m_visualizerData = animateData(m_visualizerData, data, timeStepMs);
+            paintVisualizer(painter, visualizerRect, m_visualizerData, colors.visualizer);
+        }
     }
 }
 
