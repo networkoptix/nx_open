@@ -655,7 +655,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedE
 {
     std::map<QnUuid, std::set<QString>> result;
     auto deviceAgentManifests = m_cachedDeviceAgentManifests.get();
-    for (const auto&[engineId, deviceAgentManifest] : deviceAgentManifests)
+    for (const auto& [engineId, deviceAgentManifest]: deviceAgentManifests)
         result[engineId] = fetcher(deviceAgentManifest);
 
     return result;
@@ -671,7 +671,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedE
                 deviceAgentManifest.supportedEventTypeIds.cbegin(),
                 deviceAgentManifest.supportedEventTypeIds.cend());
 
-            for (const auto eventType : deviceAgentManifest.eventTypes)
+            for (const auto& eventType: deviceAgentManifest.eventTypes)
                 result.insert(eventType.id);
 
             return result;
@@ -688,7 +688,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedO
                 deviceAgentManifest.supportedObjectTypeIds.cbegin(),
                 deviceAgentManifest.supportedObjectTypeIds.cend());
 
-            for (const auto objectType : deviceAgentManifest.objectTypes)
+            for (const auto& objectType: deviceAgentManifest.objectTypes)
                 result.insert(objectType.id);
 
             return result;

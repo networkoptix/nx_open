@@ -24,8 +24,7 @@ const QString AnalyticsEngineResource::kEngineManifestProperty{"engineManifest"}
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_cachedManifest(
-        [this]() { return fetchManifest(); }, &m_cacheMutex)
+    m_cachedManifest([this]() { return fetchManifest(); }, &m_cacheMutex)
 {
     connect(
         this,
