@@ -36,8 +36,12 @@ class NX_RELAYING_API AbstractListeningPeerPool
 public:
     virtual ~AbstractListeningPeerPool() = default;
 
+    /**
+     * @param protocolVersion E.g., "0.1".
+     */
     virtual void addConnection(
         const std::string& peerName,
+        const std::string& protocolVersion,
         std::unique_ptr<network::AbstractStreamSocket> connection) = 0;
 
     virtual std::size_t getConnectionCountByPeerName(const std::string& peerName) const = 0;
@@ -86,6 +90,7 @@ public:
 
     virtual void addConnection(
         const std::string& peerName,
+        const std::string& peerProtocolVersion,
         std::unique_ptr<network::AbstractStreamSocket> connection) override;
 
     virtual std::size_t getConnectionCountByPeerName(

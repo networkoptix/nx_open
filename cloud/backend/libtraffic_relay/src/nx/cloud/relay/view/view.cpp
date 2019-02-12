@@ -188,10 +188,7 @@ void View::registerApiHandler(
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, args...]() -> std::unique_ptr<Handler>
-        {
-            return std::make_unique<Handler>(args...);
-        },
+        [args...]() { return std::make_unique<Handler>(args...); },
         method);
 }
 

@@ -5,7 +5,7 @@
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/async_channel_adapter.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>

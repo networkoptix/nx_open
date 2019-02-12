@@ -46,7 +46,7 @@ private:
     ListeningPeerPool* m_listeningPeerPool;
 
     void saveServerConnection(
-        const std::string& peerName,
+        const relay::api::BeginListeningRequest& request,
         nx::network::http::HttpServerConnection* httpConnection);
 };
 

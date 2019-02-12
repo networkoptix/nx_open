@@ -1,14 +1,12 @@
-#include "relay_api_open_tunnel_notification.h"
+#include "relay_api_notifications.h"
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/url/url_parse_helper.h>
 
-namespace nx {
-namespace cloud {
-namespace relay {
-namespace api {
+namespace nx::cloud::relay::api {
 
-static const nx::String kClientEndpoint("X-Nx-Client-Endpoint");
+static constexpr char kClientEndpoint[] = "X-Nx-Client-Endpoint";
+static constexpr char kOpenTunnel[] = "OPEN_TUNNEL";
 
 void OpenTunnelNotification::setClientPeerName(nx::String name)
 {
@@ -33,9 +31,8 @@ const network::SocketAddress& OpenTunnelNotification::clientEndpoint() const
 nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
 {
     nx::network::http::Message message(nx::network::http::MessageType::request);
-    message.request->requestLine.method = "OPEN_TUNNEL";
-    message.request->requestLine.version.protocol = "NXRELAY";
-    message.request->requestLine.version.version = "0.1";
+    message.request->requestLine.method = kOpenTunnel;
+    message.request->requestLine.version = {kRelayProtocolName, kRelayProtocolVersion};
     message.request->requestLine.url = nx::network::url::joinPath(
         nx::cloud::relay::api::kRelayClientPathPrefix,
         m_clientPeerName.toStdString());
@@ -47,6 +44,9 @@ nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
 bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
 {
     if (message.type != nx::network::http::MessageType::request)
+        return false;
+
+    if (message.request->requestLine.method != kOpenTunnel)
         return false;
 
     auto path = message.request->requestLine.url.path().toUtf8();
@@ -63,7 +63,39 @@ bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
     return true;
 }
 
-} // namespace api
-} // namespace relay
-} // namespace cloud
-} // namespace nx
+//-------------------------------------------------------------------------------------------------
+
+static constexpr char kKeepAlive[] = "KEEP_ALIVE";
+static constexpr char kConnectionPath[] = "connection";
+
+nx::network::http::Message KeepAliveNotification::toHttpMessage() const
+{
+    nx::network::http::Message message(nx::network::http::MessageType::request);
+    message.request->requestLine.method = kKeepAlive;
+    message.request->requestLine.version = {kRelayProtocolName, kRelayProtocolVersion};
+    message.request->requestLine.url = nx::network::url::joinPath(
+        nx::cloud::relay::api::kRelayClientPathPrefix,
+        kConnectionPath);
+    return message;
+}
+
+bool KeepAliveNotification::parse(const nx::network::http::Message& message)
+{
+    if (message.type != nx::network::http::MessageType::request)
+        return false;
+
+    if (message.request->requestLine.method != kKeepAlive)
+        return false;
+
+    if (message.request->requestLine.url.path().toStdString() !=
+        nx::network::url::joinPath(
+            nx::cloud::relay::api::kRelayClientPathPrefix,
+            kConnectionPath))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace nx::cloud::relay::api

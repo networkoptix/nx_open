@@ -1,6 +1,5 @@
 #include "listening_peer_pool.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
@@ -42,9 +41,13 @@ ListeningPeerPool::~ListeningPeerPool()
 
 void ListeningPeerPool::addConnection(
     const std::string& originalPeerName,
+    const std::string& peerProtocolVersion,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     auto peerName = convertHostnameToInternalFormat(originalPeerName);
+
+    NX_VERBOSE(this, "Added connection from %1, protocol version %2",
+        originalPeerName, peerProtocolVersion);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -70,7 +73,10 @@ void ListeningPeerPool::addConnection(
     auto connectionContext = std::make_unique<ConnectionContext>();
     connectionContext->peerEndpoint = connection->getForeignAddress();
     connectionContext->connectionWatcher =
-        std::make_unique<ListeningPeerConnectionWatcher>(std::move(connection));
+        std::make_unique<ListeningPeerConnectionWatcher>(
+            std::move(connection),
+            peerProtocolVersion,
+            m_settings.tcpKeepAlive.probeSendPeriod);
 
     m_statisticsCalculator.connectionAccepted();
 
