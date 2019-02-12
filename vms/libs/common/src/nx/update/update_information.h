@@ -70,6 +70,7 @@ enum class InformationError
     brokenPackageError,
     missingPackageError,
     incompatibleVersion,
+    incompatibleCloudHost,
     notFoundError,
     noNewVersion,
 };

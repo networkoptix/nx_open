@@ -480,7 +480,9 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     {
         report.versionHighlight = VersionReport::HighlightMode::red;
         report.statusHighlight = VersionReport::HighlightMode::red;
-
+        // Note: it is possible to have multiple problems. Some problems can be tracked by
+        // both error code and some error flag. So some error statuses are filled separately
+        // from this switch.
         switch(contents.error)
         {
             case Error::noError:
@@ -514,6 +516,10 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::notFoundError:
                 // No update
                 report.statusMessages << tr("Update file is not found");
+                break;
+            case Error::incompatibleCloudHost:
+                // Cloud host is incompatible. Error message is filled later.
+                report.versionHighlight = VersionReport::HighlightMode::regular;
                 break;
             case Error::noNewVersion:
                 // We have most recent version for this build.
