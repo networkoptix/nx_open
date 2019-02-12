@@ -24,8 +24,8 @@ using StreamIndex = nx::vms::api::StreamIndex;
 namespace {
 
 static constexpr int kMaxGopLen = 100;
-
 static constexpr int kRoundFactor = 4;
+static constexpr int kGetFrameExtraTriesPerChannel = 10;
 
 static StreamIndex oppositeStreamIndex(StreamIndex streamIndex)
 {
@@ -220,7 +220,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         // Don't look at archive on slow devices (dts based) if noArchiveOnSlowDevices is enabled.
         if (!video && !(resource->isDtsBased() && request.ignoreExternalArchive))
         {
-
             openDelegateIfNeeded([&]() { return archiveDelegate->endTime() - 1000 * 100; });
             video = getNextArchiveVideoPacket(archiveDelegate, AV_NOPTS_VALUE);
             if (video)
@@ -546,8 +545,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     if (rotation == nx::api::ImageRequest::kDefaultRotation)
         rotation = camera->getProperty(QnMediaResource::rotationKey()).toInt();
 
-    QnConstResourceVideoLayoutPtr layout = camera->getVideoLayout();
-
     std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(camera->createArchiveDelegate());
     if (!archiveDelegate)
         archiveDelegate.reset(new QnServerArchiveDelegate(serverModule())); // default value
@@ -557,62 +554,87 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     if (streamIndex == StreamIndex::secondary)
         archiveDelegate->setQuality(MEDIA_Quality_Low, true, QSize());
 
-    QList<QnAbstractImageFilterPtr> filterChain;
+    auto frame = readFrame(request, streamIndex, archiveDelegate.get(), 0, isOpened);
+    if (!frame)
+    {
+        // Did not get first frame, no need to try more, as it is more likely we would not success.
+        NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
+        return nullptr;
+    }
 
-    CLVideoDecoderOutputPtr outFrame;
-    int channelMask = (1 << layout->channelCount()) - 1;
-    bool gotNullFrame = false;
-    for (int i = 0; i < layout->channelCount(); ++i)
-    {
-        CLVideoDecoderOutputPtr frame = readFrame(
-            request, streamIndex, archiveDelegate.get(), i, isOpened);
-        if (!frame)
+    QnConstResourceVideoLayoutPtr layout = camera->getVideoLayout();
+    const int channelCount = layout->channelCount();
+    std::deque<int> channelMask(channelCount); // Queue for round-robin.
+    std::iota(channelMask.begin(), channelMask.end(), 0);
+
+    QList<QnAbstractImageFilterPtr> filterChain;
+    const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
+    filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
+    filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
+    filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
+
+    auto handleChannelFrame =
+        [this, &filterChain, &channelMask](CLVideoDecoderOutputPtr&& frame) -> CLVideoDecoderOutputPtr
         {
-            gotNullFrame = true;
-            if (i != 0)
-                continue;
-            NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
-            return nullptr;
-        }
-        channelMask &= ~(1 << frame->channel);
-        if (i == 0)
-        {
-            const QSize dstSize = updateDstSize(camera.get(),
-                request.size, *frame, request.aspectRatio);
-            filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
-            filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
-            filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
-        }
-        for (auto filter : filterChain)
-        {
-            frame = filter->updateImage(frame);
+            // Move the last requested channel to the back of queue.
+            const auto channelRequested = channelMask.front();
+            channelMask.pop_front();
+            channelMask.push_back(channelRequested);
+
             if (!frame)
-                break;
-        }
-        if (frame)
-            outFrame = frame;
-    }
-    // read more archive frames to get all channels for pano cameras
-    if (channelMask && !gotNullFrame)
-    {
-        for (int i = 0; i < 10; ++i)
-        {
-            CLVideoDecoderOutputPtr frame = readFrame(
-                request, streamIndex, archiveDelegate.get(), 0, isOpened);
-            if (frame)
             {
-                channelMask &= ~(1 << frame->channel);
-                for (auto filter : filterChain)
-                {
-                    frame = filter->updateImage(frame);
-                    if (!frame)
-                        break;
-                }
-                outFrame = frame;
+                NX_VERBOSE(this, "%1(): Got null frame", __func__);
+                return nullptr;
             }
-        }
+
+            NX_VERBOSE(this, "Got frame for [%1] channel, size %2, channels left %3",
+                frame->channel, frame->size(), containerString(channelMask));
+            for (auto& filter: filterChain)
+            {
+                frame = filter->updateImage(frame);
+                if (!frame)
+                {
+                    NX_VERBOSE(this, "%1(): Failed to apply filter", __func__);
+                    return nullptr;
+                }
+            }
+
+            auto it = std::find(channelMask.begin(), channelMask.end(), frame->channel);
+            if (it != channelMask.end())
+                channelMask.erase(it);
+            return frame;
+        };
+
+    CLVideoDecoderOutputPtr outFrame = handleChannelFrame(std::move(frame));
+    if (!outFrame)
+    {
+        NX_VERBOSE(this, "%1() END -> null: error processing frame", __func__);
+        return nullptr;
     }
-    NX_VERBOSE(this, "%1() END -> frame %2", __func__, outFrame->size());
+
+    // TODO: check what happens with timestamps, if we are overwriting the same channel frame.
+
+    // Getting frames for other channels of camera.
+    // NOTE: We can't get frame for exact channel from archive, so we are trying several times until
+    // we get all frames.
+    for (int i = 1; i < channelCount * kGetFrameExtraTriesPerChannel && !channelMask.empty(); ++i)
+    {
+        frame = handleChannelFrame(
+            readFrame(request, streamIndex, archiveDelegate.get(), channelMask.front(), isOpened));
+        if (frame)
+        {
+            outFrame = frame;
+            continue;
+        }
+
+        // return what we have got.
+        if (i >= channelCount)
+            break;
+    }
+
+    NX_ASSERT(outFrame);
+    NX_VERBOSE(this, "%1() END -> frame %2, mask %3",
+        __func__, outFrame->size(), containerString(channelMask));
     return outFrame;
 }
 
@@ -639,8 +661,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
         gotFrame = decoder.decode(frame, &outFrame);
 
-        NX_VERBOSE(this, "%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4",
-            __func__, gotFrame, frame->timestamp, timestampUs);
+        NX_VERBOSE(this,
+            "%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4, flags: %5, size: %6",
+            __func__, gotFrame, frame->timestamp, timestampUs, frame->flags, frame->dataSize());
         if (frame->timestamp >= (qint64) timestampUs)
             break;
     }
