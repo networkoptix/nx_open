@@ -30,6 +30,7 @@
 #include <ui/help/help_topics.h>
 #include <utils/media/sse_helper.h>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
 #include "resource_widget.h"
@@ -282,7 +283,7 @@ protected:
     virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
-    void ensureTwoWayAudioWidget();
+    void updateTwoWayAudioWidget();
     bool animationAllowed() const;
 
     rest::Handle invokeTrigger(
@@ -431,7 +432,7 @@ private:
     void handleSelectedAreaChanged();
 
 private:
-    QScopedPointer<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
+    nx::utils::ImplPtr<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
@@ -487,7 +488,6 @@ private:
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
-    QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     QScopedPointer<nx::vms::client::desktop::WatermarkPainter> m_watermarkPainter;
 

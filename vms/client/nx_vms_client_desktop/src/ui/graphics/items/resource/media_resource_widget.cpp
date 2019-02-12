@@ -259,7 +259,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::updateFisheye);
 
-    connect(d, &MediaResourceWidgetPrivate::stateChanged, this,
+    connect(d.get(), &MediaResourceWidgetPrivate::stateChanged, this,
         [this]
         {
             const bool animate = animationAllowed();
@@ -274,7 +274,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
             &QnMediaResourceWidget::invalidateMotionSensitivity);
 
-        connect(d, &MediaResourceWidgetPrivate::licenseStatusChanged,
+        connect(d.get(), &MediaResourceWidgetPrivate::licenseStatusChanged,
             this,
             [this]
             {
@@ -339,7 +339,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     /* Set up overlays */
     initIoModuleOverlay();
-    ensureTwoWayAudioWidget();
+    updateTwoWayAudioWidget();
     initAreaHighlightOverlay();
     initAreaSelectOverlay();
 
@@ -1191,30 +1191,38 @@ void QnMediaResourceWidget::updateHud(bool animate)
     updateCompositeOverlayMode();
 }
 
-void QnMediaResourceWidget::ensureTwoWayAudioWidget()
+void QnMediaResourceWidget::updateTwoWayAudioWidget()
 {
-    /* Check if widget is already created. */
-    if (m_twoWayAudioWidget)
-        return;
-
-    bool hasTwoWayAudio = d->camera && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
-
-    if (!hasTwoWayAudio)
-        return;
-
     const auto user = context()->user();
-    if (!user)
-        return;
+    const bool twoWayAudioWidgetRequired = !d->isPreviewSearchLayout
+        && d->camera
+        && d->camera->hasTwoWayAudio()
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput)
+        && NX_ASSERT(user);
 
-    m_twoWayAudioWidget = new QnTwoWayAudioWidget(QnDesktopResource::calculateUniqueId(
-        commonModule()->moduleGUID(), user->getId()));
-    m_twoWayAudioWidget->setCamera(d->camera);
-    m_twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
-    context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
+    if (twoWayAudioWidgetRequired)
+    {
+        if (!d->twoWayAudioWidgetId.isNull())
+            return; //< Already exists.
 
-    /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
-    m_triggersContainer->insertItem(0, m_twoWayAudioWidget);
+        const auto twoWayAudioWidget = new QnTwoWayAudioWidget(QnDesktopResource::calculateUniqueId(
+            commonModule()->moduleGUID(), user->getId()));
+        twoWayAudioWidget->setCamera(d->camera);
+        twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
+        context()->statisticsModule()->registerButton(lit("two_way_audio"), twoWayAudioWidget);
+
+        // Items are ordered left-to-right and bottom-to-top,
+        // so the two-way audio item is inserted at the bottom.
+        d->twoWayAudioWidgetId = m_triggersContainer->insertItem(0, twoWayAudioWidget);
+    }
+    else
+    {
+        if (d->twoWayAudioWidgetId.isNull())
+            return;
+
+        m_triggersContainer->deleteItem(d->twoWayAudioWidgetId);
+        d->twoWayAudioWidgetId = {};
+    }
 }
 
 bool QnMediaResourceWidget::animationAllowed() const
@@ -2458,7 +2466,7 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
     else if (key == ResourcePropertyKey::kCameraCapabilities)
-        ensureTwoWayAudioWidget();
+        updateTwoWayAudioWidget();
     else if (key == ResourcePropertyKey::kCombinedSensorsDescription)
         updateAspectRatio();
     else if (key == ResourcePropertyKey::kMediaStreams)

@@ -38,6 +38,7 @@ public:
     const bool isIoModule;
     bool isExportedLayout = false;
     bool isPreviewSearchLayout = false;
+    QnUuid twoWayAudioWidgetId;
 
     QScopedPointer<nx::vms::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
