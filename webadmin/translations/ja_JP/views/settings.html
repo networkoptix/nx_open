@@ -37,23 +37,23 @@
                     <div>
                         <h3>サーバーをリセット</h3>
                         <p>この操作は、このサーバーをデフォルトに戻します(データベースのクリアと構成のリセット)
-                            サーバーは現在のシステムから切り離されます ビデオのアーカイブはそのまま残ります</p>
+                            The server will be detached from the current System. ビデオのアーカイブはそのまま残ります</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">出荷時のデフォルトに戻す</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>システムからサーバーを切離す</h3>
-                        <p>これにより、データベース、ローカルユーザー、および構成を保持しているサーバーがシステムから切り離されます
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
                             ビデオのアーカイブはそのまま残ります <b>クラウドユーザーは削除されます </b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>再起動</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>                            
+<button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Adminパスワードの変更</h3>
+                            <h3>adminパスワードの変更</h3>
                             <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます<br>　　
 それ以外は回復パスワードのみを変更</p>
                             <div class="col-sm-6">
@@ -62,7 +62,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">パスワードの変更</button>
+                                        ng-click="changePassword()">パスワードを変更</button>
                             </div>
                         </form>
                     </div>
@@ -93,7 +93,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>このシステムは {{Config.cloud.productName}}にリンクされています システムオーナー: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">{{Config.cloud.productName}}から切断</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -101,10 +101,10 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">このシステムは、{{Config.cloud.productName}}にリンクされていません。
-<a ng-if="!mode.liteClient"
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
+                                <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">詳細情報</a></uib-alert>
+                                   target="_blank">Learn more</a></uib-alert>
                             <uib-alert type="error" ng-if="!hasInternetOnServer">サーバー設定を行う為にインターネットに接続します
 {{Config.cloud.productName}}</uib-alert>
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">システムを{{Config.cloud.productName}}に接続するのにインターネット接続が必要です</uib-alert>
@@ -119,20 +119,20 @@
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>トラフィックの暗号化</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> トラフィック暗号化
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
-                                    Force Video Traffic Encryption
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    ビデオトラフィック暗号化
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">保存</button>

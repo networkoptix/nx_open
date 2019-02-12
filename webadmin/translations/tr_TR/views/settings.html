@@ -39,14 +39,14 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                     <div>
                         <h3>Sunucuyu sıfırla</h3>
                         <p>Bu eylem, bu sunucuyu varsayılanlara geri döndürür (veritabanını temizler ve yapılandırmayı sıfırlar).
-                            Sunucu geçerli sistemden ayrılacaktır. Video arşivi bozulmadan kalacaktır.</p>
+                            The server will be detached from the current System. Video arşivi bozulmadan kalacaktır.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrika ayarlarına geri yükle</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Sunucuyu mevcut sistemden ayır</h3>
-                        <p>Bu aksiyon sunucuyu, tutulan veritabanından, yerel kullanıcılardan ve ayarlardan ayırır.
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
                             Video arşivi bozulmadan kalacaktır. <b>Tüm bulut kullanıcıları silindi.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Sunucuyu mevcut sistemden ayır</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Yeniden Başlat</h3>
@@ -72,7 +72,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>İsim</h3>
+                        <h3>Ad</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -95,7 +95,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Bu sistem {{Config.cloud.productName}}, sistem sahibi: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Çıkış yap {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -103,10 +103,10 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">Bu sistem {{Config.cloud.productName}} ile bağlı.
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Daha fazla bilgi</a></uib-alert>
+                                   target="_blank">Learn more</a></uib-alert>
                             <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} ayarlamak için sunucuyu internete bağlayın</uib-alert>
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} bağlanmak için internet gereklidir</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
@@ -120,20 +120,20 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>Trafik şifreleme</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Trafik şifrelemeyi zorla
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
-                                    Force Video Traffic Encryption
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    Video trafiğini şifrelemeyi zorla
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Kaydet</button>

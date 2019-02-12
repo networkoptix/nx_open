@@ -33,22 +33,24 @@
         "error": "Hata: ",
         "restartNeeded": "Değişiklikler kaydedildi. Yeni ayarlarda uygulama yeniden başlatılsın mı?",
         "settingsSaved": "Ayarlar kaydedildi",
-        "confirmHardwareRestart": "Sunucunun çalıştığı işletim sistemi yeniden başlatılsın mı?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "Tüm sunucu ayarları fabrika ayarlarına çevrilsin mi? Arşiv kaydediliyor ancak ağ ayarları sıfırlanacak.",
         "confirmRestoreSettingsNotNetwork": "Sunucu konfigürasyonunu sıfırlamak istiyor musunuz? Arşiv ve ağ ayarları kaydedilecek.",
         "unavailable": "Kullanılamaz",
         "unsafePortConfirm": "1025 den daha düşük bir port kullanmak güvenli olmayabilir. Sunucuya erişim kesilebilir. Yinede devam edilsin mi?",
-        "confirmDisconnectFromCloud": "{{CLOUD_NAME}} ile Bağlanıtıyı kes",
+        "confirmDisconnectFromCloud": "{{CLOUD_NAME}} çıkış yapılsın mı",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tüm bulut kullanıcıları silinecek.</span><br><br>Sisteme sadece yerel yönetici hesabı erişebilecektir.",
         "confirmDisconnectFromCloudAction": "Bağlantıyı kes",
         "disconnectedFromCloudSuccess": "Sistemin {{CLOUD_NAME}} ile başarıyla bağlantısı kesildi",
-        "confirmDisconnectFromSystem": "Sunucuyu mevcut sistemden ayır",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "Ayır",
-        "disconnectedFromSystemSuccess": "Sunucu, sistemden başarıyla ayrıldı",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "Sistem bağlantısı başarılı",
         "createLocalOwnerTitle": "Yerel yönetici oluştur",
         "confirmChangePassword": "Yönetici parolasını değiştir",
-        "confirmChangePasswordTitle": "Sistem şifresi değiştirilsin mi? Bu işlem 'admin' kullanıcısının kök kullanıcıların şifrelerini etkileyebilir",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Yeni parolayı kaydet",
         "nx1ControlHint": "İstemci uygulaması başlatıldı. Uygulamayı kontrol etmek için mouse/klavye veya mobil uygulamayı kullan."
     },
@@ -66,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Bulut bağlantısında geçiş etkinleştir",
         "cloudConnectUdpHolePunchingEnabled": "Bulut bağlantısı için UDP port açmayı etkinleştir",
         "cloudHost": "Cloud sunucu",
-        "cloudSystemID": "Cloud sistemi Id",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Engelli tedarikçi",
         "ec2AliveUpdateIntervalSec": "Canlılık güncelleme aralığı (saniye)",
         "ec2ConnectionKeepAliveTimeoutSec": "Bağlantı canlı tutma zaman aşımı (saniye)",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "Istatistik rapor aralığı",
         "statisticsReportUpdateDelay": "İstatistik raporu - güncelleme gecikmesi",
         "synchronizeTimeWithInternet": "Zamanı internet ile eşitle",
-        "systemName": "Sistem Adı",
+        "SystemName": "Sistem Adı",
         "takeCameraOwnershipWithoutLock": "Kilitler olmadan kamera sahipliğini alın",
         "timeSynchronizationEnabled": "Zaman senkronizasyonu etkin",
         "primaryTimeServer": "Primary time synchronization server",
@@ -116,14 +118,15 @@
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
         "useTextEmailFormat": "Düz metin e-postaları gönder",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "E-postalarda windows satır beslemesini kulllan",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info": {
         "tabs": {
@@ -133,21 +136,22 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "Sistem ulaşılabilir değil.",
+        "SystemIsUnreacheble": "Sistem ulaşılabilir değil.",
         "incorrectCurrentPassword": "Geçerli parola hatalı.",
         "incorrectRemotePassword": "Kullanıcı adı veya şifre hatalı.",
         "incompatibleVersion": "Sistem ulaşılabilir değil, yok veya versiyon uyumsuz.",
         "wrongUrl": "İstenilen sunucuya bağlanılamadı.",
-        "newSystemError": "Sistemler birleştirilemiyor. Uzak sistem konfigüre edilmemiş.",
-        "safeMode": "Sistemler birleştirilemiyor. Uzak sistem güvenli modda.",
-        "configError": "Sistemler birleştirilemiyor. Bir sistem güvenli modda olabilir.",
-        "cloudError": "Sistemler birleştirilemiyor. Buluta bağlı ise ilk olarak sistemleri buluttan çıkarın.",
-        "cloudBothError": "Sistemler birleştirilemedi. İki sistemde buluta bağlı. Öncelikle bulut bağlantılarını kesmelisiniz.",
-        "cloudHostConflict": "Sistemler birleştirelemez, çünkü sunucukar farklı barındırıcılarda bulunuyor",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "Uyarı! starter lisansına sahip sistemleri birleştiriyorsunuz. Sistem başına sadece bir starter lisansa izin verilir buna bağlı olarak ikinci lisans devre dışı kalacaktır. Yinede birleştirilsin mi?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Bağlantı başarısız: ",
         "unknownError": "Bilinmeyen hata",
-        "mergeFailed": "Birleştirme başarısız: ",
+        "mergeFailed": "Birleştirme başarısız",
         "mergeSucceed": "Birleştirme başarılı.",
         "newSystemDisplayName": "Yeni sistem",
         "incompatibleProtocol": "uyumsuz versiyon",
@@ -156,7 +160,7 @@
     },
     "login": {
         "incorrectPassword": "Kullanıcı adı veya şifre hatalı",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Çok fazla deneme yapıldı. Daha sonra tekrar deneyin."
     },
     "navigaion": {
         "cannotGetUser": "Sunucu hatası: kullanıcı verileri alınamıyor"
@@ -173,7 +177,7 @@
         "started": "Güncelleme başarıyla başlatıldı. Biraz zaman alabilir",
         "upToDate": "Güncelleme başarısız. Bu sürüm zaten yüklü.",
         "invalidFile": "Güncelleme başarısız. Dosyalar geçersiz.",
-        "incompatibleSystem": "Güncelleme başarısız. Dosyalar başka bir sistem için ayarlanmış.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "Güncelleme başarısız. Yükleme alanı yetersiz. Lütfen diskteki boş alanı kontrol edin.",
         "installationError": "Güncelleme başarısız. Yükleme komutları çalıştırılamıyor.",
         "selectFiles": "Dosyaları seç"
@@ -186,5 +190,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web arayüzü"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "duraklat",
+            "help": "help | show commands",
+            "collapse all servers": "tüm sunucuları daralt",
+            "collapse server": "collapse server + [server name]",
+            "play": "oynat",
+            "clear search": "aramayı temizle",
+            "live": "go to live | show me live",
+            "expand all servers": "tüm sunucuları genişlet",
+            "stop listening": "dinlemeyi durdur",
+            "expand server": "expand server + [server name]",
+            "view": "görüntüle + [kamera adı]"
+        },
+        "systemOffline": "Sistem çevrimdışı",
+        "cameraLinks": {
+            "copyToClipboard": "panoya kopyala",
+            "highStream": "Yüksek çözünürlük",
+            "copyDefaultText": "kopyala",
+            "unknown": "Belirtilmemiş",
+            "lowStream": "Düşük çözünürlük",
+            "transcoding": "Dönüştürme",
+            "copyActiveText": "panoya kopyalandı"
+        },
+        "searchCamPlaceholder": "Arama",
+        "cameraStates": {
+            "noFormat": "Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
+            "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+            "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+            "unauthorized": "Kimlik doğrulaması gerekli",
+            "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın.",
+            "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+            "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
+            "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
+            "error": "Hata",
+            "offline": "Çevrimdışı",
+            "noData": "Veri bulunamadı",
+            "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin."
+        },
+        "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
+        "resolution": {
+            "high": "Yüksek",
+            "auto": "Oto",
+            "low": "Düşük"
+        }
     }
 }

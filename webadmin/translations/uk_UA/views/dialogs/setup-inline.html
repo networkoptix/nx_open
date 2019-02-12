@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Не вдається налаштувати систему</h2>
-    <p class="master-description">Система не може бути налаштована. <br>
+    <p class="master-description">The System cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Розширені налаштування системи</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Розширені налаштування системи</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -141,8 +141,7 @@
     </div>
     <h2>Обліковий запис {{Config.cloud.productName}}</h2>
     <p class="master-description">
-        Обліковий запис потрібний для використання хмарної системи
-{{Config.cloud.productName}}
+        An account is required to use the cloud System {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Створити новий обліковий запис</button> &nbsp;&nbsp;
@@ -280,7 +279,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Підключити сервер до існуючої системи</h2>
+    <h2>Connect the server to the existing System</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -292,7 +291,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="URL існуючої системи (https://host:port)"
+ placeholder="Existing System URL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -332,26 +331,26 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Об'єднати системи...</h2>
+    <h2>Об'єднати системи ...</h2>
     <p class="master-description">Це може зайняти декілька хвилин</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Об'єднати системи...</h2>
-    <p class="master-description">Спроба підключення до системи</p>
+    <h2>Об'єднати системи ...</h2>
+    <p class="master-description">Trying to connect to the System</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Не вдається об'єднати системи</h2>
+    <h2>Cannot merge Systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробувати ще раз</button>
-         <button class="btn btn-default" ng-click="skip()">Налаштувати окрему систему</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
     </p>
 </div>
 
@@ -417,7 +416,8 @@
         Для підключення в будь-якому місці за допомогою {{Config.cloud.productName}} <br> потрібно налаштувати підключення сервера до Інтернету.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробувати ще раз</button>         <button class="btn btn-default" ng-click="skip()">Налаштувати локальну мережу</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Налаштувати мережу</a>
@@ -431,7 +431,8 @@
         Перевірте підключення до Інтернету.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробувати ще раз</button>         <button class="btn btn-default" ng-click="skip()">Налаштувати локальну мережу</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -442,7 +443,8 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробувати ще раз</button>         <button class="btn btn-default" ng-click="skip()">Налаштувати локальну мережу</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 

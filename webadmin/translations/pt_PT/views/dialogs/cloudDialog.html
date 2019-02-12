@@ -1,0 +1,32 @@
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true">&times;</span> <span class="sr-only"> Fechar </span></button>
+    <h3 class="modal-title" ng-bind-html="title"></h3>
+</div>
+
+<div class="modal-body">
+    <uib-alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></uib-alert>
+
+    <uib-alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></uib-alert>
+
+    <uib-alert type="info" ng-if="connecting">Connecting System to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
+        Isto pode durar cerca de um minuto.</uib-alert>
+
+    <form name="cloudForm" disable-autocomplete>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" ng-readonly="!connect"
+                   type="email" placeholder="E-mail da &quot;Cloud&quot;" required auto-focus autocomplete="new-password" validate-email>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
+                   type="password" required placeholder="Senha da &quot;Cloud&quot;" autocomplete="new-password">
+        </div>
+    </form>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()"> Cancelar </button>
+
+    <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed">{{actionLabel}}</button>
+</div>
