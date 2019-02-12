@@ -25,6 +25,8 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/update/update_information.h>
 
+#include <nx/vms/api/analytics/settings_response.h>
+
 namespace rest {
 
 struct RestResultWithDataBase
@@ -434,7 +436,7 @@ public:
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
-    
+
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
@@ -444,14 +446,15 @@ public:
     Handle getDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<QJsonObject>::type&& callback,
+        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle setDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+        std::function<
+            void(bool, Handle, const nx::vms::api::analytics::SettingsResponse&)>&& callback,
         QThread* targetThread = nullptr);
 
     /**
