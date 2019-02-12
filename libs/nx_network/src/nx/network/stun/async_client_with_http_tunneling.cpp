@@ -417,6 +417,8 @@ void AsyncClientWithHttpTunneling::onStunConnectionClosed(
 
 void AsyncClientWithHttpTunneling::scheduleReconnect()
 {
+    NX_ASSERT(isInSelfAioThread());
+
     if (!m_reconnectTimer.scheduleNextTry(
             std::bind(&AsyncClientWithHttpTunneling::reconnect, this)))
     {
