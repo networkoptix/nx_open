@@ -434,13 +434,14 @@ public:
 
     Handle getEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<QJsonObject>::type&& callback,
+        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        std::function<void (bool, Handle, const QJsonObject&)>&& callback,
+        std::function<
+            void(bool, Handle, const nx::vms::api::analytics::SettingsResponse&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle getDeviceAnalyticsSettings(

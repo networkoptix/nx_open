@@ -845,7 +845,7 @@ Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback,
 
 Handle ServerConnection::getEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -857,7 +857,10 @@ Handle ServerConnection::getEngineAnalyticsSettings(
             [callback = std::move(callback)](
                 bool success, Handle requestId, const QnJsonRestResult& result)
             {
-                callback(success, requestId, result.deserialized<QJsonObject>());
+                callback(
+                    success,
+                    requestId,
+                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
             }),
         targetThread);
 }
@@ -865,7 +868,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+    std::function<void(bool, Handle, const nx::vms::api::analytics::SettingsResponse&)>&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -878,7 +881,10 @@ Handle ServerConnection::setEngineAnalyticsSettings(
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {
-            callback(success, requestId, result.deserialized<QJsonObject>());
+            callback(
+                success,
+                requestId,
+                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
         },
         targetThread);
 }
