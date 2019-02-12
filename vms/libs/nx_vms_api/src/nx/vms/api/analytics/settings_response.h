@@ -16,4 +16,4 @@ struct SettingsResponse
 
 QN_FUSION_DECLARE_FUNCTIONS(SettingsResponse, (json)(eq), NX_VMS_API)
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::api::analytics
