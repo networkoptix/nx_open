@@ -5,6 +5,8 @@
 #include <string>
 #include <optional>
 
+#include <QString>
+
 namespace nx::sql { class QueryContext; }
 
 namespace nx::clusterdb::map::dao {
@@ -12,6 +14,8 @@ namespace nx::clusterdb::map::dao {
 class NX_KEY_VALUE_DB_API KeyValueDao
 {
 public:
+    KeyValueDao(const std::string& systemId);
+
     void insertOrUpdate(
         nx::sql::QueryContext* queryContext,
         const std::string& key,
@@ -27,6 +31,22 @@ public:
 
     std::map<std::string, std::string> getPairs(
         nx::sql::QueryContext* queryContext);
+
+    std::optional<std::string> lowerBound(
+        nx::sql::QueryContext* queryContext,
+        const std::string& key);
+
+    std::optional<std::string> upperBound(
+        nx::sql::QueryContext* queryContext,
+        const std::string& key);
+
+    std::map<std::string, std::string> getRange(
+        nx::sql::QueryContext* queryContext,
+        const std::string& lowerBoundKey,
+        const std::string& upperBoundKey);
+
+private:
+    QString m_systemId;
 };
 
 } // namespace nx::clusterdb::map::dao

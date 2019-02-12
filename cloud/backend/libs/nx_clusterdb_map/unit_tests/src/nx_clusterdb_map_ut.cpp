@@ -51,15 +51,16 @@ protected:
 
     void givenDbWithTwoKnownKeyValuePairs()
     {
-        givenOneNode();
-        givenKnownKeyValuePair();
-        givenSecondKnownKeyValuePair();
+        addNodes(1);
+        generateAndInsertKeyValuePairs(2);
+        //db contains {(A,A), (B,B)}
+    }
 
-        whenInsertKeyValuePair();
-        thenOperationSucceeded();
-
-        whenInsertSecondKeyValuePair();
-        thenOperationSucceeded();
+    void givenDbWithFourKnownKeyValuePairs()
+    {
+        addNodes(1);
+        generateAndInsertKeyValuePairs(4);
+        //db contains {(A,A), (B,B), (C,C), (D,D)}
     }
 
     void givenTwoSynchronizedNodesWithRandomKeyValuePair()
@@ -101,16 +102,16 @@ protected:
         keyValuePair(1)->value = "C";
     }
 
-    void givenNewLowerLexicographicKeyValuePair()
+    void givenNewLowerLexicographicKeyValuePair(size_t keyValuePairIndex = 2)
     {
-        keyValuePair(2)->key = "A";
-        keyValuePair(2)->value = "A";
+        keyValuePair(keyValuePairIndex)->key = "A";
+        keyValuePair(keyValuePairIndex)->value = "A";
     }
 
-    void givenNewHigherLexicographicKeyValuePair()
+    void givenNewHigherLexicographicKeyValuePair(size_t keyValuePairIndex = 2)
     {
-        keyValuePair(2)->key = "D";
-        keyValuePair(2)->value = "D";
+        keyValuePair(keyValuePairIndex)->key = "D";
+        keyValuePair(keyValuePairIndex)->value = "D";
     }
 
     void givenTwoKeyValuePairsWithSameKey()
@@ -241,12 +242,12 @@ protected:
         db()->eventProvider().unsubscribeFromRecordRemoved(m_eventSubscriptionId);
     }
 
-    void whenRequestLowerBoundForFirstKey()
+    void whenRequestLowerBoundForLowestKey()
     {
         whenRequestLowerBoundForKey();
     }
 
-    void whenRequestLowerBoundForSecondKey()
+    void whenRequestLowerBoundForHighestKey()
     {
         whenRequestLowerBoundForKey(/*keyValuePairIndex*/ 1);
     }
@@ -256,7 +257,7 @@ protected:
         whenRequestLowerBoundForKey(/*keyValuePairIndex*/ 2);
     }
 
-    void whenRequestUpperBoundForFirstKey()
+    void whenRequestUpperBoundForLowestKey()
     {
         whenRequestUpperBoundForKey();
     }
@@ -264,6 +265,11 @@ protected:
     void whenRequestUpperBoundForHighestKey()
     {
         whenRequestUpperBoundForKey(/*keyValuePairIndex*/ 1);
+    }
+
+    void whenRequestRange()
+    {
+        whenRequestRange(0, m_keyValuePairs.size() - 1);
     }
 
     void thenOperationSucceeded()
@@ -293,6 +299,17 @@ protected:
         ASSERT_EQ(keyValuePair(keyValuePairIndex)->value, m_fetchedValue);
     }
 
+    void andFetchedRangeMatchesExpectedRange()
+    {
+        //db contains {(A,A), (B,B), (C,C), (D,D)}
+
+        // getRange(A, D) should return {(A,A), (B,B), (C,C)}
+        auto expectedRange = keyValuePairsAsMap();
+        expectedRange.erase("D");
+
+        ASSERT_EQ(m_fetchedRange, expectedRange);
+    }
+
     void andFetchedValueIsEmpty()
     {
         ASSERT_TRUE(m_fetchedValue.empty());
@@ -305,7 +322,7 @@ protected:
 
     void thenLowerBoundMatchesSecondKey()
     {
-        thenLowerBoundMatchesKey(/*ranomdPairIndex*/ 1);
+        thenLowerBoundMatchesKey(/*keyValuePairIndex*/ 1);
     }
 
     void thenUpperBoundMatchesKey(size_t keyValuePairIndex = 0)
@@ -320,15 +337,15 @@ protected:
 
     void thenUpperBoundMatchesSecondKey()
     {
-        thenUpperBoundMatchesKey(/*ranomnPairIndex*/ 1);
+        thenUpperBoundMatchesKey(/*keyValuePairIndex*/ 1);
     }
 
-    void andValueIsInDb(size_t dbIndex = 0)
+    void andValueIsInDb(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
         m_fetchedValue.clear();
-        whenFetchValue(dbIndex);
+        whenFetchValue(dbIndex, keyValuePairIndex);
         thenOperationSucceeded();
-        andFetchedValueMatchesGivenValue();
+        andFetchedValueMatchesGivenValue(keyValuePairIndex);
     }
 
     void andValueIsInSecondDb()
@@ -387,6 +404,22 @@ protected:
     }
 
 private:
+    void generateAndInsertKeyValuePairs(size_t keyValuePairCount)
+    {
+        char letter = 'A';
+        for (size_t keyValuePairIndex = 0; keyValuePairIndex < keyValuePairCount; ++keyValuePairIndex, ++letter)
+        {
+            std::string letterStr(1, letter);
+            keyValuePair(keyValuePairIndex)->key = letterStr;
+            keyValuePair(keyValuePairIndex)->value = letterStr;
+
+            whenInsertKeyValuePair(/*dbIndex*/ 0, keyValuePairIndex);
+
+            thenOperationSucceeded();
+            andValueIsInDb(/*dbIndex*/ 0, keyValuePairIndex);
+        }
+    }
+
     nx::utils::Url nodeUrl(Node* node)
     {
         using namespace nx::clusterdb::engine;
@@ -442,12 +475,12 @@ private:
 
     KeyValuePair* keyValuePair(size_t index = 0)
     {
-        NX_ASSERT(0 <= (int)index && index <= m_randomPairs.size());
+        NX_ASSERT(0 <= (int)index && index <= m_keyValuePairs.size());
 
-        if (index == m_randomPairs.size())
-            m_randomPairs.emplace_back(KeyValuePair());
+        if (index == m_keyValuePairs.size())
+            m_keyValuePairs.emplace_back(KeyValuePair());
 
-        return &m_randomPairs[index];
+        return &m_keyValuePairs[index];
     }
 
 
@@ -456,11 +489,11 @@ private:
         db()->dataManager().lowerBound(
             keyValuePair(keyValuePairIndex)->key,
             [this](map::ResultCode result, std::string key)
-        {
-            m_result = result;
-            m_lowerBound = key;
-            callbackFired();
-        });
+            {
+                m_result = result;
+                m_lowerBound = key;
+                callbackFired();
+            });
 
         waitForCallback();
     }
@@ -470,11 +503,26 @@ private:
         db()->dataManager().upperBound(
             keyValuePair(keyValuePairIndex)->key,
             [this](map::ResultCode result, std::string key)
-        {
-            m_result = result;
-            m_upperBound = key;
-            callbackFired();
-        });
+            {
+                m_result = result;
+                m_upperBound = key;
+                callbackFired();
+            });
+
+        waitForCallback();
+    }
+
+    void whenRequestRange(size_t lowerBoundIndex, size_t upperBoundIndex)
+    {
+        db()->dataManager().getRange(
+            keyValuePair(/*keyValuePairIndex*/ lowerBoundIndex)->key,
+            keyValuePair(/*keyValuePairIndex*/ upperBoundIndex)->key,
+            [this](ResultCode result, std::map<std::string, std::string> keyValuePairs)
+            {
+                m_result = result;
+                m_fetchedRange = keyValuePairs;
+                callbackFired();
+            });
 
         waitForCallback();
     }
@@ -484,13 +532,21 @@ private:
         ASSERT_EQ(m_lowerBound, keyValuePair(keyValuePairIndex)->key);
     }
 
+    std::map<std::string, std::string> keyValuePairsAsMap()
+    {
+    std::map<std::string, std::string> pairs;
+    for (const auto& pair : m_keyValuePairs)
+        pairs.emplace(pair.key, pair.value);
+    return pairs;
+}
 
 private:
     std::vector<std::unique_ptr<NodeLauncher>> m_nodes;
 
-    std::vector<KeyValuePair> m_randomPairs;
+    std::vector<KeyValuePair> m_keyValuePairs;
     map::ResultCode m_result;
     std::string m_fetchedValue;
+    std::map<std::string, std::string> m_fetchedRange;
 
     std::mutex m_mutex;
     std::condition_variable m_wait;
@@ -646,13 +702,13 @@ TEST_F(Database, provides_lowerbound)
 {
     givenDbWithTwoKnownKeyValuePairs();
 
-    whenRequestLowerBoundForFirstKey();
+    whenRequestLowerBoundForLowestKey();
 
     thenOperationSucceeded();
     thenLowerBoundMatchesFirstKey();
 
 
-    whenRequestLowerBoundForSecondKey();
+    whenRequestLowerBoundForHighestKey();
 
     thenOperationSucceeded();
     thenLowerBoundMatchesSecondKey();
@@ -662,7 +718,7 @@ TEST_F(Database, provides_upperbound)
 {
     givenDbWithTwoKnownKeyValuePairs();
 
-    whenRequestUpperBoundForFirstKey();
+    whenRequestUpperBoundForLowestKey();
 
     thenOperationSucceeded();
     thenUpperBoundMatchesSecondKey();
@@ -673,7 +729,7 @@ TEST_F(Database, rejects_lowerbound_request_with_empty_key)
     givenOneNode();
     givenKeyValuePairWithEmptyKey();
 
-    whenRequestLowerBoundForFirstKey();
+    whenRequestLowerBoundForLowestKey();
 
     thenOperationFailed(map::ResultCode::logicError);
 }
@@ -683,7 +739,7 @@ TEST_F(Database, rejects_upperbound_request_with_empty_key)
     givenOneNode();
     givenKeyValuePairWithEmptyKey();
 
-    whenRequestLowerBoundForFirstKey();
+    whenRequestLowerBoundForLowestKey();
 
     thenOperationFailed(map::ResultCode::logicError);
 }
@@ -717,6 +773,16 @@ TEST_F(Database, fails_to_provide_upperbound_for_highest_key_in_db)
     thenOperationFailed(map::ResultCode::notFound);
 }
 
+TEST_F(Database, provides_range)
+{
+    givenDbWithFourKnownKeyValuePairs();
+
+    whenRequestRange();
+
+    thenOperationSucceeded();
+    andFetchedRangeMatchesExpectedRange();
+}
+
 TEST_F(Database, multiple_nodes_synchronize_insert_operation)
 {
     givenTwoNodes();
@@ -734,8 +800,8 @@ TEST_F(Database, multiple_nodes_synchronize_remove_operation)
     givenTwoSynchronizedNodesWithRandomKeyValuePair();
 
     whenRemoveKey();
-    thenOperationSucceeded();
 
+    thenOperationSucceeded();
     andValueIsNotInDb();
     andValueIsNotInSecondDb();
 }

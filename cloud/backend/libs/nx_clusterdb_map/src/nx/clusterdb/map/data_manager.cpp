@@ -39,15 +39,13 @@ DataManager::DataManager(
     m_syncEngine(syncronizationEngine),
     m_queryExecutor(queryExecutor),
     m_systemId(systemId),
-    m_eventProvider(eventProvider)
+    m_eventProvider(eventProvider),
+    m_keyValueDao(systemId)
 {
-    QnMutexLocker lock(&m_mutex);
-
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(
             [this](auto&&... args)
             {
-                QnMutexLocker lock(&m_mutex);
                 insertOrUpdateReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
             });
@@ -56,7 +54,6 @@ DataManager::DataManager(
         .registerCommandHandler<command::RemoveKeyValuePair>(
             [this](auto&&... args)
             {
-                QnMutexLocker lock(&m_mutex);
                 removeReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
             });
@@ -64,8 +61,6 @@ DataManager::DataManager(
 
 DataManager::~DataManager()
 {
-    QnMutexLocker lock(&m_mutex);
-
     m_syncEngine->incomingCommandDispatcher()
         .removeHandler<command::SaveKeyValuePair>();
 
@@ -78,8 +73,6 @@ void DataManager::insertOrUpdate(
     const std::string& value,
     UpdateCompletionHandler completionHandler)
 {
-    QnMutexLocker lock(&m_mutex);
-
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
@@ -101,8 +94,6 @@ void DataManager::remove(
     const std::string& key,
     UpdateCompletionHandler completionHandler)
 {
-    QnMutexLocker lock(&m_mutex);
-
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
@@ -124,8 +115,6 @@ void DataManager::get(
     const std::string& key,
     LookupCompletionHandler completionHandler)
 {
-    QnMutexLocker lock(&m_mutex);
-
     if (key.empty())
         return completionHandler(ResultCode::logicError, std::string());
 
@@ -156,8 +145,6 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
     if (key.empty())
         return completionHandler(ResultCode::logicError, std::string());
 
-    QnMutexLocker lock(&m_mutex);
-
     auto sharedKey = std::make_shared<std::optional<std::string>>();
 
     m_queryExecutor->executeSelect(
@@ -181,8 +168,6 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
 {
     if (key.empty())
         return completionHandler(ResultCode::logicError, std::string());
-
-    QnMutexLocker lock(&m_mutex);
 
     auto sharedKey = std::make_shared<std::optional<std::string>>();
 
@@ -210,8 +195,6 @@ void DataManager::getRange(
 {
     if (keyLowerBound > keyUpperBound)
         return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
-
-    QnMutexLocker lock(&m_mutex);
 
     auto sharedPairs = std::make_shared<std::map<std::string, std::string>>();
 
@@ -256,9 +239,7 @@ std::optional<std::string> DataManager::getLowerBoundFromDb(
     nx::sql::QueryContext * queryContext,
     const std::string& key)
 {
-    auto pairs = m_keyValueDao.getPairs(queryContext);
-    auto it = pairs.lower_bound(key);
-    return it != pairs.end() ? std::optional(std::move(it->first)) : std::nullopt;
+    return m_keyValueDao.lowerBound(queryContext, key);
 }
 
 
@@ -266,9 +247,7 @@ std::optional<std::string> DataManager::getUpperBoundFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key)
 {
-    auto pairs = m_keyValueDao.getPairs(queryContext);
-    auto it = pairs.upper_bound(key);
-    return it != pairs.end() ? std::optional(std::move(it->first)) : std::nullopt;
+    return m_keyValueDao.upperBound(queryContext, key);
 }
 
 std::map<std::string, std::string> DataManager::getRangeFromDb(
@@ -276,12 +255,7 @@ std::map<std::string, std::string> DataManager::getRangeFromDb(
     const std::string& keyLowerBound,
     const std::string& keyUpperBound)
 {
-    auto pairs = m_keyValueDao.getPairs(queryContext);
-
-    auto itLower = pairs.lower_bound(keyLowerBound);
-    auto itUpper = pairs.upper_bound(keyUpperBound);
-
-    return std::map(itLower, itUpper);
+    return m_keyValueDao.getRange(queryContext, keyLowerBound, keyUpperBound);
 }
 
 void DataManager::removeFromDb(

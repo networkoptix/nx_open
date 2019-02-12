@@ -19,7 +19,7 @@ Database::Database(
     :
     m_systemId(kSystemId),
     m_syncEngine(syncEngine),
-    m_structureUpdater(dbManager),
+    m_structureUpdater(dbManager, kSystemId),
     m_dataManager(m_syncEngine, dbManager, kSystemId, &m_eventProvider)
 {
 }

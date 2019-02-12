@@ -11,7 +11,9 @@ public:
      * Structure update is done in constructor.
      * NOTE: Throws on error.
      */
-    StructureUpdater(nx::sql::AbstractAsyncSqlQueryExecutor* dbManager);
+    StructureUpdater(
+        nx::sql::AbstractAsyncSqlQueryExecutor* dbManager,
+        const std::string& systemId);
 
 private:
     nx::sql::DbStructureUpdater m_updater;
