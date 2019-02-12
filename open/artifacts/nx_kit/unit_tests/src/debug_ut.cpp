@@ -82,7 +82,8 @@ TEST(debug, overrideStreamPreproc)
 
 TEST(debug, assertSuccess)
 {
-    bool trueCondition = true;
+    static const bool trueCondition = true;
+
     NX_KIT_ASSERT(trueCondition); //< Test NX_KIT_ASSERT() without message.
     NX_KIT_ASSERT(trueCondition,
         "This assertion with a message should not fail."); //< Test NX_KIT_ASSERT() with message.

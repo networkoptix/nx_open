@@ -64,12 +64,12 @@ NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
 
 #if !defined(NX_PRINT_PREFIX)
     /** Redefine if needed; used as the first item in NX_PRINT and NX_OUTPUT. */
-    #define NX_PRINT_PREFIX nx::kit::debug::detail::printPrefix(__FILE__)
+    #define NX_PRINT_PREFIX ::nx::kit::debug::detail::printPrefix(__FILE__)
 #endif
 
 #if !defined(NX_DEBUG_STREAM)
     /** Redefine if needed; used for all output by other macros. */
-    #define NX_DEBUG_STREAM *nx::kit::debug::stream()
+    #define NX_DEBUG_STREAM *::nx::kit::debug::stream()
 #endif
 
 #if !defined(NX_DEBUG_ENDL)
@@ -137,19 +137,19 @@ NX_KIT_API std::ostream*& stream();
 #define LL \
     NX_PRINT << "####### LL line " << __LINE__ \
         << NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        << ", file " << nx::kit::debug::relativeSrcFilename(__FILE__);
+        << ", file " << ::nx::kit::debug::relativeSrcFilename(__FILE__);
 
 /**
  * Prints the expression text and its value via toString().
  */
 #define NX_PRINT_VALUE(VALUE) \
-    NX_PRINT << "####### " #VALUE ": " << nx::kit::utils::toString((VALUE))
+    NX_PRINT << "####### " #VALUE ": " << ::nx::kit::utils::toString((VALUE))
 
 /**
  * Hex-dumps binary data using NX_PRINT.
  */
 #define NX_PRINT_HEX_DUMP(CAPTION, BYTES, SIZE) \
-    nx::kit::debug::detail::printHexDump( \
+    ::nx::kit::debug::detail::printHexDump( \
         NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (CAPTION), (const char*) (BYTES), (int) (SIZE))
 
 //-------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ NX_KIT_API std::ostream*& stream();
  * Starts measuring time - saves current time in a variable; does nothing if !NX_DEBUG_ENABLE_TIME.
  */
 #define NX_TIME_BEGIN(TAG) \
-    nx::kit::debug::detail::Timer nxTimer_##TAG( \
+    ::nx::kit::debug::detail::Timer nxTimer_##TAG( \
         (NX_DEBUG_ENABLE_TIME), NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #TAG)
 
 /**
@@ -202,7 +202,7 @@ NX_KIT_API std::ostream*& stream();
 { \
     if (NX_KIT_DEBUG_DETAIL_CONCAT(NX_DEBUG_ENABLE_FPS, TAG)) \
     { \
-        static nx::kit::debug::detail::Fps fps( \
+        static ::nx::kit::debug::detail::Fps fps( \
             NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #TAG); \
         fps.mark(__VA_ARGS__); \
     } \
@@ -212,6 +212,10 @@ NX_KIT_API std::ostream*& stream();
 // Implementation
 
 namespace detail {
+
+typedef std::function<void(const char*)> PrintFunc;
+
+#define NX_KIT_DEBUG_DETAIL_PRINT_FUNC ([&](const char* message) { NX_PRINT << message; })
 
 /**
  * Needed as a workaround for an MSVC issue: if __VA_ARGS__ is used as an argument to another
@@ -223,30 +227,31 @@ namespace detail {
 #define NX_KIT_DEBUG_DETAIL_GET_3RD_ARG(ARG1, ARG2, ARG3, ...) ARG3
 
 #define NX_KIT_DEBUG_DETAIL_ASSERT1(CONDITION) \
-    NX_KIT_DEBUG_DETAIL_ASSERT(CONDITION, "")
+    ::nx::kit::debug::detail::doAssert( \
+        CONDITION, NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, "", __FILE__, __LINE__)
 
 #define NX_KIT_DEBUG_DETAIL_ASSERT2(CONDITION, MESSAGE) \
-    NX_KIT_DEBUG_DETAIL_ASSERT(CONDITION, MESSAGE)
+    ::nx::kit::debug::detail::doAssert( \
+        CONDITION, NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, MESSAGE, __FILE__, __LINE__)
 
-#define NX_KIT_DEBUG_DETAIL_ASSERT(CONDITION, MESSAGE) ( \
-    (CONDITION) || nx::kit::debug::detail::assertionFailed( \
-        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, MESSAGE, __FILE__, __LINE__) \
-)
+NX_KIT_API void assertionFailed(
+    PrintFunc printFunc, const char* conditionStr, const std::string& message,
+    const char* file, int line);
+
+inline bool doAssert(
+    bool condition, PrintFunc printFunc, const char* conditionStr, const std::string& message,
+    const char* file, int line)
+{
+    if (!condition)
+        assertionFailed(printFunc, conditionStr, message, file, line);
+    return condition;
+}
 
 #define NX_KIT_DEBUG_DETAIL_CONCAT(X, Y) NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y)
 #define NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y) X##Y
 
-typedef std::function<void(const char*)> PrintFunc;
-
-#define NX_KIT_DEBUG_DETAIL_PRINT_FUNC ([&](const char* message) { NX_PRINT << message; })
-
 /** @param file Supply __FILE__. */
 NX_KIT_API std::string printPrefix(const char* file);
-
-/** @return Always false. */
-NX_KIT_API bool assertionFailed(
-    PrintFunc printFunc, const char* conditionStr, const std::string& message,
-    const char* file, int line);
 
 class NX_KIT_API Timer
 {
@@ -285,11 +290,11 @@ NX_KIT_API void printHexDump(
 #if defined(__linux__)
     #include <pthread.h>
     #define NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        nx::kit::utils::format(", thread %llx", (long long) pthread_self())
+        ::nx::kit::utils::format(", thread %llx", (long long) pthread_self())
 #elif defined(QT_CORE_LIB)
     #include <QtCore/QThread>
     #define NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        nx::kit::utils::format(", thread %llx", (long long) QThread::currentThreadId())
+        ::nx::kit::utils::format(", thread %llx", (long long) QThread::currentThreadId())
 #else
     // No threading libs available - do not print thread id.
     #define NX_KIT_DEBUG_DETAIL_THREAD_ID() ""

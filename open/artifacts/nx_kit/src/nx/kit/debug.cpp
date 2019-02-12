@@ -103,7 +103,7 @@ std::string printPrefix(const char* file)
 
 namespace detail {
 
-bool assertionFailed(
+void assertionFailed(
     PrintFunc printFunc, const char* conditionStr, const std::string& message,
     const char* file, int line)
 {
@@ -123,8 +123,6 @@ bool assertionFailed(
         // Crash the process to let a dump/core be generated.
         *reinterpret_cast<volatile int*>(0) = 0;
     #endif
-
-    return false;
 }
 
 } // namespace detail

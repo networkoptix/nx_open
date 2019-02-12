@@ -24,41 +24,41 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
 #define TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
     int unused_##TEST_CASE##_##TEST_NAME /* Not `static const` to suppress "unused" warning. */ = \
-        nx::kit::test::detail::regTest( \
+        ::nx::kit::test::detail::regTest( \
             {#TEST_CASE, #TEST_NAME, #TEST_CASE "." #TEST_NAME, test_##TEST_CASE##_##TEST_NAME, \
                 /*tempDir*/ ""}); \
     static void test_##TEST_CASE##_##TEST_NAME()
     // Function body follows the TEST macro.
 
 #define ASSERT_TRUE(CONDITION) \
-    nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, __LINE__)
+    ::nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, __LINE__)
 
 #define ASSERT_TRUE_AT_LINE(LINE, CONDITION) \
-    nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, (LINE))
+    ::nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, (LINE))
 
 #define ASSERT_FALSE(CONDITION) \
-    nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, __LINE__)
+    ::nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, __LINE__)
 
 #define ASSERT_FALSE_AT_LINE(LINE, CONDITION) \
-    nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, (LINE))
+    ::nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, (LINE))
 
 #define ASSERT_EQ(EXPECTED, ACTUAL) \
-    nx::kit::test::detail::assertEq( \
+    ::nx::kit::test::detail::assertEq( \
         (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, __LINE__)
 
 #define ASSERT_EQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
-    nx::kit::test::detail::assertEq( \
+    ::nx::kit::test::detail::assertEq( \
         (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, (LINE))
 
 #define ASSERT_STREQ(EXPECTED, ACTUAL) \
-    nx::kit::test::detail::assertStrEq( \
-        nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
-        nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, __LINE__)
+    ::nx::kit::test::detail::assertStrEq( \
+        ::nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
+        ::nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, __LINE__)
 
 #define ASSERT_STREQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
-    nx::kit::test::detail::assertStrEq( \
-        nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
-        nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, (LINE))
+    ::nx::kit::test::detail::assertStrEq( \
+        ::nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
+        ::nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, (LINE))
 
 /**
  * Should be called for regular tests, from the TEST() body.
