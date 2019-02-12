@@ -17,11 +17,9 @@ public:
         PluginIdRole = Qt::UserRole + 1
     };
 
-    PluginEventModel(QObject* parent = nullptr);
-    virtual ~PluginEventModel() override;
+    using QStandardItemModel::QStandardItemModel;
 
     void buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines);
-
     bool isValid() const;
 };
 
