@@ -30,8 +30,7 @@ ARG REVISION
 ARG BUILD_DATE
 ARG BUILD_HOST
 ARG BUILD_USER
-LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
-      version="$VERSION" \
+LABEL version="$VERSION" \
       revision="$REVISION" \
       build-date="$BUILD_DATE" \
       build-host="$BUILD_HOST" \

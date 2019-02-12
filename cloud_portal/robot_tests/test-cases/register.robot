@@ -4,6 +4,7 @@ Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
+Force Tags        Threaded
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -160,6 +161,7 @@ should respond to Tab key
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
     Press Key    ${CREATE ACCOUNT BUTTON}    ${ENTER}
+    Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD IS REQUIRED}
 
 should open Terms and conditions in a new page
@@ -179,7 +181,7 @@ should open Privacy Policy in a new page
     Click Link    ${PRIVACY POLICY LINK}
     Sleep    2    #This is specifically for Firefox
     ${windows}    Get Window Handles
-    Select Window    @{windows}[2]
+    Select Window    @{windows}[1]
     Location Should Be    ${PRIVACY POLICY URL}
 
 should suggest user to log out, if he was logged in and goes to registration link

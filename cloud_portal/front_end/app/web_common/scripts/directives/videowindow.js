@@ -26,8 +26,8 @@ import * as Hls from 'hls.js';
     var flashPlayer = '';
     
     angular.module('nxCommon')
-        .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'configService',
-            function ($interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, configService) {
+        .directive('videowindow', ['$rootScope', '$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'configService',
+            function ($rootScope, $interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, configService) {
                 
                 const CONFIG = configService.config;
                 
@@ -76,17 +76,6 @@ import * as Hls from 'hls.js';
                         }
                         
                         function detectBestFormat() {
-                            // Set iOS
-                            if ($window.jscd.os === 'iOS') {
-                                return 'native-hls'; // jshls have problems with iOS
-                            }
-    
-                            // Set Android
-                            if ($window.jscd.os === 'Android') {
-                                return 'jshls';
-                            }
-                            
-                            // ELSE
                             // 1. Hide all informers
                             scope.videoFlags = {
                                 flashRequired: false,
@@ -176,18 +165,24 @@ import * as Hls from 'hls.js';
                                 case 'Opera':
                                 case 'Webkit':
                                 default:
-                                    if (jsHlsSupported && weHaveHls) {
-                                        return 'jshls';// We are hoping that we have some good browser
+                                    if (weHaveHls) {
+                                        if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
+                                            return 'native-hls';
+                                        }
+                                        if (jsHlsSupported) {
+                                            return 'jshls';// We are hoping that we have some good browser
+                                        }
+                                        if ($window.jscd.flashVersion) { // We have flash - try to play using flash
+                                            return 'flashls';
+                                        }
+                                        if ($window.jscd.os === 'Linux') {
+                                            scope.videoFlags.ubuntuNX = true;
+                                            return false;
+                                        }
                                     }
-                                    if ($window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
-                                        return 'flashls';
-                                    }
+                                    
                                     if (weHaveWebm && canPlayNatively('webm')) {
                                         return 'webm';
-                                    }
-                                    if (weHaveHls && $window.jscd.os === 'Linux') {
-                                        scope.videoFlags.ubuntuNX = true;
-                                        return false;
                                     }
                             }
                             
@@ -278,7 +273,7 @@ import * as Hls from 'hls.js';
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 
-                                scope.vgApi.addEventListener('canplaythrough', function () {
+                                scope.vgApi.addEventListener('loadeddata', function () {
                                     scope.loading = false;  // Video is ready - disable loading
                                     scope.playerHandler();
                                 });
@@ -286,6 +281,14 @@ import * as Hls from 'hls.js';
                                 scope.vgApi.addEventListener('timeupdate', function (event) {
                                     var video = event.srcElement || event.originalTarget;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                });
+    
+                                scope.vgApi.addEventListener('playing', function (event) {
+                                    // I experienced a missing event "loadeddata" (WebM?)
+                                    // this is to continue playing -- TT
+                                    scope.loading = false;
+        
+                                    $rootScope.$emit('nx.player.playing');
                                 });
                                 
                                 scope.vgApi.addEventListener('ended', function (event) {
@@ -312,6 +315,7 @@ import * as Hls from 'hls.js';
                                         scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
                                         
                                         scope.vgApi.addEventListener('timeupdate', function (event) {
+                                            scope.loading = false;
                                             var video = event.srcElement || event.originalTarget;
                                             scope.vgUpdateTime({
                                                 $currentTime: video.currentTime,
@@ -319,14 +323,22 @@ import * as Hls from 'hls.js';
                                             });
                                         });
                                         
-                                        scope.vgApi.addEventListener('canplaythrough', function (event) {
-                                            $timeout(() => scope.loading = false ); // Video is playing - disable loading
+                                        scope.vgApi.addEventListener('loadeddata', function (event) {
+                                            scope.loading = false; // Video is playing - disable loading
                                             scope.playerHandler();
                                             cancelTimeoutNativeLoad();
                                         });
+    
+                                        scope.vgApi.addEventListener('playing', function (event) {
+                                            // I experienced a missing event "loadeddata" (WebM?)
+                                            // this is to continue playing -- TT
+                                            scope.loading = false;
+                                            
+                                            $rootScope.$emit('nx.player.playing');
+                                        });
                                         
                                         scope.vgApi.addEventListener('waiting', function (event) {
-                                            $timeout(() => scope.loading = true );
+                                            scope.loading = true;
                                         });
                                         
                                         scope.vgApi.addEventListener('ended', function (event) {
@@ -437,6 +449,7 @@ import * as Hls from 'hls.js';
                             if (makingPlayer) {
                                 return;
                             }
+                            
                             makingPlayer = true;
                             switch (scope.player) {
                                 case 'flashls':

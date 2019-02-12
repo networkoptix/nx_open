@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
     "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
     "thisSystem": "시스템",
-    "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다."
+    "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
     "good": "좋음",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "삭제",
     "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "successMerge": "시스템 {{systemName}} 이 {{systemName}} 과 병합되었습니다.",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
   "account": {

@@ -277,6 +277,30 @@
         ]
       },
       {
+        "name": "ARM support policy page",
+        "file_path": "static/lang_{{language}}/views/static/arm.html",
+        "url": "/content/arm",
+        "translatable": true,
+        "values":[
+          {
+            "label": "Arm Support Page Policy Title",
+            "name": "%TITLE%",
+            "value": "ARM Support Policy",
+            "description": "Title for the ARM support policy page",
+            "type": "text",
+            "advanced": true
+          },
+          {
+            "label": "ARM Support Policy Page Content",
+            "name": "%CONTENT%",
+            "value": "",
+            "description": "Content for ARM support policy page",
+            "type": "html",
+            "advanced": true
+          }
+        ]
+      },
+      {
         "name": "Privacy policy page",
         "description":"Embedded privacy policy page",
         "file_path": "static/lang_{{language}}/views/static/privacy.html",

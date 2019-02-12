@@ -137,7 +137,9 @@
     "cantOpenClient": "%VMS_NAME% יישום לא אותר. <a href=\"/download\"> הורדה</a>",
     "lostConnection": "החיבור ל- {{systemName}} אבד",
     "thisSystem": "המערכת",
-    "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות"
+    "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות",
+    "DUPLICATE_MEDIASERVER_FOUND": "שרתים כפולים נמצאו באחת המערכות.<br>הסר שרתים ישנים מכל מערכת שאתה מנסה למזג ונסה שוב.",
+    "mergedSystemIsOffline": "אחת המערכות הממוזגות אינה מקוונת. ודא שהן מקוונות ונסה שוב."
   },
   "passwordRequirements": {
     "good": "טוב",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "מחיקה",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
-    "successMerge": "המערכת {{systemName}} מוזגה עם {{systemName}}",
+    "successMerge": "מיזוג המערכת הושלם",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
   },
   "account": {

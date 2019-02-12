@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('animateScope', ['$q',function ($q) {
-
+    .factory('animateScope', ['$timeout', '$q', 'configService' ,function ($timeout, $q, configService) {
+    
+        const CONFIG = configService.config;
+        
         var animations = [];
 
         var updationLimit = null;// Limit animations to stop process at some point
@@ -128,8 +130,8 @@ angular.module('nxCommon')
             var finished = [];
 
             var scopes = [];
-
-            _.forEach(animations,function(animation){
+    
+            animations.forEach(function(animation){
                 animation.update();
                 if(scopes.indexOf(animation.scope)<0 && animation.scope !== defaultScope) {
                     scopes.push(animation.scope);
@@ -138,23 +140,27 @@ angular.module('nxCommon')
                     finished.push(animation);
                 }
             });
-
-            _.forEach(finished,function(animation){ // Remove all finished animations
+    
+            finished.forEach(function(animation){ // Remove all finished animations
                 animations.splice(animations.indexOf(animation),1);
             });
 
-            _.forEach(scopes,function(scope){
+            scopes.forEach(function(scope){
                 scope.$apply();
             });
         }
+        
         function animationFunction(digestContext){
             if(!animationRunning) {
                 return;
             }
+    
+            
             process();
-            if(typeof(animationHandler)!=='undefined' && animationHandler !== null && animationHandler !== false) {
+            if (typeof (animationHandler) !== 'undefined' && animationHandler !== null && animationHandler !== false) {
                 animationHandler();
             }
+            
             /*if(defaultScope.$root.$$phase && !digestContext ){
                 console.error('wrong phase',defaultScope.$root.$$phase);
             }
@@ -162,10 +168,14 @@ angular.module('nxCommon')
                 defaultScope.$apply();
             }*/
             if(updationLimit!==0) {
-                window.animationFrame(animationFunction);
-                if(updationLimit) {
-                    updationLimit--;
-                }
+                // Offset self call soplayer will have time to process video
+                // Safari is the problem ... also mobile devices will be more responsive -- TT
+                setTimeout(function () {
+                    window.animationFrame(animationFunction);
+                    if (updationLimit) {
+                        updationLimit--;
+                    }
+                });
             }
         }
         return {
@@ -187,7 +197,6 @@ angular.module('nxCommon')
                 return targetAnimation || false;
             },
             animate:function(scope,value,target,dependency,duration){
-
                 if(typeof(duration) === 'undefined')
                 {
                     duration = defaultDuration;
@@ -202,6 +211,7 @@ angular.module('nxCommon')
                 }
                 var animation = new Animation(scope,value,target,duration,dependency);
                 animations.push(animation);
+                
                 return animation.deferred.promise;
             },
             progress:function(scope,value,dependency,duration){ // Animate progress from 0 to 1
@@ -221,7 +231,7 @@ angular.module('nxCommon')
                 });
                 if(targetAnimation){
                     targetAnimation.breakAnimation();
-                } 
+                }
             },
             stopHandler:function(handler){
                 if(animationHandler === handler){

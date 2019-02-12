@@ -58,6 +58,7 @@ can still log in if you don't finish the process
     Validate Log In
 
 should not allow to access /restore_password/sent /restore_password/success by direct input
+    [tags]    Threaded
     Close Browser
     Open Browser and go to URL    ${url}
     Go To    ${url}/restore_password/sent
@@ -107,7 +108,7 @@ should set new password, login with new password
     Validate Log In
 
 displays password masked, shows password and changes eye icon when clicked
-    [tags]    C26260
+    [tags]    C26260    Threaded
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -155,7 +156,7 @@ should not allow to use one restore link twice
     Check For Alert Dismissable    ${CANNOT SAVE PASSWORD} ${CODE USED/INCORRECT}
 
 should make not-activated user active by restoring password
-    [tags]    email    C41871
+    [tags]    email    C41871    Threaded
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -186,7 +187,7 @@ should allow logged in user visit restore password page
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
 
 should prompt log user out if he visits restore password link from email
-    [tags]    email
+    [tags]    email    Threaded
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -209,6 +210,7 @@ should prompt log user out if he visits restore password link from email
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
 
 should handle click I forgot my password link at restore password page
+    [tags]    Threaded
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
@@ -217,7 +219,7 @@ should handle click I forgot my password link at restore password page
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
 
 Check restore password email links, colors, cloud name, and open link in new tab
-    [tags]    C26260
+    [tags]    C26260    Threaded
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}

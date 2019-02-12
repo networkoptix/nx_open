@@ -47,8 +47,10 @@ Check Special Hint
     [arguments]    ${type}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
+    Set Suite Variable    ${dropdown type}    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
+    Run Keyword If    "${LANGUAGE}"=="nl_NL"    Set Suite Variable    ${dropdown type}    ${SHARE MODAL}//nx-permissions-select//li//span[text()="${type}"]
+    Wait Until Element Is Visible    ${dropdown type}
+    Click Link    ${dropdown type}/..
     ${type}    Convert To Uppercase    ${type}
     Run Keyword If    "${type}"=="${ADMIN TEXT}"          Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMINISTRATOR}
     ...    ELSE IF    "${type}"=="${ADV VIEWER TEXT}"     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADVANCED VIEWER}
@@ -70,7 +72,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Share button - opens dialog
-    [tags]    C41888
+    [tags]    C41888    Threaded
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -79,6 +81,7 @@ Share button - opens dialog
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 Sharing link /systems/{system_id}/share - opens dialog
+    [tags]    Threaded
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Go To    ${location}/share
@@ -87,6 +90,7 @@ Sharing link /systems/{system_id}/share - opens dialog
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 Sharing link for anonymous - first ask login, then show share dialog
+    [tags]    Threaded
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
     Log Out
@@ -97,7 +101,7 @@ Sharing link for anonymous - first ask login, then show share dialog
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 After closing dialog, called by link - clear link
-    [tags]    C41888
+    [tags]    C41888    Threaded
     Set Window Size    1920    1080
     Log in to Auto Tests System    ${email}
     ${location}    Get Location
@@ -118,6 +122,7 @@ After closing dialog, called by link - clear link
     Location Should Be    ${location}
 
 Sharing roles are ordered: more access is on top of the list with options
+    [tags]    Threaded
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -128,7 +133,7 @@ Sharing roles are ordered: more access is on top of the list with options
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 When user selects role - special hint appears
-    [tags]    C41901
+    [tags]    C41901    Threaded
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -157,7 +162,7 @@ displays pencil and cross links for each user only on hover
     Remove User Permissions    ${random email}
 
 admin cannot delete or edit self
-    [tags]    C41904
+    [tags]    C41904    Threaded
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
     Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
@@ -189,14 +194,14 @@ admin cannot delete or edit other admins
     Remove User Permissions    ${random email}
 
 admin cannot invite another admin
-    [tags]    C41905
+    [tags]    C41905    Threaded
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Sleep    2
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
-    Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT']
+    Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE CANCEL}
 
@@ -311,6 +316,7 @@ Check share email for registered user
     Remove User Permissions    ${EMAIL NOPERM}
 
 User with client custom settings has access to system
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL CLIENT CUSTOM}
     Location Should Be    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Verify In System    ${AUTO TESTS}

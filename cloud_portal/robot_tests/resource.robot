@@ -6,36 +6,35 @@ Library           NoptixLibrary/
 Resource          variables.robot
 Resource          ${variables_file}
 
+
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
-${docker}    false
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox
+${options}    true
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
-    ...          ELSE    Docker Open Browser    ${url}
+    run keyword if    "${options}"=="false"    Regular Open Browser    ${url}
+    ...          ELSE    Open Browser With Options
     Set Selenium Speed    0
-    Set Selenium Timeout    10
+    Set Selenium Timeout    20
     Check Language
     Go To    ${url}
 
 Regular Open Browser
-    [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
     Set Window Size    1920    1080
 
-Docker Open Browser
-    [Arguments]    ${url}
+Open Browser With Options
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     ${chrome_options}=    Set Chrome Options
     Create Webdriver    Chrome    chrome_options=${chrome_options}
-    Sleep    20
-    Go to    ${url}
+    Set Window Size    1920    1080
+    Go to    ${ENV}
 
 Set Chrome Options
     [Documentation]    Set Chrome options for headless mode
@@ -58,13 +57,14 @@ Set Language
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${lang}']    5
-    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
+    Sleep    5    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
+    Sleep    .5
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
     Wait Until Element Is Visible    ${LOG IN BUTTON}
@@ -89,6 +89,7 @@ Log Out
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
     Wait Until Page Contains Element    ${ANONYMOUS BODY}
+    Check Language
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -229,6 +230,9 @@ Verify In System
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
+    [timeout]    5 minutes
+    ${console}    Get Browser Log
+    Log    ${console}
     Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
 
 Wait Until Elements Are Visible

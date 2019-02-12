@@ -137,7 +137,9 @@
     "cantOpenClient": "Aplicação %VMS_NAME% não está sendo detectada. <a href=\"/download\">Descarregar</a>",
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
-    "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas"
+    "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
+    "DUPLICATE_MEDIASERVER_FOUND": "Servidores duplicados foram encontrados em um dos sistemas.<br> Remova servidores antigos de cada sistema que você está tentando mesclar e tente novamente.",
+    "mergedSystemIsOffline": "Um dos sistemas que estão sendo mesclados está offline. Verifique se estão online e tente novamente."
   },
   "passwordRequirements": {
     "good": "bom",
@@ -183,7 +185,7 @@
     "confirmUnshareAction": "Apagar",
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "successMerge": "Sistema {{systemName}} foi fundido com {{systemName}}",
+    "successMerge": "Mesclagem de sistema concluída",
     "permissionsRemoved": "As permissões foram removidas de {{email}}"
   },
   "account": {

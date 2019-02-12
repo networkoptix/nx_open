@@ -1,23 +1,23 @@
 {
     "en_US"    :    "EnglishUS",
     "en_GB"    :    "EnglishGB",
-    "ru_RU"    :    "Russian",
     "fr_FR"    :    "French",
+    "ru_RU"    :    "Russian",
+    "uk_UA"    :    "Ukranian",
     "de_DE"    :    "German",
     "es_ES"    :    "Spanish",
     "hu_HU"    :    "Hungarian",
     "zh_CN"    :    "Chinese",
     "zh_TW"    :    "Taiwanese",
     "ja_JP"    :    "Japanese",
-    "ko_KR"    :    "Korean",
     "tr_TR"    :    "Turkish",
     "th_TH"    :    "Thai",
     "nl_NL"    :    "Dutch",
     "he_IL"    :    "Hebrew",
     "pl_PL"    :    "Polish",
     "vi_VN"    :    "Vietnamese",
-    "it_IT"    :    "Italian",
-    "uk_UA"    :    "Ukranian",
     "cs_CZ"    :    "Czech",
-    "sv_SE"    :    "Sweedish"
+    "sv_SE"    :    "Sweedish",
+    "pt_PT"    :    "Protuguese",
+    "it_IT"    :    "Italian"
 }
