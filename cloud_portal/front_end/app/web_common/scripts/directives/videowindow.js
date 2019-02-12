@@ -26,8 +26,9 @@ import * as Hls from 'hls.js';
     var flashPlayer = '';
     
     angular.module('nxCommon')
-        .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'nxConfigService',
-            function ($interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, nxConfigService) {
+
+        .directive('videowindow', ['$rootScope', '$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'nxConfigService',
+            function ($rootScope, $interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, nxConfigService) {
                 
                 const CONFIG = nxConfigService.getConfig();
                 
@@ -273,7 +274,7 @@ import * as Hls from 'hls.js';
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 
-                                scope.vgApi.addEventListener('canplaythrough', function () {
+                                scope.vgApi.addEventListener('loadeddata', function () {
                                     scope.loading = false;  // Video is ready - disable loading
                                     scope.playerHandler();
                                 });
@@ -281,6 +282,14 @@ import * as Hls from 'hls.js';
                                 scope.vgApi.addEventListener('timeupdate', function (event) {
                                     var video = event.srcElement || event.originalTarget;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                });
+    
+                                scope.vgApi.addEventListener('playing', function (event) {
+                                    // I experienced a missing event "loadeddata" (WebM?)
+                                    // this is to continue playing -- TT
+                                    scope.loading = false;
+        
+                                    $rootScope.$emit('nx.player.playing');
                                 });
                                 
                                 scope.vgApi.addEventListener('ended', function (event) {
@@ -307,6 +316,7 @@ import * as Hls from 'hls.js';
                                         scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
                                         
                                         scope.vgApi.addEventListener('timeupdate', function (event) {
+                                            scope.loading = false;
                                             var video = event.srcElement || event.originalTarget;
                                             scope.vgUpdateTime({
                                                 $currentTime: video.currentTime,
@@ -314,14 +324,22 @@ import * as Hls from 'hls.js';
                                             });
                                         });
                                         
-                                        scope.vgApi.addEventListener('canplaythrough', function (event) {
-                                            $timeout(() => scope.loading = false ); // Video is playing - disable loading
+                                        scope.vgApi.addEventListener('loadeddata', function (event) {
+                                            scope.loading = false; // Video is playing - disable loading
                                             scope.playerHandler();
                                             cancelTimeoutNativeLoad();
                                         });
+    
+                                        scope.vgApi.addEventListener('playing', function (event) {
+                                            // I experienced a missing event "loadeddata" (WebM?)
+                                            // this is to continue playing -- TT
+                                            scope.loading = false;
+                                            
+                                            $rootScope.$emit('nx.player.playing');
+                                        });
                                         
                                         scope.vgApi.addEventListener('waiting', function (event) {
-                                            $timeout(() => scope.loading = true );
+                                            scope.loading = true;
                                         });
                                         
                                         scope.vgApi.addEventListener('ended', function (event) {
@@ -432,6 +450,7 @@ import * as Hls from 'hls.js';
                             if (makingPlayer) {
                                 return;
                             }
+                            
                             makingPlayer = true;
                             switch (scope.player) {
                                 case 'flashls':
