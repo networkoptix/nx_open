@@ -12,6 +12,8 @@ namespace ui {
 
 class PluginEventModel: public QnCommonModuleAware, public QStandardItemModel
 {
+    Q_OBJECT
+
 public:
     enum DataRole
     {
