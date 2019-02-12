@@ -27,21 +27,6 @@ static constexpr int kMaxGopLen = 100;
 static constexpr int kRoundFactor = 4;
 static constexpr int kGetFrameExtraTriesPerChannel = 10;
 
-static StreamIndex oppositeStreamIndex(StreamIndex streamIndex)
-{
-    switch (streamIndex)
-    {
-        case StreamIndex::primary:
-            return StreamIndex::secondary;
-        case StreamIndex::secondary:
-            return StreamIndex::primary;
-        default:
-            break;
-    }
-    NX_ASSERT(false, lm("Unsupported StreamIndex %1").args(streamIndex));
-    return StreamIndex::undefined; //< Fallback for the failed assertion.
-}
-
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
 {
