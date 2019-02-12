@@ -180,17 +180,23 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
             {
                 const auto incomingMessage = m_incomingMessageQueue.popFront();
                 *buffer = incomingMessage;
+
+                utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
                 handler(SystemError::noError, incomingMessage.size());
+                if (watcher.objectDestroyed())
+                    return;
+
                 if (m_readingCeased)
                 {
+                    m_readingCeased = false;
                     m_socket->readSomeAsync(
                         &m_readBuffer,
                         [this](SystemError::ErrorCode error, size_t transferred)
                         {
                             onRead(error, transferred);
                         });
-                    m_readingCeased = false;
                 }
+
                 return;
             }
 
