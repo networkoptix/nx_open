@@ -1,3 +1,7 @@
 /*.png
 /*.xml
 /*.html
+/*.tar
+/*.deb
+/Docker/Video
+/Docker/Data
