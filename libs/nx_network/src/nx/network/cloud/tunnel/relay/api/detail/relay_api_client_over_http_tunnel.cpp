@@ -86,6 +86,7 @@ void ClientOverHttpTunnel::openTunnel(
     ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler)
 {
     auto client = std::make_unique<network::http::tunneling::Client>(url);
+    client->setCustomHeaders({{kNxProtocolHeader, kRelayProtocol}});
     client->setTimeout(kTimeout);
     auto clientPtr = client.get();
     m_tunnelingClients.push_back(std::move(client));

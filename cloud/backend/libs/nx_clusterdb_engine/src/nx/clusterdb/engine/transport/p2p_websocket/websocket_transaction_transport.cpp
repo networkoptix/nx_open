@@ -82,6 +82,8 @@ void WebsocketCommandTransport::onGotMessage(
     nx::p2p::MessageType messageType,
     const QByteArray& payload)
 {
+    NX_VERBOSE(this, "Received message %1 of size %2", messageType, payload.size());
+
     if (!m_gotTransactionEventHandler)
         return;
 
@@ -137,6 +139,9 @@ void WebsocketCommandTransport::reportCommandReceived(
         setState(State::Error);
         return;
     }
+
+    NX_VERBOSE(this, "systemId %1. Received command (%2)",
+        m_transactionLogReader->systemId(), toString(commandData->header()));
 
     m_gotTransactionEventHandler(
         std::move(commandData),

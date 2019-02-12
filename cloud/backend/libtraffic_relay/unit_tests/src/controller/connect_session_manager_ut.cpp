@@ -4,7 +4,7 @@
 
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/stream_socket_stub.h>

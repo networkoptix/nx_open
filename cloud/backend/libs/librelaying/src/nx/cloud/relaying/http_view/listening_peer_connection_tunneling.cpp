@@ -25,7 +25,7 @@ void ListeningPeerConnectionTunnelingServer::registerHandlers(
         nx::network::http::tunneling::detail::ConnectionUpgradeTunnelServer>();
 
     compatibilityTunnelServer.setProtocolName(
-        relay::api::kRelayProtocolName);
+        relay::api::kRelayProtocol);
     compatibilityTunnelServer.setRequestPath(
         relay::api::kServerIncomingConnectionsPath);
     compatibilityTunnelServer.setUpgradeRequestMethod(
@@ -46,21 +46,29 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     {
         return completionHandler(
             nx::network::http::StatusCode::badRequest,
-            std::string());
+            relay::api::BeginListeningRequest());
     }
 
-    relay::api::BeginListeningRequest beginListeningRequest{serverId};
+    relay::api::BeginListeningRequest beginListeningRequest{serverId, ""};
+
+    if (auto nxUpgrade = requestContext->request.headers.find(relay::api::kNxProtocolHeader);
+        nxUpgrade != requestContext->request.headers.end())
+    {
+        network::http::MimeProtoVersion protocol;
+        if (protocol.parse(nxUpgrade->second))
+            beginListeningRequest.protocolVersion = protocol.version.toStdString();
+    }
 
     m_listeningPeerManager->beginListening(
         std::move(beginListeningRequest),
         [this, completionHandler = std::move(completionHandler),
-            peerName = beginListeningRequest.peerName,
+            beginListeningRequest,
             response = requestContext->response](
                 auto... args) mutable
         {
             onBeginListeningCompletion(
                 std::move(completionHandler),
-                peerName,
+                std::move(beginListeningRequest),
                 response,
                 std::move(args)...);
         });
@@ -68,7 +76,7 @@ void ListeningPeerConnectionTunnelingServer::authorize(
 
 void ListeningPeerConnectionTunnelingServer::onBeginListeningCompletion(
     CompletionHandler completionHandler,
-    const std::string& peerName,
+    relay::api::BeginListeningRequest request,
     network::http::Response* httpResponse,
     relay::api::ResultCode resultCode,
     relay::api::BeginListeningResponse response,
@@ -76,20 +84,21 @@ void ListeningPeerConnectionTunnelingServer::onBeginListeningCompletion(
 {
     if (resultCode != relay::api::ResultCode::ok)
     {
-        completionHandler(nx::network::http::StatusCode::forbidden, peerName);
+        completionHandler(nx::network::http::StatusCode::forbidden, std::move(request));
         return;
     }
 
     serializeToHeaders(&httpResponse->headers, response);
-    completionHandler(nx::network::http::StatusCode::ok, peerName);
+    completionHandler(nx::network::http::StatusCode::ok, std::move(request));
 }
 
 void ListeningPeerConnectionTunnelingServer::saveNewTunnel(
     std::unique_ptr<network::AbstractStreamSocket> connection,
-    const std::string& listeningPeerName)
+    const relay::api::BeginListeningRequest& request)
 {
     m_listeningPeerPool->addConnection(
-        listeningPeerName,
+        request.peerName,
+        request.protocolVersion,
         std::move(connection));
 }
 
