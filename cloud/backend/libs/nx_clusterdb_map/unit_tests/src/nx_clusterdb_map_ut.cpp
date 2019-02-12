@@ -5,6 +5,11 @@
 #include <nx/sql/types.h>
 #include <nx/clusterdb/map/database.h>
 #include <nx/clusterdb/map/settings.h>
+#include <nx/clusterdb/map/test_support/node_launcher.h>
+#include <nx/clusterdb/engine/http/http_paths.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
 
 namespace nx::clusterdb::map::test {
 
@@ -18,29 +23,27 @@ std::string randomString()
 } // namespace
 
 class Database:
-    public testing::Test,
-    public nx::sql::test::TestWithDbHelper
+    public testing::Test
 {
 public:
-    Database():
-        TestWithDbHelper("nx_clusterdb_map", QString())
+    Database()
     {
     }
 
 protected:
-    void givenOneDb()
+    void givenOneNode()
     {
-        addDbs(1);
+        addNodes(1);
     }
 
-    void givenTwoDbs()
+    void givenTwoNodes()
     {
-        addDbs(2);
+        addNodes(2);
     }
 
     void givenDbWithRandomKeyValuePair()
     {
-        givenOneDb();
+        givenOneNode();
         givenRandomKeyValuePair();
         whenInsertKeyValuePair();
         thenOperationSucceeded();
@@ -48,7 +51,7 @@ protected:
 
     void givenDbWithTwoKnownKeyValuePairs()
     {
-        givenOneDb();
+        givenOneNode();
         givenKnownKeyValuePair();
         givenSecondKnownKeyValuePair();
 
@@ -59,9 +62,10 @@ protected:
         thenOperationSucceeded();
     }
 
-    void givenTwoSynchronizedDbsWithRandomKeyValuePair()
+    void givenTwoSynchronizedNodesWithRandomKeyValuePair()
     {
-        givenTwoDbs();
+        givenTwoNodes();
+        givenRandomKeyValuePair();
         whenInsertKeyValuePair();
 
         thenOperationSucceeded();
@@ -71,7 +75,7 @@ protected:
 
     void givenEmptyDb()
     {
-        givenOneDb();
+        givenOneNode();
     }
 
     void givenKeyValuePairWithEmptyKey()
@@ -284,7 +288,7 @@ protected:
         ASSERT_FALSE(m_eventTriggered.load());
     }
 
-    void andFetchedValueMatchesRandomValue(size_t keyValuePairIndex = 0)
+    void andFetchedValueMatchesGivenValue(size_t keyValuePairIndex = 0)
     {
         ASSERT_EQ(keyValuePair(keyValuePairIndex)->value, m_fetchedValue);
     }
@@ -324,11 +328,12 @@ protected:
         m_fetchedValue.clear();
         whenFetchValue(dbIndex);
         thenOperationSucceeded();
-        andFetchedValueMatchesRandomValue();
+        andFetchedValueMatchesGivenValue();
     }
 
     void andValueIsInSecondDb()
     {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         andValueIsInDb(/*dbIndex*/ 1);
     }
 
@@ -341,6 +346,7 @@ protected:
 
     void andValueIsNotInSecondDb()
     {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         andValueIsNotInDb(/*dbIndex*/ 1);
     }
 
@@ -381,11 +387,12 @@ protected:
     }
 
 private:
-    Settings defaultDbSettings()
+    nx::utils::Url nodeUrl(Node* node)
     {
-        Settings settings;
-        settings.dataSyncEngineSettings.maxConcurrentConnectionsFromSystem = 7;
-        return settings;
+        using namespace nx::clusterdb::engine;
+        return nx::network::url::Builder()
+            .setScheme(nx::network::http::kUrlSchemeName)
+            .setEndpoint(node->httpEndpoints().front());
     }
 
     void waitForCallback()
@@ -403,19 +410,33 @@ private:
 
     map::Database* db(size_t index = 0)
     {
-        return m_databases[index].db.get();
+        return m_nodes[index]->moduleInstance()->db();
     }
 
-    void addDbs(int count)
+    void addNodes(int count)
     {
+        ASSERT_TRUE(count > 0);
+
         for (int i = 0; i < count; ++i)
         {
-            auto queryExecutor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(
-                dbConnectionOptions());
+            m_nodes.emplace_back(new NodeLauncher());
+            ASSERT_TRUE(m_nodes.back()->startAndWaitUntilStarted());
+        }
 
-            ASSERT_TRUE(queryExecutor->init());
+        for (int i = 0; i < count; ++i)
+        {
+            for (int j = 0; j < count; ++j)
+            {
+                // Don't want any nodes connecting to themselves
+                if (i == j)
+                    continue;
 
-            m_databases.emplace_back(std::move(queryExecutor), defaultDbSettings());
+                Node* node = m_nodes[j]->moduleInstance().get();
+
+                m_nodes[i]->moduleInstance()->connectToNode(
+                    node->db()->systemId(),
+                    nodeUrl(node));
+            }
         }
     }
 
@@ -465,22 +486,7 @@ private:
 
 
 private:
-    struct DBContext
-    {
-        std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> queryExecutor;
-        std::unique_ptr<map::Database> db;
-
-        DBContext(
-            std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> queryExecutor,
-            const Settings& dbSettings)
-            :
-            queryExecutor(std::move(queryExecutor)),
-            db(std::make_unique<map::Database>(dbSettings, this->queryExecutor.get()))
-        {
-        }
-    };
-
-    std::vector<DBContext> m_databases;
+    std::vector<std::unique_ptr<NodeLauncher>> m_nodes;
 
     std::vector<KeyValuePair> m_randomPairs;
     map::ResultCode m_result;
@@ -507,7 +513,7 @@ TEST_F(Database, fetches_key_value_pair)
     whenFetchValue();
 
     thenOperationSucceeded();
-    andFetchedValueMatchesRandomValue();
+    andFetchedValueMatchesGivenValue();
 }
 
 TEST_F(Database, inserts_key_value_pair)
@@ -563,7 +569,7 @@ TEST_F(Database, fails_to_fetch_non_existent_value)
 
 TEST_F(Database, rejects_insert_with_empty_key)
 {
-    givenOneDb();
+    givenOneNode();
     givenKeyValuePairWithEmptyKey();
     whenInsertKeyValuePair();
 
@@ -572,7 +578,7 @@ TEST_F(Database, rejects_insert_with_empty_key)
 
 TEST_F(Database, rejects_fetch_with_empty_string)
 {
-    givenOneDb();
+    givenOneNode();
     givenKeyValuePairWithEmptyKey();
     whenFetchValue();
 
@@ -581,7 +587,7 @@ TEST_F(Database, rejects_fetch_with_empty_string)
 
 TEST_F(Database, rejects_remove_with_empty_string)
 {
-    givenOneDb();
+    givenOneNode();
     givenKeyValuePairWithEmptyKey();
     whenRemoveKey();
 
@@ -664,7 +670,7 @@ TEST_F(Database, provides_upperbound)
 
 TEST_F(Database, rejects_lowerbound_request_with_empty_key)
 {
-    givenOneDb();
+    givenOneNode();
     givenKeyValuePairWithEmptyKey();
 
     whenRequestLowerBoundForFirstKey();
@@ -674,7 +680,7 @@ TEST_F(Database, rejects_lowerbound_request_with_empty_key)
 
 TEST_F(Database, rejects_upperbound_request_with_empty_key)
 {
-    givenOneDb();
+    givenOneNode();
     givenKeyValuePairWithEmptyKey();
 
     whenRequestLowerBoundForFirstKey();
@@ -711,9 +717,9 @@ TEST_F(Database, fails_to_provide_upperbound_for_highest_key_in_db)
     thenOperationFailed(map::ResultCode::notFound);
 }
 
-TEST_F(Database, DISABLED_multiple_databases_synchronize_insert_operation)
+TEST_F(Database, multiple_nodes_synchronize_insert_operation)
 {
-    givenTwoDbs();
+    givenTwoNodes();
     givenRandomKeyValuePair();
 
     whenInsertKeyValuePair();
@@ -723,9 +729,9 @@ TEST_F(Database, DISABLED_multiple_databases_synchronize_insert_operation)
     andValueIsInSecondDb();
 }
 
-TEST_F(Database, DISABLED_multiple_databases_synchronize_remove_operation)
+TEST_F(Database, multiple_nodes_synchronize_remove_operation)
 {
-    givenTwoSynchronizedDbsWithRandomKeyValuePair();
+    givenTwoSynchronizedNodesWithRandomKeyValuePair();
 
     whenRemoveKey();
     thenOperationSucceeded();
