@@ -80,6 +80,21 @@ const int CUDT::m_iVersion = 4;
 const int CUDT::m_iSYNInterval = 10000;
 const int CUDT::m_iSelfClockInterval = 64;
 
+/*
+static const int CTRL_HANDSHAKE = 0;            //000 - Handshake
+static const int CTRL_KEEP_ALIVE = 1;           //001 - Keep-alive
+static const int CTRL_ACK = 2;                  //010 - Acknowledgement
+static const int CTRL_LOSS_REPORT = 3;          //011 - Loss Report
+static const int CTRL_CONGESTION_WARNING = 4;   //100 - Congestion Warning
+static const int CTRL_SHUTDOWN = 5;             //101 - Shutdown
+static const int CTRL_ACK2 = 6;                 //110 - Acknowledgement of Acknowledgement
+static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
+static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
+static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
+
+// Mimimum recv flight flag size is 32 packets
+constexpr const int kMinRecvWindowSize = 32;
+*/
 constexpr const int kDefaultRecvWindowSize = 25600;
 
 // Mimimum recv buffer size is 32 packets
