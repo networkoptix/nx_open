@@ -120,7 +120,7 @@ int QnConfigureRestHandler::execute(
     {
         owner->globalSettings()->setSystemName(data.systemName);
         owner->globalSettings()->synchronizeNowSync();
-        //< Update it now to prevent race condition. Normally it is updated with delay.
+        // Update it now to prevent race condition. Normally it is updated with delay.
         serverModule()->findInstance<QnNewSystemServerFlagWatcher>()->update();
     }
 
