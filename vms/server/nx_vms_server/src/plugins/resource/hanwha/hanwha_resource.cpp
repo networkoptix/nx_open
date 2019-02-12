@@ -1456,6 +1456,10 @@ CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
 
     const auto groupId = getGroupId();
     const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
+
+    if (!groupId.isEmpty() && calibratedChannels && calibratedChannels.diagnostics.errorCode)
+        return calibratedChannels.diagnostics;
+
     if (!groupId.isEmpty() && calibratedChannels && calibratedChannels->count(getChannel()))
     {
         const auto id = physicalIdForChannel(groupId, ptzTargetChannel);
