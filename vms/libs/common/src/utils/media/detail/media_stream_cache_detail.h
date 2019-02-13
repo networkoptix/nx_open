@@ -85,27 +85,10 @@ public:
 private:
     struct MediaPacketContext
     {
-        quint64 timestamp;
+        quint64 timestamp = 0;
         QnAbstractDataPacketPtr packet;
-        bool isKeyFrame;
-
-        MediaPacketContext()
-            :
-            timestamp( 0 ),
-            isKeyFrame( false )
-        {
-        }
-
-        MediaPacketContext(
-            quint64 _timestamp,
-            QnAbstractDataPacketPtr _packet,
-            bool _isKeyFrame )
-            :
-            timestamp( _timestamp ),
-            packet( _packet ),
-            isKeyFrame( _isKeyFrame )
-        {
-        }
+        bool isKeyFrame = false;
+        quint32 channelNumber = 0;
     };
 
     //!map<timestamp, pair<packet, key_flag> >
