@@ -117,6 +117,8 @@
             takeCameraOwnershipWithoutLock: {type: 'checkbox'},
             timeSynchronizationEnabled: {type: 'checkbox'},
             upnpPortMappingEnabled: {type: 'checkbox'},
+
+            maxEventLogRecords: {type: 'number'}
         },
         webclient: {
             useServerTime: true,

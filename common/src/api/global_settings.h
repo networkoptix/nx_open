@@ -214,6 +214,9 @@ public:
     int keepAliveProbeCount() const;
     void setKeepAliveProbeCount(int newProbeCount);
 
+    int maxEventLogRecords() const;
+    void setMaxEventLogRecords(int value);
+
     std::chrono::seconds aliveUpdateInterval() const;
     void setAliveUpdateInterval(std::chrono::seconds newInterval) const;
 
@@ -433,6 +436,8 @@ private:
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor = nullptr;
 
     // misc adaptors
+    QnResourcePropertyAdaptor<int>* m_maxEventLogRecordsAdaptor = nullptr;
+
     QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor = nullptr;

@@ -504,6 +504,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
+    m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        "maxEventLogRecords",
+        100 * 1000, //< Default value.
+        this);
+
     // TODO: #GDM Revert this hack when sync global settings will be implemented.
     connect(m_localSystemIdAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -567,7 +572,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRemoteArchiveSynchronizationThreads
         << m_maxWearableArchiveSynchronizationThreads
         << m_watermarkSettings
-        ;
+        << m_maxEventLogRecordsAdaptor;
 
     if (isHanwhaEnabledCustomization())
     {
@@ -1005,6 +1010,16 @@ int QnGlobalSettings::keepAliveProbeCount() const
 void QnGlobalSettings::setKeepAliveProbeCount(int newProbeCount)
 {
     m_ec2KeepAliveProbeCountAdaptor->setValue(newProbeCount);
+}
+
+int QnGlobalSettings::maxEventLogRecords() const
+{
+    return m_maxEventLogRecordsAdaptor->value();
+}
+
+void QnGlobalSettings::setMaxEventLogRecords(int value)
+{
+    m_maxEventLogRecordsAdaptor->setValue(value);
 }
 
 std::chrono::seconds QnGlobalSettings::aliveUpdateInterval() const

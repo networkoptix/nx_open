@@ -118,7 +118,8 @@
         "updateNotificationsEnabled": "Update notifications enabled",
         "upnpPortMappingEnabled": "UPNP port mapping enabled",
         "useTextEmailFormat": "Send plain-text emails",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info":{
         "tabs":{
