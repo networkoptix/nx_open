@@ -348,6 +348,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
     return nullptr;
 }
 
+// TODO: add assert for non-iframe
 /**
  * @return Sequence from an I-frame to the desired frame. Can be null but not empty.
  */
@@ -596,8 +597,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         NX_VERBOSE(this, "%1() END -> null: error processing frame", __func__);
         return nullptr;
     }
-
-    // TODO: check what happens with timestamps, if we are overwriting the same channel frame.
 
     // Getting frames for other channels of camera.
     // NOTE: We can't get frame for exact channel from archive, so we are trying several times until

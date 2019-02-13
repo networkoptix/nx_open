@@ -210,47 +210,42 @@ int MediaStreamCache::getMaxBitrate() const
     return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 
-//!Returns packet with timestamp == \a timestamp or packet with closest (from the left) timestamp
-/*!
-    In other words, this methods performs lower_bound in timestamp-sorted (using 'greater' comparision) array of data packets
+// TODO: write tests
+/**
+    Returns packet with timestamp == \a timestamp or packet with closest (from the left) timestamp.
+    In other words, this methods performs lower_bound in timestamp-sorted (using 'greater'
+    comparision) array of data packets.
 */
-QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
-    quint64 desiredTimestamp,
-    bool findKeyFrameOnly,
-    quint64* const foundTimestamp) const
+QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimestamp,
+    bool findKeyFrameOnly, quint64* const foundTimestamp, quint32 channelNumber) const
 {
     QnMutexLocker lk(&m_mutex);
 
     m_inactivityTimer.restart();
 
-    if (m_packetsByTimestamp.empty())
-        return QnAbstractDataPacketPtr();
-
-    PacketContainerType::const_iterator it = std::lower_bound(
+    const auto it = std::lower_bound(
         m_packetsByTimestamp.cbegin(), m_packetsByTimestamp.cend(), desiredTimestamp,
         [](const MediaStreamCache::MediaPacketContext& one, quint64 two) -> bool
         {
             return one.timestamp < two;
         });
-    if (it == m_packetsByTimestamp.cend())
-        --it;
-    for (;;)
-    {
-        if (it == m_packetsByTimestamp.cend())
-            return QnAbstractDataPacketPtr();
 
-        if (findKeyFrameOnly && !it->isKeyFrame)
+    const auto result = std::find_if(std::make_reverse_iterator(it), m_packetsByTimestamp.crend(),
+        [channelNumber, findKeyFrameOnly](const auto& value)
         {
-            // Searching for I-frame.
-            if (it == m_packetsByTimestamp.cbegin())
-                return QnAbstractDataPacketPtr();
-            --it;
-            continue;
-        }
+            if (value.channelNumber != channelNumber)
+                return false;
+            if (!findKeyFrameOnly)
+                return true;
+            if (value.isKeyFrame)
+                return true;
+            return false;
+        });
 
-        *foundTimestamp = it->timestamp;
-        return it->packet;
-    }
+    if (result == m_packetsByTimestamp.crend())
+        return {};
+    *foundTimestamp = result->timestamp;
+    return result->packet;
 }
 
 QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const

@@ -52,6 +52,7 @@ QnAbstractDataPacketPtr MediaStreamCache::SequentialReadContext::getNextFrame()
 
     if( m_firstFrame )
     {
+        // TODO: Add channel support.
         QnAbstractDataPacketPtr packet = strongCacheRef->findByTimestamp(
             m_startTimestamp,
             true,
@@ -141,12 +142,14 @@ int MediaStreamCache::getMaxBitrate() const
 QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
     quint64 desiredTimestamp,
     bool findKeyFrameOnly,
-    quint64* const foundTimestamp ) const
+    quint64* const foundTimestamp,
+    quint32 channelNumber) const
 {
     return m_sharedImpl->findByTimestamp(
         desiredTimestamp,
         findKeyFrameOnly,
-        foundTimestamp );
+        foundTimestamp,
+        channelNumber);
 }
 
 QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const

@@ -62,7 +62,8 @@ public:
     QnAbstractDataPacketPtr findByTimestamp(
         quint64 desiredTimestamp,
         bool findKeyFrameOnly,
-        quint64* const foundTimestamp ) const;
+        quint64* const foundTimestamp,
+        quint32 channelNumber = 0) const;
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
