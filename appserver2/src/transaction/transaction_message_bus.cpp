@@ -1237,6 +1237,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
         }
     }
 
+    if (commonModule()->isStandAloneMode())
+        return;
+
     // add new outgoing connections
     for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {

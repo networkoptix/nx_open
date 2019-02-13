@@ -279,6 +279,10 @@ void MessageBus::createOutgoingConnections(
 {
     if (hasStartingConnections())
         return;
+
+    if (commonModule()->isStandAloneMode())
+        return;
+
     int intervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         m_intervals.outConnectionsInterval).count();
     if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(intervalMs))
