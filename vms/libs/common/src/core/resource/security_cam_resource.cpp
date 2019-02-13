@@ -283,6 +283,7 @@ void QnSecurityCamResource::setMaxFps(int fps)
     // because setMaxFps function should not save parameters.
     setProperty(ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(capability)));
+    m_cachedCameraMediaCapabilities.reset();
 }
 int QnSecurityCamResource::reservedSecondStreamFps() const
 {
