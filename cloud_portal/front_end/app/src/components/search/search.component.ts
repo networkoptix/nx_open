@@ -1,12 +1,12 @@
 import {
     Component, OnInit, Input, ElementRef,
-    forwardRef, Renderer2, AfterViewInit, ViewEncapsulation, Inject
+    forwardRef, Renderer2, ViewEncapsulation,
+    SimpleChanges, OnChanges
 }                                                  from '@angular/core';
-import { fromEvent }                               from 'rxjs';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, Router }                  from '@angular/router';
-import { isArray }                                 from 'rxjs/internal-compatibility';
 import { NxConfigService }                         from '../../services/nx-config';
+import { isArray }                                 from 'rxjs/internal-compatibility';
 
 @Component({
     selector     : 'nx-search',
@@ -116,7 +116,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                         .multiselects
                         .find((select) => {
                             if (select.id === key) {
-                                select.selected = this.params[key].split(',');
+                                select.selected = isArray(this.params[key]) ? this.params[key] : this.params[key].split(',');
 
                                 this.showAdvancedOptions = true;
                             }

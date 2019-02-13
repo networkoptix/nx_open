@@ -1,8 +1,9 @@
 import {
     Component, EventEmitter, forwardRef, Input, OnInit, Output
-} from '@angular/core';
-import { NxConfigService }   from '../../services/nx-config';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+}                                 from '@angular/core';
+import { NxConfigService }        from '../../services/nx-config';
+import { NG_VALUE_ACCESSOR }      from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 /* USAGE
  <nx-vendor-list
@@ -31,7 +32,10 @@ export class NxVendorListComponent implements OnInit {
 
     private filter: any = {};
 
-    constructor(CONFIG: NxConfigService) {
+    constructor(CONFIG: NxConfigService,
+                private _router: Router,
+                private _route: ActivatedRoute) {
+
         this.CONFIG = CONFIG.getConfig();
 
         this.arrGridColumns = Array.apply(undefined, Array(this.CONFIG.campage.vendorGroups)).map((x, i) => i);
@@ -87,9 +91,32 @@ export class NxVendorListComponent implements OnInit {
     }
 
     setVendor(value) {
-        this.filter.query = value;
+        interface Params {
+            [key: string]: any;
+        }
+
+        const queryParams: Params = {};
+
+        this.filter.multiselects.find((select) => {
+            if (select.id === 'vendors') {
+                select.selected.push(value);
+
+                queryParams[select.id] = select.selected;
+
+                // changes the route without moving from the current view or
+                // triggering a navigation event,
+                this._router.navigate(['/campage'], {
+                    queryParams,
+                    relativeTo: this._route,
+                    replaceUrl: true,
+                    // queryParamsHandling: 'merge',
+                    // do not trigger navigation
+                    // skipLocationChange : true
+                });
+            }
+        });
         // Propagate component's value attribute (model)
-        this.propagateChange(this.filter);
+        this.propagateChange({...this.filter});
     }
 
 }
