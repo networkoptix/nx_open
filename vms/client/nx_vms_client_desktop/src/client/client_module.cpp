@@ -562,6 +562,8 @@ void QnClientModule::initLog()
         logger.logBaseName = logFile.isEmpty()
             ? ("client_log" + logFileNameSuffix)
             : logFile;
+        logSettings.updateDirectoryIfEmpty(
+            QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
         setMainLogger(
             buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
