@@ -1,6 +1,6 @@
 #include "relay_connection_acceptor.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>

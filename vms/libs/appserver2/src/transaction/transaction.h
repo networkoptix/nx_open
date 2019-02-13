@@ -901,7 +901,7 @@ APPLY(804, broadcastAction, nx::vms::api::EventActionData, \
                        false, \
                        InvalidGetHashHelper(), \
                        BusinessEventNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

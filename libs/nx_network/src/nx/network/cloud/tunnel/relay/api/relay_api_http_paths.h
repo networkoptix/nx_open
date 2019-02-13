@@ -5,25 +5,41 @@ namespace cloud {
 namespace relay {
 namespace api {
 
-NX_NETWORK_API extern const char* const kRelayProtocolName;
+static constexpr char kRelayProtocolName[] = "NXRELAY";
+static constexpr char kRelayProtocolVersion[] = "0.1";
+static constexpr char kRelayProtocol[] = "NXRELAY/0.1";
 
-NX_NETWORK_API extern const char* const kServerIncomingConnectionsPath;
-NX_NETWORK_API extern const char* const kServerTunnelPath;
-NX_NETWORK_API extern const char* const kServerTunnelBasePath;
+/**
+ * Introducing this custom header since it is not correct to add "Upgrade" to any request
+ * (e.g., when using GET / POST tunnel).
+ */
+static constexpr char kNxProtocolHeader[] = "Nx-Upgrade";
 
-NX_NETWORK_API extern const char* const kServerClientSessionsPath;
-NX_NETWORK_API extern const char* const kClientSessionConnectionsPath;
-NX_NETWORK_API extern const char* const kClientGetPostTunnelPath;
-NX_NETWORK_API extern const char* const kClientTunnelBasePath;
-NX_NETWORK_API extern const char* const kRelayClientPathPrefix;
+static constexpr char kServerIncomingConnectionsPath[] =
+    "/relay/server/{serverId}/incoming_connections/";
 
-NX_NETWORK_API extern const char* const kRelayStatisticsMetricsPath;
-NX_NETWORK_API extern const char* const kRelayStatisticsSpecificMetricPath;
+static constexpr char kServerTunnelPath[] = "/relay/server/{serverId}/tunnel/get_post/{sequence}";
+static constexpr char kServerTunnelBasePath[] = "/relay/server/{serverId}/tunnel";
 
-NX_NETWORK_API extern const char* const kServerIdName;
-NX_NETWORK_API extern const char* const kSessionIdName;
-NX_NETWORK_API extern const char* const kSequenceName;
-NX_NETWORK_API extern const char* const kMetricName;
+static constexpr char kServerClientSessionsPath[] = "/relay/server/{serverId}/client_sessions/";
+static constexpr char kClientSessionConnectionsPath[] =
+    "/relay/client_session/{sessionId}/connections/";
+
+static constexpr char kClientGetPostTunnelPath[] =
+    "/relay/client_session/{sessionId}/tunnel/get_post/{sequence}";
+
+static constexpr char kClientTunnelBasePath[] = "/relay/client_session/{sessionId}/tunnel";
+static constexpr char kRelayClientPathPrefix[] = "/relay/client/";
+
+static constexpr char kRelayStatisticsMetricsPath[] = "/relay/statistics/metrics/";
+static constexpr char kRelayStatisticsSpecificMetricPath[] = "/relay/statistics/metrics/{metric}";
+
+static constexpr char kApiPrefix[] = "/relay";
+
+static constexpr char kServerIdName[] = "serverId";
+static constexpr char kSessionIdName[] = "sessionId";
+static constexpr char kSequenceName[] = "sequence";
+static constexpr char kMetricName[] = "metric";
 
 } // namespace api
 } // namespace relay
