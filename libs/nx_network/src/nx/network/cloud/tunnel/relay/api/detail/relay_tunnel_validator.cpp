@@ -43,7 +43,7 @@ void TunnelValidator::validate(
 {
     if (!relaySupportsKeepAlive())
     {
-        return post([this, handler = std::move(handler)]()
+        return post([handler = std::move(handler)]()
             { handler(network::http::tunneling::ResultCode::ok); });
     }
 
