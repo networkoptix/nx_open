@@ -1,6 +1,7 @@
 #include "watermark_images.h"
 
 #include <cmath>
+#include <array>
 #include <algorithm>
 
 #include <QtCore/QMap>
@@ -20,6 +21,15 @@ const QColor kWatermarkColor = QColor(Qt::white);
 const int kWatermarkFontSize = 84; //< Pure magic. It was 42 * 2 before. No more memes.
 constexpr double kFuzzyEqualDiff = 0.02;
 constexpr double kFuzzyEqualRatio = 1.02;
+
+// Predefined watermark image sizes for typical aspect ratios, pair<aspect ratio, image size>.
+// These values are arbitrary, but reasonable.
+const std::array<std::pair<double, QSize>, 5> predefinedSizes = {{
+    {16.0 / 9.0, QSize(1920, 1080)},
+    {4.0 / 3.0,  QSize(1600, 1200)},
+    {1.0,        QSize(1200, 1200)},
+    {3.0 / 4.0,  QSize(1200, 1600)},
+    {9.0 / 16.0, QSize(1080, 1920)}}};
 
 Watermark cachedWatermark;
 QMap<double, QPixmap> watermarkImages;
@@ -55,27 +65,15 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
 
     bool predefinedAspect = false;
     // Setup predefined sizes for a few well-known aspect ratios.
-    // These values are arbitrary, but reasonable.
-    const auto kWideScreenAspectRatio = 16.0 / 9.0;
-    if (fabs(aspectRatio / kWideScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
+    for (int i = 0; i < predefinedSizes.size(); i++)
     {
-        size = QSize(1920, 1080);
-        aspectRatio = kWideScreenAspectRatio;
-        predefinedAspect = true;
-    }
-    const auto kNormalScreenAspectRatio = 4.0 / 3.0;
-    if (fabs(aspectRatio / kNormalScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
-    {
-        size = QSize(1600, 1200);
-        aspectRatio = kNormalScreenAspectRatio;
-        predefinedAspect = true;
-    }
-    const auto kSquareScreenAspectRatio = 1.0; //< We will remove all magic consts!
-    if (fabs(aspectRatio / kSquareScreenAspectRatio - 1) < kFuzzyEqualDiff)
-    {
-        size = QSize(1200, 1200);
-        aspectRatio = kSquareScreenAspectRatio;
-        predefinedAspect = true;
+        if ((fabs(aspectRatio / predefinedSizes[i].first - 1.0) < kFuzzyEqualDiff))
+        {
+            aspectRatio = predefinedSizes[i].first;
+            size = predefinedSizes[i].second;
+            predefinedAspect = true;
+            break;
+        }
     }
 
     // Sometimes `size` uses logical coordinates that are quite big, ~10000.

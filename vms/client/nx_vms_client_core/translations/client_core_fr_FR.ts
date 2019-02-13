@@ -108,52 +108,12 @@
       <translation>Ce compte n’est pas activé. S.V.P, vérifiez votre courriel.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Ce compte est bloqué.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Fonctionnalité demandée n’est pas implémentée.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Realm Inconnu.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Mauvaise requête.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Nonce invalide.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Informations d’identification non valides.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Données non valides reçues.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Erreur inconnue.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Erreur réseau inattendue. Veuillez vérifier votre connexion Internet et réessayez.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Identifiant invalide.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Objet demandé introuvable.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Objet existe déjà.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation>Erreur interne %1. Contactez l’équipe d’assistance.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Désolé, Service %1 est temporairement indisponible. Nous faisons notre possible pour le restaurer. S.V.P, réessayer dans quelques instants.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Trop de tentatives. Réessayez dans une minute.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Désolé, Service %1 n’a pas pu traiter votre demande. S.V.P, réessayer dans quelques instants.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
@@ -256,7 +219,7 @@
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>S</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>M</source>
@@ -266,7 +229,7 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>A</translation>
+      <translation>a</translation>
     </message>
     <message>
       <source>msec</source>

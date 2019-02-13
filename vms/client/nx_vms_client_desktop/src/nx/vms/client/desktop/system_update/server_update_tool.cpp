@@ -55,6 +55,7 @@ QDir findFolderForFile(QDir root, QString file)
 }
 
 const QString kPackageIndexFile = "packages.json";
+const QString kLatestChangeset = "latest";
 const int kReadBufferSizeBytes = 1024 * 1024;
 
 } // namespace
@@ -1031,7 +1032,7 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(
     const QString& updateUrl)
 {
-    return checkSpecificChangeset(updateUrl, "latest");
+    return checkSpecificChangeset(updateUrl, kLatestChangeset);
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificChangeset(
@@ -1046,14 +1047,16 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
         {
             UpdateContents contents;
 
+            contents.changeset = changeset;
             contents.info = nx::update::updateInformation(updateUrl, engineVersion,
                 changeset, &contents.error);
-            contents.sourceType = nx::update::UpdateSourceType::internet;
+            if (changeset == kLatestChangeset)
+                contents.sourceType = nx::update::UpdateSourceType::internet;
+            else
+                contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
             contents.source = lit("%1 for build=%2").arg(updateUrl, changeset);
 
-            if ((contents.error == nx::update::InformationError::httpError
-                || contents.error == nx::update::InformationError::networkError)
-                && connection)
+            if (contents.error == nx::update::InformationError::networkError && connection)
             {
                 NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
                 auto promise = std::make_shared<std::promise<bool>>();

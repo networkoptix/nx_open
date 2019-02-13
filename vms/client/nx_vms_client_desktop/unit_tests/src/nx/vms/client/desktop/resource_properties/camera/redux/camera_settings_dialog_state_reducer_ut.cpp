@@ -6,8 +6,33 @@
 #include <nx/vms/client/desktop/resource_properties/camera/redux/camera_settings_dialog_state_reducer.h>
 
 #include <ui/style/globals.h>
+#include <test_support/resource/camera_resource_stub.h>
+#include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
 
-namespace nx::vms::client::desktop::test {
+namespace nx::vms::client::desktop {
+namespace test {
+
+namespace {
+
+QnScheduleTaskList makeEmptySchedule()
+{
+    QnScheduleTaskList result;
+    for (int day = 1; day <= 7; ++day)
+    {
+        result.push_back({
+            /*dayOfWeek*/ day,
+            /*startTime*/ 0,
+            /*endTime*/ 86400,
+            /*recordingType*/ Qn::RecordingType::never,
+            /*streamQuality*/ Qn::StreamQuality::highest,
+            /*fps*/ 0,
+            /*bitrateKbps*/ 0
+		});
+    }
+    return result;
+}
+
+} // namespace
 
 class CameraSettingsDialogStateReducerTest: public testing::Test
 {
@@ -105,4 +130,31 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
     ASSERT_LE(s.recording.minDays.value(), s.recording.maxDays.value());
 }
 
-} // namespace nx::vms::client::desktop::test
+// If clean schedule, fps brush should be reset to a default value.
+TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushAfterCleanSchedule)
+{
+    static constexpr int kDefaultFps = 30;
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setMaxFps(kDefaultFps);
+    const QnVirtualCameraResourceList cameras{camera};
+
+    State initial = Reducer::loadCameras({}, cameras);
+    ASSERT_EQ(initial.devicesDescription.maxFps, kDefaultFps);
+    ASSERT_EQ(initial.recording.brush.fps, kDefaultFps);
+    ASSERT_EQ(initial.recording.brush.recordingType, Qn::RecordingType::always);
+
+    State beforeClean = Reducer::setScheduleBrushRecordingType(std::move(initial),
+		Qn::RecordingType::never);
+    ASSERT_EQ(beforeClean.recording.brush.fps, kDefaultFps);
+
+    State afterClean = Reducer::setSchedule(std::move(beforeClean), makeEmptySchedule());
+    ASSERT_EQ(afterClean.recording.brush.fps, kDefaultFps);
+
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(afterClean, cameras);
+    State reloaded = Reducer::loadCameras(std::move(afterClean), cameras);
+    ASSERT_EQ(reloaded.recording.brush.fps, kDefaultFps);
+}
+
+} // namespace test
+} // namespace nx::vms::client::desktop

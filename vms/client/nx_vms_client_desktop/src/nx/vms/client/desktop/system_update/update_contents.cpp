@@ -19,6 +19,7 @@ using nx::update::UpdateContents;
 namespace {
 
 const QString kFilePrefix = "file://";
+const QString kClientComponent = "client";
 
 } // namespace
 
@@ -216,7 +217,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
-    bool boundToCloud = !commonModule->globalSettings()->cloudSystemId().isEmpty();
     bool alreadyInstalled = true;
 
     QString clientVersionRaw = nx::utils::AppInfo::applicationVersion();
@@ -226,11 +226,11 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     if (checkClient)
     {
         auto systemInfo = QnAppInfo::currentSystemInformation();
-        if (nx::update::findPackage(
-                *commonModule,
-                contents.info,
-                &contents.clientPackage,
-                &errorMessage) != nx::update::FindPackageResult::ok)
+        if (auto packagePtr = nx::update::findPackage(kClientComponent, systemInfo, contents.info))
+        {
+            contents.clientPackage = *packagePtr;
+        }
+        else
         {
             NX_ERROR(typeid(UpdateContents))
                 << "verifyUpdateManifest(" << contents.info.version
@@ -251,7 +251,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         info.modification = package.variant;
         info.platform = package.platform;
 
-        auto& cache = (package.component == "client")
+        auto& cache = (package.component == kClientComponent)
             ? contents.clientPackageCache
             : contents.serverPackageCache;
 
@@ -381,6 +381,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
             << contents.info.version << ") - detected detected incompatible cloud.";
+        contents.error = nx::update::InformationError::incompatibleCloudHost;
     }
 
     if (!contents.manualPackages.empty())

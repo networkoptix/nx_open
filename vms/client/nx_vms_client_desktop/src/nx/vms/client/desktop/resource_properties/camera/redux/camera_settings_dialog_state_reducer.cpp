@@ -613,7 +613,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
     }
 
-    state.recording.enabled = {};
     fetchFromCameras<bool>(state.recording.enabled, cameras,
         [](const auto& camera) { return camera->isLicenseUsed(); });
 
@@ -634,20 +633,16 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state.recording.brush.fps = std::max_element(tasks.cbegin(), tasks.cend(),
             [](const auto& l, const auto& r) { return l.fps < r.fps; })->fps;
     }
-    else
-    {
+
+    // Default brush fps value.
+    if (state.recording.brush.fps == 0)
         state.recording.brush.fps = state.maxRecordingBrushFps();
-    }
 
     fetchFromCameras<int>(state.recording.thresholds.beforeSec, cameras,
         calculateRecordingThresholdBefore);
     fetchFromCameras<int>(state.recording.thresholds.afterSec, cameras,
         calculateRecordingThresholdAfter);
 
-    state.recording.brush.fps = qBound(
-        kMinFps,
-        state.recording.brush.fps,
-        state.maxRecordingBrushFps());
     state = fillBitrateFromFixedQuality(std::move(state));
 
     state.recording.minDays = calculateMinRecordingDays(cameras);

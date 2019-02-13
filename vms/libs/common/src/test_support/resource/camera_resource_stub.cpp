@@ -19,6 +19,7 @@ CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
     d->licenseType = licenseType;
     setId(QnUuid::createUuid());
     addFlags(Qn::server_live_cam);
+    setForceUseLocalProperties(true);
 }
 
 CameraResourceStub::~CameraResourceStub()

@@ -70,6 +70,7 @@ enum class InformationError
     brokenPackageError,
     missingPackageError,
     incompatibleVersion,
+    incompatibleCloudHost,
     notFoundError,
     noNewVersion,
 };
@@ -167,6 +168,7 @@ struct UpdateContents
 {
     UpdateSourceType sourceType = UpdateSourceType::internet;
     QString source;
+    QString changeset;
 
     /** A set of servers without proper update file. */
     QSet<QnUuid> missingUpdate;

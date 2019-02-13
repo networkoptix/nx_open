@@ -480,7 +480,9 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     {
         report.versionHighlight = VersionReport::HighlightMode::red;
         report.statusHighlight = VersionReport::HighlightMode::red;
-
+        // Note: it is possible to have multiple problems. Some problems can be tracked by
+        // both error code and some error flag. So some error statuses are filled separately
+        // from this switch.
         switch(contents.error)
         {
             case Error::noError:
@@ -514,6 +516,10 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
             case Error::notFoundError:
                 // No update
                 report.statusMessages << tr("Update file is not found");
+                break;
+            case Error::incompatibleCloudHost:
+                // Cloud host is incompatible. Error message is filled later.
+                report.versionHighlight = VersionReport::HighlightMode::regular;
                 break;
             case Error::noNewVersion:
                 // We have most recent version for this build.
@@ -553,6 +559,8 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
 
     if (report.versionMode == VersionReport::VersionMode::empty)
         report.version = kNoVersionNumberText;
+    else if (contents.info.version.isEmpty())
+        report.version = contents.changeset;
     else
         report.version = contents.info.version;
 
@@ -1786,8 +1794,12 @@ void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
             else
                 resetStyle(label);
         };
+
     ui->errorLabel->setText(report.statusMessages.join("<br>"));
-    ui->targetVersionLabel->setText(report.version);
+    if (report.version.isEmpty())
+        ui->targetVersionLabel->setText(kNoVersionNumberText);
+    else
+        ui->targetVersionLabel->setText(report.version);
 
     setHighlightMode(ui->targetVersionLabel, report.versionHighlight);
     setHighlightMode(ui->errorLabel, report.statusHighlight);

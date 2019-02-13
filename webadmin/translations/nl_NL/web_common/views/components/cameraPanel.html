@@ -36,8 +36,11 @@
                 </div>
             </a>
             <div class="collapse-box">
-                <ul class="nav" nx-collapsible="server.collapsed"
-                    ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy, closing:server.collapsed}" >
+                <ul class="nav nx-collapsible"
+                    ng-class="{
+                        'edge' : (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy,
+                        'closing' : server.collapsed,
+                        'show' : !server.collapsed }" >
                     <li ng-repeat="camera in cameras[server.id]"
                         ng-class="{active:activeCamera===camera}"
                         ng-if="camera.visible"

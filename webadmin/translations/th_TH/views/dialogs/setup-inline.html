@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>ไม่สามารถตั้งค่าระบบได้</h2>
-    <p class="master-description">ไม่สามารถกำหนดค่าระบบได้ <br>
+    <p class="master-description">The System cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">การตั้งค่าระบบขั้นสูง</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>การตั้งค่าขั้นสูง</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -138,7 +138,7 @@
     </div>
     <h2>บัญชี {{Config.cloud.productName}}</h2>
     <p class="master-description">
-        จำเป็นต้องมีบัญชีเพื่อใช้ระบบคลาวด์ {{Config.cloud.productName}}
+        An account is required to use the cloud System {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus> สร้างบัญชีใหม่ </button> &nbsp;&nbsp; <button class="btn btn-default" ng-click="next('cloudLogin', true)"> ใช้ที่มีอยู่ </button>
@@ -275,7 +275,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>เชื่อมต่อเซิร์ฟเวอร์กับระบบที่มีอยู่</h2>
+    <h2>Connect the server to the existing System</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -287,7 +287,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="ระบบ URL ที่มีอยู่ (https://host:port)"
+ placeholder="Existing System URL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -327,25 +327,26 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>ผสานระบบ ...</h2>
+    <h2>กำลังผสานระบบ ...</h2>
     <p class="master-description">อาจใช้เวลาหลายนาที</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>ผสานระบบ ...</h2>
-    <p class="master-description">กำลังพยายามเชื่อมต่อกับระบบ</p>
+    <h2>กำลังผสานระบบ ...</h2>
+    <p class="master-description">Trying to connect to the System</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>ไม่สามารถแชร์ระบบ</h2>
+    <h2>Cannot merge Systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">ลองอีกครั้ง</button>         <button class="btn btn-default" ng-click="skip()">ติดตั้งระบบการแยกต่างหาก</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
     </p>
 </div>
 
@@ -411,7 +412,8 @@
         ตั้งค่าการเชื่อมต่ออินเทอร์เน็ตบนเซิร์ฟเวอร์เพื่อให้สามารถ <br> เชื่อมต่อได้ทุกที่โดยใช้ {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">ลองอีกครั้ง</button>         <button class="btn btn-default" ng-click="skip()">ติดตั้งระบบการแยกต่างหาก</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">กำหนดการตั้งค่าเครือข่าย</a>
@@ -425,7 +427,8 @@
         ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">ลองอีกครั้ง</button>         <button class="btn btn-default" ng-click="skip()">ติดตั้งระบบการแยกต่างหาก</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -436,7 +439,8 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">ลองอีกครั้ง</button>         <button class="btn btn-default" ng-click="skip()">ติดตั้งระบบการแยกต่างหาก</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
