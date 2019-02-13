@@ -25,15 +25,15 @@ std::string randomString()
 class Database:
     public testing::Test
 {
-public:
-    Database()
-    {
-    }
-
 protected:
-    void givenOneNode()
+    void givenOneDb()
     {
         addNodes(1);
+    }
+
+    void givenEmptyDb()
+    {
+        givenOneDb();
     }
 
     void givenTwoNodes()
@@ -43,27 +43,19 @@ protected:
 
     void givenDbWithRandomKeyValuePair()
     {
-        givenOneNode();
+        givenOneDb();
         givenRandomKeyValuePair();
         whenInsertKeyValuePair();
         thenOperationSucceeded();
     }
 
-    void givenDbWithTwoKnownKeyValuePairs()
+    void givenDbWithKnownKeyValuePairs(size_t keyValuePairCount = 2, char startLetter = 'B')
     {
         addNodes(1);
-        generateAndInsertKeyValuePairs(2);
-        //db contains {(A,A), (B,B)}
+        generateKeyValuePairs(keyValuePairCount, startLetter);
     }
 
-    void givenDbWithFourKnownKeyValuePairs()
-    {
-        addNodes(1);
-        generateAndInsertKeyValuePairs(4);
-        //db contains {(A,A), (B,B), (C,C), (D,D)}
-    }
-
-    void givenTwoSynchronizedNodesWithRandomKeyValuePair()
+    void givenSynchronizedNodesWithRandomKeyValuePair()
     {
         givenTwoNodes();
         givenRandomKeyValuePair();
@@ -74,14 +66,9 @@ protected:
         andValueIsInSecondDb();
     }
 
-    void givenEmptyDb()
-    {
-        givenOneNode();
-    }
-
     void givenKeyValuePairWithEmptyKey()
     {
-        keyValuePair()->value = randomString();
+        keyValuePair()->value = 'A';
     }
 
     void givenRandomKeyValuePair(size_t keyValuePairIndex = 0)
@@ -92,26 +79,28 @@ protected:
 
     void givenKnownKeyValuePair()
     {
-        keyValuePair()->key = "B";
-        keyValuePair()->value = "B";
+        keyValuePair()->key ='B';
+        keyValuePair()->value = 'B';
     }
 
     void givenSecondKnownKeyValuePair()
     {
-        keyValuePair(1)->key = "C";
-        keyValuePair(1)->value = "C";
+        keyValuePair(1)->key = 'C';
+        keyValuePair(1)->value = 'C';
     }
 
-    void givenNewLowerLexicographicKeyValuePair(size_t keyValuePairIndex = 2)
+    void givenUninsertedLowerKeyValuePair()
     {
-        keyValuePair(keyValuePairIndex)->key = "A";
-        keyValuePair(keyValuePairIndex)->value = "A";
+        m_uninsertedPairIndex = m_keyValuePairs.size();
+        keyValuePair(m_uninsertedPairIndex)->key = 'A';
+        keyValuePair(m_uninsertedPairIndex)->value = 'A';
     }
 
-    void givenNewHigherLexicographicKeyValuePair(size_t keyValuePairIndex = 2)
+    void givenUninsertedHigherKeyValuePair()
     {
-        keyValuePair(keyValuePairIndex)->key = "D";
-        keyValuePair(keyValuePairIndex)->value = "D";
+        m_uninsertedPairIndex = m_keyValuePairs.size();
+        keyValuePair(m_uninsertedPairIndex)->key = 'D';
+        keyValuePair(m_uninsertedPairIndex)->value = 'D';
     }
 
     void givenTwoKeyValuePairsWithSameKey()
@@ -244,32 +233,59 @@ protected:
 
     void whenRequestLowerBoundForLowestKey()
     {
-        whenRequestLowerBoundForKey();
+        whenRequestLowerBoundForKey(m_givenLowestKey);
     }
 
     void whenRequestLowerBoundForHighestKey()
     {
-        whenRequestLowerBoundForKey(/*keyValuePairIndex*/ 1);
+        whenRequestLowerBoundForKey(m_givenHighestKey);
     }
 
-    void whenRequestLowerBoundForNewestKey()
+    void whenRequestLowerBoundForUninsertedKey()
     {
-        whenRequestLowerBoundForKey(/*keyValuePairIndex*/ 2);
+        whenRequestLowerBoundForKey(m_uninsertedPairIndex);
     }
 
     void whenRequestUpperBoundForLowestKey()
     {
-        whenRequestUpperBoundForKey();
+        whenRequestUpperBoundForKey(m_givenLowestKey);
     }
 
-    void whenRequestUpperBoundForHighestKey()
+    void whenRequestUpperBoundForHighestKey(size_t keyValuePairIndex = 1)
     {
-        whenRequestUpperBoundForKey(/*keyValuePairIndex*/ 1);
+        whenRequestUpperBoundForKey(keyValuePairIndex);
     }
 
-    void whenRequestRange()
+    void whenRequestRangeWithLowerBound()
     {
-        whenRequestRange(0, m_keyValuePairs.size() - 1);
+        whenRequestRange(m_givenLowestKey, m_givenHighestKey);
+    }
+
+    void whenRequestRangeWithUpperBound()
+    {
+        whenRequestRange(m_givenLowestKey, std::string(1, m_givenHighestKey[0] - 1));
+    }
+
+    void whenRequestRangeWithoutUpperBound()
+    {
+        whenRequestRange(m_givenLowestKey, std::string(1, m_givenHighestKey[0] + 1));
+    }
+
+    void whenRequestRangeWithoutLowerBound()
+    {
+        std::string keyWithoutLowerBound(1, m_givenHighestKey[0] + 1);
+        std::string keyWithoutLowerBound2(1, m_givenHighestKey[0] + 2);
+        whenRequestRange(keyWithoutLowerBound, keyWithoutLowerBound2);
+    }
+
+    void whenRequestRangeWithLowerBoundAndUpperBoundSwitched()
+    {
+        whenRequestRange(m_givenHighestKey, m_givenLowestKey);
+    }
+
+    void whenRequestRangeWithEqualLowerBoundAndUpperBound()
+    {
+        whenRequestRange(m_givenLowestKey, m_givenLowestKey);
     }
 
     void thenOperationSucceeded()
@@ -301,13 +317,7 @@ protected:
 
     void andFetchedRangeMatchesExpectedRange()
     {
-        //db contains {(A,A), (B,B), (C,C), (D,D)}
-
-        // getRange(A, D) should return {(A,A), (B,B), (C,C)}
-        auto expectedRange = keyValuePairsAsMap();
-        expectedRange.erase("D");
-
-        ASSERT_EQ(m_fetchedRange, expectedRange);
+        ASSERT_EQ(m_fetchedRange, m_expectedRange);
     }
 
     void andFetchedValueIsEmpty()
@@ -315,29 +325,29 @@ protected:
         ASSERT_TRUE(m_fetchedValue.empty());
     }
 
-    void thenLowerBoundMatchesFirstKey()
+    void thenFetchedLowerBoundMatchesLowestKey()
     {
-        thenLowerBoundMatchesKey();
+        thenLowerBoundMatchesKey(m_givenLowestKey);
     }
 
-    void thenLowerBoundMatchesSecondKey()
+    void thenFetchedLowerBoundMatchesHighestKey()
     {
-        thenLowerBoundMatchesKey(/*keyValuePairIndex*/ 1);
+        thenLowerBoundMatchesKey(m_givenHighestKey);
     }
 
-    void thenUpperBoundMatchesKey(size_t keyValuePairIndex = 0)
+    void thenFetchedUpperBoundMatchesExpectedKey()
     {
-        ASSERT_EQ(m_upperBound, keyValuePair(keyValuePairIndex)->key);
+        thenFetchedUpperBoundMatchesKey(std::string(1, m_givenLowestKey[0] + 1));
     }
 
-    void thenUpperBoundMatchesFirstKey()
+    void thenFetchedUpperBoundMatchesKey(size_t keyValuePairIndex = 0)
     {
-        thenUpperBoundMatchesKey();
+        thenFetchedUpperBoundMatchesKey(keyValuePair(keyValuePairIndex)->key);
     }
 
-    void thenUpperBoundMatchesSecondKey()
+    void thenFetchedUpperBoundMatchesKey(const std::string& key)
     {
-        thenUpperBoundMatchesKey(/*keyValuePairIndex*/ 1);
+        ASSERT_EQ(m_upperBound, key);
     }
 
     void andValueIsInDb(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
@@ -404,22 +414,6 @@ protected:
     }
 
 private:
-    void generateAndInsertKeyValuePairs(size_t keyValuePairCount)
-    {
-        char letter = 'A';
-        for (size_t keyValuePairIndex = 0; keyValuePairIndex < keyValuePairCount; ++keyValuePairIndex, ++letter)
-        {
-            std::string letterStr(1, letter);
-            keyValuePair(keyValuePairIndex)->key = letterStr;
-            keyValuePair(keyValuePairIndex)->value = letterStr;
-
-            whenInsertKeyValuePair(/*dbIndex*/ 0, keyValuePairIndex);
-
-            thenOperationSucceeded();
-            andValueIsInDb(/*dbIndex*/ 0, keyValuePairIndex);
-        }
-    }
-
     nx::utils::Url nodeUrl(Node* node)
     {
         using namespace nx::clusterdb::engine;
@@ -483,44 +477,85 @@ private:
         return &m_keyValuePairs[index];
     }
 
+    void generateKeyValuePairs(size_t keyValuePairCount, char startLetter = 'B')
+    {
+        char letter = startLetter;
+        m_givenLowestKey = letter;
+        m_givenHighestKey = letter;
+        for (
+            size_t keyValuePairIndex = 0;
+            keyValuePairIndex < keyValuePairCount;
+            ++keyValuePairIndex, ++letter)
+        {
+            keyValuePair(keyValuePairIndex)->key = letter;
+            keyValuePair(keyValuePairIndex)->value = letter;
+
+            whenInsertKeyValuePair(/*dbIndex*/ 0, keyValuePairIndex);
+
+            thenOperationSucceeded();
+            andValueIsInDb(/*dbIndex*/ 0, keyValuePairIndex);
+
+            m_givenHighestKey = letter;
+        }
+    }
 
     void whenRequestLowerBoundForKey(size_t keyValuePairIndex = 0)
     {
+        whenRequestLowerBoundForKey(keyValuePair(keyValuePairIndex)->key);
+    }
+
+    void whenRequestLowerBoundForKey(const std::string& lowerBoundKey)
+    {
         db()->dataManager().lowerBound(
-            keyValuePair(keyValuePairIndex)->key,
+            lowerBoundKey,
             [this](map::ResultCode result, std::string key)
-            {
-                m_result = result;
-                m_lowerBound = key;
-                callbackFired();
-            });
+        {
+            m_result = result;
+            m_fetchedLowerBound = key;
+            callbackFired();
+        });
 
         waitForCallback();
     }
 
     void whenRequestUpperBoundForKey(size_t keyValuePairIndex = 0)
     {
+        whenRequestUpperBoundForKey(keyValuePair(keyValuePairIndex)->key);
+    }
+
+    void whenRequestUpperBoundForKey(const std::string& upperBoundKey)
+    {
         db()->dataManager().upperBound(
-            keyValuePair(keyValuePairIndex)->key,
+            upperBoundKey,
             [this](map::ResultCode result, std::string key)
-            {
-                m_result = result;
-                m_upperBound = key;
-                callbackFired();
-            });
+        {
+            m_result = result;
+            m_upperBound = key;
+            callbackFired();
+        });
 
         waitForCallback();
     }
 
     void whenRequestRange(size_t lowerBoundIndex, size_t upperBoundIndex)
     {
+        whenRequestRange(keyValuePair(lowerBoundIndex)->key, keyValuePair(upperBoundIndex)->key);
+    }
+
+    void whenRequestRange(const std::string& lowerBoundKey, const std::string& upperBoundKey)
+    {
+        auto allPairs = keyValuePairsAsMap();
+        m_expectedRange = std::map<std::string, std::string>(
+            allPairs.lower_bound(lowerBoundKey),
+            allPairs.upper_bound(upperBoundKey));
+
         db()->dataManager().getRange(
-            keyValuePair(/*keyValuePairIndex*/ lowerBoundIndex)->key,
-            keyValuePair(/*keyValuePairIndex*/ upperBoundIndex)->key,
+            lowerBoundKey,
+            upperBoundKey,
             [this](ResultCode result, std::map<std::string, std::string> keyValuePairs)
             {
                 m_result = result;
-                m_fetchedRange = keyValuePairs;
+                m_fetchedRange = std::move(keyValuePairs);
                 callbackFired();
             });
 
@@ -529,16 +564,21 @@ private:
 
     void thenLowerBoundMatchesKey(size_t keyValuePairIndex = 0)
     {
-        ASSERT_EQ(m_lowerBound, keyValuePair(keyValuePairIndex)->key);
+        thenLowerBoundMatchesKey(keyValuePair(keyValuePairIndex)->key);
+    }
+
+    void thenLowerBoundMatchesKey(const std::string& key)
+    {
+        ASSERT_EQ(m_fetchedLowerBound, key);
     }
 
     std::map<std::string, std::string> keyValuePairsAsMap()
     {
-    std::map<std::string, std::string> pairs;
-    for (const auto& pair : m_keyValuePairs)
-        pairs.emplace(pair.key, pair.value);
-    return pairs;
-}
+        std::map<std::string, std::string> pairs;
+        for (const auto& pair : m_keyValuePairs)
+            pairs.emplace(pair.key, pair.value);
+        return pairs;
+    }
 
 private:
     std::vector<std::unique_ptr<NodeLauncher>> m_nodes;
@@ -546,6 +586,8 @@ private:
     std::vector<KeyValuePair> m_keyValuePairs;
     map::ResultCode m_result;
     std::string m_fetchedValue;
+
+    std::map<std::string, std::string> m_expectedRange;
     std::map<std::string, std::string> m_fetchedRange;
 
     std::mutex m_mutex;
@@ -557,8 +599,13 @@ private:
     std::string m_eventReceivedKey;
     std::string m_eventReceivedValue;
 
-    std::string m_lowerBound;
+    std::string m_fetchedLowerBound;
     std::string m_upperBound;
+
+    size_t m_uninsertedPairIndex;
+
+    std::string m_givenLowestKey;
+    std::string m_givenHighestKey;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -625,7 +672,7 @@ TEST_F(Database, fails_to_fetch_non_existent_value)
 
 TEST_F(Database, rejects_insert_with_empty_key)
 {
-    givenOneNode();
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
     whenInsertKeyValuePair();
 
@@ -634,7 +681,7 @@ TEST_F(Database, rejects_insert_with_empty_key)
 
 TEST_F(Database, rejects_fetch_with_empty_string)
 {
-    givenOneNode();
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
     whenFetchValue();
 
@@ -643,7 +690,7 @@ TEST_F(Database, rejects_fetch_with_empty_string)
 
 TEST_F(Database, rejects_remove_with_empty_string)
 {
-    givenOneNode();
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
     whenRemoveKey();
 
@@ -698,35 +745,49 @@ TEST_F(Database, does_not_trigger_record_removed_event_after_unsubscribing)
     andEventReceivedKeyDoesNotMatchRemovalKey();
 }
 
-TEST_F(Database, provides_lowerbound)
+TEST_F(Database, fetches_lowerbound_for_lowest_key)
 {
-    givenDbWithTwoKnownKeyValuePairs();
+    givenDbWithKnownKeyValuePairs();
 
     whenRequestLowerBoundForLowestKey();
 
     thenOperationSucceeded();
-    thenLowerBoundMatchesFirstKey();
+    thenFetchedLowerBoundMatchesLowestKey();
+}
 
+
+TEST_F(Database, fetches_lowerbound_for_highest_key)
+{
+    givenDbWithKnownKeyValuePairs();
 
     whenRequestLowerBoundForHighestKey();
 
     thenOperationSucceeded();
-    thenLowerBoundMatchesSecondKey();
+    thenFetchedLowerBoundMatchesHighestKey();
 }
 
-TEST_F(Database, provides_upperbound)
+TEST_F(Database, fetches_upperbound)
 {
-    givenDbWithTwoKnownKeyValuePairs();
+    givenDbWithKnownKeyValuePairs();
 
     whenRequestUpperBoundForLowestKey();
 
     thenOperationSucceeded();
-    thenUpperBoundMatchesSecondKey();
+    thenFetchedUpperBoundMatchesExpectedKey();
+}
+
+TEST_F(Database, fails_to_fetch_upperbound_when_key_has_none)
+{
+    givenDbWithKnownKeyValuePairs();
+
+    whenRequestUpperBoundForHighestKey();
+
+    thenOperationFailed(map::ResultCode::notFound);
 }
 
 TEST_F(Database, rejects_lowerbound_request_with_empty_key)
 {
-    givenOneNode();
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
 
     whenRequestLowerBoundForLowestKey();
@@ -736,7 +797,7 @@ TEST_F(Database, rejects_lowerbound_request_with_empty_key)
 
 TEST_F(Database, rejects_upperbound_request_with_empty_key)
 {
-    givenOneNode();
+    givenOneDb();
     givenKeyValuePairWithEmptyKey();
 
     whenRequestLowerBoundForLowestKey();
@@ -744,40 +805,79 @@ TEST_F(Database, rejects_upperbound_request_with_empty_key)
     thenOperationFailed(map::ResultCode::logicError);
 }
 
-TEST_F(Database, provides_lowerbound_when_key_goes_before_all_db_keys)
+TEST_F(Database, fetches_lowerbound_when_key_goes_before_all_db_keys)
 {
-    givenDbWithTwoKnownKeyValuePairs();
-    givenNewLowerLexicographicKeyValuePair();
+    givenDbWithKnownKeyValuePairs();
+    givenUninsertedLowerKeyValuePair();
 
-    whenRequestLowerBoundForNewestKey();
+    whenRequestLowerBoundForUninsertedKey();
 
     thenOperationSucceeded();
 }
 
-TEST_F(Database, fails_to_provide_lower_bound_when_key_goes_after_all_db_keys)
+TEST_F(Database, fails_to_fetch_lowerbound_when_key_goes_after_all_db_keys)
 {
-    givenDbWithTwoKnownKeyValuePairs();
-    givenNewHigherLexicographicKeyValuePair();
+    givenDbWithKnownKeyValuePairs();
+    givenUninsertedHigherKeyValuePair();
 
-    whenRequestLowerBoundForNewestKey();
+    whenRequestLowerBoundForUninsertedKey();
 
     thenOperationFailed(map::ResultCode::notFound);
 }
 
-TEST_F(Database, fails_to_provide_upperbound_for_highest_key_in_db)
+TEST_F(Database, fetches_range_with_upperbound)
 {
-    givenDbWithTwoKnownKeyValuePairs();
+    givenDbWithKnownKeyValuePairs();
 
-    whenRequestUpperBoundForHighestKey();
+    whenRequestRangeWithUpperBound();
+
+    thenOperationSucceeded();
+    andFetchedRangeMatchesExpectedRange();
+}
+
+TEST_F(Database, fetches_range_without_upperbound)
+{
+    givenDbWithKnownKeyValuePairs();
+
+    whenRequestRangeWithoutUpperBound();
+
+    thenOperationSucceeded();
+    andFetchedRangeMatchesExpectedRange();
+}
+
+TEST_F(Database, fetches_range_with_lowerbound)
+{
+    givenDbWithKnownKeyValuePairs();
+
+    whenRequestRangeWithLowerBound();
+
+    thenOperationSucceeded();
+    andFetchedRangeMatchesExpectedRange();
+}
+
+TEST_F(Database, fails_to_fetch_range_when_key_has_no_lowerbound)
+{
+    givenDbWithKnownKeyValuePairs();
+
+    whenRequestRangeWithoutLowerBound();
 
     thenOperationFailed(map::ResultCode::notFound);
 }
 
-TEST_F(Database, provides_range)
+TEST_F(Database, rejects_fetch_range_request_when_lowerbound_is_higher_than_upperbound)
 {
-    givenDbWithFourKnownKeyValuePairs();
+    givenDbWithKnownKeyValuePairs();
 
-    whenRequestRange();
+    whenRequestRangeWithLowerBoundAndUpperBoundSwitched();
+
+    thenOperationFailed(map::ResultCode::logicError);
+}
+
+TEST_F(Database, fetches_range_when_lowerbound_and_upperbound_are_equal)
+{
+    givenDbWithKnownKeyValuePairs();
+
+    whenRequestRangeWithEqualLowerBoundAndUpperBound();
 
     thenOperationSucceeded();
     andFetchedRangeMatchesExpectedRange();
@@ -797,7 +897,7 @@ TEST_F(Database, multiple_nodes_synchronize_insert_operation)
 
 TEST_F(Database, multiple_nodes_synchronize_remove_operation)
 {
-    givenTwoSynchronizedNodesWithRandomKeyValuePair();
+    givenSynchronizedNodesWithRandomKeyValuePair();
 
     whenRemoveKey();
 
