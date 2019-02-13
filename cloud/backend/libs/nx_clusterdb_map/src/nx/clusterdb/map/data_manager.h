@@ -93,11 +93,18 @@ public:
         LookupCompletionHandler completionHandler);
 
     /**
-     * Retrieves the key/value pairs between [keyLowerBound, keyUpperBound)
+     * Retrieves the key/value pairs between [keyLowerBound, keyUpperBound]
      */
     void getRange(
         const std::string& keyLowerBound,
         const std::string& keyUpperBound,
+        GetRangeCompletionHandler completionHandler);
+
+    /**
+     * Retrieves all key/values pairs whose keys start with keyPrefix.
+     */
+    void getRangeWithPrefix(
+        const std::string& keyPrefix,
         GetRangeCompletionHandler completionHandler);
 
 private:

@@ -214,6 +214,19 @@ void DataManager::getRange(
         });
 }
 
+void DataManager::getRangeWithPrefix(
+    const std::string& keyPrefix,
+    GetRangeCompletionHandler completionHandler)
+{
+    if (keyPrefix.empty())
+        return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
+
+    std::string keyPrefixUpperBound = keyPrefix;
+    ++keyPrefixUpperBound.back();
+
+    getRange(keyPrefix, keyPrefixUpperBound, std::move(completionHandler));
+}
+
 void DataManager::insertToOrUpdateDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key,
