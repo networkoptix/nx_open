@@ -616,8 +616,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
     }
-    if (sdb)
-        sdb->flushRecords();
+
     // merge chunks
     {
         QnMutexLocker lk(&m_mutexStorages);
@@ -1731,8 +1730,6 @@ void QnStorageManager::clearSpace(bool forced)
     }
 
     // 4. DB cleanup
-    qnStorageDbPool->flush();
-
     if (m_role != QnServer::StoragePool::Normal)
         return;
 
@@ -2831,7 +2828,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                     notMigratedChunks << chunk;
                 }
             }
-            qnStorageDbPool->flush();
+
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
                 writeCSVCatalog(catalogName, notMigratedChunks);
