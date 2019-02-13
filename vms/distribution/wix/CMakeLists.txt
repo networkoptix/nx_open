@@ -179,6 +179,7 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_utils
             nx_vms_utils
             nx_vms_api
+            nx_vms_rules
             nx_kit
             udt
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
