@@ -387,6 +387,66 @@ protected:
             };
     }
 
+    void whenClientSends(int messageCount)
+    {
+        auto readyPromise = std::make_shared<nx::utils::promise<void>>();
+        auto readyFuture = readyPromise->get_future();
+        int sentCount = 0;
+
+        clientSendCb =
+            [this, &sentCount, messageCount, readyPromise](
+                SystemError::ErrorCode error, size_t) mutable
+            {
+                ASSERT_EQ(SystemError::noError, error);
+                if (++sentCount == messageCount)
+                {
+                    readyPromise->set_value();
+                    return;
+                }
+                clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+            };
+
+        clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        readyFuture.wait();
+    }
+
+    void whenServerStartsReading()
+    {
+        serverReadCb =
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                ++doneCount;
+                if (error != SystemError::noError || transferred == 0)
+                    return;
+
+                ASSERT_EQ(SystemError::noError, error);
+                ASSERT_EQ(serverReadBuf, clientSendBuf);
+                serverReadBuf.clear();
+                serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+            };
+
+        serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    }
+
+    void thenAllMessagesShouldBeReceived(int messageCount)
+    {
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(15));
+            nx::utils::promise<int> doneCountPromise;
+            auto doneCountFuture = doneCountPromise.get_future();
+
+            serverWebSocket->post(
+                [this, doneCountPromise = std::move(doneCountPromise)]() mutable
+                {
+                    doneCountPromise.set_value(doneCount);
+                });
+
+            if (doneCountFuture.get() == messageCount)
+                break;
+        }
+    }
+
     void whenServerDoesntAnswerPings() {}
 
     void whenReadWriteScheduled()
@@ -1271,6 +1331,18 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     waitForServerSocketDestroyed();
 
     ASSERT_TRUE(!serverWebSocket);
+}
+
+TEST_F(WebSocket, imcomingMessagesQueueOverflow)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenClientTestDataPrepared(100);
+    givenServerClientWebSockets();
+
+    whenClientSends(/*messageCount*/1100);
+    whenServerStartsReading();
+    thenAllMessagesShouldBeReceived(/*messageCount*/1100);
 }
 
 } // namespace test
