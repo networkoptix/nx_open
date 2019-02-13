@@ -35,9 +35,10 @@ private:
 
     void onConnectToPeerFinished(
         api::ResultCode resultCode,
+        network::http::Response* httpResponse,
         controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
         CompletionHandler completionHandler);
-        
+
     void saveNewTunnel(
         std::unique_ptr<network::AbstractStreamSocket> connection,
         controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc);
