@@ -3945,7 +3945,7 @@ void HanwhaResource::setPtzCalibarionTimer()
 
             if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
             {
-                if (!calibratedChannels.diagnostics.errorCode)
+                if (calibratedChannels.diagnostics)
                 {
                     const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
                     const bool isCalibrated = calibratedChannels->count(getChannel());
