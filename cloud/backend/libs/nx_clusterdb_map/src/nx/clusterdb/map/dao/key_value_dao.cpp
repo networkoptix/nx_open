@@ -61,10 +61,9 @@ SELECT key FROM `%1_data` WHERE key > :upper_bound
 
 static constexpr char kFetchRangeTemplate[] = R"sql(
 
-SELECT * from `%1_data` WHERE key >= :lower_bound AND key < :upper_bound
+SELECT key, value from `%1_data` WHERE key >= :lower_bound AND key <= :upper_bound
 
 )sql";
-
 
 std::string hash(const std::string& key)
 {
@@ -183,7 +182,6 @@ std::map<std::string, std::string> KeyValueDao::getRange(
     }
 
     return pairs;
-
 }
 
 } // namespace nx::clusterdb::map::dao
