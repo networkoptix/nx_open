@@ -64,7 +64,7 @@ void TunnelValidator::fetchProtocolVersion(
 {
     auto protocolHeaderIter = response.headers.find(kNxProtocolHeader);
     if (protocolHeaderIter != response.headers.end())
-        m_relayProtocolVersion = protocolHeaderIter->second;
+        m_relayProtocolVersion = protocolHeaderIter->second.toStdString();
 }
 
 void TunnelValidator::stopWhileInAioThread()
@@ -106,7 +106,7 @@ void TunnelValidator::processRelayNotification(network::http::Message message)
 }
 
 void TunnelValidator::handleConnectionClosure(
-    SystemError::ErrorCode reason)
+    SystemError::ErrorCode /*reason*/)
 {
     if (m_handler)
         nx::utils::swapAndCall(m_handler, network::http::tunneling::ResultCode::ioError);
