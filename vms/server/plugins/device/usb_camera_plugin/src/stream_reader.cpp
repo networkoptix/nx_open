@@ -4,9 +4,6 @@
 #include <nx/utils/log/log.h>
 
 #include "ffmpeg/utils.h"
-#include "camera/buffered_stream_consumer.h"
-#include "native_stream_reader.h"
-#include "transcode_stream_reader.h"
 
 namespace nx::usb_cam {
 
@@ -19,32 +16,24 @@ static constexpr int kUsecInMsec = 1000;
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     const std::shared_ptr<Camera>& camera,
-    bool forceTranscoding)
+    bool isPrimaryStream)
     :
     m_refManager(parentRefManager),
     m_camera(camera),
-    m_avConsumer(new BufferedPacketConsumer(camera->toString()))
+    m_isPrimaryStream(isPrimaryStream)
 {
-    if (forceTranscoding)
-        m_streamReader.reset(new TranscodeStreamReader(camera));
-    else
-        m_streamReader.reset(new NativeStreamReader(camera));
-}
-
-StreamReader::~StreamReader()
-{
-    m_avConsumer->interrupt();
-    removeConsumer();
+    if (!m_isPrimaryStream || !camera->videoStream().isVideoCompressed())
+        m_transcodeReader.reset(new TranscodeStreamReader(camera));
 }
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if (memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader)) == 0)
+    if (memcmp(&interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader)) == 0)
     {
         addRef();
         return this;
     }
-    if (memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -64,92 +53,107 @@ int StreamReader::releaseRef() const
 
 int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
+    m_interrupted = false;
+    if (!m_isPrimaryStream)
+        m_camera->enablePacketBuffering(true);
     *lpPacket = nullptr;
 
-    ensureConsumerAdded();
-
-    auto packet = nextPacket();
-    if (!packet)
-        return handleNxError();
+    std::shared_ptr<ffmpeg::Packet> packet;
+    int nxStatus = nextPacket(packet);
+    if (nxStatus != nxcip::NX_NO_ERROR)
+        return nxStatus;
 
     *lpPacket = toNxPacket(packet.get()).release();
-
     return nxcip::NX_NO_ERROR;
 }
 
-std::shared_ptr<ffmpeg::Packet> StreamReader::nextPacket()
+int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    while (!shouldStop())
+    while (!m_interrupted)
     {
-        auto popped =  m_avConsumer->pop();
-        if (!popped)
+        int status;
+        if (m_isPrimaryStream)
+            status = m_camera->nextPacket(packet);
+        else
+            status = m_camera->nextBufferedPacket(packet);
+        if (status == AVERROR(EAGAIN))
             continue;
-
-        std::shared_ptr<ffmpeg::Packet> result;
-        int status = m_streamReader->processPacket(popped, result);
         if (status < 0)
         {
-            m_camera->setLastError(status);
-            return nullptr;
+            NX_ERROR(this, "Usb camera plugin reading error: %1", status);
+            return nxcip::NX_IO_ERROR;
         }
-
-        if (!result)
+        if (!packet)
             continue;
 
-        return result;
+        if (packet->mediaType() == AVMEDIA_TYPE_AUDIO)
+            return nxcip::NX_NO_ERROR;
+
+        if (m_transcodeReader)
+        {
+            std::shared_ptr<ffmpeg::Packet> transcoded;
+            status = m_transcodeReader->transcode(packet, transcoded);
+            if (status == AVERROR(EAGAIN))
+                continue;
+
+            if (status < 0)
+            {
+                NX_ERROR(this, "Usb camera plugin transcoding error: %1", status);
+                return nxcip::NX_OTHER_ERROR;
+            }
+            packet = transcoded;
+        }
+
+        return nxcip::NX_NO_ERROR;
     }
-    return nullptr;
+    return nxcip::NX_INTERRUPTED;
 }
 
 void StreamReader::interrupt()
 {
-    m_avConsumer->interrupt();
-    m_avConsumer->flush();
-
     m_interrupted = true;
+    if (m_isPrimaryStream)
+        m_camera->uninitialize();
+    else
+    {
+        m_camera->interruptBufferPacketWait();
+        m_camera->enablePacketBuffering(false);
+    }
 }
 
 void StreamReader::setFps(float fps)
 {
-    m_streamReader->setFps(fps);
+    if (m_isPrimaryStream)
+        m_camera->videoStream().setFps(fps);
+    if (m_transcodeReader)
+        m_transcodeReader->setFps(fps);
 }
 
 void StreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    m_streamReader->setResolution(resolution);
+    if (m_isPrimaryStream)
+        m_camera->videoStream().setResolution(resolution);
+    if (m_transcodeReader)
+        m_transcodeReader->setResolution(resolution);
 }
 
 void StreamReader::setBitrate(int bitrate)
 {
-    m_streamReader->setBitrate(bitrate);
-}
-
-void StreamReader::ensureConsumerAdded()
-{
-    if (!m_audioConsumerAdded)
-    {
-        m_camera->audioStream()->addPacketConsumer(m_avConsumer);
-        m_audioConsumerAdded = true;
-    }
-
-    if (!m_videoConsumerAdded)
-    {
-        m_camera->videoStream()->addPacketConsumer(m_avConsumer);
-        m_videoConsumerAdded = true;
-    }
+    if (m_isPrimaryStream)
+        m_camera->videoStream().setBitrate(bitrate);
+    if (m_transcodeReader)
+        m_transcodeReader->setBitrate(bitrate);
 }
 
 std::unique_ptr<ILPMediaPacket> StreamReader::toNxPacket(const ffmpeg::Packet *packet)
 {
-    int keyPacket = packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0;
-
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
         packet->mediaType() == AVMEDIA_TYPE_VIDEO ? 0 : 1,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
         ffmpeg::utils::toNxCompressionType(packet->codecId()),
         packet->timestamp() * kUsecInMsec,
-        keyPacket,
+        packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0,
         0));
 
     nxPacket->resizeBuffer(packet->size());
@@ -157,44 +161,6 @@ std::unique_ptr<ILPMediaPacket> StreamReader::toNxPacket(const ffmpeg::Packet *p
         memcpy(nxPacket->data(), packet->data(), packet->size());
 
     return nxPacket;
-}
-
-void StreamReader::removeConsumer()
-{
-    m_camera->audioStream()->removePacketConsumer(m_avConsumer);
-    m_audioConsumerAdded = false;
-
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
-    m_videoConsumerAdded = false;
-}
-
-bool StreamReader::interrupted()
-{
-    if (m_interrupted)
-    {
-        m_interrupted = false;
-        return true;
-    }
-    return false;
-}
-
-int StreamReader::handleNxError()
-{
-    removeConsumer();
-
-    if (interrupted())
-        return nxcip::NX_INTERRUPTED;
-
-
-    if (m_camera->ioError())
-        return nxcip::NX_IO_ERROR;
-
-    return nxcip::NX_OTHER_ERROR;
-}
-
-bool StreamReader::shouldStop() const
-{
-    return m_interrupted || m_camera->ioError();
 }
 
 } // namespace usb_cam::nx

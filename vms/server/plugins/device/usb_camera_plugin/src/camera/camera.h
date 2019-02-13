@@ -2,15 +2,14 @@
 
 #include <memory>
 #include <atomic>
+#include <vector>
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_container_api.h>
 
 #include "video_stream.h"
 #include "audio_stream.h"
-
-#include "device/video/resolution_data.h"
-#include "device/abstract_compression_type_descriptor.h"
+#include "packet_buffer.h"
 
 namespace nx::usb_cam {
 
@@ -21,58 +20,50 @@ public:
         const std::string& url,
         const nxcip::CameraInfo& cameraInfo,
         nxpl::TimeProvider* const timeProvider);
-    virtual ~Camera() = default;
 
-    virtual void setCredentials( const char* username, const char* password );
+    void setCredentials(const char* username, const char* password);
 
     bool initialize();
-    bool isInitialized() const;
-
-    std::shared_ptr<AudioStream> audioStream();
-    std::shared_ptr<VideoStream> videoStream();
-
-    std::vector<device::video::ResolutionData> resolutionList() const;
+    void uninitialize();
+    VideoStream&  videoStream();
+    AudioStream&  audioStream();
 
     bool hasAudio() const;
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
     void setUrl(const std::string& url);
-
-    bool ioError() const;
-
-    void setLastError(int errorCode);
     int lastError() const;
 
     uint64_t millisSinceEpoch() const;
-    nxpl::TimeProvider* const timeProvider() const;
 
-    const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
-    CodecParameters defaultVideoParameters() const;
-    std::string ffmpegUrl() const;
     const nxcip::CameraInfo& info() const;
     std::string toString() const;
+
+    int nextPacket(std::shared_ptr<ffmpeg::Packet>& packet);
+    int nextBufferedPacket(std::shared_ptr<ffmpeg::Packet>& packet);
+    void enablePacketBuffering(bool value);
+    void interruptBufferPacketWait();
 
 private:
     static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList;
 
-    std::string m_url;
     nxcip::CameraInfo m_cameraInfo;
     nxpl::TimeProvider* const m_timeProvider;
     CodecParameters m_defaultVideoParams;
     mutable std::mutex m_mutex;
 
-    std::shared_ptr<AudioStream> m_audioStream;
-    std::shared_ptr<VideoStream> m_videoStream;
+    // Needed for emulating of secondary stream
+    PacketBuffer m_packetBuffer;
+
+    std::unique_ptr<AudioStream> m_audioStream;
+    std::unique_ptr<VideoStream> m_videoStream;
 
     bool m_audioEnabled = false;
+    std::atomic_bool m_keyFrameFound = false;
+    std::atomic_bool m_enablePacketBuffering = false;
     std::atomic_int m_lastError = 0;
 
-    device::CompressionTypeDescriptorPtr m_compressionTypeDescriptor;
-
     bool m_initialized = false;
-
-private:
-    CodecParameters getDefaultVideoParameters();
 };
 
 } // namespace nx::usb_cams

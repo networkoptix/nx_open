@@ -1,4 +1,4 @@
-#include "buffered_stream_consumer.h"
+#include "packet_buffer.h"
 
 #include <nx/utils/log/log.h>
 
@@ -13,7 +13,7 @@ static constexpr int kBufferMaxSize(1024 * 1024 * 8); // 8 MB.
 
 }
 
-void BufferedPacketConsumer::pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet)
+void PacketBuffer::pushPacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     if (m_bufferSizeBytes > kBufferMaxSize)
     {
@@ -30,7 +30,7 @@ void BufferedPacketConsumer::pushPacket(const std::shared_ptr<ffmpeg::Packet>& p
     push(packet);
 }
 
-void BufferedPacketConsumer::flush()
+void PacketBuffer::flush()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_dropUntilNextVideoKeyPacket = true;
@@ -38,7 +38,7 @@ void BufferedPacketConsumer::flush()
     m_buffer.clear();
 }
 
-void BufferedPacketConsumer::push(const std::shared_ptr<ffmpeg::Packet>& packet)
+void PacketBuffer::push(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_buffer.emplace_back(packet);
@@ -46,7 +46,7 @@ void BufferedPacketConsumer::push(const std::shared_ptr<ffmpeg::Packet>& packet)
     m_wait.notify_all();
 }
 
-std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::pop()
+std::shared_ptr<ffmpeg::Packet> PacketBuffer::pop()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_wait.wait(lock, [this]() { return m_interrupted || !m_buffer.empty(); });
@@ -59,7 +59,7 @@ std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::pop()
     return packet;
 }
 
-void BufferedPacketConsumer::interrupt()
+void PacketBuffer::interrupt()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_interrupted = true;
