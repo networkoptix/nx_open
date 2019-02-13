@@ -436,6 +436,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
             m_motionSelectionInstrument->setEnabled(!on);
         });
 
+    connect(action(action::EscapeHotkeyAction), &QAction::triggered, this,
+        &QnWorkbenchController::at_unmaximizeItemAction_triggered);
+
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
 
