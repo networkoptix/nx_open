@@ -43,13 +43,16 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         });
 
     // This should go before connecting to hasChangesChanged!
-    connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged,
+    auto updateWatermarkState =
         [this](int state)
         {
             m_watermarkSettings.useWatermark = (state == Qt::Checked);
             ui->watermarkSettingsButton->setVisible(state == Qt::Checked);
-        });
-    ui->displayWatermarkCheckBox->setCheckState(m_watermarkSettings.useWatermark ? Qt::Checked : Qt::Unchecked);
+        };
+    connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged,
+        this, updateWatermarkState);
+    // Need to sync checkbox to button, loadDataToUi() will do the rest.
+    updateWatermarkState(ui->displayWatermarkCheckBox->checkState() ? Qt::Checked : Qt::Unchecked);
 
     connect(ui->auditTrailCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
