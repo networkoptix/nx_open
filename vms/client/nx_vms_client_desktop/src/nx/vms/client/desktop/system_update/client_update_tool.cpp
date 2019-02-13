@@ -240,11 +240,11 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         // Expecting that file is stored at:
         NX_INFO(this)
             << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
-            << m_clientPackage.file;
-        QString path = contents.storageDir.filePath(m_clientPackage.file);
+            << m_clientPackage.localFile;
+        QString path = contents.storageDir.filePath(m_clientPackage.localFile);
         if (!QFileInfo::exists(path))
         {
-            NX_INFO(this)
+            NX_ERROR(this)
                 << "downloadUpdate(" << contents.info.version << ") the file"
                 << path << "does not exist!";
             setError(QString("File %1 does not exist").arg(path));
