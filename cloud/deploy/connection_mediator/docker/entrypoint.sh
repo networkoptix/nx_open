@@ -1,6 +1,8 @@
 #!/usr/local/bin/dumb-init /bin/bash
 
-mkdir -p /tmp/core
+mkdir -p /tmp/core /opt/networkoptix/connection_mediator/etc
+
+echo "$SECRETS" > /opt/networkoptix/connection_mediator/etc/secrets
 
 tmp=$(tempfile)
 envsubst < /opt/networkoptix/connection_mediator/etc/connection_mediator.conf > $tmp
