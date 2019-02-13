@@ -155,7 +155,7 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
                 ? nx::sql::DBResult::ok
                 : nx::sql::DBResult::notFound;
         },
-        [this, sharedKey, completionHandler = std::move(completionHandler)](
+        [sharedKey, completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
             completionHandler(
@@ -179,7 +179,7 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
                 ? nx::sql::DBResult::ok
                 : nx::sql::DBResult::notFound;
         },
-        [this, sharedKey, completionHandler = std::move(completionHandler)](
+        [sharedKey, completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
             completionHandler(
@@ -207,7 +207,7 @@ void DataManager::getRange(
                 ? nx::sql::DBResult::notFound
                 : nx::sql::DBResult::ok;
         },
-        [this, sharedPairs, completionHandler = std::move(completionHandler)](
+        [sharedPairs, completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
             completionHandler(toResultCode(dbResult), std::move(*sharedPairs));

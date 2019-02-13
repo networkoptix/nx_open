@@ -35,14 +35,6 @@ DELETE FROM `%1_data` WHERE key=:key
 
 )sql";
 
-
-static constexpr char kFetchKeyValuePairsTemplate[] = R"sql(
-
-SELECT key, value FROM `%1_data`
-
-)sql";
-
-
 static constexpr char kFetchValueTemplate[] = R"sql(
 
 SELECT value FROM `%1_data` where key=:key
