@@ -49,10 +49,10 @@ public:
 private:
     enum class HintState
     {
-        OK,         //< Hint is hidden.
-        Pressed,    //< Just pressed, waiting to check.
-        Released,   //< Button is released too fast, hint is required.
-        Error,      //< Some error occurred.
+        ok,         //< Hint is hidden.
+        pressed,    //< Just pressed, waiting to check.
+        released,   //< Button is released too fast, hint is required.
+        error,      //< Some error occurred.
     };
 
     void setState(HintState state);
@@ -68,7 +68,7 @@ private:
 
     const QString m_sourceId;
     bool m_started = false;
-    HintState m_state = HintState::OK;
+    HintState m_state = HintState::ok;
 
     rest::Handle m_requestHandle = 0;
     QTimer* const m_hintTimer;
