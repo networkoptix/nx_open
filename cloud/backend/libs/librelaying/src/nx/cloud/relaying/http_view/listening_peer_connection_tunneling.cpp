@@ -88,6 +88,10 @@ void ListeningPeerConnectionTunnelingServer::onBeginListeningCompletion(
         return;
     }
 
+    httpResponse->headers.emplace(
+        relay::api::kNxProtocolHeader,
+        relay::api::kRelayProtocol);
+
     serializeToHeaders(&httpResponse->headers, response);
     completionHandler(nx::network::http::StatusCode::ok, std::move(request));
 }

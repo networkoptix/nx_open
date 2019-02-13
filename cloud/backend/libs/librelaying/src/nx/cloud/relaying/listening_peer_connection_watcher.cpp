@@ -37,7 +37,7 @@ void ListeningPeerConnectionWatcher::start(
             monitoringConnectionForClosure();
 
             if (peerSupportsKeepAliveProbe())
-                startSendingKeepAliveProbes();
+                sendKeepAliveProbe();
         });
 }
 
@@ -55,13 +55,17 @@ void ListeningPeerConnectionWatcher::startTunnel(
         {
             cancelKeepAlive();
 
-            sendNotification(
-                std::move(notification),
-                [this, handler = std::move(handler)](SystemError::ErrorCode resultCode)
+            if (!peerSupportsKeepAliveProbe() || m_firstKeepAliveSent)
+                return startTunnel(std::move(notification), std::move(handler));
+
+            sendKeepAliveProbe(
+                [this, notification = std::move(notification), handler = std::move(handler)](
+                    SystemError::ErrorCode resultCode) mutable
                 {
-                    if (m_connection)
-                        m_connection->cancelIOSync(network::aio::etNone);
-                    handler(resultCode, std::exchange(m_connection, nullptr));
+                    if (resultCode != SystemError::noError)
+                        return nx::utils::swapAndCall(handler, resultCode, nullptr);
+
+                    startTunnel(std::move(notification), std::move(handler));
                 });
         });
 }
@@ -94,21 +98,43 @@ bool ListeningPeerConnectionWatcher::peerSupportsKeepAliveProbe() const
         nx::utils::SoftwareVersion(0, 1);
 }
 
-void ListeningPeerConnectionWatcher::startSendingKeepAliveProbes()
-{
-    sendKeepAliveProbe();
-    scheduleKeepAliveProbeTimer();
-}
-
 void ListeningPeerConnectionWatcher::sendKeepAliveProbe()
 {
-    relay::api::KeepAliveNotification notification;
-    sendNotification(
-        std::move(notification),
+    sendKeepAliveProbe(
         [this](SystemError::ErrorCode /*resultCode*/)
         {
             // TODO: #ak Report connection closure? Or rely on monitoringConnectionForClosure?
             scheduleKeepAliveProbeTimer();
+        });
+}
+
+void ListeningPeerConnectionWatcher::sendKeepAliveProbe(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    relay::api::KeepAliveNotification notification;
+    sendNotification(
+        std::move(notification),
+        [this, handler = std::move(handler)](SystemError::ErrorCode resultCode)
+        {
+            if (resultCode == SystemError::noError)
+                m_firstKeepAliveSent = true;
+
+            if (handler)
+                handler(resultCode);
+        });
+}
+
+void ListeningPeerConnectionWatcher::startTunnel(
+    relay::api::OpenTunnelNotification notification,
+    OpenTunnelHandler handler)
+{
+    sendNotification(
+        std::move(notification),
+        [this, handler = std::move(handler)](SystemError::ErrorCode resultCode)
+        {
+            if (m_connection)
+                m_connection->cancelIOSync(network::aio::etNone);
+            handler(resultCode, std::exchange(m_connection, nullptr));
         });
 }
 

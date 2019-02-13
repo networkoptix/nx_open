@@ -167,6 +167,17 @@ TYPED_TEST_P(ListeningPeerConnectionWatcher, keep_alive_probes_are_sent_to_peer_
         this->thenKeepAliveNotificationIsNotReceived();
 }
 
+TYPED_TEST_P(ListeningPeerConnectionWatcher, keep_alive_probe_is_always_sent_before_open_tunnel)
+{
+    if (!this->peerSupportsKeepAlive())
+        return;
+
+    this->whenStartTunnel();
+
+    this->thenKeepAliveNotificationIsReceived();
+    this->thenOpenTunnelNotificationIsReceived();
+}
+
 TYPED_TEST_P(ListeningPeerConnectionWatcher, no_keep_alive_is_sent_after_open_tunnel)
 {
     this->whenStartTunnel();
@@ -178,6 +189,7 @@ TYPED_TEST_P(ListeningPeerConnectionWatcher, no_keep_alive_is_sent_after_open_tu
 REGISTER_TYPED_TEST_CASE_P(ListeningPeerConnectionWatcher,
     sends_open_tunnel_notification,
     keep_alive_probes_are_sent_to_peer_with_support,
+    keep_alive_probe_is_always_sent_before_open_tunnel,
     no_keep_alive_is_sent_after_open_tunnel);
 
 //-------------------------------------------------------------------------------------------------
