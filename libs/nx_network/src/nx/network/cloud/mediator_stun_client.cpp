@@ -19,7 +19,7 @@ MediatorStunClient::MediatorStunClient(
             using namespace nx::network::stun;
 
             auto client = std::make_unique<AsyncClientWithHttpTunneling>(settings);
-            client->setTunnelValidatorFactory([](auto connection) {
+            client->setTunnelValidatorFactory([](auto connection, const auto& /*response*/) {
                 return std::make_unique<ClientConnectionValidator>(std::move(connection)); });
             return client;
         }()),
