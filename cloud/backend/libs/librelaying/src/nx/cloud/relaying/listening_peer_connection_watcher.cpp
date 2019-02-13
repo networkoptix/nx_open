@@ -101,7 +101,7 @@ bool ListeningPeerConnectionWatcher::peerSupportsKeepAliveProbe() const
 void ListeningPeerConnectionWatcher::sendKeepAliveProbe()
 {
     sendKeepAliveProbe(
-        [this](SystemError::ErrorCode resultCode)
+        [this](SystemError::ErrorCode /*resultCode*/)
         {
             // TODO: #ak Report connection closure? Or rely on monitoringConnectionForClosure?
             scheduleKeepAliveProbeTimer();
