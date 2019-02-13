@@ -50,14 +50,20 @@ private:
     nx::Buffer m_readBuffer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
     network::aio::Timer m_timer;
+    bool m_firstKeepAliveSent = false;
 
     void monitoringConnectionForClosure();
 
     bool peerSupportsKeepAliveProbe() const;
 
-    void startSendingKeepAliveProbes();
-
     void sendKeepAliveProbe();
+
+    void sendKeepAliveProbe(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    void startTunnel(
+        relay::api::OpenTunnelNotification notification,
+        OpenTunnelHandler handler);
 
     template<typename Notification, typename Handler>
     // requires std::is_void<std::invoke_result_t<handler, SystemError::ErrorCode>::type>::value
