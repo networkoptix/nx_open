@@ -225,6 +225,36 @@ void QnLicenseWidget::changeEvent(QEvent* event)
         ui->retranslateUi(this);
 }
 
+void QnLicenseWidget::keyPressEvent(QKeyEvent* event)
+{
+    const auto lineEdit = qobject_cast<QLineEdit*>(QApplication::focusWidget());
+    if (!lineEdit || !lineEdit->isEnabled() || lineEdit->isReadOnly() || !lineEdit->isVisible())
+    {
+        event->ignore();
+        return;
+    }
+
+    switch (event->key())
+    {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        {
+            event->accept(); //< Do not propagate Enter key up to the dialog.
+
+            if (event->modifiers() && event->modifiers() != Qt::KeypadModifier)
+                break;
+
+            if (lineEdit == ui->onlineKeyEdit)
+                ui->activateLicenseButton->click();
+
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
 void QnLicenseWidget::browseForLicenseFile()
 {
     const auto fileName = QFileDialog::getOpenFileName(

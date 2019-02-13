@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QEvent>
+#include <QtGui/QKeyEvent>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
@@ -46,6 +47,7 @@ signals:
 
 protected:
     virtual void changeEvent(QEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
 
 private:
     void updateControls();
