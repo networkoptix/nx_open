@@ -3949,12 +3949,15 @@ void HanwhaResource::setPtzCalibarionTimer()
 
             if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
             {
-                const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
-                const bool isCalibrated = calibratedChannels->count(getChannel());
-                if (isRedirected != isCalibrated)
+                if (!calibratedChannels.diagnostics.errorCode)
                 {
-                    NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
-                    return setStatus(Qn::Offline);
+                    const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+                    const bool isCalibrated = calibratedChannels->count(getChannel());
+                    if (isRedirected != isCalibrated)
+                    {
+                        NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
+                        return setStatus(Qn::Offline);
+                    }
                 }
             }
 
