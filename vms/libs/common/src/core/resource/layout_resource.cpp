@@ -18,16 +18,15 @@ QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     setTypeId(nx::vms::api::LayoutData::kResourceTypeId);
 }
 
-QString QnLayoutResource::getUniqueId() const
-{
-    if (isFile())
-        return getUrl();
-    return base_type::getUniqueId();
-}
-
 Qn::ResourceStatus QnLayoutResource::getStatus() const
 {
     return Qn::Online;
+}
+
+void QnLayoutResource::setStatus(Qn::ResourceStatus newStatus,
+    Qn::StatusChangeReason reason /*= Qn::StatusChangeReason::Local*/)
+{
+    NX_ASSERT(false, "Not implemented");
 }
 
 QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
@@ -462,8 +461,8 @@ void QnLayoutResource::setLocked(bool value)
 
 bool QnLayoutResource::isFile() const
 {
-    NX_ASSERT(hasFlags(Qn::exported_layout) == !getUrl().isEmpty());
-    return hasFlags(Qn::exported_layout);
+    NX_ASSERT(!hasFlags(Qn::exported_layout));
+    return false;
 }
 
 bool QnLayoutResource::isShared() const

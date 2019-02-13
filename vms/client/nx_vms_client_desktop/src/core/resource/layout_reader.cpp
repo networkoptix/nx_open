@@ -4,7 +4,7 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
 
-#include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
@@ -17,35 +17,35 @@
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 
-QnLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const QString& layoutUrl)
+QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const QString& layoutUrl)
 {
     // Create storage handler and read layout info.
     QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule(), layoutUrl);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
     if (!layoutFile)
-        return QnLayoutResourcePtr();
+        return QnFileLayoutResourcePtr();
 
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnFileLayoutResourcePtr layout(new QnFileLayoutResource());
 
     // Deal with encrypted layouts.
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
     if (!fileInfo.isValid)
-        return QnLayoutResourcePtr();
+        return QnFileLayoutResourcePtr();
 
     nx::vms::api::LayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout))
     {
         QnProto::Message<nx::vms::api::LayoutData> apiLayoutMessage;
         if (!QnProto::deserialize(layoutData, &apiLayoutMessage))
-            return QnLayoutResourcePtr();
+            return QnFileLayoutResourcePtr();
 
         apiLayout = apiLayoutMessage.data;
     }
 
-    ec2::fromApiToResource(apiLayout, layout);
+    ec2::fromApiToResource(apiLayout, layout.staticCast<QnLayoutResource>());
 
     QnLayoutItemDataList orderedItems;
     foreach(const auto& item, apiLayout.items)
@@ -59,7 +59,6 @@ QnLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const QStri
     layout->setId(layoutId);
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());
-    layout->addFlags(Qn::exported_layout);
     layout->setUrl(layoutUrl);
 
     if (fileInfo.isCrypted)
