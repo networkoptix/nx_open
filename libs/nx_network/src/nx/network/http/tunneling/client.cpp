@@ -72,7 +72,9 @@ void Client::handleOpenTunnelCompletion(OpenTunnelResult result)
 
     NX_VERBOSE(this, "Validating tunnel to %1", m_baseTunnelUrl);
 
-    m_validator = m_validatorFactory(std::exchange(result.connection, nullptr));
+    m_validator = m_validatorFactory(
+        std::exchange(result.connection, nullptr),
+        response());
     m_validator->bindToAioThread(getAioThread());
     if (m_timeout)
         m_validator->setTimeout(*m_timeout);
