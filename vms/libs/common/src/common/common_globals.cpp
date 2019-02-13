@@ -109,6 +109,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupAction,
 (Qn::BackupAction_ShowProgress, QString())
 )
 
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permissions),
+    (debug)
+)
+
 namespace Qn {
 
 QString toString(AuthResult value)

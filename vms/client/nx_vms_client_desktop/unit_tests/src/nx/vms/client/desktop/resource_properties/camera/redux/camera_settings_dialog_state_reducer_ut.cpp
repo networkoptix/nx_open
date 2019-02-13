@@ -32,6 +32,24 @@ QnScheduleTaskList makeEmptySchedule()
     return result;
 }
 
+QnScheduleTaskList makeDefaultSchedule()
+{
+    QnScheduleTaskList result;
+    for (int day = 1; day <= 7; ++day)
+    {
+        result.push_back({
+            /*dayOfWeek*/ day,
+            /*startTime*/ 0,
+            /*endTime*/ 86400,
+            /*recordingType*/ Qn::RecordingType::never,
+            /*streamQuality*/ Qn::StreamQuality::highest,
+            /*fps*/ 0,
+            /*bitrateKbps*/ 0
+		});
+    }
+    return result;
+}
+
 } // namespace
 
 class CameraSettingsDialogStateReducerTest: public testing::Test
@@ -154,6 +172,36 @@ TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushAfterCleanSchedule)
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(afterClean, cameras);
     State reloaded = Reducer::loadCameras(std::move(afterClean), cameras);
     ASSERT_EQ(reloaded.recording.brush.fps, kDefaultFps);
+}
+
+// When a user enables recording with an empty schedule, special notification should appear.
+TEST_F(CameraSettingsDialogStateReducerTest, recordingAlertIfScheduleIsEmpty)
+{
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setScheduleTasks(makeEmptySchedule());
+
+	State initial = Reducer::loadCameras({}, {camera});
+    ASSERT_FALSE(initial.recording.enabled());
+    ASSERT_FALSE(initial.recordingHint.has_value());
+
+    const auto makeRecordingState =
+        [camera]
+        {
+            return Reducer::setRecordingEnabled(Reducer::loadCameras({}, {camera}), true);
+        };
+
+    auto recordingEnabled = makeRecordingState();
+    ASSERT_TRUE(recordingEnabled.recording.enabled());
+    ASSERT_TRUE(recordingEnabled.recordingHint.has_value());
+    ASSERT_EQ(*recordingEnabled.recordingHint, State::RecordingHint::emptySchedule);
+
+    // Warning should be hidden if we disable recording.
+    State recordingDisabled = Reducer::setRecordingEnabled(makeRecordingState(), false);
+    ASSERT_FALSE(recordingDisabled.recordingHint.has_value());
+
+    // Warning should be hidden if we setup some schedule.
+    State scheduleSet = Reducer::setSchedule(makeRecordingState(), makeDefaultSchedule());
+    ASSERT_FALSE(recordingDisabled.recordingHint.has_value());
 }
 
 } // namespace test

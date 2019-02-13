@@ -544,16 +544,18 @@ void QnStorageAnalyticsWidget::updateTotalTablesGeometry()
 void QnStorageAnalyticsWidget::positionHintButton()
 {
     const auto cellSize = ui->forecastTotalsTable-> sizeHintForIndex(
-        ui->forecastTotalsTable->model()->index(0,0));
+        ui->forecastTotalsTable->model()->index(0, 0));
 
-    if(cellSize.isValid())
+    if (cellSize.isValid())
     {
         // Top = 12 is magic, but looks good.
         m_hintAnchor->setMargins(cellSize.width(), 12, 0, 0);
         m_hintButton->setVisible(true);
     }
     else
+    {
         m_hintButton->setVisible(false);
+    }
 }
 
 void QnStorageAnalyticsWidget::resizeEvent(QResizeEvent*)

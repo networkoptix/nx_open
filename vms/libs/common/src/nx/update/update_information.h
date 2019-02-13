@@ -20,6 +20,11 @@ struct Package
     QString variant;
     QString variantVersion;
     QString file;
+    /**
+     * Local path to the package. This value is used locally by each peer.
+     * Do not add it to fusion until it is really necessary.
+     */
+    QString localFile;
     QString url;
     QString md5;
     qint64 size = 0;

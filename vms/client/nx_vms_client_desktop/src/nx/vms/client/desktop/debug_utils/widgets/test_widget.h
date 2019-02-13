@@ -13,13 +13,13 @@ namespace nx::vms::client::desktop {
 class TestWidget: public QLabel
 {
 public:
-    TestWidget(QWidget* parent = 0);
+    explicit TestWidget(QWidget* parent = nullptr);
 
 private:
     void updateInfo();
 
-    void resizeEvent(QResizeEvent *event) override;
-    void moveEvent(QMoveEvent *event) override;
+    void resizeEvent(QResizeEvent* event) override;
+    void moveEvent(QMoveEvent* event) override;
 
     QScopedPointer<QTimer> m_timer;
 };

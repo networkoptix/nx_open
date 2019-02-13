@@ -70,7 +70,6 @@ QnCameraStatsData QnRecordingStats::transformStatsToModelData(const QnRecordingS
         if (isOwnCamera(cameraResource, server))
         {
             data.cameras << camera;
-            // data.cameras << camera; //< Uncomment this to get free extra cameras in the dialog.
         }
         else
         {

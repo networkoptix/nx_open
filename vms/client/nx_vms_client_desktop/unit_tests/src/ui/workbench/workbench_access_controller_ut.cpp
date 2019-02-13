@@ -22,11 +22,6 @@ const QString userName1 = QStringLiteral("unit_test_user_1");
 const QString userName2 = QStringLiteral("unit_test_user_2");
 }
 
-void PrintTo(const Qn::Permissions& val, ::std::ostream* os)
-{
-    *os << QnLexical::serialized(val).toStdString();
-}
-
 class QnWorkbenchAccessControllerTest: public testing::Test
 {
 protected:

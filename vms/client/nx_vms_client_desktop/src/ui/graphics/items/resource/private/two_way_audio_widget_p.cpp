@@ -214,33 +214,33 @@ QnTwoWayAudioWidget::Private::Private(
         int timeout = 0;
         switch (m_state)
         {
-            case HintState::OK:
+            case HintState::ok:
                 return;
 
-            case HintState::Pressed:
+            case HintState::pressed:
                 if (m_stateTimer.hasExpired(kDataTimeoutMs))
                 {
                     auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
                     if (data.isEmpty())
                     {
                         setHint(tr("Input device is not selected"));
-                        setState(HintState::Error);
+                        setState(HintState::error);
                         stopStreaming();
                     }
                 }
                 return;
 
-            case HintState::Released:
+            case HintState::released:
                 timeout = kShowHintMs;
                 break;
 
-            case HintState::Error:
+            case HintState::error:
                 timeout = kShowErrorMs;
                 break;
         }
 
         if (m_stateTimer.hasExpired(timeout))
-            setState(HintState::OK);
+            setState(HintState::ok);
     });
 }
 
@@ -310,7 +310,7 @@ void QnTwoWayAudioWidget::Private::startStreaming()
     if (!server || server->getStatus() != Qn::Online)
         return;
 
-    setState(HintState::Pressed);
+    setState(HintState::pressed);
 
     m_requestHandle = server->restConnection()->twoWayAudioCommand(m_sourceId,
         m_camera->getId(),
@@ -320,13 +320,13 @@ void QnTwoWayAudioWidget::Private::startStreaming()
             if (handle != m_requestHandle)
                 return;
 
-            if (m_state != HintState::Pressed)
+            if (m_state != HintState::pressed)
                 return;
 
             if (!success || result.error != QnRestResult::NoError)
             {
                 setHint(tr("Streaming is not ready yet"));
-                setState(HintState::Error);
+                setState(HintState::error);
                 stopStreaming();
             }
 
@@ -336,7 +336,7 @@ void QnTwoWayAudioWidget::Private::startStreaming()
     if (!m_started)
     {
         setHint(tr("Network error"));
-        setState(HintState::Error);
+        setState(HintState::error);
     }
 }
 
@@ -345,9 +345,9 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
     if (!m_started)
         return;
 
-    NX_ASSERT(m_state == HintState::Pressed || m_state == HintState::Error, "Invalid state");
-    if (m_state != HintState::Error)
-        setState(HintState::Released);
+    NX_ASSERT(m_state == HintState::pressed || m_state == HintState::error, "Invalid state");
+    if (m_state != HintState::error)
+        setState(HintState::released);
 
     m_started = false;
     m_requestHandle = 0;
@@ -403,13 +403,13 @@ void QnTwoWayAudioWidget::Private::paint(
     QPainterPath path;
     path.addRoundedRect(rect, roundness, roundness);
 
-    const auto background = m_state == HintState::Pressed
+    const auto background = m_state == HintState::pressed
         ? colors.background
         : (q->isUnderMouse() ? palette.midlight() : palette.window());
 
     painter->fillPath(path, background);
 
-    if (m_state == HintState::Pressed && qFuzzyEquals(m_hintVisibility, kVisible))
+    if (m_state == HintState::pressed && qFuzzyEquals(m_hintVisibility, kVisible))
     {
         NX_ASSERT(m_stateTimer.isValid());
         const auto visualizerRect = rect.adjusted(roundness, 0.0, -minSize, 0.0);
@@ -451,7 +451,7 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
     bool open = false;
     switch (m_state)
     {
-        case HintState::Pressed:
+        case HintState::pressed:
         {
             open = true;
             setHint(tr("Hold to Speak"));
@@ -464,11 +464,11 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
             break;
         }
 
-        case HintState::Released:
+        case HintState::released:
             open = m_stateTimer.isValid() && !m_stateTimer.hasExpired(kHoldTimeoutMs);
             break;
 
-        case HintState::Error:
+        case HintState::error:
             open = true;
             break;
 
@@ -477,7 +477,7 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
     }
 
     m_paintTimeStamp = 0;
-    if (m_state == HintState::OK)
+    if (m_state == HintState::ok)
     {
         m_stateTimer.invalidate();
         m_hintTimer->stop();
@@ -497,7 +497,7 @@ void QnTwoWayAudioWidget::Private::setState(HintState state)
         connect(m_hintAnimator, &AbstractAnimator::finished, this,
             [this]()
             {
-                if (m_state == HintState::Released || m_state == HintState::Error)
+                if (m_state == HintState::released || m_state == HintState::error)
                     opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kVisible);
             });
 

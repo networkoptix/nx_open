@@ -554,7 +554,7 @@ void QnLayoutResource::forgetPasswordForRecordings()
         if (auto resource = pool->getResourceByDescriptor(item.resource))
         {
             // Remove password from protected video streams.
-            if (auto aviItem = resource.objectCast<QnAviResource>())
+            if (auto aviItem = resource.dynamicCast<QnAviResource>())
                 aviItem->forgetPassword();
 
             // Remove freshly added cameras from the layout.

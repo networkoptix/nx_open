@@ -75,6 +75,25 @@ void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)
     emit licenseTypeChanged(toSharedPointer(this));
 }
 
+bool CameraResourceStub::setProperty(const QString& key,
+    const QString& value,
+    PropertyOptions options)
+{
+    base_type::setProperty(key, value, options);
+    emitPropertyChanged(key);
+    return false;
+}
+
+bool CameraResourceStub::setProperty(
+    const QString& key,
+    const QVariant& value,
+    PropertyOptions options)
+{
+    base_type::setProperty(key, value, options);
+    emitPropertyChanged(key);
+    return false;
+}
+
 void CameraResourceStub::markCameraAsVMax()
 {
     d->licenseType = Qn::LC_VMAX;

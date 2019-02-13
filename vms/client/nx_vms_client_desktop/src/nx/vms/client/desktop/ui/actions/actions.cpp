@@ -1162,7 +1162,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
-        .requiredTargetPermissions(Qn::WritePermission)
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Rotate to..."));
 
     factory.beginSubMenu();
