@@ -154,7 +154,7 @@ void ScheduleSettingsWidget::setupUi()
     addQualityItem(Qn::StreamQuality::high);
     addQualityItem(Qn::StreamQuality::highest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData((int)Qn::StreamQuality::high));
-    ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, "
+    ui->qualityLabel->setHint(tr("Quality setting determines the compression rate only, "
         "and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
 
     ui->bitrateSpinBox->setDecimals(nx::core::CameraBitrateCalculator::kBitrateKbpsPrecisionDecimals);
