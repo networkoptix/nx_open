@@ -710,6 +710,7 @@ void ServerUpdateTool::requestStopAction()
 
 void ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 {
+    NX_WARNING(this, "requestFinishUpdate(%1)", skipActivePeers);
     if (auto connection = getServerConnection(commonModule()->currentServer()))
         connection->updateActionFinish(skipActivePeers, {});
     m_stateTracker->clearState();
@@ -763,25 +764,16 @@ void ServerUpdateTool::requestInstallAction(
             if (!success)
                 NX_ERROR(typeid(ServerUpdateTool)) << "requestInstallAction() - response success=false";
             if (tool)
+            {
                 tool->m_requestingInstall.remove(handle);
+                tool->requestRemoteUpdateStateAsync();
+            }
         };
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         if (auto handle = connection->updateActionInstall(targets, callback, thread()))
             m_requestingInstall.insert(handle);
-
-        // Requesting remote update info.
-        connection->getUpdateInfo(
-            [tool=QPointer<ServerUpdateTool>(this)](bool success,
-                rest::Handle /*handle*/, const nx::update::Information& response)
-            {
-                if (success && tool)
-                {
-                    tool->m_timeStartedInstall = response.lastInstallationRequestTime;
-                    tool->m_serversAreInstalling = response.participants.toSet();
-                }
-            });
     }
 }
 

@@ -571,7 +571,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
             streamCapabilities.value(nx::vms::api::StreamIndex::primary);
 
         state.recording.customBitrateAvailable = true;
-        state = loadMinMaxCustomBitrate(std::move(state));
 
         state.singleCameraSettings.enableMotionDetection.setBase(
             isMotionDetectionEnabled(firstCamera));
@@ -643,6 +642,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<int>(state.recording.thresholds.afterSec, cameras,
         calculateRecordingThresholdAfter);
 
+    state = loadMinMaxCustomBitrate(std::move(state));
     state = fillBitrateFromFixedQuality(std::move(state));
 
     state.recording.minDays = calculateMinRecordingDays(cameras);

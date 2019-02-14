@@ -252,11 +252,25 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         {
             NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
 
-            if (m_stateTracker && !m_stateTracker->setResourceFeed(resourcePool()))
+            if (m_stateTracker)
             {
-                // We will be here when we disconnect from the server.
-                // So we can clear our state as well.
-                clearUpdateInfo();
+                if (m_stateTracker->setResourceFeed(resourcePool()))
+                {
+                    // We will be here when we connected to another system.
+                    // We should run update check again. This should fix VMS-13037.
+                    if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
+                    {
+                        QString updateUrl = qnSettings->updateFeedUrl();
+                        m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
+                    }
+                }
+                else
+                {
+                    // We will be here when we disconnect from the server.
+                    // So we can clear our state as well.
+                    clearUpdateInfo();
+                    setTargetState(WidgetUpdateState::initial, {});
+                }
             }
         });
 
@@ -815,6 +829,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         auto targets = m_stateTracker->getAllPeers();
         auto offlineServers = m_stateTracker->getOfflineServers();
 
+        targets.subtract(offlineServers);
         if (!offlineServers.empty())
         {
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
@@ -829,7 +844,6 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             auto clicked = messageBox->clickedButton();
             if (clicked == cancel)
                 return;
-            targets.subtract(offlineServers);
         }
 
         auto incompatible = m_stateTracker->getLegacyServers();
@@ -854,6 +868,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         // fall through to 'readyRestart' or 'complete' state.
         //if (!m_clientUpdateTool->shouldInstallThis(m_updateInfo))
         //    targets.remove(m_stateTracker->getClientPeerId());
+        m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
 
         if (m_updateSourceMode == UpdateSourceType::file)
         {
@@ -1062,10 +1077,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         if (m_clientUpdateTool->hasUpdate())
         {
             bool complete = m_clientUpdateTool->getState() == ClientUpdateTool::State::complete;
-            if (complete)
-                result.current += 10;
             result.installingClient = !complete;
-            result.max += 10;
         }
     }
 
@@ -2157,6 +2169,13 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         {
             ServerUpdateTool::ProgressInfo info = calculateActionProgress();
             debugState << lm("progress=%1 of %2, active=%3, done=%4").args(info.current, info.max, info.active, info.done);
+        }
+        if (m_widgetState == WidgetUpdateState::installing
+            || m_widgetState == WidgetUpdateState::installingStalled)
+        {
+            auto installDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                m_serverUpdateTool->getInstallDuration());
+            debugState << QString("duration=%1").arg(installDuration.count());
         }
         QString debugText = debugState.join("<br>");
         if (debugText != ui->debugStateLabel->text())
