@@ -137,12 +137,13 @@ public:
     virtual Error setHandler(IDeviceAgent::IHandler* handler) override;
     virtual Error pushDataPacket(IDataPacket* dataPacket) override;
     virtual const IString* manifest(Error* error) const override;
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual void setSettings(const IStringMap* settings) override;
+    virtual IStringMap* pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;
     void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
+    void processMetadataPacket(IMetadataPacket* metadataPacket, int packetIndex /*= -1*/);
 
 private:
     mutable std::mutex m_mutex;

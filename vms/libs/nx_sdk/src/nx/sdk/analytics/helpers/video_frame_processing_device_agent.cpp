@@ -137,42 +137,64 @@ void VideoFrameProcessingDeviceAgent::processMetadataPackets(
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         for (int i = 0; i < (int) metadataPackets.size(); ++i)
-        {
-            const auto metadataPacket = toPtr(metadataPackets.at(i));
-            if (metadataPacket)
-            {
-                std::string packetName;
-                if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
-                {
-                    packetName = "Object";
-                }
-                else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
-                {
-                    packetName = "Event";
-                }
-                else
-                {
-                    NX_OUTPUT << __func__ << "(): WARNING: Metadata packet #" << i
-                        << " has unknown type.";
-                    packetName = "Unknown";
-                }
-                packetName += " metadata packet #" + nx::kit::utils::toString(i);
-
-                NX_OUTPUT << __func__ << "(): " << packetName << " contains "
-                    << metadataPacket->count() << " item(s).";
-                NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
-                if (metadataPacket->timestampUs() == 0)
-                    NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
-
-                m_handler->handleMetadata(metadataPacket.get());
-            }
-            else
-            {
-                NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet #" << i
-                    << " found; discarded.";
-            }
-        }
+            processMetadataPacket(toPtr(metadataPackets.at(i)).get(), i);
     }
+}
+
+void VideoFrameProcessingDeviceAgent::processMetadataPacket(
+    IMetadataPacket* metadataPacket, int packetIndex = -1)
+{
+    const std::string packetIndexName =
+        (packetIndex == -1) ? "" : (std::string(" #") + nx::kit::utils::toString(packetIndex));
+    if (!m_handler)
+    {
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
+        return;
+    }    
+    if (!metadataPacket)
+    {
+        NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet" << packetIndexName
+            << " found; discarded.";            
+        return;
+    }
+
+    if (NX_DEBUG_ENABLE_OUTPUT)
+    {    
+        std::string packetName;
+        if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
+        {
+            packetName = "Object";
+        }
+        else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
+        {
+            packetName = "Event";
+        }
+        else
+        {
+            NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
+                << " has unknown type.";
+            packetName = "Unknown";
+        }
+        packetName += " metadata packet" + packetIndexName;
+        
+        if (metadataPacket->count() == 0)   
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
+
+        const std::string itemsName = (metadataPacket->count() == 1) 
+            ? (std::string("item of type ") + metadataPacket->at(0)->typeId())
+            : "item(s)";
+
+        NX_OUTPUT << __func__ << "(): " << packetName << " contains "
+            << metadataPacket->count() << " " << itemsName << ".";
+
+        if (metadataPacket->timestampUs() == 0)
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+    }
+
+    NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
+
+    m_handler->handleMetadata(metadataPacket);
 }
 
 const IString* VideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
@@ -180,7 +202,7 @@ const IString* VideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
     return new String(manifest());
 }
 
-void VideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void VideoFrameProcessingDeviceAgent::setSettings(const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
@@ -188,7 +210,7 @@ void VideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::IStringMap* set
     settingsReceived();
 }
 
-nx::sdk::IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
+IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -197,25 +219,10 @@ nx::sdk::IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
 // Tools for the derived class.
 
 void VideoFrameProcessingDeviceAgent::pushMetadataPacket(
-    nx::sdk::analytics::IMetadataPacket* metadataPacket)
+    IMetadataPacket* metadataPacket)
 {
-    if (!metadataPacket)
-    {
-        NX_PRINT << __func__ << "(): ERROR: metadataPacket is null; ignoring";
-        return;
-    }
-
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (!m_handler)
-    {
-        NX_PRINT << __func__ << "(): "
-            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
-    }
-    else
-    {
-        m_handler->handleMetadata(metadataPacket);
-    }
-
+    processMetadataPacket(metadataPacket);
     metadataPacket->releaseRef();
 }
 
