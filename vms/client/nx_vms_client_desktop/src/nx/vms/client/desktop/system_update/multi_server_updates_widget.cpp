@@ -1945,10 +1945,14 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    bool showButton = m_updateSourceMode != UpdateSourceType::file &&
-        (m_widgetState == WidgetUpdateState::ready || m_widgetState != WidgetUpdateState::initial);
-    if (hasLatestVersion)
-        showButton = false;
+    bool showButton = !hasLatestVersion
+        && m_updateSourceMode != UpdateSourceType::file
+        && (m_widgetState == WidgetUpdateState::ready
+            || m_widgetState != WidgetUpdateState::initial)
+        && (m_updateInfo.error == nx::update::InformationError::networkError
+            || m_updateInfo.error == nx::update::InformationError::httpError
+            // If one wants to download a file in another place.
+            || m_updateInfo.error == nx::update::InformationError::noError);
     ui->manualDownloadButton->setVisible(showButton);
 
     syncVersionReport(m_updateReport);
