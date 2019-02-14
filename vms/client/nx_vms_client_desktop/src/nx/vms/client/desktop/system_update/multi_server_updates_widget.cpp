@@ -828,22 +828,31 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         // with the same version.
         auto targets = m_stateTracker->getAllPeers();
         auto offlineServers = m_stateTracker->getOfflineServers();
-
         targets.subtract(offlineServers);
         if (!offlineServers.empty())
         {
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             messageBox->setIcon(QnMessageBoxIcon::Warning);
-            messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
-            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
-            messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
-                QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
-            auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
 
-            messageBox->exec();
-            auto clicked = messageBox->clickedButton();
-            if (clicked == cancel)
+            if (targets.empty())
+            {
+                messageBox->setText(tr("There are no online servers to update."));
+                messageBox->addButton(QDialogButtonBox::Ok);
+                messageBox->exec();
                 return;
+            }
+            else
+            {
+                messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
+                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
+                messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
+                    QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
+                auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
+                messageBox->exec();
+                auto clicked = messageBox->clickedButton();
+                if (clicked == cancel)
+                    return;
+            }
         }
 
         auto incompatible = m_stateTracker->getLegacyServers();
@@ -864,10 +873,6 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             targets.subtract(incompatible);
         }
 
-        // We always run install commands for client. Though clientUpdateTool state can
-        // fall through to 'readyRestart' or 'complete' state.
-        //if (!m_clientUpdateTool->shouldInstallThis(m_updateInfo))
-        //    targets.remove(m_stateTracker->getClientPeerId());
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
 
         if (m_updateSourceMode == UpdateSourceType::file)
@@ -889,6 +894,8 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
         NX_INFO(this) << "atStartUpdateAction() - sending 'download' command to peers" << targets;
         m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, targets);
+        // We always run install commands for client. Though clientUpdateTool state can
+        // fall through to 'readyRestart' or 'complete' state.
         m_clientUpdateTool->setUpdateTarget(m_updateInfo);
     }
     else
