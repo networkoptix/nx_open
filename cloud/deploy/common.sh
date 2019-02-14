@@ -33,6 +33,20 @@ function check_vms_dirs()
     is_dir_by_var NX_VMS_DIR || { echo Exiting..; exit 1; }
 }
 
+function copy_deps()
+{
+    local binary=$1
+    local src=$2
+    local dest=$3
+
+    local libs="$(ldd $binary | awk '{print $1}' | grep -v /)"
+
+    for lib in "$libs"
+    do
+        [ -f "$src/$lib" -a ! -f "$dest/$lib" ] && cp -l $src/$lib $dest
+    done
+}
+
 function stage_cmake()
 {
     local cmakeBuildDirectory=$1
@@ -40,11 +54,9 @@ function stage_cmake()
 
     rm -rf stage
 
-    mkdir -p stage/$moduleName/bin stage/$moduleName/lib stage/qt/lib stage/qt/bin stage/var/log
-    cp -rl $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
-    cp -rl $cmakeBuildDirectory/lib/* stage/$moduleName/lib
-
-    mv stage/$moduleName/lib/libQt* stage/qt/lib/
+    mkdir -p stage/$moduleName/bin stage/$moduleName/lib stage/var/log
+    cp -l $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
+    copy_deps stage/$moduleName/bin/$moduleName $cmakeBuildDirectory/lib stage/$moduleName/lib
 }
 
 function pack()

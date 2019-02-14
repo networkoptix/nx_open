@@ -1,15 +1,13 @@
 FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
 
-ADD stage/qt /opt/networkoptix/qt
-ADD stage/traffic_relay /opt/networkoptix/traffic_relay
-
-ADD etc/traffic_relay.conf /opt/networkoptix/traffic_relay/etc/traffic_relay.conf
-ADD docker/entrypoint.sh /opt/networkoptix/traffic_relay/bin
+COPY stage/traffic_relay /opt/networkoptix/traffic_relay
+COPY etc/traffic_relay.conf /opt/networkoptix/traffic_relay/etc/traffic_relay.conf
+COPY docker/entrypoint.sh /opt/networkoptix/traffic_relay/bin
 
 EXPOSE 3349
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/qt/bin
-ENV LD_LIBRARY_PATH /opt/networkoptix/qt/lib:/opt/networkoptix/traffic_relay/lib
+ENV QT_PLUGIN_PATH /opt/networkoptix/traffic_relay/bin \
+    LD_LIBRARY_PATH /opt/networkoptix/traffic_relay/lib
 
 CMD ["/opt/networkoptix/traffic_relay/bin/entrypoint.sh"]
 
