@@ -614,15 +614,12 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     {
         frame = handleChannelFrame(
             readFrame(request, streamIndex, archiveDelegate.get(), channelMask.front(), isOpened));
-        if (frame)
+        if (!frame)
         {
-            outFrame = frame;
-            continue;
+            NX_VERBOSE(this, "%1(): Got null frame", __func__);
+            return nullptr;
         }
-
-        // return what we have got.
-        if (i >= channelCount)
-            break;
+        outFrame = frame;
     }
 
     NX_ASSERT(outFrame);
