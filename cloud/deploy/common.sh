@@ -73,7 +73,10 @@ function stage_cmake()
 
     rm -rf stage
 
-    mkdir -p stage/$moduleName/bin stage/$moduleName/lib stage/var/log
+    mkdir -p stage/$moduleName/bin/sqldrivers stage/$moduleName/lib stage/var/log
+
+    cp ${QT_DIR}/plugins/sqldrivers/libqsqlmysql.so stage/${moduleName}/bin/sqldrivers/
+
     cp -l $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
     copy_deps stage/$moduleName/bin/$moduleName $cmakeBuildDirectory/lib stage/$moduleName/lib
     copy_deps stage/$moduleName/bin/sqldrivers/libqsqlmysql.so $cmakeBuildDirectory/lib stage/$moduleName/lib
