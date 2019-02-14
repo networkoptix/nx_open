@@ -15,6 +15,7 @@
 
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
@@ -188,15 +189,15 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
 
-    setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
-    ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, "
+    setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
+    ui->settingsDisableControlCheckBox->setHint(tr("Server will not change any cameras settings, "
         "it will receive and use camera stream as-is. "));
 
-    setHelpTopic(ui->bitratePerGopHint, Qn::CameraSettings_Expert_SettingsControl_Help);
-    ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; "
+    setHelpTopic(ui->bitratePerGopCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
+    ui->bitratePerGopCheckBox->setHint(tr("Helps fix image quality issues on some cameras; "
         "for others will cause significant bitrate increase."));
 
-    auto logicalIdHint = nx::vms::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
+    auto logicalIdHint = HintButton::hintThat(ui->logicalIdGroupBox);
     logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera "
         "for quick identification and access"));
     // TODO: #common #dkargin Fill in help topic when it is implemented.
