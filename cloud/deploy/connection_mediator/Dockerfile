@@ -7,8 +7,8 @@ COPY docker/entrypoint.sh /opt/networkoptix/connection_mediator/bin
 
 EXPOSE 3345
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/connection_mediator/bin \
-    LD_LIBRARY_PATH /opt/networkoptix/connection_mediator/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/connection_mediator/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/connection_mediator/lib
 
 CMD ["/opt/networkoptix/connection_mediator/bin/entrypoint.sh"]
 

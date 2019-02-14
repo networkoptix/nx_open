@@ -5,8 +5,8 @@ COPY stage/mediaserver /opt/networkoptix/mediaserver
 
 COPY docker/entrypoint.sh /opt/networkoptix/mediaserver/bin
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/mediaserver/bin
-ENV LD_LIBRARY_PATH /opt/networkoptix/mediaserver/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/mediaserver/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/mediaserver/lib
 
 VOLUME ["/opt/networkoptix/mediaserver/etc", "/opt/networkoptix/mediaserver/var"]
 

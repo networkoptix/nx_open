@@ -76,6 +76,7 @@ function stage_cmake()
     mkdir -p stage/$moduleName/bin stage/$moduleName/lib stage/var/log
     cp -l $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
     copy_deps stage/$moduleName/bin/$moduleName $cmakeBuildDirectory/lib stage/$moduleName/lib
+    copy_deps stage/$moduleName/bin/sqldrivers/libqsqlmysql.so $cmakeBuildDirectory/lib stage/$moduleName/lib
 }
 
 function pack()

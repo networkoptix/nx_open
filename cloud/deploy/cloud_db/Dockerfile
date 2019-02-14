@@ -12,8 +12,8 @@ COPY docker/entrypoint.sh /opt/networkoptix/cloud_db/bin
 
 EXPOSE 3346
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/cloud_db/bin \
-    LD_LIBRARY_PATH /opt/networkoptix/cloud_db/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/cloud_db/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/cloud_db/lib
 
 CMD ["/opt/networkoptix/cloud_db/bin/entrypoint.sh"]
 

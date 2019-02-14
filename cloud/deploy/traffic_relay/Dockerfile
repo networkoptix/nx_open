@@ -6,8 +6,8 @@ COPY docker/entrypoint.sh /opt/networkoptix/traffic_relay/bin
 
 EXPOSE 3349
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/traffic_relay/bin \
-    LD_LIBRARY_PATH /opt/networkoptix/traffic_relay/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/traffic_relay/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/traffic_relay/lib
 
 CMD ["/opt/networkoptix/traffic_relay/bin/entrypoint.sh"]
 

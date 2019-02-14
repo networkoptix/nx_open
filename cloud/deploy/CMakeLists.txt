@@ -10,14 +10,14 @@ function(nx_add_cloud_deploy_target name)
     add_dependencies(${name}-docker-build cloud-docker-build-prepare)
     add_custom_command(
         TARGET ${name}-docker-build
-        COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} ./make.sh stage_cmake ${CMAKE_BINARY_DIR} ${name})
-
-    add_custom_command(
-        TARGET ${name}-docker-build
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/stage/${name}/bin/sqldrivers)
     add_custom_command(
         TARGET ${name}-docker-build
         COMMAND ${CMAKE_COMMAND} -E copy ${QT_DIR}/plugins/sqldrivers/libqsqlmysql.so ${CMAKE_CURRENT_BINARY_DIR}/stage/${name}/bin/sqldrivers/)
+
+    add_custom_command(
+        TARGET ${name}-docker-build
+        COMMAND ${CMAKE_COMMAND} -E env NX_VMS_DIR=${CMAKE_SOURCE_DIR} ./make.sh stage_cmake ${CMAKE_BINARY_DIR} ${name})
 
     add_custom_command(
         TARGET ${name}-docker-build

@@ -4,8 +4,8 @@ COPY stage/ /opt/networkoptix/cloud_connect_test_util/
 
 COPY docker/nx_network.ini /tmp/nx_network.ini
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/cloud_connect_test_util/bin \
-    LD_LIBRARY_PATH /opt/networkoptix/cloud_connect_test_util/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/cloud_connect_test_util/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/cloud_connect_test_util/lib
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/opt/networkoptix/cloud_connect_test_util/bin/cloud_connect_test_util"]
 
