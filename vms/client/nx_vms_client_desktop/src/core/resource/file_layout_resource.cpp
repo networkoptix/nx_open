@@ -24,7 +24,6 @@ Qn::ResourceStatus QnFileLayoutResource::getStatus() const
 
 bool QnFileLayoutResource::isFile() const
 {
-    NX_ASSERT(hasFlags(Qn::exported_layout));
     NX_ASSERT(!getUrl().isEmpty());
     return true;
 }
