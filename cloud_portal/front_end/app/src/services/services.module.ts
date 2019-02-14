@@ -15,6 +15,7 @@ import { downgradeInjectable }       from '@angular/upgrade/static';
     entryComponents: [
     ],
     providers      : [
+        NxAppStateService,
         NxLanguageProviderService,
         NxConfigService
     ],

@@ -236,7 +236,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             queryParams,
             relativeTo: this._route,
             replaceUrl: true,
-            // queryParamsHandling: 'merge',
+            queryParamsHandling: 'merge',
             // do not trigger navigation
             // skipLocationChange : true
         });

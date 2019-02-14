@@ -109,7 +109,7 @@ export class NxVendorListComponent implements OnInit {
                     queryParams,
                     relativeTo: this._route,
                     replaceUrl: true,
-                    // queryParamsHandling: 'merge',
+                    queryParamsHandling: 'merge',
                     // do not trigger navigation
                     // skipLocationChange : true
                 });
