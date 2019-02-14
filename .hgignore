@@ -23,7 +23,6 @@ subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
 subinclude:webadmin/.hgignore
 subinclude:cloud/.hgignore
-subinclude:cloud_portal/robot_tests/.hgignore
 
 # Build folders in the repository root.
 re:^build/
