@@ -20,6 +20,13 @@ CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
     setId(QnUuid::createUuid());
     addFlags(Qn::server_live_cam);
     setForceUseLocalProperties(true);
+
+    static const CameraMediaStreams mediaStreams{{
+        {nx::vms::api::StreamIndex::primary, {1920, 1080}},
+        {nx::vms::api::StreamIndex::secondary, {640, 480}}}};
+
+    setProperty(ResourcePropertyKey::kMediaStreams,
+        QString::fromUtf8(QJson::serialized(mediaStreams)));
 }
 
 CameraResourceStub::~CameraResourceStub()
