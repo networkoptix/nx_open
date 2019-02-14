@@ -75,7 +75,8 @@ void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)
     emit licenseTypeChanged(toSharedPointer(this));
 }
 
-bool CameraResourceStub::setProperty(const QString& key,
+bool CameraResourceStub::setProperty(
+    const QString& key,
     const QString& value,
     PropertyOptions options)
 {
