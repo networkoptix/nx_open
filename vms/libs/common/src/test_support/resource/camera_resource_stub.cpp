@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 
 struct CameraResourceStub::Private
