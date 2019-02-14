@@ -12,7 +12,7 @@ class NX_KEY_VALUE_DB_API Node:
 public:
     Node(int argc, char** argv);
 
-    map::Database* database();
+    map::Database& database();
 
 protected:
     virtual void setup() override;

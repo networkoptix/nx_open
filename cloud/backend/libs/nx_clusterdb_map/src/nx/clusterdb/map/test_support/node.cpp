@@ -13,9 +13,9 @@ Node::Node(int argc, char** argv):
 {
 }
 
-map::Database* Node::database()
+map::Database& Node::database()
 {
-    return m_database.get();
+    return *m_database.get();
 }
 
 void Node::setup()

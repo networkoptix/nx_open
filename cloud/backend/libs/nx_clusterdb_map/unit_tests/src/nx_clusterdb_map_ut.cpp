@@ -184,7 +184,7 @@ protected:
 
     void whenInsertKeyValuePair(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
-        db(dbIndex)->dataManager().insertOrUpdate(
+        db(dbIndex).dataManager().insertOrUpdate(
             keyValuePair(keyValuePairIndex)->key,
             keyValuePair(keyValuePairIndex)->value,
             [this](map::ResultCode result)
@@ -203,7 +203,7 @@ protected:
 
     void whenFetchValue(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
-        db(dbIndex)->dataManager().get(
+        db(dbIndex).dataManager().get(
             keyValuePair(keyValuePairIndex)->key,
             [this](map::ResultCode result, std::string value)
             {
@@ -217,7 +217,7 @@ protected:
 
     void whenRemoveKey()
     {
-        db()->dataManager().remove(keyValuePair()->key,
+        db().dataManager().remove(keyValuePair()->key,
             [this](map::ResultCode result)
             {
                 m_result = result;
@@ -236,7 +236,7 @@ protected:
 
     void whenSubscribeToRecordInsertedEvent()
     {
-        db()->eventProvider().subscribeToRecordInserted(
+        db().eventProvider().subscribeToRecordInserted(
             [this](nx::sql::QueryContext* /*queryContext*/, std::string key, std::string value)
             {
                 m_eventTriggered = true;
@@ -248,7 +248,7 @@ protected:
 
     void whenSubscribeToRecordRemovedEvent()
     {
-        db()->eventProvider().subscribeToRecordRemoved(
+        db().eventProvider().subscribeToRecordRemoved(
             [this](nx::sql::QueryContext* /*queryContext*/, std::string key)
             {
                 m_eventTriggered = true;
@@ -259,12 +259,12 @@ protected:
 
     void whenUnsubscribeFromRecordInsertedEvent()
     {
-        db()->eventProvider().unsubscribeFromRecordInserted(m_eventSubscriptionId);
+        db().eventProvider().unsubscribeFromRecordInserted(m_eventSubscriptionId);
     }
 
     void whenUnsubscribeFromRecordRemovedEvent()
     {
-        db()->eventProvider().unsubscribeFromRecordRemoved(m_eventSubscriptionId);
+        db().eventProvider().unsubscribeFromRecordRemoved(m_eventSubscriptionId);
     }
 
     void whenRequestLowerBoundForLowestKey()
@@ -491,7 +491,7 @@ private:
         m_wait.notify_all();
     }
 
-    map::Database* db(size_t index = 0)
+    map::Database& db(size_t index = 0)
     {
         return m_nodes[index]->moduleInstance()->database();
     }
@@ -517,7 +517,7 @@ private:
                 Node* node = m_nodes[j]->moduleInstance().get();
 
                 m_nodes[i]->moduleInstance()->connectToNode(
-                    node->database()->systemId(),
+                    node->database().systemId(),
                     nodeUrl(node));
             }
         }
@@ -583,7 +583,7 @@ private:
 
     void whenRequestLowerBoundForKey(const std::string& lowerBoundKey)
     {
-        db()->dataManager().lowerBound(
+        db().dataManager().lowerBound(
             lowerBoundKey,
             [this](map::ResultCode result, std::string key)
         {
@@ -602,7 +602,7 @@ private:
 
     void whenRequestUpperBoundForKey(const std::string& upperBoundKey)
     {
-        db()->dataManager().upperBound(
+        db().dataManager().upperBound(
             upperBoundKey,
             [this](map::ResultCode result, std::string key)
             {
@@ -629,7 +629,7 @@ private:
                 allPairs.upper_bound(upperBoundKey));
         }
 
-        db()->dataManager().getRange(
+        db().dataManager().getRange(
             lowerBoundKey,
             upperBoundKey,
             [this](ResultCode result, std::map<std::string, std::string> keyValuePairs)
@@ -654,7 +654,7 @@ private:
                 ? allPairs.upper_bound(*prefixUpperBound)
                 : allPairs.end());
 
-        db()->dataManager().getRangeWithPrefix(
+        db().dataManager().getRangeWithPrefix(
             prefix,
             [this](map::ResultCode result, std::map<std::string, std::string> fetchedRange)
             {
