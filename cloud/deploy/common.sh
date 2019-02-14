@@ -39,9 +39,9 @@ function copy_deps()
     local src=$2
     local dest=$3
 
-    local libs="$(ldd $binary | awk '{print $1}' | grep -v /)"
+    local libs="$(LD_LIBRARY_PATH=$src ldd $binary | awk '{print $1}' | grep -v /)"
 
-    for lib in "$libs"
+    for lib in $libs
     do
         [ -f "$src/$lib" -a ! -f "$dest/$lib" ] && cp -l $src/$lib $dest
     done
