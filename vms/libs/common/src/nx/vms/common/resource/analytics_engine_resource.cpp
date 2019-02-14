@@ -14,7 +14,6 @@
 
 #include <nx/analytics/types.h>
 #include <nx/analytics/utils.h>
-#include <nx/analytics/device_descriptor_manager.h>
 
 namespace nx::vms::common {
 
@@ -24,13 +23,26 @@ const QString AnalyticsEngineResource::kSettingsValuesProperty{"settingsValues"}
 const QString AnalyticsEngineResource::kEngineManifestProperty{"engineManifest"};
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnCommonModule* commonModule):
-    base_type(commonModule)
+    base_type(commonModule),
+    m_cachedManifest([this]() { return fetchManifest(); }, &m_cacheMutex)
 {
+    connect(
+        this,
+        &QnResource::propertyChanged,
+        this,
+        [&](auto& resource, auto& key)
+        {
+            if (key == kEngineManifestProperty)
+            {
+                m_cachedManifest.reset();
+                emit manifestChanged(toSharedPointer(this));
+            }
+        });
 }
 
 EngineManifest AnalyticsEngineResource::manifest() const
 {
-    return QJson::deserialized(getProperty(kEngineManifestProperty).toUtf8(), EngineManifest());
+    return m_cachedManifest.get();
 }
 
 void AnalyticsEngineResource::setManifest(const api::analytics::EngineManifest& manifest)
@@ -101,10 +113,12 @@ bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePt
     if (!isDeviceDependent())
         return false;
 
-    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(commonModule());
-    const auto compatibleEngines = deviceDescriptorManager.compatibleEngineIds(device);
+    return device->compatibleAnalyticsEngines().contains(getId());
+}
 
-    return compatibleEngines.find(getId()) != compatibleEngines.cend();
+api::analytics::EngineManifest AnalyticsEngineResource::fetchManifest() const
+{
+    return QJson::deserialized<EngineManifest>(getProperty(kEngineManifestProperty).toUtf8());
 }
 
 } // namespace nx::vms::common

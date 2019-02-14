@@ -122,6 +122,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         m_handler = createHandler();
         m_deviceAgent->setHandler(m_handler.get());
         updateDeviceWithManifest(*manifest);
+        m_device->saveProperties();
     }
 
     if (!m_deviceAgent)
@@ -408,8 +409,6 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
         m_device->getId(),
         m_engine->getId(),
         manifest);
-
-    m_device->saveProperties();
 
     return true;
 }

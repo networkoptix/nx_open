@@ -3,6 +3,8 @@
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource.h>
+#include <utils/common/value_cache.h>
+
 #include <nx/analytics/types.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 
@@ -14,6 +16,8 @@ namespace nx::vms::common {
  */
 class AnalyticsEngineResource: public QnResource
 {
+    Q_OBJECT
+
     using base_type = QnResource;
 
 public:
@@ -39,6 +43,16 @@ public:
     bool isDeviceDependent() const;
 
     bool isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;
+
+signals:
+    void manifestChanged(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+
+private:
+    api::analytics::EngineManifest fetchManifest() const;
+
+private:
+    CachedValue<api::analytics::EngineManifest> m_cachedManifest;
+    mutable QnMutex m_cacheMutex;
 };
 
 } // namespace nx::vms::common

@@ -95,7 +95,9 @@ signals :
         const QnUuid& resourceId,
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source);
-    void resourceParamChanged(const nx::vms::api::ResourceParamWithRefData& param);
+    void resourceParamChanged(
+        const nx::vms::api::ResourceParamWithRefData& param,
+        ec2::NotificationSource source);
     void resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
     void resourceRemoved(const QnUuid& resourceId);
     void resourceStatusRemoved(const QnUuid& resourceId);

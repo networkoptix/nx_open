@@ -100,14 +100,11 @@ private:
     QnVirtualCameraResourceList localDevices() const;
     bool isLocalDevice(const QnVirtualCameraResourcePtr& device) const;
 
-    std::set<QnUuid> compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const;
+    QSet<QnUuid> compatibleEngineIds(const QnVirtualCameraResourcePtr& device) const;
 
     void updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& device);
     void updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& engine);
     void updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& device);
-
-    void removeDeviceDescriptor(const QnVirtualCameraResourcePtr& device) const;
-    void removeEngineFromCompatible(const AnalyticsEngineResourcePtr& engine) const;
 
 private:
     mutable QnMutex m_contextMutex;
