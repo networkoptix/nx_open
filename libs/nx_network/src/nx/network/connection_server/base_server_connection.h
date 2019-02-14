@@ -100,7 +100,8 @@ public:
     {
         base_type::bindToAioThread(aioThread);
 
-        m_streamSocket->bindToAioThread(aioThread);
+        if (m_streamSocket)
+            m_streamSocket->bindToAioThread(aioThread);
     }
 
     /**

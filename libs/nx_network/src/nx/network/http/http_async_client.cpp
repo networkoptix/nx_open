@@ -1165,8 +1165,11 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
             break;
         }
 
-        case StatusCode::found:
         case StatusCode::movedPermanently:
+        case StatusCode::found:
+        case StatusCode::seeOther:
+        case StatusCode::temporaryRedirect:
+        case StatusCode::permanentRedirect:
             return sendRequestToNewLocation(response);
 
         default:

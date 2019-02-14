@@ -6,7 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/aio_service.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>

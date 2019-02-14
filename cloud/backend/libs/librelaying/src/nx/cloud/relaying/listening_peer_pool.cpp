@@ -1,6 +1,6 @@
 #include "listening_peer_pool.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>

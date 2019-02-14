@@ -32,7 +32,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    using TunnelingClients = 
+    using TunnelingClients =
         std::list<std::unique_ptr<network::http::tunneling::Client>>;
 
     using OpenTrafficRelayTunnelHandler = nx::utils::MoveOnlyFunc<void(
@@ -47,6 +47,7 @@ private:
 
     void openTunnel(
         const nx::utils::Url& url,
+        network::http::tunneling::TunnelValidatorFactoryFunc tunnelValidatorFactoryFunc,
         ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler);
 
     void processServerTunnelResult(

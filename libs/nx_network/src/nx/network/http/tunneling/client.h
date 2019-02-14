@@ -18,7 +18,8 @@ namespace nx::network::http::tunneling {
 
 using TunnelValidatorFactoryFunc =
     std::function<std::unique_ptr<AbstractTunnelValidator>(
-        std::unique_ptr<AbstractStreamSocket> /*tunnel*/)>;
+        std::unique_ptr<AbstractStreamSocket> /*tunnel*/,
+        const Response&)>;
 
 /**
  * Establishes connection to nx::network::http::tunneling::Server listening same request path.

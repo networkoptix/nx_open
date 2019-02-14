@@ -30,10 +30,11 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     m_isSecondaryStream(encoderIndex != 0),
     m_camera(camera)
 {
+    NX_DEBUG(this, "Create media encoder %1", encoderIndex);
     m_streamReader.reset(new StreamReader(
         &m_refManager,
         m_camera,
-        m_isSecondaryStream));
+        !m_isSecondaryStream));
 }
 
 void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
@@ -84,20 +85,17 @@ int MediaEncoder::getMediaUrl(char* urlBuf) const
 
 int MediaEncoder::getMaxBitrate(int* maxBitrate) const
 {
-    if (!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    int bitrate =
-        device::video::getMaxBitrate(m_camera->ffmpegUrl(), m_camera->compressionTypeDescriptor());
-
+    int bitrate = m_camera->videoStream().getMaxBitrate();
     *maxBitrate = bitrate / kBytesInOneKilobyte;
-
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
 {
-    if (!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
     m_streamReader->setResolution(resolution);
@@ -106,7 +104,7 @@ int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
 
 int MediaEncoder::setFps(const float& fps, float* selectedFps)
 {
-    if (!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
     if (m_isSecondaryStream)
@@ -116,7 +114,7 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
         return nxcip::NX_NO_ERROR;
     }
 
-    auto resolutionList = m_camera->resolutionList();
+    auto resolutionList = m_camera->videoStream().resolutionList();
     if (resolutionList.empty())
         return nxcip::NX_OTHER_ERROR;
 
@@ -146,7 +144,7 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
 
 int MediaEncoder::setBitrate(int bitrateKbps, int* selectedBitrateKbps)
 {
-    if (!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
     // the plugin uses bits per second internally, so convert to that first
@@ -158,7 +156,7 @@ int MediaEncoder::setBitrate(int bitrateKbps, int* selectedBitrateKbps)
 
 int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 {
-    if (!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
     int ffmpegError = 0;
@@ -195,10 +193,10 @@ int MediaEncoder::getResolutionList(
     nxcip::ResolutionInfo* infoList,
     int* infoListCount) const
 {
-    if (!m_camera->videoStream()->pluggedIn())
+    if (!m_camera->videoStream().pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    auto list = m_camera->resolutionList();
+    auto list = m_camera->videoStream().resolutionList();
     if (list.empty())
     {
         *infoListCount = 0;
