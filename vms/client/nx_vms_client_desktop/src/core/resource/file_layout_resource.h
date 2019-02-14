@@ -1,9 +1,10 @@
 #pragma once
 
 #include <common/common_globals.h>
+#include <core/resource/client_resource_fwd.h>
 #include <core/resource/layout_resource.h>
 
-class QnFileLayoutResource: public QnLayoutResource
+class NX_VMS_CLIENT_DESKTOP_API QnFileLayoutResource: public QnLayoutResource
 {
     Q_OBJECT
 

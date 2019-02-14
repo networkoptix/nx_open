@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/resource_management/resource_searcher.h"
+#include <core/resource/client_resource_fwd.h>
 
 class QnResourceDirectoryBrowser:
     public QObject,

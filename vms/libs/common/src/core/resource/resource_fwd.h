@@ -69,11 +69,6 @@ typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
 typedef QnSharedResourcePointerList<QnLayoutResource> QnLayoutResourceList;
 typedef QSet<QnLayoutResourcePtr> QnLayoutResourceSet;
 
-class QnFileLayoutResource;
-typedef QnSharedResourcePointer<QnFileLayoutResource> QnFileLayoutResourcePtr;
-typedef QnSharedResourcePointerList<QnFileLayoutResource> QnFileLayoutResourceList;
-typedef QSet<QnFileLayoutResource> QnFileLayoutResourceSet;
-
 class QnLayoutItemIndex;
 typedef QList<QnLayoutItemIndex> QnLayoutItemIndexList;
 
