@@ -15,17 +15,17 @@ Node::Node(int argc, char** argv):
 
 map::Database* Node::database()
 {
-    return m_db.get();
+    return m_database.get();
 }
 
 void Node::setup()
 {
-    m_db.reset(new Database(&syncronizationEngine(), &sqlQueryExecutor()));
+    m_database = std::make_unique<Database>(&syncronizationEngine(), &sqlQueryExecutor());
 }
 
 void Node::teardown()
 {
-    m_db.reset();
+    m_database.reset();
 }
 
 } // namespace nx::clusterdb::map::test

@@ -19,7 +19,7 @@ protected:
     virtual void teardown() override;
 
 private:
-    std::unique_ptr<map::Database> m_db;
+    std::unique_ptr<map::Database> m_database;
 };
 
 } // namespace nx::clusterdb::map::test
