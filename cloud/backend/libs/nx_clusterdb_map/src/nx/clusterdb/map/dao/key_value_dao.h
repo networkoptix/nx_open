@@ -42,8 +42,12 @@ public:
 
     std::map<std::string, std::string> getRange(
         nx::sql::QueryContext* queryContext,
-        const std::string& lowerBoundKey,
-        const std::string& upperBoundKey);
+        const std::string& keyLowerBound,
+        const std::string& keyUpperBound);
+
+    std::map<std::string, std::string> getRange(
+        nx::sql::QueryContext* queryContext,
+        const std::string& keyLowerBound);
 
 private:
     QString m_systemId;

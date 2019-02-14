@@ -65,10 +65,33 @@ SELECT key, value from `%1_data` WHERE key >= :lower_bound AND key <= :upper_bou
 
 )sql";
 
-std::string hash(const std::string& key)
+static constexpr char kFetchRangeTemplateWithoutUpperBound[] = R"sql(
+
+SELECT key, value from `%1_data` WHERE key >= :lower_bound
+
+)sql";
+
+std::string hash(const QByteArray& key)
 {
     //SHA512 hash is 64 bytes. Converted to hex, we have 128 characters.
-    return QCryptographicHash::hash(key.c_str(), QCryptographicHash::Sha512).toHex().constData();
+    return QCryptographicHash::hash(key, QCryptographicHash::Sha512).toHex().constData();
+}
+
+QByteArray toByteArray(const std::string& str)
+{
+    return QByteArray(str.c_str(), str.size());
+}
+
+std::map<std::string, std::string> toStdMap(nx::sql::AbstractSqlQuery* query)
+{
+    std::map<std::string, std::string> pairs;
+    while (query->next())
+    {
+        pairs.emplace(
+            query->value(kKey).toByteArray().toStdString(),
+            query->value(kValue).toByteArray().toStdString());
+    }
+    return pairs;
 }
 
 } // namespace
@@ -83,11 +106,12 @@ void KeyValueDao::insertOrUpdate(
     const std::string& key,
     const std::string& value)
 {
+    QByteArray keyBytes = toByteArray(key);
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kReplaceKeyValuePairTemplate).arg(m_systemId));
-    query->bindValue(kKeyHashBinding, hash(key));
-    query->bindValue(kKeyBinding, key);
-    query->bindValue(kValueBinding, value);
+    query->bindValue(kKeyHashBinding, hash(keyBytes));
+    query->bindValue(kKeyBinding, keyBytes);
+    query->bindValue(kValueBinding, toByteArray(value));
     query->exec();
 }
 
@@ -95,23 +119,23 @@ void KeyValueDao::remove(nx::sql::QueryContext* queryContext, const std::string&
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kRemoveKeyValuePairTemplate).arg(m_systemId));
-    query->bindValue(kKeyBinding, key);
+    query->bindValue(kKeyBinding, toByteArray(key));
     query->exec();
 }
 
 std::optional<std::string> KeyValueDao::get(
     nx::sql::QueryContext* queryContext,
-    const std::string & key)
+    const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kFetchValueTemplate).arg(m_systemId));
-    query->bindValue(kKeyBinding, key);
+    query->bindValue(kKeyBinding, toByteArray(key));
     query->exec();
 
     if (!query->next())
         return std::nullopt;
 
-    return query->value(kValue).toString().toStdString();
+    return query->value(kValue).toByteArray().toStdString();
 }
 
 std::map<std::string, std::string> KeyValueDao::getPairs(
@@ -121,15 +145,7 @@ std::map<std::string, std::string> KeyValueDao::getPairs(
     query->prepare(QString(kFetchPairsTemplate).arg(m_systemId));
     query->exec();
 
-    std::map<std::string, std::string> pairs;
-    while (query->next())
-    {
-        pairs.emplace(
-            query->value(kKey).toString().toStdString(),
-            query->value(kValue).toString().toStdString());
-    }
-
-    return pairs;
+    return toStdMap(query.get());
 }
 
 std::optional<std::string> KeyValueDao::lowerBound(
@@ -138,13 +154,13 @@ std::optional<std::string> KeyValueDao::lowerBound(
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kLowerBoundTemplate).arg(m_systemId));
-    query->bindValue(kLowerBoundBinding, key);
+    query->bindValue(kLowerBoundBinding, toByteArray(key));
     query->exec();
 
     if (!query->next())
         return std::nullopt;
 
-    return query->value(kKey).toString().toStdString();
+    return query->value(kKey).toByteArray().toStdString();
 }
 
 std::optional<std::string> KeyValueDao::upperBound(
@@ -153,35 +169,39 @@ std::optional<std::string> KeyValueDao::upperBound(
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kUpperBoundTemplate).arg(m_systemId));
-    query->bindValue(kUpperBoundBinding, key);
+    query->bindValue(kUpperBoundBinding, toByteArray(key));
     query->exec();
 
     if (!query->next())
         return std::nullopt;
 
-    return query->value(kKey).toString().toStdString();
+    return query->value(kKey).toByteArray().toStdString();
 }
 
 std::map<std::string, std::string> KeyValueDao::getRange(
     nx::sql::QueryContext* queryContext,
-    const std::string& lowerBoundKey,
-    const std::string& upperBoundKey)
+    const std::string& keyLowerBound,
+    const std::string& keyUpperBound)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kFetchRangeTemplate).arg(m_systemId));
-    query->bindValue(kLowerBoundBinding, lowerBoundKey);
-    query->bindValue(kUpperBoundBinding, upperBoundKey);
+    query->bindValue(kLowerBoundBinding, toByteArray(keyLowerBound));
+    query->bindValue(kUpperBoundBinding, toByteArray(keyUpperBound));
     query->exec();
 
-    std::map<std::string, std::string> pairs;
-    while (query->next())
-    {
-        pairs.emplace(
-            query->value(kKey).toString().toStdString(),
-            query->value(kValue).toString().toStdString());
-    }
+    return toStdMap(query.get());
+}
 
-    return pairs;
+std::map<std::string, std::string> KeyValueDao::getRange(
+    nx::sql::QueryContext* queryContext,
+    const std::string& keyLowerBound)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(QString(kFetchRangeTemplateWithoutUpperBound).arg(m_systemId));
+    query->bindValue(kLowerBoundBinding, toByteArray(keyLowerBound));
+    query->exec();
+
+    return toStdMap(query.get());
 }
 
 } // namespace nx::clusterdb::map::dao

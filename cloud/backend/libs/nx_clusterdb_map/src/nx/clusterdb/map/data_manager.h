@@ -101,6 +101,13 @@ public:
         GetRangeCompletionHandler completionHandler);
 
     /**
+     * Retrieves the key/value pairs >= keyLowerBound.
+     */
+    void getRange(
+        const std::string& keyLowerBound,
+        GetRangeCompletionHandler completionHandler);
+
+    /**
      * Retrieves all key/values pairs whose keys start with keyPrefix.
      */
     void getRangeWithPrefix(
@@ -139,12 +146,19 @@ private:
         const std::string& key);
 
     /**
-     * Retrieves the key/value pairs between keyLowerBound(inclusive) and keyUpperBound(exclusive
+     * Retrieves the key/value pairs in the range[keyLowerBound, keyUpperBound]
      */
     std::map<std::string, std::string> getRangeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound,
         const std::string& keyUpperBound);
+
+    /**
+     * Retrieves the key/value pairs >= keyLowerBound.
+     */
+    std::map<std::string, std::string> getRangeFromDb(
+        nx::sql::QueryContext* queryContext,
+        const std::string& keyLowerBound);
 
     /**
      * Retrieves the value for the given key within an existing transaction.

@@ -28,6 +28,20 @@ ResultCode toResultCode(nx::sql::DBResult dbResult)
     }
 }
 
+std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
+{
+    if (!keyPrefix.empty())
+    {
+        std::string upperBound = keyPrefix;
+        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
+        {
+            if (++(*rit) != 0)
+                return upperBound;
+        }
+    }
+    return std::nullopt;
+}
+
 } // namespace
 
 DataManager::DataManager(
@@ -193,7 +207,7 @@ void DataManager::getRange(
     const std::string& keyUpperBound,
     GetRangeCompletionHandler completionHandler)
 {
-    if (keyLowerBound > keyUpperBound)
+    if (keyLowerBound > keyUpperBound || keyLowerBound.empty() || keyUpperBound.empty())
         return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
 
     auto sharedPairs = std::make_shared<std::map<std::string, std::string>>();
@@ -214,6 +228,31 @@ void DataManager::getRange(
         });
 }
 
+void DataManager::getRange(
+    const std::string& keyLowerBound,
+    GetRangeCompletionHandler completionHandler)
+{
+    if (keyLowerBound.empty())
+        return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
+
+    auto sharedPairs = std::make_shared<std::map<std::string, std::string>>();
+
+    m_queryExecutor->executeSelect(
+        [this, keyLowerBound, sharedPairs](
+            nx::sql::QueryContext* queryContext) mutable
+        {
+            *sharedPairs = getRangeFromDb(queryContext, keyLowerBound);
+            return sharedPairs->empty()
+                ? nx::sql::DBResult::notFound
+                : nx::sql::DBResult::ok;
+        },
+        [sharedPairs, completionHandler = std::move(completionHandler)](
+                nx::sql::DBResult dbResult)
+        {
+            completionHandler(toResultCode(dbResult), std::move(*sharedPairs));
+        });
+}
+
 void DataManager::getRangeWithPrefix(
     const std::string& keyPrefix,
     GetRangeCompletionHandler completionHandler)
@@ -221,10 +260,12 @@ void DataManager::getRangeWithPrefix(
     if (keyPrefix.empty())
         return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
 
-    std::string keyPrefixUpperBound = keyPrefix;
-    ++keyPrefixUpperBound.back();
+    auto keyPrefixUpperBound = calculateUpperBound(keyPrefix);
 
-    getRange(keyPrefix, keyPrefixUpperBound, std::move(completionHandler));
+    if (keyPrefixUpperBound.has_value())
+        getRange(keyPrefix, *keyPrefixUpperBound, std::move(completionHandler));
+    else
+        getRange(keyPrefix, std::move(completionHandler));
 }
 
 void DataManager::insertToOrUpdateDb(
@@ -269,6 +310,13 @@ std::map<std::string, std::string> DataManager::getRangeFromDb(
     const std::string& keyUpperBound)
 {
     return m_keyValueDao.getRange(queryContext, keyLowerBound, keyUpperBound);
+}
+
+std::map<std::string, std::string> DataManager::getRangeFromDb(
+    nx::sql::QueryContext* queryContext,
+    const std::string& keyLowerBound)
+{
+    return m_keyValueDao.getRange(queryContext, keyLowerBound);
 }
 
 void DataManager::removeFromDb(

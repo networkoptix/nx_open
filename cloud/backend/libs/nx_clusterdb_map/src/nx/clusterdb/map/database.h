@@ -18,7 +18,7 @@ public:
      * Throws on failure.
      */
     Database(
-        nx::clusterdb::engine::SyncronizationEngine* m_syncEngine,
+        nx::clusterdb::engine::SyncronizationEngine* syncEngine,
         nx::sql::AsyncSqlQueryExecutor* dbManager);
 
     DataManager& dataManager();

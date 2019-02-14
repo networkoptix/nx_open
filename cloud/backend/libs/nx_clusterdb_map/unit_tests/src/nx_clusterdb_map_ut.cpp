@@ -15,6 +15,20 @@ namespace nx::clusterdb::map::test {
 
 namespace {
 
+std::optional<std::string> calculateUpperBound(const std::string& str)
+{
+    if (!str.empty())
+    {
+        std::string upperBound = str;
+        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
+        {
+            if (++(*rit) != 0)
+                return upperBound;
+        }
+    }
+    return std::nullopt;
+}
+
 std::string randomString()
 {
     return nx::utils::generateRandomName((rand() % 64) + 10).constData();
@@ -58,6 +72,15 @@ protected:
     void givenDbWithPrefixedKeyValuePairs()
     {
         m_prefix = "Prefix";
+
+        addNodes(1);
+        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, m_prefix, /*startKey*/ 'B', false);
+        generateKeyValuePairs(3, 3, {}, 'B', true);
+    }
+
+    void givenDbWith0xffPrefixedKeyValuePairs()
+    {
+        m_prefix.assign(3, 0xff);
 
         addNodes(1);
         generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, m_prefix, /*startKey*/ 'B');
@@ -185,7 +208,7 @@ protected:
             [this](map::ResultCode result, std::string value)
             {
                 m_result = result;
-                m_fetchedValue = value;
+                m_fetchedValue = std::move(value);
                 callbackFired();
             });
 
@@ -308,7 +331,7 @@ protected:
 
     void whenRequestPrefixedRangeWithEmptyPrefix()
     {
-        whenRequestPrefixedRange(/*prefix*/ std::string());
+        whenRequestPrefixedRange(/*prefix*/ {});
     }
 
     void whenRequestPrefixedRangeWithNonExistentPrefix()
@@ -470,7 +493,7 @@ private:
 
     map::Database* db(size_t index = 0)
     {
-        return m_nodes[index]->moduleInstance()->db();
+        return m_nodes[index]->moduleInstance()->database();
     }
 
     void addNodes(int count)
@@ -479,7 +502,7 @@ private:
 
         for (int i = 0; i < count; ++i)
         {
-            m_nodes.emplace_back(new NodeLauncher());
+            m_nodes.emplace_back(std::make_unique<NodeLauncher>());
             ASSERT_TRUE(m_nodes.back()->startAndWaitUntilStarted());
         }
 
@@ -494,7 +517,7 @@ private:
                 Node* node = m_nodes[j]->moduleInstance().get();
 
                 m_nodes[i]->moduleInstance()->connectToNode(
-                    node->db()->systemId(),
+                    node->database()->systemId(),
                     nodeUrl(node));
             }
         }
@@ -514,11 +537,10 @@ private:
         size_t startIndex,
         size_t count,
         const std::string& prefix,
-        char startKey)
+        char startKey,
+        bool findEdgeKeys = true)
     {
         char letter = startKey;
-        m_givenLowestKey = letter;
-        m_givenHighestKey = letter;
         for (
             size_t keyValuePairIndex = startIndex;
             keyValuePairIndex < startIndex + count;
@@ -531,9 +553,27 @@ private:
 
             thenOperationSucceeded();
             andValueIsInDb(/*dbIndex*/ 0, keyValuePairIndex);
-
-            m_givenHighestKey = letter;
         }
+
+        if(findEdgeKeys)
+            this->findEdgeKeys();
+    }
+
+    void findEdgeKeys()
+    {
+        ASSERT_FALSE(m_keyValuePairs.empty());
+
+        const auto compare =
+            [](const KeyValuePair& a, const KeyValuePair& b)
+            {
+                return a.key < b.key;
+            };
+
+        m_givenHighestKey =
+            std::max_element(m_keyValuePairs.begin(), m_keyValuePairs.end(), compare)->key;
+
+        m_givenLowestKey =
+            std::min_element(m_keyValuePairs.begin(), m_keyValuePairs.end(), compare)->key;
     }
 
     void whenRequestLowerBoundForKey(size_t keyValuePairIndex = 0)
@@ -548,7 +588,7 @@ private:
             [this](map::ResultCode result, std::string key)
         {
             m_result = result;
-            m_fetchedLowerBound = key;
+            m_fetchedLowerBound = std::move(key);
             callbackFired();
         });
 
@@ -565,11 +605,11 @@ private:
         db()->dataManager().upperBound(
             upperBoundKey,
             [this](map::ResultCode result, std::string key)
-        {
-            m_result = result;
-            m_upperBound = key;
-            callbackFired();
-        });
+            {
+                m_result = result;
+                m_upperBound = std::move(key);
+                callbackFired();
+            });
 
         waitForCallback();
     }
@@ -605,14 +645,14 @@ private:
     void whenRequestPrefixedRange(const std::string& prefix)
     {
         std::string prefixLowerBound = prefix;
-        std::string prefixUpperBound = prefixLowerBound;
-        if (!prefixUpperBound.empty())
-            ++prefixUpperBound.back();
+        auto prefixUpperBound = calculateUpperBound(prefix);
 
         auto allPairs = keyValuePairsAsMap();
         m_expectedRange = std::map<std::string, std::string>(
             allPairs.lower_bound(prefixLowerBound),
-            allPairs.upper_bound(prefixUpperBound));
+            prefixUpperBound.has_value()
+                ? allPairs.upper_bound(*prefixUpperBound)
+                : allPairs.end());
 
         db()->dataManager().getRangeWithPrefix(
             prefix,
@@ -891,11 +931,6 @@ TEST_F(Database, fails_to_fetch_lowerbound_when_key_goes_after_all_db_keys)
     thenOperationFailed(map::ResultCode::notFound);
 }
 
-TEST_F(Database, fetches_range)
-{
-
-}
-
 TEST_F(Database, fetches_range_with_upperbound)
 {
     givenDbWithKnownKeyValuePairs();
@@ -991,6 +1026,17 @@ TEST_F(Database, fails_to_fetch_range_when_prefix_has_non_existent_suffix)
     whenRequestPrefixedRangeWithNonExistentPrefixSuffix();
 
     thenOperationFailed(map::ResultCode::notFound);
+}
+
+TEST_F(Database, fetches_range_with_0xff_prefix)
+{
+    givenDbWith0xffPrefixedKeyValuePairs();
+
+    whenRequestPrefixedRange();
+
+    thenOperationSucceeded();
+
+    andFetchedRangeMatchesExpectedRange();
 }
 
 TEST_F(Database, multiple_nodes_synchronize_insert_operation)

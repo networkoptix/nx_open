@@ -13,7 +13,7 @@ Node::Node(int argc, char** argv):
 {
 }
 
-map::Database* Node::db()
+map::Database* Node::database()
 {
     return m_db.get();
 }
