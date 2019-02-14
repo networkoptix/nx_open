@@ -14,8 +14,6 @@ namespace nx::clusterdb::map::dao {
 class NX_KEY_VALUE_DB_API KeyValueDao
 {
 public:
-    KeyValueDao(const std::string& systemId);
-
     void insertOrUpdate(
         nx::sql::QueryContext* queryContext,
         const std::string& key,
@@ -48,9 +46,6 @@ public:
     std::map<std::string, std::string> getRange(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound);
-
-private:
-    QString m_systemId;
 };
 
 } // namespace nx::clusterdb::map::dao

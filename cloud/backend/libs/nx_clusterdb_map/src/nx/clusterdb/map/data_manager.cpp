@@ -53,8 +53,7 @@ DataManager::DataManager(
     m_syncEngine(syncronizationEngine),
     m_queryExecutor(queryExecutor),
     m_systemId(systemId),
-    m_eventProvider(eventProvider),
-    m_keyValueDao(systemId)
+    m_eventProvider(eventProvider)
 {
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(

@@ -7,6 +7,8 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/sql/async_sql_query_executor.h>
 
+#include "schema_name.h"
+
 namespace nx::clusterdb::map::dao {
 
 namespace {
@@ -96,11 +98,6 @@ std::map<std::string, std::string> toStdMap(nx::sql::AbstractSqlQuery* query)
 
 } // namespace
 
-KeyValueDao::KeyValueDao(const std::string& systemId):
-    m_systemId(systemId.c_str())
-{
-}
-
 void KeyValueDao::insertOrUpdate(
     nx::sql::QueryContext* queryContext,
     const std::string& key,
@@ -108,7 +105,7 @@ void KeyValueDao::insertOrUpdate(
 {
     QByteArray keyBytes = toByteArray(key);
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kReplaceKeyValuePairTemplate).arg(m_systemId));
+    query->prepare(QString(kReplaceKeyValuePairTemplate).arg(kSchemaName));
     query->bindValue(kKeyHashBinding, hash(keyBytes));
     query->bindValue(kKeyBinding, keyBytes);
     query->bindValue(kValueBinding, toByteArray(value));
@@ -118,7 +115,7 @@ void KeyValueDao::insertOrUpdate(
 void KeyValueDao::remove(nx::sql::QueryContext* queryContext, const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kRemoveKeyValuePairTemplate).arg(m_systemId));
+    query->prepare(QString(kRemoveKeyValuePairTemplate).arg(kSchemaName));
     query->bindValue(kKeyBinding, toByteArray(key));
     query->exec();
 }
@@ -128,7 +125,7 @@ std::optional<std::string> KeyValueDao::get(
     const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kFetchValueTemplate).arg(m_systemId));
+    query->prepare(QString(kFetchValueTemplate).arg(kSchemaName));
     query->bindValue(kKeyBinding, toByteArray(key));
     query->exec();
 
@@ -142,7 +139,7 @@ std::map<std::string, std::string> KeyValueDao::getPairs(
     nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kFetchPairsTemplate).arg(m_systemId));
+    query->prepare(QString(kFetchPairsTemplate).arg(kSchemaName));
     query->exec();
 
     return toStdMap(query.get());
@@ -153,7 +150,7 @@ std::optional<std::string> KeyValueDao::lowerBound(
     const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kLowerBoundTemplate).arg(m_systemId));
+    query->prepare(QString(kLowerBoundTemplate).arg(kSchemaName));
     query->bindValue(kLowerBoundBinding, toByteArray(key));
     query->exec();
 
@@ -168,7 +165,7 @@ std::optional<std::string> KeyValueDao::upperBound(
     const std::string& key)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kUpperBoundTemplate).arg(m_systemId));
+    query->prepare(QString(kUpperBoundTemplate).arg(kSchemaName));
     query->bindValue(kUpperBoundBinding, toByteArray(key));
     query->exec();
 
@@ -184,7 +181,7 @@ std::map<std::string, std::string> KeyValueDao::getRange(
     const std::string& keyUpperBound)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kFetchRangeTemplate).arg(m_systemId));
+    query->prepare(QString(kFetchRangeTemplate).arg(kSchemaName));
     query->bindValue(kLowerBoundBinding, toByteArray(keyLowerBound));
     query->bindValue(kUpperBoundBinding, toByteArray(keyUpperBound));
     query->exec();
@@ -197,7 +194,7 @@ std::map<std::string, std::string> KeyValueDao::getRange(
     const std::string& keyLowerBound)
 {
     auto query = queryContext->connection()->createQuery();
-    query->prepare(QString(kFetchRangeTemplateWithoutUpperBound).arg(m_systemId));
+    query->prepare(QString(kFetchRangeTemplateWithoutUpperBound).arg(kSchemaName));
     query->bindValue(kLowerBoundBinding, toByteArray(keyLowerBound));
     query->exec();
 
