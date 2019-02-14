@@ -1,4 +1,4 @@
-#include "embedded_map.h"
+#include "map.h"
 
 #include "settings.h"
 
@@ -9,8 +9,8 @@ Map::Map(
     nx::sql::AsyncSqlQueryExecutor* queryExecutor,
     const std::string& applicationId)
     :
-    m_settings(settings),
-    m_queryExecutor(queryExecutor),
+    /*m_settings(settings),
+    m_queryExecutor(queryExecutor),*/
     m_moduleId(QnUuid::createUuid()),
     m_syncEngine(
         applicationId,
