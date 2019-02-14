@@ -55,29 +55,12 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
         return;
     }
 
-    QnMediaServerConnectionPtr serverConnection;
-    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for (const QnMediaServerResourcePtr server: onlineServers)
+    const auto server = commonModule()->currentServer();
+    NX_ASSERT(server);
+    if (!server)
     {
-        if (!server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
-            continue;
-
-        serverConnection = server->apiConnection();
-        break;
-    }
-
-    if (!serverConnection)
-    {
-        QnMediaServerResourcePtr server = commonModule()->currentServer();
-
-        NX_ASSERT(server);
-        if (!server)
-        {
-            stopTesting(tr("Could not load users."));
-            return;
-        }
-
-        serverConnection = server->apiConnection();
+        stopTesting(tr("Could not load users."));
+        return;
     }
 
     m_importButton = new QPushButton(this);
@@ -93,7 +76,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     });
     m_timeoutTimer->start();
 
-    serverConnection->testLdapSettingsAsync(settings,
+    server->apiConnection()->testLdapSettingsAsync(settings,
         this,
         SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 
