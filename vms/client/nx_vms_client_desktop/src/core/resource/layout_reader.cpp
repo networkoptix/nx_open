@@ -45,7 +45,8 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
         apiLayout = apiLayoutMessage.data;
     }
 
-    ec2::fromApiToResource(apiLayout, layout.staticCast<QnLayoutResource>());
+    auto layoutBase = layout.staticCast<QnLayoutResource>();
+    ec2::fromApiToResource(apiLayout, layoutBase);
 
     QnLayoutItemDataList orderedItems;
     foreach(const auto& item, apiLayout.items)
