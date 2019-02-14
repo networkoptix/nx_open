@@ -54,6 +54,7 @@ public:
     */
     int getMaxBitrate() const;
 
+    // TODO: Make channelNumber required.
     //!Returns packet with timestamp == \a desiredTimestamp or packet with closest (from the left) timestamp
     /*!
         In other words, this methods performs lower_bound in timestamp-sorted (using 'greater' comparision) array of data packets
@@ -63,9 +64,12 @@ public:
         quint64 desiredTimestamp,
         bool findKeyFrameOnly,
         quint64* const foundTimestamp,
-        quint32 channelNumber = 0) const;
+        int channelNumber = 0) const;
     //!Returns packet with min timestamp greater than \a timestamp
-    QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
+    QnAbstractDataPacketPtr getNextPacket(
+        quint64 timestamp,
+        quint64* const foundTimestamp,
+        int channelNumber = 0) const;
 
     nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& keyFrameFoundSubscription();
     nx::utils::Subscription<>& streamTimeDiscontinuityFoundSubscription();
@@ -89,7 +93,7 @@ private:
         quint64 timestamp = 0;
         QnAbstractDataPacketPtr packet;
         bool isKeyFrame = false;
-        quint32 channelNumber = 0;
+        int channelNumber = 0;
     };
 
     //!map<timestamp, pair<packet, key_flag> >
@@ -97,7 +101,7 @@ private:
 
     const qint64 m_cacheSizeUsec;
     const qint64 m_maxCacheSizeUsec;
-    PacketContainerType m_packetsByTimestamp;
+    PacketContainerType m_packetsByTimestamp; // TODO: Should be multiset.
     mutable QnMutex m_mutex;
     //!In micros
     qint64 m_prevPacketSrcTimestamp;

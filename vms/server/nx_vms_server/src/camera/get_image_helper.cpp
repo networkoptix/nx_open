@@ -292,7 +292,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     }
 
     // Try liveCache.
-    if (auto frame = decodeFrameFromLiveCache(streamIndex, timestampUs, camera))
+    if (auto frame = decodeFrameFromLiveCache(streamIndex, timestampUs, camera, preferredChannel))
     {
         NX_VERBOSE(this, "%1 Got from liveCache: %2 us", logPrefix, frame->pkt_dts);
         return frame;
@@ -303,11 +303,14 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
-    StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
+    StreamIndex streamIndex,
+    qint64 timestampUs,
+    QnVideoCameraPtr camera,
+    int channelNumber) const
 {
     NX_VERBOSE(this, "%1()", __func__);
 
-    auto gopFrames = getLiveCacheGopTillTime(streamIndex, timestampUs, camera);
+    auto gopFrames = getLiveCacheGopTillTime(streamIndex, timestampUs, camera, channelNumber);
     if (!gopFrames)
         return nullptr;
 
@@ -330,7 +333,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
     }
 
     const auto streamIndex = determineStreamIndex(request);
-
     if (auto frame = getImageWithCertainQuality(streamIndex, request))
     {
         NX_VERBOSE(this, "%1() END -> frame", __func__);
@@ -348,26 +350,28 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
     return nullptr;
 }
 
-// TODO: add assert for non-iframe
 /**
  * @return Sequence from an I-frame to the desired frame. Can be null but not empty.
  */
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
-    StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
+    StreamIndex streamIndex,
+    qint64 timestampUs,
+    QnVideoCameraPtr camera,
+    int channelNumber) const
 {
     const MediaQuality stream = (streamIndex == StreamIndex::primary)
         ? MEDIA_Quality_High
         : MEDIA_Quality_Low;
     if (!camera->liveCache(stream))
     {
-        NX_VERBOSE(this, "%1(): NOTE: liveCache not initialized for %2 stream",
+        NX_DEBUG(this, "%1(): NOTE: liveCache not initialized for %2 stream",
             __func__, streamIndex);
         return nullptr;
     }
 
     quint64 iFrameTimestampUs;
     QnAbstractDataPacketPtr iFrameData = camera->liveCache(stream)->findByTimestamp(
-        timestampUs, /*findKeyFramesOnly*/ true, &iFrameTimestampUs);
+        timestampUs, /*findKeyFramesOnly*/ true, &iFrameTimestampUs, channelNumber);
     if (!iFrameData)
         return nullptr;
     auto iFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(iFrameData);
@@ -378,44 +382,49 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
         return nullptr;
     }
 
-    NX_VERBOSE(this, "%1(): I-frame found: %2 us", __func__, iFrameTimestampUs);
+    NX_ASSERT(static_cast<int>(iFrame->channelNumber) == channelNumber);
+    NX_ASSERT(iFrame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey));
+    NX_VERBOSE(this, "%1(): I-frame for channel [%2] found: %3 (%4) us", __func__,
+        iFrame->channelNumber, iFrameTimestampUs, qint64(iFrameTimestampUs) - timestampUs);
 
     auto frames = std::make_unique<QnConstDataPacketQueue>();
     frames->push(iFrame);
 
-    if (iFrameTimestampUs != timestampUs)
+    if (iFrameTimestampUs == static_cast<quint64>(timestampUs))
+        return frames;
+
+    // Add subsequent P-frames.
+    quint64 frameTimestampUs = iFrameTimestampUs;
+
+    int i = 0;
+    for (i = 0; i < kMaxGopLen; ++i)
     {
-        // Add subsequent P-frames.
-        quint64 frameTimestampUs = iFrameTimestampUs;
+        quint64 pFrameTimestampUs;
+        QnAbstractDataPacketPtr pFrameData = camera->liveCache(stream)->getNextPacket(
+            frameTimestampUs, &pFrameTimestampUs, channelNumber);
+        if (!pFrameData)
+            break;
+        if ((qint64) pFrameTimestampUs > timestampUs)
+            break;
 
-        int i = 0;
-        for (i = 0; i < kMaxGopLen; ++i)
+        frameTimestampUs = pFrameTimestampUs; //< Prepare for the next iteration.
+
+        auto pFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(pFrameData);
+        if (!pFrame)
         {
-            quint64 pFrameTimestampUs;
-            QnAbstractDataPacketPtr pFrameData = camera->liveCache(stream)->getNextPacket(
-                frameTimestampUs, &pFrameTimestampUs);
-            if (!pFrameData)
-                break;
-            if ((qint64) pFrameTimestampUs > timestampUs)
-                break;
-
-            frameTimestampUs = pFrameTimestampUs; //< Prepare for the next iteration.
-
-            auto pFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(pFrameData);
-            if (!pFrame)
-            {
-                NX_VERBOSE(this, "%1(): WARNING: Wrong liveCache P-frame data for %2 us: %3",
-                    __func__, pFrameTimestampUs, pFrameData);
-                continue;
-            }
-
-            NX_VERBOSE(this, "%1(): P-frame found: %2 us", __func__, pFrameTimestampUs);
-            frames->push(pFrame);
+            NX_DEBUG(this, "%1(): WARNING: Wrong liveCache P-frame data for %2 us: %3",
+                __func__, pFrameTimestampUs, pFrameData);
+            continue;
         }
-        if (i >= kMaxGopLen)
-            NX_VERBOSE(this, "%1(): WARNING: Too many P-frames: %2", __func__, i);
+        NX_ASSERT(!pFrame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey));
+        NX_ASSERT(static_cast<int>(pFrame->channelNumber) == channelNumber);
+        NX_VERBOSE(this, "%1(): P-frame found: %3 (%4) us", __func__,
+            frameTimestampUs, qint64(frameTimestampUs) - timestampUs);
+        frames->push(pFrame);
     }
 
+    if (i >= kMaxGopLen)
+        NX_DEBUG(this, "%1(): WARNING: Too many P-frames: %2", __func__, i);
     return frames;
 }
 

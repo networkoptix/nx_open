@@ -83,7 +83,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
 
     m_packetsByTimestamp.insert(
         posToInsert,
-        {data->timestamp, data, isKeyFrame, mediaPacket->channelNumber});
+        {quint64(data->timestamp), data, isKeyFrame, int(mediaPacket->channelNumber)});
 
     m_cacheSizeInBytes += mediaPacket->dataSize();
     clearCacheIfNeeded(&lk);
@@ -115,7 +115,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
 void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
 {
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
-    if(maxTimestamp - m_packetsByTimestamp.front().timestamp <= m_cacheSizeUsec)
+    if (maxTimestamp - m_packetsByTimestamp.front().timestamp <= quint64(m_cacheSizeUsec))
         return;
 
     //determining left-most position of active blockings
@@ -217,7 +217,7 @@ int MediaStreamCache::getMaxBitrate() const
     comparision) array of data packets.
 */
 QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimestamp,
-    bool findKeyFrameOnly, quint64* const foundTimestamp, quint32 channelNumber) const
+    bool findKeyFrameOnly, quint64* const foundTimestamp, int channelNumber) const
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -248,19 +248,21 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimesta
     return result->packet;
 }
 
-QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const
+QnAbstractDataPacketPtr MediaStreamCache::getNextPacket(
+    quint64 timestamp, quint64* const foundTimestamp, int channelNumber) const
 {
     QnMutexLocker lk(&m_mutex);
 
+    // Next frame after the one to start search from.
     PacketContainerType::const_iterator it = std::upper_bound(
-        m_packetsByTimestamp.cbegin(),
-        m_packetsByTimestamp.cend(),
-        timestamp,
-        []( quint64 one, const MediaStreamCache::MediaPacketContext& two ) -> bool {
-            return one < two.timestamp;
-        } );
-    if( it == m_packetsByTimestamp.end() )
-        return QnAbstractDataPacketPtr();
+        m_packetsByTimestamp.cbegin(), m_packetsByTimestamp.cend(), timestamp,
+        [](quint64 bound, const auto& frame) { return bound < frame.timestamp; });
+
+    it = std::find_if(it, m_packetsByTimestamp.cend(),
+        [channelNumber](const auto& value) { return value.channelNumber == channelNumber; });
+
+    if (it == m_packetsByTimestamp.cend())
+        return {};
 
     *foundTimestamp = it->timestamp;
     return it->packet;

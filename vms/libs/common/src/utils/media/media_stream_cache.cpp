@@ -143,7 +143,7 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
     quint64 desiredTimestamp,
     bool findKeyFrameOnly,
     quint64* const foundTimestamp,
-    quint32 channelNumber) const
+    int channelNumber) const
 {
     return m_sharedImpl->findByTimestamp(
         desiredTimestamp,
@@ -152,9 +152,10 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
         channelNumber);
 }
 
-QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const
+QnAbstractDataPacketPtr MediaStreamCache::getNextPacket(
+    quint64 timestamp, quint64* const foundTimestamp, int channelNumber) const
 {
-    return m_sharedImpl->getNextPacket( timestamp, foundTimestamp );
+    return m_sharedImpl->getNextPacket(timestamp, foundTimestamp, channelNumber);
 }
 
 nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& MediaStreamCache::keyFrameFoundSubscription()
