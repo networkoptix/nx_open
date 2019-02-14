@@ -47,6 +47,23 @@ function copy_deps()
     done
 }
 
+function stage_cpp()
+{
+    rm -rf stage
+    check_vms_dirs
+
+    local libdir=stage/$MODULE/lib
+    local bindir=stage/$MODULE/bin
+
+    mkdir -p $bindir $libdir
+
+	cp -rl $environment/packages/linux-x64/qt-$QT_VERSION/lib/* $libdir
+	cp -rl $environment/packages/linux-x64/qt-$QT_VERSION/plugins/sqldrivers $bindir
+
+	cp -rl $NX_VMS_DIR/build_environment/target/bin/$BUILD_CONFIGURATION/$MODULE $bindir
+	cp -rl $NX_VMS_DIR/build_environment/target/lib/$BUILD_CONFIGURATION/* $libdir
+}
+
 function stage_cmake()
 {
     local cmakeBuildDirectory=$1
