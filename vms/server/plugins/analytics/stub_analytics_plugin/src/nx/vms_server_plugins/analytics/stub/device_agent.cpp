@@ -4,6 +4,7 @@
 #include <chrono>
 #include <ctime>
 #include <cmath>
+#include <vector>
 
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
@@ -55,7 +56,8 @@ std::string DeviceAgent::manifest() const
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
-        ")json" + kSuspiciousNoiseEventType + R"json("
+        ")json" + kSuspiciousNoiseEventType + R"json(",
+        ")json" + kObjectInTheAreaEventType + R"json("
     ],
     "supportedObjectTypeIds": [
         ")json" + kCarObjectType + R"json("
@@ -74,6 +76,20 @@ std::string DeviceAgent::manifest() const
             "id": ")json" + kGunshotEventType + R"json(",
             "name": "Gunshot",
             "groupId": ")json" + kSoundRelatedEventGroup + R"json("
+        }
+    ],
+    "objectTypes": [
+        {
+            "id": ")json" + kTruckObjectType + R"json(",
+            "name": "Truck"
+        },
+        {
+            "id": ")json" + kPedestrianObjectType + R"json(",
+            "name": "Pedestrian"
+        },
+        {
+            "id": ")json" + kBicycleObjectType + R"json(",
+            "name": "Bicycle"
         }
     ]
 }
@@ -260,22 +276,31 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
-    ++m_counter;
-    if (m_counter > 1)
+    ++currentEventTypeIndex;
+    std::string caption;
+    std::string description;
+    if (currentEventTypeIndex > 1)
     {
         if (m_eventTypeId == kLineCrossingEventType)
+        {
             m_eventTypeId = kObjectInTheAreaEventType;
+            caption = "Object in the Area (caption)";
+            description = "Object in the Area (description)";
+        }
         else
+        {
             m_eventTypeId = kLineCrossingEventType;
-
-        m_counter = 0;
+            caption = "Line Crossing (caption)";
+            description = "Line Crossing (description)";
+        }
+        currentEventTypeIndex = 0;
     }
 
     auto eventMetadata = new nx::sdk::analytics::EventMetadata();
-    eventMetadata->setCaption("Line crossing (caption)");
-    eventMetadata->setDescription("Line crossing (description)");
+    eventMetadata->setCaption(caption);
+    eventMetadata->setDescription(description);
     eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    eventMetadata->setIsActive(m_counter == 1);
+    eventMetadata->setIsActive(currentEventTypeIndex == 1);
     eventMetadata->setTypeId(m_eventTypeId);
 
     auto eventMetadataPacket = new EventMetadataPacket();
@@ -284,7 +309,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     eventMetadataPacket->addItem(eventMetadata);
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << m_eventTypeId << ", isActive: " << ((m_counter == 1) ? "true" : "false");
+        << "type: " << m_eventTypeId << ", isActive: " << ((currentEventTypeIndex == 1) ? "true" : "false");
 
     return eventMetadataPacket;
 }
@@ -299,21 +324,31 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
 
     auto objectMetadata = new ObjectMetadata();
 
-    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    objectMetadata->setTypeId(kCarObjectType);
-
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
     const int sequentialNumber = static_cast<int>(intPart);
+    static const std::vector<std::string> kObjectTypes = {
+        kCarObjectType,
+        kHumanFaceObjectType,
+        kTruckObjectType,
+        kPedestrianObjectType,
+        kBicycleObjectType,
+    };
 
     if (m_currentObjectIndex != sequentialNumber)
     {
         m_objectId = UuidHelper::randomUuid();
         m_currentObjectIndex = sequentialNumber;
+        m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
+	++m_currentObjectTypeIndex;
+	if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
+	    m_currentObjectTypeIndex = 0;
     }
 
+    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
+    objectMetadata->setTypeId(m_objectTypeId);
     objectMetadata->setId(m_objectId);
     objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
