@@ -45,6 +45,8 @@ function copy_deps()
     do
         [ -f "$src/$lib" -a ! -f "$dest/$lib" ] && cp -l $src/$lib $dest
     done
+
+    true
 }
 
 function stage_cpp()
