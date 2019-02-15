@@ -16,7 +16,7 @@ namespace nx_http::tunneling::detail {
 
 static constexpr auto kEveryTunnelTypeWeight = 1;
 /** With every tunnel failure, 20 seconds are added to that tunnel type retry period. */
-static constexpr auto kTunnelTypeSinkDepth = 20;
+static constexpr auto kTunnelTypeSinkDepth = 100;
 /** Effectively, maximum tunnel type retry period. */
 static constexpr auto kMaxTunnelTypeSinkDepth = 600;
 // Depth units per second.

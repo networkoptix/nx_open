@@ -333,6 +333,7 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
 
     m_httpTunnelEstablishedHandler = std::move(handler);
     m_httpTunnelingClient = std::make_unique<nx_http::tunneling::Client>(url, kTunnelTag);
+    m_httpTunnelingClient->setTimeout(m_settings.recvTimeout);
     m_httpTunnelingClient->setTunnelValidatorFactory(
         m_tunnelValidatorFactory);
     m_httpTunnelingClient->bindToAioThread(getAioThread());
