@@ -1,9 +1,6 @@
 #include "synchronization_engine.h"
 
-#include <nx/network/url/url_parse_helper.h>
-
 #include "statistics/provider.h"
-#include "transport/http_transport_paths.h"
 
 namespace nx::clusterdb::engine {
 
@@ -158,58 +155,9 @@ void SyncronizationEngine::registerHttpApi(
 {
     m_httpServer.registerHandlers(pathPrefix, dispatcher);
 
-    // TODO: #ak Move folowing to m_httpServer.registerHandlers.
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2TransactionConnectionPath),
-        &transport::CommonHttpAcceptor::createConnection,
-        &m_httpTransportAcceptor,
-        dispatcher);
-
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, transport::kPushEc2TransactionPath),
-        &transport::CommonHttpAcceptor::pushTransaction,
-        &m_httpTransportAcceptor,
-        dispatcher);
-
+    m_httpTransportAcceptor.registerHandlers(pathPrefix, dispatcher);
     m_webSocketAcceptor.registerHandlers(pathPrefix, dispatcher);
-
     m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
-}
-
-template<typename ManagerType>
-void SyncronizationEngine::registerHttpHandler(
-    const std::string& handlerPath,
-    typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    typedef SyncConnectionRequestHandler<ManagerType> RequestHandlerType;
-
-    dispatcher->registerRequestProcessor<RequestHandlerType>(
-        handlerPath.c_str(),
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        });
-}
-
-template<typename ManagerType>
-void SyncronizationEngine::registerHttpHandler(
-    nx::network::http::Method::ValueType method,
-    const std::string& handlerPath,
-    typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    typedef SyncConnectionRequestHandler<ManagerType> RequestHandlerType;
-
-    dispatcher->registerRequestProcessor<RequestHandlerType>(
-        handlerPath.c_str(),
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        },
-        method);
 }
 
 void SyncronizationEngine::onSystemDeleted(const std::string& systemId)

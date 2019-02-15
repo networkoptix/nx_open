@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "ko_KR",
   "language_name": "한국어",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -137,13 +137,21 @@
     "cantOpenClient": "%VMS_NAME% 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
     "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
     "thisSystem": "시스템",
-    "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다."
+    "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "좋음",
+    "fair": "보통",
+    "minLength": "너무 짧음",
     "minLengthMessage": "비밀번호는 최소 8자 이상 포함되어야 합니다.",
+    "required": "부적합",
     "requiredMessage": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
+    "weak": "약함",
     "weakMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
     "strongMessage": "강력한 암호!",
+    "common": "너무 평범",
     "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다.",
     "missingMessage": "패스워드가 필요합니다."
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "삭제",
     "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "successMerge": "시스템 {{systemName}} 이 {{systemName}} 과 병합되었습니다.",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
   "account": {

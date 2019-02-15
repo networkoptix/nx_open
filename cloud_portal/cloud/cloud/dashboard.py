@@ -19,6 +19,8 @@ except ImportError:
 from admin_tools.dashboard import modules, Dashboard
 from admin_tools.utils import get_admin_site_name
 
+from cloud import settings
+
 
 class CustomIndexDashboard(Dashboard):
     """
@@ -30,15 +32,15 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
             _('Applications'),
-            exclude=('django.contrib.*',),
+            exclude=settings.ADMIN_DASHBOARD,
             deletable=False,
             collapsible=False,
         ))
 
         # append an app list module for "Administration"
         self.children.append(modules.AppList(
-            _('Administration'),
-            models=('django.contrib.*',),
+            _('Internal'),
+            models=settings.ADMIN_DASHBOARD,
             deletable=False,
             collapsible=False,
         ))

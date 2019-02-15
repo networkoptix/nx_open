@@ -3,7 +3,6 @@
 #include <nx/utils/log/log.h>
 
 #include "../command_descriptor.h"
-#include "../transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport {
 

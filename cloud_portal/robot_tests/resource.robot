@@ -19,7 +19,7 @@ Open Browser and go to URL
     run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
     ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
-    Set Selenium Timeout    10
+    Set Selenium Timeout    20
     Check Language
     Go To    ${url}
 
@@ -52,25 +52,27 @@ Check Language
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
+    [arguments]    ${lang}=${LANGUAGE}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
-    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${lang}']    5
+    Sleep    5    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
+    Sleep    .5
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
     Wait Until Element Is Visible    ${LOG IN BUTTON}
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    20
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
     Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
@@ -87,7 +89,8 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}    20
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}
+    Check Language
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -139,17 +142,22 @@ Activate
 
 Restore password
     [arguments]    ${email}
-    Open Browser and go to URL    ${url}/restore_password
+    #log in to user to make sure their language is set to the current
+    Open Browser and go to URL    ${url}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Log Out
+    Validate Log Out
+    Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
+    Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    #sometimes the DB doesn't update with the new code before it's used by the test.  This is to wait for the DB update.
-    Sleep    20
+    Sleep    .5
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
-
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
     Click Link    ${RESET SUCCESS LOG IN LINK}
@@ -159,6 +167,8 @@ Restore password
 
 Share To
     [arguments]    ${random email}    ${permissions}
+    ${log}    get_browser_log
+    log    ${log}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
@@ -168,6 +178,7 @@ Share To
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
     Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
@@ -193,7 +204,7 @@ Remove User Permissions
     [arguments]    ${user email}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[contains(text(),'${DELETE USER BUTTON TEXT}')]
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    ${DELETE USER BUTTON}
     Click Button    ${DELETE USER BUTTON}
@@ -225,7 +236,7 @@ Failure Tasks
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}    20
+    \  Wait Until Element Is Visible    ${element}
 
 Elements Should Not Be Visible
     [arguments]    @{elements}

@@ -1,12 +1,12 @@
 {
-  "language": "en_US",
+  "language": "cs_CZ",
   "language_name": "Čeština",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "OK",
+    "okButton": "Ok",
     "cancelButton": "Zrušit",
-    "loginTitle": "Přihlásit se k %PRODUCT_NAME%",
+    "loginTitle": "Přihlaste se k %PRODUCT_NAME%",
     "loginButton": "Přihlásit se",
     "logoutAuthorisedTitle": "Již jste přihlášen",
     "logoutAuthorisedContinueButton": "Pokračovat",
@@ -137,13 +137,21 @@
     "cantOpenClient": "Aplikace %VMS_NAME% není nalezena. <a href=\"/download\">Stáhnout</a>",
     "lostConnection": "Připojení k {{systemName}} se ztratilo",
     "thisSystem": "systém",
-    "oldSafariNotSupported": "Verze Safari starší než 10 není podporována"
+    "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "dobré",
+    "fair": "dostatečné",
+    "minLength": "too short",
     "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
+    "required": "nesprávné",
     "requiredMessage": "Používejte pouze latinskou abecedu, číslice a symboly na klávesnici, vyhněte se použití mezery na počátku a konci",
+    "weak": "slabé",
     "weakMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
     "strongMessage": "Silné heslo!",
+    "common": "too common",
     "commonMessage": "Toto heslo je v seznamu nejoblíbenějších heslech na světě",
     "missingMessage": "Heslo je vyžadováno"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Smazat",
     "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
   },
   "account": {

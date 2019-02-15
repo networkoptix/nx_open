@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/maintenance/log/client.h>
-#include <nx/network/maintenance/log/request_path.h>
 #include <nx/network/maintenance/log/utils.h>
 #include <nx/network/maintenance/log/server.h>
-#include <nx/network/url/url_builder.h>
+#include <nx/network/maintenance/log/request_path.h>
 
 #include <nx/utils/log/logger_collection.h>
 #include <nx/utils/log/log_level.h>
@@ -20,6 +20,9 @@ using namespace nx::utils::log;
 namespace {
 
 static constexpr char kBasePath[] = "/log";
+static constexpr Level kLevel = Level::debug;
+static constexpr char kTag[] = "nx::network";
+static constexpr char kTargetString[] = "find me";
 
 } // namespace
 
@@ -29,21 +32,22 @@ class LogServer:
 public:
     ~LogServer()
     {
-        delete m_httpClient;
-        delete m_httpServer;
-        delete m_logServer;
+        m_httpClient.reset(nullptr);
+        m_httpServer.reset(nullptr);
+        m_logServer.reset(nullptr);
     }
+
 protected:
     virtual void SetUp() override
     {
-        m_httpServer = new http::TestHttpServer();
+        m_httpServer = std::make_unique<http::TestHttpServer>();
         ASSERT_TRUE(m_httpServer->bindAndListen());
 
-        m_httpClient = new http::HttpClient();
+        m_httpClient = std::make_unique<http::HttpClient>();
         m_httpClient->setResponseReadTimeout(kNoTimeout);
         m_httpClient->setMessageBodyReadTimeout(kNoTimeout);
 
-        m_logServer = new Server(&m_loggerCollection);
+        m_logServer = std::make_unique<maintenance::log::Server>(loggerCollection());
 
         m_logServer->registerRequestHandlers(
             kBasePath,
@@ -61,17 +65,18 @@ protected:
         ASSERT_TRUE(messageBody);
 
         bool parseSucceeded = false;
-        Loggers loggersReturnedByServer = QJson::deserialized<Loggers>(*messageBody, {}, &parseSucceeded);
+        Loggers loggersReturnedByServer = QJson::deserialized<Loggers>(
+            *messageBody,
+            Loggers(),
+            &parseSucceeded);
         ASSERT_TRUE(parseSucceeded);
 
         ASSERT_EQ(loggers.size(), loggersReturnedByServer.loggers.size());
         for (std::size_t i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
         {
             assertLoggerEquality(
-                loggers[i],
-                loggersReturnedByServer.loggers[i],
-                /*compareId*/ true,
-                /*comparePath*/ true);
+                loggers[i], 
+                loggersReturnedByServer.loggers[i]);
         }
     }
 
@@ -108,23 +113,17 @@ protected:
             *outLoggerReturnedByServer = loggerReturnedByServer;
     }
 
-    void assertLoggerEquality(const Logger& a, const Logger& b, bool compareId, bool comparePath)
+    void assertLoggerEquality(const Logger& a, const Logger& b)
     {
-        if (compareId)
-        {
-            ASSERT_EQ(a.id, b.id);
-        }
-
-        if (comparePath)
-        {
-            ASSERT_EQ(a.path, b.path);
-        }
-
+        ASSERT_EQ(a.id, b.id);
+        ASSERT_EQ(a.path, b.path);
         assertDefaultLevelEquality(a, b);
         assertFiltersEquality(a, b);
     }
 
-    void assertDefaultLevelEquality(const Logger& loggerToAdd, const Logger& loggerReturnedByServer)
+    void assertDefaultLevelEquality(
+        const Logger& loggerToAdd,
+        const Logger& loggerReturnedByServer)
     {
         // When adding a logger, empty defaultLevel is interpreted as Level::none by server.
         if (loggerReturnedByServer.defaultLevel == "none")
@@ -180,6 +179,11 @@ protected:
         ASSERT_TRUE(m_httpClient->doDelete(createDeleteRequestUrl(kLoggers, loggerId)));
     }
 
+    void whenDeleteLoggerUsingUnknownId()
+    {
+        whenDeleteLoggerConfiguration(2);
+    }
+
     void thenRequestSucceeded(const http::StatusCode::Value& expectedCode)
     {
         ASSERT_EQ(expectedCode, m_httpClient->response()->statusLine.statusCode);
@@ -215,44 +219,58 @@ protected:
             outloggers->push_back(loggerReturnedByServer);
     }
 
-    void whenAddLoggerStreamingConfiguration(Level level, const std::string& tag)
+    void whenAddLoggerStreamingConfiguration()
     {
-        std::string levelStr = toString(level).toStdString();
-        std::string query = std::string("level=" + levelStr + "[") + tag.c_str() + "],level=none";
+        std::string query("level=debug[nx::network],level=none");
         ASSERT_TRUE(m_httpClient->doGet(createRequestUrl(kStream, query)));
     }
 
-    void thenLogsAreProduced(
-        const Level level,
-        const std::string& tagName,
-        int logsToProduce,
-        const std::string& logThisString = std::string())
+    void givenStreamingLogger()
     {
-        Tag tag(tagName);
-
-        for (int i = 0; i < logsToProduce; ++i)
-        {
-            if (auto logger = loggerCollection()->get(tag, false))
-                logger->log(level, tag, QString::number(i) + '\n');
-        }
-
-        if (!logThisString.empty())
-        {
-            if (auto logger = loggerCollection()->get(tag, false))
-                logger->log(level, tag, QString(logThisString.c_str()) + '\n');
-        }
+        whenAddLoggerStreamingConfiguration();
+        thenRequestSucceeded(http::StatusCode::ok);
     }
 
-    void andLogStreamIsFetched(const std::string& stringToFind)
+    void whenServerConnectionIsClosed()
+    {
+        m_httpClient.reset(nullptr);
+    }
+
+    void thenLoggerIsRemovedByServer()
+    {
+        while (loggerCollection()->get(0))
+        {
+            static const std::chrono::milliseconds kSleep(100);
+            std::this_thread::sleep_for(kSleep);
+        }
+        ASSERT_EQ(loggerCollection()->get(0), nullptr);
+    }
+
+    void thenLogsAreProduced()
+    {
+        std::string tagStr(kTag);
+        Tag tag(tagStr);
+
+        for (int i = 0; i < 20; ++i)
+        {
+            if (auto logger = loggerCollection()->get(tag, false))
+                logger->log(kLevel, tag, QString::number(i) + '\n');
+        }
+
+        if (auto logger = loggerCollection()->get(tag, false))
+            logger->log(kLevel, tag, QString(kTargetString) + '\n');
+    }
+
+    void andLogStreamIsFetched()
     {
         QString s;
-        while (!s.contains(stringToFind.c_str()))
+        while (!s.contains(kTargetString))
             s += m_httpClient->fetchMessageBodyBuffer();
     }
 
-    void andLoggerIsRemoved(int loggerId)
+    void whenLoggerIsRemoved()
     {
-        loggerCollection()->remove(loggerId);
+        loggerCollection()->remove(0/*loggerId*/);
     }
 
     void whenAddLoggingConfigurationWithMalformedJson()
@@ -263,7 +281,7 @@ protected:
             getMalformedJson().toUtf8()));
     }
 
-    void whenRequestLogStreamWithMalformeQueryString()
+    void whenRequestLogStreamWithMalformedQueryString()
     {
         std::string malformedJson = "level=verbnx::network],level=none"; //< "verb" instead of "verbose"
         ASSERT_TRUE(m_httpClient->doGet(createRequestUrl(kStream, malformedJson)));
@@ -325,9 +343,9 @@ protected:
 
 private:
     LoggerCollection m_loggerCollection;
-    http::TestHttpServer* m_httpServer = nullptr;
-    http::HttpClient* m_httpClient = nullptr;
-    maintenance::log::Server* m_logServer = nullptr;
+    std::unique_ptr<http::TestHttpServer> m_httpServer;
+    std::unique_ptr<http::HttpClient> m_httpClient;
+    std::unique_ptr<maintenance::log::Server> m_logServer;
 
     nx::utils::Url createRequestUrl(
         const std::string& requestName,
@@ -351,7 +369,7 @@ private:
     }
     };
 
-TEST_F(LogServer, server_provides_all_logger_configurations)
+TEST_F(LogServer, provides_all_logger_configurations)
 {
     std::vector<Logger> loggersReturnedByServer;
     givenTwoLoggers(&loggersReturnedByServer);
@@ -362,7 +380,7 @@ TEST_F(LogServer, server_provides_all_logger_configurations)
     andActualConfigurationIsProvided(loggersReturnedByServer);
 }
 
-TEST_F(LogServer, server_accepts_new_logger)
+TEST_F(LogServer, accepts_new_logger)
 {
     Logger loggerToAdd = getDefaultLogger("nx::network");
     Logger loggerReturnedByServer;
@@ -378,7 +396,7 @@ TEST_F(LogServer, server_accepts_new_logger)
 
 TEST_F(
     LogServer,
-    server_accepts_loggers_with_a_duplicate_tag_and_second_logger_does_not_have_duplicate)
+    accepts_loggers_with_a_duplicate_tag_and_second_logger_does_not_have_duplicate)
 {
     std::string duplicateTag("nx::network");
     Logger loggerToAdd1 = getDefaultLogger(duplicateTag);
@@ -409,7 +427,7 @@ TEST_F(
     assertLoggerDoesNotHaveTag(loggerReturnedByServer2, duplicateTag);
 }
 
-TEST_F(LogServer, server_rejects_logger_configuration_with_duplicate_tags)
+TEST_F(LogServer, rejects_logger_configuration_with_duplicate_tags)
 {
     Logger loggerToAdd = getDefaultLogger();
     Logger duplicateLoggerToAdd = loggerToAdd;
@@ -425,12 +443,12 @@ TEST_F(LogServer, server_rejects_logger_configuration_with_duplicate_tags)
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
-TEST_F(LogServer, server_deletes_existing_logger_configuration)
+TEST_F(LogServer, deletes_existing_logger_configuration)
 {
     Logger loggerToAdd = getDefaultLogger();
     Logger loggerReturnedByServer;
 
-    whenAddLoggerConfiguration(getDefaultLogger());
+    whenAddLoggerConfiguration(loggerToAdd);
     thenRequestSucceeded(http::StatusCode::created);
 
     andNewLoggerConfigurationIsProvided(
@@ -442,58 +460,54 @@ TEST_F(LogServer, server_deletes_existing_logger_configuration)
     thenRequestSucceeded(http::StatusCode::ok);
 }
 
-TEST_F(LogServer, server_fails_to_delete_non_existing_logger_configuration)
+TEST_F(LogServer, fails_to_delete_non_existing_logger_configuration)
 {
     givenTwoLoggers();
 
-    whenDeleteLoggerConfiguration(2 /*loggerId*/);
+    whenDeleteLoggerUsingUnknownId();
     thenRequestFailed(http::StatusCode::notFound);
 }
 
-TEST_F(LogServer, server_streams_logs_by_adding_custom_logging_configuration)
+TEST_F(LogServer, streams_logs_by_adding_custom_logging_configuration)
 {
-    Level level(Level::debug);
-    std::string tag("nx::network");
-    std::string targetString("find me");
-    int logsToProduce = 20;
-
-    whenAddLoggerStreamingConfiguration(level, tag);
+    whenAddLoggerStreamingConfiguration();
 
     thenRequestSucceeded(http::StatusCode::ok);
-    thenLogsAreProduced(level, tag, logsToProduce, targetString);
-    andLogStreamIsFetched(targetString);
+    thenLogsAreProduced();
+    andLogStreamIsFetched();
 }
 
-TEST_F(LogServer, server_rejects_malformated_json_when_adding_logger_configuration)
+TEST_F(LogServer, rejects_malformed_json_when_adding_logger_configuration)
 {
     whenAddLoggingConfigurationWithMalformedJson();
 
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
-TEST_F(LogServer, server_rejects_logger_stream_request_with_malformed_query_string)
+TEST_F(LogServer, rejects_logger_stream_request_with_malformed_query_string)
 {
-    whenRequestLogStreamWithMalformeQueryString();
+    whenRequestLogStreamWithMalformedQueryString();
 
     thenRequestFailed(http::StatusCode::badRequest);
 }
 
-TEST_F(LogServer, DISABLED_server_crashes_when_logger_is_removed_during_stream)
+TEST_F(LogServer, connection_closure_causes_server_to_remove_logger)
 {
-    Level level(Level::debug);
-    std::string tag("nx::network");
+    givenStreamingLogger();
 
-    whenAddLoggerStreamingConfiguration(level, tag);
-    thenRequestSucceeded(http::StatusCode::ok);
+    whenServerConnectionIsClosed();
 
-    std::thread thread([&]()
-    {
-        thenLogsAreProduced(level, tag, 10000);
-    });
+    thenLoggerIsRemovedByServer();
+}
 
-    andLoggerIsRemoved(0);
+TEST_F(LogServer, streaming_logger_removal_before_connection_closure_is_properly_handled)
+{
+    givenStreamingLogger();
 
-    thread.join();
+    whenLoggerIsRemoved();
+    whenServerConnectionIsClosed();
+
+    // thenSeverDoesNotCrash();
 }
 
 } // namespace nx::network::maintenance::log::test

@@ -1,0 +1,13 @@
+Welcome to %PRODUCT_NAME%
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) está a convidá-lo a juntar-se a %PRODUCT_NAME% e partilhou o seu Sistema {{message.system_name}} consigo.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Você está convidado a juntar-se a %PRODUCT_NAME%.
+Foi-lhe autorizado acesso a {{message.system_name}}.
+{{/message.sharer_name}}
+
+Registar e ver o sistema: {{config.portal_url}}/register/{{message.code}}
+

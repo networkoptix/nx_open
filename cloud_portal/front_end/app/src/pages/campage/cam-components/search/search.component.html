@@ -1,0 +1,166 @@
+<div class="nx-search container">
+    <div class="row">
+        <div class="col-12 p-0">
+            <div class="btn-group w-100">
+                <span class="glyphicon glyphicon-search icon-search"></span>
+                <input [(ngModel)]="filter.query"
+                       type="text"
+                       class="form-control w-100 search-input"
+                       [ngClass]="{'non-empty': filter.query != ''}"
+                       name="query"
+                       autocomplete="off"
+                       placeholder="Search"/>
+                <span class="glyphicon close-icon search-clear"
+                      [hidden]="!filter.query" (click)="resetQuery()"></span>
+            </div>
+        </div>
+
+        <div class="col-12 p-0" *ngIf="showAdvancedOptions">
+            <div class="row mt-3 m-0" >
+                <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1">
+                    <label>Minimum Resolution</label>
+                    <nx-select name="resSelect"
+                               [items]="multiselectOptions.resolutions"
+                               label="optionLabel"
+                               [(ngModel)]="filter.resolution"
+                               (onSelected)="modelChanged('resolutions', $event)"
+                               [selected]="filter.resolution ? filter.resolution : null"
+                               required>
+                    </nx-select>
+                </div>
+                <div class="col-md-4 col-lg-4 pl-0 pl-md-1 pr-0     pr-md-1 mt-3 mt-md-0">
+                    <label>Manufacturers</label>
+                    <nx-multi-select name="vdMultiSelect"
+                                     [items]="multiselectOptions.vendors"
+                                     [ngModel]="filter.vendors"
+                                     (ngModelChange)="modelChanged('vendors', $event)"
+                                     canSelectAll>
+                    </nx-multi-select>
+                </div>
+                <div class="col-md-4 col-lg-4 pr-0 pl-0 pl-md-1 mt-3 mt-md-0">
+                    <label>Types</label>
+                    <nx-multi-select name="hdMultiSelect"
+                                     [items]="multiselectOptions.hardwareTypes"
+                                     [ngModel]="filter.hardwareTypes"
+                                     (ngModelChange)="modelChanged('hardwareTypes', $event)"
+                                     canSelectAll>
+                    </nx-multi-select>
+                </div>
+            </div>
+
+            <div class="row mt-3 mb-2 m-0" [hidden]="!showAdvancedOptions">
+                <div class="col-12 p-0">
+                <div class="form-group m-0">
+                    <label>Features</label>
+                    <nav aria-label="Cameras table navigation">
+                        <ul class="pagination m-0">
+                            <li class="tags ml-0">
+                                <nx-tag
+                                        name="isAudioSupported"
+                                        [(ngModel)]="filter.isAudioSupported"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isAudioSupported === null ? false : filter.isAudioSupported">
+                                    Audio
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isTwAudioSupported"
+                                        [(ngModel)]="filter.isTwAudioSupported"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isTwAudioSupported === null ? false : filter.isTwAudioSupported">
+                                    2-Way Audio
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isPtzSupported"
+                                        [(ngModel)]="filter.isPtzSupported"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isPtzSupported === null ? false : filter.isPtzSupported">PTZ
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isAptzSupported"
+                                        [(ngModel)]="filter.isAptzSupported"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isAptzSupported === null ? false : filter.isAptzSupported">
+                                    Advanced PTZ
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isFisheye"
+                                        [(ngModel)]="filter.isFisheye"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isFisheye === null ? false : filter.isFisheye">Fisheye
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isMdSupported"
+                                        [(ngModel)]="filter.isMdSupported"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isMdSupported === null ? false : filter.isMdSupported">
+                                    Motion
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isIoSupported"
+                                        [(ngModel)]="filter.isIoSupported"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isIoSupported === null ? false : filter.isIoSupported">I/O
+                                </nx-tag>
+                            </li>
+                            <li class="tags">
+                                <nx-tag
+                                        name="isH265"
+                                        [(ngModel)]="filter.isH265"
+                                        (onClick)="selectBooleanFilter($event)"
+                                        [value]="filter.isH265 === null ? false : filter.isH265">H.265
+                                </nx-tag>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="col-12 dropdown p-0 mt-2"
+             [ngClass]="{'show': showAdvancedOptions}" (nxClickElsewhere)="show = false">
+            <div class="area clearfix">
+                <div class="float-left">
+                    <a href class="btn-text" (click)="toggleOptions()" >
+                        <div class="nav-arrow">
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span translete>Advanced search</span>
+                    </a>
+                </div>
+                <div *ngIf="numberFilters != 0" class="float-right">
+                    <div [ngSwitch]="numberFilters" class="float-left">
+                            <span *ngSwitchCase="1">
+                            1 filter applied
+                        </span>
+                            <span *ngSwitchDefault>
+                            {{numberFilters}} filters applied
+                        </span>
+                    </div>
+                    <div class="ml-2 float-left">
+                        <a href class="btn-text has-icon position-relative"
+                           (click)="resetFilters()">
+                            <span class="close"></span>
+                            <span translete>Clear All</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="mb-0 mt-2 w-100" [hidden]="!showAdvancedOptions">
+        </div>
+
+    </div>
+</div>

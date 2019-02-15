@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+Dobrý den {{message.userFullName}},
 
   Otevřete prosím odkaz níže a potvrďte svou emailovou adresu a aktivujte účet.
 

@@ -12,8 +12,6 @@
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
 #include "p2p_sync_settings.h"
-#include "transaction_transport.h"
-#include "transaction_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

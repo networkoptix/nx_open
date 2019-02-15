@@ -1,0 +1,35 @@
+<form #messageForm="ngForm" name="messageForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title">{{ title }}</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="activeModal.close()" *ngIf="closable">
+            <div class="close-content"><span class="close-icon"></span></div>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group" validate-field>
+            <textarea class="form-control"
+                   [(ngModel)]="message"
+                   id="message"
+                   name="message" type="text"
+                      required nxFocusMe></textarea>
+            <p class="help-block"
+               *ngIf="!messageForm.controls['message']?.valid && messageForm.controls['message']?.touched">
+                    <span class="input-error"
+                          translate>
+                        A message is required
+                    </span>
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <nx-process-button [process]="sendMessage"
+                           [form]="messageForm"
+                           action-type="'primary'"
+                           buttonText="{{ 'Send' | translate }}"></nx-process-button>
+
+        <button type="button" class="btn btn-default" (click)="close()" translate>Cancel</button>
+    </div>
+</form>

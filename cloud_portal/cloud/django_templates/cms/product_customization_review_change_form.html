@@ -1,0 +1,227 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+{% load cms_filters %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    {% with can_preview=original.version.product.product_type.can_preview version=original.version product=original.version.product %}
+    <div id="alert" style="display:none" class="alert alert-warning"
+         title="Preview being generated">Currently making the preview for you. A new tab
+        will open shortly.
+    </div>
+    <div id="alert-error" style="display:none" class="alert alert-error"
+         title="Error generating preview">There was an error making the preview
+    </div>
+
+    <div class="module custom-block">
+        {% if customization_reviews %}
+        <div style="margin-bottom: 20px;">
+            <h2>Review Status {% if product.product_type.single_customization %}for each customization{% endif %}</h2>
+            <div class="table-responsive">
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <td><strong>Customization{% if not product.product_type.single_customization %}s{% endif %}</strong></td>
+                            <td><strong>Status</strong></td>
+                            <td><strong>Reviewed by</strong></td>
+                            <td><strong>Reviewed on</strong></td>
+                            <td><strong>Review Notes</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for review in customization_reviews %}
+                        {% get_review_state review.state as state %}
+                        {% has_permission user 'cms.can_view_customization' review.customization.name as can_view_customization %}
+                        <tr>
+                            <td> {{ review.customization }}</td>
+                            <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
+                            <td> {{ review.reviewed_by }}</td>
+                            <td> {{ review.reviewed_date }}</td>
+                            {% if can_view_customization %}
+                            <td> {{ review.notes | linebreaks }}</td>
+                            {% else %}
+                            <td> {{ review.notes | anon_notes | linebreaks }} </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        {% if contexts %}
+        <div>
+            <h2>Change list</h2>
+            <ul>
+            {% for context_name, records in contexts.items %}
+                <li>
+                    <div>
+                        {% with context_url=records.0.data_structure.context.url %}
+                            {{ context_name }}
+                            {% if context_url and can_preview and version.state == 'in review'%}
+                                <a class="float-right preview" href="{% url 'preview' %}"
+                                   value="{{records.0.data_structure.context.id}}"
+                                   target="_blank">Preview</a>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <ul>
+                    {% for record in records %}
+                        {% with data_structure=record.data_structure language=record.language %}
+                        <li>
+                            {% if data_structure.label %}
+                                {{ data_structure.label }}:
+                            {% else %}
+                                {{ data_structure.name }}
+                            {% endif %}
+
+                            {% if language %}
+                                ({{ language.code }})
+                            {% endif %}
+
+                            {% if data_structure.type == DataStructureTypes.image or data_structure.type == DataStructureTypes.external_image  %}
+                                <div><img class="preview-image review-preview"
+                                          {% if data_structure.type == DataStructureTypes.image %}
+                                            src="data:image/png;base64,{{ record }}"
+                                          {% else %}
+                                            src="{{ record }}"
+                                          {% endif %}></div>
+                            {% elif data_structure.type == DataStructureTypes.file %}
+                                <a href="{% url 'download_file' data_structure.name %}?version_id={{ version.id }}&lang={{ language.code }}&draft"
+                                   download>Download</a>
+                            {% elif data_structure.type == DataStructureTypes.external_file %}
+                                <a href="{{ record }}">Download</a>
+                            {% else %}
+                                <div class="show-html">{{ record|safe }}</div>
+                            {% endif %}
+                            {% if product.product_type.single_customization %}
+                                <a href="{% url 'admin:change_page' product.id data_structure.context.id %}"
+                                   target="_blank">(edit)</a>
+                            {% endif %}
+                        </li>
+                        {% endwith %}
+                    {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div>There are no changes to review</div>
+        {% endif %}
+        <h2>Review</h2>
+    </div>
+    <h1 style="text-align: center">Review for {{ original.customization }}</h1>
+    <form action="" enctype="multipart/form-data" method="post" novalidate>
+        {% csrf_token %}
+        <input name="version_id" value="{{ version.id }}" hidden/>
+        <input name="review_id" value="{{ original.id }}" hidden/>
+        {% block field_sets %}
+            {% for fieldset in adminform %}
+                {% include "admin/includes/fieldset.html" %}
+            {% endfor %}
+        {% endblock %}
+
+        {% get_review_state original.state as state %}
+        {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update %}
+            <div class="submit-row">
+                {% if state == 'Accepted' %}
+                <button class="btn btn-sm btn-danger" type="submit" name="force_update">Force Update</button>
+                {% endif %}
+                {% if state == 'Pending' %}
+                    {% if product and False %}
+                    <button class="btn btn-sm btn-default">
+                        <a href="{% url 'download_package' product.id %}?version_id={{ version.id }}"
+                           download>Download</a>
+                    </button>
+                    {% endif %}
+                    {% if perms.cms.publish_version %}
+                    <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
+                            data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
+                    {% endif %}
+                    <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
+                            data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
+                    {% if perms.cms.publish_version %}
+                    <button class="btn btn-sm btn-success" type="submit" name="publish">
+                            {% if can_preview %}Publish{% else %} Accept {% endif %}
+                    </button>
+                {% endif %}
+            {% endif %}
+            </div>
+        {% endif %}
+        <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add Comment to notes</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div>
+                                <label for="id_add">Note</label>
+                                <div id="add">
+                                    <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
+                                </div>
+                                <label for="can_view_customization">Can View Customization (If selected the user will be able to see this customization)</label>
+                                <div>
+                                    <input id="can_view_customization" name="can_view_customization" type="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                        <button id="addNoteButton" type="submit"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        $(function() {
+            // When a preview tag is clicked make a post request instead of a get request
+            var previews = $('.preview');
+            var csrf = $('input[name=csrfmiddlewaretoken]')[0];
+            for ( var i = 0; i < previews.length; ++i){
+                $(previews[i]).click(function(event){
+                    event.preventDefault();
+                    // Post request to generate and redirect to preview page
+                    var posting = $.post(this.href, {
+                        'version_id': {{version.id}},
+                        'csrfmiddlewaretoken': csrf.value,
+                        'context_id': $(this).attr('value')
+                    });
+
+                    // Use our custom alert so that posting done callback does not get blocked
+                    $("#alert-error").css({display: 'none'});
+                    $("#alert").css({display: 'block'});
+                    posting.done(function(data){
+                        $("#alert").css({display: 'none'});
+                        window.open(data, '_blank');
+                    });
+                    posting.fail(function(){
+                        $("#alert-error").css({display: 'block'});
+                        alert("Error creating the preview");
+                    })
+                })
+            }
+
+            // Copy the button that opened the modal
+            $('#addNotes').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var modal = $(this);
+                var noteButton = modal.find('#addNoteButton');
+                noteButton.attr('name', button.data('action'));
+                noteButton.text(button.data('name'));
+                noteButton.attr('class', button.attr('class'));
+            })
+
+        });
+    </script>
+    {% endwith %}
+{% endblock %}

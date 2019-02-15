@@ -443,7 +443,7 @@ private:
     void setTunnelValidator()
     {
         tunnelingClient().setTunnelValidatorFactory(
-            [this](auto tunnel)
+            [this](auto tunnel, const Response&)
             {
                 return std::make_unique<TestValidator>(
                     std::move(tunnel),

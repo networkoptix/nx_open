@@ -116,7 +116,7 @@
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
         "useTextEmailFormat": "Düz metin e-postaları gönder",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "E-postalarda windows satır beslemesini kulllan",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Kullanıcı adı veya şifre hatalı",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Çok fazla deneme yapıldı. Daha sonra tekrar deneyin."
     },
     "navigaion": {
         "cannotGetUser": "Sunucu hatası: kullanıcı verileri alınamıyor"

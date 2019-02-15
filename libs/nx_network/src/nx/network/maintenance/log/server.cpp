@@ -185,10 +185,6 @@ void Server::serveGetStreamingLogger(
     if (loggerId == LoggerCollection::kInvalidId)
         return completionHandler(http::RequestResult(http::StatusCode::badRequest));
 
-    auto logger = m_loggerCollection->get(loggerId);
-    if (!logger)
-        return completionHandler(http::RequestResult(http::StatusCode::internalServerError));
-
     messageBody->setOnBeforeDestructionHandler(
         [this, sharedNewLogger, logWriterPtr, loggerId]()
         {

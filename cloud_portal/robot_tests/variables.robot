@@ -39,6 +39,7 @@ ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(
 ${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTIVATION LINK BUTTON TEXT}']
 ${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//label[text()="${WRONG PASSWORD}"]
 ${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//label[text()="${ACCOUNT DOES NOT EXIST}"]
+${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//label[text()="${TOO MANY ATTEMPTS TEXT}"]
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
@@ -77,7 +78,7 @@ ${CHANGE PASSWORD FORM}               //form[@name='passwordForm']
 ${CURRENT PASSWORD INPUT}             //form[@name='passwordForm']//input[@ng-model='pass.password']
 ${NEW PASSWORD INPUT}                 //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input
 ${CHANGE PASSWORD BUTTON}             //form[@name='passwordForm']//button[@ng-click='checkForm()']
-${PASSWORD IS REQUIRED}               //span[@ng-if='form.passwordNew.$error.required']
+${PASSWORD IS REQUIRED}               //span[@ng-if='form[id].$error.required']
 ${CHANGE PASS EYE ICON OPEN}          ${CHANGE PASSWORD FORM}${EYE ICON OPEN}
 ${CHANGE PASS EYE ICON CLOSED}        ${CHANGE PASSWORD FORM}${EYE ICON CLOSED}
 
@@ -103,15 +104,15 @@ ${REGISTER EYE ICON CLOSED}           ${REGISTER FORM}${EYE ICON CLOSED}
 ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
 
 #Register form errors
-${FIRST NAME IS REQUIRED}      //span[@ng-if='registerForm.firstName.$touched && registerForm.firstName.$error.required' and contains(text(),'${FIRST NAME IS REQUIRED TEXT}')]
-${LAST NAME IS REQUIRED}       //span[@ng-if='registerForm.lastName.$touched && registerForm.lastName.$error.required' and contains(text(),'${LAST NAME IS REQUIRED TEXT}')]
-${EMAIL IS REQUIRED}           //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),"${EMAIL IS REQUIRED TEXT}")]
-${EMAIL ALREADY REGISTERED}    //span[@ng-if='registerForm.registerEmail.$error.alreadyExists' and contains(text(),'${EMAIL ALREADY REGISTERED TEXT}')]
-${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
-${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
-${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
-${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
-${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
+${FIRST NAME IS REQUIRED}             //span[@ng-if='registerForm.firstName.$touched && registerForm.firstName.$error.required' and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
+${LAST NAME IS REQUIRED}              //span[@ng-if='registerForm.lastName.$touched && registerForm.lastName.$error.required' and contains(text(),"${LAST NAME IS REQUIRED TEXT}")]
+${EMAIL IS REQUIRED}                  //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),"${EMAIL IS REQUIRED TEXT}")]
+${EMAIL ALREADY REGISTERED}           //span[@ng-if='registerForm.registerEmail.$error.alreadyExists' and contains(text(),"${EMAIL ALREADY REGISTERED TEXT}")]
+${EMAIL INVALID}                      //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),"${EMAIL INVALID TEXT}")]
+${PASSWORD SPECIAL CHARS}             //span[contains(@ng-if,'form[id].$error.pattern &&') and contains(@ng-if,'!form[id].$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
+${PASSWORD TOO SHORT}                 //span[contains(@ng-if,'form[id].$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
+${PASSWORD TOO COMMON}                //span[contains(@ng-if,'form[id].$error.common &&') and contains(@ng-if,'form[id].$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
+${PASSWORD IS WEAK}                   //span[contains(@ng-if,'form[id].$error.weak &&') and contains(@ng-if,'form[id].$error.common &&') and contains(@ng-if,'!form[id].$error.pattern &&') and contains(@ng-if,'!form[id].$error.required &&') and contains(@ng-if,'!form[id].$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 
 ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
 
@@ -134,7 +135,7 @@ ${RENAME SAVE}                        //form[@name='renameForm']//button[text()=
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
 ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
-${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),'${SYSTEM NAME IS REQUIRED TEXT}')]
+${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),"${SYSTEM NAME IS REQUIRED TEXT}")]
 
 ${OWNER NAME}                         //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]
 ${OWNER EMAIL}                        //a[@ng-href="mailto:${EMAIL OWNER}"]
@@ -153,6 +154,8 @@ ${USERS LIST}                         //div[@process-loading='gettingSystemUsers
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), "${SYSTEM NO ACCESS TEXT}")]
 ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
+${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
+${SYSTEM SEARCH X BUTTON}             //a[@ng-click="search.value=''"]
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
@@ -163,7 +166,7 @@ ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), "${DISCONNECT MODAL WARNING TEXT}")]
 # extra spaces here temporarily
 ${DISCONNECT MODAL CANCEL}               //button[text()='Cancel ']
-${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='Disconnect ']
+${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='${DISCONNECT BUTTON TEXT} ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
@@ -198,21 +201,26 @@ ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-s
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 
 #Downloads
-${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
-${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOADS HEADER}                   //h1["Downloads"]
+${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - Client only"]/../..
+${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - Client only"]/../..
+${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - Client only"]/../..
+${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]
+${PLAY STORE DOWNLOAD BUTTON}         //a[@class="mobile-link Android"]
 
 ${WINDOWS TAB}                        //a[@id="Windows"]
 ${UBUNTU TAB}                         //a[@id="Linux"]
 ${MAC OS TAB}                         //a[@id="MacOS"]
 
 #History
-${RELEASES TAB}                       //span[@class='tab-heading' and text()='${RELEASES TEXT}']/..
-${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
-${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
+${RELEASES TAB}                       //span[@class='tab-heading' and text()='Releases']/..
+${PATCHES TAB}                        //span[@class='tab-heading' and text()='Patches']/..
+${BETAS TAB}                          //span[@class='tab-heading' and text()='Betas']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
+#Known Limitations
+${REMOTE CONNECTIVITY TILE LINK}      //h2[contains(text(),"${REMOTE CONNECTIVITY}")]/..//a[contains(@href,"${SUPPORT URL}")]
+${SUPPORT TILE LINK}                  //h2[contains(text(),"${SUPPORT}")]/..//a[@href="${SUPPORT URL}"]
 #About
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
 
@@ -232,7 +240,7 @@ ${WINDOWS TAB}                        //a[@ng-click="select()"]//span[text()="Wi
 ${UBUNTU TAB}                         //a[@ng-click="select()"]//span[text()="Ubuntu Linux"]/../..
 ${MAC OS TAB}                         //a[@ng-click="select()"]//span[text()="Mac OS"]/../..
 
-${RELEASE NUMBER}               //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
+${RELEASE NUMBER}                     //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b
 
 #Password badges
 ${PASSWORD BADGE}                     //span[contains(@class,"badge")]
@@ -241,21 +249,21 @@ ${PASSWORD TOO COMMON BADGE}          //span[contains(@class,"badge") and contai
 ${PASSWORD IS WEAK BADGE}             //span[contains(@class,"badge") and contains(text(),'${PASSWORD IS WEAK BADGE TEXT}')]
 ${PASSWORD IS FAIR BADGE}             //span[contains(@class,"badge") and contains(text(),'${PASSWORD IS FAIR BADGE TEXT}')]
 ${PASSWORD IS GOOD BADGE}             //span[contains(@class,"badge") and contains(text(),'${PASSWORD IS GOOD BADGE TEXT}')]
-${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contains(text(),'${PASSWORD INCORRECT BADGE TEXT}')]
+${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contains(text(),"${PASSWORD INCORRECT BADGE TEXT}")]
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[contains(text(),'${CONTINUE BUTTON TEXT}')]
 ${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[contains(text(),'${LOG OUT BUTTON TEXT}')]
 
-${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
+${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), '${CONTINUE BUTTON TEXT}')]
 ${CONTINUE MODAL}                     //ngb-modal-window
 
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 #Eye icons for password forms
-${EYE ICON OPEN}             //span[contains(@class, "glyphicon-eye-open")]
-${EYE ICON CLOSED}           //span[contains(@class, "glyphicon-eye-close")]
+${EYE ICON OPEN}             //span[@ng-if="!passwordVisible"]
+${EYE ICON CLOSED}           //span[@ng-if="passwordVisible"]
 
 #ASCII
 ${ESCAPE}                             \\27

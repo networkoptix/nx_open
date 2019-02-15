@@ -30,6 +30,7 @@ if not CUSTOMIZATION:
     CUSTOMIZATION = conf['customization']
 
 assert ('trafficRelay' in conf), 'Ivan, please add traffic relay to config for this instance'
+assert ('bucket' in conf), 'Ivan, please add s3 bucket to config for this instance'
 
 TRAFFIC_RELAY_HOST = '{systemId}.' + conf['trafficRelay']['host']  # {systemId}.relay-bur.vmsproxy.hdw.mx
 TRAFFIC_RELAY_PROTOCOL = 'https://'
@@ -64,6 +65,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'storages',
+
     'django_celery_results',
     'rest_framework',
     'rest_hooks',
@@ -76,7 +80,7 @@ INSTALLED_APPS = (
 )
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,7 +88,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'cloud.logger.CatchExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'cloud.urls'
@@ -103,6 +109,22 @@ if LOCAL_ENVIRONMENT:
 
 ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
 ADMIN_TOOLS_MENU = 'cms.menu.CustomMenu'
+ADMIN_DASHBOARD = ('cms.models.ContentVersion',
+                   'cms.models.Context',
+                   'cms.models.ContextProxy',
+                   'cms.models.ContextTemplate',
+                   'cms.models.Customization',
+                   'cms.models.DataRecord',
+                   'cms.models.DataStructure',
+                   'cms.models.ExternalFile',
+                   'cms.models.Language',
+                   'cms.models.ProductType',
+                   'cms.models.UserGroupsToProductPermissions',
+                   'django_celery_results.*',
+                   'notifications.models.*',
+                   'rest_hooks.*',
+                   'zapier.models.*'
+                   )
 
 TEMPLATES = [
     {
@@ -168,7 +190,7 @@ CACHES = {
         }
     }
 }
-PRIMARY_PRODUCT = "cloud_portal"
+
 
 if LOCAL_ENVIRONMENT:
     conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
@@ -228,51 +250,70 @@ LOGGING = {
         },
         'api.views.utils': {
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         },
         'api.helpers.exceptions': {
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         },
         'api.controllers.cloud_gateway': {
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         },
         'notifications.tasks': {
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         },
         'api.account_backend': {  # explicitly mention all modules with loogers
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         },
         'api.controller.cloud_api': {
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         },
         'api.views.account': {
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': 'CRITICAL',
+            'propagate': False,
             'handlers': ['console']
         },
         'cms.controllers.filldata': {
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
             'handlers': ['console']
         }
     }
 }
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) and s3 config
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_ROOT = BASE_DIR + '/static/integrations/'
+MEDIA_URL = '/static/integrations/'
+# #End of s3 config
+
+
+# START s3 config
+AWS_STORAGE_BUCKET_NAME = conf['bucket']
+
+S3_DOMAIN = conf['s3_domain'] if 's3_domain' in conf else '%s.s3.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = S3_DOMAIN % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'ContentDisposition': 'attachment',
+}
+# mysite is a default name for the admin site
+INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
+# END s3
+
+if LOCAL_ENVIRONMENT:
+    AWS_STORAGE_BUCKET_NAME = 'cloud-portal'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -283,18 +324,18 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.AllowAny',
     )
 }
+# Used for Zapier
 HOOK_EVENTS = {
     'user.send_zap_request': None
 }
 
 # Celery settings section
 
-#Configure AWS SQS
-#Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
-#BROKER_TRANSPORT_OPTIONS
+# Configure AWS SQS
+# Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
+# BROKER_TRANSPORT_OPTIONS
 #   queue_name_prefix allows you to name the queue for sqs
 #   region allows you to specify the aws region
-
 
 
 BROKER_URL = os.getenv('QUEUE_BROKER_URL')
@@ -387,12 +428,24 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
-    "review_version": {
+    'review_version': {
         'engine': 'email'
     },
     'cloud_notification':{
         'engine': 'email',
         'queue': 'broadcast-notifications'
+    },
+    'cloud_invite':{
+        'engine': 'email'
+    },
+    'ipvd_feedback': {
+        'engine': 'email'
+    },
+    'sales_inquiry': {
+        'engine': 'email'
+    },
+    'support_request': {
+        'engine': 'email'
     }
 }
 
@@ -406,7 +459,7 @@ DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{custom
 
 MAX_RETRIES = conf['max_retries']
 CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
-CMS_MAX_FILE_SIZE = 9
+CMS_MAX_FILE_SIZE = 9437184
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

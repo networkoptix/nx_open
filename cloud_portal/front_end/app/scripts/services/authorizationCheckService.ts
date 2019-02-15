@@ -7,12 +7,12 @@
             .factory('authorizationCheckService', AuthorizationCheckService);
 
         AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64',
-            'cloudApi', 'configService', 'NxDialogsService', 'languageService', '$location'];
+            'cloudApi', 'nxConfigService', 'NxDialogsService', 'languageService', '$location'];
 
         function AuthorizationCheckService($rootScope, $q, $localStorage, $base64,
-                                           cloudApi, configService, NxDialogsService, languageService, $location) {
+                                           cloudApi, nxConfigService, NxDialogsService, languageService, $location) {
 
-            const CONFIG = configService.config;
+            const CONFIG = nxConfigService.getConfig();
 
             let search = $location.search();
             let auth: any;

@@ -29,6 +29,7 @@ struct Http
     int tcpBacklogSize;
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
     bool serveOptions;
+    std::string maintenanceHtdigestPath;
 
     Http();
 };

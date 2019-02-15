@@ -98,7 +98,7 @@ placeholder{ /* Hack to have full-screen */
         color: $light;
 
         @include media-breakpoint-down(sm) {
-            top : 40%;
+            top : 50%;
         }
 
         &>*{

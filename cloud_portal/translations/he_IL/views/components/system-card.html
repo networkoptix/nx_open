@@ -9,7 +9,7 @@
             <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">מיזוג עם מערכת אחרת</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">התנתק מ
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -49,7 +49,8 @@
         <div class="merge-info-text">
             <p>בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות.</p>
             <p>עד לסיום המיזוג אתה יכול להיכנס למערכת זו ולצפות בוידאו, אבל לא יכול לשנות הגדרות.</p>
-            <p>כאשר המיזוג יסתיים, כל המשתמשים והמצלמות מהמערכת הזו יהיו זמינים ב <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. המערכת, ומערכת זו תימחק.</p>
+            <p>כאשר המיזוג יסתיים, כל המשתמשים והמצלמות ממערכת זו יהפכו לזמינים
+                במערכת "<span class="merge-system-name">{{mergeTargetSystem.name}}</span> ", ומערכת זו תימחק.</p>
         </div>
     </div>
 </div>

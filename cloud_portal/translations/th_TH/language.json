@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "th_TH",
   "language_name": "ภาษาไทย",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "แสดงขั้นสูง",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
     },
     "Administrator": {
       "label": "ผู้ดูแลระบบ",
@@ -137,13 +137,21 @@
     "cantOpenClient": "ไม่พบแอ็พพลิเคชัน %VMS_NAME% <a href=\"/download\">Download</a>",
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
     "thisSystem": "ระบบ",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "ดี",
+    "fair": "ยุติธรรม",
+    "minLength": "สั้นเกินไป",
     "minLengthMessage": "รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
+    "required": "ไม่ถูกต้อง",
     "requiredMessage": "ใช้อักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์เท่านั้นหลีกเลี่ยงช่องว่างด้านบนและด้านหลัง",
+    "weak": "อ่อนแอ",
     "weakMessage": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
     "strongMessage": "รหัสผ่านที่แข็งแกร่ง!",
+    "common": "บ่อยเกินไป",
     "commonMessage": "รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก",
     "missingMessage": "จำเป็นต้องใช้รหัสผ่าน"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "ลบ",
     "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
   },
   "account": {
@@ -279,7 +287,7 @@
       "copyActiveText": "คัดลอกไปยังคลิปบอร์ด"
     },
     "systemOffline": "ระบบออฟไลน์",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "ไม่พบกล้อง",
     "cameraStates": {
       "offline": "ออฟไลน์",
       "error": "ข้อผิดพลาด",

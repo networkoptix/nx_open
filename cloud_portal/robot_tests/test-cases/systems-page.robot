@@ -35,31 +35,31 @@ Restart
 
 *** Test Cases ***
 should show list of Systems
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${ACCOUNT DROPDOWN}    ${SYSTEMS TILE}
 
 has system name, owner and OpenInNx button visible on systems page
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
 
 should show Open in NX client button for online system
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
 
 should not show Open in NX client button for offline system
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
@@ -67,18 +67,17 @@ should show system's state for systems if they are offline. Otherwise - button O
     Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
 
 should show the no systems connected message when you have no systems
-    [tags]    C41866
+    [tags]    C41866    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
 should show system name in header with no dropdown if user has only one system
-    [tags]    C41569
+    [tags]    C41569    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
     Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
@@ -97,7 +96,6 @@ should show the system page instead of all systems when user only has one
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
     Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
@@ -111,7 +109,7 @@ should show the system page instead of all systems when user only has one
     Remove User Permissions    ${EMAIL NOPERM}
 
 should open system page (users list) when clicked on system
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
@@ -122,7 +120,7 @@ should open system page (users list) when clicked on system
     Verify In System    Auto Tests
 
 Should show your system for owner and owner name for non-owners
-    [tags]    C41893
+    [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
@@ -131,10 +129,36 @@ Should show your system for owner and owner name for non-owners
     \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check Systems Text    ${user}
 
 Should not show systems dropdown with no systems
-    [tags]    C41568
+    [tags]    C41568    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Element Should Not Be Visible    ${SYSTEMS DROPDOWN}
+
+Search should highlight system name
+    [tags]    C41891    Threaded
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS}
+    Wait Until Element Is Visible    //span[@class="highlighted" and text()="${AUTO TESTS}"]
+
+Search should highlight owner name
+    [tags]    C41891    Threaded
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${TEST FIRST NAME}
+    Wait Until Element Is Visible    //span[@class="highlighted" and text()="${TEST FIRST NAME}"]
+
+Search can be cleared by x button
+    [tags]    C41891    Threaded
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${TEST FIRST NAME}
+    Wait Until Element Is Visible    ${SYSTEM SEARCH X BUTTON}
+    Click Link    ${SYSTEM SEARCH X BUTTON}
+    Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
 
 should update owner name in systems list, if it's changed
     Go To    ${url}/account

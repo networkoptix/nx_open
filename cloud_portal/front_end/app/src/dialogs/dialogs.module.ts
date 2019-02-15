@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { ComponentsModule } from '../components/components.module';
 import { DirectivesModule } from '../directives/directives.module';
-import { DropdownsModule }  from '../dropdowns/dropdowns.module';
 
 import { NxDialogsService }                                   from './dialogs.service';
 import { NxModalLoginComponent, LoginModalContent }           from './login/login.component';
@@ -12,6 +11,7 @@ import { DisconnectModalContent, NxModalDisconnectComponent } from './disconnect
 import { RenameModalContent, NxModalRenameComponent }         from './rename/rename.component';
 import { ShareModalContent, NxModalShareComponent }           from './share/share.component';
 import { MergeModalContent, NxModalMergeComponent }           from './merge/merge.component';
+import { MessageModalContent, NxModalMessageComponent }       from './message/message.component';
 import { EmbedModalContent, NxModalEmbedComponent }           from './embed/embed.component';
 import { downgradeInjectable }                                from '@angular/upgrade/static';
 import { FormsModule, EmailValidator }                        from '@angular/forms';
@@ -27,7 +27,6 @@ import { ClipboardModule }                                    from 'ngx-clipboar
         ClipboardModule,
         ComponentsModule,
         DirectivesModule,
-        DropdownsModule
     ],
     declarations   : [
         LoginModalContent, NxModalLoginComponent,
@@ -36,6 +35,7 @@ import { ClipboardModule }                                    from 'ngx-clipboar
         RenameModalContent, NxModalRenameComponent,
         ShareModalContent, NxModalShareComponent,
         MergeModalContent, NxModalMergeComponent,
+        MessageModalContent, NxModalMessageComponent,
         EmbedModalContent, NxModalEmbedComponent,
     ],
     entryComponents: [
@@ -45,6 +45,7 @@ import { ClipboardModule }                                    from 'ngx-clipboar
         RenameModalContent, NxModalRenameComponent,
         ShareModalContent, NxModalShareComponent,
         MergeModalContent, NxModalMergeComponent,
+        MessageModalContent, NxModalMessageComponent,
         EmbedModalContent, NxModalEmbedComponent,
     ],
     providers      : [
@@ -55,6 +56,7 @@ import { ClipboardModule }                                    from 'ngx-clipboar
         NxModalRenameComponent,
         NxModalShareComponent,
         NxModalMergeComponent,
+        NxModalMessageComponent,
         NxModalEmbedComponent,
     ],
     exports        : []

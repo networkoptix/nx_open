@@ -406,6 +406,7 @@ table.webclient-window>tbody>tr>td{
   border: 1px solid $additional_light2;
   position:absolute;
   margin-left: -72px;
+  display : none; // Edge bug
 }
 
 .cameras-panel .nav > li.active > a .camera-preview{
@@ -435,7 +436,8 @@ table.webclient-window>tbody>tr>td{
   }
 
   &.Unauthorized,
-  &.Offline{
+  &.Offline,
+  &.Online{
     color:$light16 !important;
 
     small{
@@ -445,10 +447,6 @@ table.webclient-window>tbody>tr>td{
     .camera-preview{
       background-color: $light3 !important;
       border: 1px solid $light5 !important;
-
-      img{
-        display:none;
-      }
     }
   }
 }
@@ -611,7 +609,7 @@ table.webclient-window>tbody>tr>td{
   width:100%;
   height:100%;
   overflow:hidden;
-  background-color: $additional_light2;
+  background-color: $dark1;
 }
 
 .view-panel{
@@ -683,9 +681,10 @@ table.webclient-window>tbody>tr>td{
 
 .cast-button{
   max-width:20px;
+  height : 20px;
   background-color:transparent;
   border:none;
-  padding:0px;
+  padding:0;
 }
 
 .fullscreen-notification{
@@ -959,10 +958,12 @@ table.webclient-window>tbody>tr>td{
     position : absolute;
     width    : 100% !important;
     height   : 100% !important;
+    display  : none; // visible list messes up iPhone height calc
   }
   
   &.on-top {
     z-index : 99; /* Keeps the cameras-panel above the video player and preloads for mobile. */
+    display : block !important;
   }
 }
 

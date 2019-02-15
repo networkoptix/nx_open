@@ -44,6 +44,7 @@ Restart
 
 *** Test Cases ***
 systems dropdown should allow you to go back to the systems page
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
     Click Button    ${SYSTEMS DROPDOWN}
@@ -52,6 +53,7 @@ systems dropdown should allow you to go back to the systems page
     Location Should Be    ${url}/systems
 
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
@@ -59,6 +61,7 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 should confirm, if not owner deletes system (You will loose access to this system)
+    [tags]    Threaded
     Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
@@ -68,6 +71,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
+    [tags]    C41884
     Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
@@ -80,7 +84,7 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Elements Are Visible    ${DISCONNECT MODAL WARNING}    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
-    ${SYSYEM DELETED FROM ACCOUNT}    Replace String    ${SYSYEM DELETED FROM ACCOUNT}    {{message.system_name}}    ${AUTO TESTS}
+    ${SYSYEM DELETED FROM ACCOUNT}    Replace String    ${SYSYEM DELETED FROM ACCOUNT}    {{system_name}}    ${AUTO TESTS}
     Check For Alert    ${SYSYEM DELETED FROM ACCOUNT}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Log Out
@@ -91,29 +95,30 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
-    Wait Until Element Contains    ${SHARE PERMISSIONS DROPDOWN}    Viewer
+    Wait Until Element Contains    ${SHARE PERMISSIONS DROPDOWN}    ${VIEWER TEXT}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 correct items are shown for owner
-    [tags]    C41560
+    [tags]    C41560    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${USERS LIST}
 #    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']
     Wait Until Elements Are Visible    //h2[.='${YOUR SYSTEM TEXT}']    ${RENAME SYSTEM}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
 
 correct items are shown for admin
-    [tags]    C41561
+    [tags]    C41561    Threaded
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER NAME}    ${OWNER EMAIL}
 
 correct items are shown for advanced viewer and below
-    [tags]    C41562
+    [tags]    C41562    Threaded
     ${users}         Set Variable    ${EMAIL ADVVIEWER}    ${EMAIL VIEWER}    ${EMAIL LIVEVIEWER}    ${EMAIL CUSTOM}
-    ${users text}    Set Variable     ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
+    ${users text}    Set Variable    ${ADV VIEWER TEXT}    ${VIEWER TEXT}     ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
     :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
     \    Log in to Auto Tests System    ${user}
-    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[text()="${text}"]
+    \    Log     ${text}
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
     \    Element Should Not Be Visible    ${RENAME SYSTEM}
     \    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \    Element Should Not Be Visible    ${USERS LIST}
@@ -121,23 +126,26 @@ correct items are shown for advanced viewer and below
     \    Validate Log Out
 
 does not display edit and remove for owner row
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'Edit')]/..
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
 
 always displays owner on the top of the table
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${FIRST USER OWNER}
 
 contains user emails and names
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
 
 rename button opens dialog and clicking cancel closes rename dialog without rename
-    [tags]    C41880
+    [tags]    C41880    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
@@ -147,7 +155,7 @@ rename button opens dialog and clicking cancel closes rename dialog without rena
     Verify In System    Auto Tests
 
 clicking 'X' closes rename dialog without rename
-    [tags]    C41880
+    [tags]    C41880    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
@@ -158,7 +166,7 @@ clicking 'X' closes rename dialog without rename
     Verify In System    Auto Tests
 
 clicking save with no input in rename dialoge throws error
-    [tags]    C41880
+    [tags]    C41880    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
@@ -193,29 +201,33 @@ clicking save in rename dialog renames system
     Verify In System    Auto Tests
 
 should open System page by link to not authorized user and redirect to homepage, if he does not log in
+    [tags]    Threaded
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Wait Until Element Is Visible    ${JUMBOTRON}
 
 should open System page by link to not authorized user and show it, after owner logs in
+    [tags]    Threaded
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL OWNER}   ${password}    None
     Verify In System    Auto Tests
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
+    [tags]    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
+    [tags]    Threaded
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${EMAIL NOPERM}    ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
 should display same user data as user provided during registration (stress to cyrillic)
-    [tags]    email
+    [tags]    email    Threaded
 #create user
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -224,7 +236,6 @@ should display same user data as user provided during registration (stress to cy
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
     Share To    ${random email}    ${ADMIN TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
 #verify user was added with appropriate name
@@ -237,7 +248,7 @@ should display same user data as user provided during registration (stress to cy
     Remove User Permissions    ${random email}
 
 should display same user data as showed in user account (stress to cyrillic)
-    [tags]    email    C41573    C41842
+    [tags]    email    C41573    C41842    Threaded
 #create user
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -246,7 +257,6 @@ should display same user data as showed in user account (stress to cyrillic)
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
     Share To    ${random email}    ${VIEWER TEXT}
-    Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
     Go To    ${url}/account
@@ -276,6 +286,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Remove User Permissions    ${random email}
 
 should show "your system" for owner and "owner's name" for non-owners
+    [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
     Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']

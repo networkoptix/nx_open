@@ -1,9 +1,11 @@
-<div class="placeholder" [ngClass]="type">
-    <div class="placeholder-content">
-        <div class="placeholder-preloader">
-            <div class="circleG circleG_1"></div>
-            <div class="circleG circleG_2"></div>
-            <div class="circleG circleG_3"></div>
+<div [ngClass]="{ 'placeholder-wrapper' : type == '' }">
+    <div class="placeholder" [ngClass]="type">
+        <div class="placeholder-content">
+            <div class="placeholder-preloader">
+                <div class="circleG circleG_1"></div>
+                <div class="circleG circleG_2"></div>
+                <div class="circleG circleG_3"></div>
+            </div>
         </div>
     </div>
 </div>

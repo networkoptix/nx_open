@@ -64,7 +64,7 @@
 	"We'd recommend to install the latest versions of Google Chrome or Mozilla Firefox, but you can use any other modern web-browser.": "Zalecamy zainstalowanie najnowszych wersji Google Chrome lub Mozilla Firefox, ale możesz także użyć dowolnej innej nowoczesnej przeglądarki internetowej.",
 	"What's new?": "Co nowego?",
 	"Wrong password": "Nieprawidłowe hasło",
-	"You can merge cloud Systems, where you are owner.": "Możesz złączyć systemy w chmurze, jeśli jesteś właścicielem.",
+	"You can merge only those cloud Systems, where you have the \"Owner\" permissions.": "Można złączyć tylko te systemy w chmurze, których jesteś właścicielem.",
 	"You can only merge Systems in which you have owner permissions.": "Możesz złączyć tylko systemy, w których masz uprawnienia właściciela.",
 	"Your browser is not supported": "Twoja przeglądarka nie jest obsługiwana",
 	"is incompatible.": "jest niezgodny.",

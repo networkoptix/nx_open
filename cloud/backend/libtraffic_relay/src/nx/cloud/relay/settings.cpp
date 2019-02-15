@@ -36,6 +36,9 @@ const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 const QLatin1String kHttpServeOptions("http/serveOptions");
 const bool kDefaultHttpServeOptions = true;
 
+const QLatin1String kHttpMaintenanceHtdigestPath("http/maintenanceHtdigestPath");
+const QLatin1String kDefaultHttpMaintenanceHtdigestPath("");
+
 //-------------------------------------------------------------------------------------------------
 // Https
 
@@ -205,6 +208,9 @@ void Settings::loadHttp()
 
     m_http.serveOptions = settings().value(
         kHttpServeOptions, kDefaultHttpServeOptions).toBool();
+
+    m_http.maintenanceHtdigestPath = settings().value(
+        kHttpMaintenanceHtdigestPath, kDefaultHttpMaintenanceHtdigestPath).toString().toStdString();
 }
 
 void Settings::loadEndpointList(

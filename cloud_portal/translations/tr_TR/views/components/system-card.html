@@ -9,7 +9,7 @@
             <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Başka bir sistemle birleştir</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Çıkış yap
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -50,7 +50,8 @@
         <div class="merge-info-text">
             <p>Veri tabanının boyutuna bağlı olarak birkaç saat sürebilir.</p>
             <p>Birleştirme tamamlanana kadar bu sisteme giriş yapabilir ve video izleyebilir, ancak herhangi bir ayarı değiştiremezsiniz.</p>
-            <p>Birleştirme bittiğinde, bu sistemdeki tüm kullanıcılar ve kameralar <span class="merge-system-name">{{mergeTargetSystem.name}}kullanılabilir hale gelecek </span>. Sistem ve diğer sistem silinecek.</p>
+            <p>Birleştirme işlemi tamamlandığında, bu sistemdeki tüm kullanıcılar ve kameralar kullanılabilir hale gelir
+                <span class="merge-system-name">" Sistem{{mergeTargetSystem.name}}</span> " ve bu sistem silinecektir.</p>
         </div>
     </div>
 </div>

@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "צור חשבון",
         "errorNoHDD": "מכשיר זה מיועד לעבודה עם דיסק קשיח מותקן. <br>יש לכבות את המכשיר ולהתקין דיסק קשיח.",
-        "errorNoNetwork": "מכשיר זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
+        "errorNoNetwork": "התקן זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
     },
     "passwordRequirements": {
         "minLengthMessage": "סיסמא חייבת להכיל לפחות 8 תווים",
@@ -74,7 +74,7 @@
         "emailFrom": "אי מייל מ",
         "emailSignature": "חתימת דוא\"ל",
         "emailSupportEmail": "דוא\"ל תמיכה",
-        "enableEdgeRecording": "אפשר הקלטות  edge",
+        "enableEdgeRecording": "אפשר הקלטות edge",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
@@ -86,7 +86,7 @@
         "maxRecordQueueSizeBytes": "גודל תור מרבי של רשומות (בתים)",
         "maxRecordQueueSizeElements": "גודל תור מרבי של רשומות (אלמנטים)",
         "maxRemoteArchiveSynchronizationThreads": "סינכרון מרבי של אשכולות סינכרון מרחוק",
-        "maxRtspConnectDurationSeconds": "משך התחברות Rstp מקסימלית בשניות.",
+        "maxRtspConnectDurationSeconds": "משך התחברות Rstp מקסימלית בשניות",
         "maxSceneItems": "פריטי סצנה מקסימליים (0 פירושו ברירת מחדל)",
         "proxyConnectTimeoutSec": "זמן קצוב לחיבור של שרת proxy (שניות)",
         "rtpTimeoutMs": "RTP פסק זמן (אלפיות השנייה)",
@@ -116,7 +116,7 @@
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
         "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "השתמש במעבר שורה של חלונות בהודעות דוא\"ל",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "שם או הסיסמה שגויים",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "יותר מדי ניסיונות. נסה שוב בעוד דקה."
     },
     "navigaion": {
         "cannotGetUser": "תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"

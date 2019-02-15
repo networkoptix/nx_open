@@ -7,6 +7,9 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/maintenance/server.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/http/server/authentication_dispatcher.h>
+#include <nx/network/http/server/http_server_base_authentication_manager.h>
+#include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
 
 #include <nx/cloud/db/api/result_code.h>
 
@@ -53,11 +56,28 @@ public:
     void registerStatisticsApiHandlers(statistics::Provider* statisticsProvider);
 
 private:
+    /** Provides htdigest authentication for maintenance server*/
+    struct MaintenanceAuthenticator
+    {
+        nx::network::http::server::HtdigestAuthenticationProvider provider;
+        nx::network::http::server::BaseAuthenticationManager manager;
+
+        MaintenanceAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
+            manager(&provider)
+        {
+        }
+    };
+
     const conf::Settings& m_settings;
     Controller* m_controller;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     HttpServer m_multiAddressHttpServer;
+    std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
     network::maintenance::Server m_maintenanceServer;
+
+    void registerAuthenticators();
 
     void registerApiHandlers(
         const SecurityManager& securityManager,

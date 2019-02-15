@@ -5,14 +5,18 @@
     angular.module('nxCommon').controller('ViewCtrl',
         ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
             'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'voiceControl',
-            'dialogs', 'configService', 'languageService',
+            'dialogs', 'nxConfigService', 'languageService',
             
             function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
                       camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl,
-                      dialogs, configService, languageService) {
+                      dialogs, nxConfigService, languageService) {
                 
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
+                
+                const ROUTE_CAMERA_ID = $routeParams.cameraId ?
+                    '{' + $routeParams.cameraId + '}' :
+                    undefined;
                 
                 var channels = {
                     Auto: 'lo',
@@ -37,13 +41,13 @@
                 
                 $scope.canViewArchive = false;
                 $scope.searchCams = '';
-                $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId || null;
+                $scope.storage.cameraId = ROUTE_CAMERA_ID || $scope.storage.cameraId || null;
                 
                 $scope.isWebAdmin = CONFIG.webadminSystemApiCompatibility;
                 $scope.cameraLinks = {enabled: $location.search().cameraLinks};
                 $scope.voiceControls = {enabled: false, showCommands: false};
                 
-                if (!$routeParams.cameraId && $scope.storage.cameraId) {
+                if (!ROUTE_CAMERA_ID && $scope.storage.cameraId) {
                     systemAPI.setCameraPath($scope.storage.cameraId);
                 }
                 
@@ -141,7 +145,7 @@
                 }
                 
                 function updateAvailableResolutions() {
-                    if ($scope.player == null) {
+                    if ($scope.player === null) {
                         $scope.availableResolutions = [LANG.common.resolution.auto];
                         return;
                     }
@@ -163,7 +167,7 @@
                             
                             for (var i = 0; i < availableFormats.length; i++) {
                                 if (availableFormats[i].encoderIndex === 0) {
-                                    if (!(window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera))) {
+                                    if (window.jscd.os !== 'iOS' || (window.jscd.os === 'iOS' && !checkiOSResolution($scope.activeCamera))) {
                                         streams.push(LANG.common.resolution.high);
                                     }
                                 }
@@ -175,7 +179,7 @@
                         $scope.availableResolutions = streams;
                         
                         if ($scope.activeCamera && streams.length === 1) {
-                            if (window.jscd.os === 'iOS') {
+                            if (window.jscd.os === 'iOS' && $scope.activeCamera.status !== 'Unauthorized') {
                                 $scope.iOSVideoTooLarge = true;
                             } else {
                                 console.error("no suitable streams from this camera");
@@ -200,16 +204,12 @@
                     $scope.showSettings = !$scope.showSettings;
                 };
                 
-                function updateVideoSource(playingPosition) {
-                    
+                function updateVideoSource(playingPositionDisplay) {
                     // clear preview for next camera
                     $scope.preview = '';
                     
-                    if (!$scope.activeCamera ||
-                        $scope.activeCamera.status === 'Unauthorized') {
-                        
+                    if (!$scope.activeCamera) {
                         $scope.activeVideoSource = {src: ''};
-                        
                         return;
                     }
                     
@@ -217,7 +217,7 @@
                         cameraId = $scope.activeCamera.id,
                         resolution = $scope.activeResolution,
                         resolutionHls = channels[resolution] || channels.Low,
-                        live = !playingPosition;
+                        live = !playingPositionDisplay;
                     
                     if ($scope.playerAPI) {
                         // Pause playing
@@ -226,16 +226,18 @@
                     
                     updateAvailableResolutions();
                     
-                    $scope.positionSelected = !!playingPosition;
+                    $scope.positionSelected = !!playingPositionDisplay;
                     if (!$scope.positionProvider) {
                         return;
                     }
                     
-                    $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
+                    $scope.positionProvider.init(playingPositionDisplay, $scope.positionProvider.playing);
+                    
+                    var playingPositionServer;
                     if (live) {
-                        playingPosition = timeManager.nowToDisplay();
+                        playingPositionServer = window.timeManager.nowToServer();
                     } else {
-                        playingPosition = Math.round(playingPosition);
+                        playingPositionServer = Math.round(window.timeManager.displayToServer(playingPositionDisplay));
                     }
                     
                     // Fix here!
@@ -244,25 +246,28 @@
                     }
                     $scope.resolution = resolutionHls;
                     
-                    $scope.currentResolution = $scope.player === "webm" ? resolution : resolutionHls;
-                    $scope.activeVideoSource = _.filter([
+                    $scope.currentResolution = $scope.player === 'webm' ? resolution : resolutionHls;
+                    
+                    let videoSources = [
                         {
-                            src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt,
+                            src: systemAPI.hlsUrl(cameraId, !live && playingPositionServer, resolutionHls) + salt,
                             type: mimeTypes.hls,
                             transport: 'hls'
                         },
                         {
-                            src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt,
+                            src: systemAPI.webmUrl(cameraId, !live && playingPositionServer, resolution) + salt,
                             type: mimeTypes.webm,
                             transport: 'webm'
                         },
                         {
-                            src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt,
+                            src: systemAPI.previewUrl(cameraId, !live && playingPositionServer, null, window.screen.availHeight) + salt,
                             type: mimeTypes.jpeg,
                             transport: 'preview'
                         }
-                    ], function (src) {
-                        return cameraSupports(src.transport) != null;
+                    ];
+                    
+                    $scope.activeVideoSource = videoSources.filter((src) => {
+                        return cameraSupports(src.transport);
                     });
                     
                     $scope.preview = _.find($scope.activeVideoSource, function (src) {
@@ -277,8 +282,8 @@
                             streamType = $scope.player === 'webm' ? 'webm' : 'hls';
                         }
                         
-                        streamInfo.src = streamType === 'webm' ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
-                            : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
+                        streamInfo.src = streamType === 'webm' ? systemAPI.webmUrl(cameraId, !live && playingPositionServer, resolution, true)
+                            : systemAPI.hlsUrl(cameraId, !live && playingPositionServer, resolutionHls);
                         streamInfo.title = $scope.activeCamera.name;
                         
                         if (cameraSupports(streamType) || $scope.debugMode) {
@@ -348,6 +353,7 @@
                         } else {
                             $scope.playerAPI.pause();
                         }
+                        
                         if ($scope.positionProvider) {
                             $scope.positionProvider.playing = play;
                             
@@ -414,7 +420,7 @@
                 
                 $scope.showEmbed = function () {
                     $scope.showSettings = false;
-                    dialogs.embed({})
+                    dialogs.embed({});
                 };
                 
                 $scope.selectResolution = function (resolution) {
@@ -505,7 +511,7 @@
                         }
                     }
                     
-                    // record actice camera again as only one camera should be selected per system
+                    // record active camera again as only one camera should be selected per system
                     $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
                 }
                 
@@ -515,8 +521,8 @@
                             $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                         } else {
                             $scope.showCameraPanel = false;
-                            return;
                         }
+                        return;
                     }
                     
                     resetSystemActiveCamera();
@@ -534,14 +540,19 @@
                     
                     systemAPI.setCameraPath($scope.activeCamera.id);
                     timeFromUrl = timeFromUrl || null;
+                    if (!timeFromUrl && $scope.positionProvider) {
+                        timeFromUrl = $scope.positionProvider.playedPosition;
+                    }
                     $scope.updateCamera(timeFromUrl);
-                    timeFromUrl = null;
                     
                     //When camera is changed request offset for camera
-                    var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-                    if (serverOffset) {
-                        window.timeManager.setOffset(serverOffset);
-                    }
+                    $scope.camerasProvider
+                        .getServerTimeOffset($scope.activeCamera.parentId)
+                        .then(function (serverOffset) {
+                            window.timeManager.setOffset(serverOffset);
+                            updateVideoSource(timeFromUrl);
+                            timeFromUrl = null;
+                        });
                 });
                 
                 window.timeManager.init(CONFIG.webclient.useServerTime, CONFIG.webclient.useSystemTime);
@@ -599,7 +610,7 @@
                     $scope.ready = true;
                     $timeout(updateHeights);
                     $scope.camerasProvider.startPoll();
-                    if (($scope.betaMode || $scope.debugMode) && window.jscd.browser.toLowerCase() == 'chrome') {
+                    if (($scope.betaMode || $scope.debugMode) && window.jscd.browser.toLowerCase() === 'chrome') {
                         $scope.voiceControls = {enabled: true, showCommands: true};
                         voiceControl.initControls($scope);
                     }
@@ -614,7 +625,7 @@
                 });
                 
                 $window.resize(updateHeights);
-                window.addEventListener("orientationchange", $timeout(updateHeights, 200));
+                window.addEventListener('orientationchange', $timeout(updateHeights, 200));
                 
                 $scope.mobileAppAlertClose = function () {
                     $scope.session.mobileAppNotified = true;
@@ -623,8 +634,16 @@
                 
                 var killSubscription = $rootScope.$on('$routeChangeStart', function (event, next) {
                     timeFromUrl = $location.search().time;
-                    
-                    $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+    
+                    if (next.params.cameraId) {
+                        $scope.storage.cameraId = '{' + next.params.cameraId + '}';
+                        $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+                        
+                        if ($scope.activeCamera) {
+                            $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
+                        }
+                    }
+    
                 });
                 
                 $('html').addClass('webclient-page');

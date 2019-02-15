@@ -11,10 +11,10 @@
 
 #include "request_path.h"
 #include "server_side_command_pipeline.h"
-#include "../p2p_websocket/websocket_transaction_transport.h"
+#include "../p2p_websocket/connection.h"
+#include "../util.h"
 #include "../../compatible_ec2_protocol_version.h"
 #include "../../connection_manager.h"
-#include "../../http/sync_connection_request_handler.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
@@ -143,7 +143,7 @@ nx::network::http::StatusCode::Value Acceptor::forwardMessageToConnection(
         [message = std::move(message), &messageProcessed](
             AbstractConnection* connection) mutable
         {
-            auto p2pConnection = dynamic_cast<websocket::WebsocketCommandTransport*>(connection);
+            auto p2pConnection = dynamic_cast<websocket::Connection*>(connection);
             if (!p2pConnection)
                 return;
 
@@ -211,7 +211,7 @@ bool Acceptor::registerNewConnection(
     const auto userAgent = nx::network::http::getHeaderValue(
         requestContext.request.headers, "User-Agent").toStdString();
 
-    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::Connection>(
         m_protocolVersionRange,
         m_commandLog,
         systemId,

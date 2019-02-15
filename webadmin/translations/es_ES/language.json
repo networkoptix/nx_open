@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "crear cuenta",
         "errorNoHDD": "Este dispositivo está diseñado para trabajar con disco duro instalado. <br>Por favor apague el dispositivo e instalar un disco duro.",
-        "errorNoNetwork": "Este dispositivo necesita la conexión de red para trabajar. <br>Por favor lo conecte a la local red ot Internet"
+        "errorNoNetwork": "Este dispositivo necesita conexión de red para funcionar.<br>Por favor conéctelo a la red local o internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
@@ -116,7 +116,7 @@
         "updateNotificationsEnabled": "Notificaciones de actualización habilitadas",
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
         "useTextEmailFormat": "Enviar correos electrónicos de texto plano",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "Usa el salto de línea de Windows en los correos",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Nombre de usuario o contraseña es incorrecta",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Demasiados intentos. Inténtalo de nuevo en un minuto."
     },
     "navigaion": {
         "cannotGetUser": "Falla en el servidor: no se puede recuperar datos de usuario actual"

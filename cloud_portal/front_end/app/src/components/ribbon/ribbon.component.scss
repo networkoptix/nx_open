@@ -1,0 +1,39 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+div {
+    background-color : $brand_d1;
+    color            : $light1;
+    line-height      : 1rem;
+    font-family      : $font-family-medium;
+    font-size        : $font-size-base;
+    
+    &.ribbon {
+        border-top    : 1px solid $brand_d2;
+        border-bottom : 1px solid $brand_d2;
+        padding       : .5rem 1rem;
+        display       : flex;
+        align-items   : center;
+        
+        .message {
+            flex : 70%;
+        }
+        
+        .action {
+            flex       : 30%;
+            text-align : right;
+        }
+    }
+    
+    & > a {
+        color           : $light1;
+        font-family     : $font-family-regular;
+        font-size       : $font-size-base;
+        text-decoration : underline;
+        
+        &:hover {
+            opacity : .8;
+        }
+    }
+}

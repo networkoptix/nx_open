@@ -48,7 +48,6 @@ require('./services/cloud_api.ts');
 require('./services/dialogs.ts');
 require('./services/language.ts');
 require('./services/mediaserver.js');
-require('./services/nx-config.ts');
 require('./services/page.js');
 require('./services/poll.js');
 require('./services/process.ts');

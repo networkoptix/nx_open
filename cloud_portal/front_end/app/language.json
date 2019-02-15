@@ -10,7 +10,15 @@
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue",
-    "logoutAuthorisedLogoutButton": "Log Out"
+    "logoutAuthorisedLogoutButton": "Log Out",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "IPVD Feedback for {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -137,13 +145,21 @@
     "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "good",
+    "fair": "fair",
+    "minLength": "too short",
     "minLengthMessage": "Password must contain at least 8 characters",
+    "required": "incorrect",
     "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "weak": "weak",
     "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "strongMessage": "Strong password!",
+    "common": "too common",
     "commonMessage": "This password is in top most popular passwords in the world",
     "missingMessage": "Password is required"
   },
@@ -177,7 +193,7 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "successMerge":"System {{systemName}} has been merged with {{systemName}}",
+    "successMerge":"System merge completed",
     "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {
