@@ -1283,7 +1283,7 @@ void ActionHandler::at_openFileAction_triggered()
 {
     static const QStringList kProprietaryFormats{"nov"};
     static const QStringList kVideoFormats = QnCustomFileDialog::kVideoFilter.second;
-    static const QStringList kPicturesFormats = QnCustomFileDialog::kPicturesFilter.second;
+    static const QStringList kPicturesFormats = QnCustomFileDialog::picturesFilter().second;
     static const QStringList kAllSupportedFormats = kProprietaryFormats
         + kVideoFormats
         + kPicturesFormats;
@@ -1294,7 +1294,7 @@ void ActionHandler::at_openFileAction_triggered()
         QnCustomFileDialog::createFilter({
             {tr("All Supported"), kAllSupportedFormats},
             QnCustomFileDialog::kVideoFilter,
-            QnCustomFileDialog::kPicturesFilter,
+            QnCustomFileDialog::picturesFilter(),
             QnCustomFileDialog::kAllFilesFilter
             }),
         nullptr,

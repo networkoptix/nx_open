@@ -259,7 +259,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::updateFisheye);
 
-    connect(d, &MediaResourceWidgetPrivate::stateChanged, this,
+    connect(d.get(), &MediaResourceWidgetPrivate::stateChanged, this,
         [this]
         {
             const bool animate = animationAllowed();
@@ -274,7 +274,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
             &QnMediaResourceWidget::invalidateMotionSensitivity);
 
-        connect(d, &MediaResourceWidgetPrivate::licenseStatusChanged,
+        connect(d.get(), &MediaResourceWidgetPrivate::licenseStatusChanged,
             this,
             [this]
             {
@@ -339,7 +339,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     /* Set up overlays */
     initIoModuleOverlay();
-    ensureTwoWayAudioWidget();
+    updateTwoWayAudioWidget();
     initAreaHighlightOverlay();
     initAreaSelectOverlay();
 
@@ -1027,6 +1027,21 @@ QnResourceWidgetRenderer* QnMediaResourceWidget::renderer() const
     return m_renderer;
 }
 
+int QnMediaResourceWidget::defaultRotation() const
+{
+    return d->resource->getProperty(QnMediaResource::rotationKey()).toInt();
+}
+
+int QnMediaResourceWidget::defaultFullRotation() const
+{
+    const bool fisheyeEnabled = (isZoomWindow() || item() && item()->dewarpingParams().enabled)
+        && dewarpingParams().enabled;
+    const int fisheyeRotation = fisheyeEnabled
+        && dewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown ? 180 : 0;
+
+    return (defaultRotation() + fisheyeRotation) % 360;
+}
+
 bool QnMediaResourceWidget::hasVideo() const
 {
     return d->hasVideo;
@@ -1191,30 +1206,38 @@ void QnMediaResourceWidget::updateHud(bool animate)
     updateCompositeOverlayMode();
 }
 
-void QnMediaResourceWidget::ensureTwoWayAudioWidget()
+void QnMediaResourceWidget::updateTwoWayAudioWidget()
 {
-    /* Check if widget is already created. */
-    if (m_twoWayAudioWidget)
-        return;
-
-    bool hasTwoWayAudio = d->camera && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
-
-    if (!hasTwoWayAudio)
-        return;
-
     const auto user = context()->user();
-    if (!user)
-        return;
+    const bool twoWayAudioWidgetRequired = !d->isPreviewSearchLayout
+        && d->camera
+        && d->camera->hasTwoWayAudio()
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput)
+        && NX_ASSERT(user);
 
-    m_twoWayAudioWidget = new QnTwoWayAudioWidget(QnDesktopResource::calculateUniqueId(
-        commonModule()->moduleGUID(), user->getId()));
-    m_twoWayAudioWidget->setCamera(d->camera);
-    m_twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
-    context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
+    if (twoWayAudioWidgetRequired)
+    {
+        if (!d->twoWayAudioWidgetId.isNull())
+            return; //< Already exists.
 
-    /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
-    m_triggersContainer->insertItem(0, m_twoWayAudioWidget);
+        const auto twoWayAudioWidget = new QnTwoWayAudioWidget(QnDesktopResource::calculateUniqueId(
+            commonModule()->moduleGUID(), user->getId()));
+        twoWayAudioWidget->setCamera(d->camera);
+        twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
+        context()->statisticsModule()->registerButton(lit("two_way_audio"), twoWayAudioWidget);
+
+        // Items are ordered left-to-right and bottom-to-top,
+        // so the two-way audio item is inserted at the bottom.
+        d->twoWayAudioWidgetId = m_triggersContainer->insertItem(0, twoWayAudioWidget);
+    }
+    else
+    {
+        if (d->twoWayAudioWidgetId.isNull())
+            return;
+
+        m_triggersContainer->deleteItem(d->twoWayAudioWidgetId);
+        d->twoWayAudioWidgetId = {};
+    }
 }
 
 bool QnMediaResourceWidget::animationAllowed() const
@@ -1909,7 +1932,22 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
 {
-    m_watermarkPainter->drawWatermark(painter, rect);
+    const auto imageRotation = defaultFullRotation();
+    if (imageRotation == 0)
+    {
+        m_watermarkPainter->drawWatermark(painter, rect);
+    }
+    else
+    {
+        // We have implicit camera rotation due to default rotation and/or dewarping procedure.
+        // We should rotate watermark to make it appear in appropriate orientation.
+        const auto& oldTransform = painter->transform();
+        const auto transform =
+            QTransform().translate(rect.center().x(), rect.center().y()).rotate(-imageRotation);
+        painter->setTransform(transform, true);
+        m_watermarkPainter->drawWatermark(painter, transform.inverted().mapRect(rect));
+        painter->setTransform(oldTransform);
+    }
 }
 
 QnPtzControllerPtr QnMediaResourceWidget::ptzController() const
@@ -2458,7 +2496,7 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
     else if (key == ResourcePropertyKey::kCameraCapabilities)
-        ensureTwoWayAudioWidget();
+        updateTwoWayAudioWidget();
     else if (key == ResourcePropertyKey::kCombinedSensorsDescription)
         updateAspectRatio();
     else if (key == ResourcePropertyKey::kMediaStreams)

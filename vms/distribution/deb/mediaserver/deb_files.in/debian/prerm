@@ -63,6 +63,6 @@ then
 
     if [ "$RET" = "$REMOVE" ]
     then
-        rm -f /opt/$COMPANY_NAME/mediaserver/var/ecs.sqlite
+        rm -f /opt/$COMPANY_NAME/mediaserver/var/*.sqlite*
     fi
 fi

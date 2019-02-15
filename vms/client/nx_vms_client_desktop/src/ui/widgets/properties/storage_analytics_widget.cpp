@@ -121,7 +121,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->averagingPeriodCombobox->addItem(tr("Last 24 hours"),
         QVariant::fromValue<qint64>(milliseconds(24h).count()));
     ui->averagingPeriodCombobox->addItem(tr("Longest period available"), 0);
-    ui->averagingPeriodCombobox->setCurrentIndex(0); // 5 min.
+    ui->averagingPeriodCombobox->setCurrentIndex(2); // 24h.
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, //< Inactive tab may be not updated.
         this, [this](int) { atPageChanged(); });
@@ -198,6 +198,7 @@ void QnStorageAnalyticsWidget::setupTableView(TableView* table, TableView* total
     header->setMinimumSectionSize(kMinimumColumnWidth);
     header->setSectionResizeMode(QHeaderView::Fixed);
     header->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
+    header->setDefaultAlignment(Qt::AlignLeft);
     header->setSortIndicatorShown(true);
 
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
@@ -543,16 +544,18 @@ void QnStorageAnalyticsWidget::updateTotalTablesGeometry()
 void QnStorageAnalyticsWidget::positionHintButton()
 {
     const auto cellSize = ui->forecastTotalsTable-> sizeHintForIndex(
-        ui->forecastTotalsTable->model()->index(0,0));
+        ui->forecastTotalsTable->model()->index(0, 0));
 
-    if(cellSize.isValid())
+    if (cellSize.isValid())
     {
         // Top = 12 is magic, but looks good.
         m_hintAnchor->setMargins(cellSize.width(), 12, 0, 0);
         m_hintButton->setVisible(true);
     }
     else
+    {
         m_hintButton->setVisible(false);
+    }
 }
 
 void QnStorageAnalyticsWidget::resizeEvent(QResizeEvent*)

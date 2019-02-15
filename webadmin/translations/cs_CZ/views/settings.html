@@ -40,14 +40,14 @@
                     <div>
                         <h3>Obnovení serveru</h3>
                         <p>Tato akce vrátí tento server do výchozího nastavení (smaže databázi a obnoví konfiguraci).
-                            Server bude odpojen od stávajícího systému. Videoarchiv zůstane neporušený.</p>
+                            The server will be detached from the current System. Videoarchiv zůstane neporušený.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Obnovit výchozí nastavení</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Odpojení serveru ze systému</h3>
-                        <p>Tato akce odpojí server ze systému, který uchovává databázi, místní uživatele a nastavení.
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
                             Videoarchiv zůstane neporušený. <b>Uživatelé cloudu budou smazáni.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Odpojit od systému</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Restartování</h3>
@@ -87,7 +87,7 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Sloučení systémů</h3>
+                            <h3>Sloučit systémy</h3>
                             <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Sloučit systémy</button></p>
                         </form>
                     </div>
@@ -96,7 +96,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Tento systém je spojen s {{Config.cloud.productName}}, vlastníkem systému je: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Odpojit od {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -104,10 +104,10 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">Tento systém není spojen s {{Config.cloud.productName}}
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Další informace</a></uib-alert>
+                                   target="_blank">Learn more</a></uib-alert>
                             <uib-alert type="error" ng-if="!hasInternetOnServer">Připojte server k Internetu a proveďte nastavení {{Config.cloud.productName}}</uib-alert>
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Připojení k Internetu je vyžadované pro připojení systému k {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
@@ -125,15 +125,15 @@
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
                                     Force Video Traffic Encryption
                                 </label>
                             </div>

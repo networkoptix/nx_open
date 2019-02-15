@@ -26,8 +26,8 @@ public:
 
     static QnCustomFileDialog::FileFilter createVideoFilter()
     {
-        static const QStringList kVideoFormats{"avi", "mkv", "mp4", "mov", "ts", "m2ts", "mpeg", "mpg",
-            "flv", "wmv", "3gp"};
+        static const QStringList kVideoFormats{"avi", "mkv", "mp4", "mov", "ts", "m2ts", "mpeg",
+            "mpg", "flv", "wmv", "3gp"};
         return {tr("Video"), kVideoFormats};
     }
 
@@ -39,8 +39,6 @@ public:
 
 } // namespace
 
-const QnCustomFileDialog::FileFilter QnCustomFileDialog::kPicturesFilter(
-    FileExtensions::createPicturesFilter());
 const QnCustomFileDialog::FileFilter QnCustomFileDialog::kVideoFilter(
     FileExtensions::createVideoFilter());
 const QnCustomFileDialog::FileFilter QnCustomFileDialog::kAllFilesFilter(
@@ -60,6 +58,12 @@ QnCustomFileDialog::QnCustomFileDialog(
 
 QnCustomFileDialog::~QnCustomFileDialog()
 {
+}
+
+QnCustomFileDialog::FileFilter QnCustomFileDialog::picturesFilter()
+{
+    static const FileFilter kPicturesFilter(FileExtensions::createPicturesFilter());
+	return kPicturesFilter;
 }
 
 QString QnCustomFileDialog::createFilter(std::vector<FileFilter> filters)

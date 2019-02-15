@@ -62,9 +62,7 @@ public:
 
     // Clears internal state back to initial state
     void clearState();
-
-private:
-    void updateVersionColumn();
+    void forceUpdateColumn(Columns column);
 
 private:
     void atItemChanged(UpdateItemPtr item);

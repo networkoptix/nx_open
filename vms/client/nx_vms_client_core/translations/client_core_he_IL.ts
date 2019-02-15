@@ -120,52 +120,12 @@
       <translation>חשבון זה אינו מופעל. אנא בדוק את האימייל שלך.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>החשבון זה חסום.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>התכונה המבוקשת אינה מיושמת.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>תחום לא ידוע.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>בקשה שגויה.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Nonce לא חוקי.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>פרטי הכניסה אינם תקפים עוד.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>נתקבלו נתונים לא חוקיים.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>שגיאה לא ידועה.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>שגיאת חיבור. בדוק את חיבור האינטרנט שלך ונסה שוב.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>כניסה לא חוקית.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>האובייקט המבוקש לא נמצא.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>האובייקט כבר קיים.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -173,14 +133,17 @@
       <translation>שגיאה פנימית %1. צור קשר עם צוות התמיכה.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>מצטערים, השירות %1 אינו זמין באופן זמני. אנו עושים כמיטב יכולתנו כדי לשחזר אותו. בבקשה נסה שוב מאוחר יותר.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>יותר מדי ניסיונות. נסה שוב בעוד דקה.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>מצטער, לשירות %1 לא היתה אפשרות לעבד את בקשתך. אנא נסה שוב בעוד מספר רגעים.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

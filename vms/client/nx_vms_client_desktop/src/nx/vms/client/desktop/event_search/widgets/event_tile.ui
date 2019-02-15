@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>699</width>
-    <height>279</height>
+    <height>327</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -110,19 +110,6 @@
         <property name="verticalSpacing">
          <number>4</number>
         </property>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="descriptionLabel">
-          <property name="text">
-           <string notr="true">&lt;Textual description of the event&gt;</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="5" column="0" colspan="2">
          <widget class="QLabel" name="footerLabel">
           <property name="text">
@@ -136,7 +123,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0" colspan="2">
+        <item row="2" column="0" colspan="2">
          <widget class="QLabel" name="debugPreviewTimeLabel">
           <property name="text">
            <string notr="true">&lt;Debug preview time&gt;</string>
@@ -165,7 +152,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0" colspan="2">
+        <item row="3" column="0" colspan="2">
          <widget class="QWidget" name="narrowHolder" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
@@ -360,6 +347,19 @@
             </widget>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QLabel" name="descriptionLabel">
+          <property name="text">
+           <string notr="true">&lt;Textual description of the event&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>

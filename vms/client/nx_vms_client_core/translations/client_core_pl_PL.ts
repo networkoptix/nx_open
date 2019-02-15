@@ -120,52 +120,12 @@
       <translation>To konto nie jest aktywne. Proszę sprawdzić e-mail.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>To konto jest zablokowane.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Żądana funkcja nie jest zaimplementowana.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Nieznany obszar.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Nieprawidłowe zapytanie.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Nieprawidłowe dane tymczasowe.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Dane logowania są już nieważne.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Otrzymano nieprawidłowe dane.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Nieznany błąd.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Nieoczekiwany błąd sieciowy. Sprawdź połączenie internetowe i spróbuj ponownie.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Nieprawidłowy login.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Nie można odnaleźć żądanego obiektu.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Obiekt już istnieje.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -173,14 +133,17 @@
       <translation>Błąd wewnętrzny %1. Skontaktuj się z działem wsparcia technicznego.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Przepraszamy, usługa %1 jest tymczasowo niedostępna. Robimy wszystko, aby przywrócić jej działanie. Spróbuj ponownie później.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Zbyt wiele prób. Spróbuj ponownie za minutę.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Przepraszamy, usługa %1 nie może przetworzyć tego zapytania. Spróbuj ponownie później.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

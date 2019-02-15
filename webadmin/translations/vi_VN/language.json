@@ -33,7 +33,7 @@
         "error": "Lỗi: ",
         "restartNeeded": "Đã lưu thay đổi. Khởi động lại máy chủ để áp dụng các cài đặt mới?",
         "settingsSaved": "Đã lưu cài đặt",
-        "confirmHardwareRestart": "Khởi động lại máy chủ hoạt động hệ thống?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "Khôi phục tất cả các cài đặt máy chủ? Lưu trữ sẽ được lưu, nhưng cài đặt mạng sẽ được đặt lại.",
         "confirmRestoreSettingsNotNetwork": "Đặt lại cấu hình máy chủ? Cài đặt lưu trữ và mạng sẽ được lưu.",
         "unavailable": "Không khả dụng",
@@ -42,13 +42,15 @@
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tất cả người dùng đám mây sẽ bị xóa.</span><br><br>Hệ thống có thể truy cập qua mạng nội bộ bằng tài khoản quản trị viên cục bộ.",
         "confirmDisconnectFromCloudAction": "Ngắt kết nối",
         "disconnectedFromCloudSuccess": "Hệ thống đã bị ngắt kết nối khỏi {{CLOUD_NAME}} thành công",
-        "confirmDisconnectFromSystem": "Tách máy chủ khỏi hệ thống hiện tại",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "Tách",
-        "disconnectedFromSystemSuccess": "Máy chủ đã được tách rời khỏi hệ thống thành công",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "Hệ thống ngắt nối thành công",
         "createLocalOwnerTitle": "Tạo tài khoản quản trị local",
         "confirmChangePassword": "Thay đổi mật khẩu",
-        "confirmChangePasswordTitle": "Thay đổi mật khẩu hệ thống? Nó sẽ ảnh hưởng đến người dùng 'admin' và mật khẩu root cho một số máy chủ",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Lưu mật khẩu mới",
         "nx1ControlHint": "Ứng dụng trên máy đã được bắt đầu. Sử dụng bàn phím / chuột hoặc ứng dụng di động để điều khiển nó."
     },
@@ -66,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Bật chuyển tiếp cho kết nối đám mây",
         "cloudConnectUdpHolePunchingEnabled": "Kích hoạt tính năng lỗ lỗ UDP cho kết nối đám mây",
         "cloudHost": "Máy chủ lưu trữ đám mây",
-        "cloudSystemID": "Id hệ thống đám mây",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Nhà cung cấp Khuyết tật",
         "ec2AliveUpdateIntervalSec": "Khoảng thời gian cập nhật hệ thống (giây)",
         "ec2ConnectionKeepAliveTimeoutSec": "Kết nối duy trì thời gian chờ (giây)",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "Khoảng báo cáo thống kê",
         "statisticsReportUpdateDelay": "Báo cáo thống kê - cập nhật trễ",
         "synchronizeTimeWithInternet": "Đồng bộ hóa thời gian với Internet",
-        "systemName": "Tên hệ thống",
+        "SystemName": "Tên hệ thống",
         "takeCameraOwnershipWithoutLock": "Mất quyền sở hữu máy ảnh mà không có khóa",
         "timeSynchronizationEnabled": "Đồng bộ hóa thời gian kích hoạt",
         "primaryTimeServer": "Primary time synchronization server",
@@ -123,7 +125,8 @@
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info": {
         "tabs": {
@@ -133,21 +136,22 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "Hệ thống không thể truy cập được hoặc không tồn tại.",
+        "SystemIsUnreacheble": "Hệ thống không thể truy cập được hoặc không tồn tại.",
         "incorrectCurrentPassword": "Mật khẩu không chính xác.",
         "incorrectRemotePassword": "Email hoặc mật khẩu không chính xác.",
         "incompatibleVersion": "Hệ thống không thể truy cập được, không tồn tại hoặc có phiên bản không tương thích.",
         "wrongUrl": "Không thể kết nối đến máy chủ.",
-        "newSystemError": "Không thể kết hợp hệ thống. Không cấu hình được từ xa.",
-        "safeMode": "Không thể kết hợp hệ thống. Điều khiển hệ thống từ xa ở chế độ an toàn.",
-        "configError": "Không thể kết hợp hệ thống. Có lẽ một trong hệ đang trong chế độ an toàn.",
-        "cloudError": "Không thể kết hợp hệ thống. Phụ thuộc hệ thống được kết nối với điện toán. Bạn cần phải ngắt kết nối nó đầu tiên.",
-        "cloudBothError": "Không thể kết hợp hệ thống. Phụ thuộc hệ thống được kết nối với điện toán. Bạn cần phải ngắt kết nối nó đầu tiên.",
-        "cloudHostConflict": "Không thể hợp nhất các hệ thống vì các máy chủ được kết với các máy chủ đám mây khác",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "Cảnh báo! Bạn sắp hợp hệ thống với bản quyền đăng ký. Chỉ cho phép một bản quyền Starter cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa. Hợp nhất bằng mọi cách?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Kết nối thất bại: ",
         "unknownError": "Lỗi không xác định",
-        "mergeFailed": "Hợp nhất không thành công: ",
+        "mergeFailed": "Hợp nhất không thành công",
         "mergeSucceed": "Hợp nhất thành công.",
         "newSystemDisplayName": "Hệ thống mới",
         "incompatibleProtocol": "phiên bản không tương thích",
@@ -173,7 +177,7 @@
         "started": "Đã cập nhật thành công. Sẽ mất vài phút",
         "upToDate": "Cập nhật không thành công. Phiên bản cập nhật đã được cài đặt.",
         "invalidFile": "Cập nhật không thành công. Tệp đã chọn không phải là tệp cập nhật hợp lệ.",
-        "incompatibleSystem": "Cập nhật không thành công. Tập tin đã chọn được sử dụng cho một hệ thống khác.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "Cập nhật không thành công. Không đủ dung lượng để trích xuất lưu trữ, kiểm tra bộ nhớ có sẵn.",
         "installationError": "Đang cập nhật không thành công. Không thể thực hiện tập lệnh cài đặt.",
         "selectFiles": "Chọn tập tin"
@@ -186,5 +190,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} giao diện web"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "giờ nghĩ giảo lao",
+            "help": "help | show commands",
+            "collapse all servers": "tất cả máy chủ mất ổn định",
+            "collapse server": "collapse server + [server name]",
+            "play": "broadcast",
+            "clear search": "xóa tìm kiếm",
+            "live": "go to live | show me live",
+            "expand all servers": "mở rộng tất cả các máy chủ",
+            "stop listening": "ngừng lắng nghe",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "Hệ thống offline",
+        "cameraLinks": {
+            "copyToClipboard": "sao chép vào clipboard",
+            "highStream": "Luồng tốc độ cao",
+            "copyDefaultText": "bản sao",
+            "unknown": "Không xác định",
+            "lowStream": "Luồng tốc độ thấp",
+            "transcoding": "Đang chuyển mã",
+            "copyActiveText": "đã sao chép vào clipboard"
+        },
+        "searchCamPlaceholder": "Tìm kiếm",
+        "cameraStates": {
+            "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
+            "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
+            "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
+            "unauthorized": "Yêu cầu xác thực",
+            "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế.",
+            "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
+            "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
+            "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
+            "error": "Lỗi",
+            "offline": "Ẩn",
+            "noData": "Không có dữ liệu",
+            "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video."
+        },
+        "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
+        "resolution": {
+            "high": "cao (H)",
+            "auto": "Tự động",
+            "low": "Thấp (L)"
+        }
     }
 }

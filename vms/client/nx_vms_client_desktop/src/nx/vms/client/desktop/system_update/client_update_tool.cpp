@@ -199,6 +199,12 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
     return result;
 }
 
+bool ClientUpdateTool::isVersionInstalled(const nx::utils::SoftwareVersion& version) const
+{
+    auto versions = getInstalledVersions();
+    return versions.count(version) != 0;
+}
+
 bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
 {
     if (!contents.clientPackage.isValid())
@@ -207,7 +213,7 @@ bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
     auto version = contents.getVersion();
     auto installedVersions = getInstalledVersions(true);
 
-    return !installedVersions.count(version);
+    return installedVersions.count(version) == 0;
 }
 
 void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
@@ -215,8 +221,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
     m_clientPackage = contents.clientPackage;
     m_updateVersion = contents.getVersion();
 
-    auto installedVersions = getInstalledVersions(true);
-    if (installedVersions.count(m_updateVersion))
+    if (isVersionInstalled(m_updateVersion))
     {
         if (shouldRestartTo(m_updateVersion))
         {
@@ -240,11 +245,11 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         // Expecting that file is stored at:
         NX_INFO(this)
             << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
-            << m_clientPackage.file;
-        QString path = contents.storageDir.filePath(m_clientPackage.file);
+            << m_clientPackage.localFile;
+        QString path = contents.storageDir.filePath(m_clientPackage.localFile);
         if (!QFileInfo::exists(path))
         {
-            NX_INFO(this)
+            NX_ERROR(this)
                 << "downloadUpdate(" << contents.info.version << ") the file"
                 << path << "does not exist!";
             setError(QString("File %1 does not exist").arg(path));
@@ -421,11 +426,6 @@ void ClientUpdateTool::checkInternalState()
         switch (result)
         {
             case Result::alreadyInstalled:
-                if (shouldRestart)
-                    setState(readyRestart);
-                else
-                    setState(complete);
-                break;
             case Result::ok:
                 if (shouldRestart)
                     setState(readyRestart);

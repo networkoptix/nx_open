@@ -129,6 +129,7 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
+    NX_ASSERT(!version.isNull());
     m_targetVersion = version;
 }
 
@@ -209,7 +210,10 @@ void PeerStateTracker::setVersionInformation(
                     || item->state == StatusCode::latestUpdateInstalled;
 
                 if (installed != item->installed)
+                {
                     item->installed = true;
+                    NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
+                }
                 emit itemChanged(item);
             }
         }
@@ -551,6 +555,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 
     if (version != item->version)
     {
+        NX_INFO(this, "updateServerData() - peer %1 changing version from=%2 to %3", item->id, item->version, version);
         item->version = version;
         changed = true;
     }
@@ -559,6 +564,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     if (installed != item->installed)
     {
         item->installed = true;
+        NX_INFO(this, "updateServerData() - peer %1 changed installed=%2", item->id, item->installed);
         changed = true;
     }
 

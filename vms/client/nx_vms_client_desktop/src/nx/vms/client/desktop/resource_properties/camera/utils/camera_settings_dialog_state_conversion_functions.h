@@ -6,7 +6,7 @@ namespace nx::vms::client::desktop {
 
 struct CameraSettingsDialogState;
 
-struct CameraSettingsDialogStateConversionFunctions
+struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateConversionFunctions
 {
     static void applyStateToCameras(
         const CameraSettingsDialogState& state,

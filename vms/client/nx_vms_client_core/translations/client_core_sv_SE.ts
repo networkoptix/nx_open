@@ -14,25 +14,25 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>Kilobyte</numerusform>
+        <numerusform>Kilobyte</numerusform>
       </translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabytes</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
@@ -40,7 +40,7 @@
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -108,52 +108,12 @@
       <translation type="unfinished">This account is not activated. Please check your email.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation type="unfinished">This account is blocked.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation type="unfinished">Requested feature is not implemented.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation type="unfinished">Unknown realm.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation type="unfinished">Bad request.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation type="unfinished">Invalid nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation type="unfinished">Credentials are no longer valid.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Unexpected network error. Please check your Internet connection and try again.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation type="unfinished">Invalid login.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation type="unfinished">Requested object is not found.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation type="unfinished">Object already exists.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Sorry, %1 Service could not process your request. Please try again in a few moments.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
@@ -301,75 +264,75 @@
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>mån</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>år</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>millisekunder</numerusform>
+        <numerusform>millisekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>sekunder</numerusform>
+        <numerusform>sekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minuter</numerusform>
+        <numerusform>minuter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>timmar</numerusform>
+        <numerusform>timmar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>dagar</numerusform>
+        <numerusform>dagar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>veckor</numerusform>
+        <numerusform>veckor</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>månader</numerusform>
+        <numerusform>månader</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>år</numerusform>
+        <numerusform>år</numerusform>
       </translation>
     </message>
   </context>

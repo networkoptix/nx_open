@@ -20,10 +20,10 @@ class QnRecordingStatsModel;
 
 namespace Ui { class StorageAnalyticsWidget; }
 namespace nx::vms::client::desktop {
-class TableView; 
+class TableView;
 class SnappedScrollBar;
 class WidgetAnchor;
-}// namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop
 
 class QnStorageAnalyticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {

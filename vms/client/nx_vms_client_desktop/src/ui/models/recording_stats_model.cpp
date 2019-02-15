@@ -62,13 +62,13 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
 
 bool QnSortedRecordingStatsModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
-    return  sourceModel()->index(sourceRow, 0, sourceParent).
+    return sourceModel()->index(sourceRow, 0, sourceParent).
         data(QnRecordingStatsModel::RowKind) != QnRecordingStatsModel::Totals;
 }
 
 bool QnTotalRecordingStatsModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
-    return  sourceModel()->index(sourceRow, 0, sourceParent).
+    return sourceModel()->index(sourceRow, 0, sourceParent).
         data(QnRecordingStatsModel::RowKind) == QnRecordingStatsModel::Totals;
 }
 

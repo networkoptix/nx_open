@@ -55,6 +55,7 @@ QDir findFolderForFile(QDir root, QString file)
 }
 
 const QString kPackageIndexFile = "packages.json";
+const QString kLatestChangeset = "latest";
 const int kReadBufferSizeBytes = 1024 * 1024;
 
 } // namespace
@@ -709,6 +710,7 @@ void ServerUpdateTool::requestStopAction()
 
 void ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 {
+    NX_WARNING(this, "requestFinishUpdate(%1)", skipActivePeers);
     if (auto connection = getServerConnection(commonModule()->currentServer()))
         connection->updateActionFinish(skipActivePeers, {});
     m_stateTracker->clearState();
@@ -762,25 +764,16 @@ void ServerUpdateTool::requestInstallAction(
             if (!success)
                 NX_ERROR(typeid(ServerUpdateTool)) << "requestInstallAction() - response success=false";
             if (tool)
+            {
                 tool->m_requestingInstall.remove(handle);
+                tool->requestRemoteUpdateStateAsync();
+            }
         };
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         if (auto handle = connection->updateActionInstall(targets, callback, thread()))
             m_requestingInstall.insert(handle);
-
-        // Requesting remote update info.
-        connection->getUpdateInfo(
-            [tool=QPointer<ServerUpdateTool>(this)](bool success,
-                rest::Handle /*handle*/, const nx::update::Information& response)
-            {
-                if (success && tool)
-                {
-                    tool->m_timeStartedInstall = response.lastInstallationRequestTime;
-                    tool->m_serversAreInstalling = response.participants.toSet();
-                }
-            });
     }
 }
 
@@ -1031,7 +1024,7 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(
     const QString& updateUrl)
 {
-    return checkSpecificChangeset(updateUrl, "latest");
+    return checkSpecificChangeset(updateUrl, kLatestChangeset);
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificChangeset(
@@ -1046,14 +1039,16 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
         {
             UpdateContents contents;
 
+            contents.changeset = changeset;
             contents.info = nx::update::updateInformation(updateUrl, engineVersion,
                 changeset, &contents.error);
-            contents.sourceType = nx::update::UpdateSourceType::internet;
+            if (changeset == kLatestChangeset)
+                contents.sourceType = nx::update::UpdateSourceType::internet;
+            else
+                contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
             contents.source = lit("%1 for build=%2").arg(updateUrl, changeset);
 
-            if ((contents.error == nx::update::InformationError::httpError
-                || contents.error == nx::update::InformationError::networkError)
-                && connection)
+            if (contents.error == nx::update::InformationError::networkError && connection)
             {
                 NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
                 auto promise = std::make_shared<std::promise<bool>>();

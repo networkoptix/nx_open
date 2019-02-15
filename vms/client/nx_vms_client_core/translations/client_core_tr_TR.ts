@@ -108,52 +108,12 @@
       <translation>Bu hesap aktif değil. Lütfen e-postanızı kontrol edin.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Hesap kilitlenmiş.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>İstenen özellik uygulanmadı.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Bilinmeyen Bölge.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Hatalı istek.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Geçersiz giriş.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Kimlik bilgileri artık geçerli değil.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Geçersiz veri dosyası.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Bilinmeyen hata.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Sunucuya bağlanamıyor. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Geçersiz giriş.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>İstenen nesne bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Nesne zaten var.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation>Bilinmeyen Hata %1. Lütfen Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Üzgünüz, %1 hizmeti geçici olarak kullanılamıyor. Geri yüklemek için elimizden geleni yapıyoruz. Lütfen daha sonra yeniden deneyin.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Çok fazla deneme yapıldı. Daha sonra tekrar deneyin.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Üzgünüz, %1 hizmeti isteğinizi işleyemedi. Lütfen birkaç dakika sonra yeniden deneyin.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
