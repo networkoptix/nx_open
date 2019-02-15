@@ -1,43 +1,43 @@
-FROM ubuntu:16.04
+FROM golang:1.11.5-stretch as builder
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends git \
+        && go get -u github.com/vigasin/config_helper
+
+FROM ubuntu:18.04
+
+COPY --from=builder /go/bin/config_helper /usr/local/bin/
 
 # no tty
 ENV DEBIAN_FRONTEND noninteractive
 
 COPY docker/01proxy /etc/apt/apt.conf.d/01proxy
-COPY docker/sources.list.d /etc/apt/sources.list.d/
-COPY docker/apt_keys /tmp/apt_keys/
-COPY docker/get-pip.py /
+COPY docker/sources.list.d /tmp/sources.list.d/
 COPY docker/libmysqlclient18_5.6.25-0ubuntu1_amd64.deb /tmp/
 
 RUN dpkg-divert --local --rename --add /sbin/initctl \
         && ln -sf /bin/true /sbin/initctl \
-        && for f in /tmp/apt_keys/*; do apt-key add $f; done \
-        && rm -rf /tmp/apt_keys \
         && apt-get update \
-        && apt-get install -y --no-install-recommends software-properties-common \
-        && add-apt-repository ppa:deadsnakes/ppa \
+        && apt-get install -y --no-install-recommends gnupg2 \
+        && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5072E1F5 \
+        && mv /tmp/sources.list.d /etc/apt/sources.list.d \
         && apt-get update \
+        && apt-get install gnupg2 \
+        && apt-get upgrade -y \
         && apt-get install -y --no-install-recommends wget psmisc \
             libsm6 libice6 libaudio2 libogg0 libxfixes3 libxrender1 libfontconfig1 libgl1-mesa-glx libglib2.0-0 \
-            dnsutils mysql-community-client strace gdb ca-certificates \
-            libpython2.7 libpython3.6 \
-            libmysqlclient20 openssh-client apache2-utils libltdl7 gettext-base \
-            python python3.6 nginx-extras libncurses5 \
-            libcurl3 libstdc++6 locales \
-            inetutils-ping net-tools vim-nox \
+            dnsutils mysql-client strace ca-certificates \
+            libmysqlclient20  apache2-utils libltdl7 gettext-base \
+            libncurses5 libcurl3 libstdc++6 locales \
+            busybox \
+        && busybox --install \
         && dpkg -i /tmp/libmysqlclient18_5.6.25-0ubuntu1_amd64.deb \
         && rm /tmp/libmysqlclient18_5.6.25-0ubuntu1_amd64.deb \
         && locale-gen en_US.UTF-8 \
-        && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 \
         && /usr/bin/wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.0.2/dumb-init_1.0.2_amd64 \
         && chmod +x /usr/local/bin/dumb-init \
-        && rm -rf /var/lib/apt/lists/* \
-        && python2 get-pip.py \
-        && python3.6 get-pip.py \
-        && rm /get-pip.py \
-        && pip2 install pyOpenSSL==17.5.0
-
-COPY docker/config_helper.py /usr/local/bin/
+        && rm -rf /var/lib/apt/lists
 
 # Set the locale
 ENV LANG en_US.UTF-8
