@@ -241,11 +241,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             setAutoUpdateCheckMode(qnGlobalSettings->isUpdateNotificationsEnabled());
         });
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,this,
-        [this]()
-        {
-            checkForInternetUpdates();
-        });
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &MultiServerUpdatesWidget::atCloudSettingsChanged);
 
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
@@ -970,6 +967,37 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     return true;
 }
 
+void MultiServerUpdatesWidget::atCloudSettingsChanged()
+{
+    if (m_widgetState == WidgetUpdateState::ready)
+    {
+        if (!m_updateInfo.isEmpty())
+        {
+            NX_INFO(this, "atCloudSettingsChanged() - recalculating update report");
+            auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+            if (m_updateInfo.error != nx::update::InformationError::httpError
+                || m_updateInfo.error != nx::update::InformationError::networkError)
+            {
+                m_updateInfo.error = nx::update::InformationError::noError;
+            }
+            m_haveValidUpdate = m_serverUpdateTool->verifyUpdateManifest(m_updateInfo, installedVersions);
+            m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_updateLocalStateChanged = true;
+        }
+        else
+        {
+            NX_INFO(this, "atCloudSettingsChanged() - update info is completely empty. No reason to recalculate it");
+        }
+    }
+    else
+    {
+        NX_INFO(this, "atCloudSettingsChanged() - no need to recalculate update info in the state %1", toString(m_widgetState));
+    }
+
+    if (m_updateLocalStateChanged)
+        loadDataToUi();
+}
+
 void MultiServerUpdatesWidget::atServerPackageDownloaded(const nx::update::Package& package)
 {
     if (m_widgetState == WidgetUpdateState::downloading)
@@ -1157,7 +1185,6 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
 
         NX_INFO(NX_SCOPE_TAG, "mediaservers have an active update process to version %1", updateInfo.info.version);
 
-        m_clientUpdateTool->setUpdateTarget(updateInfo);
         bool hasClientUpdate = m_clientUpdateTool->hasUpdate();
         if (updateInfo.alreadyInstalled && !hasClientUpdate)
         {
@@ -1174,6 +1201,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             NX_INFO(NX_SCOPE_TAG, "taking update info from mediaserver");
             m_updateInfo = updateInfo;
             m_updateReport = calculateUpdateVersionReport(m_updateInfo);
+            m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             m_haveValidUpdate = true;
         }
 
@@ -1190,10 +1218,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
                 << "processRemoteUpdateInformation() - servers" << peersAreInstalling << " are installing an update";
             // TODO: Should check if we need client update
             if (hasClientUpdate)
-            {
                 peersAreInstalling.insert(m_stateTracker->getClientPeerId());
-                //m_clientUpdateTool->setUpdateTarget(m_updateInfo);
-            }
             setTargetState(WidgetUpdateState::installing, peersAreInstalling);
         }
         else if (!serversAreDownloading.empty())
