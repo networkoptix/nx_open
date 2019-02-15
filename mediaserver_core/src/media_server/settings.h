@@ -113,6 +113,7 @@ namespace nx_ms_conf
     static const QString DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG("30s");
 
     static const QString ALLOW_REMOVABLE_STORAGES("allowRemovableStorages");
+    static const QString VACUUM_INTERVAL("vacuumIntervalSec");
 }
 
 /**

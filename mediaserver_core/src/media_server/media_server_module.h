@@ -76,6 +76,7 @@ public:
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
+    QnStorageDbPool* storageDbPool() const;
 
     nx::mediaserver::RootTool* rootTool() const;
 
@@ -96,6 +97,7 @@ private:
 
     CommonPluginContainer m_pluginContainer;
     PluginManager* m_pluginManager = nullptr;
+    QnStorageDbPool* m_storageDbPool = nullptr;
     nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
