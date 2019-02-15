@@ -480,22 +480,6 @@
         ]
       },
       {
-        "name": "searchBy",
-        "label": "Search fields",
-        "value": "",
-        "description": "",
-        "type": "select",
-        "meta": {
-          "multi": true,
-          "options": [
-            "name",
-            "companyName",
-            "shortDescription",
-            "description"
-          ]
-        }
-      },
-      {
         "name": "Integration page",
         "is_global": true,
         "description": "Integrations",
