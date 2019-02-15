@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
 
 COPY stage/ /opt/networkoptix/cloud_connect_test_util/
 

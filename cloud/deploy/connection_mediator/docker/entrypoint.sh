@@ -10,7 +10,7 @@ mv $tmp /opt/networkoptix/connection_mediator/etc/connection_mediator.conf
 
 if [ -n "$MODULE_CONFIGURATION" ]
 then
-    config_helper.py /opt/networkoptix/connection_mediator/etc/connection_mediator.conf "$MODULE_CONFIGURATION"
+    config_helper /opt/networkoptix/connection_mediator/etc/connection_mediator.conf "$MODULE_CONFIGURATION"
 fi
 
 exec /opt/networkoptix/connection_mediator/bin/connection_mediator -e

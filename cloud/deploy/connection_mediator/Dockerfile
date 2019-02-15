@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
 
 COPY stage/connection_mediator /opt/networkoptix/connection_mediator
 
