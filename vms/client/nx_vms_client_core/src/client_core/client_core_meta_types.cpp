@@ -66,7 +66,7 @@ void initializeMetaTypes()
 
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 
-    qRegisterMetaType<QnStringSet>();
+    qRegisterMetaType<QnStringSet>("QnStringSet");
     qRegisterMetaTypeStreamOperators<QnStringSet>();
 
     qRegisterMetaType<nx::media::PlayerStatistics>();
