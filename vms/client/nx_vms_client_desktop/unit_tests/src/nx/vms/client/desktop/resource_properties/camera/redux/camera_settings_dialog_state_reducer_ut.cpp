@@ -149,15 +149,14 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
 }
 
 // Schedule brush should be correctly initialized after loadCameras.
-TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushAfterLoadCameras)
+TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushIsValidAfterLoadCameras)
 {
     static constexpr int kDefaultFps = 30;
 
     CameraResourceStubPtr camera(new CameraResourceStub());
     camera->setMaxFps(kDefaultFps);
-    const QnVirtualCameraResourceList cameras{camera};
 
-    State initial = Reducer::loadCameras({}, cameras);
+    State initial = Reducer::loadCameras({}, {camera});
     ASSERT_EQ(initial.devicesDescription.maxFps, kDefaultFps);
     ASSERT_EQ(initial.recording.brush.fps, kDefaultFps);
     ASSERT_EQ(initial.recording.brush.recordingType, Qn::RecordingType::always);
@@ -166,7 +165,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushAfterLoadCameras)
 }
 
 // If clean schedule, fps brush should be reset to a default value.
-TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushAfterCleanSchedule)
+TEST_F(CameraSettingsDialogStateReducerTest, brushFpsIsValidAfterCleanSchedule)
 {
     static constexpr int kDefaultFps = 30;
 
@@ -189,15 +188,14 @@ TEST_F(CameraSettingsDialogStateReducerTest, scheduleBrushAfterCleanSchedule)
 }
 
 // Schedule brush correctness when bitrate switches from custom to predefined and back.
-TEST_F(CameraSettingsDialogStateReducerTest, setScheduleBrush)
+TEST_F(CameraSettingsDialogStateReducerTest, brushBitrateIsValidOnScheduleBrushChange)
 {
     static constexpr int kDefaultFps = 30;
 
     CameraResourceStubPtr camera(new CameraResourceStub());
     camera->setMaxFps(kDefaultFps);
-    const QnVirtualCameraResourceList cameras{camera};
 
-    State initial = Reducer::toggleCustomBitrateVisible(Reducer::loadCameras({}, cameras));
+    State initial = Reducer::toggleCustomBitrateVisible(Reducer::loadCameras({}, {camera}));
     ASSERT_TRUE(initial.recording.customBitrateAvailable && initial.recording.customBitrateVisible);
 
     State high = Reducer::setScheduleBrushQuality(std::move(initial), Qn::StreamQuality::high);
@@ -217,18 +215,18 @@ TEST_F(CameraSettingsDialogStateReducerTest, setScheduleBrush)
     ASSERT_EQ(customBitrate, custom.recording.bitrateMbps);
     ASSERT_EQ(customBitrate, customBrush.bitrateMbps);
 
-    State high2 = Reducer::setScheduleBrush(std::move(custom), highBrush);
-    ASSERT_EQ(highBrush, high2.recording.brush);
-    ASSERT_EQ(highBitrate, high2.recording.bitrateMbps);
+    State highAfterCustom = Reducer::setScheduleBrush(std::move(custom), highBrush);
+    ASSERT_EQ(highBrush, highAfterCustom.recording.brush);
+    ASSERT_EQ(highBitrate, highAfterCustom.recording.bitrateMbps);
 
-    State custom2 = Reducer::setScheduleBrush(std::move(high2), customBrush);
-    ASSERT_EQ(customBrush, custom2.recording.brush);
+    State customAfterHigh = Reducer::setScheduleBrush(std::move(highAfterCustom), customBrush);
+    ASSERT_EQ(customBrush, customAfterHigh.recording.brush);
     ASSERT_EQ(customBitrate, customBrush.bitrateMbps);
-    ASSERT_EQ(customBitrate, custom2.recording.bitrateMbps);
+    ASSERT_EQ(customBitrate, customAfterHigh.recording.bitrateMbps);
 
-    State medium2 = Reducer::setScheduleBrush(std::move(custom2), mediumBrush);
-    ASSERT_EQ(mediumBrush, medium2.recording.brush);
-    ASSERT_EQ(mediumBitrate, medium2.recording.bitrateMbps);
+    State mediumAfterCustom = Reducer::setScheduleBrush(std::move(customAfterHigh), mediumBrush);
+    ASSERT_EQ(mediumBrush, mediumAfterCustom.recording.brush);
+    ASSERT_EQ(mediumBitrate, mediumAfterCustom.recording.bitrateMbps);
 }
 
 // When a user enables recording with an empty schedule, special notification should appear.
