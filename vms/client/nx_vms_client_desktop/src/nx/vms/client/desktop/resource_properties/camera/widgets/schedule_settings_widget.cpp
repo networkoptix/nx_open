@@ -111,13 +111,13 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
     connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged, store,
         [store](double value)
         {
-            store->setCustomRecordingBitrateMbps(static_cast<float>(value));
+            store->setRecordingBitrateMbps(static_cast<float>(value));
         });
 
     connect(ui->bitrateSlider, &QSlider::valueChanged, store,
         [this, store](int /*value*/)
         {
-            store->setCustomRecordingBitrateNormalized(
+            store->setRecordingBitrateNormalized(
                 normalizedValue(ui->bitrateSlider));
         });
 }

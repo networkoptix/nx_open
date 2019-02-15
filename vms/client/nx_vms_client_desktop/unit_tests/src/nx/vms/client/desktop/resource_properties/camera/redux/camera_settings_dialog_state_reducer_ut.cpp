@@ -211,7 +211,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, setScheduleBrush)
     ASSERT_TRUE(mediumBrush.isAutomaticBitrate());
 
     const auto customBitrate = (mediumBitrate + highBitrate) * 0.5;
-    State custom = Reducer::setCustomRecordingBitrateMbps(std::move(medium), customBitrate);
+    State custom = Reducer::setRecordingBitrateMbps(std::move(medium), customBitrate);
     const auto customBrush = custom.recording.brush;
     ASSERT_FALSE(customBrush.isAutomaticBitrate());
     ASSERT_EQ(customBitrate, custom.recording.bitrateMbps);
