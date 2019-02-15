@@ -10,7 +10,7 @@ COPY stage/cloud/requirements.txt /app/requirements.txt
 
 RUN set -ex \
     apk update \
-    && apk add --no-cache tini gettext wget ca-certificates mariadb-client   \
+    && apk add --no-cache bash tini gettext wget ca-certificates mariadb-client   \
         libcurl libjpeg-turbo libressl2.6-libcrypto libwebp libxml2 libxslt mariadb-client-libs musl openjpeg tiff yaml zlib \
     && pip install -r /app/requirements.txt
 
