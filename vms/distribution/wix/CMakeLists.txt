@@ -16,6 +16,15 @@ set(VC14RedistPath "${vcredist_directory}")
 set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
 set(server_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/server")
 
+set(productLogo "${customization.dir}/icons/all/favicon.ico")
+set(customInstallerIcon "${customization.dir}/icons/windows/installer_icon.ico")
+
+if(EXISTS "${customInstallerIcon}")
+   set(installerIcon ${customInstallerIcon})
+else()
+   set(installerIcon ${productLogo})
+endif()
+
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
 file(TO_CMAKE_PATH ${certificates_path} certificates_path)
 file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
