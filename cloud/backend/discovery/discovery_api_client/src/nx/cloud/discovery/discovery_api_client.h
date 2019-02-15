@@ -19,8 +19,7 @@ struct Node
     enum Status
     {
         online,
-        offline,
-        //TODO what other statuses are required?
+        offline
     };
 
     std::string nodeId;
@@ -72,8 +71,14 @@ public:
     void setOnNodeLost(NodeLostHandler handler);
 
 private:
-    nx::network::http::HttpClient m_httpClient;
+    nx::utils::Url m_discoveryServiceUrl;
+    std::string m_clusterId;
     Node m_node;
+
+    NodeDiscoveredHandler m_nodeDiscoveredHandler;
+    NodeLostHandler m_nodeLostHandler;
+
+    nx::network::http::HttpClient m_httpClient;
 };
 
 } // namespace nx::cloud::discovery
