@@ -159,6 +159,37 @@ Search can be cleared by x button
     Click Link    ${SYSTEM SEARCH X BUTTON}
     Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
 
+Search should only be visible with 9 or more systems
+
+    [tags]    C41890
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Remove User Permissions    ${EMAIL VIEWER}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Elements Should Not Be Visible    ${SYSTEMS SEARCH INPUT}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Share To    ${EMAIL VIEWER}    ${VIEWER TEXT}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Element Is Visible    ${SYSTEMS SEARCH INPUT}
+
 should update owner name in systems list, if it's changed
     Go To    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    None
