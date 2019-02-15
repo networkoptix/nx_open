@@ -92,11 +92,6 @@ rest::Handle InternetOnlyPeerManager::downloadChunk(
     return -1;
 }
 
-void InternetOnlyPeerManager::cancel()
-{
-    m_aioTimer.post([this]() { m_cancelled = true; });
-}
-
 rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& /*fileName*/,
@@ -128,30 +123,28 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     ++d->nextRequestId;
 
     httpClient->doGet(url,
-        nx::utils::guarded(this, [this, callback, requestId, httpClient, thread = thread()]()
-        {
-            if (m_cancelled)
-                return;
+        nx::utils::guarded(this,
+            [this, callback, requestId, thread = thread()]()
+            {
+                executeInThread(thread, nx::utils::guarded(this,
+                    [this, callback, requestId]()
+                    {
+                        NX_MUTEX_LOCKER lock(&d->mutex);
+                        const auto httpClient = d->requestClients.take(requestId);
+                        lock.unlock();
 
-            executeInThread(thread, nx::utils::guarded(this,
-                [this, callback, requestId]()
-                {
-                    NX_MUTEX_LOCKER lock(&d->mutex);
-                    const auto httpClient = d->requestClients.take(requestId);
-                    lock.unlock();
+                        if (!httpClient)
+                            return;
 
-                    if (!httpClient)
-                        return;
+                        const bool success = httpClient->hasRequestSucceeded();
 
-                    const bool success = httpClient->hasRequestSucceeded();
+                        QByteArray result;
+                        if (success)
+                            result = httpClient->fetchMessageBodyBuffer();
 
-                    QByteArray result;
-                    if (success)
-                        result = httpClient->fetchMessageBodyBuffer();
-
-                    callback(success, requestId, result);
-                }));
-        }));
+                        callback(success, requestId, result);
+                    }));
+            }));
 
     return requestId;
 }
