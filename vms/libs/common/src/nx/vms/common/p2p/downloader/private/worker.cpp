@@ -164,6 +164,7 @@ void Worker::pleaseStopUnsafe()
     cancelRequests();
     m_peerManager->cancel();
     m_waitCondition.wakeOne();
+    m_stepDelayTimer.stop();
 }
 
 Worker::State Worker::state() const
