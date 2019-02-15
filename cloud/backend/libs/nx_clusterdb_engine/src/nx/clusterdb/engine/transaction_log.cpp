@@ -74,14 +74,6 @@ nx::sql::DBResult CommandLog::saveLocalTransaction(
     const nx::Buffer& transactionHash,
     std::unique_ptr<SerializableAbstractCommand> transactionSerializer)
 {
-    TransactionLogContext* vmsTransactionLogData = nullptr;
-
-    QnMutexLocker lock(&m_mutex);
-    DbTransactionContext& dbTranContext =
-        getDbTransactionContext(lock, queryContext, systemId);
-    vmsTransactionLogData = getTransactionLogContext(lock, systemId);
-    lock.unlock();
-
     NX_DEBUG(
         QnLog::EC2_TRAN_LOG.join(this),
         lm("systemId %1. Generated new command %2 (hash %3)")

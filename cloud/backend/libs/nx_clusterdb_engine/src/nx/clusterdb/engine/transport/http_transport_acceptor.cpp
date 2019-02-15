@@ -238,10 +238,10 @@ nx::network::http::RequestResult
         connectionRequestAttributes.contentEncoding.c_str());
     response->headers.emplace(
         Qn::EC2_GUID_HEADER_NAME,
-        m_localPeerData.id.toByteArray());
+        localPeerData.id.toByteArray());
     response->headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        m_localPeerData.instanceId.toByteArray());
+        localPeerData.instanceId.toByteArray());
 
     NX_ASSERT(m_protocolVersionRange.isCompatible(
         connectionRequestAttributes.remotePeerProtocolVersion));
