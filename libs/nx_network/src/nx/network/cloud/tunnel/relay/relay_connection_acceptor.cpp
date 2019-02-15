@@ -1,6 +1,5 @@
 #include "relay_connection_acceptor.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -144,25 +143,29 @@ void ReverseConnection::onConnectDone(
         m_httpPipeline->setOnConnectionClosed(
             [this](auto&&... args) { onConnectionClosed(std::move(args)...); });
         m_httpPipeline->setMessageHandler(
-            [this](auto&&... args) { relayNotificationReceived(std::move(args)...); });
+            [this](auto&&... args) { dispatchRelayNotificationReceived(std::move(args)...); });
         m_beginListeningResponse = response;
     }
 
     nx::utils::swapAndCall(m_connectHandler, api::toSystemError(resultCode));
 }
 
-void ReverseConnection::relayNotificationReceived(
+void ReverseConnection::dispatchRelayNotificationReceived(
     nx::network::http::Message message)
 {
-    api::OpenTunnelNotification openTunnelNotification;
-    if (!openTunnelNotification.parse(message))
-    {
-        NX_DEBUG(this, lm("Could not parse received notification. \r\n%1")
-            .arg(message));
-        m_httpPipeline.reset();
-        return; //< Just ignoring.
-    }
+    nx::cloud::relay::api::OpenTunnelNotification openTunnelNotification;
+    if (openTunnelNotification.parse(message))
+        return processOpenTunnelNotification(std::move(openTunnelNotification));
 
+    NX_VERBOSE(this, lm("Ignoring unknown notification %1")
+        .args(message.type == http::MessageType::request ? message.request->requestLine.toString()
+            : message.type == http::MessageType::response ? message.response->statusLine.toString()
+            : http::StringType()));
+}
+
+void ReverseConnection::processOpenTunnelNotification(
+    api::OpenTunnelNotification openTunnelNotification)
+{
     m_streamSocket = std::make_unique<ServerSideReverseStreamSocket>(
         m_httpPipeline->takeSocket(),
         openTunnelNotification.clientEndpoint());
