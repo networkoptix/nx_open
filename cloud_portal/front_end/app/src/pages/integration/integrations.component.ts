@@ -64,11 +64,9 @@ export class NxIntegrationsComponent implements OnInit {
                     });
     }
 
-    setTags(filtered?) {
-        const elements = (!filtered) ? this.allElements : this.elements;
-        this.filterModel.tags = [];
+    setTags() {
 
-        elements.forEach((integration) => {
+        this.allElements.forEach((integration) => {
             integration.information.type.forEach((type) => {
                 const found = this.filterModel.tags.some((tag) => tag.id === type);
                 if (!found) {
@@ -99,7 +97,6 @@ export class NxIntegrationsComponent implements OnInit {
             });
         }
 
-        this.setTags(true /*filtered*/);
         if (this.filterModel.tags.length) {
             const hasTagSelection = this.filterModel.tags.some((tag) => tag.value);
 

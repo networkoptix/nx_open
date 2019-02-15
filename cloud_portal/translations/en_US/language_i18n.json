@@ -125,8 +125,14 @@
         "dvr": "DVR"
     }, 
     "integration": {
+        "backToEditText": "Back to the editing interfaces", 
+        "Access Control": "Access Control", 
         "previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.", 
-        "backToEditText": "Back to the editing interfaces"
+        "Storage": "Storage", 
+        "Connector": "Connector", 
+        "Health Monitor": "Health Monitor", 
+        "Drone": "Drone", 
+        "Data Analytics": "Data Analytics"
     }, 
     "is incompatible.": "is incompatible.", 
     "is offline.": "is offline.", 
