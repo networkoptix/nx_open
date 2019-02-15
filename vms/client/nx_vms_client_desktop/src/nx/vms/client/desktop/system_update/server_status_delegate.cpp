@@ -42,6 +42,7 @@ public:
     {
         bool errorStyle = false;
         bool progressHidden = true;
+        bool leftHidden = true;
 
         m_animated = false;
         if (m_owner->isVerificationErrorVisible())
@@ -51,30 +52,30 @@ public:
             {
                 m_left->setText(data->verificationMessage);
                 m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
-                m_left->setHidden(false);
+                leftHidden = false;
                 errorStyle = true;
             }
             else
             {
-                m_left->setHidden(true);
+                leftHidden = true;
             }
         }
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
             m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
-            m_left->setHidden(false);
+            leftHidden = false;
         }
         else if (data->installed)
         {
             m_left->setText(tr("Installed"));
             m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
-            m_left->setHidden(false);
+            leftHidden = false;
         }
         else if (data->installing)
         {
             m_left->setText(tr("Installing..."));
-            m_left->setHidden(false);
+            leftHidden = false;
             m_animated = true;
             progressHidden = true;
         }
@@ -83,13 +84,13 @@ public:
             switch (data->state)
             {
                 case StatusCode::preparing:
-                    m_left->setHidden(true);
+                    leftHidden = true;
                     progressHidden = false;
                     m_progress->setMinimum(0);
                     m_progress->setMaximum(0);
                     break;
                 case StatusCode::downloading:
-                    m_left->setHidden(true);
+                    leftHidden = true;
                     progressHidden = false;
                     m_progress->setMinimum(0);
                     m_progress->setMaximum(100);
@@ -99,36 +100,42 @@ public:
                     // TODO: We should get proper server version here
                     m_left->setText(tr("Downloaded"));
                     m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
-                    m_left->setHidden(false);
+                    leftHidden = false;
                     break;
                 case StatusCode::error:
                     m_left->setText(data->statusMessage);
                     m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
-                    m_left->setHidden(false);
+                    leftHidden = false;
                     errorStyle = true;
                     break;
                 case StatusCode::latestUpdateInstalled:
                     m_left->setText(tr("Installed"));
                     m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
-                    m_left->setHidden(false);
+                    leftHidden = false;
                     break;
                 case StatusCode::idle:
-                    m_left->setHidden(true);
+                    leftHidden = true;
                     progressHidden = true;
                     break;
                 case StatusCode::offline:
                     // TODO: Some servers that are installing updates can also be offline. But it is different state
                     m_left->setText("–");
                     m_left->setIcon(QIcon());
-                    m_left->setHidden(false);
+                    leftHidden = false;
                     break;
                 default:
                     // In fact we should not be here. All the states should be handled accordingly
-                    m_left->setHidden(false);
+                    leftHidden = false;
                     m_left->setText(QString("Unhandled state: ") + data->statusMessage);
                     errorStyle = true;
                     break;
             }
+        }
+
+        if (!m_owner->isStatusVisible())
+        {
+            progressHidden = true;
+            leftHidden = true;
         }
 
         if (errorStyle)
@@ -140,6 +147,8 @@ public:
 
         if (progressHidden != m_progress->isHidden())
             m_progress->setHidden(progressHidden);
+        if (leftHidden != m_left->isHidden())
+            m_left->setHidden(leftHidden);
 
         if (m_lastItem != data)
         {

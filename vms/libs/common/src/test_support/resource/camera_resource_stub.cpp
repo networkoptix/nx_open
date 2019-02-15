@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 
 struct CameraResourceStub::Private
@@ -20,6 +22,13 @@ CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
     setId(QnUuid::createUuid());
     addFlags(Qn::server_live_cam);
     setForceUseLocalProperties(true);
+
+    static const CameraMediaStreams mediaStreams{{
+        {nx::vms::api::StreamIndex::primary, {1920, 1080}},
+        {nx::vms::api::StreamIndex::secondary, {640, 480}}}};
+
+    setProperty(ResourcePropertyKey::kMediaStreams,
+        QString::fromUtf8(QJson::serialized(mediaStreams)));
 }
 
 CameraResourceStub::~CameraResourceStub()
@@ -75,7 +84,8 @@ void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)
     emit licenseTypeChanged(toSharedPointer(this));
 }
 
-bool CameraResourceStub::setProperty(const QString& key,
+bool CameraResourceStub::setProperty(
+    const QString& key,
     const QString& value,
     PropertyOptions options)
 {

@@ -778,6 +778,11 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.recording.brush.fps,
         state.maxRecordingBrushFps());
 
+    if (state.recording.isCustomBitrate())
+        state = setCustomRecordingBitrateMbps(std::move(state), brush.bitrateMbps);
+    else
+        state = fillBitrateFromFixedQuality(std::move(state));
+
     state = setScheduleBrushFps(std::move(state), fps);
     state.recordingHint = State::RecordingHint::brushChanged;
 

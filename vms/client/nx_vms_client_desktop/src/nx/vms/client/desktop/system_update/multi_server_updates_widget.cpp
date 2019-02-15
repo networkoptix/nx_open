@@ -828,22 +828,31 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         // with the same version.
         auto targets = m_stateTracker->getAllPeers();
         auto offlineServers = m_stateTracker->getOfflineServers();
-
         targets.subtract(offlineServers);
         if (!offlineServers.empty())
         {
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             messageBox->setIcon(QnMessageBoxIcon::Warning);
-            messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
-            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
-            messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
-                QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
-            auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
 
-            messageBox->exec();
-            auto clicked = messageBox->clickedButton();
-            if (clicked == cancel)
+            if (targets.empty())
+            {
+                messageBox->setText(tr("There are no online servers to update."));
+                messageBox->addButton(QDialogButtonBox::Ok);
+                messageBox->exec();
                 return;
+            }
+            else
+            {
+                messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
+                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
+                messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
+                    QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
+                auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
+                messageBox->exec();
+                auto clicked = messageBox->clickedButton();
+                if (clicked == cancel)
+                    return;
+            }
         }
 
         auto incompatible = m_stateTracker->getLegacyServers();
@@ -864,10 +873,6 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             targets.subtract(incompatible);
         }
 
-        // We always run install commands for client. Though clientUpdateTool state can
-        // fall through to 'readyRestart' or 'complete' state.
-        //if (!m_clientUpdateTool->shouldInstallThis(m_updateInfo))
-        //    targets.remove(m_stateTracker->getClientPeerId());
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
 
         if (m_updateSourceMode == UpdateSourceType::file)
@@ -889,6 +894,8 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
         NX_INFO(this) << "atStartUpdateAction() - sending 'download' command to peers" << targets;
         m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, targets);
+        // We always run install commands for client. Though clientUpdateTool state can
+        // fall through to 'readyRestart' or 'complete' state.
         m_clientUpdateTool->setUpdateTarget(m_updateInfo);
     }
     else
@@ -1945,10 +1952,14 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    bool showButton = m_updateSourceMode != UpdateSourceType::file &&
-        (m_widgetState == WidgetUpdateState::ready || m_widgetState != WidgetUpdateState::initial);
-    if (hasLatestVersion)
-        showButton = false;
+    bool showButton = !hasLatestVersion
+        && m_updateSourceMode != UpdateSourceType::file
+        && (m_widgetState == WidgetUpdateState::ready
+            || m_widgetState != WidgetUpdateState::initial)
+        && (m_updateInfo.error == nx::update::InformationError::networkError
+            || m_updateInfo.error == nx::update::InformationError::httpError
+            // If one wants to download a file in another place.
+            || m_updateInfo.error == nx::update::InformationError::noError);
     ui->manualDownloadButton->setVisible(showButton);
 
     syncVersionReport(m_updateReport);
@@ -2261,6 +2272,10 @@ void MultiServerUpdatesWidget::syncStatusVisibility()
         statusMode = StatusMode::hidden;
 
     m_statusItemDelegate->setStatusMode(statusMode);
+    // This will force delegate update all its widgets.
+    ui->tableView->update();
+    m_updatesModel->forceUpdateColumn(ServerUpdatesModel::Columns::ProgressColumn);
+    //forceUpdateColumn()
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn,
         statusMode == StatusMode::hidden);
 }
