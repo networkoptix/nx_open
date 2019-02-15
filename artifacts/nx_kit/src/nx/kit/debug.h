@@ -228,11 +228,11 @@ typedef std::function<void(const char*)> PrintFunc;
 
 #define NX_KIT_DEBUG_DETAIL_ASSERT1(CONDITION) \
     ::nx::kit::debug::detail::doAssert( \
-        CONDITION, NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, "", __FILE__, __LINE__)
+        !!(CONDITION), NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, "", __FILE__, __LINE__)
 
 #define NX_KIT_DEBUG_DETAIL_ASSERT2(CONDITION, MESSAGE) \
     ::nx::kit::debug::detail::doAssert( \
-        CONDITION, NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, MESSAGE, __FILE__, __LINE__)
+        !!(CONDITION), NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, MESSAGE, __FILE__, __LINE__)
 
 NX_KIT_API void assertionFailed(
     PrintFunc printFunc, const char* conditionStr, const std::string& message,
