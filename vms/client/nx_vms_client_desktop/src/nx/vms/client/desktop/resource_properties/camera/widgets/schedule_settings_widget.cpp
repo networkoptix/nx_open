@@ -238,13 +238,26 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->fpsSpinBox->setValue(brush.fps);
     setReadOnly(ui->fpsSpinBox, state.readOnly);
 
+    const bool fpsLockedBitrate =
+        qFuzzyIsNull(state.recording.maxBitrateMpbs - state.recording.minBitrateMbps);
+
     const bool automaticBitrate = brush.isAutomaticBitrate();
     ui->qualityComboBox->setEnabled(recordingParamsEnabled);
     setReadOnly(ui->qualityComboBox, state.readOnly);
-    ui->qualityComboBox->setCurrentIndex(
-        ui->qualityComboBox->findData(
-            (int)brush.quality
-            + (automaticBitrate ? 0 : kCustomQualityOffset)));
+
+    ui->qualityComboBox->setEnabled(!fpsLockedBitrate);
+    if (fpsLockedBitrate)
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(int(Qn::StreamQuality::highest)));
+    }
+    else
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(
+                (int)brush.quality
+                + (automaticBitrate ? 0 : kCustomQualityOffset)));
+    }
 
     ui->advancedSettingsWidget->setVisible(
         recording.customBitrateAvailable
@@ -253,11 +266,12 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     if (recording.customBitrateAvailable)
     {
-        ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled);
+        ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled && !fpsLockedBitrate);
         ui->bitrateSpinBox->setRange(recording.minBitrateMbps, recording.maxBitrateMpbs);
         ui->bitrateSpinBox->setValue(recording.bitrateMbps);
         setReadOnly(ui->bitrateSpinBox, state.readOnly);
-        setNormalizedValue(ui->bitrateSlider, recording.normalizedCustomBitrateMbps());
+        setNormalizedValue(ui->bitrateSlider,
+            fpsLockedBitrate ? 1.0 : recording.normalizedCustomBitrateMbps());
         setReadOnly(ui->bitrateSlider, state.readOnly);
 
         const auto buttonText = recording.customBitrateVisible
