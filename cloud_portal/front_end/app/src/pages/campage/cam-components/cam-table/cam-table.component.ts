@@ -260,7 +260,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
 
         if (this.params && +this.params.page > this.pager.pages.length) {
-            this.uri.updateURI([
+            this.uri.updateURI('/campage', [
                 {
                     key: 'page', value: this.pager.currentPage
                 }
@@ -270,7 +270,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         if (!keep) {
             // clear selected camera
             this.setClickedRow(-1, {});
-            this.uri.updateURI([
+            this.uri.updateURI('/campage', [
                 {
                     key: 'page', value: this.pager.currentPage
                 }, {

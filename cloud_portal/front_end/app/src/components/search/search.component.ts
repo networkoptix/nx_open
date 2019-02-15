@@ -7,6 +7,7 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, Router }                  from '@angular/router';
 import { NxConfigService }                         from '../../services/nx-config';
 import { isArray }                                 from 'rxjs/internal-compatibility';
+import { NxUriService }                            from '../../services/uri.service';
 
 @Component({
     selector     : 'nx-search',
@@ -22,26 +23,35 @@ import { isArray }                                 from 'rxjs/internal-compatibi
 
 export class NxSearchComponent implements OnInit, ControlValueAccessor {
     @Input() expandable: any;
+    @Input() skinny: any;
+
 
     private localFilter: any = {};
     private numberFilters = 0;
     private params: any = {};
     private config: any;
+    private uriPath: string;
+    private showAdvancedOptions: boolean;
 
     public advSearch = false;
-    public showAdvancedOptions = false;
 
     constructor(private _elementRef: ElementRef,
                 private _router: Router,
                 private _route: ActivatedRoute,
                 private _renderer: Renderer2,
+                private uri: NxUriService,
                 configService: NxConfigService) {
 
         this.config = configService.getConfig();
+        this.uriPath = '/' + this._route.snapshot.url[0].path;
+
+
     }
 
     ngOnInit() {
+        this.skinny = (this.skinny !== undefined);  // optional param
         this.expandable = (this.expandable !== undefined);  // optional param
+        this.showAdvancedOptions = !this.expandable;
 
         // Example URI
         // /campage?search=Axis&tags=isAptzSupported&resolution=SVGA&vendors=Axis,30X,Sony
@@ -99,7 +109,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                     return;
                 }
 
-                if (this.localFilter.selects.length) {
+                if (this.localFilter.selects && this.localFilter.selects.length) {
                     this.localFilter
                         .selects
                         .find((select) => {
@@ -111,7 +121,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                         });
                 }
 
-                if (this.localFilter.multiselects.length) {
+                if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
                     this.localFilter
                         .multiselects
                         .find((select) => {
@@ -147,38 +157,51 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     numberOfOptionsSelected() {
         this.numberFilters = 0;
 
-        this.localFilter.tags.forEach((filter) => {
-            if (filter.value) {
-                this.numberFilters++;
-            }
-        });
+        if (this.localFilter.tags) {
+            this.localFilter.tags.forEach((filter) => {
+                if (filter.value) {
+                    this.numberFilters++;
+                }
+            });
+        }
 
-        this.localFilter.selects.forEach((filter) => {
-            if (filter.selected && filter.selected.value !== '0') { // not default value
-                this.numberFilters++;
-            }
-        });
+        if (this.localFilter.selects) {
+            this.localFilter.selects.forEach((filter) => {
+                if (filter.selected && filter.selected.value !== '0') { // not default value
+                    this.numberFilters++;
+                }
+            });
+        }
 
-        this.localFilter.multiselects.forEach((filter) => {
-            if (filter.selected) { // not default value
-                this.numberFilters += filter.selected.length;
-            }
-        });
+        if (this.localFilter.multiselects) {
+            this.localFilter.multiselects.forEach((filter) => {
+                if (filter.selected) { // not default value
+                    this.numberFilters += filter.selected.length;
+                }
+            });
+        }
     }
 
     resetFilters() {
         this.localFilter.query = '';
-        this.localFilter.tags.forEach((filter) => {
-            filter.value = false;
-        });
 
-        this.localFilter.selects.forEach((filter) => {
-            filter.selected = filter.items[0];
-        });
+        if (this.localFilter.tags) {
+            this.localFilter.tags.forEach((filter) => {
+                filter.value = false;
+            });
+        }
 
-        this.localFilter.multiselects.forEach((filter) => {
-            filter.selected = [];
-        });
+        if (this.localFilter.selects) {
+            this.localFilter.selects.forEach((filter) => {
+                filter.selected = filter.items[0];
+            });
+        }
+
+        if (this.localFilter.multiselects) {
+            this.localFilter.multiselects.forEach((filter) => {
+                filter.selected = [];
+            });
+        }
 
         this.numberFilters = 0;
 
@@ -230,16 +253,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
-        // changes the route without moving from the current view or
-        // triggering a navigation event,
-        this._router.navigate(['/campage'], {
-            queryParams,
-            relativeTo: this._route,
-            replaceUrl: true,
-            queryParamsHandling: 'merge',
-            // do not trigger navigation
-            // skipLocationChange : true
-        });
+        this.uri.updateURI(this.uriPath, queryParams, true);
     }
 
     selectBooleanFilter() {
@@ -253,5 +267,4 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.onChangeCallback(this.localFilter);
         this.numberOfOptionsSelected();
     }
-
 }

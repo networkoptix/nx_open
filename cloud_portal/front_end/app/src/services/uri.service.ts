@@ -15,20 +15,24 @@ export class NxUriService {
         return this.route.queryParams;
     }
 
-    updateURI(objParams) {
+    updateURI(navigateTo: string, objParams: any = {}, formattedParams?) {
         interface Params {
             [key: string]: any;
         }
 
-        const queryParams: Params = {};
+        let queryParams: Params = {};
 
-        objParams.forEach((param) => {
-            queryParams[param.key] = param.value;
-        });
+        if (!formattedParams) {
+            objParams.forEach((param) => {
+                queryParams[param.key] = param.value;
+            });
+        } else {
+            queryParams = objParams;
+        }
 
         // changes the route without moving from the current view or
         // triggering a navigation event,
-        this.router.navigate(['/campage'], {
+        this.router.navigate([navigateTo], {
             queryParams,
             relativeTo         : this.route,
             replaceUrl         : true,

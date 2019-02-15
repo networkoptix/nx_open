@@ -24,7 +24,13 @@
 	},
 	"integration" : {
 		"previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.",
-		"backToEditText": "Back to the editing interfaces"
+		"backToEditText": "Back to the editing interfaces",
+		"Access Control": "Access Control",
+		"Connector": "Connector",
+		"Data Analytics": "Data Analytics",
+		"Drone": "Drone",
+		"Health Monitor": "Health Monitor",
+		"Storage": "Storage"
 	},
 	"About %PRODUCT_NAME%": "About %PRODUCT_NAME%",
 	"Download %VMS_NAME%": "Download %VMS_NAME%",

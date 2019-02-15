@@ -10,13 +10,12 @@ import { CampageSearchService }    from './campage-search.service';
 import { NxModalMessageComponent } from '../../dialogs/message/message.component';
 import { NxConfigService }         from '../../services/nx-config';
 import { TranslateService }        from '@ngx-translate/core';
-import { ActivatedRoute, Router }  from '@angular/router';
 import { NxUriService }            from '../../services/uri.service';
 
 @Component({
-  selector: 'campage',
-  templateUrl: 'campage.component.html',
-    styleUrls: ['campage.component.scss'],
+    selector     : 'campage',
+    templateUrl  : 'campage.component.html',
+    styleUrls    : ['campage.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
 
@@ -366,7 +365,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
           return;
       }
 
-      this.uri.updateURI([
+      this.uri.updateURI('/campage', [
           {
               key: 'camera', value: elementSelected.model || elementSelected.value.model
           }
@@ -420,7 +419,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   resetActiveCamera() {
-      this.uri.updateURI([{ key: 'camera', value: undefined }]);
+      this.uri.updateURI('/campage', [{ key: 'camera', value: undefined }]);
       this.activeCamera = undefined;
       this.toggleCamview = false;
   }

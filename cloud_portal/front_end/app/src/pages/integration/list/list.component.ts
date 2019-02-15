@@ -68,9 +68,9 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         let haveInReview = false;
-        if (changes.list) {
+        if (changes.list.currentValue) {
             // inject platform icons info
-            this.list.forEach(plugin => {
+            changes.list.currentValue.forEach(plugin => {
                 plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
                 this.setPlugunLogo(plugin);
 
