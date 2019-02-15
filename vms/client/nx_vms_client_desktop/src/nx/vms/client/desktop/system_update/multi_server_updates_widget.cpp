@@ -86,7 +86,7 @@ const quint32 kProcessTerminateTimeoutMs = 15000;
 const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
 
 // Adds resource list to message box
-void injectResourceList(QnSessionAwareMessageBox& messageBox, const QnResourceList& resources)
+void injectResourceList(QnMessageBox& messageBox, const QnResourceList& resources)
 {
     if (resources.empty())
         return;
@@ -1583,7 +1583,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             loadDataToUi();
 
             auto complete = m_peersComplete;
-            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+            QScopedPointer<QnMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Success);
 
