@@ -11,13 +11,12 @@ namespace nx::clusterdb::map {
 
 class Settings;
 
-class NX_KEY_VALUE_DB_API Map
+class NX_KEY_VALUE_DB_API EmbeddedDatabase
 {
 public:
-    Map(
+    EmbeddedDatabase(
         const Settings& settings,
-        nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-        const std::string& applicationId);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
 
     Database& database();
 

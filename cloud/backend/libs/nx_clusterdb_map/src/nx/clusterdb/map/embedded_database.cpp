@@ -1,19 +1,24 @@
-#include "map.h"
+#include "embedded_database.h"
 
 #include "settings.h"
 
 namespace nx::clusterdb::map {
 
-Map::Map(
+namespace {
+
+static constexpr char kApplicationId[] = "nx::clusterdb::map::EmbeddedDatabase";
+
+} // namespace
+
+EmbeddedDatabase::EmbeddedDatabase(
     const Settings& settings,
-    nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-    const std::string& applicationId)
+    nx::sql::AsyncSqlQueryExecutor* queryExecutor)
     :
     /*m_settings(settings),
     m_queryExecutor(queryExecutor),*/
     m_moduleId(QnUuid::createUuid()),
     m_syncEngine(
-        applicationId,
+        kApplicationId,
         m_moduleId,
         settings.dataSyncEngineSettings,
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
@@ -22,7 +27,7 @@ Map::Map(
 {
 }
 
-Database& Map::database()
+Database& EmbeddedDatabase::database()
 {
     return m_database;
 }
