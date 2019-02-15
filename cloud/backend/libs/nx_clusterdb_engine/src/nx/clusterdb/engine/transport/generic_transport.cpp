@@ -103,9 +103,21 @@ void GenericTransport::sendTransaction(
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
+            if (peerAlreadyHasCommand(transactionSerializer->header()))
+            {
+                NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+                    "Not sending command %1 to %2 since remote peer must have it",
+                    engine::toString(transactionSerializer->header()),
+                    m_commonTransportHeaderOfRemoteTransaction);
+                return;
+            }
+
             if (isHandshakeCommand(transactionSerializer->header().command)
                 || m_canSendCommands)
             {
+                NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), "Sending command %1 to %2",
+                    engine::toString(transactionSerializer->header()),
+                    m_commonTransportHeaderOfRemoteTransaction);
                 m_commandPipeline->sendTransaction(
                     std::move(transportHeader),
                     transactionSerializer);
@@ -186,6 +198,12 @@ void GenericTransport::processCommandData(
         return;
     }
 
+    if (m_remotePeer.persistentId.isNull() &&
+        !commandData->header().persistentInfo.dbID.isNull())
+    {
+        m_remotePeer.persistentId = commandData->header().persistentInfo.dbID;
+    }
+
     if (isHandshakeCommand(commandData->header().command))
     {
         processHandshakeCommand(
@@ -200,6 +218,12 @@ void GenericTransport::processCommandData(
     m_gotCommandHandler(
         std::move(commandData),
         std::move(transportHeader));
+}
+
+bool GenericTransport::peerAlreadyHasCommand(const CommandHeader& header) const
+{
+    return header.peerID == m_remotePeer.id
+        && header.persistentInfo.dbID == m_remotePeer.persistentId;
 }
 
 bool GenericTransport::isHandshakeCommand(int commandType) const
@@ -280,19 +304,7 @@ void GenericTransport::onTransactionsReadFromLog(
             .args(m_systemId, serializedTransactions.size(), toString(resultCode),
                 m_commonTransportHeaderOfRemoteTransaction));
 
-    // Posting transactions to send
-    for (auto& tranData: serializedTransactions)
-    {
-        CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
-        transportHeader.systemId = m_systemId;
-        transportHeader.vmsTransportHeader.distance = 1;
-        transportHeader.vmsTransportHeader.processedPeers.insert(
-            m_localPeer.id);
-
-        m_commandPipeline->sendTransaction(
-            transportHeader,
-            std::move(tranData.serializer));
-    }
+    sendTransactions(std::exchange(serializedTransactions, {}));
 
     // TODO: #ak If m_remotePeerTranState contained unknown peers, than they are now
     // missing in readedUpTo.
@@ -331,6 +343,23 @@ void GenericTransport::onTransactionsReadFromLog(
 
     // Sending transactions to remote peer is allowed now.
     enableOutputChannel();
+}
+
+void GenericTransport::sendTransactions(
+    std::vector<dao::TransactionLogRecord> serializedTransactions)
+{
+    for (auto& tranData: serializedTransactions)
+    {
+        CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+        transportHeader.systemId = m_systemId;
+        transportHeader.vmsTransportHeader.distance = 1;
+        transportHeader.vmsTransportHeader.processedPeers.insert(
+            m_localPeer.id);
+
+        m_commandPipeline->sendTransaction(
+            transportHeader,
+            std::move(tranData.serializer));
+    }
 }
 
 void GenericTransport::enableOutputChannel()

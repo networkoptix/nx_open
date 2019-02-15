@@ -104,13 +104,16 @@ void CommonHttpAcceptor::createConnection(
             httpConnection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
 
+    auto localPeer = m_localPeerData;
+    localPeer.persistentId = QnUuid::fromArbitraryData(systemId);
+
     auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         httpConnection->getAioThread(),
         m_connectionGuardSharedState,
         connectionRequestAttributes,
         systemId,
-        m_localPeerData,
+        localPeer,
         httpConnection->socket()->getForeignAddress(),
         requestContext.request);
     auto commandPipelinePtr = commandPipeline.get();
@@ -121,7 +124,7 @@ void CommonHttpAcceptor::createConnection(
         m_outgoingCommandFilter,
         systemId,
         connectionRequestAttributes,
-        m_localPeerData,
+        localPeer,
         std::move(commandPipeline));
 
     const int connectionSeq = ++m_connectionSeq;
@@ -147,6 +150,7 @@ void CommonHttpAcceptor::createConnection(
     auto requestResult =
         prepareOkResponseToCreateTransactionConnection(
             connectionRequestAttributes,
+            localPeer,
             requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
@@ -223,6 +227,7 @@ void CommonHttpAcceptor::pushTransaction(
 nx::network::http::RequestResult
     CommonHttpAcceptor::prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
+        const vms::api::PeerData& localPeerData,
         nx::network::http::Response* const response)
 {
     response->headers.emplace(
@@ -270,7 +275,7 @@ void CommonHttpAcceptor::startOutgoingChannel(
         {
             auto acceptedTransportConnection =
                 dynamic_cast<AcceptedCommonHttpConnection*>(transportConnection);
-            if (!acceptedTransportConnection || 
+            if (!acceptedTransportConnection ||
                 acceptedTransportConnection->data() != connectionSeq)
             {
                 // connectionId is not globally unique.

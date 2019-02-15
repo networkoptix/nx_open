@@ -57,6 +57,10 @@ public:
 
     const statistics::Provider& statisticsProvider() const;
 
+    /**
+     * NOTE: Using this filter can lead to hard-to-find problems.
+     * Make sure you fully understand what you are doing.
+     */
     void setOutgoingCommandFilter(
         const OutgoingCommandFilterConfiguration& configuration);
 

@@ -122,9 +122,8 @@ public:
         const auto resultCode = saveToDb(
             queryContext,
             systemId,
-            transaction.get(),
             transactionHash,
-            transaction.serialize(Qn::UbjsonFormat, m_supportedProtocolRange.currentVersion()));
+            transaction.clone()); //< TODO: #ak Get rid of this clone.
         if (resultCode != nx::sql::DBResult::ok)
             return resultCode;
 
@@ -295,9 +294,8 @@ private:
     nx::sql::DBResult saveToDb(
         nx::sql::QueryContext* connection,
         const std::string& systemId,
-        const CommandHeader& transaction,
         const QByteArray& transactionHash,
-        const QByteArray& ubjsonData);
+        std::unique_ptr<SerializableAbstractCommand> transactionSerializer);
 
     template<typename CommandDescriptor>
     nx::sql::DBResult invokeExternalProcessor(

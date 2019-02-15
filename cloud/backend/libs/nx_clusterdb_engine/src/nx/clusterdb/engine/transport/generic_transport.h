@@ -65,7 +65,7 @@ private:
     const ProtocolVersionRange m_protocolVersionRange;
     const std::string m_systemId;
     const vms::api::PeerData m_localPeer;
-    const vms::api::PeerData m_remotePeer;
+    vms::api::PeerData m_remotePeer;
     std::unique_ptr<AbstractCommandPipeline> m_commandPipeline;
     bool m_canSendCommands = false;
     /**
@@ -90,6 +90,8 @@ private:
         const QByteArray& serializedCommand,
         CommandTransportHeader transportHeader);
 
+    bool peerAlreadyHasCommand(const CommandHeader& header) const;
+
     bool isHandshakeCommand(int commandType) const;
 
     void processHandshakeCommand(
@@ -103,6 +105,8 @@ private:
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
         vms::api::TranState readedUpTo);
+
+    void sendTransactions(std::vector<dao::TransactionLogRecord> serializedTransactions);
 
     void enableOutputChannel();
 };
