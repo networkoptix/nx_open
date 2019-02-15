@@ -107,8 +107,8 @@ private:
 
     mutable QnMutex m_mutex;
 
-    QThread* m_thread = nullptr;
-    QTimer* m_timer = nullptr;
+    std::unique_ptr<QThread> m_thread = nullptr;
+    std::unique_ptr<QTimer> m_timer = nullptr;
 };
 
 } // namespace time_sync
