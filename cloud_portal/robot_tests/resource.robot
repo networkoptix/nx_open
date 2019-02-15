@@ -47,9 +47,9 @@ Set Chrome Options
 Check Language
 #    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
-    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
+    ${status}=    Run Keyword And Return Status    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
     Register Keyword To Run On Failure    Failure Tasks
-    Run Keyword If    "${status}"=="FAIL"    Set Language
+    Run Keyword If    "${status}"=="False"    Set Language
 
 Set Language
     [arguments]    ${lang}=${LANGUAGE}
