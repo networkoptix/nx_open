@@ -159,6 +159,17 @@ State loadMinMaxCustomBitrate(State state)
         Qn::StreamQuality::lowest);
     state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
         Qn::StreamQuality::highest);
+
+    state.recording.minRelevantQuality = Qn::StreamQuality::lowest;
+    for (int i = int(Qn::StreamQuality::low); i <= int(Qn::StreamQuality::highest); ++i)
+    {
+        const auto bitrate = calculateBitrateForQualityMbps(state, Qn::StreamQuality(i));
+        if (bitrate <= state.recording.minBitrateMbps)
+            state.recording.minRelevantQuality = Qn::StreamQuality(i);
+        else
+            break;
+    }
+
     return state;
 }
 

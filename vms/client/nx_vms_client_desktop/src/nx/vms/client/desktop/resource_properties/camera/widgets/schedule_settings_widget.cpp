@@ -4,6 +4,8 @@
 #include "../redux/camera_settings_dialog_store.h"
 #include "../utils/schedule_paint_functions.h"
 
+#include <QtGui/QStandardItemModel>
+
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -238,24 +240,52 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->fpsSpinBox->setValue(brush.fps);
     setReadOnly(ui->fpsSpinBox, state.readOnly);
 
-    const bool fpsLockedBitrate =
-        qFuzzyIsNull(state.recording.maxBitrateMpbs - state.recording.minBitrateMbps);
-
     const bool automaticBitrate = brush.isAutomaticBitrate();
     ui->qualityComboBox->setEnabled(recordingParamsEnabled);
     setReadOnly(ui->qualityComboBox, state.readOnly);
 
-    ui->qualityComboBox->setEnabled(!fpsLockedBitrate);
+    const auto qualityItemModel = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model());
+    NX_CRITICAL(qualityItemModel);
+
+    const auto setItemEnabled =
+        [model = qualityItemModel](int index, bool value)
+        {
+            const auto item = model->item(index);
+            if (!NX_ASSERT(item))
+                return;
+
+            auto flags = item->flags();
+            flags.setFlag(Qt::ItemIsEnabled, value);
+            flags.setFlag(Qt::ItemIsSelectable, value);
+            item->setFlags(flags);
+        };
+
+    for (int i = 0; i < ui->qualityComboBox->count(); ++i)
+    {
+        int quality = ui->qualityComboBox->itemData(i).toInt();
+        if (quality >= kCustomQualityOffset)
+            quality -= kCustomQualityOffset;
+
+        setItemEnabled(i, quality >= int(state.recording.minRelevantQuality));
+    }
+
+    const bool fpsLockedBitrate =
+        qFuzzyIsNull(state.recording.maxBitrateMpbs - state.recording.minBitrateMbps);
+
     if (fpsLockedBitrate)
     {
         ui->qualityComboBox->setCurrentIndex(
             ui->qualityComboBox->findData(int(Qn::StreamQuality::highest)));
     }
+    else if (brush.quality < state.recording.minRelevantQuality)
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(int(state.recording.minRelevantQuality)));
+    }
     else
     {
         ui->qualityComboBox->setCurrentIndex(
-            ui->qualityComboBox->findData(
-                (int)brush.quality
+            ui->qualityComboBox->findData((int)brush.quality
                 + (automaticBitrate ? 0 : kCustomQualityOffset)));
     }
 
