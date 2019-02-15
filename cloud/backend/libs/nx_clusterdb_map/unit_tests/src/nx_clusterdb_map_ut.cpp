@@ -29,9 +29,28 @@ std::optional<std::string> calculateUpperBound(const std::string& str)
     return std::nullopt;
 }
 
-std::string randomString()
+std::optional<std::string> calculateLowerBound(const std::string& str)
 {
-    return nx::utils::generateRandomName((rand() % 64) + 10).constData();
+    if (!str.empty())
+    {
+        std::string upperBound = str;
+        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
+        {
+            if (--(*rit) != 0)
+                return upperBound;
+        }
+    }
+    return std::nullopt;
+}
+
+std::string randomBinaryString()
+{
+    std::string s;
+    int count = rand() % 32 + 1;
+    s.reserve(count);
+    for (int i = 0; i < count; ++i)
+        s += rand() % 5 == 0 ? 0 : rand() % 256; //< Generate a 0 occasionally
+    return s;
 }
 
 } // namespace
@@ -55,18 +74,10 @@ protected:
         addNodes(2);
     }
 
-    void givenDbWithRandomKeyValuePair()
-    {
-        givenOneDb();
-        givenRandomKeyValuePair();
-        whenInsertKeyValuePair();
-        thenOperationSucceeded();
-    }
-
     void givenDbWithKnownKeyValuePairs()
     {
         addNodes(1);
-        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, /*prefix*/{}, /*startKey*/'B');
+        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, /*prefix*/{});
     }
 
     void givenDbWithPrefixedKeyValuePairs()
@@ -74,8 +85,8 @@ protected:
         m_prefix = "Prefix";
 
         addNodes(1);
-        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, m_prefix, /*startKey*/ 'B', false);
-        generateKeyValuePairs(3, 3, {}, 'B', true);
+        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, m_prefix);
+        generateKeyValuePairs(3, 3, {});
     }
 
     void givenDbWith0xffPrefixedKeyValuePairs()
@@ -83,18 +94,19 @@ protected:
         m_prefix.assign(3, 0xff);
 
         addNodes(1);
-        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, m_prefix, /*startKey*/ 'B');
-        generateKeyValuePairs(3, 3, {}, 'B');
+        generateKeyValuePairs(/*startIndex*/ 0, /*count*/ 3, m_prefix);
+        generateKeyValuePairs(3, 3, {});
     }
 
     void givenSynchronizedNodesWithRandomKeyValuePair()
     {
         givenTwoNodes();
-        givenRandomKeyValuePair();
+        givenBinaryKeyValuePair();
         whenInsertKeyValuePair();
 
         thenOperationSucceeded();
         andValueIsInDb();
+        andValueIsInSecondDb();
         andValueIsInSecondDb();
     }
 
@@ -103,10 +115,20 @@ protected:
         keyValuePair()->value = 'A';
     }
 
-    void givenRandomKeyValuePair(size_t keyValuePairIndex = 0)
+    void givenBinaryKeyValuePair()
     {
-        keyValuePair(keyValuePairIndex)->key = randomString();
-        keyValuePair(keyValuePairIndex)->value = randomString();
+        keyValuePair()->key = randomBinaryString();
+        keyValuePair()->value = randomBinaryString();
+    }
+
+    void givenDbWithBinaryKeyValuePair()
+    {
+        givenOneDb();
+        givenBinaryKeyValuePair();
+        whenInsertKeyValuePair();
+        thenOperationSucceeded();
+        andValueIsInDb();
+        m_fetchedValue.clear();
     }
 
     void givenKnownKeyValuePair()
@@ -153,7 +175,7 @@ protected:
     void givenRecordInsertedEventWasAlreadyTriggered()
     {
         givenEmptyDb();
-        givenRandomKeyValuePair();
+        givenBinaryKeyValuePair();
 
         whenSubscribeToRecordInsertedEvent();
         whenInsertKeyValuePair();
@@ -169,7 +191,7 @@ protected:
 
     void givenRecordRemovedEventWasAlreadyTriggered()
     {
-        givenDbWithRandomKeyValuePair();
+        givenDbWithBinaryKeyValuePair();
 
         whenSubscribeToRecordRemovedEvent();
         whenRemoveKey();
@@ -537,8 +559,7 @@ private:
         size_t startIndex,
         size_t count,
         const std::string& prefix,
-        char startKey,
-        bool findEdgeKeys = true)
+        char startKey = 'B')
     {
         char letter = startKey;
         for (
@@ -555,8 +576,7 @@ private:
             andValueIsInDb(/*dbIndex*/ 0, keyValuePairIndex);
         }
 
-        if(findEdgeKeys)
-            this->findEdgeKeys();
+        findEdgeKeys();
     }
 
     void findEdgeKeys()
@@ -706,7 +726,7 @@ private:
     std::string m_fetchedLowerBound;
     std::string m_upperBound;
 
-    size_t m_uninsertedPairIndex;
+    size_t m_uninsertedPairIndex = 0;
 
     std::string m_givenLowestKey;
     std::string m_givenHighestKey;
@@ -718,7 +738,7 @@ private:
 
 TEST_F(Database, fetches_key_value_pair)
 {
-    givenDbWithRandomKeyValuePair();
+    givenDbWithBinaryKeyValuePair();
     whenFetchValue();
 
     thenOperationSucceeded();
@@ -728,7 +748,7 @@ TEST_F(Database, fetches_key_value_pair)
 TEST_F(Database, inserts_key_value_pair)
 {
     givenEmptyDb();
-    givenRandomKeyValuePair();
+    givenBinaryKeyValuePair();
     whenInsertKeyValuePair();
 
     thenOperationSucceeded();
@@ -737,7 +757,7 @@ TEST_F(Database, inserts_key_value_pair)
 
 TEST_F(Database, removes_key_value_pair)
 {
-    givenDbWithRandomKeyValuePair();
+    givenDbWithBinaryKeyValuePair();
     whenRemoveKey();
 
     thenOperationSucceeded();
@@ -760,7 +780,7 @@ TEST_F(Database, updates_key_value_pair)
 
 TEST_F(Database, handles_removing_non_existent_key)
 {
-    givenDbWithRandomKeyValuePair();
+    givenDbWithBinaryKeyValuePair();
     whenRemoveNonExistentKey();
 
     thenOperationSucceeded();
@@ -769,7 +789,7 @@ TEST_F(Database, handles_removing_non_existent_key)
 TEST_F(Database, fails_to_fetch_non_existent_value)
 {
     givenEmptyDb();
-    givenRandomKeyValuePair();
+    givenBinaryKeyValuePair();
     whenFetchValue();
 
     thenOperationFailed(map::ResultCode::notFound);
@@ -806,7 +826,7 @@ TEST_F(Database, rejects_remove_with_empty_string)
 TEST_F(Database, triggers_record_inserted_event)
 {
     givenEmptyDb();
-    givenRandomKeyValuePair();
+    givenBinaryKeyValuePair();
     whenSubscribeToRecordInsertedEvent();
     whenInsertKeyValuePair();
 
@@ -819,7 +839,7 @@ TEST_F(Database, triggers_record_inserted_event)
 
 TEST_F(Database, triggers_record_removed_event)
 {
-    givenDbWithRandomKeyValuePair();
+    givenDbWithBinaryKeyValuePair();
     whenSubscribeToRecordRemovedEvent();
     whenRemoveKey();
 
@@ -1000,6 +1020,17 @@ TEST_F(Database, fetches_range_with_prefix)
     andFetchedRangeMatchesExpectedRange();
 }
 
+TEST_F(Database, fetches_range_with_0xff_prefix)
+{
+    givenDbWith0xffPrefixedKeyValuePairs();
+
+    whenRequestPrefixedRange();
+
+    thenOperationSucceeded();
+
+    andFetchedRangeMatchesExpectedRange();
+}
+
 TEST_F(Database, rejects_fetch_range_when_prefix_is_empty)
 {
     givenDbWithPrefixedKeyValuePairs();
@@ -1028,21 +1059,10 @@ TEST_F(Database, fails_to_fetch_range_when_prefix_has_non_existent_suffix)
     thenOperationFailed(map::ResultCode::notFound);
 }
 
-TEST_F(Database, fetches_range_with_0xff_prefix)
-{
-    givenDbWith0xffPrefixedKeyValuePairs();
-
-    whenRequestPrefixedRange();
-
-    thenOperationSucceeded();
-
-    andFetchedRangeMatchesExpectedRange();
-}
-
 TEST_F(Database, multiple_nodes_synchronize_insert_operation)
 {
     givenTwoNodes();
-    givenRandomKeyValuePair();
+    givenBinaryKeyValuePair();
 
     whenInsertKeyValuePair();
 
