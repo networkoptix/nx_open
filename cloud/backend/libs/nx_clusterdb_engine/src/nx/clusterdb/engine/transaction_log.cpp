@@ -74,19 +74,33 @@ nx::sql::DBResult CommandLog::saveLocalTransaction(
     const nx::Buffer& transactionHash,
     std::unique_ptr<SerializableAbstractCommand> transactionSerializer)
 {
+    TransactionLogContext* vmsTransactionLogData = nullptr;
+
+    QnMutexLocker lock(&m_mutex);
+    DbTransactionContext& dbTranContext =
+        getDbTransactionContext(lock, queryContext, systemId);
+    vmsTransactionLogData = getTransactionLogContext(lock, systemId);
+    lock.unlock();
+
     NX_DEBUG(
         QnLog::EC2_TRAN_LOG.join(this),
         lm("systemId %1. Generated new command %2 (hash %3)")
-            .args(systemId, toString(transactionSerializer->header()), transactionHash));
+        .args(systemId, toString(transactionSerializer->header()), transactionHash));
 
     // Saving transaction to the log.
     const auto result = saveToDb(
         queryContext,
         systemId,
         transactionHash,
-        std::move(transactionSerializer));
+        *transactionSerializer);
     if (result != nx::sql::DBResult::ok)
         return result;
+
+    // Saving transactions, generated under current DB transaction,
+    //  so that we can send "new transaction" notifications after commit.
+    vmsTransactionLogData->outgoingTransactionsSorter.addTransaction(
+        dbTranContext.cacheTranId,
+        std::move(transactionSerializer));
 
     return nx::sql::DBResult::ok;
 }
@@ -362,10 +376,10 @@ nx::sql::DBResult CommandLog::saveToDb(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     const QByteArray& commandHash,
-    std::unique_ptr<SerializableAbstractCommand> transactionSerializer)
+    const SerializableAbstractCommand& transactionSerializer)
 {
-    const auto& commandHeader = transactionSerializer->header();
-    const auto ubjsonData = transactionSerializer->serialize(
+    const auto& commandHeader = transactionSerializer.header();
+    const auto ubjsonData = transactionSerializer.serialize(
         Qn::SerializationFormat::UbjsonFormat,
         m_supportedProtocolRange.currentVersion());
 
@@ -387,12 +401,6 @@ nx::sql::DBResult CommandLog::saveToDb(
 
     vmsTransactionLogData->cache.insertOrReplaceTransaction(
         dbTranContext.cacheTranId, commandHeader, commandHash);
-
-    // Saving transactions, generated under current DB transaction,
-    //  so that we can send "new transaction" notifications after commit.
-    vmsTransactionLogData->outgoingTransactionsSorter.addTransaction(
-        dbTranContext.cacheTranId,
-        std::move(transactionSerializer));
 
     return nx::sql::DBResult::ok;
 }

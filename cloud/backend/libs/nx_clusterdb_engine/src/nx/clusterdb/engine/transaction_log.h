@@ -119,18 +119,31 @@ public:
             return nx::sql::DBResult::cancelled;
         }
 
-        const auto resultCode = saveToDb(
+        auto resultCode = saveToDb(
             queryContext,
             systemId,
             transactionHash,
-            transaction.clone()); //< TODO: #ak Get rid of this clone.
+            transaction);
         if (resultCode != nx::sql::DBResult::ok)
             return resultCode;
 
-        return invokeExternalProcessor<CommandDescriptor>(
+        resultCode = invokeExternalProcessor<CommandDescriptor>(
             queryContext,
             systemId,
             transaction);
+        if (resultCode != nx::sql::DBResult::ok)
+            return resultCode;
+
+        // TODO: #ak Get rid of transaction.clone().
+        queryContext->transaction()->addOnSuccessfulCommitHandler(
+            [this, systemId, commandSerializer = transaction.clone()]() mutable
+            {
+                m_outgoingTransactionDispatcher->dispatchTransaction(
+                    systemId,
+                    std::move(commandSerializer));
+            });
+
+        return nx::sql::DBResult::ok;
     }
 
     template<typename CommandDescriptor>
@@ -263,8 +276,8 @@ private:
 
     const QnUuid m_peerId;
     const ProtocolVersionRange m_supportedProtocolRange;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
-    AbstractOutgoingCommandDispatcher* const m_outgoingTransactionDispatcher;
+    nx::sql::AsyncSqlQueryExecutor* m_dbManager = nullptr;
+    AbstractOutgoingCommandDispatcher* m_outgoingTransactionDispatcher = nullptr;
     mutable QnMutex m_mutex;
     DbTransactionContextMap m_dbTransactionContexts;
     std::map<std::string, std::unique_ptr<TransactionLogContext>> m_systemIdToTransactionLog;
@@ -295,7 +308,7 @@ private:
         nx::sql::QueryContext* connection,
         const std::string& systemId,
         const QByteArray& transactionHash,
-        std::unique_ptr<SerializableAbstractCommand> transactionSerializer);
+        const SerializableAbstractCommand& transactionSerializer);
 
     template<typename CommandDescriptor>
     nx::sql::DBResult invokeExternalProcessor(
