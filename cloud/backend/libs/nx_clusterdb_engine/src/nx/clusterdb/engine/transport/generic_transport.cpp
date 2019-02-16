@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include "../command_descriptor.h"
+#include "../outgoing_command_filter.h"
 #include "../transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport {
@@ -20,6 +21,7 @@ GenericTransport::GenericTransport(
     std::unique_ptr<AbstractCommandPipeline> commandPipeline)
     :
     m_protocolVersionRange(protocolVersionRange),
+    m_outgoingCommandFilter(outgoingCommandFilter),
     m_systemId(systemId),
     m_localPeer(localPeer),
     m_remotePeer(connectionRequestAttributes.remotePeer),
@@ -248,7 +250,8 @@ void GenericTransport::processHandshakeCommand(
 void GenericTransport::processHandshakeCommand(
     Command<vms::api::SyncRequestData> data)
 {
-    m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
+    m_tranStateToSynchronizeTo =
+        m_outgoingCommandFilter.filter(m_transactionLogReader->getCurrentState());
     m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response

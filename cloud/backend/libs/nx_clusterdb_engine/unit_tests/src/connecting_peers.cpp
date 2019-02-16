@@ -110,4 +110,58 @@ TEST_F(ConnectingPeers, as_a_chain)
     thenPeersSynchronizedEventually();
 }
 
+TEST_F(ConnectingPeers, with_outgoing_command_filter)
+{
+    givenSynchronizedPeers(3);
+
+    peer(0).process().stop();
+
+    peer(2).addRandomData();
+    thenPeersSynchronizedEventually({1, 2});
+    peer(2).process().stop();
+    // NOTE: At this point peer 1 contains data from peer 2. This data is missing on peer 0.
+
+    // Using filter we forbid peer1 to synchronize peer2 data to peer0.
+    peer(1).setOutgoingCommandFilter(OutgoingCommandFilterConfiguration{true});
+    ASSERT_TRUE(peer(0).process().startAndWaitUntilStarted());
+    peer(1).connectTo(peer(0));
+
+    // NOTE: Peers 0 and 1 will never be fully synchronized since data from peer 2 will never
+    // be sent from peer 1 to peer 0.
+    thenPeersAreAbleToSynchronizeNewData({0, 1});
+}
+
+TEST_F(ConnectingPeers, receiving_same_data_from_multiple_peers_simultaneously)
+{
+    constexpr int count = 4;
+
+    /**
+     * Peer network graph:
+     *   2 - 3
+     *    \ /
+     *     1
+     *     |
+     *     0
+     */
+
+    givenSynchronizedPeers(count);
+    peer(0).process().stop();
+    peer(1).process().stop();
+
+    for (int i = 2; i < peerCount(); ++i)
+    {
+        for(int j = 0; j < 17; ++j)
+            peer(i).addRandomData();
+    }
+    thenPeersSynchronizedEventually({2, 3});
+
+    ASSERT_TRUE(peer(0).process().startAndWaitUntilStarted());
+    ASSERT_TRUE(peer(1).process().startAndWaitUntilStarted());
+    peer(0).connectTo(peer(1));
+    for (int i = 2; i < peerCount(); ++i)
+        peer(1).connectTo(peer(i));
+
+    thenPeersSynchronizedEventually();
+}
+
 } // namespace nx::clusterdb::engine::test

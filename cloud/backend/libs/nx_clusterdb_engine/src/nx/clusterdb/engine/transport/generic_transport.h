@@ -63,6 +63,7 @@ protected:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
+    const OutgoingCommandFilter& m_outgoingCommandFilter;
     const std::string m_systemId;
     const vms::api::PeerData m_localPeer;
     vms::api::PeerData m_remotePeer;
