@@ -17,6 +17,7 @@
 #include "compatible_ec2_protocol_version.h"
 #include "command.h"
 #include "dao/abstract_transaction_data_object.h"
+#include "outgoing_transaction_dispatcher.h"
 #include "outgoing_transaction_sorter.h"
 #include "result_code.h"
 #include "serialization/transaction_serializer.h"
