@@ -13,50 +13,61 @@ namespace aio {
 class AIOService;
 
 /**
- * This class should be inherited by any class that tends to provide asynchronous operation 
+ * This class should be inherited by any class that tends to provide asynchronous operation
  * through nx::network::aio.
  *
- * It implements AbstractPollable and simplifies asynchronous operation cancellation by introducing 
+ * It implements AbstractPollable and simplifies asynchronous operation cancellation by introducing
  * BasicPollable::stopWhileInAioThread method.
- * It is recommended that BasicPollable::stopWhileInAioThread implementation can be safely 
+ * It is recommended that BasicPollable::stopWhileInAioThread implementation can be safely
  * called multiple times.
- * 
+ *
  * Sample implementation:
  * <pre><code>
  * class SampleClassWithAsyncOperations:
  *     public nx::network::aio::BasicPollable
  * {
  *     using base_type = nx::network::aio::BasicPollable;
- * 
+ *
  * public:
+ *     SampleClassWithAsyncOperations(std::unique_ptr<HttpConnection> httpConnection):
+ *         m_httpConnection(std::move(httpConnection))
+ *     {
+ *         // Making sure this, m_httpConnection and m_timer are bound to the same AIO thread.
+ *         bindToAioThread(m_httpConnection->getAioThread());
+ *     }
+ *
  *     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
  *     {
  *         base_type::bindToAioThread(aioThread);
- *        
- *         if (m_connection)
- *             m_connection->bindToAioThread(aioThread);
+ *
+ *         if (m_httpConnection)
+ *             m_httpConnection->bindToAioThread(aioThread);
+ *         m_timer.bindToAioThread(aioThread);
  *     }
  *
  *     void doSomethingAsync(CompletionHandler handler)
  *     {
- *         m_connection = ...; //< Creating connection.
- *         m_connection->bindToAioThread(getAioThread());
- *         m_connection->any_async_call(... handler);
+ *         m_httpConnection->any_async_call(... handler);
  *     }
  *
  * protected:
  *     virtual void stopWhileInAioThread() override
  *     {
  *         base_type::stopWhileInAioThread();
- *         m_connection->pleaseStopSync(); // or m_connection.reset();
+ *
+ *         m_httpConnection.reset();
+ *         m_timer.pleaseStopSync();
  *     }
- * 
+ *
  * private:
- *     std::unique_ptr<AbstractStreamSocket> m_connection;
+ *     // HttpConnection and aio::Timer inherit aio::BasicPollable.
+ *
+ *     std::unique_ptr<HttpConnection> m_httpConnection;
+ *     aio::Timer m_timer;
  * };
  * </code></pre>
  *
- * Successor to this class MUST support safe object deletion while in object's aio thread 
+ * Successor to this class MUST support safe object deletion while in object's aio thread
  * (usually, it is acheived automatically).
  * QnStoppableAsync::pleaseStop and BasicPollable::stopWhileInAioThread are not called in this case.
  *
@@ -67,7 +78,7 @@ class NX_NETWORK_API BasicPollable:
 {
 public:
     /**
-     * @param aioThread If nullptr, then object is bound to the current AIO thread 
+     * @param aioThread If nullptr, then object is bound to the current AIO thread
      * (if called in AIO thread) or to a random AIO thread (if current thread is not AIO).
      */
     BasicPollable(aio::AbstractAioThread* aioThread = nullptr);
@@ -80,11 +91,11 @@ public:
     virtual ~BasicPollable() override;
 
     /**
-     * @param completionHandler Called in object's AIO thread (returned by getAioThread()) after 
+     * @param completionHandler Called in object's AIO thread (returned by getAioThread()) after
      * completion or cancellation of all scheduled asynchronous operations.
      * Object can be safely deleted after completion of this call.
-     * WARNING: All usage of this object from non-AIO thread should be halted before invoking 
-     * this method. Otherwise, undefined behavior will happen. All usage in AIO thread is safe 
+     * WARNING: All usage of this object from non-AIO thread should be halted before invoking
+     * this method. Otherwise, undefined behavior will happen. All usage in AIO thread is safe
      * (it will be cancelled or waited for completion).
      * NOTE: In most cases, you don't need to override this.
      * Override BasicPollable::stopWhileInAioThread instead.
@@ -92,7 +103,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
-     * If called within object's AIO thread (returned by getAioThread()) then cancells all 
+     * If called within object's AIO thread (returned by getAioThread()) then cancells all
      * scheduled operations without blocking and returns immediately.
      * Otherwise, invokes BasicPollable::pleaseStop and waits for completion.
      * NOTE: In most cases, you don't need to override this.
@@ -102,10 +113,10 @@ public:
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     /**
-     * Generally, binding to aio thread can be done just after object creation before scheduling 
+     * Generally, binding to aio thread can be done just after object creation before scheduling
      * any asynchronous operations.
      * Some implementation may allow more. E.g., binding if all async operations have completed.
-     * NOTE: Calling this method while there are scheduled asynchronous operations is 
+     * NOTE: Calling this method while there are scheduled asynchronous operations is
      * undefined behavior.
      * NOTE: Re-binding is allowed.
      */
@@ -116,9 +127,9 @@ public:
      * Returns immediately (without waiting for func to be executed).
      */
     virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    
+
     /**
-     * If called within AIO thread (same as returned by getAioThread()) then func is executed 
+     * If called within AIO thread (same as returned by getAioThread()) then func is executed
      * right in this call and dispatch returns after that.
      * Otherwse, invokes BasicPollable::post.
      */
