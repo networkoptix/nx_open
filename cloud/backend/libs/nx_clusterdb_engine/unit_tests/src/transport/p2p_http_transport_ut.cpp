@@ -37,11 +37,11 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 
 //-------------------------------------------------------------------------------------------------
 
-//using namespace engine::test;
-//
-//INSTANTIATE_TYPED_TEST_CASE_P(
-//    P2pHttp,
-//    Synchronization,
-//    P2pHttpTransportInstaller);
+using namespace engine::test;
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    P2pHttp,
+    Synchronization,
+    P2pHttpTransportInstaller);
 
 } // namespace nx::clusterdb::engine::transport::test
