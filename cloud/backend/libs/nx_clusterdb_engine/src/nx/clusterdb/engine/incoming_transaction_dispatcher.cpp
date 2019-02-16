@@ -45,8 +45,8 @@ void IncomingCommandDispatcher::dispatchTransaction(
 
     if (it == m_commandProcessors.end() || it->second->markedForRemoval)
     {
-        NX_VERBOSE(this, lm("Received unsupported transaction %1")
-            .arg(commandData->header().command));
+        NX_VERBOSE(this, "Received unsupported transaction %1",
+            engine::toString(commandData->header()));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
