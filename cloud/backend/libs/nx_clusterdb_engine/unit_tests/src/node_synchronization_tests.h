@@ -149,7 +149,7 @@ TYPED_TEST_P(Synchronization, with_outgoing_command_filter)
     // Using filter we forbid peer1 to synchronize peer2 data to peer0.
     this->peer(1).setOutgoingCommandFilter(OutgoingCommandFilterConfiguration{true});
     ASSERT_TRUE(this->peer(0).process().startAndWaitUntilStarted());
-    this->peer(1).connectTo(peer(0));
+    this->peer(1).connectTo(this->peer(0));
 
     // NOTE: Peers 0 and 1 will never be fully synchronized since data from peer 2 will never
     // be sent from peer 1 to peer 0.
@@ -173,7 +173,7 @@ TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_sim
     this->peer(0).process().stop();
     this->peer(1).process().stop();
 
-    for (int i = 2; i < peerCount(); ++i)
+    for (int i = 2; i < this->peerCount(); ++i)
     {
         for(int j = 0; j < 17; ++j)
             this->peer(i).addRandomData();
@@ -182,9 +182,9 @@ TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_sim
 
     ASSERT_TRUE(this->peer(0).process().startAndWaitUntilStarted());
     ASSERT_TRUE(this->peer(1).process().startAndWaitUntilStarted());
-    this->peer(0).connectTo(peer(1));
-    for (int i = 2; i < peerCount(); ++i)
-        this->peer(1).connectTo(peer(i));
+    this->peer(0).connectTo(this->peer(1));
+    for (int i = 2; i < this->peerCount(); ++i)
+        this->peer(1).connectTo(this->peer(i));
 
     this->thenPeersSynchronizedEventually();
 }
