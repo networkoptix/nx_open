@@ -54,8 +54,8 @@ thread::thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false):
 {
     start();
 
-    // NOTE: m_threadCanBeStarted is used to make sure that thread does not exit before we check 
-    // isRunning(). Without it we would be unable to distinguish thread start error from a 
+    // NOTE: m_threadCanBeStarted is used to make sure that thread does not exit before we check
+    // isRunning(). Without it we would be unable to distinguish thread start error from a
     // situation when a very fast thread has already returned before we called isRunning().
     // It would be much simpler if QThread::start() has returned error.
     if (!isRunning())

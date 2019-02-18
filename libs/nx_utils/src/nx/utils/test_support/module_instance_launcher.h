@@ -112,7 +112,7 @@ public:
     }
 
     /**
-     * Adds short argument without value (e.g., "-f") or 
+     * Adds short argument without value (e.g., "-f") or
      * a long argument with value (e.g., --output-file=tmp.txt)
      */
     void addArg(const char* arg)
@@ -205,7 +205,7 @@ private:
     enum class ArgumentType
     {
         /**
-         * Can be short argument name (e.g., "-o") or 
+         * Can be short argument name (e.g., "-o") or
          * long argument with value (e.g, --output-file=out.txt).
          */
         name,
