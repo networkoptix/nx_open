@@ -124,10 +124,20 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     {
         // Requesting remote update info.
         m_serverConnection->getUpdateInfo(
-            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
+            [this, tool=QPointer<ClientUpdateTool>(this)](
+                bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
             {
-                if (tool && success)
-                    tool->atRemoteUpdateInformation(response);
+                if (!success || response.error != QnRestResult::NoError)
+                {
+                    NX_DEBUG(
+                        this,
+                        lm("requestRemoteUpdateInfo: Error in response for /updateInformation request: %1")
+                            .args(response.errorString));
+                    return;
+                }
+
+                if (tool)
+                    tool->atRemoteUpdateInformation(response.data);
             }, thread());
     }
     else

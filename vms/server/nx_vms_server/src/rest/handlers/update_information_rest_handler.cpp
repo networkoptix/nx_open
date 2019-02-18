@@ -106,6 +106,7 @@ void checkCloudHostRemotely(
 }
 
 int QnUpdateInformationRestHandler::checkInternetForUpdate(
+    const QnRequestParamList& params,
     const QString& publicationKey,
     QByteArray* result,
     QByteArray* contentType,
@@ -117,7 +118,8 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
 
     if (error == nx::update::InformationError::noError)
     {
-        QnFusionRestHandlerDetail::serialize(information, *result, *contentType, request.format);
+        QnFusionRestHandlerDetail::serializeJsonRestReply(information, params, *result, *contentType,
+            QnRestResult());
         return nx::network::http::StatusCode::ok;
     }
 
@@ -129,6 +131,7 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
 }
 
 static int checkForUpdateInformationRemotely(
+    const QnRequestParamList& params,
     QnCommonModule* commonModule,
     const QString& path,
     QByteArray* result,
@@ -156,8 +159,8 @@ static int checkForUpdateInformationRemotely(
 
     if (done)
     {
-        QnFusionRestHandlerDetail::serialize(
-            outputReply, *result, *contentType, context->request().format);
+        QnFusionRestHandlerDetail::serializeJsonRestReply(outputReply, params, *result, *contentType,
+            QnRestResult());
         return nx::network::http::StatusCode::ok;
     }
 
@@ -251,7 +254,8 @@ int QnUpdateInformationRestHandler::executeGet(
     }
 
     if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
-        return checkInternetForUpdate(versionValue, &result, &contentType, request);
+        return checkInternetForUpdate(params, versionValue, &result, &contentType, request);
 
-    return checkForUpdateInformationRemotely(commonModule, path, &result, &contentType, &context);
+    return checkForUpdateInformationRemotely(params, commonModule, path, &result, &contentType,
+        &context);
 }
