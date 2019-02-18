@@ -4,7 +4,6 @@
 
 #include "../command_descriptor.h"
 #include "../outgoing_command_filter.h"
-#include "../transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport {
 
