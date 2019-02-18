@@ -1,13 +1,13 @@
 <footer *ngIf="viewFooter">
     <div class="container">
         <div class="row">
-            <ul class="nav navbar-nav col-6 col-md-8 flex-column flex-lg-row">
+            <ul class="nav navbar-nav col-6 col-md-9 flex-column flex-lg-row">
                 <li>
                     <nx-language-select dropup="true" short="true" instantReload></nx-language-select>
                 </li>
                 <li *ngFor="let item of footerItems"><a *ngIf="item.enabled" [href]="item.url" [attr.target]="item.newWindow ? '_blank': '_self'">{{ item.name | translate }}</a></li>
             </ul>
-            <ul class="nav navbar-nav col-6 col-md-4 justify-content-end">
+            <ul class="nav navbar-nav col-6 col-md-3 justify-content-end">
                 <li><a [href]="companyLink" target="_blank" class="company">
                     &copy;&nbsp;{{ copyrightYear }}&nbsp;{{ companyName }}</a>
                 </li>
