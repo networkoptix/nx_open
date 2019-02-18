@@ -55,6 +55,7 @@ Builder& Builder::setPassword(const QString& password, QUrl::ParsingMode mode)
 Builder& Builder::setHost(const QString& host, QUrl::ParsingMode mode)
 {
     m_url.setHost(host, mode);
+    setPath(m_url.path());
     return *this;
 }
 
@@ -66,7 +67,7 @@ Builder& Builder::setPort(int port)
 
 Builder& Builder::setEndpoint(const SocketAddress& endpoint, QUrl::ParsingMode mode)
 {
-    m_url.setHost(endpoint.address.toString(), mode);
+    setHost(endpoint.address.toString(), mode);
     if (endpoint.port > 0)
         m_url.setPort(endpoint.port);
     return *this;
@@ -77,8 +78,18 @@ Builder& Builder::setPath(const QString& path, QUrl::ParsingMode mode)
     // QUrl does not like several slashes at the beginning, as well as no slash at all.
     auto actualPath = normalizePath(path);
 
-    if (!actualPath.isEmpty() && !actualPath.startsWith('/'))
-        actualPath = '/' + actualPath;
+    const bool shouldStartWithSlash = !m_url.host().isEmpty();
+
+    if (shouldStartWithSlash)
+    {
+        if (!actualPath.isEmpty() && !actualPath.startsWith('/'))
+            actualPath = '/' + actualPath;
+    }
+	else
+	{
+	    while (actualPath.startsWith('/'))
+            actualPath = actualPath.mid(1);
+	}
 
     m_url.setPath(actualPath, mode);
     return *this;
