@@ -13,9 +13,10 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/same.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
-#include <nx/utils/algorithm/same.h>
 
 namespace nx::vms::client::desktop {
 
@@ -160,12 +161,18 @@ State loadMinMaxCustomBitrate(State state)
     state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
         Qn::StreamQuality::highest);
 
+    static const std::array<Qn::StreamQuality, 4> kUserVisibleQualities{{
+        Qn::StreamQuality::low,
+        Qn::StreamQuality::normal,
+        Qn::StreamQuality::high,
+        Qn::StreamQuality::highest}};
+
     state.recording.minRelevantQuality = Qn::StreamQuality::lowest;
-    for (int i = int(Qn::StreamQuality::low); i <= int(Qn::StreamQuality::highest); ++i)
+    for (const auto quality: kUserVisibleQualities)
     {
-        const auto bitrate = calculateBitrateForQualityMbps(state, Qn::StreamQuality(i));
+        const auto bitrate = calculateBitrateForQualityMbps(state, quality);
         if (bitrate <= state.recording.minBitrateMbps)
-            state.recording.minRelevantQuality = Qn::StreamQuality(i);
+            state.recording.minRelevantQuality = quality;
         else
             break;
     }
@@ -898,7 +905,7 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateMbps(State state, flo
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     state.recording.brush.bitrateMbps = mbps;
     state.recording.brush.quality = calculateQualityForBitrateMbps(state, mbps);
-    if (qFuzzyIsNull(calculateBitrateForQualityMbps(state, state.recording.brush.quality) - mbps))
+    if (qFuzzyEquals(calculateBitrateForQualityMbps(state, state.recording.brush.quality), mbps))
         state.recording.brush.bitrateMbps = 0; //< Standard quality detected.
     state.recording.bitrateMbps = mbps;
     return state;

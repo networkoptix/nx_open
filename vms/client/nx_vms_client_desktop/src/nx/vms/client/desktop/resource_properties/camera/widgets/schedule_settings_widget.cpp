@@ -14,6 +14,7 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/stream_quality_strings.h>
@@ -270,7 +271,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     }
 
     const bool fpsLockedBitrate =
-        qFuzzyIsNull(state.recording.maxBitrateMpbs - state.recording.minBitrateMbps);
+        qFuzzyEquals(state.recording.maxBitrateMpbs, state.recording.minBitrateMbps);
 
     if (fpsLockedBitrate)
     {
