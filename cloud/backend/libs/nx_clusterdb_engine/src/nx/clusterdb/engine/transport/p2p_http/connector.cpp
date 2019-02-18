@@ -49,7 +49,7 @@ void Connector::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 void Connector::connect(Handler completionHandler)
 {
     m_connectionId = QnUuid::createUuid().toSimpleString().toStdString();
-    
+
     m_completionHandler = std::move(completionHandler);
 
     auto httpClient = std::make_unique<network::http::AsyncClient>();

@@ -73,7 +73,7 @@ void Acceptor::openServerCommandChannel(
     localPeer.protoVersion = remotePeerData.protoVersion;
     nx::p2p::serializePeerData(*response, localPeer, remotePeerData.dataFormat);
 
-    auto multipartMessageBodySource = 
+    auto multipartMessageBodySource =
         std::make_unique<nx::network::http::MultipartMessageBodySource>(
             "28cc020ef6044ccaa9a524d3303a4cd2");
     auto commandPipeline = std::make_unique<ServerSideCommandPipeline>(
@@ -87,7 +87,7 @@ void Acceptor::openServerCommandChannel(
             connectionId,
             systemId,
             std::exchange(commandPipeline, nullptr),
-            localPeer,  
+            localPeer,
             remotePeerData))
     {
         return completionHandler(nx::network::http::StatusCode::forbidden);
@@ -147,7 +147,7 @@ nx::network::http::StatusCode::Value Acceptor::forwardMessageToConnection(
             if (!p2pConnection)
                 return;
 
-            auto commandPipeline = 
+            auto commandPipeline =
                 dynamic_cast<ServerSideCommandPipeline*>(&p2pConnection->p2pTransport());
             if (!commandPipeline)
                 return;
