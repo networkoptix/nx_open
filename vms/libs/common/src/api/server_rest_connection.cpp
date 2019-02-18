@@ -910,7 +910,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -959,7 +959,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(

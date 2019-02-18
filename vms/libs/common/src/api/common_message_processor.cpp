@@ -592,7 +592,7 @@ bool QnCommonMessageProcessor::handleRemoteAnalyticsNotification(
         return false;
 
     nx::vms::api::ResourceParamWithRefDataList kvPairs;
-    const auto ownData = propertyDictionary()->value(param.resourceId, param.name);
+    const auto ownData = resourcePropertyDictionary()->value(param.resourceId, param.name);
     if (ownData != param.value)
     {
         kvPairs.push_back(nx::vms::api::ResourceParamWithRefData(
