@@ -54,7 +54,7 @@ private:
     mutable std::condition_variable m_pluginEventGenerationLoopCondition;
 
     std::unique_ptr<std::thread> m_thread;
-    bool m_terminated = false;
+    std::atomic<bool> m_terminated{false};
 
     std::string m_capabilities;
     bool m_needUncompressedVideoFrames = false;

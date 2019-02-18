@@ -6,6 +6,7 @@
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
@@ -29,41 +30,10 @@ Engine::~Engine()
     {
         std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_terminated = true;
+        m_pluginEventGenerationLoopCondition.notify_all();
     }
-    m_pluginEventGenerationLoopCondition.notify_all();
     if (m_thread)
         m_thread->join();
-}
-
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* /*outError*/)
-{
-    return new DeviceAgent(this, deviceInfo);
-}
-
-void Engine::initCapabilities()
-{
-    if (ini().deviceDependent)
-        m_capabilities += "|deviceDependent";
-
-    const std::string pixelFormatString = ini().needUncompressedVideoFrames;
-    if (!pixelFormatString.empty())
-    {
-        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
-        {
-            NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
-                << ini().iniFile() << ": [" << pixelFormatString << "].";
-        }
-        else
-        {
-            m_needUncompressedVideoFrames = true;
-            m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
-        }
-    }
-
-    // Delete first '|', if any.
-    if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
-        m_capabilities.erase(0, 1);
 }
 
 void Engine::generatePluginEvents()
@@ -98,6 +68,37 @@ void Engine::generatePluginEvents()
             m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
         }
     }
+}
+
+IDeviceAgent* Engine::obtainDeviceAgent(
+    const IDeviceInfo* deviceInfo, Error* /*outError*/)
+{
+    return new DeviceAgent(this, deviceInfo);
+}
+
+void Engine::initCapabilities()
+{
+    if (ini().deviceDependent)
+        m_capabilities += "|deviceDependent";
+
+    const std::string pixelFormatString = ini().needUncompressedVideoFrames;
+    if (!pixelFormatString.empty())
+    {
+        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
+        {
+            NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
+                << ini().iniFile() << ": [" << pixelFormatString << "].";
+        }
+        else
+        {
+            m_needUncompressedVideoFrames = true;
+            m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
+        }
+    }
+
+    // Delete first '|', if any.
+    if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
+        m_capabilities.erase(0, 1);
 }
 
 std::string Engine::manifest() const
@@ -292,16 +293,18 @@ void Engine::executeAction(
         if (!params.empty())
         {
             *outMessageToUser = std::string("Your param values are:\n");
-            for (const auto& entry : params)
+            bool first = true;
+            for (const auto& entry: params)
             {
                 const auto& parameterName = entry.first;
                 const auto& parameterValue = entry.second;
 
-                *outMessageToUser += parameterName + ": [" + parameterValue + "],\n";
+                if (!first)
+                    *outMessageToUser += ",\n";
+                else
+                    first = false;
+                *outMessageToUser += parameterName + ": [" + parameterValue + "]";
             }
-
-            // Remove a trailing comma and a newline character.
-            *outMessageToUser = outMessageToUser->substr(0, outMessageToUser->size() - 2);
         }
         else
         {
@@ -390,9 +393,7 @@ static const std::string kPluginManifest = R"json(
 
 } // namespace
 
-extern "C" {
-
-NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
+extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,
@@ -402,5 +403,3 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
             return new nx::vms_server_plugins::analytics::stub::Engine(plugin);
         });
 }
-
-} // extern "C"
