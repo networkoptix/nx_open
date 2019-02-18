@@ -31,7 +31,8 @@ def get_settings_from_cache():
         'sortSupportedDevices': customization_cache['sort_supported_devices'],
         'supportedResolutions': customization_cache['supported_resolutions'],
         'supportedHardwareTypes': customization_cache['supported_hardware_types'],
-        'searchTags': customization_cache['search_tags']
+        'searchTags': customization_cache['search_tags'],
+        'integrationSearchFields': customization_cache['integration_search_fields']
     }
 
 

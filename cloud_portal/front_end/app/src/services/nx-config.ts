@@ -233,27 +233,29 @@ export class NxConfigService {
                 ]
             },
             webclient                     : {
-                useServerTime            : true,
-                useSystemTime            : true,
-                disableVolume            : true,
-                reloadInterval           : 5 * 1000,
-                leftPanelPreviewHeight   : 128,
-                resetDisplayedTextTimer  : 3 * 1000,
-                hlsLoadingTimeout        : 90 * 1000,
+                useServerTime: true,
+                useSystemTime: true,
+                disableVolume: true,
+                reloadInterval: 5 * 1000,
+                leftPanelPreviewHeight: 128,
+                resetDisplayedTextTimer: 3 * 1000,
+                hlsLoadingTimeout: 90 * 1000,
                 // One minute timeout for manifest:
                 // * 30 seconds for gateway to open connection
                 // * 30 seconds for server to init camera
                 // * 20 seconds for chunks
                 // * 10 seconds extra
                 updateArchiveStateTimeout: 60 * 1000,
-                flashChromelessPath      : 'components/flashlsChromeless.swf',
-                flashChromelessDebugPath : 'components/flashlsChromeless_debug.swf',
-                staticResources          : 'static/web_common/',
-                maxCrashCount            : 2,
-                nativeTimeout            : 60 * 1000,
-                playerReadyTimeout       : 100,
-                endOfArchiveTime         : 30 * 1000,
-                chunksToCheckFatal       : 30 // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+                updateArchiveRecordsTimeout: 2 * 1000,
+                flashChromelessPath: 'components/flashlsChromeless.swf',
+                flashChromelessDebugPath: 'components/flashlsChromeless_debug.swf',
+                staticResources: 'static/web_common/',
+                maxCrashCount: 2,
+                nativeTimeout: 60 * 1000,
+                playerReadyTimeout: 100,
+                endOfArchiveTime: 30 * 1000,
+                chunksToCheckFatal: 30, // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+                skipFramesRenderingTimeline: true
             },
             messageType: {
                 ipvd: 'ipvd_feedback',
@@ -298,6 +300,10 @@ export class NxConfigService {
             },
             campage: {
                 vendorGroups: 4
+            },
+            search: {
+                maxLength   : 200,
+                debounceTime: 500 // ms
             }
         };
     }

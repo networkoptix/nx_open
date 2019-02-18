@@ -480,6 +480,41 @@
         ]
       },
       {
+        "name": "Integration page",
+        "is_global": true,
+        "description": "Integrations",
+        "hidden": true,
+        "translatable": false,
+        "values": [
+          {
+            "label": "Fields to filter by",
+            "name": "%INTEGRATION_SEARCH_FIELDS%",
+            "description": "Defines the fields used to search",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
+            "value": [
+              {
+                "value": "name",
+                "name": "name"
+              },
+              {
+                "value": "companyName",
+                "name": "companyName"
+              },
+              {
+                "value": "shortDescription",
+                "name": "shortDescription"
+              },
+              {
+                "value": "description",
+                "name": "description"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "name": "Camera page",
         "is_global": true,
         "description": "Settings for camera page",
@@ -578,8 +613,8 @@
                 "label": "camera"
               },
               {
-                "id": "Multi-Sensor Camera",
-                "label": "multi_sensor_camera"
+                "id": "multiSensorCamera",
+                "label": "Multi-Sensor Camera"
               },
               {
                 "id": "Encoder",

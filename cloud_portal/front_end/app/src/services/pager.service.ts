@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class PagerService {
+export class NxPagerService {
 
-  constructor() { }
+    constructor() {
+    }
 
-  getPager(totalItems: number, currentPage: number = 1, pageSize: number = 10) {
+    getPager(totalItems: number, currentPage = 1, pageSize = 10) {
         // calculate total pages
-        let totalPages = Math.ceil(totalItems / pageSize);
+        const totalPages = Math.ceil(totalItems / pageSize);
 
         // ensure current page isn't out of range
         if (currentPage < 1) {
@@ -38,23 +39,23 @@ export class PagerService {
         }
 
         // calculate start and end item indexes
-        let startIndex = (currentPage - 1) * pageSize;
-        let endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
 
         // create an array of pages to ngFor in the cam table
-        let pages = Array.from(Array((endPage + 1) - startPage).keys()).map(i => startPage + i);
+        const pages = Array.from(Array((endPage + 1) - startPage).keys()).map(i => startPage + i);
 
         // return object with all pager properties required by the view
         return {
-            totalItems: totalItems,
-            currentPage: currentPage,
-            pageSize: pageSize,
-            totalPages: totalPages,
-            startPage: startPage,
-            endPage: endPage,
-            startIndex: startIndex,
-            endIndex: endIndex,
-            pages: pages
+            totalItems,
+            currentPage,
+            pageSize,
+            totalPages,
+            startPage,
+            endPage,
+            startIndex,
+            endIndex,
+            pages
         };
     }
 }

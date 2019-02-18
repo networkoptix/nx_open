@@ -96,10 +96,9 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     applyLocalFilter(value) {
         this.filter = value;
-        setTimeout(() => {
-            this.items = this.itemsOrig.filter((item) => {
-                return item.id.toLowerCase().includes(value.toLowerCase());
-            });
+
+        this.items = this.itemsOrig.filter((item) => {
+            return item.id.toLowerCase().includes(value.toLowerCase());
         });
     }
 
@@ -113,7 +112,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     }
 
     updateLabel() {
-        switch (this.innerValue.length) {
+        switch (this.innerValue && this.innerValue.length) {
             case 0:
             case this.items.length: {
                 this.numSelected = 'Any';

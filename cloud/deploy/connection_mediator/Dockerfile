@@ -1,15 +1,14 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
 
-ADD stage/qt /opt/networkoptix/qt
-ADD stage/connection_mediator /opt/networkoptix/connection_mediator
+COPY stage/connection_mediator /opt/networkoptix/connection_mediator
 
-ADD etc/connection_mediator.conf /opt/networkoptix/connection_mediator/etc/connection_mediator.conf
-ADD docker/entrypoint.sh /opt/networkoptix/connection_mediator/bin
+COPY etc/connection_mediator.conf /opt/networkoptix/connection_mediator/etc/connection_mediator.conf
+COPY docker/entrypoint.sh /opt/networkoptix/connection_mediator/bin
 
 EXPOSE 3345
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/qt/bin
-ENV LD_LIBRARY_PATH /opt/networkoptix/qt/lib:/opt/networkoptix/connection_mediator/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/connection_mediator/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/connection_mediator/lib
 
 CMD ["/opt/networkoptix/connection_mediator/bin/entrypoint.sh"]
 

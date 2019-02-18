@@ -96,13 +96,14 @@ window.L = {};
                     appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
-                    appState.sortSupportedDevices = response.sortSupportedDevices;
-                    appState.supportedResolutions = response.supportedResolutions;
-                    appState.supportedHardwareTypes = response.supportedHardwareTypes;
-                    appState.searchTags = response.searchTags;
                     appState.trafficRelayHost = response.trafficRelayHost;
                     
                     angular.extend(CONFIG, appState);
+                    
+                    CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
+                    CONFIG.campage.supportedResolutions = response.supportedResolutions;
+                    CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;
+                    CONFIG.campage.searchTags = response.searchTags;
                 });
 
                 $.ajax({

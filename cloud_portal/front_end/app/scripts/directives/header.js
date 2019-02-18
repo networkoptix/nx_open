@@ -73,7 +73,7 @@
                     .get()
                     .then(function (account) {
                         scope.account = account;
-                    scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
+                        scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
 
                         $('body').removeClass('loading');
                         $('body').addClass('authorized');

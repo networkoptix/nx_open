@@ -1,14 +1,21 @@
-import { Component, OnInit, DoCheck, KeyValueDiffers, ViewEncapsulation } from '@angular/core';
-import { CamerasService }                                                 from '../../services/cameras.service';
-import { CampageSearchService }                                           from './campage-search.service';
-import { NxModalMessageComponent }                                        from '../../dialogs/message/message.component';
-import { NxConfigService }                                                from '../../services/nx-config';
-import { TranslateService }                                               from '@ngx-translate/core';
+import {
+    Component,
+    OnInit,
+    DoCheck,
+    KeyValueDiffers,
+    ViewEncapsulation
+}                                  from '@angular/core';
+import { CamerasService }          from '../../services/cameras.service';
+import { CampageSearchService }    from './campage-search.service';
+import { NxModalMessageComponent } from '../../dialogs/message/message.component';
+import { NxConfigService }         from '../../services/nx-config';
+import { TranslateService }        from '@ngx-translate/core';
+import { NxUriService }            from '../../services/uri.service';
 
 @Component({
-  selector: 'campage',
-  templateUrl: 'campage.component.html',
-    styleUrls: ['campage.component.scss'],
+    selector     : 'campage',
+    templateUrl  : 'campage.component.html',
+    styleUrls    : ['campage.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
 
@@ -39,6 +46,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     vendorDiffer: any;
     hardwareDiffer: any;
     toggleCamview: boolean;
+    params: any;
 
     hwtypes: any;
 
@@ -90,7 +98,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
                 private cameraSearchService: CampageSearchService,
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
-                private differs: KeyValueDiffers) {
+                private differs: KeyValueDiffers,
+                private uri: NxUriService) {
 
         this.setupDefaults();
         this.differ = this.differs.find({}).create();
@@ -98,15 +107,22 @@ export class NxCampageComponent implements OnInit, DoCheck {
         this.resolutionDiffer = this.differs.find([]).create();
         this.vendorDiffer = this.differs.find([]).create();
         this.hardwareDiffer = this.differs.find([]).create();
-
     }
 
     ngOnInit() {
+        // Example URI
+        // /campage?vendors=30X&camera=IPPTZ-ELS2IRL30X-ATI
+        this.uri
+            .getURI()
+            .subscribe(params => {
+                this.params = { ...params };
+            });
+
         this.activate();
     }
 
     addFilterResolutions() {
-        this.resolutions = JSON.parse(this.config.supportedResolutions);
+        this.resolutions = JSON.parse(this.config.campage.supportedResolutions);
 
         this.filterModel.selects = [
             {
@@ -118,15 +134,22 @@ export class NxCampageComponent implements OnInit, DoCheck {
         ];
     }
 
+    setActiveCamera() {
+        if (this.params.camera && this.cameras.length) {
+            const selectedCamera = this.cameras.find((camera) => camera.model === this.params.camera);
+            this.activateCamera(selectedCamera);
+        }
+    }
+
     addFilterTags() {
-        this.filterModel.tags = JSON.parse(this.config.searchTags);
-        this.filterModel.tags.forEach(tag => tag.label = this.lang[tag.id]);
+        this.filterModel.tags = JSON.parse(this.config.campage.searchTags);
+        this.filterModel.tags.forEach(tag => tag.label = this.lang.campage[tag.id]);
     }
 
     addFilterTypes() {
-        this.hardwareTypes = JSON.parse(this.config.supportedHardwareTypes);
+        this.hardwareTypes = JSON.parse(this.config.campage.supportedHardwareTypes);
         this.hardwareTypes.forEach(type => {
-            type.label = this.lang[type.label];
+            type.label = this.lang.campage[type.label];
         });
 
         this.filterModel.multiselects = [
@@ -305,7 +328,10 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
     searchVendor(filter) {
-        this.resetActiveCamera();
+        if (!this.params.camera) {
+            this.resetActiveCamera();
+        }
+
         this.filter = filter;
 
         if (this.data) {
@@ -316,8 +342,9 @@ export class NxCampageComponent implements OnInit, DoCheck {
                     this.cameras = cameras;
                     this.camerasSuccessFn(this.cameras);
                     this.camerasTable = [];
-
                     this.camerasTable = (cameras.length !== this.data.length) ? this.preFilterCameraTable(cameras) : [];
+
+                    this.setActiveCamera();
                 });
         }
     }
@@ -329,16 +356,30 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   activateCamera(elementSelected: any): void {
-      if (elementSelected === undefined) {
+      if (!elementSelected) {
+          return;
+      }
+      if (Object.keys(elementSelected).length === 0 || elementSelected.key === -1) {
+          // call was not initiated by linking the element in HTML
           this.resetActiveCamera();
           return;
       }
 
-      const selectedCamera = this.cameras.find((camera) => camera.sortKey === elementSelected.value.sortKey);
+      this.uri.updateURI('/campage', [
+          {
+              key: 'camera', value: elementSelected.model || elementSelected.value.model
+          }
+      ]);
+
+      const selectedCamera = this.cameras.find((camera) => {
+          return camera.sortKey === (elementSelected.sortKey || elementSelected.value.sortKey);
+      });
+
       if (this.activeCamera === selectedCamera) {
           return;
       }
-      this.activeCamera = selectedCamera;
+
+      this.activeCamera = {...selectedCamera};
       this.showAll = false;
 
       if (typeof this.activeCamera.firmwares === 'string') {
@@ -378,6 +419,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
   }
 
   resetActiveCamera() {
+      this.uri.updateURI('/campage', [{ key: 'camera', value: undefined }]);
       this.activeCamera = undefined;
       this.toggleCamview = false;
   }
