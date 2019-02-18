@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.10",
+    "version": "1.0.1.12",
     "data": [
         {
             "keys": [
@@ -782,7 +782,19 @@
                 "hev0118h|hitron_hev0118h",
                 "dahua|dh-hcvr4104hs-s3",
                 "hangzhou hikvision digital technology co., ltd|ds-8632n-i16",
-                "ds-7216hqhi-sh|embedded net dvr"
+                "ds-7216hqhi-sh|embedded net dvr",
+                "uniview|nvr301-08-p8",
+                "ltn8708k-p8|home 8ch embedded",
+                "ds-8616n-st|network video recorder",
+                "ds-7204hqhi-f1/n|embedded net dvr",
+                "axis|axis p7224",
+                "dahua|dhi-nvr4104hs-p-4ks2",
+                "dh-nvr5832-16p-4k|private",
+                "dh-nvr7464|private",
+                "dahua|dh-xvr4116hs-s2",
+                "rvi-hdr16lb-ta|rvi dvr",
+                "dhi-nvr4208-8p-4k|private",
+                "ds-7104hqhi-f1/n|embedded net dvr"
             ],
             "analogEncoder": true
         },
@@ -3003,7 +3015,10 @@
             "dahua|ipc-pdbw5831p-b360",
             "axis|axisp3717*", "axis|p3717*",
             "axis|axis p3717*",
-            "vivotek|ma9321-ehtv"
+            "vivotek|ma9321-ehtv",
+            "avigilon|32c-h4a-4mh-360",
+            "dahua|psd81602-a360",
+            "dahua|IPC-HDBW4231F-E2-M"
             ],
             "canShareLicenseGroup": true
         },

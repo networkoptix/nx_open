@@ -56,7 +56,8 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     }
 
     const auto server = commonModule()->currentServer();
-    if (!NX_ASSERT(server))
+    NX_ASSERT(server);
+    if (!server)
     {
         stopTesting(tr("Could not load users."));
         return;

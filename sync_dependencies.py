@@ -33,7 +33,6 @@ def determine_package_versions(
         "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
-        "openldap": "2.4.42",
         "sasl2": "2.1.26",
         "openal": "1.16",
         "libjpeg-turbo": "1.4.2",
@@ -200,7 +199,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("any/server-external-" + release_version)
 
         if box == "edge1":
-            sync("openldap")
+            sync("openldap-2.4.42-1")
             sync("sasl2")
 
     if have_mediaserver or have_desktop_client:
