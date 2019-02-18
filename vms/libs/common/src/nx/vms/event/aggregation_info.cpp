@@ -114,7 +114,8 @@ bool AggregationInfo::isEmpty() const
 
 void AggregationInfo::append(
     const EventParameters& runtimeParams,
-    const AggregationInfo& subAggregationData)
+    const AggregationInfo& subAggregationData,
+    bool oneRecordPerKey)
 {
     QnUuid key = runtimeParams.getParamsHash();
     InfoDetail& info = m_details[key];
@@ -123,7 +124,7 @@ void AggregationInfo::append(
         info.setRuntimeParams(runtimeParams); //timestamp of first event is stored here
         info.setSubAggregationData(subAggregationData);
     }
-    info.setCount(info.count()+1);
+    info.setCount(oneRecordPerKey ? 1 : info.count() + 1);
 }
 
 QList<InfoDetail> AggregationInfo::toList() const

@@ -404,25 +404,18 @@ void QnThirdPartyResource::inputPortStateChanged(
         qnSyncTime->currentUSecsSinceEpoch() );
 }
 
-const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList(Qn::StreamIndex encoderNumber) const
+const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList(StreamIndex encoderNumber) const
 {
     QnMutexLocker lk( &m_mutex );
     return m_encoderData[(size_t) encoderNumber].resolutionList;
 }
 
-nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex) const
+nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(StreamIndex encoderIndex) const
 {
     QnMutexLocker lk( &m_mutex );
     if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
         return m_selectedEncoderResolutions[(size_t) encoderIndex];
     return nxcip::Resolution();
-}
-
-nx::vms::server::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
@@ -639,19 +632,19 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     CameraMediaStreams mediaStreams;
     std::vector<nxcip::Resolution> selectedEncoderResolutions(m_encoderCount);
     {
-        auto resolution = getMaxResolution(Qn::StreamIndex::primary);
-        selectedEncoderResolutions[(size_t) Qn::StreamIndex::primary] = resolution;
+        auto resolution = getMaxResolution(StreamIndex::primary);
+        selectedEncoderResolutions[(size_t) StreamIndex::primary] = resolution;
         mediaStreams.streams.push_back(CameraMediaStreamInfo(
-            Qn::StreamIndex::primary,
+            StreamIndex::primary,
             QSize(resolution.width, resolution.height),
             AV_CODEC_ID_H264));
         }
-    if((int) Qn::StreamIndex::secondary < m_encoderCount )
+    if((int) StreamIndex::secondary < m_encoderCount )
     {
         auto resolution = getSecondStreamResolution();
-        selectedEncoderResolutions[(size_t) Qn::StreamIndex::secondary] = resolution;
+        selectedEncoderResolutions[(size_t) StreamIndex::secondary] = resolution;
         mediaStreams.streams.push_back(CameraMediaStreamInfo(
-            Qn::StreamIndex::secondary,
+            StreamIndex::secondary,
             QSize(resolution.width, resolution.height),
             AV_CODEC_ID_H264));
     }
@@ -743,7 +736,7 @@ bool QnThirdPartyResource::initializeIOPorts()
     return true;
 }
 
-nxcip::Resolution QnThirdPartyResource::getMaxResolution(Qn::StreamIndex encoderNumber) const
+nxcip::Resolution QnThirdPartyResource::getMaxResolution(StreamIndex encoderNumber) const
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     QList<nxcip::Resolution>::const_iterator maxResIter = std::max_element(
@@ -755,7 +748,7 @@ nxcip::Resolution QnThirdPartyResource::getMaxResolution(Qn::StreamIndex encoder
     return maxResIter != resolutionList.constEnd() ? *maxResIter : nxcip::Resolution();
 }
 
-nxcip::Resolution QnThirdPartyResource::getNearestResolution(Qn::StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const
+nxcip::Resolution QnThirdPartyResource::getNearestResolution(StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     nxcip::Resolution foundResolution;
@@ -772,10 +765,10 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution(Qn::StreamIndex enc
 
 nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
 {
-    const nxcip::Resolution& primaryStreamResolution = getMaxResolution(Qn::StreamIndex::primary);
+    const nxcip::Resolution& primaryStreamResolution = getMaxResolution(StreamIndex::primary);
     const float currentAspect = nx::vms::server::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
 
-    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList(Qn::StreamIndex::secondary);
+    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList(StreamIndex::secondary);
     if (resolutionList.isEmpty())
     {
         return nxcip::Resolution(

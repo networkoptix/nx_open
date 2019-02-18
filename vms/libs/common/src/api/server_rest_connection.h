@@ -415,12 +415,25 @@ public:
         Result<nx::update::Information>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Asks mediaserver to run check for updates.
+     * @param changeset - changeset to be checked. It is usually a build number
+     * @param callback
+     */
+    Handle checkForUpdates(const QString& changeset,
+        Result<QnJsonRestResult>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle updateActionStop(
-        std::function<void (Handle, bool)>&& callback,
+        std::function<void(Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionFinish(bool skipActivePeers,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
-        std::function<void (Handle, bool)>&& callback,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     using UpdateStatusAll = std::vector<nx::update::Status>;
@@ -440,8 +453,7 @@ public:
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        std::function<
-            void(bool, Handle, const nx::vms::api::analytics::SettingsResponse&)>&& callback,
+        Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle getDeviceAnalyticsSettings(
@@ -454,8 +466,7 @@ public:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        std::function<
-            void(bool, Handle, const nx::vms::api::analytics::SettingsResponse&)>&& callback,
+        Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -526,6 +537,8 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
+    std::pair<QString, QString> getRequestCredentials(
+        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;

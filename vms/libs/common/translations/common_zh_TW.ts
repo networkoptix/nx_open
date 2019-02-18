@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-TW" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation type="unfinished">MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>這些系統用了不同的 %1 URL建立. 不允許合併.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>系統事件</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>系統已綁定到雲 (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>伺服器未連接到 Internet。</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>無法將雲帳密保存到本地資料庫</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>無法將雲持有人保存到本地資料庫</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>無法連線到雲: %1</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation>過多的媒體錯誤. 請開啟攝影機問題表以取得更多資訊.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>攝影機插件錯誤 %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>請試著重啟 I/O 模組, 接著至網頁界面上還原預設值.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>請更新韌體. 至少更新到 %1. 目前版本是 %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation>找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>無法初始化重採樣內容, 錯誤代碼: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>無法分配樣本緩衝, 錯誤代碼: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation>可用</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>可用授權</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>時間</translation>
     </message>
@@ -497,6 +532,166 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>橋接授權</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation>
+        <numerusform>%n 時效性授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation>
+        <numerusform>%n 類比授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation>
+        <numerusform>%n 專業版授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation>
+        <numerusform>%n 邊緣版授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation>
+        <numerusform>%n Vmax授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation>
+        <numerusform>%n 類比編碼器授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation>
+        <numerusform>%n 電視牆授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation>
+        <numerusform>%n I/O 模組授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation>
+        <numerusform>%n 啟動授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation>
+        <numerusform>%n 橋接授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation>
+        <numerusform>%n 無效授權</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 時效性授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1類比授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 專業版授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 邊緣版授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Vmax授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 類比編碼器授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 電視牆授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 I/O 模組授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 啟動授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 橋接授權</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 無效授權</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -545,10 +740,6 @@
       <translation>無效的類型</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>此裝置只接受一組授權</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>這授權類型需要較高的軟體版本</translation>
     </message>
@@ -560,6 +751,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>找不到符合硬體ID的伺服器</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -570,30 +769,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>%n 支攝影機</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>%n 支攝影機</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>%n 個裝置</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n 個裝置</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>攝影機</translation>
@@ -626,18 +801,6 @@
       <source>device</source>
       <translation>裝置</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n 組 I/O 模組</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n 組 I/O 模組</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>I/O 模組</translation>
@@ -653,6 +816,42 @@
     <message>
       <source>I/O module</source>
       <translation>I/O 模組</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -680,67 +879,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>硬體 ID: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>最低 (Ls)</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>低 (L)</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>中 (M)</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>高 (H)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>最高 (Hs)</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>預設</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>未定義</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Ls</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>L</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>H</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Hs</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>預</translation>
     </message>
   </context>
   <context>
@@ -787,172 +925,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>未命名的系統</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>確定</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>找不到</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>未執行</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>不支援的傳輸</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>內部伺服器錯誤</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>無效參數</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>毫秒</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>時</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>日</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>週</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>年</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>毫秒</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>時</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>日</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>週</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>月</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>年</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>毫秒</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>秒</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>分</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>時</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>日</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>週</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>月</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>年</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1031,6 +1003,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>擁有整個系統的權限且可管理系統. 可新增使用者.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>未知的錯誤.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1507,6 +1521,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation>退出全螢幕</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>開啟佈局</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

@@ -353,7 +353,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
             return;
         }
 
-        remove_(u.get());
+        remove_(n);
     }
 
     insert_(1, u);
@@ -373,9 +373,9 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
         return -1;
 
     std::shared_ptr<CUDT> u = m_nodeHeap[0]->socket.lock();
-    remove_(u.get());
+    remove_(m_nodeHeap[0]);
 
-    if (!u->connected() || u->broken())
+    if (!u || !u->connected() || u->broken())
         return -1;
 
     // pack a packet from the socket
@@ -395,7 +395,7 @@ void CSndUList::remove(CUDT* u)
 {
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
-    remove_(u);
+    remove_(u->sNode());
 }
 
 uint64_t CSndUList::getNextProcTime()
@@ -451,10 +451,8 @@ void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
     }
 }
 
-void CSndUList::remove_(CUDT* u)
+void CSndUList::remove_(CSNode* n)
 {
-    CSNode* n = u->sNode();
-
     if (n->locationOnHeap >= 0)
     {
         // remove the node from heap
@@ -573,9 +571,25 @@ int CSndQueue::sendto(const sockaddr* addr, CPacket& packet)
 //-------------------------------------------------------------------------------------------------
 // CRcvUList
 
+CRcvUList::~CRcvUList()
+{
+    for (auto node = m_nodeListHead; node != nullptr;)
+    {
+        auto nodeToDelete = node;
+        node = node->next;
+        delete nodeToDelete;
+    }
+}
+
 void CRcvUList::insert(std::shared_ptr<CUDT> u)
 {
-    CRNode* n = u->rNode();
+    auto n = new CRNode();
+    n->socketId = u->socketId();
+    n->socket = u;
+    n->timestamp = 1;
+
+    m_socketIdToNode[n->socketId] = n;
+
     CTimer::rdtsc(n->timestamp);
 
     if (!m_nodeListHead)
@@ -593,13 +607,8 @@ void CRcvUList::insert(std::shared_ptr<CUDT> u)
     m_nodeListTail = n;
 }
 
-void CRcvUList::remove(std::shared_ptr<CUDT> u)
+void CRcvUList::remove(CRNode* n)
 {
-    CRNode* n = u->rNode();
-
-    if (!n->onList)
-        return;
-
     if (nullptr == n->prev)
     {
         // n is the first node
@@ -621,15 +630,17 @@ void CRcvUList::remove(std::shared_ptr<CUDT> u)
             n->next->prev = n->prev;
     }
 
-    n->next = n->prev = nullptr;
+    m_socketIdToNode.erase(n->socketId);
+    delete n;
 }
 
-void CRcvUList::update(std::shared_ptr<CUDT> u)
+void CRcvUList::update(UDTSOCKET socketId)
 {
-    CRNode* n = u->rNode();
-
-    if (!n->onList)
+    auto it = m_socketIdToNode.find(socketId);
+    if (it == m_socketIdToNode.end())
         return;
+
+    auto n = it->second;
 
     CTimer::rdtsc(n->timestamp);
 
@@ -734,7 +745,7 @@ std::shared_ptr<CUDT> CRendezvousQueue::getByAddr(
     // TODO: optimize search
     for (const auto& crl: m_rendezvousSockets)
     {
-        if (CIPAddress::ipcmp(addr, &crl.peerAddr) && 
+        if (CIPAddress::ipcmp(addr, &crl.peerAddr) &&
             (id == 0 || id == crl.id))
         {
             id = crl.id;
@@ -795,7 +806,6 @@ CRcvQueue::CRcvQueue(
     int size,
     int payload,
     int ipVersion,
-    int hsize,
     UdpChannel* c,
     CTimer* t)
     :
@@ -928,7 +938,7 @@ void CRcvQueue::worker()
                                 u->processCtrl(unit->m_Packet);
 
                             u->checkTimers(false);
-                            m_pRcvUList->update(u);
+                            m_pRcvUList->update(id);
                         }
                     }
                 }
@@ -941,7 +951,7 @@ void CRcvQueue::worker()
                 }
             }
         }
-        catch (CUDTException /*e*/)
+        catch (const CUDTException& /*e*/)
         {
             //socket has been removed before connect finished? ignoring error...
         }
@@ -958,17 +968,16 @@ void CRcvQueue::worker()
         {
             std::shared_ptr<CUDT> u = ul->socket.lock();
 
-            if (u->connected() && !u->broken() && !u->isClosing())
+            if (u && u->connected() && !u->broken() && !u->isClosing())
             {
                 u->checkTimers(false);
-                m_pRcvUList->update(u);
+                m_pRcvUList->update(ul->socketId);
             }
             else
             {
                 // the socket must be removed from Hash table first, then RcvUList
-                m_socketByIdDict.remove(u->socketId());
-                m_pRcvUList->remove(u);
-                u->rNode()->onList = false;
+                m_socketByIdDict.remove(ul->socketId);
+                m_pRcvUList->remove(ul);
             }
 
             ul = m_pRcvUList->m_nodeListHead;
@@ -1019,7 +1028,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
     delete[] newpkt->m_pcData;
     delete newpkt;
 
-    // remove this message from queue, 
+    // remove this message from queue,
     // if no more messages left for this socket, release its data structure
     i->second.pop();
     if (i->second.empty())

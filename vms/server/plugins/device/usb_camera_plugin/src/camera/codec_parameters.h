@@ -9,8 +9,7 @@ extern "C" {
 
 #include "ffmpeg/utils.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 struct CodecParameters
 {
@@ -38,5 +37,4 @@ struct CodecParameters
     }
 };
 
-} //namespace usb_cam
-} //namespace nx
+} // namespace usb_cam::nx

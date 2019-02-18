@@ -13,8 +13,7 @@ namespace api {
     \note Application may be installed for all users and for current user only, so checking existance of directory with name equal to version is not enough
 */
 ResultType::Value isVersionInstalled(
-    nx::utils::SoftwareVersion version,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& version,
     bool* const installed);
 
 //!Retrieves a list of the installed versions
@@ -25,10 +24,9 @@ ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versio
 */
 ResultType::Value restartClient(
     nx::utils::SoftwareVersion version = {},
-    const nx::vms::api::SoftwareVersion& engineVersion = {},
     const QString& auth = {});
 
-bool checkOnline(const nx::vms::api::SoftwareVersion& engineVersion, bool runWhenOffline = true);
+bool checkOnline(bool runWhenOffline = true);
 
 //!Installs client update from a zip file
 /*!

@@ -5,8 +5,22 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/storage_resource.h>
 
 namespace nx::vms::client::desktop::resources::search_helper {
+
+//Removes "layout://" prefix and parameters from exported layout's resources urls
+//TODO: #vbreus Remove local file directories paths from local files urls
+QString getUrlForSearch(const QnResourcePtr& resource)
+{
+    if (const auto& aviResource = resource.dynamicCast<QnAviResource>())
+    {
+        if (const auto storage = aviResource->getStorage())
+            return storage->getUrl();
+    }
+    return resource->getUrl();
+}
 
 bool isSearchStringValid(const QString& searchString)
 {
@@ -53,7 +67,7 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
         if (resource->logicalId() > 0)
             checkParameterFullMatch(Parameter::logicalId, QString::number(resource->logicalId()));
         checkParameter(Parameter::name, resource->getName());
-        checkParameter(Parameter::url, resource->getUrl());
+        checkParameter(Parameter::url, getUrlForSearch(resource));
 
         if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
         {

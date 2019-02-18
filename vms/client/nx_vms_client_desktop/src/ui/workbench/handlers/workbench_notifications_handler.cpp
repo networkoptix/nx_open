@@ -67,7 +67,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
 
-    QnCommonMessageProcessor* messageProcessor = qnCommonMessageProcessor;
+    QnCommonMessageProcessor* messageProcessor = commonModule()->messageProcessor();
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 

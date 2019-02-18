@@ -159,12 +159,6 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
 {
     QString maxSensorWidth;
@@ -515,7 +509,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMed
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
-    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
+    if (resourceType.isNull() || (resourceType->getManufacturer() != MANUFACTURE))
     {
         NX_ERROR(typeid(QnPlAreconVisionResource), lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()));
         return 0;

@@ -7,7 +7,7 @@
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
+        <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
     </message>
@@ -20,7 +20,7 @@
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobyte</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
@@ -33,7 +33,7 @@
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabyte</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
@@ -46,7 +46,7 @@
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabyte</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
@@ -59,7 +59,7 @@
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabyte</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
@@ -71,9 +71,9 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>Petabyte</numerusform>
+        <numerusform>Petabyte</numerusform>
       </translation>
     </message>
     <message>
@@ -86,7 +86,7 @@
     <name>QObject</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nenhum</translation>
     </message>
   </context>
   <context>
@@ -108,52 +108,12 @@
       <translation>Esta conta não está activada. Por favor verifique o seu email.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Esta conta está bloqueada.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Funcionalidade pedida não está implementada.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Unknown realm.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Pedido inválido.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Invalid nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Credenciais já não são válidas.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Recebidos dados inválidos.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Erro desconhecido.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Erro de rede inesperado. Por favor verifique sua conexão com a internet e tente novamente.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Login inválido.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Objeto solicitado não foi encontrado.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Objecto já existe.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation>Erro interno %1. Por favor contacte a equipe de suporte.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Desculpe, o serviço %1 está temporariamente indisponível. Estamos a fazer os possíveis para restaurá-lo. Por favor, tente novamente mais tarde.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Demasiadas tentativas. Tente novamente dentro de um minuto.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Desculpe, o Serviço %1 não pôde processar o seu pedido. Por favor, tente novamente dentro de uns instantes.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
@@ -187,26 +150,26 @@
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>Não foi possível encontrar o encoder de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Não foi possível inicializar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
+      <translation>O formato de amostra do dispositivo de inputs %1 não é suportado.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation type="unfinished">Primary audio device is not selected.</translation>
+      <translation>O dispositivo de áudio principal não está seleccionado.</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>System (%1)</source>
@@ -256,7 +219,7 @@
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>sem</translation>
     </message>
     <message>
       <source>M</source>
@@ -266,17 +229,17 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>a</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>mseg</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>seg</translation>
     </message>
     <message>
       <source>min</source>
@@ -291,85 +254,85 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>dias</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>semanas</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>meses</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>anos</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>milissegundo</numerusform>
+        <numerusform>milissegundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>segundo</numerusform>
+        <numerusform>segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minuto</numerusform>
+        <numerusform>minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>hora</numerusform>
+        <numerusform>horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>dia</numerusform>
+        <numerusform>dias</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>semana</numerusform>
+        <numerusform>semanas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>mês</numerusform>
+        <numerusform>meses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>ano</numerusform>
+        <numerusform>anos</numerusform>
       </translation>
     </message>
   </context>

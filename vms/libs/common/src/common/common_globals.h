@@ -22,8 +22,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction MediaStreamEvent StreamIndex
-    ResourceStatus StatusChangeReason
+    RebuildAction BackupAction MediaStreamEvent
+    StatusChangeReason
     Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -706,15 +706,6 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     };
     QString toString(MediaStreamEvent value);
 
-    enum class StreamIndex
-    {
-        undefined = -1,
-        primary = 0,
-        secondary = 1
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
-    QString toString(StreamIndex value);
-
     enum StorageStatus
     {
         none = 0,
@@ -768,7 +759,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::MediaStreamEvent)(Qn::StreamIndex)
+    (Qn::MediaStreamEvent)
     ,
     (metatype)(lexical)
 )
@@ -776,6 +767,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permissions),
+    (debug)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

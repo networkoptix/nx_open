@@ -11,6 +11,8 @@ namespace nx {
 namespace network {
 namespace stun {
 
+static constexpr char kTunnelTag[] = "STUN over HTTP tunnel";
+
 AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     m_settings(settings),
     m_reconnectTimer(m_settings.reconnectPolicy)
@@ -205,6 +207,12 @@ void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
         m_stunClient->setKeepAliveOptions(*m_keepAliveOptions);
 }
 
+void AsyncClientWithHttpTunneling::setTunnelValidatorFactory(
+    http::tunneling::TunnelValidatorFactoryFunc func)
+{
+    m_tunnelValidatorFactory = std::move(func);
+}
+
 void AsyncClientWithHttpTunneling::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
@@ -323,7 +331,9 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
     using namespace std::placeholders;
 
     m_httpTunnelEstablishedHandler = std::move(handler);
-    m_httpTunnelingClient = std::make_unique<nx::network::http::tunneling::Client>(url);
+    m_httpTunnelingClient = std::make_unique<http::tunneling::Client>(url, kTunnelTag);
+    m_httpTunnelingClient->setTunnelValidatorFactory(
+        m_tunnelValidatorFactory);
     m_httpTunnelingClient->bindToAioThread(getAioThread());
     m_httpTunnelingClient->openTunnel(
         std::bind(&AsyncClientWithHttpTunneling::onOpenHttpTunnelCompletion, this, _1));
@@ -407,6 +417,8 @@ void AsyncClientWithHttpTunneling::onStunConnectionClosed(
 
 void AsyncClientWithHttpTunneling::scheduleReconnect()
 {
+    NX_ASSERT(isInSelfAioThread());
+
     if (!m_reconnectTimer.scheduleNextTry(
             std::bind(&AsyncClientWithHttpTunneling::reconnect, this)))
     {

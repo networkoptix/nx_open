@@ -33,6 +33,16 @@
       <source>System Servers</source>
       <translation>시스템 서버</translation>
     </message>
+    <message>
+      <location/>
+      <source>Customer Support</source>
+      <translation>고객지원센터</translation>
+    </message>
+    <message>
+      <location/>
+      <source>ARM support policy</source>
+      <translation type="unfinished">ARM support policy</translation>
+    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -144,7 +154,7 @@
   <context>
     <name>AnalyticsSdkEventWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
       <source>Keywords separated by space</source>
       <translation>공간으로 단어 구분됨</translation>
     </message>
@@ -167,14 +177,9 @@
   <context>
     <name>ArchiveLengthWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
       <translation>녹화 범위 설정</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>최소 저장일:</translation>
     </message>
     <message>
       <location/>
@@ -183,8 +188,13 @@
     </message>
     <message>
       <location/>
-      <source>Max. Days</source>
-      <translation>최대 저장일:</translation>
+      <source>Max. days</source>
+      <translation type="unfinished">Max. days</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. days</source>
+      <translation type="unfinished">Min. days</translation>
     </message>
   </context>
   <context>
@@ -307,6 +317,11 @@
       <source>Start</source>
       <translation>시작:</translation>
     </message>
+    <message>
+      <location/>
+      <source>on the next day</source>
+      <translation type="unfinished">on the next day</translation>
+    </message>
   </context>
   <context>
     <name>BackupSettingsDialog</name>
@@ -377,7 +392,7 @@
   <context>
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
       <translation>북마크 정보</translation>
     </message>
@@ -520,112 +535,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdditionDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
-      <source>Server is offline</source>
-      <translation>오프라인</translation>
-    </message>
-    <message>
-      <location/>
-      <source>IP, hostname, RTSP link...</source>
-      <translation>IP, 호스트 이름, RTSP 링크...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>자동</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Address</source>
-      <translation>주소</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Scanning...</source>
-      <translation>찾는중...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Stop</source>
-      <translation>정지</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Brand</source>
-      <translation>브랜드</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Model</source>
-      <translation>모델</translation>
-    </message>
-    <message>
-      <location/>
-      <source>New Scan...</source>
-      <translation>새로 찾기...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Add device(s)...</source>
-      <translation>장치 추가</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Discovered Devices:</source>
-      <translation>검색된 장치</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Device Address</source>
-      <translation>장치 주소</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Start IP</source>
-      <translation>IP 시작</translation>
-    </message>
-    <message>
-      <location/>
-      <source>End IP</source>
-      <translation>IP 끝</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Subnet Scan</source>
-      <translation>서브넷 검색</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Discovery Port</source>
-      <translation>검색 포트:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password</source>
-      <translation>비밀번호</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Login</source>
-      <translation>로그인</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Scan</source>
-      <translation>검색</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Add selected</source>
-      <translation>추가 선택</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/camera_advanced_params_widget.ui"/>
       <source>Category</source>
       <translation>카테고리</translation>
     </message>
@@ -636,9 +548,17 @@
     </message>
   </context>
   <context>
+    <name>CameraCredentialsDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
+      <source>Authentication credentials</source>
+      <translation type="unfinished">Authentication credentials</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
       <translation>주 스트림을 저장하지 않음</translation>
     </message>
@@ -649,38 +569,13 @@
     </message>
     <message>
       <location/>
-      <source>RTP transport:</source>
-      <translation>RTP 전송:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Auto</source>
       <translation>자동</translation>
     </message>
     <message>
       <location/>
-      <source>TCP</source>
-      <translation>TCP</translation>
-    </message>
-    <message>
-      <location/>
-      <source>UDP</source>
-      <translation>UDP</translation>
-    </message>
-    <message>
-      <location/>
       <source>Restore Defaults</source>
       <translation>초기값 복구</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Force motion detection for stream:</source>
-      <translation>스트림에 대 한 강제 모션 감지:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation>경고! 카메라 자체 preset 설정은 사용할 수 없습니다.</translation>
     </message>
     <message>
       <location/>
@@ -759,6 +654,26 @@
     </message>
     <message>
       <location/>
+      <source>Force motion detection for stream</source>
+      <translation type="unfinished">Force motion detection for stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>RTP transport</source>
+      <translation>RTP 전송</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom Media Port</source>
+      <translation type="unfinished">Custom Media Port</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Trust camera timestamp</source>
+      <translation type="unfinished">Trust camera timestamp</translation>
+    </message>
+    <message>
+      <location/>
       <source>Preferred PTZ preset type:</source>
       <translation type="unfinished">Preferred PTZ preset type:</translation>
     </message>
@@ -774,6 +689,11 @@
     </message>
     <message>
       <location/>
+      <source>Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+    </message>
+    <message>
+      <location/>
       <source>This camera supports pan and tilt</source>
       <translation type="unfinished">This camera supports pan and tilt</translation>
     </message>
@@ -781,6 +701,84 @@
       <location/>
       <source>This camera supports zoom</source>
       <translation type="unfinished">This camera supports zoom</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion during archive import</source>
+      <translation type="unfinished">Detect motion during archive import</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraInfoWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_info_widget.ui"/>
+      <source>Model</source>
+      <translation>모델</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Vendor</source>
+      <translation>제조사:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP Address</source>
+      <translation>IP 주소:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ping</source>
+      <translation>핑</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Firmware</source>
+      <translation>펌웨어:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera ID</source>
+      <translation type="unfinished">Camera ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Web Page</source>
+      <translation>웹페이지:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Primary Stream</source>
+      <translation type="unfinished">Primary Stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>2 차 스트림</translation>
+    </message>
+    <message>
+      <location/>
+      <source>MAC Address</source>
+      <translation>MAC 정보:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show on layout</source>
+      <translation type="unfinished">Show on layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Log</source>
+      <translation>이벤트 로그</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera rules</source>
+      <translation type="unfinished">Camera rules</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>논리 ID</translation>
     </message>
   </context>
   <context>
@@ -792,11 +790,37 @@
     </message>
   </context>
   <context>
+    <name>CameraLicensePanelWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
+      <source>Activate License...</source>
+      <translation>라이센스 활성화...</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraListDialog</name>
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
       <translation>장치 추가...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraMotionSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_motion_settings_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>움직임 감지:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>민감도:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>초기화</translation>
     </message>
   </context>
   <context>
@@ -808,11 +832,6 @@
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>초</translation>
-    </message>
-    <message>
-      <location/>
       <source>Output ID:</source>
       <translation>출력 ID:</translation>
     </message>
@@ -820,54 +839,9 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-      <source>Schedule Settings</source>
-      <translation>일정 설정</translation>
-    </message>
-    <message>
-      <location/>
-      <source>FPS</source>
-      <translation>프레임</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>화질</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Record Always</source>
-      <translation>상시 녹화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion Only</source>
-      <translation>움직임 녹화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do Not Record</source>
-      <translation>녹화안함</translation>
-    </message>
-    <message>
-      <location/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_schedule_widget.ui"/>
       <source>Motion Recording</source>
       <translation>움직임 녹화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Pre-Recording</source>
-      <translation>사전녹화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Post-Recording</source>
-      <translation>사후녹화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy Schedule...</source>
-      <translation>일정 복사...</translation>
     </message>
     <message>
       <location/>
@@ -881,16 +855,6 @@
     </message>
     <message>
       <location/>
-      <source>Show Quality</source>
-      <translation>품질 표시</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Show FPS</source>
-      <translation>프레임 표시</translation>
-    </message>
-    <message>
-      <location/>
       <source>Copying Schedule</source>
       <translation>일정 복사</translation>
     </message>
@@ -901,24 +865,55 @@
     </message>
     <message>
       <location/>
-      <source>Panic Mode:</source>
-      <translation>패닉 모드:</translation>
+      <source>Copy Schedule to...</source>
+      <translation type="unfinished">Copy Schedule to...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.ui"/>
+      <source>All Cameras</source>
+      <translation>전체 카메라</translation>
     </message>
     <message>
       <location/>
-      <source>Motion + Lo-Res</source>
-      <translation>움직임 + 저해상도</translation>
+      <source>Select Cameras</source>
+      <translation>카메라 선택</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsGeneralTabWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_settings_general_tab_widget.ui"/>
+      <source>Authentication</source>
+      <translation>인증</translation>
     </message>
     <message>
       <location/>
-      <source>Bitrate</source>
-      <translation>비트 전송률</translation>
+      <source>Edit Credentials</source>
+      <translation type="unfinished">Edit Credentials</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Audio</source>
+      <translation>오디오</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable audio</source>
+      <translation type="unfinished">Enable audio</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Edit Streams...</source>
+      <translation>스트림 편집...</translation>
     </message>
   </context>
   <context>
     <name>CameraStreamsDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
       <translation>스트림 주소</translation>
     </message>
@@ -992,11 +987,16 @@
       <source>Description contains:</source>
       <translation>상세 포함</translation>
     </message>
+    <message>
+      <location/>
+      <source>Omit Logging</source>
+      <translation type="unfinished">Omit Logging</translation>
+    </message>
   </context>
   <context>
     <name>CustomSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
       <source>Category</source>
       <translation>카테고리</translation>
     </message>
@@ -1012,6 +1012,89 @@
       <location/>
       <source>Restore from Backup...</source>
       <translation>백업파일 복구...</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceAdditionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
+      <source>to</source>
+      <translation type="unfinished">to</translation>
+    </message>
+    <message>
+      <location/>
+      <source>SELECT SERVER</source>
+      <translation type="unfinished">SELECT SERVER</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Known Address</source>
+      <translation type="unfinished">Known Address</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Subnet Scan</source>
+      <translation>서브넷 검색</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Address</source>
+      <translation>주소</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Hint</source>
+      <translation type="unfinished">Hint</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Port</source>
+      <translation>포트:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>End IP</source>
+      <translation>IP 끝</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Start IP</source>
+      <translation>IP 시작</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>비밀번호</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login</source>
+      <translation>로그인</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search</source>
+      <translation>검색</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Stop</source>
+      <translation>정지</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add all Devices</source>
+      <translation type="unfinished">Add all Devices</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add Devices</source>
+      <translation type="unfinished">Add Devices</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>기본</translation>
     </message>
   </context>
   <context>
@@ -1109,7 +1192,7 @@
   <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
       <translation>설정 내보내기</translation>
     </message>
@@ -1122,7 +1205,7 @@
   <context>
     <name>ExportMediaSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
       <translation>설정 내보내기</translation>
     </message>
@@ -1143,9 +1226,22 @@
     </message>
   </context>
   <context>
+    <name>ExportPasswordWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
+      <source>Protect with password</source>
+      <translation type="unfinished">Protect with password</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>비밀번호</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
       <translation>영상 백업</translation>
     </message>
@@ -1168,15 +1264,23 @@
   <context>
     <name>FilenamePanel</name>
     <message>
-      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <location filename="../src/nx/vms/client/desktop/common/widgets/filename_panel.ui"/>
       <source>Browse...</source>
       <translation>찾기...</translation>
     </message>
   </context>
   <context>
+    <name>FilteredResourceSelectionWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
+      <source>Nothing matches your search</source>
+      <translation type="unfinished">Nothing matches your search</translation>
+    </message>
+  </context>
+  <context>
     <name>FisheyeSettingsWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
       <translation>천장 설치시</translation>
     </message>
@@ -1319,29 +1423,39 @@
       <source>Backup and Restore</source>
       <translation>백업 및 복원</translation>
     </message>
+    <message>
+      <location/>
+      <source>Security</source>
+      <translation>보안</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Encrypting video traffic will significantly increase CPU usage.</source>
+      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
+    </message>
   </context>
   <context>
     <name>ImageControlWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/image_control_widget.ui"/>
       <source>Image Control</source>
       <translation>이미지 제어</translation>
     </message>
     <message>
       <location/>
-      <source>Aspect Ratio</source>
-      <translation>가로 세로 비율</translation>
+      <source>Aspect ratio</source>
+      <translation type="unfinished">Aspect ratio</translation>
     </message>
     <message>
       <location/>
-      <source>Rotation</source>
-      <translation>회전</translation>
+      <source>Default rotation</source>
+      <translation type="unfinished">Default rotation</translation>
     </message>
   </context>
   <context>
     <name>ImageOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
       <source>Image</source>
       <translation>이미지:</translation>
     </message>
@@ -1390,9 +1504,190 @@
     </message>
   </context>
   <context>
+    <name>InteractiveSettingsTestDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
+      <source>{
+    &quot;items&quot;: [
+        {
+            &quot;type&quot;: &quot;TextField&quot;,
+            &quot;name&quot;: &quot;text&quot;,
+            &quot;caption&quot;: &quot;Text Field&quot;,
+            &quot;description&quot;: &quot;A text field&quot;,
+            &quot;defaultValue&quot;: &quot;a text&quot;,
+            &quot;value&quot;: &quot;a text&quot;
+        },
+        {
+            &quot;type&quot;: &quot;GroupBox&quot;,
+            &quot;name&quot;: &quot;group&quot;,
+            &quot;caption&quot;: &quot;Group Box&quot;,
+            &quot;items&quot;: [
+                {
+                    &quot;type&quot;: &quot;SpinBox&quot;,
+                    &quot;name&quot;: &quot;number&quot;,
+                    &quot;caption&quot;: &quot;Spin Box&quot;,
+                    &quot;description&quot;: &quot;A number&quot;,
+                    &quot;defaultValue&quot;: 42,
+                    &quot;value&quot;: 42,
+                    &quot;minValue&quot;: 0,
+                    &quot;maxValue&quot;: 100
+                },
+                {
+                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
+                    &quot;name&quot;: &quot;double&quot;,
+                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
+                    &quot;description&quot;: &quot;A real number&quot;,
+                    &quot;defaultValue&quot;: 3.14,
+                    &quot;value&quot;: 3.14,
+                    &quot;minValue&quot;: 0.0,
+                    &quot;maxValue&quot;: 100.0
+                },
+                {
+                    &quot;type&quot;: &quot;ComboBox&quot;,
+                    &quot;name&quot;: &quot;combobox&quot;,
+                    &quot;caption&quot;: &quot;Combo Box&quot;,
+                    &quot;description&quot;: &quot;A choice&quot;,
+                    &quot;defaultValue&quot;: &quot;value2&quot;,
+                    &quot;value&quot;: &quot;value2&quot;,
+                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
+                },
+                {
+                    &quot;type&quot;: &quot;CheckBox&quot;,
+                    &quot;name&quot;: &quot;checkbox&quot;,
+                    &quot;caption&quot;: &quot;Check Box&quot;,
+                    &quot;description&quot;: &quot;True or False&quot;,
+                    &quot;defaultValue&quot;: true,
+                    &quot;value&quot;: true
+                },
+                {
+                    &quot;type&quot;: &quot;GroupBox&quot;,
+                    &quot;name&quot;: &quot;buttons&quot;,
+                    &quot;caption&quot;: &quot;Buttons&quot;,
+                    &quot;items&quot;: [
+                        {
+                            &quot;type&quot;: &quot;Row&quot;,
+                            &quot;name&quot;: &quot;row&quot;,
+                            &quot;items&quot;: [
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button1&quot;,
+                                    &quot;caption&quot;: &quot;Button 1&quot;,
+                                    &quot;description&quot;: &quot;Action 1&quot;
+                                },
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button2&quot;,
+                                    &quot;caption&quot;: &quot;Button 2&quot;,
+                                    &quot;description&quot;: &quot;Action 2&quot;
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}</source>
+      <translation type="unfinished">{
+    &quot;items&quot;: [
+        {
+            &quot;type&quot;: &quot;TextField&quot;,
+            &quot;name&quot;: &quot;text&quot;,
+            &quot;caption&quot;: &quot;Text Field&quot;,
+            &quot;description&quot;: &quot;A text field&quot;,
+            &quot;defaultValue&quot;: &quot;a text&quot;,
+            &quot;value&quot;: &quot;a text&quot;
+        },
+        {
+            &quot;type&quot;: &quot;GroupBox&quot;,
+            &quot;name&quot;: &quot;group&quot;,
+            &quot;caption&quot;: &quot;Group Box&quot;,
+            &quot;items&quot;: [
+                {
+                    &quot;type&quot;: &quot;SpinBox&quot;,
+                    &quot;name&quot;: &quot;number&quot;,
+                    &quot;caption&quot;: &quot;Spin Box&quot;,
+                    &quot;description&quot;: &quot;A number&quot;,
+                    &quot;defaultValue&quot;: 42,
+                    &quot;value&quot;: 42,
+                    &quot;minValue&quot;: 0,
+                    &quot;maxValue&quot;: 100
+                },
+                {
+                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
+                    &quot;name&quot;: &quot;double&quot;,
+                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
+                    &quot;description&quot;: &quot;A real number&quot;,
+                    &quot;defaultValue&quot;: 3.14,
+                    &quot;value&quot;: 3.14,
+                    &quot;minValue&quot;: 0.0,
+                    &quot;maxValue&quot;: 100.0
+                },
+                {
+                    &quot;type&quot;: &quot;ComboBox&quot;,
+                    &quot;name&quot;: &quot;combobox&quot;,
+                    &quot;caption&quot;: &quot;Combo Box&quot;,
+                    &quot;description&quot;: &quot;A choice&quot;,
+                    &quot;defaultValue&quot;: &quot;value2&quot;,
+                    &quot;value&quot;: &quot;value2&quot;,
+                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
+                },
+                {
+                    &quot;type&quot;: &quot;CheckBox&quot;,
+                    &quot;name&quot;: &quot;checkbox&quot;,
+                    &quot;caption&quot;: &quot;Check Box&quot;,
+                    &quot;description&quot;: &quot;True or False&quot;,
+                    &quot;defaultValue&quot;: true,
+                    &quot;value&quot;: true
+                },
+                {
+                    &quot;type&quot;: &quot;GroupBox&quot;,
+                    &quot;name&quot;: &quot;buttons&quot;,
+                    &quot;caption&quot;: &quot;Buttons&quot;,
+                    &quot;items&quot;: [
+                        {
+                            &quot;type&quot;: &quot;Row&quot;,
+                            &quot;name&quot;: &quot;row&quot;,
+                            &quot;items&quot;: [
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button1&quot;,
+                                    &quot;caption&quot;: &quot;Button 1&quot;,
+                                    &quot;description&quot;: &quot;Action 1&quot;
+                                },
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button2&quot;,
+                                    &quot;caption&quot;: &quot;Button 2&quot;,
+                                    &quot;description&quot;: &quot;Action 2&quot;
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}</translation>
+    </message>
+  </context>
+  <context>
+    <name>IoModuleSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
+      <source>Form</source>
+      <translation>틀</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable tile interface</source>
+      <translation>타일 인터페이스 사용</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
       <source>Processing Image...Please Wait.</source>
       <translation>이미지 처리중...기다려주세요.</translation>
     </message>
@@ -1440,7 +1735,7 @@
   <context>
     <name>LayoutGeneralSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
       <translation>잠김</translation>
     </message>
@@ -1471,14 +1766,14 @@
     </message>
     <message>
       <location/>
-      <source>Minimal Size</source>
-      <translation>최소 크기</translation>
+      <source>Minimum Grid Size</source>
+      <translation type="unfinished">Minimum Grid Size</translation>
     </message>
   </context>
   <context>
     <name>LayoutSelectionDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
       <translation>레이아웃 선택</translation>
     </message>
@@ -1497,11 +1792,6 @@
     <name>LdapSettingsDialog</name>
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
-      <source>ldap(s)://host:port</source>
-      <translation>ldap(s):/ / 호스트: 포트</translation>
-    </message>
-    <message>
-      <location/>
       <source>Optional</source>
       <translation>추가 조건</translation>
     </message>
@@ -1522,11 +1812,6 @@
     </message>
     <message>
       <location/>
-      <source>Admin DN</source>
-      <translation>관리자 DN</translation>
-    </message>
-    <message>
-      <location/>
       <source>Password</source>
       <translation>비밀번호</translation>
     </message>
@@ -1539,6 +1824,16 @@
       <location/>
       <source>Search Filter</source>
       <translation>검색 필터</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation type="unfinished">Search Timeout (s)</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Admin DN or CN</source>
+      <translation type="unfinished">Admin DN or CN</translation>
     </message>
   </context>
   <context>
@@ -1567,14 +1862,6 @@
       <location/>
       <source>Disable imported users</source>
       <translation>가져온 사용자정보를 사용 안 함</translation>
-    </message>
-  </context>
-  <context>
-    <name>LegacyCameraSettingsStreamsPanel</name>
-    <message>
-      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
-      <source>Edit Streams...</source>
-      <translation>스트림 편집...</translation>
     </message>
   </context>
   <context>
@@ -1710,19 +1997,6 @@
     </message>
   </context>
   <context>
-    <name>LicensesProposeWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
-      <source>Licensing</source>
-      <translation>인증 중</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Activate License...</source>
-      <translation>라이센스 활성화...</translation>
-    </message>
-  </context>
-  <context>
     <name>LocalSettingsDialog</name>
     <message>
       <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
@@ -1842,6 +2116,14 @@
     </message>
   </context>
   <context>
+    <name>MediaFileSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.ui"/>
+      <source>File Settings</source>
+      <translation>파일설정</translation>
+    </message>
+  </context>
+  <context>
     <name>MessageBox</name>
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
@@ -1850,59 +2132,110 @@
     </message>
   </context>
   <context>
-    <name>MultipleCameraSettingsWidget</name>
+    <name>MultiServerUpdatesWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
-      <source>General</source>
-      <translation>일반</translation>
+      <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
+      <source>Applying System updates at the end of the week is not recommended.</source>
+      <translation>금요일에 시스템 업데이트를 적용 하는 것은 권장 하지 않습니다.</translation>
     </message>
     <message>
       <location/>
-      <source>Authentication</source>
-      <translation>인증</translation>
+      <source>Check for update</source>
+      <translation type="unfinished">Check for update</translation>
     </message>
     <message>
       <location/>
-      <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <source>Updating to...</source>
+      <translation>업데이트...</translation>
     </message>
     <message>
       <location/>
-      <source>Login:</source>
-      <translation>로그인:</translation>
+      <source>You have the latest version installed</source>
+      <translation>최신버전 입니다</translation>
     </message>
     <message>
       <location/>
-      <source>Enable Audio</source>
-      <translation>오디오 사용</translation>
+      <source>Download</source>
+      <translation type="unfinished">Download</translation>
     </message>
     <message>
       <location/>
-      <source>Recording</source>
-      <translation>저장</translation>
+      <source>Browse</source>
+      <translation>Browse</translation>
     </message>
     <message>
       <location/>
-      <source>Expert</source>
-      <translation>전문가</translation>
+      <source>Download &amp;&amp; Install</source>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>취소</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Link copied</source>
+      <translation>링크 복사</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Advanced Update Settings</source>
+      <translation type="unfinished">Advanced Update Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
+      <translation>업데이트 진행에 다소 시간이 소요될 수 있습니다. 잠시만 기다려 주세요.</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultipleLayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
+      <source>Show all layouts</source>
+      <translation type="unfinished">Show all layouts</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Layouts</source>
+      <translation type="unfinished">Select Layouts</translation>
     </message>
   </context>
   <context>
     <name>NewWearableCameraDialog</name>
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
-      <source>New Wearable Camera...</source>
-      <translation>새로운 웨어러블 카메라...</translation>
-    </message>
-    <message>
-      <location/>
       <source>To server</source>
       <translation>서버</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;웨어러블 카메라&quot;는 서버에 업로드 및 사용자가 접근 할수 있는 가상저장소 입니다.</translation>
+      <source>New Virtual Camera...</source>
+      <translation type="unfinished">New Virtual Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
+    <name>OpenLayoutActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
+      <source>Layout</source>
+      <translation type="unfinished">Layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show to</source>
+      <translation type="unfinished">Show to</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
     </message>
   </context>
   <context>
@@ -1926,6 +2259,49 @@
       <location/>
       <source>Play to users</source>
       <translation>사용자에게 재생</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginEventWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <source>Source:</source>
+      <translation>소스:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>주석 포함</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keywords separated by space</source>
+      <translation>공간으로 단어 구분됨</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>상세 포함</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Level:</source>
+      <translation type="unfinished">Level:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>ERROR</source>
+      <translation type="unfinished">ERROR</translation>
+    </message>
+    <message>
+      <location/>
+      <source>WARNING</source>
+      <translation type="unfinished">WARNING</translation>
+    </message>
+    <message>
+      <location/>
+      <source>INFO</source>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2067,9 +2443,14 @@
   <context>
     <name>QnCompatibilityVersionInstallationDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
       <translation>호환성 버전 설치합니다....</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restart to the updated version when ready</source>
+      <translation type="unfinished">Restart to the updated version when ready</translation>
     </message>
   </context>
   <context>
@@ -2091,19 +2472,6 @@
     </message>
   </context>
   <context>
-    <name>QnIOPortSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Enable tile interface</source>
-      <translation>타일 인터페이스 사용</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLoginToCloudDialog</name>
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
@@ -2114,14 +2482,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>로그인 상태 유지</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnMediaFileSettingsDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
-      <source>File Settings</source>
-      <translation>파일설정</translation>
     </message>
   </context>
   <context>
@@ -2183,14 +2543,6 @@
       <location/>
       <source>Delete...</source>
       <translation>삭제...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourceTreeWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/resource_tree_widget.ui"/>
-      <source>Filter</source>
-      <translation>필터</translation>
     </message>
   </context>
   <context>
@@ -2336,7 +2688,7 @@
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
       <translation>빠른 검토</translation>
     </message>
@@ -2378,6 +2730,11 @@
       <source>Please wait while the connection is being restored...</source>
       <translation>재 연결시 까지 기다려 주세요</translation>
     </message>
+    <message>
+      <location/>
+      <source>Server name</source>
+      <translation type="unfinished">Server name</translation>
+    </message>
   </context>
   <context>
     <name>RecordingBusinessActionWidget</name>
@@ -2398,11 +2755,6 @@
     </message>
     <message>
       <location/>
-      <source>max</source>
-      <translation>최대</translation>
-    </message>
-    <message>
-      <location/>
       <source>Pre-Recording:</source>
       <translation>사전녹화:</translation>
     </message>
@@ -2415,11 +2767,6 @@
       <location/>
       <source>Fixed duration:</source>
       <translation>기간 고정</translation>
-    </message>
-    <message>
-      <location/>
-      <source>seconds</source>
-      <translation>초</translation>
     </message>
   </context>
   <context>
@@ -2476,6 +2823,19 @@
     </message>
   </context>
   <context>
+    <name>RecordingThresholdWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/recording_threshold_widget.ui"/>
+      <source>Pre-Recording</source>
+      <translation>사전녹화</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Post-Recording</source>
+      <translation>사후녹화</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceBrowserWidget</name>
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
@@ -2484,8 +2844,18 @@
     </message>
     <message>
       <location/>
-      <source>Search</source>
-      <translation>검색</translation>
+      <source>Filter TEST</source>
+      <translation type="unfinished">Filter TEST</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing found</source>
+      <translation>결과 없음</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Drag any image or video file to the application window to play them</source>
+      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
     </message>
   </context>
   <context>
@@ -2514,6 +2884,97 @@
       <location/>
       <source>Speak to users</source>
       <translation>사용자와 대화하기</translation>
+    </message>
+  </context>
+  <context>
+    <name>ScheduleSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/schedule_settings_widget.ui"/>
+      <source>Schedule Settings</source>
+      <translation>일정 설정</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Record Always</source>
+      <translation>상시 녹화</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Only</source>
+      <translation>움직임 녹화</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion + Lo-Res</source>
+      <translation>움직임 + 저해상도</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do Not Record</source>
+      <translation>녹화안함</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>비트 전송률</translation>
+    </message>
+    <message>
+      <location/>
+      <source>FPS</source>
+      <translation>프레임</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality</source>
+      <translation>화질</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show Quality</source>
+      <translation>품질 표시</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show FPS</source>
+      <translation>프레임 표시</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecuritySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/system_administration/widgets/security_settings_widget.ui"/>
+      <source>Enable audit trail</source>
+      <translation>검사 보고 설정</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Allow only secure connections</source>
+      <translation type="unfinished">Allow only secure connections</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Encrypt video traffic</source>
+      <translation type="unfinished">Encrypt video traffic</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation type="unfinished">Display watermark with username over video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation type="unfinished">Watermark Preview</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Limit Session Length</source>
+      <translation type="unfinished">Limit Session Length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
@@ -2624,134 +3085,6 @@
       <location/>
       <source>Check Result:</source>
       <translation>확인 결과:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SingleCameraSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
-      <source>General</source>
-      <translation>일반</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Address</source>
-      <translation>주소</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ping</source>
-      <translation>핑</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Authentication</source>
-      <translation>인증</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording</source>
-      <translation>저장</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion</source>
-      <translation>움직임</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Advanced</source>
-      <translation>고급</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Expert</source>
-      <translation>전문가</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Enable Audio</source>
-      <translation>오디오 사용</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion is not available for this camera.</source>
-      <translation>이 카메라에서 움직임 감지를 사용할 수 없습니다</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion Detection</source>
-      <translation>움직임 감지:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fisheye</source>
-      <translation>어안렌즈</translation>
-    </message>
-    <message>
-      <location/>
-      <source>I/O ports</source>
-      <translation>I/O 포트</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Name</source>
-      <translation>이름</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Model</source>
-      <translation>모델</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Firmware</source>
-      <translation>펌웨어:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Vendor</source>
-      <translation>제조사:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Audio</source>
-      <translation>오디오</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Login</source>
-      <translation>로그인</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password</source>
-      <translation>비밀번호</translation>
-    </message>
-    <message>
-      <location/>
-      <source>IP Address</source>
-      <translation>IP 주소:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Web Page</source>
-      <translation>웹페이지:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>MAC Address</source>
-      <translation>MAC 정보:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Sensitivity</source>
-      <translation>민감도:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Reset</source>
-      <translation>초기화</translation>
     </message>
   </context>
   <context>
@@ -2875,13 +3208,18 @@
     </message>
     <message>
       <location/>
-      <source>Additional storage:</source>
-      <translation>추가 장치</translation>
+      <source>Server is offline. Statistics are not available.</source>
+      <translation>서버는 오프 라인입니다. 통계를 사용할 수 없습니다.</translation>
     </message>
     <message>
       <location/>
-      <source>Server is offline. Statistics are not available.</source>
-      <translation>서버는 오프 라인입니다. 통계를 사용할 수 없습니다.</translation>
+      <source>Additional storage</source>
+      <translation type="unfinished">Additional storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Base forecast on data recorded during</source>
+      <translation type="unfinished">Base forecast on data recorded during</translation>
     </message>
   </context>
   <context>
@@ -2966,7 +3304,7 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
       <translation>역할들:</translation>
     </message>
@@ -2995,11 +3333,6 @@
     </message>
     <message>
       <location/>
-      <source>Enable audit trail</source>
-      <translation>검사 보고 설정</translation>
-    </message>
-    <message>
-      <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
       <translation>개발자에게 장애 문제 자동 보고</translation>
     </message>
@@ -3008,21 +3341,11 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>주위: 이 옵션 활성화 시 기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다.</translation>
     </message>
-    <message>
-      <location/>
-      <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
-    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
       <translation>문자</translation>
     </message>
@@ -3051,19 +3374,37 @@
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>System Time</source>
-      <translation>시스템 시간</translation>
+      <source>Sync time with the Internet</source>
+      <translation>인터넷으로 시간 동기화</translation>
     </message>
     <message>
       <location/>
-      <source>Sync time with the Internet</source>
-      <translation>인터넷으로 시간 동기화</translation>
+      <source>VMS Time</source>
+      <translation type="unfinished">VMS Time</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSynchronizationWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
+      <source>Sync Time with the Internet</source>
+      <translation type="unfinished">Sync Time with the Internet</translation>
+    </message>
+    <message>
+      <location/>
+      <source>VMS Time</source>
+      <translation type="unfinished">VMS Time</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not sync time among servers</source>
+      <translation type="unfinished">Do not sync time among servers</translation>
     </message>
   </context>
   <context>
     <name>TimestampOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
       <translation>타임스템프</translation>
     </message>
@@ -3151,37 +3492,34 @@
     </message>
   </context>
   <context>
-    <name>WearableMotionWidget</name>
+    <name>WearableCameraMotionWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.ui"/>
       <source>Motion Detection</source>
       <translation>움직임 감지:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Detect motion in uploaded video</source>
-      <translation>업로드 된 동영상의 움직임 감지</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
       <translation>민감도:</translation>
     </message>
-  </context>
-  <context>
-    <name>WearableProgressWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Cancel</source>
-      <translation>취소</translation>
+      <location/>
+      <source>Detect motion</source>
+      <translation type="unfinished">Detect motion</translation>
     </message>
   </context>
   <context>
-    <name>WearableUploadWidget</name>
+    <name>WearableCameraUploadWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Upload Video</source>
-      <translation>비디오 업로드</translation>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.ui"/>
+      <source>Cancel</source>
+      <translation>취소</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Footage</source>
+      <translation type="unfinished">Upload Footage</translation>
     </message>
     <message>
       <location/>
@@ -3231,9 +3569,9 @@
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
       <translation type="unfinished">Watermark preview</translation>
     </message>

@@ -80,19 +80,6 @@ const int CUDT::m_iVersion = 4;
 const int CUDT::m_iSYNInterval = 10000;
 const int CUDT::m_iSelfClockInterval = 64;
 
-static const int CTRL_HANDSHAKE = 0;            //000 - Handshake
-static const int CTRL_KEEP_ALIVE = 1;           //001 - Keep-alive
-static const int CTRL_ACK = 2;                  //010 - Acknowledgement
-static const int CTRL_LOSS_REPORT = 3;          //011 - Loss Report
-static const int CTRL_CONGESTION_WARNING = 4;   //100 - Congestion Warning
-static const int CTRL_SHUTDOWN = 5;             //101 - Shutdown
-static const int CTRL_ACK2 = 6;                 //110 - Acknowledgement of Acknowledgement
-static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
-static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
-static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
-
-                                                // Mimimum recv flight flag size is 32 packets
-constexpr const int kMinRecvWindowSize = 32;
 constexpr const int kDefaultRecvWindowSize = 25600;
 
 // Mimimum recv buffer size is 32 packets
@@ -158,7 +145,8 @@ CUDT::CUDT()
     m_ullLingerExpiration = 0;
 }
 
-CUDT::CUDT(const CUDT& ancestor)
+CUDT::CUDT(const CUDT& ancestor):
+    std::enable_shared_from_this<CUDT>()
 {
     m_pSndBuffer = NULL;
     m_pRcvBuffer = NULL;
@@ -231,7 +219,6 @@ CUDT::~CUDT()
     delete m_pCC;
     delete m_pPeerAddr;
     delete m_pSNode;
-    delete m_pRNode;
 }
 
 CSndQueue& CUDT::sndQueue()
@@ -268,7 +255,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
     CGuard sendguard(m_SendLock);
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     switch (optName)
     {
@@ -487,7 +474,7 @@ void CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
             break;
 
         case UDT_STATE:
-            *(int32_t*)optval = s_UDTUnited->getStatus(m_SocketID);
+            *(int32_t*)optval = s_UDTUnited->getStatus(m_SocketId);
             optlen = sizeof(int32_t);
             break;
 
@@ -587,11 +574,6 @@ void CUDT::open()
     m_pSNode->timestamp = 1;
     m_pSNode->locationOnHeap = -1;
 
-    if (!m_pRNode)
-        m_pRNode = new CRNode();
-    m_pRNode->socket = shared_from_this();
-    m_pRNode->timestamp = 1;
-
     m_iRTT = 10 * m_iSYNInterval;
     m_iRTTVar = m_iRTT >> 1;
     m_ullCPUFrequency = CTimer::getCPUFrequency();
@@ -639,7 +621,7 @@ void CUDT::listen()
     m_synPacketHandler = std::make_shared<ServerSideConnectionAcceptor>(
         m_StartTime,
         m_iSockType,
-        m_SocketID,
+        m_SocketId,
         &m_multiplexer->sendQueue(),
         m_sPollID);
     // if there is already another socket listening on the same port
@@ -674,7 +656,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     if (m_bRendezvous)
         ttl *= 10;
     ttl += CTimer::getTime();
-    rcvQueue().registerConnector(m_SocketID, shared_from_this(), m_iIPversion, serv_addr, ttl);
+    rcvQueue().registerConnector(m_SocketId, shared_from_this(), m_iIPversion, serv_addr, ttl);
 
     // This is my current configurations
     m_ConnReq.m_iVersion = m_iVersion;
@@ -682,7 +664,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     m_ConnReq.m_iMSS = m_iMSS;
     m_ConnReq.m_iFlightFlagSize = (m_iRcvBufSize < m_iFlightFlagSize) ? m_iRcvBufSize : m_iFlightFlagSize;
     m_ConnReq.m_iReqType = (!m_bRendezvous) ? 1 : 0;
-    m_ConnReq.m_iID = m_SocketID;
+    m_ConnReq.m_iID = m_SocketId;
     CIPAddress::ntop(serv_addr, m_ConnReq.m_piPeerIP, m_iIPversion);
 
     // Random Initial Sequence Number
@@ -740,7 +722,7 @@ void CUDT::connect(const sockaddr* serv_addr)
         }
 
         response.setLength(m_iPayloadSize);
-        if (rcvQueue().recvfrom(m_SocketID, response) > 0)
+        if (rcvQueue().recvfrom(m_SocketId, response) > 0)
         {
             internalConnectResult = connect(response);
             if (internalConnectResult <= 0)
@@ -829,7 +811,7 @@ int CUDT::connect(const CPacket& response)
 
 POST_CONNECT:
     // Remove from rendezvous queue
-    rcvQueue().removeConnector(m_SocketID);
+    rcvQueue().removeConnector(m_SocketId);
 
     // Re-configure according to the negotiated values.
     m_iMSS = m_ConnRes.m_iMSS;
@@ -870,7 +852,7 @@ POST_CONNECT:
     }
 
     m_pCC = m_pCCFactory->create();
-    m_pCC->m_UDT = m_SocketID;
+    m_pCC->m_UDT = m_SocketId;
     m_pCC->setMSS(m_iMSS);
     m_pCC->setMaxCWndSize(m_iFlowWindowSize);
     m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
@@ -887,14 +869,13 @@ POST_CONNECT:
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     // acknowledge the management module.
-    s_UDTUnited->connect_complete(m_SocketID);
+    s_UDTUnited->connect_complete(m_SocketId);
 
     // acknowledde any waiting epolls to write
-    s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, true);
+    s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, true);
 
     return 0;
 }
@@ -903,7 +884,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
-    // Uses the smaller MSS between the peers        
+    // Uses the smaller MSS between the peers
     if (hs->m_iMSS > m_iMSS)
         hs->m_iMSS = m_iMSS;
     else
@@ -920,7 +901,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_iRcvCurrSeqNo = hs->m_iISN - 1;
 
     m_PeerID = hs->m_iID;
-    hs->m_iID = m_SocketID;
+    hs->m_iID = m_SocketId;
 
     // use peer's ISN and send it back for security check
     m_iISN = hs->m_iISN;
@@ -968,7 +949,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     }
 
     m_pCC = m_pCCFactory->create();
-    m_pCC->m_UDT = m_SocketID;
+    m_pCC->m_UDT = m_SocketId;
     m_pCC->setMSS(m_iMSS);
     m_pCC->setMaxCWndSize(m_iFlowWindowSize);
     m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
@@ -987,7 +968,6 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     //send the response to the peer, see listen() for more discussions about this
@@ -999,6 +979,24 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     response.m_iID = m_PeerID;
     sndQueue().sendto(peer, response);
     delete[] buffer;
+}
+
+int CUDT::shutdown(int /*how*/)
+{
+    m_bBroken = true;
+
+    // signal a waiting "recv" call if there is any data available
+#ifndef _WIN32
+    pthread_mutex_lock(&m_RecvDataLock);
+    if (m_bSynRecving)
+        pthread_cond_signal(&m_RecvDataCond);
+    pthread_mutex_unlock(&m_RecvDataLock);
+#else
+    if (m_bSynRecving)
+        SetEvent(m_RecvDataCond);
+#endif
+
+    return 0;
 }
 
 void CUDT::close()
@@ -1041,12 +1039,12 @@ void CUDT::close()
         sndQueue().sndUList().remove(this);
 
     // trigger any pending IO events.
-    s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_ERR, true);
+    s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_ERR, true);
     // then remove itself from all epoll monitoring
     try
     {
         for (set<int>::iterator i = m_sPollID.begin(); i != m_sPollID.end(); ++i)
-            s_UDTUnited->m_EPoll.remove_usock(*i, m_SocketID);
+            s_UDTUnited->m_EPoll.remove_usock(*i, m_SocketId);
     }
     catch (...)
     {
@@ -1066,7 +1064,7 @@ void CUDT::close()
     m_synPacketHandler = nullptr;
 
     if (m_multiplexer)
-        m_multiplexer->recvQueue().removeConnector(m_SocketID);
+        m_multiplexer->recvQueue().removeConnector(m_SocketId);
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
@@ -1090,7 +1088,7 @@ void CUDT::close()
 
     // waiting all send and recv calls to stop
     CGuard sendguard(m_SendLock);
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     // CLOSED.
     m_bOpened = false;
@@ -1194,7 +1192,7 @@ int CUDT::send(const char* data, int len)
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
         // write is not available any more
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, false);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, false);
     }
 
     return size;
@@ -1214,7 +1212,7 @@ int CUDT::recv(char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     if (0 == m_pRcvBuffer->getRcvDataSize())
     {
@@ -1273,7 +1271,7 @@ int CUDT::recv(char* data, int len)
     if (m_pRcvBuffer->getRcvDataSize() <= 0)
     {
         // read is not available any more
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN, false);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, false);
     }
 
     if ((res <= 0) && (m_iRcvTimeOut >= 0))
@@ -1374,7 +1372,7 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
         // write is not available any more
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, false);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, false);
     }
 
     return len;
@@ -1392,7 +1390,7 @@ int CUDT::recvmsg(char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     if (m_bBroken || isClosing())
     {
@@ -1401,7 +1399,7 @@ int CUDT::recvmsg(char* data, int len)
         if (m_pRcvBuffer->getRcvMsgNum() <= 0)
         {
             // read is not available any more
-            s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN, false);
+            s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, false);
         }
 
         if (0 == res)
@@ -1465,7 +1463,7 @@ int CUDT::recvmsg(char* data, int len)
     if (m_pRcvBuffer->getRcvMsgNum() <= 0)
     {
         // read is not available any more
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN, false);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, false);
     }
 
     if ((res <= 0) && (m_iRcvTimeOut >= 0))
@@ -1561,7 +1559,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
         // write is not available any more
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, false);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, false);
     }
 
     return size - tosend;
@@ -1580,7 +1578,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
     if (size <= 0)
         return 0;
 
-    CGuard recvguard(m_RecvLock);
+    std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     int64_t torecv = size;
     int unitsize = block;
@@ -1636,7 +1634,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
     if (m_pRcvBuffer->getRcvDataSize() <= 0)
     {
         // read is not available any more
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN, false);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, false);
     }
 
     return size - torecv;
@@ -1728,7 +1726,6 @@ void CUDT::initSynch()
     pthread_mutex_init(&m_RecvDataLock, NULL);
     pthread_cond_init_monotonic(&m_RecvDataCond);
     pthread_mutex_init(&m_SendLock, NULL);
-    pthread_mutex_init(&m_RecvLock, NULL);
     pthread_mutex_init(&m_AckLock, NULL);
 #else
     m_SendBlockLock = CreateMutex(NULL, false, NULL);
@@ -1736,7 +1733,6 @@ void CUDT::initSynch()
     m_RecvDataLock = CreateMutex(NULL, false, NULL);
     m_RecvDataCond = CreateEvent(NULL, false, false, NULL);
     m_SendLock = CreateMutex(NULL, false, NULL);
-    m_RecvLock = CreateMutex(NULL, false, NULL);
     m_AckLock = CreateMutex(NULL, false, NULL);
 #endif
 }
@@ -1749,7 +1745,6 @@ void CUDT::destroySynch()
     pthread_mutex_destroy(&m_RecvDataLock);
     pthread_cond_destroy(&m_RecvDataCond);
     pthread_mutex_destroy(&m_SendLock);
-    pthread_mutex_destroy(&m_RecvLock);
     pthread_mutex_destroy(&m_AckLock);
 #else
     CloseHandle(m_SendBlockLock);
@@ -1757,7 +1752,6 @@ void CUDT::destroySynch()
     CloseHandle(m_RecvDataLock);
     CloseHandle(m_RecvDataCond);
     CloseHandle(m_SendLock);
-    CloseHandle(m_RecvLock);
     CloseHandle(m_AckLock);
 #endif
 }
@@ -1776,17 +1770,15 @@ void CUDT::releaseSynch()
     pthread_mutex_lock(&m_RecvDataLock);
     pthread_cond_signal(&m_RecvDataCond);
     pthread_mutex_unlock(&m_RecvDataLock);
-
-    pthread_mutex_lock(&m_RecvLock);
-    pthread_mutex_unlock(&m_RecvLock);
 #else
     SetEvent(m_SendBlockCond);
     WaitForSingleObject(m_SendLock, INFINITE);
     ReleaseMutex(m_SendLock);
     SetEvent(m_RecvDataCond);
-    WaitForSingleObject(m_RecvLock, INFINITE);
-    ReleaseMutex(m_RecvLock);
 #endif
+
+    m_RecvLock.lock();
+    m_RecvLock.unlock();
 }
 
 void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int size)
@@ -1844,7 +1836,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
 #endif
 
                 // acknowledge any waiting epolls to read
-                s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN, true);
+                s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, true);
             }
             else if (ack == m_iRcvLastAck)
             {
@@ -2100,7 +2092,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 #endif
 
             // acknowledde any waiting epolls to write
-            s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, true);
+            s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, true);
 
             // insert this socket to snd list if it is not on the list yet
             sndQueue().sndUList().update(shared_from_this(), false);
@@ -2254,7 +2246,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
                 initdata.m_iMSS = m_iMSS;
                 initdata.m_iFlightFlagSize = m_iFlightFlagSize;
                 initdata.m_iReqType = (!m_bRendezvous) ? -1 : -2;
-                initdata.m_iID = m_SocketID;
+                initdata.m_iID = m_SocketId;
 
                 char* hs = new char[m_iPayloadSize];
                 int hs_size = m_iPayloadSize;
@@ -2495,8 +2487,8 @@ int CUDT::processData(CUnit* unit)
         m_iRcvLossTotal += loss;
     }
 
-    // This is not a regular fixed size packet...   
-    //an irregular sized packet usually indicates the end of a message, so send an ACK immediately   
+    // This is not a regular fixed size packet...
+    // an irregular sized packet usually indicates the end of a message, so send an ACK immediately
     if (packet.getLength() != m_iPayloadSize)
         CTimer::rdtsc(m_ullNextACKTime);
 
@@ -2572,7 +2564,7 @@ void CUDT::checkTimers(bool forceAck)
         if ((m_iEXPCount > 16) && (currtime - m_ullLastRspTime > 5000000 * m_ullCPUFrequency))
         {
             //
-            // Connection is broken. 
+            // Connection is broken.
             // UDT does not signal any information about this instead of to stop quietly.
             // Application will detect this when it calls any UDT methods next time.
             //
@@ -2587,7 +2579,7 @@ void CUDT::checkTimers(bool forceAck)
             releaseSynch();
 
             // app can call any UDT API to learn the connection_broken error
-            s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR, true);
+            s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR, true);
 
             return;
         }
@@ -2630,7 +2622,7 @@ void CUDT::addEPoll(const int eid, int eventsToReport)
     }
 
     if (auto synPacketHandler = m_synPacketHandler)
-        synPacketHandler->addEPoll(eid, eventsToReport);
+        synPacketHandler->addEPoll(eid);
 
     if (m_bConnected && !m_bBroken && !isClosing())
     {
@@ -2646,7 +2638,7 @@ void CUDT::addEPoll(const int eid, int eventsToReport)
     }
 
     if (eventsToReport != 0)
-        s_UDTUnited->m_EPoll.update_events(m_SocketID, m_sPollID, eventsToReport, true);
+        s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, eventsToReport, true);
 }
 
 void CUDT::removeEPoll(const int eid)
@@ -2655,7 +2647,7 @@ void CUDT::removeEPoll(const int eid)
     // since this happens after the epoll ID has been removed, they cannot be set again
     set<int> remove;
     remove.insert(eid);
-    s_UDTUnited->m_EPoll.update_events(m_SocketID, remove, UDT_EPOLL_IN | UDT_EPOLL_OUT, false);
+    s_UDTUnited->m_EPoll.update_events(m_SocketId, remove, UDT_EPOLL_IN | UDT_EPOLL_OUT, false);
 
     {
         CGuard lk(s_UDTUnited->m_EPoll.m_EPollLock);
@@ -2759,7 +2751,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             }
             else
             {
-                // a new connection has been created, enable epoll for write 
+                // a new connection has been created, enable epoll for write
                 CUDT::s_UDTUnited->m_EPoll.update_events(m_SocketId, m_pollIds, UDT_EPOLL_OUT, true);
             }
         }
@@ -2768,9 +2760,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
     return hs.m_iReqType;
 }
 
-void ServerSideConnectionAcceptor::addEPoll(
-    const int eid,
-    int eventsToReport)
+void ServerSideConnectionAcceptor::addEPoll(const int eid)
 {
     CGuard lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
     m_pollIds.insert(eid);

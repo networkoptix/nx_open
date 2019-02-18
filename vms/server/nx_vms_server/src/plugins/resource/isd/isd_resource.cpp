@@ -78,13 +78,6 @@ QString QnPlIsdResource::getDriverName() const
     return MANUFACTURE;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);

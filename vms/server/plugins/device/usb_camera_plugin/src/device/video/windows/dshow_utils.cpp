@@ -45,6 +45,7 @@ DShowCompressionTypeDescriptor::~DShowCompressionTypeDescriptor()
 
 nxcip::CompressionType DShowCompressionTypeDescriptor::toNxCompressionType() const
 {
+
         auto viHeader = videoInfoHeader();
         return viHeader
             ? toNxCodecID(viHeader->bmiHeader.biCompression)

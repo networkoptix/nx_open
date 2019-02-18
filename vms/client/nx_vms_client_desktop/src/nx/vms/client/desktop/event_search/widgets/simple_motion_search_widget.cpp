@@ -5,6 +5,8 @@
 #include <QtWidgets/QAction>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/common/read_only.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -75,21 +77,40 @@ public:
 private:
     void updateResourceButton()
     {
-        static const QString kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
+        static const auto kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
 
         const auto resource = q->navigator()->currentResource();
         const bool isMedia = resource.dynamicCast<QnMediaResource>();
 
-        // Camera icon and text is the default option (even if there is no media selected).
-        const bool isCamera = resource.dynamicCast<QnSecurityCamResource>() || !isMedia;
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        const bool isCamera = camera || !isMedia;
 
         m_resourceButton->setIcon(isCamera
             ? qnSkin->icon("text_buttons/camera.png")
             : qnSkin->icon("text_buttons/video.png"));
 
-        const QString name = resource ? resource->getName() : tr("none");
-        const QString title = isCamera ? tr("Current camera") : tr("Current media");
-        m_resourceButton->setText(kTemplate.arg(title, name));
+        // TODO: #vkutin Think how to avoid code duplication with AbstractSearchWidget::Private.
+        if (resource)
+        {
+            const auto name = resource->getName();
+            if (isCamera)
+            {
+                const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+                    QnCameraDeviceStringSet("<unused>", tr("Selected camera"), tr("Selected device")),
+                    camera);
+
+                m_resourceButton->setText(kTemplate.arg(baseText, name));
+            }
+            else
+            {
+                m_resourceButton->setText(kTemplate.arg(tr("Selected media"), name));
+            }
+        }
+        else
+        {
+            m_resourceButton->setText(kTemplate.arg(tr("Selected camera"),
+                tr("none", "No currently selected camera")));
+        }
     }
 
 private:

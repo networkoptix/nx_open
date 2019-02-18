@@ -22,7 +22,7 @@ class QnAdamResource:
     };
 
 public:
-    static const QString kManufacture;
+    static const QString kManufacturer;
 
     QnAdamResource(QnMediaServerModule* serverModule);
     virtual ~QnAdamResource();
@@ -40,8 +40,6 @@ public slots:
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
 
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override { return nullptr; }

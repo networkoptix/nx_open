@@ -39,7 +39,7 @@ public:
         const QnResourceParams &params) override;
 
     virtual bool isSequential() const override;
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
 
     virtual QnResourceList findResources() override;
 

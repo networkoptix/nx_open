@@ -7,6 +7,21 @@ import time
 import distutils.spawn
 import rdep_config
 
+DEPRECATED_SYNC_URLS = [
+    "rsync://enk.me/buildenv/rdep/packages",
+    "rsync://mono.enk.me/buildenv/rdep/packages"
+]
+SYNC_URL = "rsync://rdep.enk.me/buildenv/rdep/packages"
+if time.timezone == 28800:
+    SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
+
+DEPRECATED_PUSH_URLS = [
+    "rsync@enk.me:buildenv/rdep/packages",
+    "rsync@mono.enk.me:buildenv/rdep/packages"
+]
+PUSH_URL = "rsync@rdep.enk.me:buildenv/rdep/packages"
+
+
 OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cygwin")
 REPOSITORY_PATH = os.getenv("RDEP_PACKAGES_DIR")
 if not REPOSITORY_PATH:
@@ -14,19 +29,16 @@ if not REPOSITORY_PATH:
     REPOSITORY_PATH = os.getenv("environment")
     if REPOSITORY_PATH:
         REPOSITORY_PATH = os.path.join(REPOSITORY_PATH, "packages")
-SYNC_URL = "rsync://mono.enk.me/buildenv/rdep/packages"
-if time.timezone == 28800:
-    SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
-PUSH_URL = "rsync@mono.enk.me:buildenv/rdep/packages"
 
-def configure(print_summary = False):
+
+def configure(print_summary=False):
     if not os.path.isdir(REPOSITORY_PATH):
         os.makedirs(REPOSITORY_PATH)
 
     config = rdep_config.RepositoryConfig(REPOSITORY_PATH)
-    if not config.get_url():
+    if not config.get_url() or config.get_url() in DEPRECATED_SYNC_URLS:
         config.set_url(SYNC_URL)
-    if not config.get_push_url(None):
+    if not config.get_push_url() or config.get_push_url() in DEPRECATED_PUSH_URLS:
         config.set_push_url(PUSH_URL)
 
     global_config = rdep_config.RdepConfig()
@@ -57,12 +69,13 @@ def configure(print_summary = False):
     if print_summary:
         print("Rdep repository is ready.")
         print("  Path =", REPOSITORY_PATH)
-        print("  Sync URL =", SYNC_URL)
-        print("  Push URL =", PUSH_URL)
+        print("  Sync URL =", config.get_url())
+        print("  Push URL =", config.get_push_url())
         print("  Rsync =", rsync)
 
     return True
 
+
 if __name__ == '__main__':
-    if not configure(print_summary = True):
+    if not configure(print_summary=True):
         exit(1)

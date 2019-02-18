@@ -3,8 +3,6 @@
 #include "../event_panel.h"
 
 #include <QtCore/QHash>
-#include <QtCore/QPointer>
-#include <QtCore/QScopedPointer>
 
 #include <common/common_globals.h>
 

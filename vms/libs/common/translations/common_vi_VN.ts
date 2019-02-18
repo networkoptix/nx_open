@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation type="unfinished">MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Các Hệ thống này được xây dựng với URL %1 khác nhau. Hợp nhất không được phép.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Sự kiện hệ thống</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Hệ thống đã được liên kết với đám mây (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Máy chủ không được kết nối với Internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Không thể lưu thông tin đăng nhập đám mây vào DB cục bộ</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Không thể lưu đám mây chủ nhân vào DB cục bộ</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Không thể kết nối với đám mây: %1</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề camera thoại để biết thêm chi tiết.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>Máy ảnh Plugin lỗi. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>Hãy cố gắng để khởi động lại các I/O module, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Vui lòng cập nhật firmware. Phiên bản được hỗ trợ tối thiểu là %1. Phiên bản hiện tại là %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>Không thể khởi cài đặt lấy nội dung mẫu, mã lỗi: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Không thể cấp phát bộ đệm mẫu, mã lỗi: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>Không thể gửi khung âm thanh tới bộ mã hóa, Mã lỗi: %1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation>Trống</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>Bản quyền miễn phí</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>Thời gian</translation>
     </message>
@@ -497,6 +532,166 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>Giấy phép Cầu</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Invalid Licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -545,10 +740,6 @@
       <translation>Kiểu không hợp lệ</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>Chỉ có giấy phép duy nhất được phép cho thiết bị này</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>Bản quyền này yêu cầu phiên bản phần mềm cao hơn</translation>
     </message>
@@ -560,6 +751,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>Không tìm thấy Máy chủ với ID phần cứng phù hợp</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -570,30 +769,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>%n máy chụp hình</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>%n máy chụp hình</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>%n thiết bị</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n thiết bị</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>Máy ảnh</translation>
@@ -626,18 +801,6 @@
       <source>device</source>
       <translation>thiết bị</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n Mô-đun I/O</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n mô-đun I/O</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>I/O Modules</translation>
@@ -653,6 +816,42 @@
     <message>
       <source>I/O module</source>
       <translation>I/O Module</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -680,67 +879,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>ID Phần cứng: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>Thấp nhất (Ls)</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Thấp (L)</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Trong (M)</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Cao (H)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Cao nhất (Hs)</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Đặt trước</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>Không xác định</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Short cho thấp nhất Ls</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Short cho Low L</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Short cho vừa M</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Short cho cao H</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Short cho tốt nhất Hs</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Short cho đặt trước</translation>
     </message>
   </context>
   <context>
@@ -787,172 +925,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>Hệ thống Chưa Đặt tên</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>Xác định</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>Không thể tìm thấy</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>Không thực hiện</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>Chuyển giao không được hỗ trợ</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>Lỗi Máy chủ Nội bộ</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>Lập luận không hợp lệ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>giây</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>phút</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>giờ</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>ngày</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>tuần</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>tháng</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>năm</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>mili giây</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>giây</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>phút</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>giờ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>ngày</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>tuần</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>tháng</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>năm</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1031,6 +1003,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Có quyền truy cập vào toàn bộ Hệ thống và có thể quản lý nó. Có thể tạo người dùng.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Lỗi không xác định.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1507,6 +1521,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation type="unfinished">Exit fullscreen</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Mở bố trí</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

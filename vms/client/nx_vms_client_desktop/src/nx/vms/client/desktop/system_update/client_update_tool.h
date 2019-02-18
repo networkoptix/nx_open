@@ -72,6 +72,11 @@ public:
     bool shouldInstallThis(const UpdateContents& contents) const;
 
     /**
+     * Checks if this client version is already installed.
+     */
+    bool isVersionInstalled(const nx::utils::SoftwareVersion& version) const;
+
+    /**
      * Asks tool to get update for client.
      * If client should download update - it will start downloading.
      * If client already has this update - it goes to readyReboot.
@@ -111,10 +116,11 @@ public:
 
     /**
      * Tells applauncher to install update package.
-     * It will work only if tool is in state State::readyInstall.
+     * It will work only if tool is in state State::readyInstall. This is asyncronous call.
+     * You should subscribe to 'updateStateChanged' to get notification.
      * @return true if success
      */
-    bool installUpdate();
+    bool installUpdateAsync();
 
     /**
      * Restart client to the new version.
@@ -157,6 +163,8 @@ public:
      * Get readable error text.
      */
     QString getErrorText() const;
+
+    void checkInternalState();
 
 signals:
     /**
@@ -206,6 +214,8 @@ protected:
     std::promise<UpdateContents> m_remoteUpdateInfoRequest;
     UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
+
+    std::future<int> m_applauncherTask;
 
     mutable std::future<std::set<nx::utils::SoftwareVersion>> m_installedVersionsFuture;
     mutable std::set<nx::utils::SoftwareVersion> m_installedVersions;

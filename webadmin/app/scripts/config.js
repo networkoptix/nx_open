@@ -133,7 +133,9 @@
             hanwhaDeleteProfilesOnInitIfNeeded: {type: 'checkbox'},
             hanwhaChunkReaderMessageBodyTimeoutSeconds: {type: 'number'},
             hanwhaChunkReaderResponseTimeoutSeconds: {type: 'number'},
-            showHanwhaAlternativePtzControlsOnTile: {type: 'checkbox'}
+            showHanwhaAlternativePtzControlsOnTile: {type: 'checkbox'},
+
+            maxEventLogRecords: {type: 'number'}
         },
         webclient: {
             useServerTime: true,

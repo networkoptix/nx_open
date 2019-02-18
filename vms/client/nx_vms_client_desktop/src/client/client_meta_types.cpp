@@ -46,6 +46,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
+#include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
@@ -65,10 +66,8 @@ void QnClientMetaTypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     nx::vms::client::core::initializeMetaTypes();
 
@@ -200,5 +199,6 @@ void QnClientMetaTypes::registerQmlTypes()
     RecordingStatusHelper::registerQmlType();
     FocusFrameItem::registerQmlType();
     MotionRegionsItem::registerQmlType();
+    GlobalToolTip::registerQmlType();
 }
 

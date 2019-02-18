@@ -101,6 +101,14 @@ private:
     PtzOverlayWidget* overlayWidget(QnMediaResourceWidget* widget) const;
     PtzOverlayWidget* ensureOverlayWidget(QnMediaResourceWidget* widget);
 
+    /**
+     * Check if current camera is a static sensor of a ptz-redirected camera.
+     */
+    void handlePtzRedirect(QnMediaResourceWidget* widget);
+    bool ensurePtzRedirectedCameraIsOnLayout(
+        QnMediaResourceWidget* staticSensor,
+		const QnVirtualCameraResourcePtr& dynamicSensor);
+
     bool processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event);
 
     void ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos);

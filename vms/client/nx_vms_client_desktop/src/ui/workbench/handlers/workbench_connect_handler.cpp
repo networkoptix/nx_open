@@ -29,11 +29,13 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <client_core/client_core_settings.h>
 #include <client/desktop_client_message_processor.h>
@@ -193,7 +195,6 @@ QDebug operator<<(QDebug dbg, QnWorkbenchConnectHandler::PhysicalState state)
     return dbg.space();
 }
 
-
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -269,7 +270,6 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                 default:
                     NX_ASSERT(false, "Unhandled connection state");
             }
-
 
             /* Check if we need to log out if logged in under this user. */
             QString currentLogin = commonModule()->currentUrl().userName();
@@ -744,7 +744,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
             }
         });
 
-
     auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
     commonModule()->setReadOnly(connection->connectionInfo().ecDbReadOnly);
@@ -1044,7 +1043,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
         // This code is also returned if we are downloading compatibility version
         case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
-            if (!applauncher::api::checkOnline(commonModule()->engineVersion(), false))
+            if (!applauncher::api::checkOnline(false))
                 break;
             // Fall through
         case Qn::SuccessConnectionResult:
@@ -1104,6 +1103,18 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
+    for (const auto aviResource: resourcePool()->getResources<QnAviResource>())
+    {
+        if (!aviResource->isOnline())
+            resourcesToRemove.push_back(aviResource);
+    }
+
+    for (const auto fileLayoutResource: resourcePool()->getResources<QnFileLayoutResource>())
+    {
+        if (!fileLayoutResource->isOnline())
+            resourcesToRemove.push_back(fileLayoutResource);
+    }
+
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 
@@ -1116,7 +1127,7 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     cameraUserAttributesPool()->clear();
     mediaServerUserAttributesPool()->clear();
-    propertyDictionary()->clear(idList);
+    resourcePropertyDictionary()->clear(idList);
     statusDictionary()->clear(idList);
 
     licensePool()->reset();

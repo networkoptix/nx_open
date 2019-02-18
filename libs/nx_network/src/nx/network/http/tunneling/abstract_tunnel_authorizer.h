@@ -22,7 +22,7 @@ public:
     virtual ~TunnelAuthorizer() = default;
 
     /**
-     * NOTE: For the sake of simplicity, an implementation is allowed 
+     * NOTE: For the sake of simplicity, an implementation is allowed
      * to invoke completionHandler within this call.
      */
     virtual void authorize(

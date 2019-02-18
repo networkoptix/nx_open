@@ -18,24 +18,17 @@ extern "C" {
 #include "ilp_media_packet.h"
 #include "camera/camera.h"
 #include "camera/codec_parameters.h"
-#include "camera/buffered_stream_consumer.h"
+#include "transcode_stream_reader.h"
 
-namespace nx {
-namespace usb_cam {
-
-class StreamReaderPrivate;
+namespace nx::usb_cam {
 
 class StreamReader: public nxcip::StreamReader
 {
 public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
-        int encoderIndex,
-        const CodecParameters& codecParams,
         const std::shared_ptr<Camera>& camera,
-        bool forceTranscoding);
-
-    virtual ~StreamReader() = default;
+        bool isPrimaryStream);
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual int addRef() const override;
@@ -44,55 +37,22 @@ public:
     virtual int getNextData(nxcip::MediaDataPacket** lpPacket) override;
     virtual void interrupt() override;
 
-    virtual void setFps(float fps);
-    virtual void setResolution(const nxcip::Resolution& resolution);
-    virtual void setBitrate(int bitrate);
+    void setFps(float fps);
+    void setResolution(const nxcip::Resolution& resolution);
+    void setBitrate(int bitrate);
+
+private:
+    int nextPacket(std::shared_ptr<ffmpeg::Packet>& packet);
+    std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::unique_ptr<StreamReaderPrivate> m_streamReader;
-};
-
-class StreamReaderPrivate
-{
-public:
-    StreamReaderPrivate(
-        int encoderIndex,
-        const std::shared_ptr<Camera>& camera);
-
-    virtual ~StreamReaderPrivate();
-
-    virtual int getNextData(nxcip::MediaDataPacket** packet) = 0;
-    virtual void interrupt();
-
-    virtual void setFps(float fps) = 0;
-    virtual void setResolution(const nxcip::Resolution& resolution) = 0;
-    virtual void setBitrate(int bitrate) = 0;
-
-    virtual void ensureConsumerAdded();
-
-protected:
-    static constexpr int kMsecInSec = 1000;
-    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(150);
-    static constexpr std::chrono::milliseconds kWaitTimeout = std::chrono::milliseconds(2000000);
-
+    std::unique_ptr<TranscodeStreamReader> m_transcodeReader;
     int m_encoderIndex;
     std::shared_ptr<Camera> m_camera;
-    std::shared_ptr<BufferedPacketConsumer> m_avConsumer;
-
     CyclicAllocator m_allocator;
-
-    std::atomic_bool m_videoConsumerAdded = false;
-    std::atomic_bool m_audioConsumerAdded = false;
     std::atomic_bool m_interrupted = false;
-
-protected:
-    std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
-    void removeConsumer();
-    bool interrupted();
-    int handleNxError();
-    bool shouldStop() const;
+    bool m_isPrimaryStream = true;
 };
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace usb_cam::nx

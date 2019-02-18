@@ -63,7 +63,7 @@ Connection::Connection(
     const vms::api::PeerDataEx& localPeer,
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
-    const Qn::UserAccessData& userAccessData,
+    const Qn::UserAccessData& /*userAccessData*/,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
     :

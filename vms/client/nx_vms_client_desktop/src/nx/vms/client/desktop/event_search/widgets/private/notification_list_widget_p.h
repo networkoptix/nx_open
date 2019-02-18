@@ -2,7 +2,6 @@
 
 #include "../notification_list_widget.h"
 
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QTabWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -26,12 +25,11 @@ public:
     virtual ~Private() override;
 
 private:
-    NotificationListWidget* q = nullptr;
-    EventRibbon* const m_eventRibbon = nullptr;
-    AbstractEventListModel* m_systemHealthModel = nullptr;
-    AbstractEventListModel* m_notificationsModel = nullptr;
-
-    QWidget* m_placeholder = nullptr;
+    NotificationListWidget* const q;
+    EventRibbon* const m_eventRibbon;
+    QWidget* const m_placeholder;
+    AbstractEventListModel* const m_systemHealthModel;
+    AbstractEventListModel* const m_notificationsModel;
 };
 
 } // namespace nx::vms::client::desktop

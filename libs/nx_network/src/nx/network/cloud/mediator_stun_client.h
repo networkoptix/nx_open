@@ -3,7 +3,6 @@
 #include <optional>
 
 #include <nx/network/http/http_types.h>
-#include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/stun/async_client_delegate.h>
 #include <nx/network/stun/server_aliveness_tester.h>
 
@@ -24,8 +23,8 @@ class NX_NETWORK_API MediatorStunClient:
 
 public:
     MediatorStunClient(
-        MediatorEndpointProvider* endpointProvider,
-        std::unique_ptr<nx::network::stun::AbstractAsyncClient> delegate);
+        AbstractAsyncClient::Settings settings,
+        MediatorEndpointProvider* endpointProvider);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 

@@ -779,12 +779,12 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     {
         /* Leave invisible. */
     }
-    else if (options & QnResourceWidget::DisplayDewarped)
+    else if (options.testFlag(QnResourceWidget::DisplayDewarped))
     {
         /* Leave invisible. */
         instant = true;
     }
-    else if (options & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity))
+    else if (options.testFlag(QnResourceWidget::DisplayMotion))
     {
         /* Leave invisible. */
     }

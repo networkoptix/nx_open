@@ -14,8 +14,7 @@
   <Property Id="ARPNOREPAIR" Value="1" />
   <Property Id="ARPNOMODIFY" Value="1" />
 
-  <Icon Id="favicon.ico" SourceFile="${customization.dir}/icons/all/favicon.ico"/>
-
+  <Icon Id="favicon.ico" SourceFile="${productLogo}"/>
 
   <!-- Set up ARPINSTALLLOCATION property -->
   <CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
@@ -24,16 +23,4 @@
   <InstallExecuteSequence>
     <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
   </InstallExecuteSequence>
-
-    <DirectoryRef Id="INSTALLDIR">
-        <Directory Id="$(var.SystemFolderActual)" />
-        <Directory Id="Common" Name="Common">
-            <Directory Id="Resource" Name="Resource">
-                <Component Id="AlwaysFiles">
-                    <File Id="alwayseve.ico" Name="favicon.ico" Source="${customization.dir}/icons/all/favicon.ico"/>
-                </Component>
-            </Directory>
-        </Directory>
-    </DirectoryRef>
-
 </Include>

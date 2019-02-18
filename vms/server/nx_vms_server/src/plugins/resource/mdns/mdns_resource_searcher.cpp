@@ -20,11 +20,6 @@ QnMdnsResourceSearcher::~QnMdnsResourceSearcher()
 
 }
 
-//bool QnMdnsResourceSearcher::isProxy() const
-//{
-//    return false;
-//}
-
 QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;

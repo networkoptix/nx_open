@@ -286,6 +286,7 @@
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
 #endif
+#include <atomic>
 
 using namespace nx::vms::server;
 
@@ -3512,7 +3513,7 @@ void MediaServerProcess::stopObjects()
     safeDisconnect(commonModule(), this);
     safeDisconnect(commonModule()->runtimeInfoManager(), this);
     if (m_ec2Connection)
-        safeDisconnect(m_ec2Connection->getTimeNotificationManager().get(), this);
+        safeDisconnect(m_ec2Connection->timeNotificationManager().get(), this);
     safeDisconnect(m_ec2Connection.get(), this);
     safeDisconnect(m_updatePiblicIpTimer.get(), this);
     m_updatePiblicIpTimer.reset();
@@ -3713,6 +3714,12 @@ void MediaServerProcess::setUpServerRuntimeData()
 
 void MediaServerProcess::initSsl()
 {
+    static QnMutex initSslMutex;
+    static bool sslInitialized = false;
+    QnMutexLocker lock(&initSslMutex);
+    if (sslInitialized)
+        return;
+
     const auto allowedSslVersions = serverModule()->settings().allowedSslVersions();
     if (!allowedSslVersions.isEmpty())
         nx::network::ssl::Engine::setAllowedServerVersions(allowedSslVersions.toUtf8());
@@ -3725,6 +3732,8 @@ void MediaServerProcess::initSsl()
         serverModule()->settings().sslCertificatePath(),
         nx::utils::AppInfo::productName().toUtf8(), "US",
         nx::utils::AppInfo::organizationName().toUtf8());
+
+    sslInitialized = true;
 }
 
 void MediaServerProcess::doMigrationFrom_2_4()
@@ -4397,7 +4406,7 @@ void MediaServerProcess::run()
 
     // Searchers must be initialized before the resources are loaded as resources instances
     // are created by searchers.
-    serverModule->resourceSearchers()->start();
+    serverModule->resourceSearchers()->initialize();
 
     m_audioStreamerPool = std::make_unique<QnAudioStreamerPool>(serverModule.get());
 

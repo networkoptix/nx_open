@@ -108,52 +108,12 @@
       <translation>Dieser Account ist nicht aktiviert. Bitte überprüfen Sie Ihre Email.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Dieser Account wurde gesperrt.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Angeforderte Funktion ist nicht implementiert.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Unbekannter Bereich.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Ungültige Anforderung.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Ungültige Nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Anmeldeinformationen sind nicht länger gültig.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Ungültige Daten erhalten.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Unbekannter Fehler.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Unerwarteter Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Ungültige Anmeldung.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Angefordertes Objekt wurde nicht gefunden.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Das Objekt ist bereits vorhanden.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation>Interner %1-Fehler. Bitte den Support kontaktieren.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Es tut uns leid, %1-Service ist vorübergehend nicht verfügbar. Wir tun unser Bestes, um es wiederherzustellen. Bitte versuchen Sie es später erneut.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Zu viele Versuche. Versuchen Sie es später erneut.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Es tut uns leid, %1-Service kann Ihre Anforderung nicht bearbeiten. Bitte versuchen Sie es in ein paar Minuten erneut.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
@@ -271,105 +234,105 @@
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>Msek</translation>
+      <translation>msek</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>Sek</translation>
+      <translation>sek</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>Min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>Std</translation>
+      <translation>std</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>Tage</translation>
+      <translation>tage</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>Wochen</translation>
+      <translation>wochen</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>Monate</translation>
+      <translation>monate</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation>Jahre</translation>
+      <translation>jahre</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>Millisekunde</numerusform>
-        <numerusform>Millisekunden</numerusform>
+        <numerusform>millisekunde</numerusform>
+        <numerusform>millisekunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>Sekunde</numerusform>
-        <numerusform>Sekunden</numerusform>
+        <numerusform>sekunde</numerusform>
+        <numerusform>sekunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>Minute</numerusform>
-        <numerusform>Minuten</numerusform>
+        <numerusform>minute</numerusform>
+        <numerusform>minuten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>Stunde</numerusform>
-        <numerusform>Stunden</numerusform>
+        <numerusform>stunde</numerusform>
+        <numerusform>stunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>Tag</numerusform>
-        <numerusform>Tage</numerusform>
+        <numerusform>tag</numerusform>
+        <numerusform>tage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>Woche</numerusform>
-        <numerusform>Wochen</numerusform>
+        <numerusform>woche</numerusform>
+        <numerusform>wochen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>Monat</numerusform>
-        <numerusform>Monate</numerusform>
+        <numerusform>monat</numerusform>
+        <numerusform>monate</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>Jahr</numerusform>
-        <numerusform>Jahre</numerusform>
+        <numerusform>jahr</numerusform>
+        <numerusform>jahre</numerusform>
       </translation>
     </message>
   </context>

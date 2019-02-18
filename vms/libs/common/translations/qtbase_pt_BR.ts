@@ -1104,7 +1104,7 @@ Quer apagar mesmo assim?</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation>Runtime</translation>
+      <translation>Tempo de execução</translation>
     </message>
     <message>
       <source>Configuration</source>

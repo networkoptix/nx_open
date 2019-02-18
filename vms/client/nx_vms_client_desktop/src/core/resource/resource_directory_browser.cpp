@@ -8,7 +8,7 @@
 
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/layout_reader.h>
-#include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <client_core/client_core_module.h>
@@ -68,7 +68,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid& resourceT
     return result;
 }
 
-QString QnResourceDirectoryBrowser::manufacture() const {
+QString QnResourceDirectoryBrowser::manufacturer() const {
     return lit("DirectoryBrowser");
 }
 
@@ -210,7 +210,7 @@ int QnResourceDirectoryBrowser::findResources(const QString& directory, const Re
     return resourcesFound;
 }
 
-QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
+QnFileLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
     const QString layoutUrl = fixSeparators(filename);
@@ -219,13 +219,13 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     // Check the file still seems to be valid.
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
     if (!fileInfo.isValid)
-        return QnLayoutResourcePtr();
+        return QnFileLayoutResourcePtr();
 
     // Check that the layout does not exist yet.
     QnUuid layoutId = guidFromArbitraryData(layoutUrl);
     if (resourcePool)
     {
-        auto existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
+        auto existingLayout = resourcePool->getResourceById<QnFileLayoutResource>(layoutId);
         if (existingLayout)
             return existingLayout;
     }
@@ -325,14 +325,8 @@ void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
     // - file has been removed
     // - file has been renamed. Just the same as to be removed
 
-    if (!QFileInfo::exists(path)) //< File does not exist means resource should be deleted.
+    if (!QFileInfo::exists(path))
     {
-        QnResourcePool* pool = resourcePool();
-        QnResourcePtr res = pool->getResourceByUrl(path);
-        if (res)
-        {
-            pool->removeResource(res);
-        }
         QnMutexLocker lock(&m_cacheMutex);
         m_resourceCache.remove(path);
         m_fsWatcher.removePath(path);
@@ -351,7 +345,9 @@ void QnResourceDirectoryBrowser::at_trackResources(const QnResourceList& resourc
             m_resourceCache.insert(url, ptr);
         }
         else
+        {
             skipped++;
+        }
     }
     // Add file to watch. It properly handles duplicate paths.
     m_fsWatcher.addPaths(paths);

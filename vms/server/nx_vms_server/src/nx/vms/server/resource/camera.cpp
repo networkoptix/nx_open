@@ -34,6 +34,16 @@ Camera::Camera(QnMediaServerModule* serverModule):
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
 
+    connect(this, &Camera::groupIdChanged,
+        [this]()
+        {
+            NX_CRITICAL(!isInitializationInProgress(), "Initialization should fail");
+
+            const auto status = getStatus();
+            if (!NX_ASSERT(status != Qn::Online && status != Qn::Recording, status))
+                setStatus(Qn::Offline);
+        });
+
     connect(this, &QnResource::initializedChanged,
         [this]()
         {
@@ -241,7 +251,7 @@ bool Camera::setAdvancedParameter(const QString& id, const QString& value)
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParameters =
-        [&](Qn::StreamIndex streamIndex)
+        [&](nx::vms::api::StreamIndex streamIndex)
         {
             QnMutexLocker lock(&m_initMutex);
             if (!isInitialized())
@@ -255,8 +265,8 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         };
 
     QnAdvancedStreamParams parameters;
-    parameters.primaryStream = getStreamParameters(Qn::StreamIndex::primary);
-    parameters.secondaryStream = getStreamParameters(Qn::StreamIndex::secondary);
+    parameters.primaryStream = getStreamParameters(nx::vms::api::StreamIndex::primary);
+    parameters.secondaryStream = getStreamParameters(nx::vms::api::StreamIndex::secondary);
     return parameters;
 }
 
@@ -424,6 +434,12 @@ void Camera::initializationDone()
     fixInputPortMonitoring();
 }
 
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
+{
+    // Implementation may be overloaded in a driver.
+    return StreamCapabilityMap();
+}
+
 nx::media::CameraTraits Camera::mediaTraits() const
 {
     return m_mediaTraits;
@@ -451,12 +467,12 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
     const StreamCapabilityMaps streamCapabilityMaps = {
-        {Qn::StreamIndex::primary, getStreamCapabilityMap(Qn::StreamIndex::primary)},
-        {Qn::StreamIndex::secondary, getStreamCapabilityMap(Qn::StreamIndex::secondary)}
+        {StreamIndex::primary, getStreamCapabilityMap(StreamIndex::primary)},
+        {StreamIndex::secondary, getStreamCapabilityMap(StreamIndex::secondary)}
     };
 
     const auto traits = mediaTraits();
-    for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
+    for (const auto streamType: {StreamIndex::primary, StreamIndex::secondary})
     {
         //auto streamCapabilities = getStreamCapabilityMap(streamType);
         if (!streamCapabilityMaps[streamType].isEmpty())
@@ -506,13 +522,13 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
     return CameraDiagnostics::NoErrorResult();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex)
 {
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
-        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1);
-        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps());
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1, key.codec);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps(), key.codec);
         result.maxFps = getMaxFps();
         return result;
     };

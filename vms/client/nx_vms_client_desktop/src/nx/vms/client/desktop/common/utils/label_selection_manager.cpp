@@ -1,18 +1,14 @@
 #include "label_selection_manager.h"
 
-#include <QtCore/QChildEvent>
-#include <QtCore/QScopedValueRollback>
 #include <QtCore/QPointer>
-#include <QtCore/QSet>
-#include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
+#include <QtGui/QFocusEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QContextMenuEvent>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/private/qwidgettextcontrol_p.h>
-
-#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -21,9 +17,6 @@ namespace nx::vms::client::desktop {
 
 class LabelSelectionManager::Private: public QObject
 {
-    using LabelSet = QSet<QLabel*>;
-    static constexpr std::string_view kSelectionsPropertyName = "__qn_LabelsWithSelection";
-
 public:
     explicit Private(QCoreApplication* application)
     {
@@ -41,58 +34,50 @@ protected:
         const auto label = qobject_cast<QLabel*>(widget);
         switch (event->type())
         {
-            // Register every QWidgetTextControl added as a child to a QLabel.
-            case QEvent::ChildAdded:
-            {
-                if (!label)
-                    break;
-
-                auto childEvent = static_cast<QChildEvent*>(event);
-                const auto handleChildAdded =
-                    [this, child = QPointer<QObject>(childEvent->child())]()
-                    {
-                        if (const auto textControl = qobject_cast<QWidgetTextControl*>(child))
-                            registerTextControl(textControl);
-                    };
-
-                // Must check later if the object is QWidgetTextControl, as at this point
-                // it's still at the QObject stage of construction.
-                executeLater(handleChildAdded, this);
-                break;
-            }
-
-            // On a left mouse button press within a window clear selection of all registered
-            // text controls inside the same window.
             case QEvent::MouseButtonPress:
             {
                 const auto mouseEvent = static_cast<QMouseEvent*>(event);
                 if (mouseEvent->button() != Qt::LeftButton)
                     break;
 
-                clearAll(widget->window());
-                m_pressedLabel = label;
+                const auto focusLabel = qobject_cast<QLabel*>(QApplication::focusWidget());
+                if (focusLabel && focusLabel != label)
+                    focusLabel->clearFocus();
+
                 break;
             }
 
-            // On a left mouse button click on a label without selection, select its entire text.
+            // Select all text (on mouse release) if an unfocused label was left-clicked.
+            case QEvent::FocusIn:
+            {
+                const auto focusEvent = static_cast<QFocusEvent*>(event);
+                if (!focusEvent->gotFocus())
+                    break;
+
+                m_lastFocusedLabel = focusEvent->reason() == Qt::MouseFocusReason ? label : nullptr;
+                break;
+            }
+
             case QEvent::MouseButtonRelease:
             {
                 const auto mouseEvent = static_cast<QMouseEvent*>(event);
-                if (mouseEvent->button() != Qt::LeftButton)
+                const bool selectAll = m_lastFocusedLabel
+                    && m_lastFocusedLabel == label
+                    && mouseEvent->button() == Qt::LeftButton
+                    && label->selectedText().isEmpty();
+
+                m_lastFocusedLabel = nullptr;
+                if (!selectAll)
                     break;
 
-                if (label && label == m_pressedLabel && label->selectedText().isEmpty()
-                    && label->textInteractionFlags().testFlag(Qt::TextSelectableByMouse))
-                {
-                    if (const auto textControl = getTextControl(label))
-                        setFullSelection(textControl);
-                }
+                const auto textControl = getTextControl(label);
+                const auto linkText = textControl->anchorAt(mouseEvent->pos());
+                if (linkText.isEmpty())
+                    setFullSelection(textControl);
 
-                m_pressedLabel = nullptr;
                 break;
             }
 
-            // Replace standard Qt popup menus on labels.
             case QEvent::ContextMenu:
             {
                 if (label && processContextMenuEvent(label, static_cast<QContextMenuEvent*>(event)))
@@ -109,52 +94,6 @@ protected:
     }
 
 private:
-    void registerTextControl(QWidgetTextControl* textControl)
-    {
-        if (!NX_ASSERT(textControl) || m_textControls.contains(textControl))
-            return;
-
-        connect(textControl, &QWidgetTextControl::selectionChanged, this,
-            [this]()
-            {
-                const auto textControl = qobject_cast<QWidgetTextControl*>(sender());
-                if (NX_ASSERT(textControl))
-                {
-                    const auto label = getLabel(textControl);
-                    clearAllExcept(getWindow(textControl), label);
-
-                    if (!label->selectedText().isEmpty())
-                        label->setFocus();
-                }
-            });
-
-        connect(textControl, &QObject::destroyed, this,
-            [this](QObject* object)
-            {
-                m_textControls.remove(static_cast<QWidgetTextControl*>(object));
-            });
-
-        m_textControls.insert(textControl);
-    }
-
-    void clearAll(QWidget* window)
-    {
-        clearAllExcept(window, nullptr);
-    }
-
-    void clearAllExcept(QWidget* window, QLabel* exception)
-    {
-        if (m_updating)
-            return;
-
-        QScopedValueRollback<bool> update(m_updating, true);
-        for (auto control: m_textControls)
-        {
-            if (getLabel(control) != exception && getWindow(control) == window)
-                clearSelection(control);
-        }
-    }
-
     bool processContextMenuEvent(QLabel* label, QContextMenuEvent* event) const
     {
         const auto textControl = getTextControl(label);
@@ -174,12 +113,12 @@ private:
                 setFullSelection(textControl);
 
             menu->addAction(tr("Copy"),
-                [text = label->selectedText()]() { qApp->clipboard()->setText(text); });
+                [text = label->selectedText()]() { QApplication::clipboard()->setText(text); });
         }
         else
         {
             menu->addAction(tr("Copy Link Location"),
-                [linkText]() { qApp->clipboard()->setText(linkText); });
+                [linkText]() { QApplication::clipboard()->setText(linkText); });
         }
 
         menu->setAttribute(Qt::WA_DeleteOnClose);
@@ -192,24 +131,6 @@ private:
         return label->findChild<QWidgetTextControl*>({}, Qt::FindDirectChildrenOnly);
     }
 
-    static QWidget* getWindow(QWidgetTextControl* textControl)
-    {
-        const auto label = getLabel(textControl);
-        return label ? label->window() : nullptr;
-    }
-
-    static QLabel* getLabel(QWidgetTextControl* textControl)
-    {
-        return qobject_cast<QLabel*>(textControl->parent());
-    }
-
-    static void clearSelection(QWidgetTextControl* textControl)
-    {
-        auto cursor = textControl->textCursor();
-        cursor.clearSelection();
-        textControl->setTextCursor(cursor);
-    }
-
     static void setFullSelection(QWidgetTextControl* textControl)
     {
         auto cursor = textControl->textCursor();
@@ -218,9 +139,7 @@ private:
     }
 
 private:
-    QSet<QWidgetTextControl*> m_textControls;
-    QPointer<QLabel> m_pressedLabel;
-    bool m_updating = false;
+    QPointer<QLabel> m_lastFocusedLabel;
 };
 
 //-------------------------------------------------------------------------------------------------

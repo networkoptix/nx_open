@@ -76,7 +76,7 @@ public:
 signals:
     void connectionOpened();
     void connectionClosed();
-    void connectionReset( QnCommonMessageProcessor* );
+    void connectionReset( QnCommonMessageProcessor*);
 
     void initialResourcesReceived();
 
@@ -150,8 +150,8 @@ private slots:
     void on_resourceParamChanged(
         const nx::vms::api::ResourceParamWithRefData& param,
         ec2::NotificationSource source);
-    void on_resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param );
-    void on_resourceRemoved(const QnUuid& resourceId );
+    void on_resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
+    void on_resourceRemoved(const QnUuid& resourceId);
     void on_resourceStatusRemoved(const QnUuid& resourceId);
 
     void on_accessRightsChanged(const nx::vms::api::AccessRightsData& accessRights);
@@ -169,11 +169,9 @@ private slots:
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
-    void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action );
+    void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action);
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 protected:
     ec2::AbstractECConnectionPtr m_connection;
 };
-
-#define qnCommonMessageProcessor commonModule()->messageProcessor()

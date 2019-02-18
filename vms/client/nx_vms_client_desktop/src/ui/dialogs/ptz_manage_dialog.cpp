@@ -297,12 +297,9 @@ bool QnPtzManageDialog::savePresets()
 
     for (const QnPtzPresetItemModel& model: m_model->presetModels())
     {
-        if (!model.modified)
-            continue;
-
         if (model.local)
             result &= createPreset(model.preset);
-        else
+        else if (model.isNameModified())
             result &= updatePreset(model.preset);
     }
 

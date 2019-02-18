@@ -2,54 +2,289 @@
 
 #include <nx/network/url/url_builder.h>
 
-namespace nx {
-namespace network {
-namespace url {
+namespace nx::network::url {
 namespace test {
+
+namespace {
+
+static const nx::utils::Url kSampleUrl("https://localhost:7001");
+static const QString kSampleHost("localhost");
+
+} // namespace
 
 class UrlBuilderTest: public ::testing::Test
 {
-public:
-    static void assertValidUrlCanBeConstructedWithHost(const QString& host)
-    {
-        const SocketAddress address(host, 7001);
-        const auto url = nx::network::url::Builder()
-            .setScheme(nx::network::http::urlSheme(true))
-            .setEndpoint(address).toUrl();
-        ASSERT_TRUE(url.isValid());
-        ASSERT_FALSE(url.host().isEmpty());
-    }
 };
 
-TEST_F(UrlBuilderTest, buildIpV6UrlFull)
+class BuildUrlFromHost:
+    public UrlBuilderTest,
+    public ::testing::WithParamInterface<std::string>
 {
-    assertValidUrlCanBeConstructedWithHost("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
-    assertValidUrlCanBeConstructedWithHost("[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]");
+};
+
+TEST_P(BuildUrlFromHost, urlIsValid)
+{
+    const std::string hostname = GetParam();
+    const SocketAddress address(hostname, 7001);
+    const auto url = Builder()
+        .setScheme(nx::network::http::kSecureUrlSchemeName)
+        .setEndpoint(address)
+        .toUrl();
+    ASSERT_TRUE(url.isValid());
+    ASSERT_TRUE(url.toQUrl().isValid());
+    ASSERT_FALSE(url.host().isEmpty());
 }
 
-TEST_F(UrlBuilderTest, buildIpV6UrlCollapsed)
+static std::vector<std::string> kIPv6HostNames{
+    // Full notation.
+    "2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d",
+    "[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]",
+    // Shortened notation.
+    "[2001::9d38:6ab8:384e:1c3e:aaa2]",
+    "2001::9d38:6ab8:384e:1c3e:aaa2",
+    "::",
+    "::1",
+    "2001::",
+    // Zeroes in the notation.
+    "[2001:0000:11a3:09d7:1f34:8a2e:07a0:765d]",
+    "2001:0000:11a3:09d7:1f34:8a2e:07a0:765d",
+    // Single zero in the notation.
+    "[2001:0:11a3:09d7:1f34:8a2e:07a0:765d]",
+    "2001:0:11a3:09d7:1f34:8a2e:07a0:765d"
+};
+
+INSTANTIATE_TEST_CASE_P(UrlBuilderParseIPv6Host,
+	BuildUrlFromHost,
+	::testing::ValuesIn(kIPv6HostNames));
+
+class BuildUrlWithHostAndPath:
+    public UrlBuilderTest,
+    public ::testing::WithParamInterface<std::string>
 {
-    assertValidUrlCanBeConstructedWithHost("[2001::9d38:6ab8:384e:1c3e:aaa2]");
-    assertValidUrlCanBeConstructedWithHost("2001::9d38:6ab8:384e:1c3e:aaa2");
-    assertValidUrlCanBeConstructedWithHost("::");
-    assertValidUrlCanBeConstructedWithHost("::1");
-    assertValidUrlCanBeConstructedWithHost("2001::");
+};
+
+TEST_P(BuildUrlWithHostAndPath, urlIsValid)
+{
+    const std::string path = GetParam();
+    const auto url = Builder(kSampleUrl)
+        .setPath(path)
+        .toUrl();
+    ASSERT_TRUE(url.isValid());
+    ASSERT_TRUE(url.toQUrl().isValid());
 }
 
-TEST_F(UrlBuilderTest, buildIpV6UrlWithZeroes)
+TEST_P(BuildUrlWithHostAndPath, urlIsValidWhenHostIsSetLater)
 {
-    assertValidUrlCanBeConstructedWithHost("[2001:0000:11a3:09d7:1f34:8a2e:07a0:765d]");
-    assertValidUrlCanBeConstructedWithHost("2001:0000:11a3:09d7:1f34:8a2e:07a0:765d");
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .setHost(kSampleHost)
+        .toUrl();
+    ASSERT_TRUE(url.isValid());
+    ASSERT_TRUE(url.toQUrl().isValid());
 }
 
-TEST_F(UrlBuilderTest, buildIpV6UrlWithSingleZero)
+TEST_P(BuildUrlWithHostAndPath, urlIsValidWhenWhenEndpointIsSetLater)
 {
-    assertValidUrlCanBeConstructedWithHost("[2001:0:11a3:09d7:1f34:8a2e:07a0:765d]");
-    assertValidUrlCanBeConstructedWithHost("2001:0:11a3:09d7:1f34:8a2e:07a0:765d");
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .setEndpoint(SocketAddress(kSampleHost))
+        .toUrl();
+    ASSERT_TRUE(url.isValid());
+    ASSERT_TRUE(url.toQUrl().isValid());
 }
 
+TEST_P(BuildUrlWithHostAndPath, pathStartsFromSingleSlash)
+{
+    const std::string path = GetParam();
+    const auto url = Builder(kSampleUrl)
+        .setPath(path)
+        .toUrl();
+    ASSERT_EQ(url.path().isEmpty(), path.empty());
+    ASSERT_TRUE(url.path().isEmpty() || url.path().startsWith("/"));
+}
+
+TEST_P(BuildUrlWithHostAndPath, pathStartsFromSingleSlashWhenHostIsSetLater)
+{
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .setHost(kSampleHost)
+        .toUrl();
+    ASSERT_EQ(url.path().isEmpty(), path.empty());
+    ASSERT_TRUE(url.path().isEmpty() || url.path().startsWith("/"));
+}
+
+TEST_P(BuildUrlWithHostAndPath, pathStartsFromSingleSlashWhenEndpointIsSetLater)
+{
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .setEndpoint(SocketAddress(kSampleHost))
+        .toUrl();
+    ASSERT_EQ(url.path().isEmpty(), path.empty());
+    ASSERT_TRUE(url.path().isEmpty() || url.path().startsWith("/"));
+}
+
+TEST_P(BuildUrlWithHostAndPath, noDoubleSlashInPath)
+{
+    const std::string path = GetParam();
+    const auto url = Builder(kSampleUrl)
+        .setPath(path)
+        .toUrl();
+    ASSERT_FALSE(url.path().contains("//"));
+}
+
+class BuildUrlWithPathOnly:
+    public UrlBuilderTest,
+    public ::testing::WithParamInterface<std::string>
+{
+};
+
+TEST_P(BuildUrlWithPathOnly, urlIsValid)
+{
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .toUrl();
+    ASSERT_TRUE(path.empty() || url.isValid());
+    ASSERT_TRUE(path.empty() || url.toQUrl().isValid());
+}
+
+TEST_P(BuildUrlWithPathOnly, pathStartsFromNoSlash)
+{
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .toUrl();
+    ASSERT_EQ(url.path().isEmpty(), path.empty());
+    ASSERT_TRUE(!url.path().startsWith("/"));
+}
+
+TEST_P(BuildUrlWithPathOnly, noDoubleSlashInPath)
+{
+    const std::string path = GetParam();
+    const auto url = Builder()
+        .setPath(path)
+        .toUrl();
+    ASSERT_FALSE(url.path().contains("//"));
+}
+
+static std::vector<std::string> kPaths {
+    std::string(),
+    "path",
+    "/path",
+    "//path",
+    "///path",
+    "path/",
+    "/path/",
+    "//path/",
+    "///path/",
+    "path//",
+    "/path//",
+    "//path//",
+    "///path//",
+    "/path/long/",
+    "//path//long//",
+    "///path//long",
+    "///path///long///",
+};
+
+INSTANTIATE_TEST_CASE_P(UrlBuilderParsePath,
+	BuildUrlWithHostAndPath,
+	::testing::ValuesIn(kPaths));
+
+INSTANTIATE_TEST_CASE_P(UrlBuilderParsePath,
+	BuildUrlWithPathOnly,
+	::testing::ValuesIn(kPaths));
+
+struct UrlPathParts
+{
+    std::string path;
+    std::vector<std::string> parts;
+    std::string expectedPath;
+
+    UrlPathParts(
+        const std::string& path,
+		const std::vector<std::string>& parts,
+		const std::string& expectedPath)
+        :
+        path(path),
+        parts(parts),
+        expectedPath(expectedPath)
+    {}
+};
+
+void PrintTo(UrlPathParts value, ::std::ostream* os)
+{
+    *os
+        << "( " << value.path << ", [";
+    for (const auto& part: value.parts)
+        *os << part << ", ";
+    *os <<"], " << value.expectedPath << ")";
+}
+
+class AppendPathToUrl:
+    public UrlBuilderTest,
+    public ::testing::WithParamInterface<UrlPathParts>
+{
+};
+
+TEST_P(AppendPathToUrl, appendedPathIsValid)
+{
+    const UrlPathParts parts = GetParam();
+    Builder builder = Builder(kSampleUrl)
+        .setPath(parts.path);
+
+    for (const auto& part: parts.parts)
+        builder.appendPath(part);
+
+    const auto url = builder.toUrl();
+    ASSERT_TRUE(url.isValid());
+    ASSERT_TRUE(url.toQUrl().isValid());
+}
+
+TEST_P(AppendPathToUrl, appendedPathIsExpected)
+{
+    const UrlPathParts parts = GetParam();
+    Builder builder = Builder(kSampleUrl)
+        .setPath(parts.path);
+
+    for (const auto& part: parts.parts)
+        builder.appendPath(part);
+
+    const auto url = builder.toUrl();
+    ASSERT_EQ(url.path().toStdString(), parts.expectedPath);
+}
+
+static std::vector<UrlPathParts> kPathParts
+{
+	{"", {}, ""},
+    {"", {""}, ""},
+    {"path", {}, "/path"},
+    {"path", {""}, "/path"},
+    {"path", {"/", "/"}, "/path/"},
+    {"path", {"part"}, "/path/part"},
+    {"path", {"part1", "part2"}, "/path/part1/part2"},
+    {"path/", {"/part"}, "/path/part"},
+    {"path/", {"//part"}, "/path/part"},
+    {"path//", {"part"}, "/path/part"},
+    {"path//", {"/part"}, "/path/part"},
+    {"path//", {"//part"}, "/path/part"},
+    {"path///", {"///part///"}, "/path/part/"},
+    {"path", {"part1/", "part2"}, "/path/part1/part2"},
+    {"path", {"part1/", "/part2"}, "/path/part1/part2"},
+    {"path", {"part1//", "part2"}, "/path/part1/part2"},
+    {"path", {"part1//", "//part2"}, "/path/part1/part2"},
+    {"path///", {"///part1///", "///part2///"}, "/path/part1/part2/"}
+};
+
+INSTANTIATE_TEST_CASE_P(UrlBuilderAppendPath,
+	AppendPathToUrl,
+	::testing::ValuesIn(kPathParts));
 
 } // namespace test
-} // namespace url
-} // namespace network
-} // namespace nx
+} // namespace nx::network::url
+
+

@@ -208,7 +208,6 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString& updateId,
         lm("Update chunk [id = %1, offset = %2, size = %3].")
             .arg(updateId).arg(offset).arg(data.size()));
 
-
     if (m_bannedUpdates.contains(updateId))
     {
         NX_ERROR(this, lm("Update %1 is banned.").arg(updateId));

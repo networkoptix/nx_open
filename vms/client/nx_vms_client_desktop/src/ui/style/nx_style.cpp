@@ -3259,19 +3259,30 @@ QSize QnNxStyle::sizeFromContents(
     if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
         type = CT_PushButton;
 
+    const auto withContentsMargins =
+        [](const QWidget* widget, const QSize& size)
+        {
+            if (!widget)
+                return size;
+
+            const auto m = widget->contentsMargins();
+            return size + QSize(m.left() + m.right(), m.top() + m.bottom());
+        };
+
     switch (type)
     {
         case CT_CheckBox:
-            return QSize(
+            return withContentsMargins(widget, QSize(
                 size.width() + proxy()->pixelMetric(PM_IndicatorWidth, option, widget) +
-                               proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget),
-                qMax(size.height(), proxy()->pixelMetric(PM_IndicatorHeight, option, widget)));
+                    proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget),
+                qMax(size.height(), proxy()->pixelMetric(PM_IndicatorHeight, option, widget))));
 
         case CT_RadioButton:
-            return QSize(
+            return withContentsMargins(widget, QSize(
                 size.width() + proxy()->pixelMetric(PM_ExclusiveIndicatorWidth, option, widget) +
-                               proxy()->pixelMetric(PM_RadioButtonLabelSpacing, option, widget),
-                qMax(size.height(), proxy()->pixelMetric(PM_ExclusiveIndicatorHeight, option, widget)));
+                    proxy()->pixelMetric(PM_RadioButtonLabelSpacing, option, widget),
+                qMax(size.height(), proxy()->pixelMetric(PM_ExclusiveIndicatorHeight, option,
+                    widget))));
 
         case CT_PushButton:
         {
@@ -4083,7 +4094,6 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
-        qobject_cast<QLabel*>(widget) ||
         isNonEditableComboBox(widget))
     {
         if (widget->focusPolicy() != Qt::NoFocus)

@@ -696,10 +696,10 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     if (canCheckLive)
     {
         QnVideoCameraPtr camera;
-        const Qn::StreamIndex streamIndex =
+        const nx::vms::api::StreamIndex streamIndex =
             (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
-            ? Qn::StreamIndex::primary
-            : Qn::StreamIndex::secondary;
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary;
         if (getResource())
             camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
 
@@ -818,9 +818,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
     for (; i < numVideo + numAudio; ++i)
     {
         AbstractRtspEncoderPtr encoder;
+        bool isVideoTrack = (i < numVideo);
         if (d->useProprietaryFormat)
         {
-            bool isVideoTrack = (i < numVideo);
             QnRtspFfmpegEncoder* ffmpegEncoder = createRtspFfmpegEncoder(isVideoTrack);
             if (!isVideoTrack)
             {
@@ -831,7 +831,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
         }
         else
         {
-            QnAbstractMediaData::DataType dataType = i < numVideo ?
+            QnAbstractMediaData::DataType dataType = isVideoTrack ?
                 QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO;
             QnConstAbstractMediaDataPtr mediaHigh = getCameraData(dataType, MEDIA_Quality_High);
             QnConstAbstractMediaDataPtr mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
@@ -848,6 +848,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
         sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
         trackInfo->setEncoder(std::move(encoder));
+        trackInfo->mediaType = isVideoTrack ?
+            RtspServerTrackInfo::MediaType::Video : RtspServerTrackInfo::MediaType::Audio;
         d->trackInfo.insert(i, trackInfo);
     }
 
@@ -1331,10 +1333,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && QnResource::isOnline(status))
         {
-            const Qn::StreamIndex streamIndex =
+            const nx::vms::api::StreamIndex streamIndex =
                 (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
-                ? Qn::StreamIndex::primary
-                : Qn::StreamIndex::secondary;
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary;
             bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
             copySize = d->dataProcessor->copyLastGopFromCamera(
                 camera,
@@ -1480,10 +1482,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                const Qn::StreamIndex streamIndex =
+                const nx::vms::api::StreamIndex streamIndex =
                     (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
-                    ? Qn::StreamIndex::primary
-                    : Qn::StreamIndex::secondary;
+                    ? nx::vms::api::StreamIndex::primary
+                    : nx::vms::api::StreamIndex::secondary;
                 bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
                 d->dataProcessor->copyLastGopFromCamera(
                     camera,

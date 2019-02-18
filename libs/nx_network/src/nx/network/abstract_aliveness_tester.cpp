@@ -58,6 +58,8 @@ void AbstractAlivenessTester::confirmAliveness()
 
 void AbstractAlivenessTester::stopWhileInAioThread()
 {
+    cancelProbe();
+
     base_type::stopWhileInAioThread();
 
     m_timer.pleaseStopSync();

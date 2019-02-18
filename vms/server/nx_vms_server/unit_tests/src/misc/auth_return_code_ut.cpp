@@ -404,7 +404,7 @@ TEST_F(AuthenticationTest, cookieWrongPassword)
     // Check return code for wrong password
     testCookieAuth(
         "admin", "invalid password",
-        QnRestResult::InvalidParameter);
+        QnRestResult::CantProcessRequest);
 }
 
 TEST_F(AuthenticationTest, cookieCorrectPassword)

@@ -18,7 +18,19 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 };
+
+class QnTotalRecordingStatsModel: public QSortFilterProxyModel
+{
+public:
+    typedef QSortFilterProxyModel base_type;
+    QnTotalRecordingStatsModel(QObject* parent = nullptr) : base_type(parent) {}
+
+protected:
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+};
+
 
 class QnRecordingStatsModel : public Customized<QAbstractListModel>,
     public QnConnectionContextAware

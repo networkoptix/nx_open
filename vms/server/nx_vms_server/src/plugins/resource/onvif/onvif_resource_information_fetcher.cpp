@@ -369,7 +369,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
 
     bool doNotAddVendorToDeviceName = resData.value<bool>(ResourceDataKey::kDoNotAddVendorToDeviceName);
 
-    QnPlOnvifResourcePtr resource = createOnvifResourceByManufacture(serverModule(), manufacturerAlias);
+    QnPlOnvifResourcePtr resource = createOnvifResourceByManufacturer(serverModule(), manufacturerAlias);
     if (!resource)
         return resource;
 
@@ -425,12 +425,12 @@ QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& respo
              : QString::fromStdString(response.SerialNumber));
 }
 
-QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacturer(
     QnMediaServerModule* serverModule,
-    const QString& manufacture)
+    const QString& manufacturer)
 {
     QnPlOnvifResourcePtr resource;
-    const QString lowerCaseManufacture = manufacture.toLower();
+    const QString lowerCaseManufacture = manufacturer.toLower();
 
     if (lowerCaseManufacture.contains("digital watchdog")
         || lowerCaseManufacture.contains("digital_watchdog")
@@ -465,7 +465,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource(serverModule));
 
-    resource->setVendor(manufacture);
+    resource->setVendor(manufacturer);
 
     return resource;
 }

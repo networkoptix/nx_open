@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/tunneling/base_tunnel_validator.h>
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/tunneling/detail/client_factory.h>
@@ -26,23 +27,26 @@ enum TunnelMethod
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
+static constexpr char kTunnelTag[] = "/HttpTunnelingTest";
 
+template<typename TunnelMethodMask>
 class HttpTunneling:
-    public ::testing::TestWithParam<int /*Tunnel methods mask*/>
+    public ::testing::Test,
+    private TunnelAuthorizer<>
 {
 public:
     HttpTunneling():
         m_tunnelingServer(
             std::bind(&HttpTunneling::saveServerTunnel, this, std::placeholders::_1),
-            nullptr)
+            this)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
-            [this](const nx::utils::Url& baseUrl)
+            [this](const std::string& tag, const nx::utils::Url& baseUrl)
             {
-                return m_localFactory.create(baseUrl);
+                return m_localFactory.create(tag, baseUrl);
             });
 
-        enableTunnelMethods(GetParam());
+        enableTunnelMethods(TunnelMethodMask::value);
     }
 
     ~HttpTunneling()
@@ -59,9 +63,7 @@ protected:
     {
         startHttpServer();
 
-        m_tunnelingServer.registerRequestHandlers(
-            kBasePath,
-            &m_httpServer->httpMessageDispatcher());
+        m_tunnelingClient = std::make_unique<Client>(m_baseUrl, kTunnelTag);
     }
 
     void stopTunnelingServer()
@@ -74,11 +76,22 @@ protected:
         m_timeout = timeout;
     }
 
+    void givenTunnellingServer()
+    {
+        m_tunnelingServer.registerRequestHandlers(
+            kBasePath,
+            &m_httpServer->httpMessageDispatcher());
+    }
+
+    void addSomeCustomHttpHeadersToTheClient()
+    {
+        m_customHeaders.emplace("H1", "V1.1");
+        m_customHeaders.emplace("H1", "V1.2");
+        m_customHeaders.emplace("H2", "V2");
+    }
+
     void givenSilentTunnellingServer()
     {
-        stopTunnelingServer();
-        startHttpServer();
-
         m_httpServer->registerRequestProcessorFunc(
             http::kAnyPath,
             [this](auto&&... args) { leaveRequestWithoutResponse(std::move(args)...); });
@@ -86,7 +99,8 @@ protected:
 
     void whenRequestTunnel()
     {
-        m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient->setCustomHeaders(m_customHeaders);
+
         if (m_timeout)
             m_tunnelingClient->setTimeout(*m_timeout);
         else
@@ -109,6 +123,7 @@ protected:
     {
         m_prevClientTunnelResult = m_clientTunnels.pop();
 
+        ASSERT_EQ(ResultCode::ok, m_prevClientTunnelResult.resultCode);
         ASSERT_EQ(SystemError::noError, m_prevClientTunnelResult.sysError);
         ASSERT_TRUE(StatusCode::isSuccessCode(m_prevClientTunnelResult.httpStatus));
         ASSERT_NE(nullptr, m_prevClientTunnelResult.connection);
@@ -124,7 +139,8 @@ protected:
     {
         m_prevClientTunnelResult = m_clientTunnels.pop();
 
-        ASSERT_NE(SystemError::noError, m_prevClientTunnelResult.sysError);
+        ASSERT_NE(ResultCode::ok, m_prevClientTunnelResult.resultCode);
+        // NOTE: sysError and httpStatus of m_prevClientTunnelResult may be ok.
         ASSERT_EQ(nullptr, m_prevClientTunnelResult.connection);
     }
 
@@ -133,18 +149,59 @@ protected:
         ASSERT_EQ(expected, m_prevClientTunnelResult.sysError);
     }
 
+    Client& tunnelingClient()
+    {
+        return *m_tunnelingClient;
+    }
+
+    detail::ClientFactory& tunnelClientFactory()
+    {
+        return m_localFactory;
+    }
+
+    void andCustomHeadersAreReportedToTheServer()
+    {
+        for (const auto& header: m_customHeaders)
+        {
+            bool found = false;
+
+            const auto headerRange =
+                m_lastOpenTunnelRequestReceivedByServer.headers.equal_range(header.first);
+            for (auto it = headerRange.first; it != headerRange.second; ++it)
+            {
+                if (it->second == header.second)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            ASSERT_TRUE(found);
+        }
+    }
+
 private:
     Server<> m_tunnelingServer;
     std::unique_ptr<Client> m_tunnelingClient;
     detail::ClientFactory m_localFactory;
     detail::ClientFactory::Function m_clientFactoryBak;
-    std::unique_ptr<TestHttpServer> m_httpServer;
     nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
+    std::unique_ptr<TestHttpServer> m_httpServer;
+    http::HttpHeaders m_customHeaders;
+    http::Request m_lastOpenTunnelRequestReceivedByServer;
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
     std::optional<std::chrono::milliseconds> m_timeout;
+
+    virtual void authorize(
+        const RequestContext* requestContext,
+        CompletionHandler completionHandler) override
+    {
+        m_lastOpenTunnelRequestReceivedByServer = requestContext->request;
+        completionHandler(StatusCode::ok);
+    }
 
     void startHttpServer()
     {
@@ -220,59 +277,212 @@ private:
     }
 };
 
+TYPED_TEST_CASE_P(HttpTunneling);
+
+TYPED_TEST_P(HttpTunneling, tunnel_is_established)
+{
+    this->givenTunnellingServer();
+    this->whenRequestTunnel();
+    this->thenTunnelIsEstablished();
+}
+
+TYPED_TEST_P(HttpTunneling, error_is_reported)
+{
+    this->stopTunnelingServer();
+
+    this->whenRequestTunnel();
+    this->thenTunnelIsNotEstablished();
+}
+
+TYPED_TEST_P(HttpTunneling, timeout_supported)
+{
+    this->setEstablishTunnelTimeout(std::chrono::milliseconds(1));
+
+    this->givenSilentTunnellingServer();
+
+    this->whenRequestTunnel();
+
+    this->thenTunnelIsNotEstablished();
+    this->andResultCodeIs(SystemError::timedOut);
+}
+
+TYPED_TEST_P(HttpTunneling, custom_http_headers_are_transferred)
+{
+    this->givenTunnellingServer();
+    this->addSomeCustomHttpHeadersToTheClient();
+    this->whenRequestTunnel();
+
+    this->thenTunnelIsEstablished();
+    this->andCustomHeadersAreReportedToTheServer();
+}
+
+REGISTER_TYPED_TEST_CASE_P(HttpTunneling,
+    tunnel_is_established,
+    error_is_reported,
+    timeout_supported,
+    custom_http_headers_are_transferred);
+
 //-------------------------------------------------------------------------------------------------
 
-TEST_P(HttpTunneling, tunnel_is_established)
+struct EveryMethodMask { static constexpr int value = TunnelMethod::all; };
+INSTANTIATE_TYPED_TEST_CASE_P(EveryMethod, HttpTunneling, EveryMethodMask);
+
+struct GetPostMethodMask { static constexpr int value = TunnelMethod::getPost; };
+INSTANTIATE_TYPED_TEST_CASE_P(GetPost, HttpTunneling, GetPostMethodMask);
+
+struct ConnectionUpgradeMethodMask { static constexpr int value = TunnelMethod::connectionUpgrade; };
+INSTANTIATE_TYPED_TEST_CASE_P(ConnectionUpgrade, HttpTunneling, ConnectionUpgradeMethodMask);
+
+struct ExperimentalMethodMask { static constexpr int value = TunnelMethod::experimental; };
+INSTANTIATE_TYPED_TEST_CASE_P(Experimental, HttpTunneling, ExperimentalMethodMask);
+
+struct SslMethodMask { static constexpr int value = TunnelMethod::ssl; };
+INSTANTIATE_TYPED_TEST_CASE_P(Ssl, HttpTunneling, SslMethodMask);
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+struct ValidatorBehavior
 {
+    ResultCode expectedResult = ResultCode::ok;
+    bool failWithTimeout = false;
+};
+
+class TestValidator:
+    public BaseTunnelValidator
+{
+    using base_type = BaseTunnelValidator;
+
+public:
+    TestValidator(
+        std::unique_ptr<AbstractStreamSocket> tunnel,
+        ValidatorBehavior behaviorDescriptor,
+        nx::utils::SyncQueue<ResultCode>* validationResults)
+        :
+        base_type(std::move(tunnel)),
+        m_behaviorDescriptor(behaviorDescriptor),
+        m_validationResults(validationResults)
+    {
+    }
+
+    virtual void setTimeout(std::chrono::milliseconds timeout) override
+    {
+        m_timeout = timeout;
+    }
+
+    virtual void validate(ValidateTunnelCompletionHandler handler) override
+    {
+        if (m_behaviorDescriptor.failWithTimeout && !m_timeout)
+            return;
+
+        m_validationResults->push(m_behaviorDescriptor.expectedResult);
+        post([this, handler = std::move(handler)]()
+            { handler(m_behaviorDescriptor.expectedResult); });
+    }
+
+private:
+    ValidatorBehavior m_behaviorDescriptor;
+    nx::utils::SyncQueue<ResultCode>* m_validationResults = nullptr;
+    std::optional<std::chrono::milliseconds> m_timeout;
+};
+
+} // namespace
+
+class HttpTunnelingValidation:
+    public HttpTunneling<EveryMethodMask>
+{
+    using base_type = HttpTunneling<EveryMethodMask>;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        givenTunnellingServer();
+
+        m_initialTopTunnelTypeId = tunnelClientFactory().topTunnelTypeId(kTunnelTag);
+    }
+
+    void givenSuccessfulValidator()
+    {
+        m_validatorBehavior.expectedResult = ResultCode::ok;
+        setTunnelValidator();
+    }
+
+    void givenFailingValidator()
+    {
+        m_validatorBehavior.expectedResult = ResultCode::ioError;
+        setTunnelValidator();
+    }
+
+    void givenValidatorFailingTimeout()
+    {
+        m_validatorBehavior.expectedResult = ResultCode::ioError;
+        m_validatorBehavior.failWithTimeout = true;
+        setTunnelValidator();
+    }
+
+    void andValidationIsCompleted()
+    {
+        const auto result = m_validationResults.pop(std::chrono::milliseconds::zero());
+        ASSERT_TRUE(result);
+        ASSERT_EQ(m_validatorBehavior.expectedResult, *result);
+    }
+
+    void andTunnelTypePrioritiesChanged()
+    {
+        ASSERT_NE(m_initialTopTunnelTypeId, tunnelClientFactory().topTunnelTypeId(kTunnelTag));
+    }
+
+private:
+    int m_initialTopTunnelTypeId = -1;
+    nx::utils::SyncQueue<ResultCode> m_validationResults;
+    ValidatorBehavior m_validatorBehavior;
+
+    void setTunnelValidator()
+    {
+        tunnelingClient().setTunnelValidatorFactory(
+            [this](auto tunnel, const Response&)
+            {
+                return std::make_unique<TestValidator>(
+                    std::move(tunnel),
+                    m_validatorBehavior,
+                    &m_validationResults);
+            });
+    }
+};
+
+TEST_F(HttpTunnelingValidation, validation_is_performed)
+{
+    givenSuccessfulValidator();
+
     whenRequestTunnel();
+
+
     thenTunnelIsEstablished();
+    andValidationIsCompleted();
 }
 
-TEST_P(HttpTunneling, error_is_reported)
+TEST_F(HttpTunnelingValidation, validation_error_is_reported)
 {
-    stopTunnelingServer();
-
-    whenRequestTunnel();
-    thenTunnelIsNotEstablished();
-}
-
-TEST_P(HttpTunneling, timeout_supported)
-{
-    setEstablishTunnelTimeout(std::chrono::milliseconds(1));
-
-    givenSilentTunnellingServer();
+    givenFailingValidator();
 
     whenRequestTunnel();
 
     thenTunnelIsNotEstablished();
-    andResultCodeIs(SystemError::timedOut);
+    andValidationIsCompleted();
+    andTunnelTypePrioritiesChanged();
 }
 
-//-------------------------------------------------------------------------------------------------
+TEST_F(HttpTunnelingValidation, client_forwards_timeout_to_validator)
+{
+    givenValidatorFailingTimeout();
 
-INSTANTIATE_TEST_CASE_P(
-    EveryMethod,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::all));
+    whenRequestTunnel();
 
-INSTANTIATE_TEST_CASE_P(
-    GetPostWithLargeMessageBody,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::getPost));
-
-INSTANTIATE_TEST_CASE_P(
-    ConnectionUpgrade,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::connectionUpgrade));
-
-INSTANTIATE_TEST_CASE_P(
-    Experimental,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::experimental));
-
-INSTANTIATE_TEST_CASE_P(
-    Ssl,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::ssl));
+    thenTunnelIsNotEstablished();
+    andValidationIsCompleted();
+}
 
 } // namespace nx::network::http::tunneling::test

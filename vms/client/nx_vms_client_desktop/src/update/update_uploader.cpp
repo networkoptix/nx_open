@@ -116,7 +116,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     }
 
     if (!m_peers.isEmpty())
-        connect(commonModule()->ec2Connection()->getUpdatesNotificationManager().get(),   &ec2::AbstractUpdatesNotificationManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
+        connect(commonModule()->ec2Connection()->updatesNotificationManager().get(),   &ec2::AbstractUpdatesNotificationManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
 
     sendPreambule();
     return true;
@@ -279,5 +279,5 @@ void QnUpdateUploader::cleanUp() {
     m_updateFile.reset();
     m_updateId.clear();
     m_chunkTimer->stop();
-    commonModule()->ec2Connection()->getUpdatesNotificationManager()->disconnect(this);
+    commonModule()->ec2Connection()->updatesNotificationManager()->disconnect(this);
 }

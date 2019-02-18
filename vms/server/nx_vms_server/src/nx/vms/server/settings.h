@@ -244,8 +244,8 @@ public:
     Option<bool> authenticationEnabled{this, "authenticationEnabled", true, ""};
     Option<QByteArray> authKey{this, "authKey", "", ""};
     Option<qint64> forceStopRecordingTime{this, "forceStopRecordingTime",
-        60 * 24 * 30,
-        "Stop camera recording timeout if not enough license. Value in minutes. By default it's 30"
+        60 * 60 * 24 * 30,
+        "Stop camera recording timeout if not enough license. Value in seconds. By default it's 30"
         " days.",
         [this](const qint64& value)
         {
@@ -254,6 +254,7 @@ public:
     };
     Option<int> maxConnections{this, "maxConnections", 2000, ""};
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
+    Option<bool> noPlugins{this, "noPlugins", false, "Turn off all plugins"};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
     Option<QString> rtspTransport{this, "rtspTransport", "tcp", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
@@ -356,6 +357,17 @@ public:
             return value;
         }
     };
+    Option<std::chrono::seconds> vacuumIntervalSec{this, "vacuumIntervalSec",
+        kDefaultVacuumIntervalSecacuumIntervalSec,
+        "Interval between storage media db vacuum routines.",
+        [](const std::chrono::seconds& value)
+        {
+            if (value.count() == 0)
+                return kDefaultVacuumIntervalSecacuumIntervalSec;
+
+            return value;
+        }
+    };
 
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
@@ -368,6 +380,7 @@ public:
     static constexpr std::chrono::milliseconds kDefaultHlsTargetDurationMs{5 * 1000};
     static constexpr std::chrono::hours kDbBackupPeriodHrs{24};
     static constexpr int kDefaultHlsRemovedLiveChunksToKeep = -1;
+    static constexpr std::chrono::seconds kDefaultVacuumIntervalSecacuumIntervalSec{3600 * 24};
 };
 
 } // namespace vms::server

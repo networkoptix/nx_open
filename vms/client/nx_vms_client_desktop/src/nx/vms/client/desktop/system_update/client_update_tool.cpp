@@ -14,14 +14,12 @@
 
 namespace nx::vms::client::desktop {
 
-bool requestInstalledVersions(
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    QList<nx::utils::SoftwareVersion>* versions)
+bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
     using namespace applauncher::api;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline(engineVersion))
+    if (!checkOnline())
         return false;
 
     const auto result = applauncher::api::getInstalledVersions(versions);
@@ -68,11 +66,11 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     m_downloader->startDownloads();
 
     m_installedVersionsFuture = std::async(std::launch::async,
-        [this]()
+        []()
         {
             std::set<nx::utils::SoftwareVersion> output;
             QList<nx::utils::SoftwareVersion> versions;
-            if (requestInstalledVersions(commonModule()->engineVersion(), &versions))
+            if (requestInstalledVersions(&versions))
             {
                 for (const auto& version: versions)
                     output.insert(version);
@@ -158,12 +156,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::Package clientPackage;
-    nx::update::findPackage(
-        commonModule()->moduleGUID(),
-        commonModule()->engineVersion(),
-        systemInfo,
-        updateInformation,
-        /*isClient=*/true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
+    nx::update::findPackage(*commonModule(), updateInformation, &clientPackage, &errorMessage);
 
     if (getState() == State::initial)
     {
@@ -206,6 +199,12 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
     return result;
 }
 
+bool ClientUpdateTool::isVersionInstalled(const nx::utils::SoftwareVersion& version) const
+{
+    auto versions = getInstalledVersions();
+    return versions.count(version) != 0;
+}
+
 bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
 {
     if (!contents.clientPackage.isValid())
@@ -214,18 +213,15 @@ bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
     auto version = contents.getVersion();
     auto installedVersions = getInstalledVersions(true);
 
-    return !installedVersions.count(version);
+    return installedVersions.count(version) == 0;
 }
 
 void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 {
     m_clientPackage = contents.clientPackage;
-    NX_ASSERT(m_clientPackage.isValid());
-
     m_updateVersion = contents.getVersion();
 
-    auto installedVersions = getInstalledVersions(true);
-    if (installedVersions.count(m_updateVersion))
+    if (isVersionInstalled(m_updateVersion))
     {
         if (shouldRestartTo(m_updateVersion))
         {
@@ -249,11 +245,11 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         // Expecting that file is stored at:
         NX_INFO(this)
             << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
-            << m_clientPackage.file;
-        QString path = contents.storageDir.filePath(m_clientPackage.file);
+            << m_clientPackage.localFile;
+        QString path = contents.storageDir.filePath(m_clientPackage.localFile);
         if (!QFileInfo::exists(path))
         {
-            NX_INFO(this)
+            NX_ERROR(this)
                 << "downloadUpdate(" << contents.info.version << ") the file"
                 << path << "does not exist!";
             setError(QString("File %1 does not exist").arg(path));
@@ -274,7 +270,12 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         info.size = m_clientPackage.size;
         info.name = m_clientPackage.file;
         info.url = m_clientPackage.url;
-        NX_ASSERT(info.isValid());
+
+        if (!info.isValid())
+        {
+            setError("There is no valid client package to download");
+            return;
+        }
         auto code = m_downloader->addFile(info);
         m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
@@ -412,40 +413,25 @@ bool ClientUpdateTool::isDownloadComplete() const
         || m_state == State::complete;
 }
 
-bool ClientUpdateTool::installUpdate()
+void ClientUpdateTool::checkInternalState()
 {
-    // Try to run applauncher if it is not running.
-    if (!applauncher::api::checkOnline(commonModule()->engineVersion()))
-    {
-        NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
-        setApplauncherError("applauncher is offline");
-        return false;
-    }
-
-    NX_ASSERT(!m_updateFile.isEmpty());
-
-    static const int kMaxTries = 5;
-    QString absolutePath = QFileInfo(m_updateFile).absoluteFilePath();
-
-    for (int retries = 0; retries < kMaxTries; ++retries)
+    auto kWaitTime = std::chrono::milliseconds(1);
+    if (m_applauncherTask.valid()
+        && m_applauncherTask.wait_for(kWaitTime) == std::future_status::ready)
     {
         using Result = applauncher::api::ResultType::Value;
-        Result result = applauncher::api::installZip(m_updateVersion, absolutePath);
+        Result result = static_cast<Result>(m_applauncherTask.get());
+        bool shouldRestart = shouldRestartTo(m_updateVersion);
 
         switch (result)
         {
             case Result::alreadyInstalled:
-                if (shouldRestartTo(m_updateVersion))
-                    setState(State::readyRestart);
-                else
-                    setState(State::complete);
-                return true;
             case Result::ok:
-                if (shouldRestartTo(m_updateVersion))
-                    setState(State::readyRestart);
+                if (shouldRestart)
+                    setState(readyRestart);
                 else
-                    setState(State::complete);
-                return true;
+                    setState(complete);
+                break;
 
             case Result::otherError:
             case Result::versionNotInstalled:
@@ -457,16 +443,66 @@ bool ClientUpdateTool::installUpdate()
                 QString error = applauncherErrorToString(result);
                 NX_ERROR(this) << "Failed to run installation:" << error;
                 setApplauncherError(error);
-                return false;
+                break;
             }
             default:
-                // Other variats can be fixed by retrying installation, do they?
                 break;
         }
-
-        QThread::msleep(100);
-        qApp->processEvents();
     }
+}
+
+bool ClientUpdateTool::installUpdateAsync()
+{
+    // Try to run applauncher if it is not running.
+    if (!applauncher::api::checkOnline())
+    {
+        NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
+        setApplauncherError("applauncher is offline");
+        return false;
+    }
+
+    if (m_state != readyInstall)
+        return false;
+
+    NX_ASSERT(!m_updateFile.isEmpty());
+
+    m_applauncherTask = std::async(std::launch::async,
+        [tool = QPointer(this)](
+            QString updateFile,
+            nx::utils::SoftwareVersion updateVersion) -> int
+        {
+            using Result = applauncher::api::ResultType::Value;
+            static const int kMaxTries = 5;
+            QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
+            QString message;
+
+            for (int retries = 0; retries < kMaxTries; ++retries)
+            {
+                Result result = applauncher::api::installZip(updateVersion, absolutePath);
+                bool repeat = false;
+
+                switch (result)
+                {
+                    case Result::alreadyInstalled:
+                    case Result::otherError:
+                    case Result::versionNotInstalled:
+                    case Result::invalidVersionFormat:
+                    case Result::notEnoughSpace:
+                    case Result::notFound:
+                    case Result::ioError:
+                        return result;
+                    default:
+                        repeat = true;
+                        // Other variats can be fixed by retrying installation, do they?
+                        break;
+                }
+
+                if (!repeat)
+                    break;
+            }
+
+            return Result::otherError;
+        }, m_updateFile, m_updateVersion);
     return false;
 }
 
@@ -495,7 +531,6 @@ bool ClientUpdateTool::isInstallComplete() const
     using Result = applauncher::api::ResultType::Value;
     Result result = applauncher::api::isVersionInstalled(
         m_updateVersion,
-        commonModule()->engineVersion(),
         &installed);
 
     switch (result)
@@ -531,7 +566,7 @@ bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version
 bool ClientUpdateTool::restartClient()
 {
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::api::checkOnline(commonModule()->engineVersion()))
+    if (!applauncher::api::checkOnline())
         return false;
 
     using Result = applauncher::api::ResultType::Value;

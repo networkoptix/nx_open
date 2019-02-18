@@ -806,13 +806,6 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);
@@ -914,9 +907,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
 void HanwhaResource::initMediaStreamCapabilities()
 {
-    m_capabilities.streamCapabilities[Qn::StreamIndex::primary] =
+    m_capabilities.streamCapabilities[StreamIndex::primary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
-    m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
+    m_capabilities.streamCapabilities[StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
         ResourcePropertyKey::kMediaCapabilities,
@@ -1049,13 +1042,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
 
     m_hasSerialPort = (hasRs485 != boost::none && *hasRs485)
         || (hasRs422 != boost::none && *hasRs422);
-
-    if (isAnalogEncoder() || isProxiedAnalogEncoder() || hasSerialPort())
-    {
-        // We can't reliably determine if there's PTZ caps for analogous cameras
-        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
-        setIsUserAllowedToModifyPtzCapabilities(true);
-    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1298,8 +1284,8 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
         HanwhaRequestHelper helper(sharedContext());
         helper.set(
-            lit("eventsources/alarminput"),
-            {{lit("AlarmInput.%1.Enable").arg(getChannel()), kHanwhaTrue}});
+            "eventsources/alarminput",
+            {{lm("AlarmInput.%1.Enable").args(getChannel() + 1), kHanwhaTrue}});
     }
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
@@ -1401,6 +1387,17 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
     }
+
+    const bool hasContinuousMovemement = m_ptzCapabilities[core::ptz::Type::operational] &
+        Ptz::ContinuousPtrzCapabilities;
+
+    // We can't reliably determine if there's PTZ caps for analogous cameras
+    // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+    const bool userIsAllowedToModifyCapabilities = (!hasContinuousMovemement && hasSerialPort())
+        || isAnalogEncoder()
+        || isProxiedAnalogEncoder();
+
+    setIsUserAllowedToModifyPtzCapabilities(userIsAllowedToModifyCapabilities);
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -2509,7 +2506,10 @@ int HanwhaResource::streamBitrate(
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
-    streamParams.resolution = streamResolution(role);
+    if (streamParams.resolution.isEmpty())
+        streamParams.resolution = streamResolution(role); //< Set default value if empty.
+    if (streamParams.codec.isEmpty())
+        streamParams.codec = toHanwhaString(streamCodec(role)); //< Set default value if empty.
     if (bitrateKbps == 0)
     {
         // Since we can't fully control bitrate on the NVRs that don't have bypass
@@ -2517,14 +2517,12 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
         .streamCapabilities
-        .value(role == Qn::ConnectionRole::CR_LiveVideo
-            ? Qn::StreamIndex::primary
-            : Qn::StreamIndex::secondary);
+        .value(toStreamIndex(role));
 
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
@@ -3947,12 +3945,15 @@ void HanwhaResource::setPtzCalibarionTimer()
 
             if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
             {
-                const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
-                const bool isCalibrated = calibratedChannels->count(getChannel());
-                if (isRedirected != isCalibrated)
+                if (calibratedChannels.diagnostics)
                 {
-                    NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
-                    return setStatus(Qn::Offline);
+                    const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+                    const bool isCalibrated = calibratedChannels->count(getChannel());
+                    if (isRedirected != isCalibrated)
+                    {
+                        NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
+                        return setStatus(Qn::Offline);
+                    }
                 }
             }
 

@@ -31,7 +31,6 @@
 #include <nx/vms/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/camera/export_schedule_resource_selection_dialog_delegate.h>
-#include <nx/vms/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
@@ -47,13 +46,7 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
-        [this]()
-        {
-            if (ini().redesignedCameraSettingsDialog)
-                at_cameraSettingsAction_triggered();
-            else
-                at_legacyCameraSettingsAction_triggered();
-        });
+        &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
     connect(action(action::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
     connect(action(action::NewUserAction), &QAction::triggered, this,
@@ -79,30 +72,6 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
-}
-
-void QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered()
-{
-    const auto parameters =  menu()->currentParameters(sender());
-    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return;
-
-    const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
-
-    QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
-        m_legacyCameraSettingsDialog,
-        parent);
-    dialogConstructor.disableAutoFocus();
-
-    if (!m_legacyCameraSettingsDialog->setCameras(cameras))
-        return;
-
-    if (parameters.hasArgument(Qn::FocusTabRole))
-    {
-        const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-        m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
-    }
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
@@ -322,14 +291,16 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                         nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
                             sourceCamera,
                             task.streamQuality,
-                            task.fps);
+                            task.fps,
+                            QString()); //< Bitrate for default codec.
 
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
                     const auto targetNormalBitrate =
                         nx::core::CameraBitrateCalculator::getBitrateForQualityMbps(
                             camera,
                             task.streamQuality,
-                            task.fps);
+                            task.fps,
+                            QString()); //< Bitrate for default codec.
 
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;
@@ -390,4 +361,3 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     }
     menu()->triggerIfPossible(action::SaveLayoutAction, layout);
 }
-

@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Cài đặt máy chủ nâng cao</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -75,7 +78,7 @@
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
  placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">Gb</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -125,8 +128,9 @@
                     <option value="error">Lỗi: Duy nhất lỗi đăng nhập.</option>
                     <option value="warning">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
                     <option value="info">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
-                    <option value="debug">Gỡ lỗi: Đăng nhập tất cả thông tin thư và gỡ lỗi hệ thống.</option>
-                    <option value="debug2">Gỡ lỗi 2: Đăng nhập mọi thông báo hệ thống và thông tin gỡ rối mở rộng.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
@@ -135,7 +139,7 @@
         </div>
     </form>
 
-    <h1>Thiết lập hệ thống nâng cao</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
         <b> Cảnh báo! </b> Bất kỳ thay đổi nào trên trang này có thể khiến máy chủ hoạt động không chính xác.
     </div>

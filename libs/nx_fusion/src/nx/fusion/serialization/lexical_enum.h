@@ -232,8 +232,7 @@ __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(cons
 }
 
 #define QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION_STEP_I(R, DATA, ELEMENT) \
-    if(!QnLexicalDetail::isNullString(BOOST_PP_TUPLE_ELEM(1, ELEMENT)))         \
-        data.insert ELEMENT;
+       data.insert ELEMENT;
 
 
 /**

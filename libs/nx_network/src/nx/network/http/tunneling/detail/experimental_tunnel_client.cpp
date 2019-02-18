@@ -64,6 +64,7 @@ void ExperimentalTunnelClient::openTunnel(
 void ExperimentalTunnelClient::initiateDownChannel()
 {
     m_downChannelHttpClient = std::make_unique<AsyncClient>();
+    m_downChannelHttpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
         m_downChannelHttpClient->setResponseReadTimeout(*m_timeout);

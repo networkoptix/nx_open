@@ -15,6 +15,7 @@
 
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
@@ -159,13 +160,13 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
             if (ui->checkBoxForceMotionDetection->isChecked())
             {
                 const auto type = ui->comboBoxForcedMotionStream->currentData();
-                store->setMotionStreamType(type.canConvert<vms::api::MotionStreamType>()
-                    ? type.value<vms::api::MotionStreamType>()
-                    : vms::api::MotionStreamType::primary);
+                store->setForcedMotionStreamType(type.canConvert<vms::api::StreamIndex>()
+                    ? type.value<vms::api::StreamIndex>()
+                    : vms::api::StreamIndex::primary);
             }
             else
             {
-                store->setMotionStreamType(vms::api::MotionStreamType::automatic);
+                store->setForcedMotionStreamType(vms::api::StreamIndex::undefined);
             }
         };
 
@@ -188,15 +189,15 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
 
-    setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
-    ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, "
+    setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
+    ui->settingsDisableControlCheckBox->setHint(tr("Server will not change any cameras settings, "
         "it will receive and use camera stream as-is. "));
 
-    setHelpTopic(ui->bitratePerGopHint, Qn::CameraSettings_Expert_SettingsControl_Help);
-    ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; "
+    setHelpTopic(ui->bitratePerGopCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
+    ui->bitratePerGopCheckBox->setHint(tr("Helps fix image quality issues on some cameras; "
         "for others will cause significant bitrate increase."));
 
-    auto logicalIdHint = nx::vms::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
+    auto logicalIdHint = HintButton::hintThat(ui->logicalIdGroupBox);
     logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera "
         "for quick identification and access"));
     // TODO: #common #dkargin Fill in help topic when it is implemented.
@@ -264,59 +265,72 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ::setReadOnly(ui->secondStreamDisableCheckBox, state.readOnly);
 
-    // Motion override.
+    // Motion detection.
 
-    ui->groupBoxMotionDetection->setVisible(
-        state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All);
+    const bool remoteArchiveMdSupported =
+		state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All;
+    const bool forcedSoftMdSupported =
+		state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All;
 
-    const bool allMotionStreamsOverridden =
-        state.expert.motionStreamOverridden == CombinedValue::All;
+    ui->groupBoxMotionDetection->setVisible(remoteArchiveMdSupported || forcedSoftMdSupported);
 
-    check_box_utils::setupTristateCheckbox(
-        ui->checkBoxForceMotionDetection,
-        state.expert.motionStreamOverridden != CombinedValue::Some,
-        allMotionStreamsOverridden);
-
-    ui->comboBoxForcedMotionStream->setVisible(allMotionStreamsOverridden);
-    ui->comboBoxForcedMotionStream->clear();
-
-    if (allMotionStreamsOverridden)
+    ui->remoteArchiveMotionDetectionCheckBox->setVisible(remoteArchiveMdSupported);
+    if (remoteArchiveMdSupported)
     {
-        combo_box_utils::insertMultipleValuesItem(ui->comboBoxForcedMotionStream);
-        ui->comboBoxForcedMotionStream->addItem(tr("Primary", "Primary stream for motion detection"),
-            QVariant::fromValue(vms::api::MotionStreamType::primary));
-
-        if (state.devicesDescription.hasDualStreamingCapability == CombinedValue::All)
-        {
-            ui->comboBoxForcedMotionStream->addItem(tr("Secondary",
-                "Secondary stream for motion detection"),
-                QVariant::fromValue(vms::api::MotionStreamType::secondary));
-        }
-
-        if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All)
-        {
-            ui->comboBoxForcedMotionStream->addItem(tr("Edge", "Edge stream for motion detection"),
-                QVariant::fromValue(vms::api::MotionStreamType::edge));
-        }
-
-        if (state.expert.motionStreamType.hasValue())
-        {
-            const auto index = ui->comboBoxForcedMotionStream->findData(
-                QVariant::fromValue(state.expert.motionStreamType()));
-
-            NX_ASSERT(index > 0, "Unknown motion stream type");
-            ui->comboBoxForcedMotionStream->setCurrentIndex(index);
-        }
-        else
-        {
-            ui->comboBoxForcedMotionStream->setCurrentIndex(0/*multiple values*/);
-        }
+        check_box_utils::setupTristateCheckbox(
+			ui->remoteArchiveMotionDetectionCheckBox,
+			state.expert.remoteMotionDetectionEnabled);
+        ::setReadOnly(ui->remoteArchiveMotionDetectionCheckBox, state.readOnly);
     }
 
-    ui->comboBoxForcedMotionStream->adjustSize();
+    ui->forceSoftMotionDetectionWidget->setVisible(forcedSoftMdSupported);
+    if (forcedSoftMdSupported)
+	{
+        const bool allMotionStreamsOverridden =
+            state.expert.motionStreamOverridden == CombinedValue::All;
 
-    ::setReadOnly(ui->checkBoxForceMotionDetection, state.readOnly);
-    ::setReadOnly(ui->comboBoxForcedMotionStream, state.readOnly);
+        check_box_utils::setupTristateCheckbox(
+            ui->checkBoxForceMotionDetection,
+            state.expert.motionStreamOverridden != CombinedValue::Some,
+            allMotionStreamsOverridden);
+
+        ui->comboBoxForcedMotionStream->setVisible(allMotionStreamsOverridden);
+        ui->comboBoxForcedMotionStream->clear();
+
+        if (allMotionStreamsOverridden)
+        {
+            combo_box_utils::insertMultipleValuesItem(ui->comboBoxForcedMotionStream);
+            ui->comboBoxForcedMotionStream->addItem(
+			    tr("Primary", "Primary stream for motion detection"),
+                QVariant::fromValue(nx::vms::api::StreamIndex::primary));
+
+            if (state.devicesDescription.hasDualStreamingCapability == CombinedValue::All)
+            {
+                ui->comboBoxForcedMotionStream->addItem(
+				    tr("Secondary", "Secondary stream for motion detection"),
+                    QVariant::fromValue(nx::vms::api::StreamIndex::secondary));
+            }
+
+            if (state.expert.forcedMotionStreamType.hasValue())
+            {
+                const auto index = ui->comboBoxForcedMotionStream->findData(
+                    QVariant::fromValue(state.expert.forcedMotionStreamType()));
+
+                NX_ASSERT(index > 0, "Unknown motion stream type");
+                ui->comboBoxForcedMotionStream->setCurrentIndex(index);
+            }
+            else
+            {
+                ui->comboBoxForcedMotionStream->setCurrentIndex(/*multiple values*/ 0);
+            }
+
+        }
+
+        ui->comboBoxForcedMotionStream->adjustSize();
+
+        ::setReadOnly(ui->checkBoxForceMotionDetection, state.readOnly);
+        ::setReadOnly(ui->comboBoxForcedMotionStream, state.readOnly);
+	}
 
     // Archive.
 

@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl-BE" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation>MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation>MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Systeemgebeurtenis</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Systeem al verbonden met cloud (Id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>De server is niet verbonden met het internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Het is niet gelukt om de cloud inloggegevens op te slaan in de lokale database</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Het is niet gelukt om de cloud eigenaar op te slaan in de lokale database</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Kan geen verbinding maken met cloud: %1</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation>Te veel mediafouten. Open het dialoogvenster voor camera-problemen voor meer informatie.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>Camera plugin fout. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>Probeer de I / O-module opnieuw te starten en herstel de fabrieksinstellingen op de webpagina.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Werk de firmware bij. Minimale ondersteunde versie is %1. De huidige versie is %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation>Kan de decoder niet vinden voor codec %1.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>Kan de resampling-context niet starten, foutcode: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Kon geen voorbeeldbuffers toewijzen, foutcode: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>Kan audio-frame niet verzenden naar de encoder, foutcode: %1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>Kan geen audio-frame ontvangen van de decoder, Foutcode: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation>Gratis</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>Gratis Licensie</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>Tijd</translation>
     </message>
@@ -497,6 +532,190 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>Bridge licentie</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation>
+        <numerusform>%n Tijdlicenties</numerusform>
+        <numerusform>%n Tijdlicenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation>
+        <numerusform>%n Analoge Licenties</numerusform>
+        <numerusform>%n Analoge Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation>
+        <numerusform>%n Professional Licenties</numerusform>
+        <numerusform>%n Professional Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation>
+        <numerusform>%n Edge Licenties</numerusform>
+        <numerusform>%n Edge Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation>
+        <numerusform>%n Vmax Licenties</numerusform>
+        <numerusform>%n Vmax Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation>
+        <numerusform>%n Analoge Encoder Licenties</numerusform>
+        <numerusform>%n Analoge Encoder Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation>
+        <numerusform>%n Video Wall licenties</numerusform>
+        <numerusform>%n Video Wall licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation>
+        <numerusform>%n I/O module licenties</numerusform>
+        <numerusform>%n I/O Module Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation>
+        <numerusform>%n Start Licenties</numerusform>
+        <numerusform>%n Start Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation>
+        <numerusform>%n Recorder licenties</numerusform>
+        <numerusform>%n Recorder licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation>
+        <numerusform>%n Ongeldige Licenties</numerusform>
+        <numerusform>%n Ongeldige Licenties</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Tijd Licenties</numerusform>
+        <numerusform>%n/%1 Tijd Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Analoge Licenties</numerusform>
+        <numerusform>%n/%1 Analoge Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Professional Licenties</numerusform>
+        <numerusform>%n/%1 Professional Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Edge Licenties</numerusform>
+        <numerusform>%n/%1 Edge Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Vmax Licenties</numerusform>
+        <numerusform>%n/%1 Vmax Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Analoge Encoder Licenties</numerusform>
+        <numerusform>%n/%1 Analoge Encoder Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Video Wall licenties</numerusform>
+        <numerusform>%n/%1 Video Wall licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 I/O Module Licenties</numerusform>
+        <numerusform>%n/%1 I/O Module Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Start Licenties</numerusform>
+        <numerusform>%n/%1 Start Licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Recorder licenties</numerusform>
+        <numerusform>%n/%1 Recorder licenties</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Ongeldige Licenties</numerusform>
+        <numerusform>%n/%1 Ongeldige Licenties</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -549,10 +768,6 @@
       <translation>Ongeldig type</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>Voor dit apparaat is alleen een enkele licentie toegestaan</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>Dit licentietype vereist een hogere softwareversie</translation>
     </message>
@@ -564,6 +779,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -574,34 +797,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>%n Camera (s)</numerusform>
-        <numerusform>%n Camera (s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>%n camera (s)</numerusform>
-        <numerusform>%n camera (s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>%n Apparaat (en)</numerusform>
-        <numerusform>%n Apparaat (en)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n apparaat (en)</numerusform>
-        <numerusform>%n apparaat (en)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>Camera's</translation>
@@ -634,20 +829,6 @@
       <source>device</source>
       <translation>apparaat</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>I/O Modules</translation>
@@ -663,6 +844,48 @@
     <message>
       <source>I/O module</source>
       <translation>I/O module</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -690,67 +913,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>Hardware ID: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>Laagste</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Lage</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Middelgroot</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Hoog</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Beste</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Preset</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>Ongedefineerd</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Laagst</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Laag</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Medium</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hoog</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Beste</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Preset</translation>
     </message>
   </context>
   <context>
@@ -797,180 +959,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>Naamloos systeem</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>Oké</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>Niet gevonden</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>Niet geïmplementeerd</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>Niet-ondersteund vervoer</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>Interne serverfout</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>Ongeldige parameter</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>u</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>j</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sec</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>uren</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dagen</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>weken</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>maanden</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>jaren</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milliseconden</numerusform>
-        <numerusform>milliseconden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>seconden</numerusform>
-        <numerusform>seconden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minuten</numerusform>
-        <numerusform>minuten</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>uren</numerusform>
-        <numerusform>uren</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dagen</numerusform>
-        <numerusform>dagen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>weken</numerusform>
-        <numerusform>weken</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>maanden</numerusform>
-        <numerusform>maanden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>jaren</numerusform>
-        <numerusform>jaren</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1049,6 +1037,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Heeft toegang tot het hele systeem en kan het beheren. Kan gebruikers creëren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Onbekende fout.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1537,6 +1567,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation>Volledige schermweergave sluiten</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Open schermindeling</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

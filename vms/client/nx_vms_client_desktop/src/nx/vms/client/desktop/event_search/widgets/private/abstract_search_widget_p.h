@@ -36,7 +36,7 @@ class AbstractSearchWidget::Private:
     using base_type = QWidget;
 
     AbstractSearchWidget* const q;
-    const QScopedPointer<Ui::AbstractSearchWidget> ui;
+    nx::utils::ImplPtr<Ui::AbstractSearchWidget> ui;
 
 public:
     Private(AbstractSearchWidget* q, AbstractSearchListModel* model);
@@ -96,6 +96,8 @@ private:
     void handleFetchFinished();
 
     void updateDeviceDependentActions();
+
+    QString currentDeviceText() const;
 
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;

@@ -6,11 +6,7 @@
 #include "device/device_data.h"
 #include "device/video/windows/dshow_utils.h"
 
-namespace nx {
-namespace usb_cam {
-namespace device {
-namespace audio {
-namespace detail {
+namespace nx::usb_cam::device::audio::detail {
 
 void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
 {
@@ -78,10 +74,6 @@ bool pluggedIn(const std::string& devicePath)
     return false;
 }
 
-} // namespace detail
-} // namespace audio
-} // namespace device
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam::device::audio::detail
 
 #endif //_WIN32

@@ -59,16 +59,17 @@ void initializeMetaTypes()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     QnCommonMetaTypes::initialize();
 
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 
-    qRegisterMetaType<QnStringSet>();
+    // This type is used to store some values in settings as QVariant, so we need to maintain the
+    // alias at it was used long time ago.
+    // TODO: #GDM Create a settings migration from QVariant to json and get rid of these operators.
+    qRegisterMetaType<QnStringSet>("QnStringSet");
     qRegisterMetaTypeStreamOperators<QnStringSet>();
 
     qRegisterMetaType<nx::media::PlayerStatistics>();

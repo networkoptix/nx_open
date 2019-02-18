@@ -10,8 +10,10 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/app_info.h>
-
-#include <common/static_common_module.h>
+#include <common/common_module.h>
+#include <api/global_settings.h>
+#include <nx/network/socket_global.h>
+#include <api/runtime_info_manager.h>
 
 namespace nx::update {
 
@@ -349,7 +351,7 @@ static InformationError fillUpdateInformation(
     }
 
     // Falling back to previous protocol with update.json
-    if (error == InformationError::httpError )
+    if (error == InformationError::httpError)
         error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
 
     if (error == InformationError::noError)
@@ -364,7 +366,7 @@ static InformationError fillUpdateInformation(
     return error;
 }
 
-Information updateInformationImpl(
+static Information updateInformationImpl(
     const QString& url,
     const QString& publicationKey,
     nx::vms::api::SoftwareVersion currentVersion,
@@ -412,25 +414,13 @@ Information updateInformationImpl(
     return result;
 }
 
-} // namespace
-
-Information updateInformation(
-    const QString& url,
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    const QString& publicationKey,
-    InformationError* error)
-{
-    return updateInformationImpl(url, publicationKey, engineVersion, error,
-        /*checkAlternativeServers*/ true);
-}
-
 static void setErrorMessage (const QString& message, QString* outMessage)
 {
     if (outMessage)
         *outMessage = message;
 };
 
-FindPackageResult findPackage(
+static FindPackageResult findPackage(
     const QnUuid& moduleGuid,
     const nx::vms::api::SoftwareVersion& engineVersion,
     const vms::api::SystemInformation& systemInformation,
@@ -513,7 +503,7 @@ FindPackageResult findPackage(
     return FindPackageResult::otherError;
 }
 
-FindPackageResult findPackage(
+static FindPackageResult findPackage(
     const QnUuid& moduleGuid,
     const nx::vms::api::SoftwareVersion& engineVersion,
     const vms::api::SystemInformation& systemInformation,
@@ -533,6 +523,18 @@ FindPackageResult findPackage(
         cloudHost, boundToCloud, outPackage, outMessage);
 }
 
+} // namespace
+
+Information updateInformation(
+    const QString& url,
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    const QString& publicationKey,
+    InformationError* error)
+{
+    return updateInformationImpl(url, publicationKey, engineVersion, error,
+        /*checkAlternativeServers*/ true);
+}
+
 FindPackageResult fromByteArray(
     const QByteArray& serializedUpdateInformation,
     Information* outInformation,
@@ -549,6 +551,41 @@ FindPackageResult fromByteArray(
         return FindPackageResult::otherError;
     }
     return FindPackageResult::ok;
+}
+
+FindPackageResult findPackage(
+    const QnCommonModule& commonModule,
+    nx::update::Package* outPackage,
+    QString* outMessage)
+{
+    return findPackage(
+        commonModule.moduleGUID(),
+        commonModule.engineVersion(),
+        QnAppInfo::currentSystemInformation(),
+        commonModule.globalSettings()->targetUpdateInformation(),
+        commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !commonModule.globalSettings()->cloudSystemId().isEmpty(),
+        outPackage,
+        outMessage);
+}
+
+FindPackageResult findPackage(
+    const QnCommonModule& commonModule,
+    const Information& updateInformation,
+    nx::update::Package* outPackage,
+    QString* outMessage)
+{
+    return findPackage(
+        commonModule.moduleGUID(),
+        commonModule.engineVersion(),
+        QnAppInfo::currentSystemInformation(),
+        updateInformation,
+        commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !commonModule.globalSettings()->cloudSystemId().isEmpty(),
+        outPackage,
+        outMessage);
 }
 
 

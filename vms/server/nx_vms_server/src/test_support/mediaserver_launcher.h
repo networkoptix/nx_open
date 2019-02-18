@@ -24,7 +24,8 @@ public:
         noResourceDiscovery = 1 << 0,
         noMonitorStatistics = 1 << 1,
         noStorageDiscovery  = 1 << 2,
-        count = 1 << 3,
+        noPlugins  = 1 << 3,
+        count = 1 << 4,
         all = count - 1
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
@@ -58,6 +59,8 @@ public:
      */
     bool start();
 
+    bool waitForStarted();
+
     /**
      * Start media server. Don't wait while it's being started. Server started at separate thread.
      */
@@ -78,6 +81,7 @@ public:
 signals:
     void started();
 private:
+    void setLowDelayIntervals();
     void prepareToStart();
     void fillDefaultSettings();
 
@@ -91,4 +95,5 @@ private:
     std::map<std::string, QString> m_settings;
     std::vector<std::string> m_cmdOptions;
     QnUuid m_serverGuid;
+    std::unique_ptr<nx::utils::promise<bool>> m_processStartedPromise;
 };

@@ -4,10 +4,7 @@
 
 #include <camera/camera_plugin.h>
 
-namespace nx {
-namespace usb_cam {
-namespace ffmpeg{
-namespace utils{
+namespace nx::usb_cam::ffmpeg::utils {
 
 namespace {
 
@@ -22,7 +19,7 @@ static int greatestCommonDenominator(int n1, int n2)
     return gcd;
 }
 
-} // namespace 
+} // namespace
 
 std::string errorToString(int errorCode)
 {
@@ -214,7 +211,7 @@ uint64_t suggestChannelLayout(const AVCodec *codec)
     for (const uint64_t *channel = codec->channel_layouts; *channel; ++channel)
     {
         int nbChannels = av_get_channel_layout_nb_channels(*channel);
-        if (nbChannels > bestNbChannels) 
+        if (nbChannels > bestNbChannels)
         {
             bestLayout = *channel;
             bestNbChannels = nbChannels;
@@ -225,7 +222,7 @@ uint64_t suggestChannelLayout(const AVCodec *codec)
 
 AVSampleFormat suggestSampleFormat(const AVCodec * codec)
 {
-    static const std::vector<AVSampleFormat> priorityList = 
+    static const std::vector<AVSampleFormat> priorityList =
     {
         AV_SAMPLE_FMT_S32,
         AV_SAMPLE_FMT_S16,
@@ -280,14 +277,11 @@ AVRational toFraction(float number, int precision)
         numerator /= gcd;
         denominator /= gcd;
     }while (gcd != 1);
-    
+
     if (wholeNumber > 0)
         numerator = denominator * wholeNumber + numerator;
-    
+
     return {numerator, denominator};
 }
 
-} // namespace utils
-} // namespace ffmpeg
-} // namespace usb_cam
-} // namesapce nx
+} // namespace nx::usb_cam::ffmpeg::utils

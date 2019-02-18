@@ -223,13 +223,6 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);

@@ -315,7 +315,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
 }
 
 nx::vms::server::resource::StreamCapabilityMap
-    QnDigitalWatchdogResource::getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex)
+    QnDigitalWatchdogResource::getStreamCapabilityMapFromDriver(StreamIndex streamIndex)
 {
     NX_VERBOSE(this, "%1(%2): id %3", __func__, streamIndex, getId());
 
@@ -357,7 +357,7 @@ nx::vms::server::resource::StreamCapabilityMap
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     VideoEncoder& encoder,
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     NX_VERBOSE(this, "%1(%2): id %3", __func__, streamIndex, getId());

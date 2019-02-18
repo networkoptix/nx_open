@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/resource_management/resource_searcher.h"
+#include <core/resource/client_resource_fwd.h>
 
 class QnResourceDirectoryBrowser:
     public QObject,
@@ -14,7 +15,7 @@ public:
 
     virtual QnResourcePtr createResource(const QnUuid& resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QString manufacture() const override;
+    virtual QString manufacturer() const override;
     virtual QnResourceList findResources() override;
 
     virtual void setPathCheckList(const QStringList& paths) override;
@@ -26,7 +27,8 @@ public:
     // Local files search only once. Use cleanup before search to re-search files again
     void cleanup();
 
-    static QnLayoutResourcePtr layoutFromFile(const QString& filename, QnResourcePool* resourcePool);
+    static QnFileLayoutResourcePtr layoutFromFile(const QString& filename,
+        QnResourcePool* resourcePool);
     static QnResourcePtr resourceFromFile(const QString& filename, QnResourcePool* resourcePool);
 
 signals:

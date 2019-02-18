@@ -58,6 +58,21 @@ void BaseTunnelClient::bindToAioThread(
         m_connection->bindToAioThread(aioThread);
 }
 
+ClientFeedbackFunction BaseTunnelClient::takeFeedbackFunction()
+{
+    return std::exchange(m_clientFeedbackFunction, nullptr);
+}
+
+void BaseTunnelClient::setCustomHeaders(HttpHeaders headers)
+{
+    m_customHeaders = std::move(headers);
+}
+
+const HttpHeaders& BaseTunnelClient::customHeaders() const
+{
+    return m_customHeaders;
+}
+
 void BaseTunnelClient::stopWhileInAioThread()
 {
     m_httpClient.reset();

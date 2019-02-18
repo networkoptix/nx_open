@@ -549,17 +549,17 @@ bool QnServerDb::cleanupEvents()
     }
 
     // cleanup by  record count
-    const int kMaxRecords = 100000;
-    const int kMaxOverflowRecords = 120000;
+    const int maxRecords = globalSettings()->maxEventLogRecords();
+    const int maxOverflowRecords = int(maxRecords * 1.2);
 
-    if (kMaxOverflowRecords < m_runtimeActionsTotalRecords)
+    if (maxOverflowRecords < m_runtimeActionsTotalRecords)
     {
         QSqlQuery cleanupQuery(m_sdb);
         cleanupQuery.prepare(
             "DELETE FROM runtime_actions WHERE rowid in \
             (SELECT rowid FROM runtime_actions ORDER BY rowid LIMIT :recordsToDelete)"
         );
-        cleanupQuery.bindValue(":recordsToDelete", m_runtimeActionsTotalRecords - kMaxRecords);
+        cleanupQuery.bindValue(":recordsToDelete", m_runtimeActionsTotalRecords - maxRecords);
         rez = execSQLQuery(&cleanupQuery, Q_FUNC_INFO);
 
         if (rez)
@@ -1226,6 +1226,9 @@ bool QnServerDb::getBookmarksInternal(
     {
         addFilter("start_time + duration  >= ?", (qint64) filter.startTimeMs.count());
     }
+
+    if (filter.sparsing.minVisibleLengthMs.count() > 0)
+        addFilter("duration  >= ?", (qint64) filter.sparsing.minVisibleLengthMs.count());
 
     if (!filter.text.isEmpty())
     {

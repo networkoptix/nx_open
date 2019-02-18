@@ -14,6 +14,17 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+int rowOf(QGridLayout* layout, QWidget* widget)
+{
+    int row{}, column{}, rowSpan{}, columnSpan{};
+    layout->getItemPosition(layout->indexOf(widget), &row, &column, &rowSpan, &columnSpan);
+    return row;
+}
+
+} // namespace
+
 CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::CameraInfoWidget())
@@ -49,6 +60,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
 
     connect(ui->secondaryStreamCopyButton, &ClipboardButton::clicked, this,
         [this]() { ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
+
+    connect(ui->cameraIdCopyButton, &ClipboardButton::clicked, this,
+        [this]() { ClipboardButton::setClipboardText(ui->cameraIdLabel->text()); });
 
     connect(ui->pingButton, &QPushButton::clicked, this,
         [this]() { emit actionRequested(ui::action::PingAction); });
@@ -110,13 +124,27 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->multipleNameLabel->setText(
         QnDeviceDependentStrings::getNumericName(state.deviceType, state.devicesCount));
 
-    ui->modelLabel->setText(single.model);
-    ui->modelDetailLabel->setText(single.model);
-    ui->vendorLabel->setText(single.vendor);
-    ui->vendorDetailLabel->setText(single.vendor);
-    ui->macAddressLabel->setText(single.macAddress);
-    ui->firmwareLabel->setText(single.firmware);
-    ui->cameraIdLabel->setText(single.id);
+    ui->modelLabel->setText(single.model.trimmed());
+    ui->modelDetailLabel->setText(ui->modelLabel->text());
+    ui->vendorLabel->setText(single.vendor.trimmed());
+    ui->vendorDetailLabel->setText(ui->vendorLabel->text());
+    ui->macAddressLabel->setText(single.macAddress.trimmed());
+    ui->firmwareLabel->setText(single.firmware.trimmed());
+
+    const int logicalId = state.singleCameraSettings.logicalId();
+    const bool hasLogicalId = logicalId > 0;
+    ui->logicalIdLabel->setText(QString::number(logicalId));
+    ui->logicalIdDetailLabel->setText(ui->logicalIdLabel->text());
+    ui->logicalIdTitleLabel->setVisible(hasLogicalId);
+    ui->logicalIdLabel->setVisible(hasLogicalId);
+    ui->logicalIdDetailTitleLabel->setVisible(hasLogicalId);
+    ui->logicalIdDetailLabel->setVisible(hasLogicalId);
+
+    ui->moreInfoLayout->setRowMinimumHeight(rowOf(ui->moreInfoLayout, ui->logicalIdDetailLabel),
+        hasLogicalId ? ui->moreInfoLayout->rowMinimumHeight(0) : 0);
+
+    ui->cameraIdLabel->setText(single.id.trimmed());
+    ui->cameraIdCopyButton->setHidden(ui->cameraIdLabel->text().isEmpty());
 
     ui->ipAddressLabel->setText(single.ipAddress);
     ui->ipAddressDetailLabel->setText(single.ipAddress);
@@ -154,6 +182,8 @@ void CameraInfoWidget::updatePalette()
         ui->vendorLabel,
         ui->vendorDetailLabel,
         ui->macAddressLabel,
+        ui->logicalIdLabel,
+        ui->logicalIdDetailLabel,
         ui->firmwareLabel,
         ui->cameraIdLabel,
         ui->ipAddressLabel,

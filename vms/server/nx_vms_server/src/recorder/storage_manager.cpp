@@ -451,7 +451,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
-                    m_owner->propertyDictionary()->saveParams(storage->getId());
+                    m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
         }
 
@@ -560,7 +560,7 @@ QnStorageManager::QnStorageManager(
     m_rebuildArchiveThread = new ScanMediaFilesTask(this,
         threadName
         ? (std::string(threadName) + std::string("::ScanMediaFilesTask")).c_str()
-        : nullptr); // ??? Name
+        : nullptr);
     m_rebuildArchiveThread->start();
 
     m_clearMotionTimer.restart();
@@ -664,8 +664,6 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
     }
-    if (sdb)
-        sdb->flushRecords();
     // merge chunks
     {
         QnMutexLocker lk(&m_mutexStorages);
@@ -1806,9 +1804,6 @@ void QnStorageManager::clearSpace(bool forced)
                             << endl;
         NX_VERBOSE(this, clearSpaceLogMessage);
     }
-
-    // 4. DB cleanup
-    storageDbPool()->flush();
 
     if (m_role != QnServer::StoragePool::Normal)
         return;
@@ -3001,7 +2996,6 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                     notMigratedChunks << chunk;
                 }
             }
-            storageDbPool()->flush();
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
                 writeCSVCatalog(catalogName, notMigratedChunks);

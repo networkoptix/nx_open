@@ -22,34 +22,44 @@ enum class FindPackageResult
     notParticipant
 };
 
+/**
+ * Searches update information on the update server by the publicationKey (version).
+ * @param url an update server url
+ * @param currentVersion a version to compare against in case if the publicationKey == "latest".
+ *     Refer to #dklychkov or #dkargin for details
+ * @param publicationKey a version id to use while searching
+ * @param error an out parameter used to report encountered errors
+ */
 Information updateInformation(
     const QString& url,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::vms::api::SoftwareVersion& currentVersion,
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);
 
+/**
+ * Searches for an update package for your particular module in the global update information.
+ * @param commonModule a reference to the QnCommonModuleInstance
+ * @param outPacakge a result package will be placed here, if found
+ * @param outMessage a detailed error message
+ */
 FindPackageResult findPackage(
-    const QnUuid& moduleGuid,
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    const vms::api::SystemInformation& systemInformation,
-    const nx::update::Information& updateInformation,
-    bool isClient,
-    const QString& cloudHost,
-    bool boundToCloud,
+    const QnCommonModule& commonModule,
     nx::update::Package* outPackage,
     QString* outMessage);
 
+/**
+ * Searches for an update package for your particular module in the given update information.
+ */
 FindPackageResult findPackage(
-    const QnUuid& moduleGuid,
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    const vms::api::SystemInformation& systemInformation,
-    const QByteArray& serializedUpdateInformation,
-    bool isClient,
-    const QString& cloudHost,
-    bool boundToCloud,
+    const QnCommonModule& commonModule,
+    const Information& updateInformation,
     nx::update::Package* outPackage,
     QString* outMessage);
 
+/**
+ * A wrapper for QJson::deserialize(). Processes common errors and fills the error message
+ * accordingly.
+ */
 FindPackageResult fromByteArray(
     const QByteArray& serializedUpdateInformation,
     Information* outInformation,

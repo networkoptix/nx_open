@@ -129,6 +129,7 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
+    NX_ASSERT(!version.isNull());
     m_targetVersion = version;
 }
 
@@ -167,6 +168,16 @@ bool PeerStateTracker::hasVerificationErrors() const
     return false;
 }
 
+bool PeerStateTracker::hasStatusErrors() const
+{
+    for (auto& item: m_items)
+    {
+        if (item->state == StatusCode::error && !item->statusMessage.isEmpty())
+            return true;
+    }
+    return false;
+}
+
 void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)
@@ -199,7 +210,10 @@ void PeerStateTracker::setVersionInformation(
                     || item->state == StatusCode::latestUpdateInstalled;
 
                 if (installed != item->installed)
+                {
                     item->installed = true;
+                    NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
+                }
                 emit itemChanged(item);
             }
         }
@@ -453,6 +467,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyRestart:
             m_clientItem->statusMessage = "Client is ready to install and restart";
             m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
         case State::installing:
@@ -540,6 +555,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 
     if (version != item->version)
     {
+        NX_INFO(this, "updateServerData() - peer %1 changing version from=%2 to %3", item->id, item->version, version);
         item->version = version;
         changed = true;
     }
@@ -548,6 +564,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     if (installed != item->installed)
     {
         item->installed = true;
+        NX_INFO(this, "updateServerData() - peer %1 changed installed=%2", item->id, item->installed);
         changed = true;
     }
 
