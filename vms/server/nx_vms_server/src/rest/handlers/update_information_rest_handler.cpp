@@ -172,15 +172,25 @@ static int checkForUpdateInformationRemotely(
 }
 
 static int makeUpdateInformationResponse(
+    const QnRequestParamList& params,
     const QByteArray& updateInformationData,
     QByteArray* result,
     QByteArray* contentType,
     const UpdateInformationRequestData& request)
 {
-    *contentType = Qn::serializationFormatToHttpContentType(request.format);
-    *result = updateInformationData;
-    if (result->isEmpty())
-        *result = "{}";
+    nx::update::Information resultUpdateInformation;
+    const auto deserializeResult = nx::update::fromByteArray(updateInformationData,
+        &resultUpdateInformation, nullptr);
+
+    if (deserializeResult != nx::update::FindPackageResult::ok || !resultUpdateInformation.isValid())
+    {
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+            toString(nx::update::InformationError::notFoundError), result, contentType,
+            request.format, request.extraFormatting, QnRestResult::CantProcessRequest);
+    }
+
+    QnFusionRestHandlerDetail::serializeJsonRestReply(resultUpdateInformation, params, *result,
+        *contentType, QnRestResult());
 
     return nx::network::http::StatusCode::ok;
 }
@@ -241,14 +251,14 @@ int QnUpdateInformationRestHandler::executeGet(
 
     if (versionValue.isNull() || versionValue == "target")
     {
-        return makeUpdateInformationResponse(
+        return makeUpdateInformationResponse(params,
             commonModule->globalSettings()->targetUpdateInformation(), &result, &contentType,
             request);
     }
 
     if (versionValue == "installed")
     {
-        return makeUpdateInformationResponse(
+        return makeUpdateInformationResponse(params,
             commonModule->globalSettings()->installedUpdateInformation(), &result, &contentType,
             request);
     }
