@@ -199,6 +199,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         /** Value to be displayed in the dialog. */
         float bitrateMbps = 0.0;
 
+        Qn::StreamQuality minRelevantQuality = Qn::StreamQuality::undefined;
+
         struct Thresholds
         {
             UserEditableMultiple<int> beforeSec;

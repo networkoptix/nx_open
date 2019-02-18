@@ -7,6 +7,8 @@ nx_add_target(nxtool EXECUTABLE SIGNED
         "nxtool.rc"
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/nxtool_app_info_impl.cpp"
+    ADDITIONAL_RESOURCES
+        "${customization.dir}/icons/${platform}/nxtool.ico"
     OTHER_SOURCES
         ${QML_FILES}
     PUBLIC_LIBS

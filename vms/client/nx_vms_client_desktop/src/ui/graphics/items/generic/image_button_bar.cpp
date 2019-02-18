@@ -2,10 +2,13 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
 
 #include <utils/math/math.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+
+#include <nx/utils/range_adapters.h>
 
 #include "image_button_widget.h"
 
@@ -186,44 +189,74 @@ int QnImageButtonBar::unusedMask() const {
     return 0;
 }
 
-void QnImageButtonBar::submitVisibleButtons() {
-    if(m_updating)
+void QnImageButtonBar::submitVisibleButtons()
+{
+    if (m_updating)
         return;
+
     QScopedValueRollback<bool> guard(m_submitting, true);
 
-    foreach(QnImageButtonWidget *button, m_buttonByMask) {
+    for (auto button: m_buttonByMask)
+    {
         m_layout->removeItem(button);
-        button->setVisible(false);
+        if (auto action = button->defaultAction())
+            action->setVisible(false);
+        else
+            button->setVisible(false);
     }
 
-    foreach(QnImageButtonWidget *button, m_buttonByMask) {
-        int mask = m_maskByButton.value(button);
-        if(!(mask & m_visibleButtons))
+    for (auto button: m_buttonByMask)
+    {
+        const int mask = m_maskByButton.value(button);
+        if ((mask & m_visibleButtons) == 0)
             continue;
 
         m_layout->insertItem(0, button);
-        button->setVisible(true);
+        if (auto action = button->defaultAction())
+            action->setVisible(true);
+        else
+            button->setVisible(true);
     }
 }
 
-void QnImageButtonBar::submitCheckedButtons(int mask) {
-    if(m_updating)
+void QnImageButtonBar::submitCheckedButtons(int mask)
+{
+    if (m_updating)
         return;
+
     QScopedValueRollback<bool> guard(m_submitting, true);
 
-    for(QMap<int, QnImageButtonWidget *>::const_iterator pos = m_buttonByMask.begin(); pos != m_buttonByMask.end(); pos++)
-        if(pos.key() & mask)
-            pos.value()->setChecked(pos.key() & m_checkedButtons);
+    for (auto [buttonMask, button]: nx::utils::keyValueRange(m_buttonByMask))
+    {
+        if ((buttonMask & mask) == 0)
+            continue;
+
+        const bool checked = (buttonMask & m_checkedButtons) != 0;
+        if (auto action = button->defaultAction(); action && action->isCheckable())
+            action->setChecked(checked);
+        else
+            button->setChecked(checked);
+    }
 }
 
-void QnImageButtonBar::submitEnabledButtons(int mask) {
-    if(m_updating)
+void QnImageButtonBar::submitEnabledButtons(int mask)
+{
+    if (m_updating)
         return;
+
     QScopedValueRollback<bool> guard(m_submitting, true);
 
-    for(QMap<int, QnImageButtonWidget *>::const_iterator pos = m_buttonByMask.begin(); pos != m_buttonByMask.end(); pos++)
-        if(pos.key() & mask)
-            pos.value()->setEnabled(pos.key() & m_enabledButtons);
+    for (auto [buttonMask, button]: nx::utils::keyValueRange(m_buttonByMask))
+    {
+        if ((buttonMask & mask) == 0)
+            continue;
+
+        const bool enabled = (buttonMask & m_enabledButtons) != 0;
+        if (auto action = button->defaultAction())
+            action->setEnabled(enabled);
+        else
+            button->setEnabled(enabled);
+    }
 }
 
 void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {

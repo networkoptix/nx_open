@@ -259,7 +259,6 @@
         </Directory>
 
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
-            <ComponentRef Id="AlwaysFiles"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
 

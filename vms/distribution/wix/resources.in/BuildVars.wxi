@@ -104,5 +104,8 @@
 
         <?define eulaVersion = "${eulaVersion}"?>
         <?define developerBuild = "${developerBuild}"?>
+
+        <?define installerIcon = "${installerIcon}"?>
+        <?define productLogo = "${productLogo}"?>
      <?endif?>
 </Include>
