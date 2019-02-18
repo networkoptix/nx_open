@@ -1759,14 +1759,14 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
                 stopProcess = true;
                 break;
             case WidgetUpdateState::downloading:
-                if (m_rightPanelDownloadProgress.isNull())
+                if (m_rightPanelDownloadProgress.isNull() && ini().systemUpdateProgressInformers)
                 {
                     auto manager = context()->instance<WorkbenchProgressManager>();
                     m_rightPanelDownloadProgress = manager->add(tr("Downloading updates..."));
                 }
                 break;
             case WidgetUpdateState::pushing:
-                if (m_rightPanelDownloadProgress.isNull())
+                if (m_rightPanelDownloadProgress.isNull() && ini().systemUpdateProgressInformers)
                 {
                     auto manager = context()->instance<WorkbenchProgressManager>();
                     m_rightPanelDownloadProgress = manager->add(tr("Pushing updates..."));
