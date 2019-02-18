@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <nx/sdk/helpers/ref_countable.h>
-
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 
 namespace nx {
@@ -27,7 +27,7 @@ private:
     int64_t m_timestampUs = -1;
     int64_t m_durationUs = -1;
 
-    std::vector<const IObjectMetadata*> m_objects;
+    std::vector<Ptr<const IObjectMetadata>> m_objects;
 };
 
 } // namespace analytics

@@ -58,6 +58,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
             ++itr;
     }
 
+    const bool deviceIsAlive = isDeviceAlive();
     for (const auto& engine: engines)
     {
         if (isEngineAlreadyBound(engine))
@@ -66,7 +67,9 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
         binding->setMetadataSink(m_metadataSink);
         m_bindings.emplace(engine->getId(), binding);
-        binding->startAnalytics(m_device->deviceAgentSettingsValues(engine->getId()));
+
+        if (deviceIsAlive)
+            binding->startAnalytics(m_device->deviceAgentSettingsValues(engine->getId()));
     }
 
     updateSupportedFrameTypes();
@@ -228,7 +231,6 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
     }
 
     const auto isAlive = isDeviceAlive();
-
     for (auto& entry: m_bindings)
     {
         auto engineId = entry.first;

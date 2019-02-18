@@ -3,6 +3,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/api/analytics/settings_response.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -105,7 +106,7 @@ void DeviceAgentSettingsAdapter::refreshSettings(const QnUuid& engineId, bool fo
         engine,
         nx::utils::guarded(this,
             [this, engineId](
-                bool success, rest::Handle requestId, const QJsonObject& result)
+                bool success, rest::Handle requestId, const nx::vms::api::analytics::SettingsResponse &result)
             {
                 if (!d->pendingRefreshRequests.removeOne(requestId))
                     return;
@@ -116,7 +117,7 @@ void DeviceAgentSettingsAdapter::refreshSettings(const QnUuid& engineId, bool fo
                 if (!success)
                     return;
 
-                d->store->resetDeviceAgentSettingsValues(engineId, result.toVariantMap());
+                d->store->resetDeviceAgentSettingsValues(engineId, result.values.toVariantMap());
             }),
         thread());
 
@@ -155,7 +156,9 @@ void DeviceAgentSettingsAdapter::applySettings()
             QJsonObject::fromVariantMap(it->get()),
             nx::utils::guarded(this,
                 [this, engineId = it.key()](
-                    bool success, rest::Handle requestId, const QJsonObject& result)
+                    bool success,
+                    rest::Handle requestId,
+                    const nx::vms::api::analytics::SettingsResponse& result)
                 {
                     if (!d->pendingApplyRequests.removeOne(requestId))
                         return;
@@ -166,7 +169,9 @@ void DeviceAgentSettingsAdapter::applySettings()
                     if (!success)
                         return;
 
-                    d->store->resetDeviceAgentSettingsValues(engineId, result.toVariantMap());
+                    d->store->resetDeviceAgentSettingsValues(
+                        engineId,
+                        result.values.toVariantMap());
                 }),
             thread());
 

@@ -1,5 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
-
 #include <algorithm>
 #include <cstring>
 
@@ -13,12 +11,12 @@ namespace test {
 
 TEST(utils, alignUp)
 {
-    ASSERT_EQ(0, alignUp(0, 0));
-    ASSERT_EQ(17, alignUp(17, 0));
-    ASSERT_EQ(48, alignUp(48, 16));
-    ASSERT_EQ(48, alignUp(42, 16));
-    ASSERT_EQ(7, alignUp(7, 7));
-    ASSERT_EQ(8, alignUp(7, 8));
+    ASSERT_EQ(0U, alignUp(0, 0));
+    ASSERT_EQ(17U, alignUp(17, 0));
+    ASSERT_EQ(48U, alignUp(48, 16));
+    ASSERT_EQ(48U, alignUp(42, 16));
+    ASSERT_EQ(7U, alignUp(7, 7));
+    ASSERT_EQ(8U, alignUp(7, 8));
 }
 
 TEST(utils, misalignedPtr)

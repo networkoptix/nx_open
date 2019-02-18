@@ -28,6 +28,8 @@ public:
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
+    
+    virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
 

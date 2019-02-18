@@ -1,4 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
 #pragma once
 
 #define NX_INI_FILE "test_c.ini"

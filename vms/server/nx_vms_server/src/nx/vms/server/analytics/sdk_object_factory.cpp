@@ -21,6 +21,7 @@
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <api/runtime_info_manager.h>
 
 #include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx_ec/ec_api.h>
@@ -100,21 +101,12 @@ SdkObjectFactory::SdkObjectFactory(QnMediaServerModule* serverModule):
 
 bool SdkObjectFactory::init()
 {
-    clearActionDescriptorList();
-
     if (!initPluginResources())
         return false;
 
     if (!initEngineResources())
         return false;
 
-    return true;
-}
-
-bool SdkObjectFactory::clearActionDescriptorList()
-{
-    nx::analytics::DescriptorManager descriptorManager(serverModule()->commonModule());
-    descriptorManager.clearRuntimeInfo();
     return true;
 }
 
@@ -248,11 +240,12 @@ bool SdkObjectFactory::initEngineResources()
             pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
+    QSet<QnUuid> activeEngines;
     std::map<QnUuid, Ptr<IEngine>> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
         const auto& engineList = entry.second;
-        for (const auto& engine : engineList)
+        for (const auto& engine: engineList)
         {
             analyticsManager->saveSync(engine);
             auto engineResource = resourcePool()
@@ -320,11 +313,21 @@ bool SdkObjectFactory::initEngineResources()
 
                 continue;
             }
-            engineResource->setStatus(Qn::Online);
+            activeEngines.insert(engineResource->getId());
         }
     }
 
+    updateActiveEngines(std::move(activeEngines));
     return true;
+}
+
+void SdkObjectFactory::updateActiveEngines(QSet<QnUuid> activeEngines)
+{
+    auto runtimeInfoManager = serverModule()->commonModule()->runtimeInfoManager();
+    auto localRuntimeInfo = runtimeInfoManager->localInfo();
+
+    localRuntimeInfo.data.activeAnalyticsEngines = std::move(activeEngines);
+    runtimeInfoManager->updateLocalItem(localRuntimeInfo);
 }
 
 nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
