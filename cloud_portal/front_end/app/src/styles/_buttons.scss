@@ -115,6 +115,34 @@ button, .btn {
     }
 }
 
+.btn.btn-clear {
+    color            : $dark9;
+    background-color : transparent;
+    max-width        : 180px;
+    display          : flex;
+    align-content    : center;
+    justify-content  : center;
+    border-radius    : $border-radius-base !important;
+    
+    input {
+        position : absolute;
+        opacity  : 0;
+    }
+    
+    .glyphicon-close {
+        opacity: 1 !important;
+    }
+    
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : rgba($light16, .1);
+    }
+    
+    &:active,
+    &.active {
+        background-color : rgba($light16, .15) !important;
+    }
+}
+
 // (END) Overwrite Boostrap section ******
 
 .btn-back {
