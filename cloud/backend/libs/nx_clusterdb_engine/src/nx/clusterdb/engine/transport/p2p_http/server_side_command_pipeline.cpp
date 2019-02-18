@@ -13,8 +13,16 @@ ServerSideCommandPipeline::ServerSideCommandPipeline(
 {
     bindToAioThread(m_multipartMessageBody->getAioThread());
 
+    // TODO: #ak this and m_multipartMessageBody synchronization relay on the same AIO thread.
+    // This is weak. Should refactor.
     m_multipartMessageBody->setOnBeforeDestructionHandler(
         [this]() { markConnectonAsClosed(); });
+}
+
+ServerSideCommandPipeline::~ServerSideCommandPipeline()
+{
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 void ServerSideCommandPipeline::bindToAioThread(
@@ -103,6 +111,9 @@ void ServerSideCommandPipeline::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_sendExecutor.pleaseStopSync();
+
+    if (m_multipartMessageBody)
+        m_multipartMessageBody->setOnBeforeDestructionHandler(nullptr);
 }
 
 void ServerSideCommandPipeline::markConnectonAsClosed()
@@ -110,6 +121,8 @@ void ServerSideCommandPipeline::markConnectonAsClosed()
     NX_ASSERT(isInSelfAioThread());
 
     m_eof = true;
+
+    m_multipartMessageBody = nullptr;
 
     if (m_pendingRead)
     {

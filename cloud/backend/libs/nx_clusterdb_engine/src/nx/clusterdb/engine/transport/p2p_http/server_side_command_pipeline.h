@@ -20,6 +20,7 @@ public:
         nx::network::http::MultipartMessageBodySource* multipartMessageBody,
         const std::string& mimeType,
         const nx::network::SocketAddress& remotePeerEndpoint);
+    ~ServerSideCommandPipeline();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
