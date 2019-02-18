@@ -4,7 +4,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_item.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
