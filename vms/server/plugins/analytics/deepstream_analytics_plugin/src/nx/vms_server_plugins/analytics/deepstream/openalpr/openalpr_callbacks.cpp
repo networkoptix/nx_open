@@ -76,7 +76,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = new nx::sdk::analytics::ObjectMetadata();
+        auto detectedObject = makePtr<nx::sdk::analytics::ObjectMetadata>();
         nx::sdk::analytics::IObjectMetadata::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
@@ -151,7 +151,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 attributes.begin(),
                 attributes.end()));
 
-        packet->addItem(detectedObject);
+        packet->addItem(detectedObject.get());
     }
 
     pipeline->handleMetadata(packet);

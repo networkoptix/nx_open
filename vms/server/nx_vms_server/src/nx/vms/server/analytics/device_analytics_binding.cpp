@@ -357,7 +357,8 @@ std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
     if (!NX_ASSERT(m_engine, "No analytics engine is set"))
         return nullptr;
 
-    auto handler = std::make_unique<DeviceAgentHandler>(serverModule(), m_engine, m_device);
+    auto handler = std::make_unique<DeviceAgentHandler>(
+        serverModule(), m_engine->getId(), m_device);
     handler->setMetadataSink(m_metadataSink.get());
 
     return handler;

@@ -133,8 +133,10 @@ void Engine::executeAction(IAction* action, Error* outError)
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
+    const auto actionParams = toPtr(action->params());
+
     if (!logUtils.convertAndOutputStringMap(
-        &params, action->params(), "params", /*outputIndent*/ 4))
+        &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
         *outError = Error::unknownError;

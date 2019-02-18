@@ -296,7 +296,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
         currentEventTypeIndex = 0;
     }
 
-    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    auto eventMetadata = makePtr<EventMetadata>();
     eventMetadata->setCaption(caption);
     eventMetadata->setDescription(description);
     eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
@@ -306,10 +306,11 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     auto eventMetadataPacket = new EventMetadataPacket();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
     eventMetadataPacket->setDurationUs(0);
-    eventMetadataPacket->addItem(eventMetadata);
+    eventMetadataPacket->addItem(eventMetadata.get());
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << m_eventTypeId << ", isActive: " << ((currentEventTypeIndex == 1) ? "true" : "false");
+        << "type: " << m_eventTypeId
+        << ", isActive: " << ((currentEventTypeIndex == 1) ? "true" : "false");
 
     return eventMetadataPacket;
 }
@@ -322,7 +323,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
 
-    auto objectMetadata = new ObjectMetadata();
+    auto objectMetadata = makePtr<ObjectMetadata>();
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -375,7 +376,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
 
     objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
     objectMetadataPacket->setDurationUs(0);
-    objectMetadataPacket->addItem(objectMetadata);
+    objectMetadataPacket->addItem(objectMetadata.get());
     return objectMetadataPacket;
 }
 

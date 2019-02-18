@@ -144,7 +144,7 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     engineInfo->setName(getName().toStdString());
     m_sdkEngine->setEngineInfo(engineInfo.get());
 
-    m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), toSharedPointer(this));
+    m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), getId());
     m_sdkEngine->setHandler(m_handler.get());
 
     if (!sendSettingsToSdkEngine())
