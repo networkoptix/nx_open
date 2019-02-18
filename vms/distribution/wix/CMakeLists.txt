@@ -26,7 +26,6 @@ else()
 endif()
 
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
-file(TO_CMAKE_PATH ${certificates_path} certificates_path)
 file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
 add_subdirectory(custom_actions)
