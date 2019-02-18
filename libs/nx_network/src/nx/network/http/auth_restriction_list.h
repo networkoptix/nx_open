@@ -81,14 +81,14 @@ public:
     AuthMethod::Values getAllowedAuthMethods(const nx::network::http::Request& request) const;
 
     void allow(const Filter& filter, AuthMethod::Values authMethod);
-    
+
     /**
      * Allow using path filter only.
      */
     void allow(const std::string& pathMask, AuthMethod::Values method);
 
     void deny(const Filter& filter, AuthMethod::Values authMethod);
-    
+
     /**
      * Deny using path filter only.
      */

@@ -33,7 +33,7 @@ ParserState FixedSizeMessageParser::parse(
                 if (readMessageSize(&readBuffer))
                     m_state = State::readingMessage;
                 break;
-        
+
             case State::readingMessage:
                 if (readMessage(&readBuffer))
                 {

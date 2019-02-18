@@ -86,7 +86,7 @@ void MediatorConnector::mockupMediatorAddress(
 
         m_mockedUpMediatorAddress = mediatorAddress;
         m_mediatorEndpointProvider->mockupMediatorAddress(mediatorAddress);
-    }   
+    }
 
     establishTcpConnectionToMediatorAsync();
 }
@@ -341,7 +341,7 @@ void MediatorEndpointProvider::fetchMediatorEndpoints(
     NX_ASSERT(isInSelfAioThread());
 
     m_fetchMediatorEndpointsHandlers.push_back(std::move(handler));
-    
+
     if (m_mediatorUrlFetcher)
         return; //< Operation has already been started.
 

@@ -67,7 +67,7 @@ void ConnectionUpgradeTunnelServer<ApplicationData...>::registerRequestHandlers(
 {
     using namespace std::placeholders;
 
-    const auto path = 
+    const auto path =
         this->requestPath().empty()
         ? url::joinPath(basePath, kConnectionUpgradeTunnelPath)
         : this->requestPath();
@@ -138,7 +138,7 @@ network::http::RequestResult
                 &ConnectionUpgradeTunnelServer::reportTunnel,
                 std::move(allArgs));
         };
-    
+
     return requestResult;
 }
 

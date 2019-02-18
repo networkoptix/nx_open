@@ -17,7 +17,7 @@ class NX_NETWORK_API MultipartMessageBodySource:
 
 public:
     MultipartMessageBodySource(StringType boundary);
-    
+
     MultipartBodySerializer* serializer();
 
 private:

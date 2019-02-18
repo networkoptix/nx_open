@@ -32,7 +32,7 @@ public:
         nx::network::IoCompletionHandler handler) override;
 
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
-    
+
     virtual network::SocketAddress getForeignAddress() const override;
 
     virtual void start(

@@ -133,12 +133,12 @@ bool MultipartContentParser::setContentType(const StringType& contentType)
     static const char multipartContentType[] = "multipart/";
 
     //analyzing response headers (if needed)
-    const nx::network::http::StringType::value_type* sepPos = 
+    const nx::network::http::StringType::value_type* sepPos =
         std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
     if( sepPos == contentType.constData()+contentType.size() )
         return false;   //unexpected content type
 
-    if( nx::network::http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType)-1) 
+    if( nx::network::http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType)-1)
         != multipartContentType)
     {
         return false;   //unexpected content type

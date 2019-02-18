@@ -99,7 +99,7 @@ public:
      * NOTE: Mediator url resolution will still happen by referring to specified address.
      */
     void mockupCloudModulesXmlUrl(const utils::Url &cloudModulesXmlUrl);
-    
+
     /**
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
@@ -141,7 +141,7 @@ private:
 
 /**
  * Adds support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
- * It implicitely fetches endpoint from MediatorEndpointProvider and 
+ * It implicitely fetches endpoint from MediatorEndpointProvider and
  * calls AbstractAsyncClient::connect.
  */
 class DelayedConnectStunClient:

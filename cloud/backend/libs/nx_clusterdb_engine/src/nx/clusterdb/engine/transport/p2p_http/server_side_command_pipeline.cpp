@@ -110,7 +110,7 @@ void ServerSideCommandPipeline::markConnectonAsClosed()
     NX_ASSERT(isInSelfAioThread());
 
     m_eof = true;
-    
+
     if (m_pendingRead)
     {
         auto pendingRead = std::exchange(m_pendingRead, std::nullopt);
