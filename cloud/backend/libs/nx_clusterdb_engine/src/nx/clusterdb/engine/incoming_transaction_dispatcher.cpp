@@ -64,13 +64,16 @@ void IncomingCommandDispatcher::dispatchTransaction(
     return it->second->processor->process(
         std::move(transportHeader),
         std::move(commandData),
-        [it, completionHandler = std::move(completionHandler)](
+        [this, it, completionHandler = std::move(completionHandler)](
             ResultCode resultCode)
-        {
-            --it->second->usageCount;
-            it->second->usageCountDecreased.wakeAll();
-            completionHandler(resultCode);
-        });
+            {
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    --it->second->usageCount;
+                    it->second->usageCountDecreased.wakeAll();
+                }
+                completionHandler(resultCode);
+            });
 }
 
 void IncomingCommandDispatcher::removeHandler(int commandCode)
