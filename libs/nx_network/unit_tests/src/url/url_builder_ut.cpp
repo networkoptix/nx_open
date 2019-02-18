@@ -177,7 +177,10 @@ TEST_P(AppendPathToUrl, appendedPathIsExpected)
 static std::vector<UrlPathParts> kPathParts
 {
 	{"", {}, ""},
+    {"", {""}, ""},
     {"path", {}, "/path"},
+    {"path", {""}, "/path"},
+    {"path", {"/", "/"}, "/path/"},
     {"path", {"part"}, "/path/part"},
     {"path", {"part1", "part2"}, "/path/part1/part2"},
     {"path/", {"/part"}, "/path/part"},

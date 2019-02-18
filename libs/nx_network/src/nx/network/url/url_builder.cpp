@@ -101,6 +101,9 @@ Builder& Builder::setPath(const QByteArray& path, QUrl::ParsingMode mode)
 
 Builder& Builder::appendPath(const QString& path, QUrl::ParsingMode mode)
 {
+    if (path.isEmpty())
+        return *this;
+
     auto value = m_url.path();
     if (!value.endsWith('/') && !path.startsWith('/'))
         value += '/';
