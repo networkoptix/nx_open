@@ -364,4 +364,3 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 }
 
 } // extern "C"
-

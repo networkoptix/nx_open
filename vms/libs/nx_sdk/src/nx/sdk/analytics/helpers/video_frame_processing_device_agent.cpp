@@ -151,16 +151,16 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
         NX_PRINT << __func__ << "(): "
             << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
         return;
-    }    
+    }
     if (!metadataPacket)
     {
         NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet" << packetIndexName
-            << " found; discarded.";            
+            << " found; discarded.";
         return;
     }
 
     if (NX_DEBUG_ENABLE_OUTPUT)
-    {    
+    {
         std::string packetName;
         if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
         {
@@ -177,11 +177,11 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
             packetName = "Unknown";
         }
         packetName += " metadata packet" + packetIndexName;
-        
-        if (metadataPacket->count() == 0)   
+
+        if (metadataPacket->count() == 0)
             NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
 
-        const std::string itemsName = (metadataPacket->count() == 1) 
+        const std::string itemsName = (metadataPacket->count() == 1)
             ? (std::string("item of type ") + metadataPacket->at(0)->typeId())
             : "item(s)";
 
