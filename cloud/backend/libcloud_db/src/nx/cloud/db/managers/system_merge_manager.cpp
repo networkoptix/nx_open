@@ -41,7 +41,7 @@ void SystemMergeManager::startMergingSystems(
     const std::string& idOfSystemToBeMerged,
     std::function<void(api::Result)> completionHandler)
 {
-    NX_VERBOSE(this, lm("Requested merge of system %1 into %2")
+    NX_DEBUG(this, lm("Requested merge of system %1 into %2")
         .args(idOfSystemToBeMerged, idOfSystemToMergeTo));
 
     const auto result = validateRequestInput(
@@ -119,7 +119,7 @@ bool SystemMergeManager::verifyMergeHistoryRecord(
 {
     if (!mergeHistoryRecord.verify(system.authKey.c_str()))
     {
-        NX_WARNING(this, lm("Could not verify merge history record for system %1. Ignoring...")
+        NX_INFO(this, lm("Could not verify merge history record for system %1. Ignoring...")
             .args(system.id));
         return false;
     }
@@ -246,7 +246,7 @@ void SystemMergeManager::issueVmsMergeRequest(
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, lm("Merge %1 into %2. Issuing request to system %1")
+    NX_DEBUG(this, lm("Merge %1 into %2. Issuing request to system %1")
         .args(mergeRequestContext->idOfSystemToBeMerged,
             mergeRequestContext->idOfSystemToMergeTo));
 
@@ -266,13 +266,13 @@ void SystemMergeManager::processVmsMergeRequestResult(
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, lm("Merge %1 into %2. Request to system %1 completed")
+    NX_DEBUG(this, lm("Merge %1 into %2. Request to system %1 completed")
         .args(mergeRequestContext->idOfSystemToBeMerged,
             mergeRequestContext->idOfSystemToMergeTo));
 
     if (vmsRequestResult.resultCode != VmsResultCode::ok)
     {
-        NX_VERBOSE(this, lm("Merge %1 into %2. Request to system %1 failed with result %3")
+        NX_DEBUG(this, lm("Merge %1 into %2. Request to system %1 failed with result %3")
             .args(mergeRequestContext->idOfSystemToBeMerged,
                 mergeRequestContext->idOfSystemToMergeTo,
                 QnLexical::serialized(vmsRequestResult.resultCode)));
@@ -294,7 +294,7 @@ void SystemMergeManager::processUpdateSystemResult(
     MergeRequestContext* mergeRequestContextPtr,
     nx::sql::DBResult dbResult)
 {
-    NX_VERBOSE(this, lm("Merge %1 into %2. Updating system %1 status completed with result %3")
+    NX_DEBUG(this, lm("Merge %1 into %2. Updating system %1 status completed with result %3")
         .args(mergeRequestContextPtr->idOfSystemToBeMerged,
             mergeRequestContextPtr->idOfSystemToMergeTo,
             nx::sql::toString(dbResult)));
@@ -336,7 +336,7 @@ void SystemMergeManager::finishMerge(
     MergeRequestContext* mergeRequestContextPtr,
     api::Result result)
 {
-    NX_VERBOSE(this, lm("Merge %1 into %2. Reporting %3")
+    NX_DEBUG(this, lm("Merge %1 into %2. Reporting %3")
         .args(mergeRequestContextPtr->idOfSystemToBeMerged,
             mergeRequestContextPtr->idOfSystemToMergeTo,
             QnLexical::serialized(result.code)));
