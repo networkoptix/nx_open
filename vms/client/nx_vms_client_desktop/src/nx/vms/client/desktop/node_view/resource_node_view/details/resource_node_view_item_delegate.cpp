@@ -10,9 +10,12 @@
 
 #include <ui/style/helper.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <client/client_color_types.h>
+#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -23,6 +26,7 @@ struct ResourceNodeViewItemDelegate::Private
 {
     QnResourceItemColors colors;
     QnTextPixmapCache textPixmapCache;
+    bool showRecordingIndicator = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -41,9 +45,9 @@ ResourceNodeViewItemDelegate::~ResourceNodeViewItemDelegate()
 }
 
 void ResourceNodeViewItemDelegate::paint(
-    QPainter *painter,
-    const QStyleOptionViewItem &styleOption,
-    const QModelIndex &index) const
+    QPainter* painter,
+    const QStyleOptionViewItem& styleOption,
+    const QModelIndex& index) const
 {
     base_type::paint(painter, styleOption, index);
 
@@ -65,6 +69,16 @@ void ResourceNodeViewItemDelegate::setColors(const QnResourceItemColors& colors)
     d->colors = colors;
 }
 
+void ResourceNodeViewItemDelegate::setShowRecordingIndicator(bool show)
+{
+    d->showRecordingIndicator = show;
+}
+
+bool ResourceNodeViewItemDelegate::getShowRecordingIndicator() const
+{
+    return d->showRecordingIndicator;
+}
+
 void ResourceNodeViewItemDelegate::initStyleOption(
     QStyleOptionViewItem* option,
     const QModelIndex& index) const
@@ -80,9 +94,9 @@ void ResourceNodeViewItemDelegate::initStyleOption(
 }
 
 void ResourceNodeViewItemDelegate::paintItemText(
-    QPainter *painter,
-    const QStyleOptionViewItem &styleOption,
-    const QModelIndex &index,
+    QPainter* painter,
+    const QStyleOptionViewItem& styleOption,
+    const QModelIndex& index,
     const QColor& mainColor,
     const QColor& extraColor,
     const QColor& invalidColor) const
@@ -144,9 +158,9 @@ void ResourceNodeViewItemDelegate::paintItemText(
 }
 
 void ResourceNodeViewItemDelegate::paintItemIcon(
-    QPainter *painter,
-    const QStyleOptionViewItem &option,
-    const QModelIndex &index,
+    QPainter* painter,
+    const QStyleOptionViewItem& option,
+    const QModelIndex& index,
     QIcon::Mode mode) const
 {
     if (!option.features.testFlag(QStyleOptionViewItem::HasDecoration))
@@ -155,9 +169,57 @@ void ResourceNodeViewItemDelegate::paintItemIcon(
     const auto style = option.widget ? option.widget->style() : QApplication::style();
     const QRect iconRect = style->subElementRect(
         QStyle::SE_ItemViewItemDecoration, &option, option.widget);
-        option.icon.paint(painter, iconRect, option.decorationAlignment, mode, QIcon::On);
+    option.icon.paint(painter, iconRect, option.decorationAlignment, mode, QIcon::On);
+
+    if (getShowRecordingIndicator())
+        paintRecordingIndicator(painter, iconRect, index);
+}
+
+void ResourceNodeViewItemDelegate::paintRecordingIndicator(
+    QPainter* painter,
+    const QRect& iconRect,
+    const QModelIndex& index) const
+{
+    NX_ASSERT(index.model());
+    if (!index.model())
+        return;
+
+    const auto extraStatus =
+        index.data(ResourceNodeDataRole::cameraExtraStatusRole).value<CameraExtraStatus>();
+
+    if (extraStatus == CameraExtraStatus())
+        return;
+
+    const auto nodeHasChildren = [](const QModelIndex& index)
+        { return index.model()->rowCount(index) > 0; };
+
+    QRect indicatorRect(iconRect);
+
+    // Check if there are too much icons for this indentation level.
+    const auto shiftIconLeft =
+        [&indicatorRect]
+        {
+            indicatorRect.moveLeft(indicatorRect.left() - style::Metrics::kDefaultIconSize);
+            return indicatorRect.left() >= 0;
+        };
+
+    // Leave space for expand/collapse control if needed.
+    if (nodeHasChildren(index))
+        shiftIconLeft();
+
+    // Draw "recording" or "scheduled" icon.
+    if (extraStatus.testFlag(CameraExtraStatusFlag::recording)
+        || extraStatus.testFlag(CameraExtraStatusFlag::scheduled))
+    {
+        if (!shiftIconLeft())
+            return;
+
+        const auto icon = extraStatus.testFlag(CameraExtraStatusFlag::recording)
+            ? qnSkin->icon("tree/recording.png")
+            : qnSkin->icon("tree/scheduled.png");
+        icon.paint(painter, indicatorRect);
+    }
 }
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-
