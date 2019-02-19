@@ -1,6 +1,8 @@
 
 #include "socket_global.h"
 
+#include <udt/udt.h>
+
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -12,6 +14,20 @@ const std::chrono::seconds kDebugIniReloadInterval(10);
 
 namespace nx {
 namespace network {
+
+class UdtInitializer
+{
+public:
+    UdtInitializer()
+    {
+        UDT::startup();
+    }
+
+    ~UdtInitializer()
+    {
+        UDT::cleanup();
+    }
+};
 
 bool SocketGlobals::Ini::isHostDisabled(const HostAddress& host) const
 {
@@ -73,6 +89,8 @@ SocketGlobals::SocketGlobals(int initializationFlags, const QString& customCloud
 {
     if (m_initializationFlags & InitializationFlags::disableUdt)
         m_pollSetFactory.disableUdt();
+
+    m_udtInitializer = std::make_unique<UdtInitializer>();
 
     m_aioServiceGuard.initialize();
 

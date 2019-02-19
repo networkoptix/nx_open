@@ -23,6 +23,8 @@
 namespace nx {
 namespace network {
 
+class UdtInitializer;
+
 class NX_NETWORK_API SocketGlobals
 {
 public:
@@ -141,6 +143,7 @@ private:
 
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
+    std::unique_ptr<UdtInitializer> m_udtInitializer;
     std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
