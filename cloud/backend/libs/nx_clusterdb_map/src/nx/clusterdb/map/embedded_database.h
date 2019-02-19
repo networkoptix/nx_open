@@ -15,15 +15,12 @@ class NX_KEY_VALUE_DB_API EmbeddedDatabase
 {
 public:
     EmbeddedDatabase(
-        const Settings& settings,
+        const nx::clusterdb::engine::SynchronizationSettings& dataSyncSettings,
         nx::sql::AsyncSqlQueryExecutor* queryExecutor);
 
     Database& database();
 
 private:
-    /*const Settings& m_settings;
-    nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;*/
-
     QnUuid m_moduleId;
     nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
     Database m_database;

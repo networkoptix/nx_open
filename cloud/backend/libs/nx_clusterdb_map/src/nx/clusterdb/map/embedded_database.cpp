@@ -11,16 +11,14 @@ static constexpr char kApplicationId[] = "nx::clusterdb::map::EmbeddedDatabase";
 } // namespace
 
 EmbeddedDatabase::EmbeddedDatabase(
-    const Settings& settings,
+    const nx::clusterdb::engine::SynchronizationSettings& dataSyncSettings,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor)
     :
-    /*m_settings(settings),
-    m_queryExecutor(queryExecutor),*/
     m_moduleId(QnUuid::createUuid()),
     m_syncEngine(
         kApplicationId,
         m_moduleId,
-        settings.dataSyncEngineSettings,
+        dataSyncSettings,
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         queryExecutor),
     m_database(&m_syncEngine, queryExecutor)
