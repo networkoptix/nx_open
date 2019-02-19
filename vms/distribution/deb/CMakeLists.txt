@@ -1,10 +1,10 @@
 # Variables used by build_distribution.conf files and/or .deb contents.
 if(arch STREQUAL "x64")
     set(os.arch "amd64")
-    set(arch.dir "x86_64-linux-gnu/")
 elseif(arch STREQUAL "x86")
     set(os.arch "i386")
-    set(arch.dir "i386-linux-gnu/")
+elseif(arch STREQUAL "aarch64")
+    set(os.arch "arm64")
 endif()
 set(target.arch "${os.arch}")
 

@@ -14,7 +14,7 @@ stripIfNeeded() # dir
 {
     local -r DIR="$1" && shift
 
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
+    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "aarch64" ]]
     then
         local FILE
         for FILE in $(find "$DIR" -type f)
@@ -48,7 +48,8 @@ copyLibs()
             && "$LIB_BASENAME" != libEnginio.so* \
             && "$LIB_BASENAME" != libqgsttools_p.* \
             && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_vms_client* ]]
+            && "$LIB_BASENAME" != libnx_vms_client* ]] ||
+            [[ "$BOX" == "tx1" && "$LIB_BASENAME" == libtegra_video.* ]]
         then
             echo "  Copying $LIB_BASENAME"
             cp -P "$LIB" "$STAGE_LIB/"
@@ -57,7 +58,7 @@ copyLibs()
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
-    if [ "$ARCH" != "arm" ]
+    if [[ "$ARCH" != "arm" ]]
     then
         echo "Copying libicu"
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
