@@ -11,6 +11,9 @@
 
 namespace nx::analytics {
 
+using namespace nx::vms::api::analytics;
+using namespace nx::utils::data_structures;
+
 namespace {
 
 const QString kObjectTypeDescriptorTypeName("ObjectType");
@@ -53,9 +56,6 @@ std::optional<std::set<ObjectTypeId>> intersectObjectTypeIds(
 
 } // namespace
 
-using namespace nx::vms::api::analytics;
-using namespace nx::utils::data_structures;
-
 ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QnCommonModule* commonModule)
     : base_type(commonModule),
       m_objectTypeDescriptorContainer(makeContainer<ObjectTypeDescriptorContainer>(
@@ -63,9 +63,7 @@ ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QnCommonModule* commonM
       m_engineDescriptorContainer(
           makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
       m_groupDescriptorContainer(
-          makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty)),
-      m_deviceDescriptorContainer(
-          makeContainer<DeviceDescriptorContainer>(commonModule, kDeviceDescriptorsProperty))
+          makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
 {
 }
 
@@ -86,17 +84,14 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIds(
     const QnVirtualCameraResourcePtr& device) const
 {
     ScopedObjectTypeIds result;
-    auto descriptor = m_deviceDescriptorContainer.mergedDescriptors(device->getId());
-    if (!descriptor)
-        return {};
 
-    const auto& objectTypeIdsByEngine = descriptor->supportedObjectTypeIds;
-    for (const auto& [engineId, descriptorIds]: objectTypeIdsByEngine)
+    const auto& objectTypeIdsByEngine = device->supportedObjectTypes();
+    for (const auto& [engineId, objectTypeIds]: objectTypeIdsByEngine)
     {
-        for (const auto& descriptorId: descriptorIds)
+        for (const auto& objectTypeId: objectTypeIds)
         {
-            const auto groupId = objectTypeGroupForEngine(engineId, descriptorId);
-            result[engineId][groupId].insert(descriptorId);
+            const auto groupId = objectTypeGroupForEngine(engineId, objectTypeId);
+            result[engineId][groupId].insert(objectTypeId);
         }
     }
 
@@ -135,32 +130,17 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIdsIntersect
 ScopedObjectTypeIds ObjectTypeDescriptorManager::compatibleObjectTypeIds(
     const QnVirtualCameraResourcePtr& device) const
 {
-    const auto descriptor = m_deviceDescriptorContainer.mergedDescriptors(device->getId());
-    if (!descriptor)
-        return {};
-
-    const auto& compatibleEngineIds = descriptor->compatibleEngineIds;
-    if (compatibleEngineIds.empty())
+    const auto& compatibleEngines = device->compatibleAnalyticsEngineResources();
+    if (compatibleEngines.empty())
         return {};
 
     ScopedObjectTypeIds result;
-    for (const auto& engineId: compatibleEngineIds)
+    for (const auto& engine: compatibleEngines)
     {
-        const auto engine =
-            commonModule()
-                ->resourcePool()
-                ->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
-
-        if (!engine)
+        const auto objectTypeDescriptors = engine->analyticsObjectTypeDescriptors();
+        for (const auto& [objectTypeId, objectTypeDescriptor]: objectTypeDescriptors)
         {
-            NX_WARNING(this, "Analytics Engine resource with id %1 is not found", engineId);
-            continue;
-        }
-
-        const auto eventTypeDescriptors = engine->analyticsObjectTypeDescriptors();
-        for (const auto& [objectTypeId, eventTypeDescriptor] : eventTypeDescriptors)
-        {
-            for (const auto& scope: eventTypeDescriptor.scopes)
+            for (const auto& scope: objectTypeDescriptor.scopes)
                 result[scope.engineId][scope.groupId].insert(objectTypeId);
         }
     }

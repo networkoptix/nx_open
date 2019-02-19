@@ -59,7 +59,6 @@ private:
     ObjectTypeDescriptorContainer m_objectTypeDescriptorContainer;
     EngineDescriptorContainer m_engineDescriptorContainer;
     GroupDescriptorContainer m_groupDescriptorContainer;
-    DeviceDescriptorContainer m_deviceDescriptorContainer;
 };
 
 } // namespace nx::analytics

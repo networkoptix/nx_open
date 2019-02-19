@@ -47,6 +47,11 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     m_typedManifest = QJson::deserialized<EngineManifest>(m_manifest);
 }
 
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+{
+    // Do nothing.
+}
+
 void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.

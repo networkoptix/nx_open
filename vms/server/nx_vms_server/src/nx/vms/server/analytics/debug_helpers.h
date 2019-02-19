@@ -26,13 +26,13 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
 nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
 
-QString filename(
+QString nameOfFileToDumpDataTo(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
     const QString& postfix);
 
-QString filename(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix);
+QString nameOfFileToDumpDataTo(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix);
 
 /** If the string is not empty and does not end with `\n`, `\n` will be added. */
 void dumpStringToFile(

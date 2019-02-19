@@ -84,22 +84,24 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 
 static void testEngineSettings(IEngine* engine)
 {
-    const auto settings = new StringMap();
+    const auto settings = makePtr<StringMap>();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    engine->setSettings(nullptr); //< Test assigning empty settings.
-    engine->setSettings(settings); //< Test assigning some settings.
+    engine->setSettings(nullptr); //< Test assigning null settings.
+    engine->setSettings(makePtr<StringMap>().get()); //< Test assigning empty settings.
+    engine->setSettings(settings.get()); //< Test assigning some settings.
 }
 
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 {
-    const auto settings = new StringMap();
+    const auto settings = makePtr<StringMap>();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr); //< Test assigning empty settings.
-    deviceAgent->setSettings(settings); //< Test assigning some settings.
+    deviceAgent->setSettings(nullptr); //< Test assigning null settings.
+    deviceAgent->setSettings(makePtr<StringMap>().get()); //< Test assigning empty settings.
+    deviceAgent->setSettings(settings.get()); //< Test assigning some settings.
 }
 
 class Action: public RefCountable<IAction>
@@ -303,11 +305,13 @@ TEST(stub_analytics_plugin, test)
 
     testEngineManifest(engine.get());
     testEngineSettings(engine.get());
+
     testExecuteActionNonExisting(engine.get());
     testExecuteActionAddToList(engine.get());
     testExecuteActionAddPerson(engine.get());
 
     const auto deviceInfo = makePtr<DeviceInfo>();
+    deviceInfo->setId("TEST");
     const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), &error));
     ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(baseDeviceAgent);
@@ -315,10 +319,10 @@ TEST(stub_analytics_plugin, test)
     const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
     ASSERT_TRUE(deviceAgent);
 
+    ASSERT_EQ(Error::noError, deviceAgent->setHandler(deviceAgentHandler.get()));
+
     testDeviceAgentManifest(deviceAgent.get());
     testDeviceAgentSettings(deviceAgent.get());
-
-    ASSERT_EQ(Error::noError, deviceAgent->setHandler(deviceAgentHandler.get()));
 
     const auto metadataTypes = makePtr<MetadataTypes>();
     ASSERT_EQ(Error::noError, deviceAgent->setNeededMetadataTypes(metadataTypes.get()));

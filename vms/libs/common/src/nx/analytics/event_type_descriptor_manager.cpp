@@ -10,6 +10,9 @@
 
 namespace nx::analytics {
 
+using namespace nx::vms::api::analytics;
+using namespace nx::utils::data_structures;
+
 namespace {
 
 static const QString kEventTypeDescriptorTypeName = "EventType";
@@ -55,9 +58,6 @@ std::optional<std::set<EventTypeId>> intersectEventTypeIds(
 
 } // namespace
 
-using namespace nx::vms::api::analytics;
-using namespace nx::utils::data_structures;
-
 EventTypeDescriptorManager::EventTypeDescriptorManager(QnCommonModule* commonModule):
     base_type(commonModule),
     m_eventTypeDescriptorContainer(
@@ -65,9 +65,7 @@ EventTypeDescriptorManager::EventTypeDescriptorManager(QnCommonModule* commonMod
     m_engineDescriptorContainer(
         makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
     m_groupDescriptorContainer(
-        makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty)),
-    m_deviceDescriptorContainer(
-        makeContainer<DeviceDescriptorContainer>(commonModule, kDeviceDescriptorsProperty))
+        makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
 {
 }
 
@@ -90,17 +88,14 @@ ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIds(
     const QnVirtualCameraResourcePtr& device) const
 {
     ScopedEventTypeIds result;
-    auto descriptor = m_deviceDescriptorContainer.mergedDescriptors(device->getId());
-    if (!descriptor)
-        return {};
 
-    const auto& eventTypeIdsByEngine = descriptor->supportedEventTypeIds;
-    for (const auto& [engineId, descriptorIds]: eventTypeIdsByEngine)
+    const auto& eventTypeIdsByEngine = device->supportedEventTypes();
+    for (const auto& [engineId, eventTypeIds]: eventTypeIdsByEngine)
     {
-        for (const auto& descriptorId: descriptorIds)
+        for (const auto& eventTypeId: eventTypeIds)
         {
-            const auto groupId = eventTypeGroupForEngine(engineId, descriptorId);
-            result[engineId][groupId].insert(descriptorId);
+            const auto groupId = eventTypeGroupForEngine(engineId, eventTypeId);
+            result[engineId][groupId].insert(eventTypeId);
         }
     }
 
@@ -136,49 +131,28 @@ ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIdsIntersection
     return result;
 }
 
-
 EventTypeDescriptorMap EventTypeDescriptorManager::supportedEventTypeDescriptors(
     const QnVirtualCameraResourcePtr& device) const
 {
-    std::set<EventTypeId> eventTypeIds;
-    auto descriptor = m_deviceDescriptorContainer.mergedDescriptors(device->getId());
-    if (!descriptor)
-        return {};
+    std::set<EventTypeId> descriptorIds;
 
-    const auto& eventTypeIdsByEngine = descriptor->supportedEventTypeIds;
-    for (const auto& [engineId, descriptorIds] : eventTypeIdsByEngine)
-    {
-        for (const auto& descriptorId: descriptorIds)
-            eventTypeIds.insert(descriptorId);
-    }
+    const auto& eventTypeIdsByEngine = device->supportedEventTypes();
+    for (const auto& [engineId, eventTypeIds]: eventTypeIdsByEngine)
+        descriptorIds.insert(eventTypeIds.cbegin(), eventTypeIds.cend());
 
-    return descriptors(eventTypeIds);
+    return descriptors(descriptorIds);
 }
 
 ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIds(
     const QnVirtualCameraResourcePtr& device) const
 {
-    const auto descriptor = m_deviceDescriptorContainer.mergedDescriptors(device->getId());
-    if (!descriptor)
-        return {};
-
-    const auto& compatibleEngineIds = descriptor->compatibleEngineIds;
-    if (compatibleEngineIds.empty())
+    const auto& compatibleEngines = device->compatibleAnalyticsEngineResources();
+    if (compatibleEngines.empty())
         return {};
 
     ScopedEventTypeIds result;
-    for (const auto& engineId: compatibleEngineIds)
+    for (const auto& engine: compatibleEngines)
     {
-        const auto engine = commonModule()
-            ->resourcePool()
-            ->getResourceById<nx::vms::common::AnalyticsEngineResource>(engineId);
-
-        if (!engine)
-        {
-            NX_WARNING(this, "Analytics Engine resource with id %1 is not found", engineId);
-            continue;
-        }
-
         const auto eventTypeDescriptors = engine->analyticsEventTypeDescriptors();
         for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
         {

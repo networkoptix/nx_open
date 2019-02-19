@@ -1,4 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
 #include "test.h"
 
 #include <chrono>
@@ -111,7 +110,7 @@ static std::string& suiteId()
     return value;
 }
 
-static void printSectionHeader(const std::string formatStr, ...)
+static void printSectionHeader(const char* formatStr, ...)
 {
     static bool firstSection = true;
     if (firstSection)
@@ -124,7 +123,7 @@ static void printSectionHeader(const std::string formatStr, ...)
 
     va_list args;
     va_start(args, formatStr);
-    vfprintf(stderr, formatStr.c_str(), args);
+    vfprintf(stderr, formatStr, args);
     va_end(args);
 
     std::cerr << std::endl;
@@ -141,7 +140,7 @@ static std::string testLogPrefix(const char* caption)
     return std::string(caption) + ": Suite [" + suiteId() + "]: ";
 }
 
-[[noreturn]] static void fatalError(const std::string formatStr, ...)
+[[noreturn]] static void fatalError(const char* formatStr, ...)
 {
     va_list args;
     va_start(args, formatStr);
@@ -151,7 +150,7 @@ static std::string testLogPrefix(const char* caption)
     exit(255);
 }
 
-static void printNote(const std::string formatStr, ...)
+static void printNote(const char* formatStr, ...)
 {
     va_list args;
     va_start(args, formatStr);
@@ -166,7 +165,7 @@ int regTest(const Test& test)
     if (verbose)
     {
         std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
-            << test.testCase << "." << test.testName << std::endl;
+            << test.testCaseDotName << std::endl;
     }
 
     return 0; //< Return value is not used.
@@ -317,7 +316,7 @@ const char* tempDir()
 
     if (test->tempDir.empty())
     {
-        test->tempDir = baseTempDir() + test->testCase + "." + test->testName + kPathSeparator;
+        test->tempDir = baseTempDir() + test->testCaseDotName + kPathSeparator;
         createDir(test->tempDir);
 
         if (verbose)
@@ -347,7 +346,7 @@ const char* staticTempDir()
 
 static bool runTest(Test& test, int testNumber)
 {
-    printSectionHeader("Test #%lu: " + test.testCase + "." + test.testName, testNumber);
+    printSectionHeader("Test #%lu: %s", testNumber, test.testCaseDotName);
     std::cerr << std::endl;
 
     currentTest() = &test;

@@ -887,7 +887,7 @@ Handle ServerConnection::getUpdateStatus(
 
 Handle ServerConnection::getEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -899,7 +899,10 @@ Handle ServerConnection::getEngineAnalyticsSettings(
             [callback = std::move(callback)](
                 bool success, Handle requestId, const QnJsonRestResult& result)
             {
-                callback(success, requestId, result.deserialized<QJsonObject>());
+                callback(
+                    success,
+                    requestId,
+                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
             }),
         targetThread);
 }
@@ -907,7 +910,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -920,7 +923,10 @@ Handle ServerConnection::setEngineAnalyticsSettings(
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {
-            callback(success, requestId, result.deserialized<QJsonObject>());
+            callback(
+                success,
+                requestId,
+                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
         },
         targetThread);
 }
@@ -928,7 +934,7 @@ Handle ServerConnection::setEngineAnalyticsSettings(
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -941,7 +947,10 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
             [callback = std::move(callback)](
                 bool success, Handle requestId, const QnJsonRestResult& result)
             {
-                callback(success, requestId, result.deserialized<QJsonObject>());
+                callback(
+                    success,
+                    requestId,
+                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
             }),
         targetThread);
 }
@@ -950,7 +959,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -964,7 +973,10 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {
-            callback(success, requestId, result.deserialized<QJsonObject>());
+            callback(
+                success,
+                requestId,
+                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
         },
         targetThread);
 }

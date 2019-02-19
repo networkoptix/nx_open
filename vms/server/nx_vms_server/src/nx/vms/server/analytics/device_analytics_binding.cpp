@@ -122,6 +122,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         m_handler = createHandler();
         m_deviceAgent->setHandler(m_handler.get());
         updateDeviceWithManifest(*manifest);
+        m_device->saveProperties();
     }
 
     if (!m_deviceAgent)
@@ -257,7 +258,7 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
             this,
             QString::fromStdString(toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
-            debug_helpers::filename(
+            debug_helpers::nameOfFileToDumpDataTo(
                 m_device,
                 m_engine,
                 nx::vms::server::resource::AnalyticsPluginResourcePtr(),
@@ -356,7 +357,8 @@ std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
     if (!NX_ASSERT(m_engine, "No analytics engine is set"))
         return nullptr;
 
-    auto handler = std::make_unique<DeviceAgentHandler>(serverModule(), m_engine, m_device);
+    auto handler = std::make_unique<DeviceAgentHandler>(
+        serverModule(), m_engine->getId(), m_device);
     handler->setMetadataSink(m_metadataSink.get());
 
     return handler;
@@ -408,8 +410,6 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
         m_device->getId(),
         m_engine->getId(),
         manifest);
-
-    m_device->saveProperties();
 
     return true;
 }

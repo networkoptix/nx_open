@@ -2,11 +2,14 @@
 
 #include <nx/analytics/properties.h>
 #include <nx/analytics/utils.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+
+#include <api/runtime_info_manager.h>
 
 #include <nx/utils/log/log.h>
 
@@ -14,75 +17,81 @@ namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 
+namespace {
+
+std::map<ActionTypeId, ActionTypeDescriptor> retrieveActionTypeDescriptors(
+    const EngineId& engineId,
+    const nx::vms::api::analytics::EngineManifest& engineManifest,
+    const ObjectTypeId& objectTypeId)
+{
+    std::map<ActionTypeId, ActionTypeDescriptor> result;
+    for (const auto& actionType: engineManifest.objectActions)
+    {
+        if (!actionType.supportedObjectTypeIds.contains(objectTypeId))
+            continue;
+
+        ActionTypeDescriptor descriptor(engineId, actionType);
+        result[descriptor.getId()] = descriptor;
+    }
+
+    return result;
+}
+
+} // namespace
+
 ActionTypeDescriptorManager::ActionTypeDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_actionTypeDescriptorContainer(
-        makeContainer<ActionTypeDescriptorContainer>(commonModule, kActionTypeDescriptorsProperty))
+    base_type(commonModule)
 {
 }
 
 std::optional<ActionTypeDescriptor> ActionTypeDescriptorManager::descriptor(
-    const EngineId& engineId,
     const ActionTypeId& actionTypeId) const
 {
-    return m_actionTypeDescriptorContainer.mergedDescriptors(engineId, actionTypeId);
-}
+    const auto resourcePool = commonModule()->resourcePool();
+    const auto engines = resourcePool->getResources<nx::vms::common::AnalyticsEngineResource>();
 
-void ActionTypeDescriptorManager::updateFromEngineManifest(
-    const PluginId& pluginId,
-    const EngineId& engineId,
-    const QString& engineName,
-    const EngineManifest& manifest)
-{
-    m_actionTypeDescriptorContainer.mergeWithDescriptors(
-        fromManifestItemListToDescriptorMap<ActionTypeDescriptor>(
-            engineId, manifest.objectActions),
-        engineId);
-}
+    for (const auto& engine: engines)
+    {
+        const auto manifest = engine->manifest();
+        for (const auto& actionType: manifest.objectActions)
+        {
+            if (actionType.id == actionTypeId)
+                return ActionTypeDescriptor(engine->getId(), actionType);
+        }
+    }
 
-void ActionTypeDescriptorManager::clearRuntimeInfo()
-{
-    m_actionTypeDescriptorContainer.removeDescriptors();
+    return std::nullopt;
 }
 
 ActionTypeDescriptorMap ActionTypeDescriptorManager::availableObjectActionTypeDescriptors(
     const ObjectTypeId& objectTypeId,
     const QnVirtualCameraResourcePtr& device) const
 {
+    const auto deviceParentServer = device->getParentServer();
+    if (!NX_ASSERT(deviceParentServer))
+        return {};
+
+    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
+    const auto runtimeInfo = runtimeInfoManager->item(deviceParentServer->getId());
+
     const auto resourcePool = commonModule()->resourcePool();
-    const auto deviceParentServer =
-        resourcePool->getResourceById<QnMediaServerResource>(device->getParentId());
+    const auto engines = resourcePool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
+        runtimeInfo.data.activeAnalyticsEngines);
 
-    if (!deviceParentServer)
+    ActionTypeDescriptorMap result;
+    for (const auto& engine: engines)
     {
-        NX_WARNING(this, "Device %1(%2) parent server doesn't exist", device->getUserDefinedName(),
-            device->getId());
-        return {};
+        const auto manifest = engine->manifest();
+        auto actionTypeDescriptors = retrieveActionTypeDescriptors(
+            engine->getId(),
+            manifest,
+            objectTypeId);
+
+        if (!actionTypeDescriptors.empty())
+            result.emplace(engine->getId(), std::move(actionTypeDescriptors));
     }
 
-    const auto serverStatus = deviceParentServer->getStatus();
-    if (serverStatus == Qn::Offline || serverStatus == Qn::Incompatible ||
-        serverStatus == Qn::Unauthorized)
-    {
-        NX_WARNING(this,
-            "Device %1(%2), Device server status is %2, analytics actions are not available",
-            device->getUserDefinedName(), device->getId());
-
-        return {};
-    }
-
-    auto descriptors = m_actionTypeDescriptorContainer.descriptors(deviceParentServer->getId());
-    if (!descriptors)
-    {
-        NX_DEBUG(this, "Device %1(%2), Object type id %3, no available actions found",
-            device->getUserDefinedName(), device->getId(), objectTypeId);
-        return {};
-    }
-
-    return MapHelper::filtered(
-        *descriptors, [&objectTypeId](const auto& keys, const auto& descriptor) {
-            return descriptor.supportedObjectTypeIds.contains(objectTypeId);
-        });
+    return result;
 }
 
 } // namespace nx::analytics

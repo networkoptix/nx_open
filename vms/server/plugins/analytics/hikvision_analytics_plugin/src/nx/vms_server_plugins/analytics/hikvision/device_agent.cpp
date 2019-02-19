@@ -72,7 +72,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 if (wrongChannel)
                     return;
 
-                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+                auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .args(hikvisionEvent.caption, hikvisionEvent.description, m_channelNumber));
 
@@ -87,7 +87,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUs(-1);
-                packet->addItem(eventMetadata);
+                packet->addItem(eventMetadata.get());
             }
 
             m_handler->handleMetadata(packet);
