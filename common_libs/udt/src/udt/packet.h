@@ -52,7 +52,7 @@ struct iovec
 };
 #endif
 
-class CChannel;
+class UdpChannel;
 
 enum class ControlPacketType
 {
@@ -78,7 +78,7 @@ enum class PacketFlag
 
 class CPacket
 {
-    friend class CChannel;
+    friend class UdpChannel;
     friend class CSndQueue;
     friend class CRcvQueue;
 
@@ -86,10 +86,10 @@ public:
     int32_t& m_iSeqNo;                   // alias: sequence number
     int32_t& m_iMsgNo;                   // alias: message number
     int32_t& m_iTimeStamp;               // alias: timestamp
-    int32_t& m_iID;			// alias: socket ID
+    int32_t& m_iID;            // alias: socket ID
     char*& m_pcData;                     // alias: data/control information
 
-    static const int m_iPktHdrSize;	// packet header size
+    static const int m_iPktHdrSize;    // packet header size
 
 public:
     CPacket();
@@ -223,11 +223,11 @@ class CHandShake
 public:
     CHandShake();
 
-    int serialize(char* buf, int& size);
+    int serialize(char* buf, int& size) const;
     int deserialize(const char* buf, int size);
 
 public:
-    static const int m_iContentSize;	// Size of hand shake data
+    static const int m_iContentSize;    // Size of hand shake data
 
 public:
     int32_t m_iVersion;          // UDT version
@@ -236,9 +236,9 @@ public:
     int32_t m_iMSS;              // maximum segment size
     int32_t m_iFlightFlagSize;   // flow control window size
     int32_t m_iReqType;          // connection request type: 1: regular connection request, 0: rendezvous connection request, -1/-2: response
-    int32_t m_iID;		// socket ID
-    int32_t m_iCookie;		// cookie
-    uint32_t m_piPeerIP[4];	// The IP address that the peer's UDP port is bound to
+    int32_t m_iID;        // socket ID
+    int32_t m_iCookie;        // cookie
+    uint32_t m_piPeerIP[4];    // The IP address that the peer's UDP port is bound to
 };
 
 

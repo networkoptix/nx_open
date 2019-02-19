@@ -225,13 +225,13 @@ public:
 
     void clear()
     {
-        for (typename std::list<T*>::iterator i = m_StorageList.begin(); i != m_StorageList.end(); ++i)
+        for (auto i = m_StorageList.begin(); i != m_StorageList.end(); ++i)
         {
             (*i)->release();
             delete *i;
         }
         m_StorageList.clear();
-        for (typename std::vector<ItemPtrList>::iterator i = m_vHashPtr.begin(); i != m_vHashPtr.end(); ++i)
+        for (auto i = m_vHashPtr.begin(); i != m_vHashPtr.end(); ++i)
             i->clear();
         m_iCurrSize = 0;
     }
@@ -257,15 +257,15 @@ private:
 class CInfoBlock
 {
 public:
-    uint32_t m_piIP[4];		// IP address, machine read only, not human readable format
-    int m_iIPversion;		// IP version
-    uint64_t m_ullTimeStamp;	// last update time
-    int m_iRTT;			// RTT
-    int m_iBandwidth;		// estimated bandwidth
-    int m_iLossRate;		// average loss rate
-    int m_iReorderDistance;	// packet reordering distance
-    double m_dInterval;		// inter-packet time, congestion control
-    double m_dCWnd;		// congestion window size, congestion control
+    uint32_t m_piIP[4];        // IP address, machine read only, not human readable format
+    int m_iIPversion;        // IP version
+    uint64_t m_ullTimeStamp;    // last update time
+    int m_iRTT;            // RTT
+    int m_iBandwidth;        // estimated bandwidth
+    int m_iLossRate;        // average loss rate
+    int m_iReorderDistance;    // packet reordering distance
+    double m_dInterval;        // inter-packet time, congestion control
+    double m_dCWnd;        // congestion window size, congestion control
 
 public:
     virtual ~CInfoBlock() {}

@@ -45,7 +45,6 @@ Yunhong Gu, last updated 03/12/2011
 using namespace std;
 
 CSndBuffer::CSndBuffer(int size, int mss):
-    m_BufLock(),
     m_pBlock(NULL),
     m_pFirstBlock(NULL),
     m_pCurrBlock(NULL),
@@ -83,12 +82,6 @@ CSndBuffer::CSndBuffer(int size, int mss):
     }
 
     m_pFirstBlock = m_pCurrBlock = m_pLastBlock = m_pBlock;
-
-#ifndef _WIN32
-    pthread_mutex_init(&m_BufLock, NULL);
-#else
-    m_BufLock = CreateMutex(NULL, false, NULL);
-#endif
 }
 
 CSndBuffer::~CSndBuffer()
@@ -109,12 +102,6 @@ CSndBuffer::~CSndBuffer()
         delete[] temp->m_pcData;
         delete temp;
     }
-
-#ifndef _WIN32
-    pthread_mutex_destroy(&m_BufLock);
-#else
-    CloseHandle(m_BufLock);
-#endif
 }
 
 void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
@@ -155,7 +142,7 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
     m_pLastBlock = s;
 
     {
-        CGuard lk(m_BufLock);
+        std::lock_guard<std::mutex> lock(m_BufLock);
         m_iCount += size;
     }
 
@@ -205,7 +192,7 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
     m_pLastBlock = s;
 
     {
-        CGuard lk(m_BufLock);
+        std::lock_guard<std::mutex> lock(m_BufLock);
         m_iCount += size;
     }
 
@@ -233,7 +220,7 @@ int CSndBuffer::readData(char** data, int32_t& msgno)
 
 int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msglen)
 {
-    CGuard bufferguard(m_BufLock);
+    std::lock_guard<std::mutex> lock(m_BufLock);
 
     Block* p = m_pFirstBlock;
 
@@ -269,7 +256,7 @@ int CSndBuffer::readData(char** data, const int offset, int32_t& msgno, int& msg
 
 void CSndBuffer::ackData(int offset)
 {
-    CGuard bufferguard(m_BufLock);
+    std::lock_guard<std::mutex> lock(m_BufLock);
 
     for (int i = 0; i < offset; ++i)
         m_pFirstBlock = m_pFirstBlock->m_pNext;

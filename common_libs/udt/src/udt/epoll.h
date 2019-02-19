@@ -55,6 +55,7 @@ class EpollImpl;
 class CEPoll
 {
     friend class CUDT;
+    friend class ServerSideConnectionAcceptor;
     friend class CRendezvousQueue;
 
 public:

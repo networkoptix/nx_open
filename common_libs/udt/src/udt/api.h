@@ -45,6 +45,7 @@ Yunhong Gu, last updated 09/28/2010
 #include <condition_variable>
 #include <map>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 #include "udt.h"
@@ -54,6 +55,7 @@ Yunhong Gu, last updated 09/28/2010
 #include "epoll.h"
 
 class CUDT;
+class Multiplexer;
 
 class CUDTSocket
 {
@@ -64,33 +66,33 @@ public:
     void addEPoll(const int eid);
     void removeEPoll(const int eid);
 
-    UDTSTATUS m_Status;                       // current socket state
+    UDTSTATUS m_Status = INIT;                       // current socket state
 
-    uint64_t m_TimeStamp;                     // time when the socket is closed
+    uint64_t m_TimeStamp = 0;                     // time when the socket is closed
 
-    int m_iIPversion;                         // IP version
-    sockaddr* m_pSelfAddr;                    // pointer to the local address of the socket
-    sockaddr* m_pPeerAddr;                    // pointer to the peer address of the socket
+    int m_iIPversion = 0;                         // IP version
+    sockaddr* m_pSelfAddr = nullptr;                    // pointer to the local address of the socket
+    struct sockaddr m_pPeerAddr;                    // pointer to the peer address of the socket
 
-    UDTSOCKET m_SocketID;                     // socket ID
-    UDTSOCKET m_ListenSocket;                 // ID of the listener socket; 0 means this is an independent socket
+    UDTSOCKET m_SocketId = 0;                     // socket ID
+    UDTSOCKET m_ListenSocket = 0;                 // ID of the listener socket; 0 means this is an independent socket
 
-    UDTSOCKET m_PeerID;                       // peer socket ID
-    int32_t m_iISN;                           // initial sequence number, used to tell different connection from same IP:port
+    UDTSOCKET m_PeerID = 0;                       // peer socket ID
+    int32_t m_iISN = 0;                           // initial sequence number, used to tell different connection from same IP:port
 
-    CUDT* m_pUDT;                             // pointer to the UDT entity
+    std::shared_ptr<CUDT> m_pUDT;                             // pointer to the UDT entity
 
-    std::set<UDTSOCKET>* m_pQueuedSockets;    // set of connections waiting for accept()
-    std::set<UDTSOCKET>* m_pAcceptSockets;    // set of accept()ed connections
+    std::set<UDTSOCKET> m_pQueuedSockets;    // set of connections waiting for accept()
+    std::set<UDTSOCKET> m_pAcceptSockets;    // set of accept()ed connections
 
     std::condition_variable m_AcceptCond;     // used to block "accept" call
     std::mutex m_AcceptLock;                  // mutex associated to m_AcceptCond
 
-    unsigned int m_uiBackLog;                 // maximum number of connections in queue
+    unsigned int m_uiBackLog = 0;                 // maximum number of connections in queue
 
-    int m_iMuxID;                             // multiplexer ID
+    int m_multiplexerId = -1;                             // multiplexer ID
 
-    pthread_mutex_t m_ControlLock;            // lock this socket exclusively for control APIs: bind/listen/connect
+    std::mutex m_ControlLock;            // lock this socket exclusively for control APIs: bind/listen/connect
 
 private:
     CUDTSocket(const CUDTSocket&);
@@ -103,6 +105,7 @@ class CUDTUnited
 {
     friend class CUDT;
     friend class CRendezvousQueue;
+    friend class ServerSideConnectionAcceptor;
 
 public:
     CUDTUnited();
@@ -156,7 +159,7 @@ public:
     // Returned value:
     //    Pointer to the UDT entity.
 
-    CUDT* lookup(const UDTSOCKET u);
+    std::shared_ptr<CUDT> lookup(const UDTSOCKET u);
 
     // Functionality:
     //    Check the status of the UDT socket.
@@ -174,6 +177,7 @@ public:
     int listen(const UDTSOCKET u, int backlog);
     UDTSOCKET accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen);
     int connect(const UDTSOCKET u, const sockaddr* name, int namelen);
+    int shutdown(const UDTSOCKET u, int how);
     int close(const UDTSOCKET u);
     int getpeername(const UDTSOCKET u, sockaddr* name, int* namelen);
     int getsockname(const UDTSOCKET u, sockaddr* name, int* namelen);
@@ -213,12 +217,12 @@ private:
     //   void init();
 
 private:
-    std::map<UDTSOCKET, CUDTSocket*> m_Sockets;       // stores all the socket structures
+    std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_Sockets;       // stores all the socket structures
 
-    pthread_mutex_t m_ControlLock;                    // used to synchronize UDT API
+    std::mutex m_ControlLock;                    // used to synchronize UDT API
 
-    pthread_mutex_t m_IDLock;                         // used to synchronize ID generation
-    UDTSOCKET m_SocketID;                             // seed to generate a new unique socket ID
+    std::mutex m_IDLock;                         // used to synchronize ID generation
+    UDTSOCKET m_SocketId = 0;                             // seed to generate a new unique socket ID
 
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
@@ -234,40 +238,37 @@ private:
 
 private:
     void connect_complete(const UDTSOCKET u);
-    CUDTSocket* locate(const UDTSOCKET u);
-    CUDTSocket* locate(const sockaddr* peer, const UDTSOCKET id, int32_t isn);
+    std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
+    std::shared_ptr<CUDTSocket> locate(const sockaddr* peer, const UDTSOCKET id, int32_t isn);
     void updateMux(CUDTSocket* s, const sockaddr* addr = NULL, const UDPSOCKET* = NULL);
     void updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
-    std::map<int, CMultiplexer> m_mMultiplexer;		// UDP multiplexer
+    std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;
     pthread_mutex_t m_MultiplexerLock;
 
 private:
-    CCache<CInfoBlock>* m_pCache;			// UDT network information cache
+    std::unique_ptr<CCache<CInfoBlock>> m_cache;            // UDT network information cache
 
 private:
-    volatile bool m_bClosing;
-    pthread_mutex_t m_GCStopLock;
-    pthread_cond_t m_GCStopCond;
+    volatile bool m_bClosing = false;
+    std::mutex m_GCStopLock;
+    std::condition_variable m_GCStopCond;
 
-    pthread_mutex_t m_InitLock;
-    int m_iInstanceCount;				// number of startup() called by application
-    bool m_bGCStatus;					// if the GC thread is working (true)
+    std::mutex m_InitLock;
+    int m_iInstanceCount = 0;                // number of startup() called by application
+    bool m_bGCStatus = false;                    // if the GC thread is working (true)
 
-    pthread_t m_GCThread;
-#ifndef _WIN32
-    static void* garbageCollect(void*);
-#else
-    static DWORD WINAPI garbageCollect(LPVOID);
-#endif
+    std::thread m_GCThread;
 
-    std::map<UDTSOCKET, CUDTSocket*> m_ClosedSockets;   // temporarily store closed sockets
+    void garbageCollect();
+
+    std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_ClosedSockets;   // temporarily store closed sockets
 
     void checkBrokenSockets();
     void removeSocket(
         const UDTSOCKET u,
-        std::vector<CMultiplexer>* const multiplexersToRemove);
+        std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
 
 private:
     CEPoll m_EPoll;                                     // handling epoll data structures and events
