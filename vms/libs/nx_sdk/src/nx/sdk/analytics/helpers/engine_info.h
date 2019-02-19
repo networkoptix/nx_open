@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <nx/sdk/analytics/i_engine_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
