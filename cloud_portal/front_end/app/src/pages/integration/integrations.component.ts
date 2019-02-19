@@ -122,42 +122,5 @@ export class NxIntegrationsComponent implements OnInit {
         const pattern = new RegExp(text, 'gm');
         item.name = item.name.replace(pattern, '<span class="marked">' + text + '</span>');
     }
-
-    // searchFilterFor(text) {
-    //     this.elements = this.allElements.map(obj => ({ ...obj }));
-    //
-    //     if ('' !== text) {
-    //         this.elements = this.elements.filter(item => {
-    //             if (item.information.name.indexOf(text) > -1 ||
-    //                     item.information.companyName.indexOf(text) > -1 ||
-    //                     item.information.shortDescription.indexOf(text) > -1 ||
-    //                     item.overview.description.indexOf(text) > -1) {
-    //
-    //                 // this.markMatch(item, text);
-    //                 return item;
-    //             }
-    //         });
-    //     }
-    // }
-
-    // setFilter(value, target) {
-    //     let showAll = true;
-    //     this.selectors[target] = value; // model is not updated yet
-    //
-    //     if (this.filterModel.query === '') {
-    //         this.elements = this.allElements.map(obj => ({ ...obj }));
-    //     }
-    //
-    //     this.elements = this.elements.filter(item => {
-    //         if (this.selectors[item.type]) {
-    //             showAll = false;
-    //             return item;
-    //         }
-    //     });
-    //
-    //     if (showAll) {
-    //         this.elements = this.allElements.map(obj => ({ ...obj }));
-    //     }
-    // }
 }
 
