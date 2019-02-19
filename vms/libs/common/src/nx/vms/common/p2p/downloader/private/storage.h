@@ -24,6 +24,7 @@ struct FileMetadata: FileInformation
     }
 
     QVector<QByteArray> chunkChecksums;
+    QString fullFilePath;
 };
 
 class Storage: public QObject
@@ -37,8 +38,6 @@ public:
     QDir downloadsDirectory() const;
 
     QStringList files() const;
-
-    QString filePath(const QString& fileName) const;
 
     FileInformation fileInformation(const QString& fileName) const;
 
@@ -58,6 +57,7 @@ public:
     void cleanupExpiredFiles();
 
     void findDownloads(bool waitForFinished = false);
+    QString filePath(const QString& fileName) const;
 
     static qint64 defaultChunkSize();
     static QByteArray calculateMd5(const QString& filePath);
@@ -85,6 +85,7 @@ private:
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
     void findDownloadsRecursively(const QDir& dir);
+    QString filePathNoLock(const QString& fileName) const;
 
     static ResultCode reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);

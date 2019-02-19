@@ -48,7 +48,7 @@ update::Status CommonUpdateManager::start()
         m_downloaderFailDetail = DownloaderFailDetail::noError;
         for (const auto& file : downloader()->files())
         {
-            if (file.startsWith("updates/"))
+            if (file.contains("updates/"))
                 downloader()->deleteFile(file);
         }
         installer()->stopSync();
