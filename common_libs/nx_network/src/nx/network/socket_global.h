@@ -134,6 +134,8 @@ private:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
 
+    std::unique_ptr<UdtInitializer> m_udtInitializer;
+
     const int m_initializationFlags;
     Ini m_ini;
     DebugIni m_debugIni;
@@ -143,7 +145,6 @@ private:
 
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
-    std::unique_ptr<UdtInitializer> m_udtInitializer;
     std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.

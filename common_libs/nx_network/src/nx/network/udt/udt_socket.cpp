@@ -91,9 +91,6 @@ UdtSocket<InterfaceToImplement>::UdtSocket(int ipVersion):
         new detail::UdtSocketImpl(),
         detail::SocketState::closed)
 {
-    SocketGlobals::customInit(
-        reinterpret_cast<SocketGlobals::CustomInit>(&UDT::startup),
-        reinterpret_cast<SocketGlobals::CustomDeinit>(&UDT::cleanup));
 }
 
 template<typename InterfaceToImplement>
