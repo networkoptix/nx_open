@@ -1,5 +1,7 @@
 #include "blur_filter.h"
 
+#include <cmath>
+
 #include <QtGui/QImage>
 
 namespace nx::utils::graphics {
