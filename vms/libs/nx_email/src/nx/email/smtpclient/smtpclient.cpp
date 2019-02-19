@@ -400,7 +400,7 @@ void SmtpClient::quit()
     }
     catch (SendMessageTimeoutException)
     {
-        NX_WARNING(this, lit("Send message timeout exception has been caught"));
+        NX_WARNING(this, "Send message timeout exception has been caught");
     }
 }
 
