@@ -61,9 +61,12 @@ private:
     std::optional<nx::network::KeepAliveOptions> m_keepAliveOptions;
     OnConnectionClosedHandler m_onConnectionClosedHandler;
     bool m_connected = false;
+    bool m_externallyProvidedUrl = false;
     nx::network::RetryTimer m_reconnectTimer;
 
     void handleConnectionClosure(SystemError::ErrorCode reason);
+
+    void connectInternal(ConnectHandler handler);
 
     void scheduleReconnect();
     void cancelReconnectTimer();

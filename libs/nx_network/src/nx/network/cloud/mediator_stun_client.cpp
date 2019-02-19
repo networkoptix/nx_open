@@ -51,16 +51,9 @@ void MediatorStunClient::connect(
         [this, url, handler = std::move(handler)]() mutable
         {
             m_url = url;
-            cancelReconnectTimer();
+            m_externallyProvidedUrl = true;
 
-            base_type::connect(
-                *m_url,
-                [this, handler = std::move(handler)](auto&&... args) mutable
-                {
-                    handleConnectCompletion(
-                        std::move(handler),
-                        std::forward<decltype(args)>(args)...);
-                });
+            connectInternal(std::move(handler));
         });
 }
 
@@ -125,6 +118,20 @@ void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)
         m_onConnectionClosedHandler(reason);
 }
 
+void MediatorStunClient::connectInternal(ConnectHandler handler)
+{
+    cancelReconnectTimer();
+
+    base_type::connect(
+        *m_url,
+        [this, handler = std::move(handler)](auto&&... args) mutable
+        {
+            handleConnectCompletion(
+                std::move(handler),
+                std::forward<decltype(args)>(args)...);
+        });
+}
+
 void MediatorStunClient::scheduleReconnect()
 {
     NX_ASSERT(isInSelfAioThread());
@@ -146,7 +153,7 @@ void MediatorStunClient::cancelReconnectTimer()
 
 void MediatorStunClient::reconnect()
 {
-    if (m_endpointProvider)
+    if (m_endpointProvider && !(m_url && m_externallyProvidedUrl))
     {
         NX_VERBOSE(this, "Reconnecting via resolve");
         m_url = std::nullopt;
@@ -156,7 +163,7 @@ void MediatorStunClient::reconnect()
     {
         NX_ASSERT(m_url);
         NX_VERBOSE(this, "Reconnecting directly to %1", *m_url);
-        connect(*m_url, [this](auto&&... /*args*/) {});
+        connectInternal([this](auto&&... /*args*/) {});
     }
 }
 
@@ -177,7 +184,7 @@ void MediatorStunClient::onFetchEndpointCompletion(
     m_url = nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
         .appendPath(api::kStunOverHttpTunnelPath).toUrl();
 
-    connect(*m_url, [this](auto&&... /*args*/) {});
+    connectInternal([this](auto&&... /*args*/) {});
 
     sendPendingRequests();
 }
