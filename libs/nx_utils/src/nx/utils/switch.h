@@ -19,11 +19,11 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *
  * Usage:
  * ```
- *  const std::string line = nx::utils::switch_(
+ *  const std::string line = switch_(
  *      count,
  *      0, []{ return "none"; },
  *      1, []{ return "single"; },
- *      mux::default_, []{ return "many"; }
+ *      default_, []{ return "many"; }
  *  );
  * ```
  *
@@ -36,9 +36,9 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *     case 1: line = "single";
  *     default: line = "many";
  * }
+ * ```
  *
  * But keeps `line` const and supports `count` of any type.
- * ```
  */
 template<typename Value, typename Match, typename Action, typename... Tail>
 auto switch_(const Value& value, const Match& match, const Action& action,
