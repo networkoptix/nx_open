@@ -45,7 +45,7 @@ void Peer::connectTo(const Peer& other)
         url);
 }
 
-void Peer::addRandomData()
+Customer Peer::addRandomData()
 {
     Customer customer;
     customer.id = QnUuid::createUuid().toSimpleByteArray().toStdString();
@@ -56,7 +56,40 @@ void Peer::addRandomData()
     process().moduleInstance()->customerManager().saveCustomer(
         customer,
         [&done](ResultCode resultCode) { done.set_value(resultCode); });
-    ASSERT_EQ(ResultCode::ok, done.get_future().get());
+    const auto resultCode = done.get_future().get();
+    if (resultCode != ResultCode::ok)
+        throw std::runtime_error(toString(resultCode));
+
+    return customer;
+}
+
+bool Peer::hasData(const std::vector<Customer>& expected)
+{
+    std::promise<std::tuple<ResultCode, Customers>> done;
+    process().moduleInstance()->customerManager().getCustomers(
+        [&done](ResultCode resultCode, Customers customers)
+        {
+            done.set_value(std::make_tuple(resultCode, std::move(customers)));
+        });
+    auto [resultCode, customers] = done.get_future().get();
+    if (resultCode != ResultCode::ok)
+        return false;
+
+    for (const auto& customer: expected)
+    {
+        if (!std::any_of(customers.begin(), customers.end(),
+                [customer](const auto& value) { return value == customer; }))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Peer::setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter)
+{
+    process().moduleInstance()->syncronizationEngine().setOutgoingCommandFilter(filter);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -95,9 +128,21 @@ int ClusterTestFixture::peerCount() const
 
 bool ClusterTestFixture::allPeersAreSynchronized() const
 {
+    std::vector<int> ids(m_peers.size(), 0);
+    int lastId = 0;
+    for (auto& id: ids)
+        id = lastId++;
+
+    return peersAreSynchronized(ids);
+}
+
+bool ClusterTestFixture::peersAreSynchronized(std::vector<int> ids) const
+{
     std::optional<Customers> firstPeerCustomers;
-    for (const auto& peer: m_peers)
+    for (const auto& peerIndex: ids)
     {
+        const auto& peer = m_peers[peerIndex];
+
         std::promise<std::tuple<ResultCode, Customers>> done;
         peer->process().moduleInstance()->customerManager().getCustomers(
             [&done](ResultCode resultCode, Customers customers)

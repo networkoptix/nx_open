@@ -122,13 +122,16 @@ void CommonHttpAcceptor::createConnection(
             httpConnection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
 
+    auto localPeer = m_localPeerData;
+    localPeer.persistentId = QnUuid::fromArbitraryData(systemId);
+
     auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         httpConnection->getAioThread(),
         m_connectionGuardSharedState,
         connectionRequestAttributes,
         systemId,
-        m_localPeerData,
+        localPeer,
         httpConnection->socket()->getForeignAddress(),
         requestContext.request);
     auto commandPipelinePtr = commandPipeline.get();
@@ -139,7 +142,7 @@ void CommonHttpAcceptor::createConnection(
         m_outgoingCommandFilter,
         systemId,
         connectionRequestAttributes,
-        m_localPeerData,
+        localPeer,
         std::move(commandPipeline));
 
     const int connectionSeq = ++m_connectionSeq;
@@ -165,6 +168,7 @@ void CommonHttpAcceptor::createConnection(
     auto requestResult =
         prepareOkResponseToCreateTransactionConnection(
             connectionRequestAttributes,
+            localPeer,
             requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
@@ -240,6 +244,7 @@ void CommonHttpAcceptor::pushTransaction(
 nx::network::http::RequestResult
     CommonHttpAcceptor::prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
+        const vms::api::PeerData& localPeerData,
         nx::network::http::Response* const response)
 {
     response->headers.emplace(
@@ -250,10 +255,10 @@ nx::network::http::RequestResult
         connectionRequestAttributes.contentEncoding.c_str());
     response->headers.emplace(
         Qn::EC2_GUID_HEADER_NAME,
-        m_localPeerData.id.toByteArray());
+        localPeerData.id.toByteArray());
     response->headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        m_localPeerData.instanceId.toByteArray());
+        localPeerData.instanceId.toByteArray());
 
     NX_ASSERT(m_protocolVersionRange.isCompatible(
         connectionRequestAttributes.remotePeerProtocolVersion));
@@ -287,7 +292,7 @@ void CommonHttpAcceptor::startOutgoingChannel(
         {
             auto acceptedTransportConnection =
                 dynamic_cast<AcceptedCommonHttpConnection*>(transportConnection);
-            if (!acceptedTransportConnection || 
+            if (!acceptedTransportConnection ||
                 acceptedTransportConnection->data() != connectionSeq)
             {
                 // connectionId is not globally unique.

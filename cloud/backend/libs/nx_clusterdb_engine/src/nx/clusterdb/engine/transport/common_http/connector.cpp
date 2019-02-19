@@ -31,13 +31,14 @@ HttpCommandPipelineConnector::HttpCommandPipelineConnector(
     m_connectionGuardSharedState(std::make_shared<::ec2::ConnectionGuardSharedState>())
 {
     m_peerData.id = QnUuid::fromStringSafe(nodeId.c_str());
+    m_peerData.persistentId = QnUuid::fromArbitraryData(systemId);
     m_peerData.instanceId = m_peerData.id;
     m_peerData.peerType = nx::vms::api::PeerType::server;
     m_peerData.dataFormat = Qn::SerializationFormat::UbjsonFormat;
 }
 
 void HttpCommandPipelineConnector::bindToAioThread(
-    network::aio::AbstractAioThread* aioThread) 
+    network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
 
@@ -75,8 +76,8 @@ void HttpCommandPipelineConnector::onStateChanged(
     ::ec2::QnTransactionTransportBase::State newState)
 {
     using State = ::ec2::QnTransactionTransportBase::State;
-    
-    // TODO: Have to do post here since onStateChanged is called by 
+
+    // TODO: Have to do post here since onStateChanged is called by
     // QnTransactionTransportBase with mutex locked.
     post(
         [this, newState]()
@@ -191,7 +192,7 @@ void HttpTransportConnector::onPipelineConnectCompleted(
         return;
     }
 
-    CommonHttpConnection* transport = 
+    CommonHttpConnection* transport =
         static_cast<CommonHttpConnection*>(connection.get());
 
     ConnectionRequestAttributes connectionRequestAttributes;

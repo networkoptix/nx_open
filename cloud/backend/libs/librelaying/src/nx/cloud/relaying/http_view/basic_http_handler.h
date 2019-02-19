@@ -33,7 +33,7 @@ public:
     {
         m_resultCodeToHttpStatusCode.emplace(
             relay::api::ResultCode::needRedirect,
-            nx::network::http::StatusCode::temporaryRedirect);
+            nx::network::http::StatusCode::found);
     }
 
     void addResultCodeToHttpStatusConversion(
