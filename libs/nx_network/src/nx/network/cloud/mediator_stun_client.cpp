@@ -163,7 +163,7 @@ void MediatorStunClient::reconnect()
     {
         NX_ASSERT(m_url);
         NX_VERBOSE(this, "Reconnecting directly to %1", *m_url);
-        connectInternal([this](auto&&... /*args*/) {});
+        connectInternal([](auto&&... /*args*/) {});
     }
 }
 
@@ -184,7 +184,7 @@ void MediatorStunClient::onFetchEndpointCompletion(
     m_url = nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
         .appendPath(api::kStunOverHttpTunnelPath).toUrl();
 
-    connectInternal([this](auto&&... /*args*/) {});
+    connectInternal([](auto&&... /*args*/) {});
 
     sendPendingRequests();
 }
