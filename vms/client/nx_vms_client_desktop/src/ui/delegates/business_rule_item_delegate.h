@@ -37,10 +37,6 @@ public:
 signals:
     void commit();
 
-protected:
-    void initStyleOption(QStyleOptionButton* option) const;
-    void paintEvent(QPaintEvent* event);
-
 private slots:
     void at_clicked();
 

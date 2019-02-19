@@ -181,16 +181,6 @@ void QnSelectResourcesDialogButton::at_clicked()
     emit commit();
 }
 
-void QnSelectResourcesDialogButton::initStyleOption(QStyleOptionButton *option) const
-{
-    base_type::initStyleOption(option);
-}
-
-void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event)
-{
-    base_type::paintEvent(event);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnBusinessRuleItemDelegate ---------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
