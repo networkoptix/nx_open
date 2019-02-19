@@ -100,6 +100,7 @@ window.L = {};
                     
                     angular.extend(CONFIG, appState);
                     
+                    CONFIG.integration.searchFields = response.integrationSearchFields;
                     CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
                     CONFIG.campage.supportedResolutions = response.supportedResolutions;
                     CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;

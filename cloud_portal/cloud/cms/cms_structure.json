@@ -495,20 +495,24 @@
             "type": "array",
             "value": [
               {
+                "name": "name",
                 "value": "name",
-                "name": "name"
+                "section": "information"
               },
               {
+                "name": "companyName",
                 "value": "companyName",
-                "name": "companyName"
+                "section": "information"
               },
               {
+                "name": "shortDescription",
                 "value": "shortDescription",
-                "name": "shortDescription"
+                "section": "information"
               },
               {
+                "name": "description",
                 "value": "description",
-                "name": "description"
+                "section": "overview"
               }
             ]
           }

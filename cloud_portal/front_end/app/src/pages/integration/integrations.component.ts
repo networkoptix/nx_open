@@ -1,6 +1,7 @@
 import { Component, OnInit }  from '@angular/core';
 import { IntegrationService } from './integration.service';
 import { NxUriService }       from '../../services/uri.service';
+import { NxConfigService }    from '../../services/nx-config';
 
 @Component({
     selector   : 'integrations-component',
@@ -9,7 +10,8 @@ import { NxUriService }       from '../../services/uri.service';
 })
 
 export class NxIntegrationsComponent implements OnInit {
-
+    private CONFIG: any = {};
+    private searchBy: any;
     private allElements: any;
     private elements: any;
     private emptyFilter: any = {};
@@ -25,6 +27,8 @@ export class NxIntegrationsComponent implements OnInit {
     };
 
     private setupDefaults() {
+        this.CONFIG = this.config.getConfig();
+
         this.allElements = [];
 
         this.emptyFilter = {
@@ -35,12 +39,15 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     constructor(private uri: NxUriService,
-                private integrations: IntegrationService) {
+                private integrations: IntegrationService,
+                private config: NxConfigService) {
 
         this.setupDefaults();
     }
 
     ngOnInit(): void {
+        this.searchBy = JSON.parse(this.CONFIG.integration.searchFields);
+
         // Example URI
         // /integrations?search=node
         this.uri
@@ -60,12 +67,11 @@ export class NxIntegrationsComponent implements OnInit {
                         }
                     },
                     error => {
-                        console.error('Error -> ', error);
+                        console.error('Integration plugins error -> ', error);
                     });
     }
 
     setTags() {
-
         this.allElements.forEach((integration) => {
             integration.information.type.forEach((type) => {
                 const found = this.filterModel.tags.some((tag) => tag.id === type);
@@ -80,17 +86,28 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     setFilter() {
+        function searchByFields(fields, item, query) {
+            // item['information'][this.searchBy[0].value]
+
+            let result = false;
+            fields.forEach((field) => {
+                try {
+                    result = result || item[field.section][field.value].toLowerCase().indexOf(query) > -1;
+                } catch (e) {
+                    console.error('Misconfigured integration search params ->', e);
+                }
+            });
+
+            return result;
+        }
+
         this.elements = this.allElements.map(obj => ({ ...obj }));
 
         if (this.filterModel.query !== '') {
             const query = this.filterModel.query.toLowerCase();
 
             this.elements = this.elements.filter(item => {
-                if (item.information['name'].toLowerCase().indexOf(query) > -1 ||
-                        item.information['companyName'].toLowerCase().indexOf(query) > -1 ||
-                        item.information['shortDescription'].toLowerCase().indexOf(query) > -1 ||
-                        item.overview['description'].toLowerCase().indexOf(query) > -1) {
-
+                if (searchByFields(this.searchBy, item, query)) {
                     // this.markMatch(item, text);
                     return item;
                 }
