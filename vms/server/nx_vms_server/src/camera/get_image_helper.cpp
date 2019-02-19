@@ -56,6 +56,40 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     return video;
 }
 
+CLVideoDecoderOutputPtr handleChannelFrame(
+    const QList<QnAbstractImageFilterPtr>& filterChain,
+    std::deque<int>& channelMask,
+    CLVideoDecoderOutputPtr&& frame)
+{
+    // Move the last requested channel to the back of queue.
+    const auto channelRequested = channelMask.front();
+    channelMask.pop_front();
+    channelMask.push_back(channelRequested);
+
+    if (!frame)
+    {
+        NX_VERBOSE(typeid(QnGetImageHelper), "%1(): Got null frame", __func__);
+        return nullptr;
+    }
+
+    NX_VERBOSE(typeid(QnGetImageHelper), "Got frame for [%1] channel, size %2, channels left %3",
+        frame->channel, frame->size(), containerString(channelMask));
+    for (auto& filter: filterChain)
+    {
+        frame = filter->updateImage(frame);
+        if (!frame)
+        {
+            NX_VERBOSE(typeid(QnGetImageHelper), "%1(): Failed to apply filter", __func__);
+            return nullptr;
+        }
+    }
+
+    auto it = std::find(channelMask.begin(), channelMask.end(), frame->channel);
+    if (it != channelMask.end())
+        channelMask.erase(it);
+    return frame;
+}
+
 } // namespace
 
 QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
@@ -568,39 +602,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
     filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
 
-    auto handleChannelFrame =
-        [this, &filterChain, &channelMask](CLVideoDecoderOutputPtr&& frame) -> CLVideoDecoderOutputPtr
-        {
-            // Move the last requested channel to the back of queue.
-            const auto channelRequested = channelMask.front();
-            channelMask.pop_front();
-            channelMask.push_back(channelRequested);
-
-            if (!frame)
-            {
-                NX_VERBOSE(this, "%1(): Got null frame", __func__);
-                return nullptr;
-            }
-
-            NX_VERBOSE(this, "Got frame for [%1] channel, size %2, channels left %3",
-                frame->channel, frame->size(), containerString(channelMask));
-            for (auto& filter: filterChain)
-            {
-                frame = filter->updateImage(frame);
-                if (!frame)
-                {
-                    NX_VERBOSE(this, "%1(): Failed to apply filter", __func__);
-                    return nullptr;
-                }
-            }
-
-            auto it = std::find(channelMask.begin(), channelMask.end(), frame->channel);
-            if (it != channelMask.end())
-                channelMask.erase(it);
-            return frame;
-        };
-
-    CLVideoDecoderOutputPtr outFrame = handleChannelFrame(std::move(frame));
+    CLVideoDecoderOutputPtr outFrame = handleChannelFrame(filterChain, channelMask, std::move(frame));
     if (!outFrame)
     {
         NX_VERBOSE(this, "%1() END -> null: error processing frame", __func__);
@@ -612,7 +614,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     // we get all frames.
     for (int i = 1; i < channelCount * kGetFrameExtraTriesPerChannel && !channelMask.empty(); ++i)
     {
-        frame = handleChannelFrame(
+        frame = handleChannelFrame(filterChain, channelMask,
             readFrame(request, streamIndex, archiveDelegate.get(), channelMask.front(), isOpened));
         if (!frame)
         {

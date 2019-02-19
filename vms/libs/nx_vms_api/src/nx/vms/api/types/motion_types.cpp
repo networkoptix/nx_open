@@ -4,19 +4,19 @@
 
 namespace nx::vms::api {
 
-MotionStreamType oppositeStreamIndex(MotionStreamType streamIndex)
+StreamIndex oppositeStreamIndex(StreamIndex streamIndex)
 {
     switch (streamIndex)
     {
-        case MotionStreamType::primary:
-            return MotionStreamType::secondary;
-        case MotionStreamType::secondary:
-            return MotionStreamType::primary;
+        case StreamIndex::primary:
+            return StreamIndex::secondary;
+        case StreamIndex::secondary:
+            return StreamIndex::primary;
         default:
             break;
     }
     NX_ASSERT(false, lm("Unsupported StreamIndex %1").args(streamIndex));
-    return MotionStreamType::undefined; //< Fallback for the failed assertion.
+    return StreamIndex::undefined; //< Fallback for the failed assertion.
 }
 
 } // namespace nx::vms::api
