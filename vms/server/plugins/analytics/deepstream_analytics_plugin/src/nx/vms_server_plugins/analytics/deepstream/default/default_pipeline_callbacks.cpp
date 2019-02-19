@@ -17,6 +17,7 @@ extern "C" {
 #define NX_PRINT_PREFIX "deepstream::defaultCallbacks::"
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
@@ -120,7 +121,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
                 << " " << roiMeta.text_params.display_text;
         }
 
-        auto detectedObject = makePtr<nx::sdk::analytics::ObjectMetadata>();
+        auto detectedObject = nx::sdk::makePtr<nx::sdk::analytics::ObjectMetadata>();
         nx::sdk::analytics::IObjectMetadata::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
