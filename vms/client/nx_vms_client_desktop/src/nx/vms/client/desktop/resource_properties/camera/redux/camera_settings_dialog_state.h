@@ -132,7 +132,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         CombinedValue hasDualStreamingCapability = CombinedValue::None;
         CombinedValue hasRemoteArchiveCapability = CombinedValue::None;
         CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;
-        CombinedValue canForcePtzCapabilities = CombinedValue::None;
+        CombinedValue canForcePanTiltCapabilities = CombinedValue::None;
+        CombinedValue canForceZoomCapability = CombinedValue::None;
         CombinedValue supportsMotionStreamOverride = CombinedValue::None;
         CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
         CombinedValue supportsRecording = CombinedValue::None;
@@ -309,9 +310,14 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         return devicesDescription.canSwitchPtzPresetTypes != CombinedValue::None;
     }
 
-    bool canForcePtzCapabilities() const
+    bool canForcePanTiltCapabilities() const
     {
-        return devicesDescription.canForcePtzCapabilities == CombinedValue::All;
+        return devicesDescription.canForcePanTiltCapabilities == CombinedValue::All;
+    }
+
+    bool canForceZoomCapability() const
+    {
+        return devicesDescription.canForceZoomCapability == CombinedValue::All;
     }
 };
 
