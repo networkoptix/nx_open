@@ -130,7 +130,7 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
         return false;
 
     QString version;
-    if(!QJson::deserialize(map, lit("version"), &version) || version != lit("1.0"))
+    if(!QJson::deserialize(map, lit("version"), &version) || !version.startsWith(lit("1.0")))
         return false;
 
     QList<QnResourceDataPoolChunk> chunks;
