@@ -85,7 +85,6 @@ private:
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
     void findDownloadsRecursively(const QDir& dir);
-    QString filePathNoLock(const QString& fileName) const;
 
     static ResultCode reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);

@@ -70,19 +70,14 @@ QDir Storage::downloadsDirectory() const
     return m_downloadsDirectory;
 }
 
-QString Storage::filePathNoLock(const QString& fileName) const
+QString Storage::filePath(const QString& fileName) const
 {
+    QnMutexLocker lock(&m_mutex);
     const auto it = m_fileInformationByName.find(keyFromFileName(fileName));
     if (it == m_fileInformationByName.cend())
         return QString();
 
     return it.value().fullFilePath;
-}
-
-QString Storage::filePath(const QString& fileName) const
-{
-    QnMutexLocker lock(&m_mutex);
-    return filePathNoLock(fileName);
 }
 
 QStringList Storage::files() const
@@ -676,7 +671,7 @@ QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 
 
 bool Storage::saveMetadata(const FileMetadata& fileInformation)
 {
-    const auto fileName = metadataFileName(filePathNoLock(fileInformation.name));
+    const auto fileName = metadataFileName(fileInformation.fullFilePath);
 
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly))
