@@ -23,6 +23,8 @@
 namespace nx {
 namespace network {
 
+class UdtInitializer;
+
 class NX_NETWORK_API SocketGlobals
 {
 public:
@@ -131,6 +133,8 @@ private:
     //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
+
+    std::unique_ptr<UdtInitializer> m_udtInitializer;
 
     const int m_initializationFlags;
     Ini m_ini;
