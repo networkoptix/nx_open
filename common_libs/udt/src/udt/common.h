@@ -192,7 +192,7 @@ private:
     static int m_EventCondInit;
 
 private:
-    static uint64_t s_ullCPUFrequency;	// CPU frequency : clock cycles per microsecond
+    static uint64_t s_ullCPUFrequency;    // CPU frequency : clock cycles per microsecond
     static uint64_t readCPUFrequency();
     static bool m_bUseMicroSecond;       // No higher resolution timer available, use gettimeofday().
 };
@@ -339,7 +339,7 @@ public:
 
 struct CIPAddress
 {
-    static bool ipcmp(const sockaddr* addr1, const sockaddr* addr2, int ver = AF_INET);
+    static bool ipcmp(const sockaddr* addr1, const sockaddr* addr2);
     static void ntop(const sockaddr* addr, uint32_t ip[4], int ver = AF_INET);
     static void pton(sockaddr* addr, const uint32_t ip[4], int ver = AF_INET);
 };

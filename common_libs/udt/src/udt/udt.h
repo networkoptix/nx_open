@@ -129,7 +129,7 @@ enum UDTOpt
     UDT_SNDSYN,          // if sending is blocking
     UDT_RCVSYN,          // if receiving is blocking
     UDT_CC,              // custom congestion control algorithm
-    UDT_FC,		// Flight flag size (window size)
+    UDT_FC,        // Flight flag size (window size)
     UDT_SNDBUF,          // maximum buffer in sending queue
     UDT_RCVBUF,          // UDT receiving buffer size
     UDT_LINGER,          // waiting for unsent data when closing
@@ -140,12 +140,21 @@ enum UDTOpt
     UDT_RENDEZVOUS,      // rendezvous connection mode
     UDT_SNDTIMEO,        // send() timeout
     UDT_RCVTIMEO,        // recv() timeout
-    UDT_REUSEADDR,	// reuse an existing port or create a new one
-    UDT_MAXBW,		// maximum bandwidth (bytes per second) that the connection can use
-    UDT_STATE,		// current socket state, see UDTSTATUS, read only
-    UDT_EVENT,		// current avalable events associated with the socket
-    UDT_SNDDATA,		// size of data in the sending buffer
-    UDT_RCVDATA		// size of data available for recv
+    UDT_REUSEADDR,    // reuse an existing port or create a new one
+    UDT_MAXBW,        // maximum bandwidth (bytes per second) that the connection can use
+    UDT_STATE,        // current socket state, see UDTSTATUS, read only
+    UDT_EVENT,        // current avalable events associated with the socket
+    UDT_SNDDATA,        // size of data in the sending buffer
+    UDT_RCVDATA        // size of data available for recv
+};
+
+enum UDTShutdownOpt
+{
+#if defined(_WIN32)
+    UDT_SHUT_RDWR = SD_BOTH
+#else
+    UDT_SHUT_RDWR = SHUT_RDWR
+#endif
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +172,7 @@ struct CPerfMon
     int pktRecvACKTotal;                 // total number of received ACK packets
     int pktSentNAKTotal;                 // total number of sent NAK packets
     int pktRecvNAKTotal;                 // total number of received NAK packets
-    int64_t usSndDurationTotal;		// total time duration when UDT is sending data (idle time exclusive)
+    int64_t usSndDurationTotal;        // total time duration when UDT is sending data (idle time exclusive)
 
                                     // local measurements
     int64_t pktSent;                     // number of sent data packets, including retransmissions
@@ -177,7 +186,7 @@ struct CPerfMon
     int pktRecvNAK;                      // number of received NAK packets
     double mbpsSendRate;                 // sending rate in Mb/s
     double mbpsRecvRate;                 // receiving rate in Mb/s
-    int64_t usSndDuration;		// busy sending time (i.e., idle time exclusive)
+    int64_t usSndDuration;        // busy sending time (i.e., idle time exclusive)
 
                                 // instant measurements
     double usPktSndPeriod;               // packet sending period, in microseconds
@@ -246,12 +255,12 @@ private:
                          // 5: method not supported
                          // 6+: undefined error
 
-    int m_iMinor;		// for specific error reasons
-    int m_iErrno;		// errno returned by the system if there is any
-    std::string m_strMsg;	// text error message
+    int m_iMinor;        // for specific error reasons
+    int m_iErrno;        // errno returned by the system if there is any
+    std::string m_strMsg;    // text error message
 
-    std::string m_strAPI;	// the name of UDT function that returns the error
-    std::string m_strDebug;	// debug information, set to the original place that causes the error
+    std::string m_strAPI;    // the name of UDT function that returns the error
+    std::string m_strDebug;    // debug information, set to the original place that causes the error
 
 public: // Error Code
     static const int SUCCESS;
@@ -319,6 +328,10 @@ UDT_API int bind2(UDTSOCKET u, UDPSOCKET udpsock);
 UDT_API int listen(UDTSOCKET u, int backlog);
 UDT_API UDTSOCKET accept(UDTSOCKET u, struct sockaddr* addr, int* addrlen);
 UDT_API int connect(UDTSOCKET u, const struct sockaddr* name, int namelen);
+/**
+ * @param how. Currently ignored. The function always works as if UDT_SHUT_RDWR was passed here.
+ */
+UDT_API int shutdown(UDTSOCKET u, int how);
 UDT_API int close(UDTSOCKET u);
 UDT_API int getpeername(UDTSOCKET u, struct sockaddr* name, int* namelen);
 UDT_API int getsockname(UDTSOCKET u, struct sockaddr* name, int* namelen);

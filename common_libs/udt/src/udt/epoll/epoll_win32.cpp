@@ -124,7 +124,7 @@ int EpollWin32::poll(
     if (eventCount < 0)
         return -1;
 
-    //select sets fd_count to number of sockets triggered and 
+    //select sets fd_count to number of sockets triggered and
     //moves those descriptors to the beginning of fd_array
     if (eventCount == 0)
         return eventCount;
@@ -228,7 +228,7 @@ bool EpollWin32::isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const
 void EpollWin32::initializeInterruptSocket()
 {
     m_interruptionSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (m_interruptionSocket < 0)
+    if (m_interruptionSocket == INVALID_SOCKET)
         throw CUDTException(-1, 0, GetLastError());
 
     u_long val = 1;

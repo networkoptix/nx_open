@@ -395,7 +395,14 @@ SmtpOperationResult SmtpClient::sendMail(const MimeMessage& email)
 
 void SmtpClient::quit()
 {
-    sendMessage(lit("QUIT"));
+    try
+    {
+        sendMessage(lit("QUIT"));
+    }
+    catch (SendMessageTimeoutException)
+    {
+        NX_WARNING(this, lit("Send message timeout exception has been caught"));
+    }
 }
 
 /* [3] --- */

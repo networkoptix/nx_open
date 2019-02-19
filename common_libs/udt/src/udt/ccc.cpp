@@ -88,12 +88,12 @@ void CCC::setRTO(int usRTO)
 
 void CCC::sendCustomMsg(CPacket& pkt) const
 {
-    CUDT* u = CUDT::getUDTHandle(m_UDT);
+    auto u = CUDT::getUDTHandle(m_UDT);
 
     if (NULL != u)
     {
-        pkt.m_iID = u->m_PeerID;
-        u->m_pSndQueue->sendto(u->m_pPeerAddr, pkt);
+        pkt.m_iID = u->peerId();
+        u->sndQueue().sendto(u->peerAddr(), pkt);
     }
 }
 
@@ -101,7 +101,7 @@ const CPerfMon* CCC::getPerfInfo()
 {
     try
     {
-        CUDT* u = CUDT::getUDTHandle(m_UDT);
+        std::shared_ptr<CUDT> u = CUDT::getUDTHandle(m_UDT);
         if (NULL != u)
             u->sample(&m_PerfInfo, false);
     }

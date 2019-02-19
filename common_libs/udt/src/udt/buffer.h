@@ -41,6 +41,7 @@ Yunhong Gu, last updated 05/05/2009
 #ifndef __UDT_BUFFER_H__
 #define __UDT_BUFFER_H__
 
+#include <mutex>
 
 #include "udt.h"
 #include "list.h"
@@ -122,7 +123,7 @@ private:
     void increase();
 
 private:
-    pthread_mutex_t m_BufLock;           // used to synchronize buffer operation
+    std::mutex m_BufLock;           // used to synchronize buffer operation
 
     struct Block
     {
@@ -138,22 +139,22 @@ private:
 
     // m_pBlock:         The head pointer
     // m_pFirstBlock:    The first block
-    // m_pCurrBlock:	The current block
+    // m_pCurrBlock:    The current block
     // m_pLastBlock:     The last block (if first == last, buffer is empty)
 
     struct Buffer
     {
-        char* m_pcData;			// buffer
-        int m_iSize;			// size
-        Buffer* m_pNext;			// next buffer
-    } *m_pBuffer;			// physical buffer
+        char* m_pcData;            // buffer
+        int m_iSize;            // size
+        Buffer* m_pNext;            // next buffer
+    } *m_pBuffer;            // physical buffer
 
     int32_t m_iNextMsgNo;                // next message number
 
-    int m_iSize;				// buffer size (number of packets)
+    int m_iSize;                // buffer size (number of packets)
     int m_iMSS;                          // maximum seqment/packet size
 
-    int m_iCount;			// number of used blocks
+    int m_iCount;            // number of used blocks
 
 private:
     CSndBuffer(const CSndBuffer&);
@@ -261,14 +262,14 @@ private:
 private:
     CUnit** m_pUnit;                     // pointer to the protocol buffer
     int m_iSize;                         // size of the protocol buffer
-    CUnitQueue* m_pUnitQueue;		// the shared unit queue
+    CUnitQueue* m_pUnitQueue;        // the shared unit queue
 
     int m_iStartPos;                     // the head position for I/O (inclusive)
     int m_iLastAckPos;                   // the last ACKed position (exclusive)
                                          // EMPTY: m_iStartPos = m_iLastAckPos   FULL: m_iStartPos = m_iLastAckPos + 1
-    int m_iMaxPos;			// the furthest data position
+    int m_iMaxPos;            // the furthest data position
 
-    int m_iNotch;			// the starting read point of the first unit
+    int m_iNotch;            // the starting read point of the first unit
 
 private:
     CRcvBuffer();

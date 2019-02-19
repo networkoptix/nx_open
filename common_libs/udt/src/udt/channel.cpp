@@ -71,7 +71,7 @@ Yunhong Gu, last updated 01/27/2011
 #endif
 
 
-CChannel::CChannel():
+UdpChannel::UdpChannel():
     m_iIPversion(AF_INET),
     m_iSockAddrSize(sizeof(sockaddr_in)),
     m_iSocket(INVALID_SOCKET),
@@ -80,7 +80,7 @@ CChannel::CChannel():
 {
 }
 
-CChannel::CChannel(int version):
+UdpChannel::UdpChannel(int version):
     m_iIPversion(version),
     m_iSocket(INVALID_SOCKET),
     m_iSndBufSize(65536),
@@ -89,12 +89,12 @@ CChannel::CChannel(int version):
     m_iSockAddrSize = (AF_INET == m_iIPversion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
 }
 
-CChannel::~CChannel()
+UdpChannel::~UdpChannel()
 {
     closeSocket();
 }
 
-void CChannel::open(const sockaddr* addr)
+void UdpChannel::open(const sockaddr* addr)
 {
     // construct an socket
     m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
@@ -133,15 +133,15 @@ void CChannel::open(const sockaddr* addr)
     setUDPSockOpt();
 }
 
-void CChannel::open(UDPSOCKET udpsock)
+void UdpChannel::open(UDPSOCKET udpsock)
 {
     m_iSocket = udpsock;
     setUDPSockOpt();
 }
 
-void CChannel::setUDPSockOpt()
+void UdpChannel::setUDPSockOpt()
 {
-#if defined(BSD) || defined(OSX)
+#if defined(BSD) || defined(__APPLE__)
     // BSD system will fail setsockopt if the requested buffer size exceeds system maximum value
     int maxsize = 64000;
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVBUF, (char*)&m_iRcvBufSize, sizeof(int)))
@@ -157,7 +157,7 @@ void CChannel::setUDPSockOpt()
 
     timeval tv;
     tv.tv_sec = 0;
-#if defined (BSD) || defined (OSX)
+#if defined (BSD) || defined (__APPLE__)
     // Known BSD bug as the day I wrote this code.
     // A small time out value will cause the socket to block forever.
     tv.tv_usec = 10000;
@@ -182,43 +182,43 @@ void CChannel::setUDPSockOpt()
 #endif
 }
 
-int CChannel::getSndBufSize()
+int UdpChannel::getSndBufSize()
 {
     socklen_t size = sizeof(socklen_t);
     ::getsockopt(m_iSocket, SOL_SOCKET, SO_SNDBUF, (char *)&m_iSndBufSize, &size);
     return m_iSndBufSize;
 }
 
-int CChannel::getRcvBufSize()
+int UdpChannel::getRcvBufSize()
 {
     socklen_t size = sizeof(socklen_t);
     ::getsockopt(m_iSocket, SOL_SOCKET, SO_RCVBUF, (char *)&m_iRcvBufSize, &size);
     return m_iRcvBufSize;
 }
 
-void CChannel::setSndBufSize(int size)
+void UdpChannel::setSndBufSize(int size)
 {
     m_iSndBufSize = size;
 }
 
-void CChannel::setRcvBufSize(int size)
+void UdpChannel::setRcvBufSize(int size)
 {
     m_iRcvBufSize = size;
 }
 
-void CChannel::getSockAddr(sockaddr* addr) const
+void UdpChannel::getSockAddr(sockaddr* addr) const
 {
     socklen_t namelen = m_iSockAddrSize;
     ::getsockname(m_iSocket, addr, &namelen);
 }
 
-void CChannel::getPeerAddr(sockaddr* addr) const
+void UdpChannel::getPeerAddr(sockaddr* addr) const
 {
     socklen_t namelen = m_iSockAddrSize;
     ::getpeername(m_iSocket, addr, &namelen);
 }
 
-int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
+int UdpChannel::sendto(const sockaddr* addr, CPacket& packet) const
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -276,7 +276,7 @@ int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
     return res;
 }
 
-int CChannel::recvfrom(sockaddr* addr, CPacket& packet) const
+int UdpChannel::recvfrom(sockaddr* addr, CPacket& packet) const
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -337,7 +337,7 @@ int CChannel::recvfrom(sockaddr* addr, CPacket& packet) const
     return packet.getLength();
 }
 
-int CChannel::shutdown()
+int UdpChannel::shutdown()
 {
     if (m_iSocket == INVALID_SOCKET)
         return 0;
@@ -349,7 +349,7 @@ int CChannel::shutdown()
 #endif
 }
 
-void CChannel::closeSocket()
+void UdpChannel::closeSocket()
 {
     if (m_iSocket == INVALID_SOCKET)
         return;

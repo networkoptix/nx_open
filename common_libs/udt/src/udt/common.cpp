@@ -102,7 +102,7 @@ int pthread_cond_wait_monotonic_timeout(
     }
 
 #ifdef __ANDROID__
-    return pthread_cond_timedwait_monotonic(condition, mutex, &timeout);
+    return pthread_cond_timedwait_monotonic_np(condition, mutex, &timeout);
 #else
     return pthread_cond_timedwait(condition, mutex, &timeout);
 #endif
@@ -124,7 +124,7 @@ int pthread_cond_wait_monotonic_timepoint(
     locktime.tv_nsec = (timeMks % 1000000) * 1000;
 
 #ifdef __ANDROID__
-    return pthread_cond_timedwait_monotonic(condition, mutex, &locktime);
+    return pthread_cond_timedwait_monotonic_np(condition, mutex, &locktime);
 #else
     return pthread_cond_timedwait(condition, mutex, &locktime);
 #endif
@@ -758,10 +758,14 @@ const int CUDTException::EPEERERR = 7000;
 const int CUDTException::EUNKNOWN = -1;
 
 
-//
-bool CIPAddress::ipcmp(const sockaddr* addr1, const sockaddr* addr2, int ver)
+bool CIPAddress::ipcmp(
+    const sockaddr* addr1,
+    const sockaddr* addr2)
 {
-    if (AF_INET == ver)
+    if (addr1->sa_family != addr2->sa_family)
+        return false;
+
+    if (addr1->sa_family == AF_INET)
     {
         sockaddr_in* a1 = (sockaddr_in*)addr1;
         sockaddr_in* a2 = (sockaddr_in*)addr2;
@@ -769,7 +773,7 @@ bool CIPAddress::ipcmp(const sockaddr* addr1, const sockaddr* addr2, int ver)
         if ((a1->sin_port == a2->sin_port) && (a1->sin_addr.s_addr == a2->sin_addr.s_addr))
             return true;
     }
-    else
+    else if (addr1->sa_family == AF_INET6)
     {
         sockaddr_in6* a1 = (sockaddr_in6*)addr1;
         sockaddr_in6* a2 = (sockaddr_in6*)addr2;
@@ -783,7 +787,7 @@ bool CIPAddress::ipcmp(const sockaddr* addr1, const sockaddr* addr2, int ver)
             return true;
         }
     }
-
+        
     return false;
 }
 
