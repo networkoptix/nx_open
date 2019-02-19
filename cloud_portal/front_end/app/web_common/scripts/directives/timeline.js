@@ -471,18 +471,10 @@
                         scope.goToLive = goToLive;
                         scope.playPause = playPause;
                         
-                        function updateDisableZoomOut () {
-                            $timeout(() => {
-                                scope.disableZoomOut = scope.scaleManager.disableZoomOut;
-                            });
-                        }
-                        
                         // 1. Visual buttons
                         const interval = CONFIG.timelineMouseEventTimeout;
                         var waitingSecondClick = false;
                         var initialClick;
-    
-                        updateDisableZoomOut();
                         
                         function onMouseUp(delay) {
                             if (!window.jscd.mobile) {
@@ -506,7 +498,6 @@
                         
                         element.on('mouseup', '.zoomOutButton', function () {
                             onMouseUp(true);
-                            updateDisableZoomOut();
                         });
                         
                         element.on('mouseleave', '.zoomOutButton', function () {
@@ -527,12 +518,10 @@
                                 initialClick = $timeout(function () {
                                     waitingSecondClick = false;
                                     onMouseUp(false);
-                                    updateDisableZoomOut();
                                 }, interval);
                             } else {
                                 $timeout.cancel(initialClick);
                                 timelineActions.fullZoomOut();
-                                updateDisableZoomOut();
                                 $timeout(() => {
                                     waitingSecondClick = false;
                                 }, interval);
@@ -541,18 +530,15 @@
                         
                         element.on('dblclick', '.zoomOutButton', function () {
                             timelineActions.fullZoomOut();
-                            updateDisableZoomOut();
                         });
                         
                         element.on('mouseup', '.zoomInButton', function () {
                             if (!window.jscd.mobile) {
                                 timelineActions.zoomingStop();
-                                updateDisableZoomOut();
                                 return;
                             }
                             $timeout(() => {
                                 timelineActions.zoomingStop();
-                                updateDisableZoomOut();
                             }, interval);
                         });
                         element.on('mouseleave', '.zoomInButton', function () {
