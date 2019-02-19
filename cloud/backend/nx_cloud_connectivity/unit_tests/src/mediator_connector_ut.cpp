@@ -290,7 +290,7 @@ private:
     void acceptAndReset()
     {
         m_malfunctioningServer->acceptAsync(
-            [this](SystemError::ErrorCode resultCode,
+            [this](SystemError::ErrorCode /*resultCode*/,
                 std::unique_ptr<nx::network::AbstractStreamSocket> connection)
             {
                 connection.reset();
