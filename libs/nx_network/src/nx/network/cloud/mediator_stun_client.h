@@ -12,9 +12,9 @@ class MediatorEndpointProvider;
 
 /**
  * Adds support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
- * It implicitely fetches endpoint from MediatorEndpointProvider and
+ * It implicitly fetches endpoint from MediatorEndpointProvider before each (re-)connect and
  * calls AbstractAsyncClient::connect.
- * Also, it implements custom keep alive probes.
+ * In addition, it uses periodic STUN Binding requests as keep alive probes.
  */
 class NX_NETWORK_API MediatorStunClient:
     public nx::network::stun::AsyncClientDelegate
@@ -55,14 +55,20 @@ private:
     };
 
     MediatorEndpointProvider* m_endpointProvider = nullptr;
-    bool m_urlKnown = false;
+    std::optional<nx::utils::Url> m_url;
     std::vector<RequestContext> m_postponedRequests;
     std::unique_ptr<nx::network::stun::ServerAlivenessTester> m_alivenessTester;
     std::optional<nx::network::KeepAliveOptions> m_keepAliveOptions;
     OnConnectionClosedHandler m_onConnectionClosedHandler;
     bool m_connected = false;
+    nx::network::RetryTimer m_reconnectTimer;
 
     void handleConnectionClosure(SystemError::ErrorCode reason);
+
+    void scheduleReconnect();
+    void cancelReconnectTimer();
+    void reconnect();
+    void connectWithResolving();
 
     void onFetchEndpointCompletion(
         nx::network::http::StatusCode::Value resultCode);

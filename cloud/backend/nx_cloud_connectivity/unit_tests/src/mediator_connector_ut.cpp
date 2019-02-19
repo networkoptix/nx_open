@@ -67,6 +67,9 @@ public:
         if (m_cloudServerSocket)
             m_cloudServerSocket->pleaseStopSync();
 
+        if (m_malfunctioningServer)
+            m_malfunctioningServer->pleaseStopSync();
+
         if (m_factoryFuncToRestore)
         {
             AbstractCloudDataProviderFactory::setFactoryFunc(
@@ -84,7 +87,36 @@ protected:
         andNewMediatorEndpointIsAvailable();
     }
 
+    void givenWrongCloudModulesXml()
+    {
+        m_malfunctioningServer = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+        ASSERT_TRUE(m_malfunctioningServer->setNonBlockingMode(true));
+        ASSERT_TRUE(m_malfunctioningServer->bind(nx::network::SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_malfunctioningServer->listen());
+
+        acceptAndReset();
+    }
+
     void givenPeerFailedToConnectToMediator()
+    {
+        auto client = m_mediatorConnector->clientConnection();
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
+        ConnectRequest request;
+        std::promise<ResultCode> done;
+        client->connect(
+            request,
+            [this, &done](
+                network::stun::TransportHeader /*stunTransportHeader*/,
+                ResultCode resultCode,
+                ConnectResponse)
+            {
+                done.set_value(resultCode);
+            });
+        const auto resultCode = done.get_future().get();
+        ASSERT_EQ(ResultCode::networkError, resultCode);
+    }
+
+    void givenPeerFailedToResolveMediatorAddress()
     {
         std::promise<nx::network::http::StatusCode::Value> fetchMediatorEndpointCompleted;
         m_mediatorConnector->fetchAddress(
@@ -181,6 +213,7 @@ private:
     SystemCredentials m_cloudSystemCredentials;
     LocalCloudDataProvider m_localCloudDataProvider;
     nx::network::http::TestHttpServer m_cloudModulesXmlProvider;
+    std::unique_ptr<nx::network::TCPServerSocket> m_malfunctioningServer;
     std::unique_ptr<nx::network::cloud::CloudServerSocket> m_cloudServerSocket;
     CloudModuleListGenerator m_cloudModuleListGenerator;
 
@@ -212,12 +245,23 @@ private:
 
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> generateCloudModuleXml()
     {
-        if (!m_mediator)
-            return nullptr;
+        if (m_mediator)
+        {
+            return std::make_unique<nx::network::http::BufferSource>(
+                "text/xml",
+                m_cloudModuleListGenerator.get(m_mediator.get()));
+        }
 
-        return std::make_unique<nx::network::http::BufferSource>(
-            "text/xml",
-            m_cloudModuleListGenerator.get(m_mediator.get()));
+        if (m_malfunctioningServer)
+        {
+            return std::make_unique<nx::network::http::BufferSource>(
+                "text/xml",
+                m_cloudModuleListGenerator.get(
+                    m_malfunctioningServer->getLocalAddress(),
+                    m_malfunctioningServer->getLocalAddress()));
+        }
+
+        return nullptr;
     }
 
     void intializeMediatorConnector()
@@ -242,6 +286,17 @@ private:
     {
         // TODO
     }
+
+    void acceptAndReset()
+    {
+        m_malfunctioningServer->acceptAsync(
+            [this](SystemError::ErrorCode resultCode,
+                std::unique_ptr<nx::network::AbstractStreamSocket> connection)
+            {
+                connection.reset();
+                acceptAndReset();
+            });
+    }
 };
 
 TYPED_TEST_CASE_P(MediatorConnector);
@@ -264,7 +319,20 @@ TYPED_TEST_P(
     MediatorConnector,
     reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator)
 {
+    this->givenWrongCloudModulesXml();
     this->givenPeerFailedToConnectToMediator();
+
+    this->whenStartMediator();
+
+    this->thenConnectionToMediatorIsReestablished();
+    this->andNewMediatorEndpointIsAvailable();
+}
+
+TYPED_TEST_P(
+    MediatorConnector,
+    reloads_cloud_modules_list_after_failure_to_load_cloud_modules_list)
+{
+    this->givenPeerFailedToResolveMediatorAddress();
     this->whenStartMediator();
 
     this->thenConnectionToMediatorIsReestablished();
@@ -273,7 +341,8 @@ TYPED_TEST_P(
 
 REGISTER_TYPED_TEST_CASE_P(MediatorConnector,
     reloads_cloud_modules_list_after_loosing_connection_to_mediator,
-    reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator);
+    reloads_cloud_modules_list_after_each_failure_to_connect_to_mediator,
+    reloads_cloud_modules_list_after_failure_to_load_cloud_modules_list);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -300,6 +369,13 @@ public:
             mediatorStunUdpEndpoint = mediatorStunTcpEndpoint;
         }
 
+        return get(mediatorStunTcpEndpoint, mediatorStunUdpEndpoint);
+    }
+
+    nx::Buffer get(
+        const nx::network::SocketAddress& mediatorStunTcpEndpoint,
+        const nx::network::SocketAddress& mediatorStunUdpEndpoint)
+    {
         auto modulesXml = lm(
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
             "<sequence>\r\n"
@@ -341,13 +417,12 @@ public:
             mediatorHttpEndpoint = mediatorStunUdpEndpoint;
         }
 
-        return createCloudModulesXml(
+        return get(
             mediatorHttpEndpoint,
             mediatorStunUdpEndpoint);
     }
 
-protected:
-    nx::Buffer createCloudModulesXml(
+    nx::Buffer get(
         const nx::network::SocketAddress& mediatorHttpEndpoint,
         const nx::network::SocketAddress& mediatorStunUdpEndpoint)
     {
@@ -404,9 +479,16 @@ public:
         auto mediatorStunEndpoint =
             mediator->moduleInstance()->impl()->stunUdpEndpoints().front();
 
-        return createCloudModulesXml(
+        return base_type::get(
             nx::network::SocketAddress(m_httpHost, mediatorHttpEndpoint.port),
             nx::network::SocketAddress(m_stunHost, mediatorStunEndpoint.port));
+    }
+
+    nx::Buffer get(
+        const nx::network::SocketAddress& mediatorHttpEndpoint,
+        const nx::network::SocketAddress& mediatorStunUdpEndpoint)
+    {
+        return base_type::get(mediatorHttpEndpoint, mediatorStunUdpEndpoint);
     }
 
 private:
