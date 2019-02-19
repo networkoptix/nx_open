@@ -1,5 +1,11 @@
 #include "storage.h"
 
+#if defined(WIN32)
+    #include <io.h>
+#else
+    #include <fcntl.h>
+#endif
+
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QCryptographicHash>
@@ -752,8 +758,20 @@ ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
     if (!file.open(QFile::ReadWrite))
         return ResultCode::ioError;
 
-    if (!file.resize(size))
+    bool ok = false;
+
+    #if defined(WIN32)
+        ok = _chsize_s(file.handle(), size) == 0;
+    #else
+        ok = posix_fallocate(file.handle(), 0, size) == 0;
+    #endif
+
+    if (!ok)
+    {
+        file.close();
+        file.remove();
         return ResultCode::noFreeSpace;
+    }
 
     return ResultCode::ok;
 }
