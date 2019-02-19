@@ -18,7 +18,8 @@ namespace nx_http::tunneling {
 
 using TunnelValidatorFactoryFunc =
     std::function<std::unique_ptr<AbstractTunnelValidator>(
-        std::unique_ptr<AbstractStreamSocket> /*tunnel*/)>;
+        std::unique_ptr<AbstractStreamSocket> /*tunnel*/,
+        const Response&)>;
 
 /**
  * Establishes connection to nx_http::tunneling::Server listening same request path.
@@ -43,6 +44,9 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     void setTimeout(std::chrono::milliseconds timeout);
+
+    void setCustomHeaders(HttpHeaders headers);
+
     void openTunnel(OpenTunnelCompletionHandler completionHandler);
 
     const Response& response() const;

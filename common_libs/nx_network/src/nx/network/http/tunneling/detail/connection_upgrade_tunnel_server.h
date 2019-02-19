@@ -40,9 +40,9 @@ private:
     virtual StatusCode::Value validateOpenTunnelRequest(
         const RequestContext& requestContext) override;
 
-    virtual network::http::RequestResult processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* response,
+    virtual nx_http::RequestResult processOpenTunnelRequest(
+        const nx_http::Request& request,
+        nx_http::Response* response,
         ApplicationData... requestData) override;
 };
 
@@ -121,10 +121,10 @@ StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData...>::validateOpe
 }
 
 template<typename ...ApplicationData>
-network::http::RequestResult
+nx_http::RequestResult
     ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
-        const network::http::Request& /*request*/,
-        network::http::Response* /*response*/,
+        const nx_http::Request& /*request*/,
+        nx_http::Response* /*response*/,
         ApplicationData... requestData)
 {
     RequestResult requestResult(StatusCode::switchingProtocols);

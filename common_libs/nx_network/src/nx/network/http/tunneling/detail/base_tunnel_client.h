@@ -68,6 +68,8 @@ public:
     virtual const Response& response() const = 0;
 
     ClientFeedbackFunction takeFeedbackFunction();
+    void setCustomHeaders(HttpHeaders headers);
+    const HttpHeaders& customHeaders() const;
 
 protected:
     const QUrl m_baseTunnelUrl;
@@ -89,6 +91,7 @@ protected:
 
 private:
     ClientFeedbackFunction m_clientFeedbackFunction;
+    HttpHeaders m_customHeaders;
 };
 
 } // namespace detail

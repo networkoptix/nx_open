@@ -1,10 +1,10 @@
 #include "relay_connection_acceptor.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+
+#include "api/relay_api_client_factory.h"
 
 namespace nx {
 namespace network {
@@ -144,24 +144,31 @@ void ReverseConnection::onConnectDone(
         m_httpPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
             this, std::move(streamSocket));
         m_httpPipeline->setMessageHandler(
-            std::bind(&ReverseConnection::relayNotificationReceived, this, _1));
+            [this](auto&&... args) { dispatchRelayNotificationReceived(std::move(args)...); });
         m_beginListeningResponse = response;
     }
 
     nx::utils::swapAndCall(m_connectHandler, api::toSystemError(resultCode));
 }
 
-void ReverseConnection::relayNotificationReceived(
+void ReverseConnection::dispatchRelayNotificationReceived(
     nx_http::Message message)
 {
-    api::OpenTunnelNotification openTunnelNotification;
-    if (!openTunnelNotification.parse(message))
-    {
-        NX_LOGX(lm("Could not parse received notification. \r\n%1")
-            .arg(message), cl_logDEBUG1);
-        m_httpPipeline.reset();
-        return; //< Just ignoring.
-    }
+    nx::cloud::relay::api::OpenTunnelNotification openTunnelNotification;
+    if (openTunnelNotification.parse(message))
+        return processOpenTunnelNotification(std::move(openTunnelNotification));
+
+    NX_VERBOSE(this, lm("Ignoring unknown notification %1")
+        .args(message.type == nx_http::MessageType::request ? message.request->requestLine.toString()
+            : message.type == nx_http::MessageType::response ? message.response->statusLine.toString()
+            : nx_http::StringType()));
+}
+
+void ReverseConnection::processOpenTunnelNotification(
+    api::OpenTunnelNotification openTunnelNotification)
+{
+    NX_VERBOSE(this, lm("Received OPEN_TUNNEL notification from %1")
+        .args(m_httpPipeline->socket()->getForeignAddress()));
 
     m_streamSocket = std::make_unique<ServerSideReverseStreamSocket>(
         m_httpPipeline->takeSocket(),

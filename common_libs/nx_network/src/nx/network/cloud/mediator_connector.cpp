@@ -26,7 +26,7 @@ MediatorConnector::MediatorConnector():
     stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
     m_stunClient = std::make_shared<stun::AsyncClientWithHttpTunneling>(
         stunClientSettings);
-    m_stunClient->setTunnelValidatorFactory([](auto connection) {
+    m_stunClient->setTunnelValidatorFactory([](auto connection, const nx_http::Response&) {
         return std::make_unique<nx::stun::ClientConnectionValidator>(
             std::move(connection)); });
 

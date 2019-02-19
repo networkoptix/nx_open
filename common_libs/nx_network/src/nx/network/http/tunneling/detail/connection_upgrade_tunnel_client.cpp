@@ -30,6 +30,7 @@ void ConnectionUpgradeTunnelClient::openTunnel(
     m_completionHandler = std::move(completionHandler);
 
     m_httpClient = std::make_unique<AsyncClient>();
+    m_httpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
         m_httpClient->setMessageBodyReadTimeout(*m_timeout);

@@ -37,6 +37,11 @@ void Client::setTimeout(std::chrono::milliseconds timeout)
     m_actualClient->setTimeout(timeout);
 }
 
+void Client::setCustomHeaders(HttpHeaders headers)
+{
+    m_actualClient->setCustomHeaders(std::move(headers));
+}
+
 void Client::openTunnel(
     OpenTunnelCompletionHandler completionHandler)
 {
@@ -67,7 +72,9 @@ void Client::handleOpenTunnelCompletion(OpenTunnelResult result)
 
     NX_VERBOSE(this, lm("Validating tunnel to %1").args(m_baseTunnelUrl));
 
-    m_validator = m_validatorFactory(std::exchange(result.connection, nullptr));
+    m_validator = m_validatorFactory(
+        std::exchange(result.connection, nullptr),
+        response());
     m_validator->bindToAioThread(getAioThread());
     if (m_timeout)
         m_validator->setTimeout(*m_timeout);
