@@ -24,12 +24,14 @@ namespace sdk {
 struct LogUtils
 {
     const bool enableOutput;
-    const std::string printPrefix;
+    std::string printPrefix;
 
     LogUtils(bool enableOutput, std::string printPrefix):
         enableOutput(enableOutput), printPrefix(std::move(printPrefix))
     {
     }
+
+    void setPrintPrefix(std::string newPrefix);
 
     /**
      * Convert IStringMap to an std::map and log via NX_OUTPUT. Errors are printed with NX_PRINT.

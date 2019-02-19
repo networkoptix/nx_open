@@ -20,14 +20,7 @@ namespace {
 bool analyticsModeCanBeChangedForWidget(QnResourceWidget* widget)
 {
     const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-    if (!mediaWidget)
-        return false;
-
-    if (!mediaWidget->isAnalyticsSupported())
-        return false;
-
-    const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    return camera && !camera->enabledAnalyticsEngineResources().isEmpty();
+    return mediaWidget && mediaWidget->isAnalyticsSupported();
 }
 
 } // namespace

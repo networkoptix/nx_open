@@ -1,4 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
 #include "ini_config.h"
 
 #include <algorithm>

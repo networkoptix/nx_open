@@ -12,6 +12,7 @@
 #include <QtGui/QPainter>
 
 #include <nx/core/watermark/watermark.h>
+#include <utils/graphics/drop_shadow_filter.h>
 
 using nx::core::Watermark;
 
@@ -105,6 +106,29 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
     return pixmap;
 }
 
+QPixmap createWatermarkTile(const Watermark& watermark, const QSize& size, const QFont& font)
+{
+    QImage tile(size, QImage::Format_ARGB32_Premultiplied);
+    tile.fill(Qt::transparent);
+
+    QPainter painter(&tile);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setPen(kWatermarkColor);
+    painter.setFont(font);
+    painter.drawText(0, 0,size.width(),size.height(),Qt::AlignCenter, watermark.text);
+    painter.end(); //< or we may crush in painter destructor later.
+
+    nx::utils::graphics::DropShadowFilter().filterImage(tile); //< Add shadow.
+
+    QPixmap finalTile(tile.size());
+    finalTile.fill(Qt::transparent);
+    QPainter painter1(&finalTile);
+    painter1.setOpacity(watermark.settings.opacity); //< Use opacity to make watermark semi-transparent.
+    painter1.drawImage(QPoint(0, 0), tile);
+
+    return finalTile;
+}
+
 } // namespace
 
 QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& size)
@@ -141,27 +165,21 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     xCount = std::max(1, std::min(pixmap.width() / minTileWidth, xCount));
     yCount = std::max(1, std::min(pixmap.height() / minTileHeight, yCount));
 
-    QPainter painter(&pixmap);
-    auto color = kWatermarkColor;
-    color.setAlphaF(watermark.settings.opacity);
-    painter.setRenderHint(QPainter::TextAntialiasing);
-    painter.setPen(color);
-    painter.setFont(font);
-
     width = pixmap.width() / xCount;
     const int height = pixmap.height() / yCount;
+
+    QPixmap tile = createWatermarkTile(watermark, QSize(width, height), font);
+
+    QPainter painter(&pixmap);
     for (int x = 0; x < xCount; x++)
     {
         for (int y = 0; y < yCount; y++)
         {
-            painter.drawText((int)((x * pixmap.width()) / xCount),
-                (int) ((y * pixmap.height()) / yCount),
-                width,
-                height,
-                Qt::AlignCenter,
-                watermark.text);
+            painter.drawPixmap((int)((x * pixmap.width()) / xCount),
+                (int)((y * pixmap.height()) / yCount), tile);
         }
     }
+
     return pixmap;
 }
 

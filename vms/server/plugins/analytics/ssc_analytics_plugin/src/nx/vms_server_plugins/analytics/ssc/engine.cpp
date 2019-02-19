@@ -272,6 +272,10 @@ void Engine::configureSerialPort(QSerialPort* port, const QString& name, int ind
     NX_PRINT << "Serial port " << name.toStdString() << " configuration finished";
 }
 
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+{
+}
+
 void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.

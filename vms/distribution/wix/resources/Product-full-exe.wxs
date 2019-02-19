@@ -8,7 +8,7 @@
             Name="$(var.productName) Bundle"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"
+            IconSourceFile="$(var.installerIcon)"
             UpgradeCode="$(var.fullBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />

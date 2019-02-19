@@ -22,12 +22,15 @@ public:
     virtual ~ResourceNodeViewItemDelegate() override;
 
     virtual void paint(
-        QPainter *painter,
-        const QStyleOptionViewItem &styleOption,
-        const QModelIndex &index) const override;
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const override;
 
     const QnResourceItemColors& colors() const;
     void setColors(const QnResourceItemColors& colors);
+
+    bool getShowRecordingIndicator() const;
+    void setShowRecordingIndicator(bool show);
 
 protected:
     virtual void initStyleOption(
@@ -35,18 +38,22 @@ protected:
         const QModelIndex& index) const override;
 
     void paintItemText(
-        QPainter *painter,
-        const QStyleOptionViewItem &option,
-        const QModelIndex &index,
+        QPainter* painter,
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index,
         const QColor& mainColor,
         const QColor& extraColor,
         const QColor& invalidColor) const;
 
     void paintItemIcon(
-        QPainter *painter,
-        const QStyleOptionViewItem &option,
-        const QModelIndex &index,
+        QPainter* painter,
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index,
         QIcon::Mode mode) const;
+
+    void paintRecordingIndicator(QPainter* painter,
+        const QRect& iconRect,
+        const QModelIndex& index) const;
 
 private:
     struct Private;

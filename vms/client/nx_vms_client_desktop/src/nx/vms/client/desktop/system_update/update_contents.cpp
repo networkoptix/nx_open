@@ -157,9 +157,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             << nx::update::toString(contents.error);
         return false;
     }
-    // Hack to prevent double verification of update package.
-    if (contents.verified)
-        return contents.error != nx::update::InformationError::noError;
 
     if (contents.info.isEmpty())
     {
@@ -174,7 +171,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     contents.filesToUpload.clear();
 
     // Check if some packages from manifest do not exist.
-    if (contents.sourceType == nx::update::UpdateSourceType::file)
+    if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerted)
     {
         QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
         QList<nx::update::Package> checked;
@@ -197,6 +194,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 }
             }
         }
+        contents.packagesGenerted = true;
         contents.info.packages = checked;
     }
 
@@ -394,8 +392,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             << ") - detected some servers can not download update packages:"
             << contents.info.version, files.join(",");
     }
-
-    contents.verified = true;
 
     return contents.isValidToInstall();
 }

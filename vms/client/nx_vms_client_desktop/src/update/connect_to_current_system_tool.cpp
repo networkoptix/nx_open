@@ -17,7 +17,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
-#include <update/media_server_update_tool.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
+//#include <update/media_server_update_tool.h>
 
 namespace {
 
@@ -77,11 +79,16 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     m_targetId = targetId;
     m_adminPassword = password;
     m_originalTargetId = server->getOriginalGuid();
+    auto serverInformation = server->getModuleInformation();
+    m_serverName = server->getName();
+    m_serverVersion = serverInformation.version;
+    m_wasIncompatible = serverInformation.protoVersion != QnAppInfo::ec2ProtoVersion();
 
     NX_INFO(this, lm("Start connecting server %1 (id=%2, url=%3").args(
-        server->getName(), m_originalTargetId, server->getApiUrl()));
+        m_serverName, m_originalTargetId, server->getApiUrl()));
 
-    updateServer();
+    emit progressChanged(kUpdateProgress);
+    mergeServer();
 }
 
 utils::MergeSystemsStatus::Value QnConnectToCurrentSystemTool::mergeError() const
@@ -99,18 +106,44 @@ QnUpdateResult QnConnectToCurrentSystemTool::updateResult() const
     return m_updateResult;
 }
 
+QnUuid QnConnectToCurrentSystemTool::getTargetId() const
+{
+    return m_targetId;
+}
+
+QnUuid QnConnectToCurrentSystemTool::getOriginalId() const
+{
+    return m_originalTargetId;
+}
+
+bool QnConnectToCurrentSystemTool::wasServerIncompatible() const
+{
+    return m_wasIncompatible;
+}
+
+nx::utils::SoftwareVersion QnConnectToCurrentSystemTool::getServerVersion() const
+{
+    return m_serverVersion;
+}
+
+QString QnConnectToCurrentSystemTool::getServerName() const
+{
+    return m_serverName;
+}
+
 void QnConnectToCurrentSystemTool::cancel()
 {
     if (m_mergeTool)
         m_mergeTool->deleteLater();
 
+    /* dkargin: I want to keep this code for some time.
     if (m_updateTool)
     {
         m_updateTool->cancelUpdate();
         m_updateTool->deleteLater();
-    }
+    }*/
 
-    if (m_mergeTool || m_updateTool)
+    if (m_mergeTool/* || m_updateTool*/)
         finish(Canceled);
 }
 
@@ -146,6 +179,8 @@ void QnConnectToCurrentSystemTool::mergeServer()
         finish(MergeFailed);
         return;
     }
+
+    auto serverInformation = server->getModuleInformation();
 
     const auto ecServer = commonModule()->currentServer();
     if (!ecServer)
@@ -192,23 +227,23 @@ void QnConnectToCurrentSystemTool::waitServer()
 {
     NX_ASSERT(m_mergeTool);
 
-    auto finishMerge = [this](bool success)
+    auto finishMerge = [this](ErrorCode result)
         {
             resourcePool()->disconnect(this);
             delete m_mergeTool;
-            finish(success ? NoError : MergeFailed);
+            finish(result);
         };
 
     if (resourcePool()->getIncompatibleServerById(m_targetId, true))
     {
-        finishMerge(true);
+        finishMerge(NoError);
         return;
     }
 
     auto handleResourceChanged = [this, finishMerge](const QnResourcePtr& resource)
         {
             if (resource->getId() == m_originalTargetId && resource->getStatus() != Qn::Offline)
-                finishMerge(true);
+                finishMerge(NoError);
         };
 
     NX_INFO(this, "Start waiting server.");
@@ -221,7 +256,7 @@ void QnConnectToCurrentSystemTool::waitServer()
     executeDelayedParented(
         [finishMerge]()
         {
-            finishMerge(false);
+            finishMerge(MergeFailed);
         }, kWaitTimeout.count(), m_mergeTool);
 
     emit progressChanged(kUpdateProgress);
@@ -229,18 +264,10 @@ void QnConnectToCurrentSystemTool::waitServer()
 
 void QnConnectToCurrentSystemTool::updateServer()
 {
+    // This will be disabled until new update system is used for the merge.
+    // dkargin: I would like to keep this code for some time.
+#ifdef OLD_UPDATE_FOR_REFERENCE
     NX_ASSERT(!m_updateTool);
-
-    const auto server = resourcePool()->getIncompatibleServerById(m_targetId, true);
-
-    if (server->getModuleInformation().protoVersion == QnAppInfo::ec2ProtoVersion())
-    {
-        emit progressChanged(kUpdateProgress);
-        mergeServer();
-        return;
-    }
-
-    NX_INFO(this, "Start server update.");
 
     emit stateChanged(tr("Updating Server"));
     emit progressChanged(kEmptyProgress);
@@ -296,4 +323,5 @@ void QnConnectToCurrentSystemTool::updateServer()
 
     m_updateTool->setTargets({m_targetId});
     m_updateTool->startUpdate(targetVersion);
+#endif
 }

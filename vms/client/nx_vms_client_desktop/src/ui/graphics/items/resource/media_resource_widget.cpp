@@ -2936,9 +2936,7 @@ bool QnMediaResourceWidget::isLicenseUsed() const
 
 bool QnMediaResourceWidget::isAnalyticsSupported() const
 {
-    return d->analyticsMetadataProvider
-        && display()
-        && display()->archiveReader();
+    return d->isAnalyticsSupported;
 }
 
 bool QnMediaResourceWidget::isAnalyticsEnabled() const
@@ -2968,11 +2966,14 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
     if (!analyticsEnabled)
     {
         d->analyticsController->clearAreas();
+
+        // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
+        // fill in the video buffer on succeeding analytics mode activations. But it looks like this
+        // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
+        display()->camDisplay()->setForcedVideoBufferLength(milliseconds::zero());
     }
     else
     {
-        // We don't unset forced video buffer length to avoid micro-freezes required to fill in the
-        // video buffer on succeeding analytics mode activations.
         display()->camDisplay()->setForcedVideoBufferLength(
             milliseconds(ini().analyticsVideoBufferLengthMs));
     }
