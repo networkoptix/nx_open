@@ -42,7 +42,7 @@ export class DisconnectModalContent {
             errorCodes: {
                 wrongPassword: () => {
                     this.wrongPassword = true;
-                    this.disconnectForm.controls['password'].setErrors({'nx_wrong_password': true});
+                    this.disconnectForm.controls['password'].setErrors({'wrongPassword': true});
                     this.auth.password = '';
 
                     this.renderer.selectRootElement('#password').focus();

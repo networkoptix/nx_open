@@ -205,10 +205,11 @@ import * as angular from 'angular';
                     name: name
                 });
             },
-            merge: function (masterSystemId, slaveSystemId) {
+            merge: function (masterSystemId, slaveSystemId, password) {
                 return $http.post(apiBase + '/systems/merge', {
                     master_system_id: masterSystemId,
-                    slave_system_id: slaveSystemId
+                    slave_system_id: slaveSystemId,
+                    password: password
                 });
             },
             accessRoles: function (systemId) {
