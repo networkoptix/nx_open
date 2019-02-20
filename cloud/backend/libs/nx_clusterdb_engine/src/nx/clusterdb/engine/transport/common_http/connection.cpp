@@ -231,8 +231,13 @@ void CommonHttpConnection::forwardTransactionToProcessor(
 
     // NOTE: Transport sequence MUST be valid for compatibility with VMS <= 3.2.
     // Although, it is not used by this implementation.
-    if (m_prevReceivedTransportSequence)
-        NX_ASSERT(transportHeader.sequence > *m_prevReceivedTransportSequence);
+    if (m_prevReceivedTransportSequence &&
+        transportHeader.sequence <= *m_prevReceivedTransportSequence)
+    {
+        NX_DEBUG(this, "systemId %1, connection %2. Received command with transport sequence %3 "
+            "while expecting greater than %4", m_systemId, m_connectionId, transportHeader.sequence,
+            *m_prevReceivedTransportSequence);
+    }
     m_prevReceivedTransportSequence = transportHeader.sequence;
 
     if (!m_gotTransactionEventHandler)
@@ -283,7 +288,7 @@ void CommonHttpConnection::forwardStateChangedEvent(
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+        NX_VERBOSE(this,
             lm("systemId %1, connection %2. Reporting connection closure")
                 .args(m_systemId, m_connectionId));
 
@@ -307,7 +312,7 @@ void CommonHttpConnection::restartInactivityTimer()
 
 void CommonHttpConnection::onInactivityTimeout()
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Inactivity timeout triggered")
+    NX_VERBOSE(this, lm("systemId %1, connection %2. Inactivity timeout triggered")
         .args(m_systemId, m_connectionId));
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Error);
 }

@@ -118,7 +118,7 @@ TYPED_TEST_P(Synchronization, peer_can_be_explicitly_connected_to_another_one)
     this->thenPeersSynchronizedEventually();
 }
 
-TYPED_TEST_P(Synchronization, DISABLED_connected_peers_exchange_data)
+TYPED_TEST_P(Synchronization, connected_peers_exchange_data)
 {
     this->givenConnectedPeers();
     this->whenAddDataToRandomPeer();
@@ -192,7 +192,7 @@ TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_sim
 
 REGISTER_TYPED_TEST_CASE_P(Synchronization,
     peer_can_be_explicitly_connected_to_another_one,
-    DISABLED_connected_peers_exchange_data,
+    connected_peers_exchange_data,
     peers_connected_as_a_chain_are_synchronized,
     with_outgoing_command_filter,
     peer_can_receive_same_data_from_multiple_peers_simultaneously

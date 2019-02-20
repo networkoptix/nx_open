@@ -59,7 +59,7 @@ void ConnectionManager::dispatchTransaction(
     const std::string& systemId,
     std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching command %2")
+    NX_VERBOSE(this, lm("systemId %1. Dispatching command %2")
         .args(systemId, toString(transactionSerializer->header())));
 
     // Generating transport header.
@@ -167,7 +167,7 @@ void ConnectionManager::closeConnectionsToSystem(
     const std::string& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("Closing all connections to system %1").args(systemId));
 
     auto allConnectionsRemovedGuard =
@@ -221,7 +221,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
             onGotTransaction(id, std::move(args)...);
         });
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Adding new transaction connection %1 from %2")
+    NX_DEBUG(this, lm("Adding new transaction connection %1 from %2")
         .arg(context.connectionId)
         .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
 
@@ -270,7 +270,7 @@ bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
 
     if (existingConnectionCount >= m_settings.maxConcurrentConnectionsFromSystem)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Refusing connection %1 from %2 since "
+        NX_VERBOSE(this, lm("Refusing connection %1 from %2 since "
                 "there are already %3 connections from that system")
             .arg(context.connectionId)
             .arg(context.connection->commonTransportHeaderOfRemoteTransaction())
@@ -336,7 +336,7 @@ void ConnectionManager::removeConnectionByIter(
 
     transport::AbstractConnection* existingConnectionPtr = existingConnection.get();
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Removing transaction connection %1 from %2")
+    NX_DEBUG(this, lm("Removing transaction connection %1 from %2")
             .arg(existingConnectionPtr->connectionGuid())
             .arg(existingConnectionPtr->commonTransportHeaderOfRemoteTransaction()));
 
@@ -369,7 +369,7 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
 void ConnectionManager::removeConnection(const std::string& connectionId)
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+    NX_VERBOSE(this,
         lm("Removing connection %1").args(connectionId));
 
     QnMutexLocker lock(&m_mutex);
@@ -397,7 +397,7 @@ void ConnectionManager::onTransactionDone(
 {
     if (resultCode != ResultCode::ok)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Closing connection %1 due to failed transaction (result code %2)")
                 .args(connectionId, toString(resultCode)));
 

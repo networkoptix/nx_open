@@ -174,7 +174,7 @@ bool Acceptor::validateRequest(
 
     if (systemId.empty())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             "Ignoring connection request without systemId from peer %1",
             connection->socket()->getForeignAddress());
         return false;
@@ -182,7 +182,7 @@ bool Acceptor::validateRequest(
 
     if (connectionId.empty())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             "Ignoring connection request without connectionId from peer %1",
             connection->socket()->getForeignAddress());
         return false;
@@ -190,7 +190,7 @@ bool Acceptor::validateRequest(
 
     if (!m_protocolVersionRange.isCompatible(remotePeerInfo.protoVersion))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             "Incompatible connection request from (%1.%2; %3). Requested protocol version %4",
             remotePeerInfo.id, systemId, connection->socket()->getForeignAddress(),
             remotePeerInfo.protoVersion);
@@ -229,7 +229,7 @@ bool Acceptor::registerNewConnection(
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             "Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4",
             remotePeer.id, systemId, requestContext.connection->socket()->getForeignAddress(),
             connectionId);

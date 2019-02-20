@@ -1955,8 +1955,8 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
 {
     const auto& data = transaction.params;
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
-            .arg(systemId).arg(data.id));
+    NX_VERBOSE(this, lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
+        .arg(systemId).arg(data.id));
 
     data::SystemSharing systemSharing;
     systemSharing.systemId = systemId;
@@ -1969,9 +1969,8 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
             QnSql::serialized_field(systemSharing.vmsUserId))});
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
-                .arg(systemId).arg(data.id)
-                .arg(queryContext->connection()->lastErrorText()));
+        NX_DEBUG(this, "Failed to remove sharing by vms user id. system %1, vms user id %2. %3",
+            systemId, data.id, queryContext->connection()->lastErrorText());
         return dbResult;
     }
 
@@ -2005,9 +2004,9 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
     if (data.resourceId != QnUserResource::kAdminGuid ||
         data.name != nx::settings_names::kNameSystemName)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction setResourceParam with "
-               "systemId %1, resourceId %2, param name %3, param value %4")
-                .arg(systemId).arg(data.resourceId).arg(data.name).arg(data.value));
+        NX_VERBOSE(this, "Ignoring transaction setResourceParam with "
+            "systemId %1, resourceId %2, param name %3, param value %4",
+            systemId, data.resourceId, data.name, data.value);
         return nx::sql::DBResult::ok;
     }
 
@@ -2032,10 +2031,9 @@ nx::sql::DBResult SystemManager::processRemoveResourceParam(
     clusterdb::engine::Command<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction %1 with "
-            "systemId %2, resourceId %3, param name %4")
-            .arg(::ec2::ApiCommand::toString(data.command)).arg(systemId)
-            .arg(data.params.resourceId).arg(data.params.name));
+    NX_VERBOSE(this, "Ignoring transaction %1 with systemId %2, resourceId %3, param name %4",
+        ::ec2::ApiCommand::toString(data.command), systemId, data.params.resourceId,
+        data.params.name);
     return nx::sql::DBResult::ok;
 }
 

@@ -240,11 +240,6 @@ nx::utils::log::Settings Settings::logging() const
     return m_logging;
 }
 
-const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
-{
-    return m_vmsSynchronizationLogging;
-}
-
 const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -332,7 +327,6 @@ void Settings::loadSettings()
 
     //log
     m_logging.load(settings(), QLatin1String("log"));
-    m_vmsSynchronizationLogging.load(settings(), QLatin1String("syncroLog"));
 
     //DB
     m_dbConnectionOptions.loadFromSettings(settings());
