@@ -1246,12 +1246,13 @@ void QnMediaResourceWidget::resumeHomePtzController()
 
 bool QnMediaResourceWidget::forceShowPosition() const
 {
-    const bool isLive = d->display()
+    // In videowall mode position item info must always be visible if item is not in live.
+    if (!qnRuntime->isVideoWallMode())
+        return false;
+
+    return d->display()
         && d->display()->camDisplay()
         && d->display()->camDisplay()->isRealTimeSource();
-
-    // In videowall mode position item must always be visible if item is not in live.
-    return qnRuntime->isVideoWallMode() && !isLive;
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
