@@ -48,23 +48,23 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
+            <label for="currentSystemPassword" class="control-label">Aktuelles Passwort (für dieses System)</label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Passwort" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>The current System is about to be merged <b>{{systems.systemName}}</b> with System <b>{{systems.joinSystemName}}</b></p>
+            <p>Das derzeitige System <b>{{systems.systemName}}</b> soll mit System <b>{{systems.joinSystemName}}</b> zusammengeführt werden</p>
             <p>
-                The new System will have password and name from the following System:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
-                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+                Das neue System soll das Passwort und den Namen von diesem System haben:<br/>
+<label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}}(aktuell)</label><br/>
+<label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Find System</button>
-        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Merge with {{systems.joinSystemName}}</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">System finden</button>
+<button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Führe mit {{systems.joinSystemName}} zusammen</button>
     </div>
 </form>
