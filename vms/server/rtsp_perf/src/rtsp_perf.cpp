@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 
-static const std::chrono::milliseconds kSessionStartInterval(100);
+static const std::chrono::milliseconds kSessionStartInterval(50);
 
 bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
 {
@@ -65,7 +65,7 @@ void RtspPerf::startSessions(const std::vector<QString>& urls)
             if (m_sessions[i].worker.joinable())
                 m_sessions[i].worker.join();
             m_sessions[i].worker = std::thread([url, live, this, i]() {
-                m_sessions[i].run(url, m_config.user, m_config.password, live);
+                m_sessions[i].run(url, m_config, live);
             });
             ++m_totalFailed;
             std::this_thread::sleep_for(kSessionStartInterval);
@@ -100,8 +100,7 @@ void RtspPerf::run()
     }
 }
 
-void RtspPerf::Session::run(
-    const QString& url, const QString& user, const QString& password, bool live)
+void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
 {
     int64_t position = DATETIME_NOW;
     if (!live)
@@ -115,10 +114,11 @@ void RtspPerf::Session::run(
         url,
         live ? "live" : "archive, from position: " + QString::number(position / 1000000));
     QAuthenticator auth;
-    auth.setUser(user);
-    auth.setPassword(password);
-    QnRtspClient::Config config;
-    QnRtspClient rtspClient(config);
+    auth.setUser(config.user);
+    auth.setPassword(config.password);
+    QnRtspClient::Config rtspConfig;
+    QnRtspClient rtspClient(rtspConfig);
+    rtspClient.setTCPTimeout(config.timeout);
     rtspClient.setAuth(auth, nx::network::http::header::AuthScheme::basic);
     rtspClient.setTransport(RtspTransport::tcp);
     rtspClient.setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");

@@ -41,6 +41,9 @@ int main(int argc, char** argv)
     QCommandLineOption livePercentOption(QStringList() << "l" << "live_percent",
         "Percent of live streams. By default: 100", "live percent", "100");
     parser.addOption(livePercentOption);
+    QCommandLineOption timeoutOption(QStringList() << "t" << "timeout",
+        "RTSP read timeout in milliseconds. By default: 5000ms", "timeout", "5000");
+    parser.addOption(timeoutOption);
     QCommandLineOption userOption(QStringList() << "u" << "user",
         "User name. By default: 'admin'", "user", "admin");
     parser.addOption(userOption);
@@ -53,6 +56,7 @@ int main(int argc, char** argv)
     parser.process(app);
     RtspPerf::Config config;
     config.count = parser.value(countOption).toInt();
+    config.timeout = std::chrono::milliseconds(parser.value(timeoutOption).toInt());
     config.livePercent = parser.value(livePercentOption).toInt();
     config.server = parser.value(serverOption);
     config.user = parser.value(userOption);

@@ -18,6 +18,7 @@ public:
         int count = 1;
         int livePercent = 100;
         bool useSsl = false;
+        std::chrono::milliseconds timeout {5000};
 
         QString toString()
         {
@@ -28,6 +29,7 @@ public:
                 "\nuse ssl: " + QString::number(useSsl) +
                 "\ncount: " + QString::number(count) +
                 "\nlive percent: " + QString::number(livePercent) + "%"
+                "\ntimeout: " + QString::number(timeout.count()) + "ms"
                 "\n";
         }
     };
@@ -41,7 +43,7 @@ private:
 
     struct Session
     {
-        void run(const QString& url, const QString& user, const QString& password, bool live);
+        void run(const QString& url, const Config& config, bool live);
         std::atomic<uint64_t> totalBytesRead = 0;
         std::atomic<bool> failed = true;
         std::thread worker;
