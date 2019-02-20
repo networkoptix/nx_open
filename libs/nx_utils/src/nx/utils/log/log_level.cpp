@@ -155,8 +155,10 @@ bool Filter::accepts(const Tag& tag) const
 {
     if (!isValid())
         return false;
-
-    return m_filter.match(tag.toString()).hasMatch();
+    // Workaround for accessing QRegularExpression from multiple threads. It fixes some crashes
+    // when several threads simultaneously write to logs. It happened on both client and server.
+    auto filter = m_filter;
+    return filter.match(tag.toString()).hasMatch();
 }
 
 QString Filter::toString() const
