@@ -287,10 +287,8 @@ QWidget* QnBusinessRuleItemDelegate::createSourceEditor(QWidget* parent,
 QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     const QModelIndex& index) const
 {
-    vms::api::ActionType actionType =
-        index.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
-
-    auto model = index.data(Qn::RuleModelRole).value<QnBusinessRuleViewModelPtr>();
+    const auto actionType = index.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
+    const auto model = index.data(Qn::RuleModelRole).value<QnBusinessRuleViewModelPtr>();
 
     QnSelectResourcesDialogButton* editorButton = nullptr;
 
@@ -346,11 +344,17 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
         camerasButton->setResourcePolicy<QnCameraAudioTransmitPolicy>();
         editorButton = camerasButton;
     }
+    else if (actionType == ActionType::fullscreenCameraAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnFullscreenCameraPolicy>();
+        editorButton = camerasButton;
+    }
 
     if (editorButton)
         connect(editorButton, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-    // TODO: #vbreus Create proper editor for fullscreenCameraAction
+    // TODO: #vbreus Create proper editor for exitFullscreenAction
     return editorButton;
 }
 
