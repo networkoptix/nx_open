@@ -6,6 +6,7 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/url/url_builder.h>
 
+#include "relay_tunnel_validator.h"
 #include "../relay_api_http_paths.h"
 
 namespace nx::cloud::relay::api::detail {
@@ -72,6 +73,8 @@ void ClientOverHttpTunnel::openServerTunnel(
 
     openTunnel(
         serverTunnelBaseUrl,
+        [](auto&&... args) { return std::make_unique<detail::TunnelValidator>(
+            std::forward<decltype(args)>(args)...); },
         [this, completionHandler = std::move(completionHandler)](
             auto&&... args) mutable
         {
@@ -83,9 +86,12 @@ void ClientOverHttpTunnel::openServerTunnel(
 
 void ClientOverHttpTunnel::openTunnel(
     const nx::utils::Url& url,
+    network::http::tunneling::TunnelValidatorFactoryFunc tunnelValidatorFactoryFunc,
     ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler)
 {
     auto client = std::make_unique<network::http::tunneling::Client>(url);
+    if (tunnelValidatorFactoryFunc)
+        client->setTunnelValidatorFactory(std::move(tunnelValidatorFactoryFunc));
     client->setCustomHeaders({{kNxProtocolHeader, kRelayProtocol}});
     client->setTimeout(kTimeout);
     auto clientPtr = client.get();
@@ -130,6 +136,7 @@ void ClientOverHttpTunnel::openClientTunnel(
 
     openTunnel(
         clientTunnelBaseUrl,
+        nullptr, //< Client tunnel verification is not supported yet.
         [this, completionHandler = std::move(completionHandler)](
             auto&&... args) mutable
         {

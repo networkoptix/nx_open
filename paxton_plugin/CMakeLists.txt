@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
-project(paxton_plugin VERSION 3.2.0 LANGUAGES CSharp)
+set(releaseVersion 4.0.0)
 
-set(releaseVersion ${PROJECT_VERSION})
-set(releaseVersion.full ${releaseVersion}.${buildNumber})
+project(paxton_plugin VERSION ${releaseVersion} LANGUAGES CSharp)
 
 set(customization "default" CACHE STRING "Product customization")
 set(dotNetFramework "v4.6.2" CACHE STRING "Target .NET Framework version. Allowed: v4.0, v4.6.2")
@@ -13,6 +12,7 @@ option(codeSigning "Enable code signing" OFF)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 set(repositoryRootDir ${PROJECT_SOURCE_DIR}/..)
+set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
 if("${dotNetFramework}" STREQUAL "v4.0")
     set(net2Version "Net2v5")

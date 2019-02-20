@@ -92,7 +92,7 @@ static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
 static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
 static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
 
-                                                // Mimimum recv flight flag size is 32 packets
+// Mimimum recv flight flag size is 32 packets
 constexpr const int kMinRecvWindowSize = 32;
 */
 constexpr const int kDefaultRecvWindowSize = 25600;

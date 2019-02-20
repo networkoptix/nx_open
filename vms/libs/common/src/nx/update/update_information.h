@@ -20,6 +20,11 @@ struct Package
     QString variant;
     QString variantVersion;
     QString file;
+    /**
+     * Local path to the package. This value is used locally by each peer.
+     * Do not add it to fusion until it is really necessary.
+     */
+    QString localFile;
     QString url;
     QString md5;
     qint64 size = 0;
@@ -70,6 +75,7 @@ enum class InformationError
     brokenPackageError,
     missingPackageError,
     incompatibleVersion,
+    incompatibleCloudHost,
     notFoundError,
     noNewVersion,
 };
@@ -167,6 +173,7 @@ struct UpdateContents
 {
     UpdateSourceType sourceType = UpdateSourceType::internet;
     QString source;
+    QString changeset;
 
     /** A set of servers without proper update file. */
     QSet<QnUuid> missingUpdate;
@@ -207,13 +214,15 @@ struct UpdateContents
      */
     QList<Package> manualPackages;
     bool cloudIsCompatible = true;
-    bool verified = false;
+
+    bool packagesGenerted = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
 
     nx::utils::SoftwareVersion getVersion() const;
+
     /** Check if we can apply this update. */
-    bool isValid() const;
+    bool isValidToInstall() const;
 
     /**
      * Check if this update info is completely empty.

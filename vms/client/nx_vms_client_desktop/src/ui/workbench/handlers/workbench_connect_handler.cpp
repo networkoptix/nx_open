@@ -29,6 +29,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -1102,10 +1103,17 @@ void QnWorkbenchConnectHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
+    for (const auto aviResource: resourcePool()->getResources<QnAviResource>())
+    {
+        if (!aviResource->isOnline())
+            resourcesToRemove.push_back(aviResource);
+    }
 
-    const auto aviResources = resourcePool()->getResources<QnAviResource>();
-    std::copy_if(aviResources.cbegin(), aviResources.cend(), std::back_inserter(resourcesToRemove),
-        [](auto aviResource) { return aviResource->getStatus() != Qn::Online; });
+    for (const auto fileLayoutResource: resourcePool()->getResources<QnFileLayoutResource>())
+    {
+        if (!fileLayoutResource->isOnline())
+            resourcesToRemove.push_back(fileLayoutResource);
+    }
 
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();

@@ -134,7 +134,7 @@ int VideoTranscoder::transcode(
 {
     auto frame = decode(source);
     if (shouldDrop(frame.get()))
-        return 0;
+        return AVERROR(EAGAIN);
 
     Frame* scaledFrame;
     int status = m_scaler.scale(frame.get(), &scaledFrame);

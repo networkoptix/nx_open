@@ -82,11 +82,7 @@ public:
         ActivityPresence = 1 << 10,
 
         AlwaysShowName = 1 << 11,
-
-        // TODO: #gdm Remove these flags together with legacy camera settings.
-        DisplayMotionSensitivity = 1 << 12,
-        InfoOverlaysForbidden = 1 << 13,
-        SyncPlayForbidden = 1 << 14,
+        InfoOverlaysForbidden = 1 << 12,
     };
 
     Q_DECLARE_FLAGS(Options, Option)

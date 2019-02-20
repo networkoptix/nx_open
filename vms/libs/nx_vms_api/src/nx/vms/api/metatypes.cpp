@@ -108,7 +108,7 @@ void Metatypes::initialize()
     qRegisterMetaType<ModuleInformation>();
     qRegisterMetaType<ModuleInformationWithAddresses>();
     qRegisterMetaType<MotionType>();
-    qRegisterMetaType<MotionStreamType>();
+    qRegisterMetaType<StreamIndex>();
     qRegisterMetaType<QList<ModuleInformation>>();
     qRegisterMetaType<QList<ModuleInformationWithAddresses>>();
     qRegisterMetaType<P2pStatisticsData>();

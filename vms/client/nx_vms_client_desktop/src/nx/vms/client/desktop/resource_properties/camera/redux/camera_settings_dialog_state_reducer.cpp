@@ -13,9 +13,10 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/same.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
-#include <nx/utils/algorithm/same.h>
 
 namespace nx::vms::client::desktop {
 
@@ -159,6 +160,23 @@ State loadMinMaxCustomBitrate(State state)
         Qn::StreamQuality::lowest);
     state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
         Qn::StreamQuality::highest);
+
+    static const std::array<Qn::StreamQuality, 4> kUserVisibleQualities{{
+        Qn::StreamQuality::low,
+        Qn::StreamQuality::normal,
+        Qn::StreamQuality::high,
+        Qn::StreamQuality::highest}};
+
+    state.recording.minRelevantQuality = Qn::StreamQuality::lowest;
+    for (const auto quality: kUserVisibleQualities)
+    {
+        const auto bitrate = calculateBitrateForQualityMbps(state, quality);
+        if (bitrate <= state.recording.minBitrateMbps)
+            state.recording.minRelevantQuality = quality;
+        else
+            break;
+    }
+
     return state;
 }
 
@@ -173,7 +191,7 @@ State fillBitrateFromFixedQuality(State state)
 
 QString settingsUrlPath(const Camera& camera)
 {
-    const auto resourceData = camera->commonModule()->resourceDataPool()->data(camera);
+    const auto resourceData = camera->resourceData();
     if (!resourceData.value<bool>(lit("showUrl"), false))
         return QString();
 
@@ -310,12 +328,12 @@ QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
     return QnMotionRegion::ErrorCode::Ok;
 }
 
-vms::api::MotionStreamType forcedMotionStreamType(const Camera& camera)
+vms::api::StreamIndex forcedMotionStreamType(const Camera& camera)
 {
     const auto motionStreamIndex = camera->motionStreamIndex();
     return motionStreamIndex.isForced
         ? motionStreamIndex.index
-        : nx::vms::api::MotionStreamType::undefined;
+        : nx::vms::api::StreamIndex::undefined;
 }
 
 State updateDuplicateLogicalIdInfo(State state)
@@ -380,7 +398,7 @@ bool isDefaultExpertSettings(const State& state)
     }
 
     if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
-        && state.expert.forcedMotionStreamType() != vms::api::MotionStreamType::undefined)
+        && state.expert.forcedMotionStreamType() != vms::api::StreamIndex::undefined)
     {
         return false;
     }
@@ -568,10 +586,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.recording.defaultStreamResolution = firstCamera->streamInfo().getResolution();
         state.recording.mediaStreamCapability = firstCamera->cameraMediaCapability().
-            streamCapabilities.value(nx::vms::api::MotionStreamType::primary);
+            streamCapabilities.value(nx::vms::api::StreamIndex::primary);
 
         state.recording.customBitrateAvailable = true;
-        state = loadMinMaxCustomBitrate(std::move(state));
 
         state.singleCameraSettings.enableMotionDetection.setBase(
             isMotionDetectionEnabled(firstCamera));
@@ -613,7 +630,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
     }
 
-    state.recording.enabled = {};
     fetchFromCameras<bool>(state.recording.enabled, cameras,
         [](const auto& camera) { return camera->isLicenseUsed(); });
 
@@ -634,20 +650,17 @@ State CameraSettingsDialogStateReducer::loadCameras(
         state.recording.brush.fps = std::max_element(tasks.cbegin(), tasks.cend(),
             [](const auto& l, const auto& r) { return l.fps < r.fps; })->fps;
     }
-    else
-    {
+
+    // Default brush fps value.
+    if (state.recording.brush.fps == 0)
         state.recording.brush.fps = state.maxRecordingBrushFps();
-    }
 
     fetchFromCameras<int>(state.recording.thresholds.beforeSec, cameras,
         calculateRecordingThresholdBefore);
     fetchFromCameras<int>(state.recording.thresholds.afterSec, cameras,
         calculateRecordingThresholdAfter);
 
-    state.recording.brush.fps = qBound(
-        kMinFps,
-        state.recording.brush.fps,
-        state.maxRecordingBrushFps());
+    state = loadMinMaxCustomBitrate(std::move(state));
     state = fillBitrateFromFixedQuality(std::move(state));
 
     state.recording.minDays = calculateMinRecordingDays(cameras);
@@ -697,7 +710,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return camera->trustCameraTime();
         });
 
-    fetchFromCameras<vms::api::MotionStreamType>(state.expert.forcedMotionStreamType, cameras,
+    fetchFromCameras<vms::api::StreamIndex>(state.expert.forcedMotionStreamType, cameras,
         [](const Camera& camera) { return forcedMotionStreamType(camera); });
 
     fetchFromCameras<bool>(state.expert.remoteMotionDetectionEnabled, cameras,
@@ -711,7 +724,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.expert.motionStreamOverridden = combinedValue(cameras,
         [](const Camera& camera)
         {
-            return forcedMotionStreamType(camera) != vms::api::MotionStreamType::undefined;
+            return forcedMotionStreamType(camera) != vms::api::StreamIndex::undefined;
         });
 
     if (state.canSwitchPtzPresetTypes())
@@ -783,6 +796,11 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.recording.brush.fps,
         state.maxRecordingBrushFps());
 
+    if (state.recording.isCustomBitrate())
+        state = setRecordingBitrateMbps(std::move(state), brush.bitrateMbps);
+    else
+        state = fillBitrateFromFixedQuality(std::move(state));
+
     state = setScheduleBrushFps(std::move(state), fps);
     state.recordingHint = State::RecordingHint::brushChanged;
 
@@ -826,7 +844,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         // Lock normalized bitrate.
         const auto normalizedBitrate = state.recording.normalizedCustomBitrateMbps();
         state = loadMinMaxCustomBitrate(std::move(state));
-        state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
+        state = setRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
     state.recordingHint = State::RecordingHint::brushChanged;
 
@@ -882,23 +900,24 @@ State CameraSettingsDialogStateReducer::toggleCustomBitrateVisible(State state)
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setCustomRecordingBitrateMbps(State state, float mbps)
+State CameraSettingsDialogStateReducer::setRecordingBitrateMbps(State state, float mbps)
 {
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     state.recording.brush.bitrateMbps = mbps;
     state.recording.brush.quality = calculateQualityForBitrateMbps(state, mbps);
+    if (qFuzzyEquals(calculateBitrateForQualityMbps(state, state.recording.brush.quality), mbps))
+        state.recording.brush.bitrateMbps = 0; //< Standard quality detected.
     state.recording.bitrateMbps = mbps;
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
-    State state,
-    float value)
+State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
+    State state, float value)
 {
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
     const auto mbps = state.recording.minBitrateMbps + value * spread;
-    return setCustomRecordingBitrateMbps(std::move(state), mbps);
+    return setRecordingBitrateMbps(std::move(state), mbps);
 }
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
@@ -1034,6 +1053,28 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
             tasks << data;
         }
         state.recording.schedule.setUser(tasks);
+    }
+
+    const bool emptyScheduleHintDisplayed = state.recordingHint.has_value()
+		&& *state.recordingHint == State::RecordingHint::emptySchedule;
+
+    if (value)
+    {
+        const auto schedule = state.recording.schedule.valueOr({});
+        const bool scheduleIsEmpty = schedule.isEmpty()
+            || std::all_of(schedule.cbegin(), schedule.cend(),
+				[](const QnScheduleTask& task)
+                {
+                    return task.recordingType == Qn::RecordingType::never;
+                });
+        if (scheduleIsEmpty)
+            state.recordingHint = State::RecordingHint::emptySchedule;
+		else if (emptyScheduleHintDisplayed)
+            state.recordingHint = {};
+    }
+    else if (emptyScheduleHintDisplayed)
+    {
+        state.recordingHint = {};
     }
 
     return state;
@@ -1210,13 +1251,13 @@ State CameraSettingsDialogStateReducer::setRtpTransportType(
 }
 
 State CameraSettingsDialogStateReducer::setForcedMotionStreamType(
-    State state, vms::api::MotionStreamType value)
+    State state, vms::api::StreamIndex value)
 {
     if (state.devicesDescription.supportsMotionStreamOverride != CombinedValue::All)
         return state;
 
     state.expert.forcedMotionStreamType.setUser(value);
-    state.expert.motionStreamOverridden = value == nx::vms::api::MotionStreamType::undefined
+    state.expert.motionStreamOverridden = value == nx::vms::api::StreamIndex::undefined
         ? CombinedValue::None
         : CombinedValue::All;
 
@@ -1315,7 +1356,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
-    state = setForcedMotionStreamType(std::move(state), nx::vms::api::MotionStreamType::undefined);
+    state = setForcedMotionStreamType(std::move(state), nx::vms::api::StreamIndex::undefined);
     state = setLogicalId(std::move(state), {});
 
     state.isDefaultExpertSettings = true;

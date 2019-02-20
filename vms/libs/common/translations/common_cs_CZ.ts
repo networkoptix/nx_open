@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation type="unfinished">MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Tyto systémy mají různé adresy URL %1. Sloučení není povoleno.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Systémová událost</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Systém je již zaregistrovaný v cloudu (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Server není připojen k Internetu.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Nepodařilo se uložit oprávnění cloudu do místní databáze</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Nepodařilo se uložit vlastníka cloudu do místní databáze</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Nelze se připojit k cloudu: %1</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation>Příliš mnoho chyb média. Pro více informací otevřete prosím dialog problémy s kamerou.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>Chyba pluginu kamery. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>Zkuste prosím restartovat I/O modul zařízení, poté obnovte výchozí nastavení přes webové rozhraní.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Prosím aktualizujte firmware. Minimální podporovaná verze je %1. Aktuální verze je %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation>Nelze najít dekodér pro kodek %1.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>Nelze inicializovat převzorkování kontextu, kód chyby: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Nelze přidělit vyrovnávací paměti vzorku, kód chyby: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>Nelze odeslat zvuk do enkodéru, kód chyby: %1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>Nelze přijmout zvuk z dekodéru, kód chyby: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation>Zdarma</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>Bezplatné licence</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>Čas</translation>
     </message>
@@ -497,6 +532,238 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>Most licence</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Časově omezená licence</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analogové licence</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Profesionální licence</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Edge licence</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Vmax licence</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Licence pro analogové enkodéry</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Licence pro videostěny</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Licence pro I/O moduly</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Start Licence</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Bridge Licence</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Neplatné licence</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Časově omezená licence</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Analogové licence</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Profesionální licence</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Edge licence</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Vmax licence</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Licence pro analogové enkodéry</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Licence pro videostěny</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Licence pro I/O moduly</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Start Licence</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Bridge Licence</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n%1 Neplatné licence</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -557,10 +824,6 @@
       <translation>Neplatný typ</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>Pro toto zařízení je povolena pouze jedna licence</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>Tento typ licence vyžaduje vyšší verzi softwaru</translation>
     </message>
@@ -572,6 +835,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>Server s odpovídajícím ID hardwaru nebyl nalezen</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -582,42 +853,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Kamera(y)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n kamera(y)</numerusform>
-        <numerusform>%n kamera(y)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Zařízení</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n zařízení</numerusform>
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>Kamery</translation>
@@ -650,24 +885,6 @@
       <source>device</source>
       <translation>zařízení</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modul(y)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modul(y)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>I/O Moduly</translation>
@@ -683,6 +900,60 @@
     <message>
       <source>I/O module</source>
       <translation>I/O modul</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -710,67 +981,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>ID hardwaru: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>Nejnižší</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Nízký</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Střední</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Vysoká</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Nejlepší</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Prepozice</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>Nedefinovaný</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Pos</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Ni</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>St</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Vy</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Nej</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Pr</translation>
     </message>
   </context>
   <context>
@@ -817,196 +1027,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>Nepojmenovaný systém</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>OK</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>Nenalezeno</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>Není implementováno</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>Nepodporovaný přenos</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>Vnitřní chyba serveru</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>Neplatný parametr</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>t</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>r</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msek</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sek</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>hod</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dny</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>týdny</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>měsíce</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>roky</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milisekundy</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>sekundy</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minuty</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hodiny</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>dny</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>týdny</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>měsíce</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>roky</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1085,6 +1105,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Má přístup k celému systému a může systém spravovat. Může vytvářet uživatele.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Neznámá chyba.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1597,6 +1659,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation>Ukončit režim celé obrazovky</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Otevřít rozložení</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

@@ -332,7 +332,7 @@ void setBitrate(
     if (ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs) != 0)
     {
         int error = errno;
-        NX_V4L2_LOG("ioctl() failed: %1", strerror(error));
+        NX_V4L2_LOG("ioctl() failed: %1, path %2", strerror(error), devicePath);
     }
 }
 
@@ -361,7 +361,7 @@ int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDe
 
     int error = errno;
 
-    NX_V4L2_LOG("ioctl() failed: %1", strerror(error));
+    NX_V4L2_LOG("ioctl() failed: %1, path %2", strerror(error), devicePath);
 
     if (error == ENOSPC)
     {

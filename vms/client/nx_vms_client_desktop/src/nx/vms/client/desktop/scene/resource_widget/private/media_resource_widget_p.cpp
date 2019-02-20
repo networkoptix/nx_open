@@ -3,6 +3,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/client_camera.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
@@ -62,6 +63,11 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
             this, &MediaResourceWidgetPrivate::licenseStatusChanged);
         connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
             this, &MediaResourceWidgetPrivate::stateChanged);
+
+        connect(camera, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged, this,
+			&MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
+
+        updateIsAnalyticsSupported();
     }
 }
 
@@ -219,6 +225,26 @@ void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
 
     m_isUnauthorized = value;
     emit stateChanged();
+}
+
+bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
+{
+    // Analytics stream should be enabled only for cameras with enabled analytics engine and only
+    // if at least one of these engines has the objects support.
+    if (!camera || !analyticsMetadataProvider)
+        return false;
+
+    const auto engines = camera->enabledAnalyticsEngineResources();
+    return std::any_of(engines.cbegin(), engines.cend(),
+        [](const common::AnalyticsEngineResourcePtr& engine)
+        {
+            return !engine->manifest().objectTypes.empty();
+        });
+}
+
+void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
+{
+    isAnalyticsSupported = calculateIsAnalyticsSupported();
 }
 
 } // namespace nx::vms::client::desktop

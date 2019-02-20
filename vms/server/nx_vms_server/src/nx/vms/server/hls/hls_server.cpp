@@ -326,8 +326,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
 
     QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame(
         (requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME) == requestParams.end())
-        ? nx::vms::api::MotionStreamType::primary
-        : nx::vms::api::MotionStreamType::secondary,
+        ? nx::vms::api::StreamIndex::primary
+        : nx::vms::api::StreamIndex::secondary,
         /*channel*/ 0);
     if (lastVideoFrame &&
         (lastVideoFrame->compressionType != AV_CODEC_ID_H264) &&
@@ -1058,8 +1058,8 @@ int HttpLiveStreamingProcessor::estimateStreamBitrate(
         //estimating bitrate as we can
         QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame(
             (streamQuality == MEDIA_Quality_High)
-            ? nx::vms::api::MotionStreamType::primary
-            : nx::vms::api::MotionStreamType::secondary,
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary,
             /*channel*/0);
         if (videoFrame)
         {

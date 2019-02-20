@@ -570,6 +570,25 @@ FindPackageResult findPackage(
         outMessage);
 }
 
+FindPackageResult findPackage(
+    const QnCommonModule& commonModule,
+    const Information& updateInformation,
+    nx::update::Package* outPackage,
+    QString* outMessage)
+{
+    return findPackage(
+        commonModule.moduleGUID(),
+        commonModule.engineVersion(),
+        QnAppInfo::currentSystemInformation(),
+        updateInformation,
+        commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !commonModule.globalSettings()->cloudSystemId().isEmpty(),
+        outPackage,
+        outMessage);
+}
+
+
 nx::update::Package* findPackage(
     const QString& component,
     nx::vms::api::SystemInformation& systemInfo,

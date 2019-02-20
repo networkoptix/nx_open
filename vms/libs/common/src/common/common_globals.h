@@ -23,7 +23,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent
-    ResourceStatus StatusChangeReason
+    StatusChangeReason
     Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -767,6 +767,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permissions),
+    (debug)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

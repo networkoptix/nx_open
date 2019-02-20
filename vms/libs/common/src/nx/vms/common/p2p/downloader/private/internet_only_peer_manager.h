@@ -43,7 +43,6 @@ public:
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
-    virtual void cancel() override;
 
 private:
     class Private;

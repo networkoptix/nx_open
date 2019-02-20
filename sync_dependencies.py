@@ -33,7 +33,6 @@ def determine_package_versions(
         "openssl": "1.0.2q",
         "ffmpeg": "3.1.1",
         "sigar": "1.7",
-        "openldap": "2.4.42",
         "sasl2": "2.1.26",
         "openal": "1.16",
         "libjpeg-turbo": "1.4.2",
@@ -47,7 +46,7 @@ def determine_package_versions(
         "deepstream": "0.1",
         "android-sdk": "28",
         "android-ndk": "r17",
-        "help": customization + "-3.2",
+        "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
     }
@@ -188,6 +187,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "ios"):
         sync("libjpeg-turbo")
 
+    if platform in ("macosx", "ios"):
+        sync("any/certificates", path_variable="certificates_path")
+
     if have_mediaserver:
         sync("any/nx_sdk-1.7.1")
         sync("any/nx_storage_sdk-1.7.1")
@@ -197,13 +199,12 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("any/server-external-" + release_version)
 
         if box == "edge1":
-            sync("openldap")
+            sync("openldap-2.4.42-1")
             sync("sasl2")
 
     if have_mediaserver or have_desktop_client:
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
-    sync("any/certificates", path_variable="certificates_path")
     sync("any/root-certificates", path_variable="root_certificates_path")
 
 

@@ -417,7 +417,7 @@ bool QnAviArchiveDelegate::open(
         if (m_storage == nullptr)
         {
             const auto commonModule = resource->commonModule();
-            if (!commonModule)
+            if (!NX_ASSERT(commonModule))
                 return false;
 
             m_storage = QnStorageResourcePtr(commonModule->storagePluginFactory()->createStorage(
@@ -471,7 +471,6 @@ bool QnAviArchiveDelegate::open(
         getVideoLayout();
     }
     m_keyFrameFound.resize(m_formatContext->nb_streams, false);
-    m_resource->setStatus(Qn::Online);
     return m_initialized;
 }
 

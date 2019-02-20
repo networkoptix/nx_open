@@ -9,10 +9,9 @@ namespace nx::vms::client::desktop {
 struct ScheduleCellParams
 {
     static constexpr auto kAutomaticBitrate = 0.0;
-    static constexpr auto kDefaultFps = 10;
     static constexpr auto kDefaultRecordingType = Qn::RecordingType::always;
 
-    int fps = kDefaultFps;
+    int fps = 0;
     Qn::StreamQuality quality = Qn::StreamQuality::normal;
     Qn::RecordingType recordingType = kDefaultRecordingType;
     qreal bitrateMbps = kAutomaticBitrate;

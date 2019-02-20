@@ -68,7 +68,9 @@ QnCameraStatsData QnRecordingStats::transformStatsToModelData(const QnRecordingS
     {
         const auto& cameraResource = resourcePool->getResourceByUniqueId<QnVirtualCameraResource>(camera.uniqueId);
         if (isOwnCamera(cameraResource, server))
+        {
             data.cameras << camera;
+        }
         else
         {
             // Hide all cameras which belong to another server.

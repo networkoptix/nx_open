@@ -71,8 +71,8 @@ protected:
     bool atCancelCurrentAction();
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
+    void atCloudSettingsChanged();
 
-    void syncStatusVisibility();
     void clearUpdateInfo();
     void pickLocalFile();
     void pickSpecificBuild();
@@ -175,6 +175,7 @@ private:
     void syncRemoteUpdateStateToUi();
     void syncProgress();
     void syncReportToUi();
+    void syncStatusVisibility();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 

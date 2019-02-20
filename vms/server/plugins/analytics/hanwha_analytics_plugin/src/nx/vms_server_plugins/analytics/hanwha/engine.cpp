@@ -136,6 +136,10 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_manifest);
 }
 
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+{
+}
+
 void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
@@ -360,4 +364,3 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 }
 
 } // extern "C"
-

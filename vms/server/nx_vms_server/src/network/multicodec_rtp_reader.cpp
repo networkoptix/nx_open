@@ -163,7 +163,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     QnAbstractMediaDataPtr result;
     do {
-        if (m_RtpSession.getTransport() == RtspTransport::tcp)
+        if (m_RtpSession.getPreferedTransport() == RtspTransport::tcp)
             result = getNextDataTCP();
         else
             result = getNextDataUDP();

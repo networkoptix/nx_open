@@ -160,7 +160,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
-        UserEditableMultiple<vms::api::MotionStreamType> forcedMotionStreamType;
+        UserEditableMultiple<vms::api::StreamIndex> forcedMotionStreamType;
         CombinedValue motionStreamOverridden = CombinedValue::None;
         UserEditableMultiple<bool> remoteMotionDetectionEnabled;
 
@@ -198,6 +198,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
         /** Value to be displayed in the dialog. */
         float bitrateMbps = 0.0;
+
+        Qn::StreamQuality minRelevantQuality = Qn::StreamQuality::undefined;
 
         struct Thresholds
         {

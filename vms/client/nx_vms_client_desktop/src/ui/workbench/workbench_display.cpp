@@ -1151,10 +1151,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
-    if (options)
-        widget->setOptions(widget->options() | options);
-
     synchronize(widget, false);
     bringToFront(widget);
 
@@ -2069,7 +2065,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
         int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if (checkedButtons != -1)
+        {
+            checkedButtons &= ~Qn::MotionSearchButton; //< Handled by MotionSearchSynchronizer.
             resourceWidget->setCheckedButtons(checkedButtons);
+        }
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if (!widget)

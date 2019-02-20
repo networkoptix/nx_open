@@ -8,7 +8,7 @@
 
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/layout_reader.h>
-#include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <client_core/client_core_module.h>
@@ -210,7 +210,7 @@ int QnResourceDirectoryBrowser::findResources(const QString& directory, const Re
     return resourcesFound;
 }
 
-QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
+QnFileLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
     const QString layoutUrl = fixSeparators(filename);
@@ -219,13 +219,13 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     // Check the file still seems to be valid.
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
     if (!fileInfo.isValid)
-        return QnLayoutResourcePtr();
+        return QnFileLayoutResourcePtr();
 
     // Check that the layout does not exist yet.
     QnUuid layoutId = guidFromArbitraryData(layoutUrl);
     if (resourcePool)
     {
-        auto existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
+        auto existingLayout = resourcePool->getResourceById<QnFileLayoutResource>(layoutId);
         if (existingLayout)
             return existingLayout;
     }

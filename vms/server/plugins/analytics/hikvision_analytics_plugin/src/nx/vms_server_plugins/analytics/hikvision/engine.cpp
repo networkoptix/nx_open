@@ -62,6 +62,10 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         NX_WARNING(this, lm("Can't deserialize driver manifest file"));
 }
 
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+{
+}
+
 void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.

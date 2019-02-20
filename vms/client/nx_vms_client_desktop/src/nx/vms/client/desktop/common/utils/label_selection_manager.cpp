@@ -61,8 +61,10 @@ protected:
             case QEvent::MouseButtonRelease:
             {
                 const auto mouseEvent = static_cast<QMouseEvent*>(event);
-                const bool selectAll = m_lastFocusedLabel && m_lastFocusedLabel == label
-                    && mouseEvent->button() == Qt::LeftButton && label->selectedText().isEmpty();
+                const bool selectAll = m_lastFocusedLabel
+                    && m_lastFocusedLabel == label
+                    && mouseEvent->button() == Qt::LeftButton
+                    && label->selectedText().isEmpty();
 
                 m_lastFocusedLabel = nullptr;
                 if (!selectAll)

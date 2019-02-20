@@ -48,8 +48,8 @@ public:
     void setRecordingShowFps(bool value);
     void setRecordingShowQuality(bool value);
     void toggleCustomBitrateVisible();
-    void setCustomRecordingBitrateMbps(float mbps);
-    void setCustomRecordingBitrateNormalized(float value);
+    void setRecordingBitrateMbps(float mbps);
+    void setRecordingBitrateNormalized(float value);
     void setMinRecordingDaysAutomatic(bool value);
     void setMinRecordingDaysValue(int value);
     void setMaxRecordingDaysAutomatic(bool value);
@@ -77,7 +77,7 @@ public:
     void setCustomMediaPortUsed(bool value);
     void setTrustCameraTime(bool value);
     void setCustomMediaPort(int value);
-    void setForcedMotionStreamType(nx::vms::api::MotionStreamType value);
+    void setForcedMotionStreamType(nx::vms::api::StreamIndex value);
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();

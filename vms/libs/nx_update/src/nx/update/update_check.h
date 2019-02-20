@@ -39,13 +39,22 @@ Information updateInformation(
     InformationError* error = nullptr);
 
 /**
- * Searches for an update package for your particular module.
+ * Searches for an update package for your particular module in the global update information.
  * @param commonModule a reference to the QnCommonModuleInstance
  * @param outPacakge a result package will be placed here, if found
  * @param outMessage a detailed error message
  */
 FindPackageResult findPackage(
     const QnCommonModule& commonModule,
+    nx::update::Package* outPackage,
+    QString* outMessage);
+
+/**
+ * Searches for an update package for your particular module in the given update information.
+ */
+FindPackageResult findPackage(
+    const QnCommonModule& commonModule,
+    const Information& updateInformation,
     nx::update::Package* outPackage,
     QString* outMessage);
 

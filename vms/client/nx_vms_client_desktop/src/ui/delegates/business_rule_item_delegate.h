@@ -9,7 +9,6 @@
 #include <ui/models/business_rule_view_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-typedef QVector<QnUuid> IDList;
 class QnBusinessTypesComparator;
 class QnSubjectValidationPolicy;
 
@@ -39,8 +38,8 @@ signals:
     void commit();
 
 protected:
-    void initStyleOption(QStyleOptionButton *option) const;
-    void paintEvent(QPaintEvent *event);
+    void initStyleOption(QStyleOptionButton* option) const;
+    void paintEvent(QPaintEvent* event);
 
 private slots:
     void at_clicked();
@@ -68,13 +67,21 @@ public:
         const QModelIndex& index) const override;
 
 protected:
-    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
-    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
 
-    virtual bool eventFilter(QObject *object, QEvent *event) override;
+    virtual void initStyleOption(QStyleOptionViewItem* option,
+        const QModelIndex& index) const override;
+
+    virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+
+    virtual void setModelData(QWidget* editor, QAbstractItemModel* model,
+        const QModelIndex& index) const override;
+
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
+
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private slots:
     void at_editor_commit();

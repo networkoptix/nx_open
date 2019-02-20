@@ -1,0 +1,94 @@
+<div class="container">
+    <div class="row">
+        <h1>
+            伺服器
+        </h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th ng-repeat="(key, description) in statisticsColumns">
+                        {{key}}
+                    </th>
+                    <th ng-repeat="(key, description) in metricsColumns">
+                        {{key}}
+                    </th>
+                </tr>
+                <tr>
+                    <th>伺服器</th>
+                    <th>State</th>
+                    <th ng-repeat="(key, description) in statisticsColumns">
+                        {{description}}
+                    </th>
+                    <th ng-repeat="(key, description) in metricsColumns">
+                        {{description}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="server in mediaServers">
+                    <td>
+                        {{server.name}}
+                    </td>
+                    <td ng-class="{'text-danger':server.status!='Online'}">
+                        {{server.status}}
+                    </td>
+                    <td ng-repeat="(key, description) in statisticsColumns">
+                        <div ng-repeat="(name, value) in serversStatistics[server.id][key]"
+                            ng-class="{'text-danger': value>=Config.metrics.percentValues.danger,
+                                       'text-warning': value>=Config.metrics.percentValues.warning && value<Config.metrics.percentValues.danger}">
+                            {{name}}: {{value}}%
+                        </div>
+                    </td>
+                    <td ng-repeat="(key, description) in metricsColumns">
+                        {{serversMetrics[server.id][key].value}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <h1>
+            攝影機
+        </h1>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>攝影機</th>
+                    <th>State</th>
+                    <th>伺服器</th>
+                    <th>預覽</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="camera in cameras">
+                    <td>
+                        <a ng-href="#/view/{{camera.id}}" target="_blank">
+                            {{camera.name}}
+                        </a>
+                    </td>
+                    <td ng-class="{'text-danger':(camera.status!='Online' && camera.status!='Recording')}">
+                        {{camera.status}}
+                    </td>
+                    <td ng-class="{'text-danger':camerasProvider.getServer(camera.parentId).status!='Online'}">
+                        {{camerasProvider.getServer(camera.parentId).name}}
+                        ({{camerasProvider.getServer(camera.parentId).status}})
+                    </td>
+
+                    <td>
+                        <div class="camera-preview-inline">
+                            <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
+                                    ng-src="{{camera.preview}}" error-loading='camera.errorLoading' loaded="camera.loaded" preview-image>
+                            <span ng-if="camera.status == 'Offline' || camera.status == 'Unauthorized'"
+                                 ng-class="camera.status == 'Offline' ? 'camera-preview-offline' : 'camera-preview-unauthorized'"></span>
+                            <span ng-if="camera.errorLoading && !(camera.status == 'Offline' || camera.status == 'Unauthorized')"
+                                  class='camera-preview-failed'></span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -18,6 +18,8 @@ class QnNewSystemServerFlagWatcher: public QObject, public /*mixin*/ QnCommonMod
 public:
     QnNewSystemServerFlagWatcher(QObject* parent);
     virtual ~QnNewSystemServerFlagWatcher() {}
-private:
+
     void update();
+private:
+    QnMutex m_mutex;
 };

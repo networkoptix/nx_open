@@ -38,9 +38,9 @@ nx::sdk::analytics::EventMetadataPacket* createCommonEventsMetadataPacket(
     const EventType& event, bool active)
 {
     using namespace std::chrono;
+    auto commonEvent = toPtr(createCommonEvent(event, active));
     auto packet = new nx::sdk::analytics::EventMetadataPacket();
-    auto commonEvent = createCommonEvent(event, active);
-    packet->addItem(commonEvent);
+    packet->addItem(commonEvent.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUs(-1);

@@ -841,8 +841,7 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
 
                 case ExportMediaValidator::Result::tooLong:
                     return ExportSettingsDialog::tr("You are about to export a long video. "
-                        "It may require over a gigabyte of HDD space and take "
-                        "several minutes to complete.");
+                        "It may require a lot of storage space and take significant time.");
 
                 case ExportMediaValidator::Result::tooBigExeFile:
                     return ExportSettingsDialog::tr("Exported .EXE file will have size over 4 GB "

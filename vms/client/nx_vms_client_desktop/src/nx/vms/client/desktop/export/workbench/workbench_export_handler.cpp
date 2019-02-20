@@ -15,6 +15,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <platform/environment.h>
 #include <core/resource/user_resource.h>

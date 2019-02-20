@@ -17,6 +17,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/avi_resource.h>

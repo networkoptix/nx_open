@@ -14,27 +14,25 @@ class MediaServerVideoCameraMock:
 public:
     MediaServerVideoCameraMock();
 
-    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() override;
-    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() override;
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
-        bool ensureInitialized = true) override;
+        bool ensureInitialized = true, bool createIfNotExist = true) override;
 
     virtual int copyLastGop(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         bool iFramesOnly) override;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         int channel) const override;
 
     virtual QnConstCompressedAudioDataPtr getLastAudioFrame(
-        MotionStreamType streamIndex) const override;
+        StreamIndex streamIndex) const override;
 
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        MotionStreamType streamIndex,
+        StreamIndex streamIndex,
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const override;

@@ -145,21 +145,21 @@ void CameraSettingsDialogStore::toggleCustomBitrateVisible()
         [&](State state) { return Reducer::toggleCustomBitrateVisible(std::move(state)); });
 }
 
-void CameraSettingsDialogStore::setCustomRecordingBitrateMbps(float mbps)
+void CameraSettingsDialogStore::setRecordingBitrateMbps(float mbps)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setCustomRecordingBitrateMbps(std::move(state), mbps);
+            return Reducer::setRecordingBitrateMbps(std::move(state), mbps);
         });
 }
 
-void CameraSettingsDialogStore::setCustomRecordingBitrateNormalized(float value)
+void CameraSettingsDialogStore::setRecordingBitrateNormalized(float value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setCustomRecordingBitrateNormalized(std::move(state), value);
+            return Reducer::setRecordingBitrateNormalized(std::move(state), value);
         });
 }
 
@@ -336,7 +336,7 @@ void CameraSettingsDialogStore::setTrustCameraTime(bool value)
         [&](State state) { return Reducer::setTrustCameraTime(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setForcedMotionStreamType(nx::vms::api::MotionStreamType value)
+void CameraSettingsDialogStore::setForcedMotionStreamType(nx::vms::api::StreamIndex value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setForcedMotionStreamType(std::move(state), value); });

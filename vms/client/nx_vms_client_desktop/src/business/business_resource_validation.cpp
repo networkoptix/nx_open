@@ -239,9 +239,7 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    nx::analytics::DeviceDescriptorManager deviceDescriptorManager(camera->commonModule());
-    const auto deviceDescriptor = deviceDescriptorManager.descriptor(camera->getId());
-    return deviceDescriptor && !deviceDescriptor->compatibleEngineIds.empty();
+    return !camera->compatibleAnalyticsEngines().isEmpty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)

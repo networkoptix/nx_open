@@ -22,8 +22,8 @@ class NX_VMS_CLIENT_DESKTOP_API AnalyticsObjectsVisualizationManager: public QOb
 
 public:
     using Mode = AnalyticsObjectsVisualizationMode;
-    static constexpr auto kDefaultMode = Mode::always;
-    static constexpr auto kNonDefaultMode = Mode::tabOnly;
+    static constexpr auto kDefaultMode = Mode::tabOnly;
+    static constexpr auto kNonDefaultMode = Mode::always;
     static_assert(kDefaultMode != kNonDefaultMode);
 
     explicit AnalyticsObjectsVisualizationManager(QObject* parent = nullptr);

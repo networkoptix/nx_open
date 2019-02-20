@@ -5,102 +5,137 @@
 #include <QtGui/QPainter>
 
 #include <api/server_rest_connection.h>
-
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
-
 #include <common/common_module.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/avi_resource.h>
-
-#include <nx/fusion/model_functions.h>
-
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
 
 struct ResourceThumbnailProvider::Private
 {
-    bool updateRequest(ResourceThumbnailProvider* q, const nx::api::ResourceImageRequest& value)
+    enum class ProviderType
     {
-        // TODO: #vkutin #gdm Recreate base provider only if its type has changed.
+        none,
+        camera,
+        ffmpeg,
+        image
+    };
 
-        baseProvider.reset();
+    static std::pair<ProviderType, QString> getRequiredProvider(const QnResourcePtr& resource)
+    {
+        if (!NX_ASSERT(resource))
+            return {ProviderType::none, {}};
+
+        const auto flags = resource->flags();
+
+        if (flags.testFlag(Qn::server))
+            return {ProviderType::image, "item_placeholders/videowall_server_placeholder.png"};
+
+        if (flags.testFlag(Qn::web_page))
+            return {ProviderType::image, "item_placeholders/videowall_webpage_placeholder.png"};
+
+        // Some cameras are actually provide only sound stream. So we draw sound icon for this.
+        const auto mediaResource = resource.dynamicCast<QnMediaResource>();
+        if (const bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo())
+            return {ProviderType::image, "item_placeholders/sound.png"};
+
+        if (resource.dynamicCast<QnVirtualCameraResource>())
+            return {ProviderType::camera, {}};
+
+        if (resource.dynamicCast<QnAviResource>())
+            return {ProviderType::ffmpeg, {}};
+
+        NX_ASSERT(false);
+        return {ProviderType::none, {}};
+    }
+
+    void updateRequest(ResourceThumbnailProvider* q, const nx::api::ResourceImageRequest& value)
+    {
+        const auto [providerType, placeholderIconPath] = getRequiredProvider(value.resource);
         request = value;
 
-        if (!NX_ASSERT(value.resource))
-            return false;
+        const auto prevProvider = baseProvider.get();
+        const bool wasValid = q->status() != Qn::ThumbnailStatus::Invalid;
 
-        const auto mediaResource = value.resource.dynamicCast<QnMediaResource>();
-        const bool useCustomSoundIcon = mediaResource && !mediaResource->hasVideo();
+        switch (providerType)
+        {
+            case ProviderType::camera:
+            {
+                const auto camera = value.resource.dynamicCast<QnVirtualCameraResource>();
+                NX_ASSERT(camera);
+                nx::api::CameraImageRequest cameraRequest(camera, request);
+                cameraRequest.streamSelectionMode = streamSelectionMode;
 
-        QString placeholderIconPath;
+                if (auto provider = qobject_cast<CameraThumbnailProvider*>(baseProvider.get()))
+                    provider->setRequestData(cameraRequest);
+                else
+                    baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
 
-        if (value.resource->hasFlags(Qn::server))
-        {
-            placeholderIconPath = lit("item_placeholders/videowall_server_placeholder.png");
-        }
-        else if (value.resource->hasFlags(Qn::web_page))
-        {
-            placeholderIconPath = lit("item_placeholders/videowall_webpage_placeholder.png");
-        }
-        else if (useCustomSoundIcon)
-        {
-            // Some cameras are actually provide only sound stream. So we draw sound icon for this.
-            placeholderIconPath = lit("item_placeholders/sound.png");
-        }
-        else if (const auto camera = value.resource.dynamicCast<QnVirtualCameraResource>())
-        {
-            nx::api::CameraImageRequest cameraRequest(camera, request);
-            cameraRequest.streamSelectionMode = streamSelectionMode;
-            baseProvider.reset(new CameraThumbnailProvider(cameraRequest));
-        }
-        else if (const auto aviResource = value.resource.dynamicCast<QnAviResource>())
-        {
-            baseProvider.reset(new FfmpegImageProvider(value.resource,
-                std::chrono::microseconds(request.usecSinceEpoch), request.size));
-        }
-        else
-        {
-            NX_ASSERT(false);
-            return false;
-        }
+                break;
+            }
 
-        if (!baseProvider && !placeholderIconPath.isEmpty())
-        {
-            QPixmap pixmap = qnSkin->pixmap(placeholderIconPath, true);
-            // TODO: vms 4.0 has a new way to get preset colors
-            const auto& palette = QnNxStyle::instance()->genericPalette();
-            const auto& backgroundColor = palette.color(lit("dark"), 3);
-            const auto& frameColor = palette.color(lit("dark"), 6);
-            QSize size = pixmap.size();
-            QPixmap dst(size);
-            // We fill in the background.
-            dst.fill(backgroundColor);
-            QPainter painter(&dst);
-            painter.setRenderHints(QPainter::SmoothPixmapTransform);
-            painter.setOpacity(0.7);
-            painter.drawPixmap(0, 0, pixmap);
-            painter.setOpacity(1.0);
+            case ProviderType::ffmpeg:
+            {
+                baseProvider.reset(new FfmpegImageProvider(value.resource,
+                    microseconds(request.usecSinceEpoch), request.size));
 
-            baseProvider.reset(new BasicImageProvider(dst.toImage()));
+                break;
+            }
+
+            case ProviderType::image:
+            {
+                const auto pixmap = qnSkin->pixmap(placeholderIconPath, true);
+
+                QPixmap destination(pixmap.size());
+                destination.fill(colorTheme()->color("dark4"));
+
+                QPainter painter(&destination);
+                painter.setRenderHints(QPainter::SmoothPixmapTransform);
+                painter.setOpacity(0.7);
+                painter.drawPixmap(0, 0, pixmap);
+                painter.end();
+
+                baseProvider.reset(new BasicImageProvider(destination.toImage()));
+                break;
+            }
+
+            case ProviderType::none:
+            {
+                baseProvider.reset();
+                break;
+            }
         }
 
-        if (baseProvider)
+        if (prevProvider != baseProvider.get())
         {
-            QObject::connect(baseProvider.data(), &ImageProvider::imageChanged,
-                q, &ImageProvider::imageChanged);
-            QObject::connect(baseProvider.data(), &ImageProvider::statusChanged,
-                q, &ImageProvider::statusChanged);
-            QObject::connect(baseProvider.data(), &ImageProvider::sizeHintChanged,
-                q, &ImageProvider::sizeHintChanged);
-        }
+            if (baseProvider)
+            {
+                QObject::connect(baseProvider.data(), &ImageProvider::imageChanged,
+                    q, &ImageProvider::imageChanged);
+                QObject::connect(baseProvider.data(), &ImageProvider::statusChanged,
+                    q, &ImageProvider::statusChanged);
+                QObject::connect(baseProvider.data(), &ImageProvider::sizeHintChanged,
+                    q, &ImageProvider::sizeHintChanged);
+            }
 
-        return true;
+            if (wasValid)
+            {
+                emit q->imageChanged(q->image());
+                emit q->sizeHintChanged(q->sizeHint());
+                emit q->statusChanged(q->status());
+            }
+        }
     }
 
     QScopedPointer<ImageProvider> baseProvider;
@@ -129,15 +164,7 @@ nx::api::ResourceImageRequest ResourceThumbnailProvider::requestData() const
 
 void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageRequest& request)
 {
-    const bool wasValid = status() != Qn::ThumbnailStatus::Invalid;
     d->updateRequest(this, request);
-
-    if (wasValid)
-    {
-        emit imageChanged(image());
-        emit sizeHintChanged(sizeHint());
-        emit statusChanged(status());
-    }
 }
 
 nx::api::CameraImageRequest::StreamSelectionMode

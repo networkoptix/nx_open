@@ -9,27 +9,181 @@
 #include <ui/style/globals.h>
 
 namespace nx::vms::client::desktop {
+namespace test {
 
 using State = LayoutSettingsDialogState;
 using Reducer = LayoutSettingsDialogStateReducer;
 
-class LayoutSettingsDialogStateReducerTest: public testing::Test
+struct BackgroundSetup
 {
-protected:
-    /**
-     * Sets up the stuff shared by all tests in this test case.
-     * Google Test will call SetUpTestCase() before running the first test in the test case.
-     */
-    static void SetUpTestCase()
+    const qreal imageAspectRatio = 0;
+    const qreal cellAspectRatio = 0;
+    const State::Range width;
+    const State::Range height;
+    const QSize backgroundSize;
+
+    constexpr BackgroundSetup(
+        qreal imageAspectRatio,
+        qreal cellAspectRatio,
+        State::Range width,
+        State::Range height)
+        :
+        imageAspectRatio(imageAspectRatio),
+        cellAspectRatio(cellAspectRatio),
+        width(width),
+        height(height),
+        backgroundSize(width.value, height.value)
     {
-        Reducer::setTracingEnabled(true);
+    }
+};
+
+void PrintTo(BackgroundSetup value, ::std::ostream* os)
+{
+    *os
+        << "( " << value.imageAspectRatio << ", " << value.cellAspectRatio << ", "
+        << "w:{" << value.width.min << "-" << value.width.value << "-" << value.width.max <<"}, "
+        << "h:{" << value.height.min << "-" << value.height.value << "-" << value.height.max <<"})";
+}
+
+namespace {
+
+// Constants are selected manually and depend on the hardcoded limits.
+static constexpr qreal kSquareAspectRatio = 1;
+static constexpr int kSquareSideLength = 40;
+static constexpr State::Range kSquareSide(
+    State::kBackgroundMinSize,
+    kSquareSideLength,
+    State::kBackgroundMaxSize);
+
+static_assert(kSquareSideLength * kSquareSideLength == State::kBackgroundRecommendedArea);
+
+static constexpr qreal kWideAspectRatio = 2;
+static constexpr qreal kUltraWideAspectRatio = 4;
+static constexpr qreal kNarrowAspectRatio = 1.0 / kWideAspectRatio;
+static constexpr qreal kSuperWideAspectRatio = 1000;
+static constexpr qreal kSuperNarrowAspectRatio = 1.0 / kSuperWideAspectRatio;
+
+// Select maximum values which keep the given aspect ratio and fit into recommended area.
+static constexpr int kWideShortSideLength = 28;
+static constexpr State::Range kWideShortSide(
+	State::kBackgroundMinSize,
+	kWideShortSideLength,
+	(int) (State::kBackgroundMaxSize / kWideAspectRatio));
+
+static constexpr int kWideLongSideLength = 56;
+static constexpr State::Range kWideLongSide(
+    (int) (State::kBackgroundMinSize * kWideAspectRatio),
+    kWideLongSideLength,
+    State::kBackgroundMaxSize);
+
+static_assert(kWideLongSideLength / kWideShortSideLength == (int) kWideAspectRatio);
+static_assert(kWideShortSideLength * kWideLongSideLength <= State::kBackgroundRecommendedArea);
+static_assert(
+    (kWideShortSideLength + 1) * (kWideLongSideLength + 2) > State::kBackgroundRecommendedArea);
+
+static constexpr State::Range kUltraWideLongSide(
+    (int) (State::kBackgroundMinSize * kUltraWideAspectRatio),
+    State::kBackgroundMaxSize,
+    State::kBackgroundMaxSize);
+static constexpr State::Range kUltraWideShortSide(
+    State::kBackgroundMinSize,
+    (int) (State::kBackgroundMaxSize / kUltraWideAspectRatio),
+    (int) (State::kBackgroundMaxSize / kUltraWideAspectRatio)
+);
+
+static constexpr State::Range kMaximumRange(
+    State::kBackgroundMaxSize,
+    State::kBackgroundMaxSize,
+    State::kBackgroundMaxSize
+);
+static constexpr State::Range kMinimumRange(
+    State::kBackgroundMinSize,
+    State::kBackgroundMinSize,
+    State::kBackgroundMinSize);
+
+static const std::vector<BackgroundSetup> kBackgroundSamples = {
+    // Square image.
+    /*[0]*/ {kSquareAspectRatio, kWideAspectRatio, kWideShortSide, kWideLongSide},
+    /*[1]*/ {kSquareAspectRatio, kSquareAspectRatio, kSquareSide, kSquareSide},
+    /*[2]*/ {kSquareAspectRatio, kNarrowAspectRatio, kWideLongSide, kWideShortSide},
+
+    // Wide image.
+    /*[3]*/ {kWideAspectRatio, kWideAspectRatio, kSquareSide, kSquareSide},
+    /*[4]*/ {kWideAspectRatio, kSquareAspectRatio, kWideLongSide, kWideShortSide},
+    /*[5]*/ {kWideAspectRatio, kNarrowAspectRatio, kUltraWideLongSide, kUltraWideShortSide},
+
+    // Narrow image.
+    /*[6]*/ {kNarrowAspectRatio, kWideAspectRatio, kUltraWideShortSide, kUltraWideLongSide},
+    /*[7]*/ {kNarrowAspectRatio, kSquareAspectRatio, kWideShortSide, kWideLongSide},
+    /*[8]*/ {kNarrowAspectRatio, kNarrowAspectRatio, kSquareSide, kSquareSide},
+
+    // Super-wide and narrow images.
+    /*[9]*/ {kSuperWideAspectRatio, kSquareAspectRatio, kMaximumRange, kMinimumRange},
+    /*[10]*/ {kSuperNarrowAspectRatio, kSquareAspectRatio, kMinimumRange, kMaximumRange}
+};
+
+QImage makeImage(int width, int height)
+{
+    return QImage(width, height, QImage::Format::Format_Mono);
+}
+
+QImage makeImage(qreal aspectRatio)
+{
+    constexpr int kSampleHeight = 1000;
+    return makeImage((int) (kSampleHeight * aspectRatio), kSampleHeight);
+}
+
+// Emulates loading a new image into a clean layout.
+State makeImageState(qreal imageAspectRatio, qreal cellAspectRatio)
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setCellAspectRatio(cellAspectRatio);
+    layout->setCellSpacing(0);
+
+    State state = Reducer::loadLayout(State(), layout);
+    state = Reducer::clearBackgroundImage(std::move(state));
+    state = Reducer::imageSelected(std::move(state), "/test.jpg");
+    state = Reducer::setPreview(std::move(state), makeImage(imageAspectRatio));
+    return state;
+}
+
+bool rangeLimitsAreValid(const State::Range& range, bool precise = false)
+{
+    if (range.value < range.min || range.value > range.max)
+        return false;
+
+    if (precise)
+    {
+        return range.min == State::kBackgroundMinSize
+            && range.max == State::kBackgroundMaxSize;
     }
 
+    return range.min >= State::kBackgroundMinSize
+        && range.max <= State::kBackgroundMaxSize;
+}
+
+QSize backgroundSize(const State& state)
+{
+    if (!rangeLimitsAreValid(state.background.width)
+        || !rangeLimitsAreValid(state.background.height))
+    {
+        return QSize();
+    }
+
+    return {state.background.width.value, state.background.height.value};
+}
+
+} // namespace
+
+class LayoutSettingsDialogStateReducerTest: public ::testing::Test
+{
+protected:
     /**
      * Setup the test fixture. Will be called before each fixture is run.
      */
     virtual void SetUp() override
     {
+        Reducer::setTracingEnabled(true);
         Reducer::setScreenAspectRatio({16, 9});
         m_globals.reset(new QnGlobals());
     }
@@ -42,102 +196,19 @@ protected:
         m_globals.reset();
     }
 
-    static QImage makeImage(int width, int height)
-    {
-        return QImage(width, height, QImage::Format::Format_Mono);
-    }
-
-    static QImage makeImage(float aspectRatio)
-    {
-        constexpr int kSampleHeight = 1000;
-        return makeImage(kSampleHeight * aspectRatio, kSampleHeight);
-    }
-
-    // Emulates loading a new image into a clean layout.
-    static State makeImageState(float imageAspectRatio, float cellAspectRatio = 1.0)
-    {
-        QnLayoutResourcePtr layout(new QnLayoutResource());
-        layout->setCellAspectRatio(cellAspectRatio);
-        layout->setCellSpacing(0);
-
-        State state = Reducer::loadLayout(State(), layout);
-        state = Reducer::clearBackgroundImage(std::move(state));
-        state = Reducer::imageSelected(std::move(state), "/test.jpg");
-        state = Reducer::setPreview(std::move(state), makeImage(imageAspectRatio));
-        return state;
-    }
-
-    static bool rangeLimitsAreValid(const State::Range& range, bool precise = false)
-    {
-        if (range.value < range.min || range.value > range.max)
-            return false;
-
-        if (precise)
-        {
-            return range.min == State::kBackgroundMinSize
-                && range.max == State::kBackgroundMaxSize;
-
-        }
-
-        return range.min >= State::kBackgroundMinSize
-            && range.max <= State::kBackgroundMaxSize;
-    }
-
-    static bool rangeValueIs(const State::Range& range, int value)
-    {
-        return rangeLimitsAreValid(range) && range.value == value;
-    }
-
-    static QSize backgroundSize(const State& state)
-    {
-        if (!rangeLimitsAreValid(state.background.width)
-            || !rangeLimitsAreValid(state.background.height))
-        {
-            return QSize();
-        }
-
-        return {state.background.width.value, state.background.height.value};
-    }
-
 private:
     QScopedPointer<QnGlobals> m_globals;
 };
 
-namespace {
-
-// Constants are selected manually and depend on the hardcoded limits.
-static constexpr int kSquareAspectRatio = 1;
-static constexpr int kSquareSideLength = 40;
-static_assert(kSquareSideLength * kSquareSideLength == State::kBackgroundRecommendedArea);
-static constexpr QSize kSquareBackgroundSize(kSquareSideLength, kSquareSideLength);
-
-static constexpr int kWideAspectRatio = 2;
-static constexpr int kUltraWideAspectRatio = 4;
-
-// Select maximum values which keep the given aspect ratio and fit into recommended area.
-static constexpr int kWideShortSideLength = 28;
-static constexpr int kWideLongSideLength = 56;
-static_assert(kWideLongSideLength / kWideShortSideLength == kWideAspectRatio);
-static_assert(kWideShortSideLength * kWideLongSideLength <= State::kBackgroundRecommendedArea);
-static_assert(
-    (kWideShortSideLength + 1) * (kWideLongSideLength + 2) > State::kBackgroundRecommendedArea);
-
-static constexpr QSize kWideBackgroundSize(kWideLongSideLength, kWideShortSideLength);
-static constexpr QSize kUltraWideBackgroundSize(
-    State::kBackgroundMaxSize,
-    State::kBackgroundMaxSize / kUltraWideAspectRatio);
-
-static constexpr qreal kNarrowAspectRatio = 1.0 / kWideAspectRatio;
-static constexpr QSize kNarrowBackgroundSize(kWideShortSideLength, kWideLongSideLength);
-static constexpr QSize kUltraNarrowBackgroundSize(
-    State::kBackgroundMaxSize / kUltraWideAspectRatio,
-    State::kBackgroundMaxSize);
-
-} // namespace
+class LayoutSettingsDialogStateReducerBackgroundTest:
+    public LayoutSettingsDialogStateReducerTest,
+    public ::testing::WithParamInterface<BackgroundSetup>
+{
+};
 
 TEST_F(LayoutSettingsDialogStateReducerTest, defaultSize)
 {
-    State state = Reducer::clearBackgroundImage(State());
+    State state = Reducer::clearBackgroundImage({});
     ASSERT_EQ(backgroundSize(state), QSize(State::kBackgroundMinSize, State::kBackgroundMinSize));
 }
 
@@ -146,7 +217,7 @@ TEST_F(LayoutSettingsDialogStateReducerTest, keepAspectRatioOnSizeChange)
 {
     constexpr int kSampleAspectRatio = 4;
 
-    State s = makeImageState(kSampleAspectRatio);
+    State s = makeImageState(kSampleAspectRatio, kSquareAspectRatio);
     s.background.keepImageAspectRatio = true;
     s.background.width.setRange(0, std::numeric_limits<int>::max());
     s.background.height.setRange(0, std::numeric_limits<int>::max());
@@ -164,7 +235,7 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkLimitsOnKeepArChange)
 {
     constexpr int kSampleAspectRatio = 4;
 
-    State s = makeImageState(kSampleAspectRatio);
+    State s = makeImageState(kSampleAspectRatio, kSquareAspectRatio);
     s.background.keepImageAspectRatio = true;
     s.background.cropToMonitorAspectRatio = false;
 
@@ -210,38 +281,39 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkSetFixedSize)
     ASSERT_FALSE(s.fixedSize.isEmpty());
 }
 
-TEST_F(LayoutSettingsDialogStateReducerTest, setRecommendedAreaOnNewImage)
+TEST_P(LayoutSettingsDialogStateReducerBackgroundTest, setRecommendedAreaOnNewImage)
 {
-    // Square image.
-    ASSERT_EQ(backgroundSize(makeImageState(kSquareAspectRatio, kWideAspectRatio)),
-        kNarrowBackgroundSize);
-
-    ASSERT_EQ(backgroundSize(makeImageState(kSquareAspectRatio, kSquareAspectRatio)),
-        kSquareBackgroundSize);
-
-    ASSERT_EQ(backgroundSize(makeImageState(kSquareAspectRatio, kNarrowAspectRatio)),
-        kWideBackgroundSize);
-
-    // Wide image.
-    ASSERT_EQ(backgroundSize(makeImageState(kWideAspectRatio, kWideAspectRatio)),
-        kSquareBackgroundSize);
-
-    ASSERT_EQ(backgroundSize(makeImageState(kWideAspectRatio, kSquareAspectRatio)),
-        kWideBackgroundSize);
-
-    ASSERT_EQ(backgroundSize(makeImageState(kWideAspectRatio, kNarrowAspectRatio)),
-        kUltraWideBackgroundSize);
-
-    // Narrow image.
-    ASSERT_EQ(backgroundSize(makeImageState(kNarrowAspectRatio, kWideAspectRatio)),
-        kUltraNarrowBackgroundSize);
-
-    ASSERT_EQ(backgroundSize(makeImageState(kNarrowAspectRatio, kSquareAspectRatio)),
-        kNarrowBackgroundSize);
-
-    ASSERT_EQ(backgroundSize(makeImageState(kNarrowAspectRatio, kNarrowAspectRatio)),
-        kSquareBackgroundSize);
+    BackgroundSetup setup = GetParam();
+    ASSERT_EQ(backgroundSize(makeImageState(setup.imageAspectRatio, setup.cellAspectRatio)),
+        setup.backgroundSize);
 }
+
+TEST_P(LayoutSettingsDialogStateReducerBackgroundTest, checkInitialLimits)
+{
+    const BackgroundSetup setup = GetParam();
+    const auto state = makeImageState(setup.imageAspectRatio, setup.cellAspectRatio);
+    ASSERT_TRUE(state.background.keepImageAspectRatio);
+    ASSERT_EQ(state.background.width, setup.width);
+    ASSERT_EQ(state.background.height, setup.height);
+}
+
+TEST_P(LayoutSettingsDialogStateReducerBackgroundTest, checkLimitsOnKeepArChange)
+{
+    const BackgroundSetup setup = GetParam();
+    State initial = makeImageState(setup.imageAspectRatio, setup.cellAspectRatio);
+
+    State ignoreAspectRatio = Reducer::setKeepImageAspectRatio(std::move(initial), false);
+    ASSERT_EQ(ignoreAspectRatio.background.width, State::Range(setup.width.value));
+    ASSERT_EQ(ignoreAspectRatio.background.height, State::Range(setup.height.value));
+
+    State keepAspectRatio = Reducer::setKeepImageAspectRatio(std::move(ignoreAspectRatio), true);
+    ASSERT_EQ(keepAspectRatio.background.width, setup.width);
+    ASSERT_EQ(keepAspectRatio.background.height, setup.height);
+}
+
+INSTANTIATE_TEST_CASE_P(validateBackgroundSetup,
+	LayoutSettingsDialogStateReducerBackgroundTest,
+	::testing::ValuesIn(kBackgroundSamples));
 
 TEST_F(LayoutSettingsDialogStateReducerTest, keepAreaOnImageChange)
 {
@@ -260,4 +332,5 @@ TEST_F(LayoutSettingsDialogStateReducerTest, keepAreaOnImageChange)
     ASSERT_EQ(backgroundSize(state), kExampleBackgroundSize);
 }
 
+} // namespace test
 } // namespace nx::vms::client::desktop

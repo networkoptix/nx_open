@@ -150,7 +150,10 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
 
             it->second.deviceData = device;
             if (it->second.camera)
-                it->second.camera->setUrl(it->second.deviceData.device.path);
+            {
+                it->second.camera->videoStream().updateUrl(it->second.deviceData.device.path);
+                //TODO it->second.camera->audioStream().updateUrl();
+            }
         }
         else
         {

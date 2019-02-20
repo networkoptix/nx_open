@@ -219,7 +219,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     params.addQueryItem(kBox, runtimeData.box);
     params.addQueryItem(kBrand, runtimeData.brand);
     // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
-    params.addQueryItem(kVersion, QnAppInfo::engineVersion());
+    params.addQueryItem(kVersion, QnAppInfo::applicationVersion());
 
 #ifdef Q_OS_LINUX
     if(QnAppInfo::isBpi() || QnAppInfo::isNx1())

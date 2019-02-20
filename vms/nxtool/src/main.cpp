@@ -1,8 +1,8 @@
+#include <QtGui/QIcon>
+#include <QtGui/QGuiApplication>
 
 #include <QtQml>
-#include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
 
 #include <models/buttons.h>
 #include <base/constants.h>
@@ -35,6 +35,7 @@ void registerTypes()
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/nxtool.ico"));
 
     rtu::RtuContext rtuContext(&app);
 

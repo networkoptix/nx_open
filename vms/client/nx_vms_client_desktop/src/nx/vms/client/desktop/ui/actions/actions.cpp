@@ -1013,7 +1013,7 @@ void initialize(Manager* manager, Action* root)
     factory(MakeLayoutTourAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
+        .condition(condition::canMakeShowreel()
             && !condition::isSafeMode());
 
     factory()
@@ -1162,7 +1162,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
-        .requiredTargetPermissions(Qn::WritePermission)
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Rotate to..."));
 
     factory.beginSubMenu();
