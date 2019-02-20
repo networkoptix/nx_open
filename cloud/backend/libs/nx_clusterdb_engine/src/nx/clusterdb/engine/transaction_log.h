@@ -111,7 +111,7 @@ public:
                 transaction.get(),
                 transactionHash))
         {
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            NX_DEBUG(this,
                 lm("systemId %1. Command (%2, hash %3) is skipped")
                     .args(systemId, engine::toString(transaction.header()),
                         CommandDescriptor::hash(transaction.get().params)));

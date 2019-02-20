@@ -284,7 +284,7 @@ void CommonHttpConnection::forwardStateChangedEvent(
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+        NX_VERBOSE(this,
             lm("systemId %1, connection %2. Reporting connection closure")
                 .args(m_systemId, m_connectionId));
 
@@ -308,7 +308,7 @@ void CommonHttpConnection::restartInactivityTimer()
 
 void CommonHttpConnection::onInactivityTimeout()
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Inactivity timeout triggered")
+    NX_VERBOSE(this, lm("systemId %1, connection %2. Inactivity timeout triggered")
         .args(m_systemId, m_connectionId));
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Error);
 }

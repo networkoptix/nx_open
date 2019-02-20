@@ -69,7 +69,7 @@ void WebSocketTransportAcceptor::createConnection(
 
     if (systemId.empty())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Ignoring createWebsocketTransactionConnection request without systemId from peer %1")
             .arg(connection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
@@ -77,7 +77,7 @@ void WebSocketTransportAcceptor::createConnection(
 
     if (!m_protocolVersionRange.isCompatible(remotePeerInfo.protoVersion))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
             .args(remotePeerInfo.id, systemId, connection->socket()->getForeignAddress(),
                 remotePeerInfo.protoVersion));
@@ -93,7 +93,7 @@ void WebSocketTransportAcceptor::createConnection(
     auto error = nx::network::websocket::validateRequest(request, response);
     if (error != nx::network::websocket::Error::noError)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Can't upgrade request from peer %1 to webSocket. Error: %2")
             .args(connection->socket()->getForeignAddress(), (int) error));
         return completionHandler(nx::network::http::StatusCode::badRequest);
@@ -147,7 +147,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")
             .args(remotePeerInfo.id, systemId, remoteAddress, connectionId));
     }
