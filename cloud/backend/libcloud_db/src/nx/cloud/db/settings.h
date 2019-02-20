@@ -141,7 +141,6 @@ public:
     /** List of local endpoints to bind to. By default, 0.0.0.0:3346. */
     std::list<network::SocketAddress> endpointsToListen() const;
 
-    const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     const Notification& notification() const;
@@ -159,7 +158,6 @@ public:
 
 private:
     nx::utils::log::Settings m_logging;
-    nx::utils::log::Settings m_vmsSynchronizationLogging;
     nx::sql::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     Notification m_notification;
