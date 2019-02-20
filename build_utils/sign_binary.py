@@ -7,6 +7,9 @@ from requests.packages.urllib3.util.retry import Retry
 
 chunk_size = 1024 * 1024
 
+DEFAULT_TIMEOUT = 30
+DEFAULT_RETRIES = 10
+
 
 def bool_to_str(value):
     return 'true' if value else 'false'
@@ -18,8 +21,8 @@ def sign_binary(
     output,
     customization,
     trusted_timestamping,
-    timeout,
-    max_retries
+    timeout=DEFAULT_TIMEOUT,
+    max_retries=DEFAULT_RETRIES
 ):
 
     params = {
@@ -66,8 +69,8 @@ def main():
         '-t', '--trusted-timestamping',
         action='store_true',
         help='Trusted timestamping')
-    parser.add_argument('--retries', help='Max retries count (10)', type=int, default=10)
-    parser.add_argument('--timeout', help='Request timeout in seconds (30)', type=int, default=30)
+    parser.add_argument('--retries', help='Max retries count (10)', type=int, default=DEFAULT_RETRIES)
+    parser.add_argument('--timeout', help='Request timeout in seconds (30)', type=int, default=DEFAULT_TIMEOUT)
     args = parser.parse_args()
 
     return sign_binary(
