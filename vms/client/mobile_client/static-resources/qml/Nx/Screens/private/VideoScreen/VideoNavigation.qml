@@ -761,7 +761,10 @@ Item
 
                 onClicked:
                 {
-                    videoScreenController.setPosition(chunkPositionWatcher.nextChunkStartTimeMs())
+                    var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
+                    videoScreenController.setPosition(nextChunkStartTime)
+                    if (nextChunkStartTime == -1)
+                        videoScreenController.play()
                 }
             }
 
