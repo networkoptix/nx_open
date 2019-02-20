@@ -11,6 +11,7 @@ enum class RtpTransportType
     automatic,
     tcp,
     udp,
+    udpMulticast,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RtpTransportType)
 
