@@ -6,7 +6,7 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/url/url_builder.h>
 
-#include "detail/relay_tunnel_validator.h"
+#include "relay_tunnel_validator.h"
 #include "../relay_api_http_paths.h"
 
 namespace nx::cloud::relay::api::detail {
