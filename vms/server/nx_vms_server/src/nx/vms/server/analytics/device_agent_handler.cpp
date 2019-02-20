@@ -2,7 +2,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
-#include <nx/vms/server/resource/analytics_engine_resource.h>
 
 #include <nx/vms/event/events/plugin_event.h>
 
@@ -18,11 +17,11 @@ namespace nx::vms::server::analytics {
 
 DeviceAgentHandler::DeviceAgentHandler(
     QnMediaServerModule* serverModule,
-    resource::AnalyticsEngineResourcePtr engineResource,
+    QnUuid engineResourceId,
     QnVirtualCameraResourcePtr device)
     :
     ServerModuleAware(serverModule),
-    m_engineResource(std::move(engineResource)),
+    m_engineResourceId(std::move(engineResourceId)),
     m_device(std::move(device)),
     m_metadataHandler(serverModule)
 {
@@ -31,7 +30,7 @@ DeviceAgentHandler::DeviceAgentHandler(
         Qt::QueuedConnection);
 
     m_metadataHandler.setResource(m_device);
-    m_metadataHandler.setEngineId(m_engineResource->getId());
+    m_metadataHandler.setEngineId(m_engineResourceId);
 
     nx::analytics::EventTypeDescriptorManager descriptorManager(serverModule->commonModule());
     m_metadataHandler.setEventTypeDescriptors(
@@ -48,7 +47,7 @@ void DeviceAgentHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent
     nx::vms::event::PluginEventPtr pluginEvent(
         new nx::vms::event::PluginEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
-            m_engineResource,
+            m_engineResourceId,
             sdkPluginEvent->caption(),
             sdkPluginEvent->description(),
             nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),

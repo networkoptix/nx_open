@@ -96,7 +96,7 @@ void ManifestLogger::log(
             m_logTag,
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),
-            analytics::debug_helpers::filename(
+            analytics::debug_helpers::nameOfFileToDumpDataTo(
                 m_device,
                 m_engineResource,
                 m_pluginResource,
@@ -146,7 +146,7 @@ void StartupPluginManifestLogger::log(
             m_logTag,
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),
-            analytics::debug_helpers::filename(
+            analytics::debug_helpers::nameOfFileToDumpDataTo(
                 m_plugin,
                 kManifestFilenamePostfix));
     }

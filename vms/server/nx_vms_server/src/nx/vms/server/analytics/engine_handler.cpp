@@ -16,10 +16,10 @@ using namespace nx::vms::event;
 
 EngineHandler::EngineHandler(
     QnMediaServerModule* serverModule,
-    nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource)
+    QnUuid engineResourceId)
     :
     ServerModuleAware(serverModule),
-    m_engineResource(std::move(engineResource))
+    m_engineResourceId(std::move(engineResourceId))
 {
     connect(this, &EngineHandler::pluginEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_pluginEvent,
@@ -31,7 +31,7 @@ void EngineHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent)
     nx::vms::event::PluginEventPtr pluginEvent(
         new PluginEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
-            m_engineResource,
+            m_engineResourceId,
             sdkPluginEvent->caption(),
             sdkPluginEvent->description(),
             nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),

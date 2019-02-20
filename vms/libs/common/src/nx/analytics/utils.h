@@ -83,10 +83,4 @@ std::set<EventTypeId> supportedEventTypeIdsFromManifest(
 std::set<EventTypeId> supportedObjectTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-std::map<EngineId, std::set<EventTypeId>> eventTypeIdsSupportedByDevice(
-    const DeviceDescriptorContainer& container, const DeviceId& deviceId);
-
-std::map<EngineId, std::set<ObjectTypeId>> objectTypeIdsSupportedByDevice(
-    const DeviceDescriptorContainer& container, const DeviceId& deviceId);
-
 } // namespace nx::analytics

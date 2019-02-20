@@ -11,13 +11,12 @@
 #include <licensing/remote_licenses.h>
 #include <network/system_helpers.h>
 #include <ui/dialogs/merge_systems_dialog.h>
-#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <update/connect_to_current_system_tool.h>
+#include <utils/common/app_info.h>
 #include <utils/merge_systems_tool.h>
 #include <utils/merge_systems_common.h>
 
@@ -154,21 +153,38 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindowWidget(),
-                tr("Server will be connected to System shortly"),
-                tr("It will appear in the resource tree when the database synchronization is finished."));
+            if (m_connectTool->wasServerIncompatible())
+            {
+                auto currentVersion = QnAppInfo::applicationVersion();
+                auto serverName = m_connectTool->getServerName();
+                QnMessageBox::information(mainWindowWidget(),
+                    tr("%1 has been successfully configured.").arg(serverName),
+                    tr("To complete the process, please connect to it with Client and update to version %1.").arg(
+                        currentVersion));
+            }
+            else
+            {
+                QnMessageBox::success(mainWindowWidget(),
+                    tr("Server will be connected to System shortly"),
+                    tr("It will appear in the resource tree when the database synchronization is finished."));
+            }
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
+            // Update on merge is disabled right now. We should not land here.
+            NX_ASSERT(false);
             QnMessageBox::critical(mainWindowWidget(),
                 tr("Failed to update Server"),
                 m_connectTool->updateResult().errorMessage());
             break;
 
         case QnConnectToCurrentSystemTool::MergeFailed:
-            QnMessageBox::critical(mainWindowWidget(),
-                tr("Failed to merge Systems"),
-                m_connectTool->mergeErrorMessage());
+            {
+                auto serverName = m_connectTool->getServerName();
+                QnMessageBox::critical(mainWindowWidget(),
+                    tr("Failed to merge %1 to our system.").arg(serverName),
+                    m_connectTool->mergeErrorMessage());
+            }
             break;
 
         case QnConnectToCurrentSystemTool::Canceled:

@@ -1268,21 +1268,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
 CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
 {
-    CameraExtraStatus result;
-    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return result;
-
-    if (camera->getStatus() == Qn::Recording)
-        result |= CameraExtraStatusFlag::recording;
-
-    if (camera->isLicenseUsed())
-        result |= CameraExtraStatusFlag::scheduled;
-
-    if (camera->statusFlags().testFlag(Qn::CameraStatusFlag::CSF_HasIssuesFlag))
-        result |= CameraExtraStatusFlag::buggy;
-
-    return result;
+    return getCameraExtraStatus(m_resource);
 }
 
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)

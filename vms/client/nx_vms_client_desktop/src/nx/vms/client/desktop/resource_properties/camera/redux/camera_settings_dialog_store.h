@@ -48,8 +48,8 @@ public:
     void setRecordingShowFps(bool value);
     void setRecordingShowQuality(bool value);
     void toggleCustomBitrateVisible();
-    void setCustomRecordingBitrateMbps(float mbps);
-    void setCustomRecordingBitrateNormalized(float value);
+    void setRecordingBitrateMbps(float mbps);
+    void setRecordingBitrateNormalized(float value);
     void setMinRecordingDaysAutomatic(bool value);
     void setMinRecordingDaysValue(int value);
     void setMaxRecordingDaysAutomatic(bool value);

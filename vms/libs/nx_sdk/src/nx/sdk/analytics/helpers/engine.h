@@ -109,6 +109,7 @@ public:
 // Not intended to be used by a descendant.
 
 public:
+    virtual void setEngineInfo(const IEngineInfo* engineInfo) override;
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
     virtual const IString* manifest(Error* error) const override;
@@ -123,6 +124,7 @@ private:
 private:
     mutable std::mutex m_mutex;
     IPlugin* const m_plugin;
+    const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
     IEngine::IHandler* m_handler = nullptr;
 };

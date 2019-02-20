@@ -26,7 +26,7 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(kDefaultAssertCrash, assertCrash,
         "Crash application on assertion failure.");
 
-    NX_INI_FLAG(kDefaultAssertCrash, assertHeavyCondition,
+    NX_INI_FLAG(kDefaultAssertHeavyCondition, assertHeavyCondition,
         "Enable assertions for heavy conditions.");
 
     NX_INI_FLAG(kShowPasswordsInLogs, showPasswordsInLogs,

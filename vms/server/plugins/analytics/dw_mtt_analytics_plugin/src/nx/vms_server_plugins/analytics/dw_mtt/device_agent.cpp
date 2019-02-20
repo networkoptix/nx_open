@@ -63,9 +63,9 @@ EventMetadataPacket* createCommonEventMetadataPacket(const EventType& event, boo
 {
     using namespace std::chrono;
 
+    const auto commonEvent = toPtr(createCommonEvent(event, active));
     auto packet = new EventMetadataPacket();
-    auto commonEvent = createCommonEvent(event, active);
-    packet->addItem(commonEvent);
+    packet->addItem(commonEvent.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUs(-1);
@@ -297,7 +297,7 @@ void DeviceAgent::treatAlarmPairs(const QList<AlarmPair>& alarmPairs)
 void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 {
     ++m_packetId;
-    auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
+    const auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
     m_handler->handleMetadata(packet);
     NX_URL_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
@@ -310,7 +310,7 @@ void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 void DeviceAgent::sendEventStoppedPacket(const EventType& event) const
 {
     ++m_packetId;
-    auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
+    const auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
     m_handler->handleMetadata(packet);
     NX_URL_PRINT
         << "Event [stop]  "

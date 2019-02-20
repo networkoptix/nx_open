@@ -184,7 +184,7 @@ void setForcedPtzCapabilities(std::optional<bool> panTilt, std::optional<bool> z
 
     for (const auto& camera: cameras)
     {
-        if (!camera->isUserAllowedToModifyPtzCapabilities())
+        if (camera->ptzCapabilitiesUserIsAllowedToModify() == Ptz::Capability::NoPtzCapabilities)
             continue;
 
         auto capabilities = camera->ptzCapabilitiesAddedByUser();
@@ -443,7 +443,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.canSwitchPtzPresetTypes() && state.expert.preferredPtzPresetType.hasValue())
         setPreferredPtzPresetType(state.expert.preferredPtzPresetType(), cameras);
 
-    if (state.canForcePtzCapabilities())
+    if (state.canForcePanTiltCapabilities() || state.canForceZoomCapability())
     {
         setForcedPtzCapabilities(
             state.expert.forcedPtzPanTiltCapability, state.expert.forcedPtzZoomCapability, cameras);

@@ -1,5 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
-
 #if defined(_WIN32)
     #include <stdio.h>
     #include <io.h>

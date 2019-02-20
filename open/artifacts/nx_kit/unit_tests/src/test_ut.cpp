@@ -1,5 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
-
 /**@file
  * Testing features of test.h.
  */

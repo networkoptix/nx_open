@@ -553,8 +553,12 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
 }
 
 void QnCommonMessageProcessor::on_resourceParamChanged(
-    const ResourceParamWithRefData& param)
+    const nx::vms::api::ResourceParamWithRefData& param,
+    ec2::NotificationSource source)
 {
+    if (handleRemoteAnalyticsNotification(param, source))
+        return;
+
     QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
         resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
@@ -567,6 +571,39 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
             || commonModule()->resourceDataPool()->loadData(param.value.toUtf8());
         NX_ASSERT(loaded, "Invalid json received");
     }
+}
+
+bool QnCommonMessageProcessor::handleRemoteAnalyticsNotification(
+    const nx::vms::api::ResourceParamWithRefData& param,
+    ec2::NotificationSource source)
+{
+    if (param.name != QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty
+        || source != ec2::NotificationSource::Remote)
+    {
+        return false;
+    }
+
+    const auto resource = resourcePool()->getResourceById(param.resourceId);
+    if (!resource)
+        return false;
+
+    const auto parentServer = resource->getParentResource();
+    if (!parentServer || parentServer->getId() != commonModule()->moduleGUID())
+        return false;
+
+    nx::vms::api::ResourceParamWithRefDataList kvPairs;
+    const auto ownData = resourcePropertyDictionary()->value(param.resourceId, param.name);
+    if (ownData != param.value)
+    {
+        kvPairs.push_back(nx::vms::api::ResourceParamWithRefData(
+            param.resourceId, param.name, ownData));
+
+        commonModule()->ec2Connection()->getResourceManager(Qn::kSystemAccess)->save(
+            kvPairs,
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone);
+    }
+    return true;
 }
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(
@@ -890,7 +927,7 @@ void QnCommonMessageProcessor::resetPropertyList(
     // Update changed values.
     for (const auto& param: params)
     {
-        on_resourceParamChanged(param);
+        on_resourceParamChanged(param, ec2::NotificationSource::Remote);
         if (existingProperties.contains(param.resourceId))
             existingProperties[param.resourceId].remove(param.name);
     }
@@ -902,7 +939,8 @@ void QnCommonMessageProcessor::resetPropertyList(
         for (auto paramName: iter.value())
         {
             on_resourceParamChanged(
-                ResourceParamWithRefData(resourceId, paramName, QString()));
+                ResourceParamWithRefData(resourceId, paramName, QString()),
+                ec2::NotificationSource::Remote);
         }
     }
 }

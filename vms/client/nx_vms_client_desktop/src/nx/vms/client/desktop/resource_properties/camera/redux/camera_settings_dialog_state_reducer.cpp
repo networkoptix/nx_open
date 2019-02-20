@@ -13,9 +13,10 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/same.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
-#include <nx/utils/algorithm/same.h>
 
 namespace nx::vms::client::desktop {
 
@@ -159,6 +160,23 @@ State loadMinMaxCustomBitrate(State state)
         Qn::StreamQuality::lowest);
     state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
         Qn::StreamQuality::highest);
+
+    static const std::array<Qn::StreamQuality, 4> kUserVisibleQualities{{
+        Qn::StreamQuality::low,
+        Qn::StreamQuality::normal,
+        Qn::StreamQuality::high,
+        Qn::StreamQuality::highest}};
+
+    state.recording.minRelevantQuality = Qn::StreamQuality::lowest;
+    for (const auto quality: kUserVisibleQualities)
+    {
+        const auto bitrate = calculateBitrateForQualityMbps(state, quality);
+        if (bitrate <= state.recording.minBitrateMbps)
+            state.recording.minRelevantQuality = quality;
+        else
+            break;
+    }
+
     return state;
 }
 
@@ -373,11 +391,13 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (state.canForcePtzCapabilities() && (state.expert.forcedPtzPanTiltCapability.valueOr(true)
-        || state.expert.forcedPtzZoomCapability.valueOr(true)))
-    {
+    const bool ptzCapabilitiesChanged = (state.canForcePanTiltCapabilities()
+        && state.expert.forcedPtzPanTiltCapability.valueOr(true))
+        || (state.canForcePanTiltCapabilities()
+        && state.expert.forcedPtzZoomCapability.valueOr(true));
+
+    if (ptzCapabilitiesChanged)
         return false;
-    }
 
     if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
         && state.expert.forcedMotionStreamType() != vms::api::StreamIndex::undefined)
@@ -522,8 +542,21 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription.canSwitchPtzPresetTypes = combinedValue(cameras,
         [](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); });
 
-    state.devicesDescription.canForcePtzCapabilities = combinedValue(cameras,
-        [](const Camera& camera) { return camera->isUserAllowedToModifyPtzCapabilities(); });
+    state.devicesDescription.canForcePanTiltCapabilities = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            const Ptz::Capabilities ptzCapabilities =
+                camera->ptzCapabilitiesUserIsAllowedToModify();
+            return ptzCapabilities & Ptz::Capability::ContinuousPanTiltCapabilities;
+        });
+
+    state.devicesDescription.canForceZoomCapability = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            const Ptz::Capabilities ptzCapabilities =
+                camera->ptzCapabilitiesUserIsAllowedToModify();
+            return ptzCapabilities & Ptz::Capability::ContinuousZoomCapability;
+        });
 
     state.devicesDescription.supportsMotionStreamOverride = combinedValue(cameras,
         [](const Camera& camera)
@@ -716,16 +749,30 @@ State CameraSettingsDialogStateReducer::loadCameras(
             [](const Camera& camera) { return camera->userPreferredPtzPresetType(); });
     }
 
-    if (state.canForcePtzCapabilities())
+    if (state.canForcePanTiltCapabilities())
     {
         const auto editableCameras = cameras.filtered(
-            [](const Camera& camera) { return camera->isUserAllowedToModifyPtzCapabilities(); });
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesUserIsAllowedToModify()
+                    != Ptz::Capability::NoPtzCapabilities;
+            });
 
         fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, editableCameras,
             [](const Camera& camera)
             {
                 return camera->ptzCapabilitiesAddedByUser().testFlag(
                     Ptz::ContinuousPanTiltCapabilities);
+            });
+    }
+
+    if (state.canForceZoomCapability())
+    {
+        const auto editableCameras = cameras.filtered(
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesUserIsAllowedToModify()
+                    != Ptz::Capability::NoPtzCapabilities;
             });
 
         fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, editableCameras,
@@ -779,7 +826,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     if (state.recording.isCustomBitrate())
-        state = setCustomRecordingBitrateMbps(std::move(state), brush.bitrateMbps);
+        state = setRecordingBitrateMbps(std::move(state), brush.bitrateMbps);
     else
         state = fillBitrateFromFixedQuality(std::move(state));
 
@@ -826,7 +873,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         // Lock normalized bitrate.
         const auto normalizedBitrate = state.recording.normalizedCustomBitrateMbps();
         state = loadMinMaxCustomBitrate(std::move(state));
-        state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
+        state = setRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
     state.recordingHint = State::RecordingHint::brushChanged;
 
@@ -882,23 +929,24 @@ State CameraSettingsDialogStateReducer::toggleCustomBitrateVisible(State state)
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setCustomRecordingBitrateMbps(State state, float mbps)
+State CameraSettingsDialogStateReducer::setRecordingBitrateMbps(State state, float mbps)
 {
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     state.recording.brush.bitrateMbps = mbps;
     state.recording.brush.quality = calculateQualityForBitrateMbps(state, mbps);
+    if (qFuzzyEquals(calculateBitrateForQualityMbps(state, state.recording.brush.quality), mbps))
+        state.recording.brush.bitrateMbps = 0; //< Standard quality detected.
     state.recording.bitrateMbps = mbps;
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
-    State state,
-    float value)
+State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
+    State state, float value)
 {
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
     const auto mbps = state.recording.minBitrateMbps + value * spread;
-    return setCustomRecordingBitrateMbps(std::move(state), mbps);
+    return setRecordingBitrateMbps(std::move(state), mbps);
 }
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
@@ -1202,7 +1250,7 @@ State CameraSettingsDialogStateReducer::setPreferredPtzPresetType(
 
 State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State state, bool value)
 {
-    if (!state.canForcePtzCapabilities())
+    if (state.devicesDescription.canForcePanTiltCapabilities != CombinedValue::All)
         return state;
 
     state.expert.forcedPtzPanTiltCapability.setUser(value);
@@ -1213,7 +1261,7 @@ State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State stat
 
 State CameraSettingsDialogStateReducer::setForcedPtzZoomCapability(State state, bool value)
 {
-    if (state.devicesDescription.canForcePtzCapabilities != CombinedValue::All)
+    if (state.devicesDescription.canForceZoomCapability != CombinedValue::All)
         return state;
 
     state.expert.forcedPtzZoomCapability.setUser(value);
