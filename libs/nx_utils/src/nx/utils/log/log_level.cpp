@@ -132,12 +132,16 @@ bool Tag::operator!=(const Tag& rhs) const
 // Filter
 
 Filter::Filter(const QRegularExpression& source):
-    m_filter(source)
+    m_filter(source),
+    m_valid(m_filter.isValid())
 {
+    if (m_valid)
+        m_filter.optimize();
 }
 
 Filter::Filter(const QString& source):
-    Filter(QRegularExpression(source, QRegularExpression::CaseInsensitiveOption))
+    Filter(QRegularExpression(source,
+		QRegularExpression::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption))
 {
 }
 
@@ -155,10 +159,8 @@ bool Filter::accepts(const Tag& tag) const
 {
     if (!isValid())
         return false;
-    // Workaround for accessing QRegularExpression from multiple threads. It fixes some crashes
-    // when several threads simultaneously write to logs. It happened on both client and server.
-    auto filter = m_filter;
-    return filter.match(tag.toString()).hasMatch();
+
+    return m_filter.match(tag.toString()).hasMatch();
 }
 
 QString Filter::toString() const
