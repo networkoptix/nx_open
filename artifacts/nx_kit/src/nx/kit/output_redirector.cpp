@@ -99,7 +99,7 @@ OutputRedirector::OutputRedirector()
 
 #if !defined(NX_OUTPUT_REDIRECTOR_DISABLED)
     /** The redirection is performed by this static initialization. */
-    static const OutputRedirector& redirect = OutputRedirector::getInstance();
+    const OutputRedirector& unused_OutputRedirector = OutputRedirector::getInstance();
 #endif
 
 static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
