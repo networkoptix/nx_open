@@ -85,17 +85,14 @@ nx::sql::DBResult CommandLog::saveLocalTransaction(
     NX_DEBUG(
         QnLog::EC2_TRAN_LOG.join(this),
         lm("systemId %1. Generated new command %2 (hash %3)")
-            .args(systemId, toString(transactionSerializer->header()), transactionHash));
+        .args(systemId, toString(transactionSerializer->header()), transactionHash));
 
     // Saving transaction to the log.
     const auto result = saveToDb(
         queryContext,
         systemId,
-        transactionSerializer->header(),
         transactionHash,
-        transactionSerializer->serialize(
-            Qn::SerializationFormat::UbjsonFormat,
-            m_supportedProtocolRange.currentVersion()));
+        *transactionSerializer);
     if (result != nx::sql::DBResult::ok)
         return result;
 
@@ -378,10 +375,14 @@ bool CommandLog::isShouldBeIgnored(
 nx::sql::DBResult CommandLog::saveToDb(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const CommandHeader& commandHeader,
     const QByteArray& commandHash,
-    const QByteArray& ubjsonData)
+    const SerializableAbstractCommand& transactionSerializer)
 {
+    const auto& commandHeader = transactionSerializer.header();
+    const auto ubjsonData = transactionSerializer.serialize(
+        Qn::SerializationFormat::UbjsonFormat,
+        m_supportedProtocolRange.currentVersion());
+
     NX_DEBUG(QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Saving command %2 (hash %3) to log")
             .args(systemId, toString(commandHeader), commandHash));
@@ -396,7 +397,9 @@ nx::sql::DBResult CommandLog::saveToDb(
     QnMutexLocker lock(&m_mutex);
     DbTransactionContext& dbTranContext = getDbTransactionContext(lock, queryContext, systemId);
 
-    getTransactionLogContext(lock, systemId)->cache.insertOrReplaceTransaction(
+    TransactionLogContext* vmsTransactionLogData = getTransactionLogContext(lock, systemId);
+
+    vmsTransactionLogData->cache.insertOrReplaceTransaction(
         dbTranContext.cacheTranId, commandHeader, commandHash);
 
     return nx::sql::DBResult::ok;

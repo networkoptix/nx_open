@@ -166,13 +166,13 @@ public:
             std::make_unique<StreamServerSocketToAcceptorWrapper>(
                 std::move(serverSocket)))
     {
-        bindToAioThread(getAioThread());
+        bindToAioThread(m_acceptor->getAioThread());
     }
 
     StreamSocketServer(std::unique_ptr<AbstractStreamSocketAcceptor> acceptor):
         m_acceptor(std::move(acceptor))
     {
-        bindToAioThread(getAioThread());
+        bindToAioThread(m_acceptor->getAioThread());
     }
 
     StreamSocketServer(

@@ -1,0 +1,10 @@
+Existe uma nova revisão para {{ message.product }}
+
+Clique no link para revisar o rascunho {{ message.id }} para {{ message.product }}
+
+Link para revisão: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+
+Nesta página pode
+1) Criar uma pré-visualização para ver as alterações mais recentes.
+2) Publicar esta versão que irá atualizar todo o conteúdo.
+3) Editar os contextos clicando no botão de edição de gravação. Para ver estar alterações, precisará criar uma nova versão.

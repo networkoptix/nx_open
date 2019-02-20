@@ -11,7 +11,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include "transaction_processor.h"
-#include "transaction_transport_header.h"
+#include "transport/transaction_transport_header.h"
 
 namespace nx::clusterdb::engine {
 

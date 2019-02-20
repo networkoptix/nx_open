@@ -22,8 +22,8 @@
 #include "compatible_ec2_protocol_version.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
-#include "transaction_transport_header.h"
-#include "transaction_transport.h"
+#include "transport/transaction_transport_header.h"
+#include "transport/abstract_transaction_transport.h"
 
 namespace nx {
 namespace network {
@@ -43,7 +43,6 @@ class SynchronizationSettings;
 class IncomingCommandDispatcher;
 class OutgoingCommandDispatcher;
 class CommandLog;
-class CommonHttpConnection;
 class CommandTransportHeader;
 
 struct SystemStatusDescriptor

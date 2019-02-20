@@ -1,6 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Test Teardown     Close Browser
+Force Tags        Threaded
 
 *** Variables ***
 ${url}    ${ENV}

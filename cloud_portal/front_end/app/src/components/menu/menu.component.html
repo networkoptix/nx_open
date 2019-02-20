@@ -1,0 +1,36 @@
+<h1>Dynamic</h1>
+<div>
+    <div *ngFor="let item of content.level1">
+        <nx-level-1-item [item]="item"></nx-level-1-item>
+
+        <div *ngFor="let subitem of item.level2">
+            <nx-level-2-item [item]="subitem"></nx-level-2-item>
+
+            <div *ngFor="let details of subitem.level3">
+                <nx-level-3-item [item]="details"></nx-level-3-item>
+            </div>
+        </div>
+
+        <div *ngFor="let details of item.level3">
+            <nx-level-3-item [item]="details"></nx-level-3-item>
+        </div>
+    </div>
+</div>
+
+<br />
+<br />
+<br />
+
+<h1>Static</h1>
+<div>
+    <div id="servers-static" *ngIf="getAvailability('servers-static')">
+        <a [routerLink]="['/main', 'servers']">Servers</a>
+    </div>
+    <div id="users-static" *ngIf="getAvailability('users-static')">
+        <a [routerLink]="['/main', 'users']">Users</a>
+    </div>
+    <div id="other-static" *ngIf="getAvailability('other-static')">
+        <a [routerLink]="['/main', '/other']">Other</a>
+    </div>
+</div>
+

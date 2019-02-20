@@ -148,7 +148,7 @@ class NoptixLibrary(object):
                 return
             elif re.search(url, found):
                 return
-        raise Exception(url + " was not in the email.")
+        raise Exception(found + " was not in the email.")
 
     def get_os(self):
         plat = system()
@@ -168,7 +168,7 @@ class NoptixLibrary(object):
             raise Exception("Button background-color was not found.")
 
     def check_email_user_names(self, body, fName, lName):
-        pat = '(<h1.*>).*({} {}</h1>)'.format(fName, lName)
+        pat = '(<h1.*>).*({} {}.*</h1>)'.format(fName, lName)
         if re.search(pat, body) == None:
             raise Exception("User name was not in the email.")
 

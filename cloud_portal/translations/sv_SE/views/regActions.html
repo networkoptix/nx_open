@@ -2,18 +2,18 @@
 <div class="container auth-hidden">
     <h1 class="process-success d-flex align-items-center flex-column mt-5"
         ng-if="(register.success || registerSuccess) && !activated">
-        <span>Account is created.</span>
-        <span>Confirmation message is sent to</span>
+        <span> Konto är skapat.</span>
+        <span> Bekräftelsemail skickas till </span>
         <span><strong>{{account.email}}</strong></span>
     </h1>
 
     <h1 class="process-success d-flex align-items-center flex-column mt-5"
         ng-if="(register.success || registerSuccess) && activated">
-        <span>Account is successfully created.</span>
+        <span>Konto har skapats.</span>
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">Create account</h1>
+        <h1 ng-if="!session.fromClient">Skapa konto</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -22,7 +22,7 @@
 
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
-                <label for="firstName" class="text-left text-md-right control-label">First name</label>
+                <label for="firstName" class="text-left text-md-right control-label">Förnamn</label>
             </div>
             <div class="col-md-4">
                 <input type="text" class="form-control"
@@ -30,12 +30,12 @@
                        required name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required</span>
+                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Förnamn krävs</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
-                <label for="lastName"  class="text-left text-md-right control-label">Last name</label>
+                <label for="lastName"  class="text-left text-md-right control-label">Efternamn</label>
             </div>
             <div class="col-md-4">
                 <input type="text" class="form-control"
@@ -43,12 +43,12 @@
                        required name="lastName" autocomplete="off">
             </div>
             <div class="col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required</span>
+                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Efternamn krävs</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
             <div class="col-md-4 justify-content-start justify-content-md-end">
-                <label for="registerEmail" class="text-left text-md-right control-label">Email</label>
+                <label for="registerEmail" class="text-left text-md-right control-label">E-post</label>
             </div>
             <div class="col-md-4">
                 <input ng-hide="lockEmail" type="email" class="form-control"
@@ -60,9 +60,9 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-md-4">
-                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span></div>
-                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please enter a valid Email</span></div>
-                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %PRODUCT_NAME%</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-postadress måste anges</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Ange en giltig e-postadress</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">Denna e-post har redan registrerats i %PRODUCT_NAME%</span></div>
             </div>
         </div>
 
@@ -87,13 +87,13 @@
                             <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
                         </svg>
                     </span>
-                    <span class="text">I agree to the <a href="/content/eula" target="_blank">Terms & Conditions</a> and <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a></span>
+                    <span class="text"> Jag godkänner <a href="/content/eula" target="_blank"> Villkoren </a> och <a href="%PRIVACY_LINK%" target="_blank"> sekretesspolicy </a></span>
                 </label>
             </div>
             <div class="col-md-4">
                 <div>
                     <span class="help-block input-error" ng-if="registerForm.accept.$dirty && registerForm.accept.$error.required">
-                    Please review and agree to the Terms and Conditions and Privacy policy in order to proceed</span>
+                    Läs och godkänn användarvillkoren och sekretesspolicy för att fortsätta</span>
                 </div>
             </div>
         </div>

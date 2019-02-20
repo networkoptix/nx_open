@@ -172,7 +172,7 @@
 }
 
 .camera-preview-failed{
-  background-position: -48px -191px; 
+  background-position: -48px -191px;
 }
 
 .camera-preview-offline{
@@ -186,12 +186,13 @@
   @include kill-glyphicon;
   width: 10px !important;
   height: 10px !important;
+  z-index: 9;
   &.offline-recording{
     background-position: -97px -49px;
   }
 
   &.online-recording{
-    background-position: -85px -49px; 
+    background-position: -85px -49px;
   }
 
   &.not-recording{
@@ -199,7 +200,11 @@
   }
 
   &.offline{
-    background-position: -121px -49px; 
+    background-position: -121px -49px;
+  }
+  
+  &.no-indicator {
+    display : none;
   }
 }
 

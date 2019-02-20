@@ -1,14 +1,12 @@
-import { Inject, Injectable } from '@angular/core';
-
-import './../dialogs/dialogs.scss';
-
-import { NxModalLoginComponent }      from './../dialogs/login/login.component';
-import { NxModalGenericComponent }    from './../dialogs/generic/generic.component';
-import { NxModalShareComponent }      from './../dialogs/share/share.component';
-import { NxModalDisconnectComponent } from './../dialogs/disconnect/disconnect.component';
-import { NxModalRenameComponent }     from './../dialogs/rename/rename.component';
-import { NxModalMergeComponent }      from './../dialogs/merge/merge.component';
-import { NxModalEmbedComponent }      from './../dialogs/embed/embed.component';
+import { Inject, Injectable }         from '@angular/core';
+import { NxModalLoginComponent }      from './login/login.component';
+import { NxModalGenericComponent }    from './generic/generic.component';
+import { NxModalShareComponent }      from './share/share.component';
+import { NxModalDisconnectComponent } from './disconnect/disconnect.component';
+import { NxModalRenameComponent }     from './rename/rename.component';
+import { NxModalMergeComponent }      from './merge/merge.component';
+import { NxModalEmbedComponent }      from './embed/embed.component';
+import { NxModalMessageComponent }    from './message/message.component';
 
 @Injectable()
 export class NxDialogsService {
@@ -19,6 +17,7 @@ export class NxDialogsService {
                 private disconnectModal: NxModalDisconnectComponent,
                 private renameModal: NxModalRenameComponent,
                 private mergeModal: NxModalMergeComponent,
+                private messageModel: NxModalMessageComponent,
                 private embedModal: NxModalEmbedComponent,
                 private shareModal: NxModalShareComponent) {
 
@@ -33,11 +32,11 @@ export class NxDialogsService {
         hold = hold || false;
 
         return this.toast.create({
-            className: type,
-            content: message,
+            className       : type,
+            content         : message,
             dismissOnTimeout: !hold,
-            dismissOnClick: !hold,
-            dismissButton: hold
+            dismissOnClick  : !hold,
+            dismissButton   : hold
         });
     }
 
@@ -65,6 +64,10 @@ export class NxDialogsService {
 
     merge(system) {
         return this.mergeModal.open(system);
+    }
+
+    message(type, product, productId) {
+        return this.messageModel.open(type, product, productId);
     }
 
     embed(system) {

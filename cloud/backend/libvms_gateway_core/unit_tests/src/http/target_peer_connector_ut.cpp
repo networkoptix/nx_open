@@ -55,6 +55,7 @@ class ListeningPeerPoolStub:
 public:
     virtual void addConnection(
         const std::string& /*peerName*/,
+        const std::string& /*peerProtoVersion*/,
         std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/) override
     {
     }
@@ -125,7 +126,7 @@ protected:
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         m_serverConnection = connection.get();
 
-        m_listeningPeerPool->addConnection(m_peerName, std::move(connection));
+        m_listeningPeerPool->addConnection(m_peerName, "", std::move(connection));
 
         m_targetEndpoint = nx::network::SocketAddress(m_peerName.c_str(), 0);
     }

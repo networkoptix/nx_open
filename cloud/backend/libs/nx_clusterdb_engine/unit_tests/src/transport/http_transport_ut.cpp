@@ -1,9 +1,10 @@
 #include <nx/clusterdb/engine/transport/connector_factory.h>
-#include <nx/clusterdb/engine/transport/http_transport_acceptor.h>
-#include <nx/clusterdb/engine/transport/http_transport_connector.h>
+#include <nx/clusterdb/engine/transport/common_http/acceptor.h>
+#include <nx/clusterdb/engine/transport/common_http/connector.h>
 
 #include "connection_acceptance_tests.h"
 #include "transport_acceptance_tests.h"
+#include "../node_synchronization_tests.h"
 
 namespace nx::clusterdb::engine::transport::test {
 
@@ -48,6 +49,15 @@ public:
 INSTANTIATE_TYPED_TEST_CASE_P(
     Http,
     ConnectionAcceptance,
+    HttpTransportInstaller);
+
+//-------------------------------------------------------------------------------------------------
+
+using namespace engine::test;
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    Http,
+    Synchronization,
     HttpTransportInstaller);
 
 } // namespace nx::clusterdb::engine::transport::test

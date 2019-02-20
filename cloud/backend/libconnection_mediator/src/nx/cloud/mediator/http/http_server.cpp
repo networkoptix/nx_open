@@ -24,7 +24,7 @@ Server::Server(
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
-    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher),
+    m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
     m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
@@ -141,6 +141,21 @@ bool Server::launchHttpServerIfNeeded(
     m_maintenanceServer.registerRequestHandlers(
         api::kMediatorApiPrefix,
         &m_httpMessageDispatcher);
+
+    if (!m_settings.http().maintenanceHtdigestPath.empty())
+    {
+        NX_INFO(
+            this,
+            lm("htdigest authentication for connection mediator maintenance server enabled. File path: %1")
+                .arg(m_settings.http().maintenanceHtdigestPath));
+
+        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
+            m_settings.http().maintenanceHtdigestPath);
+
+        m_authenticationDispatcher.add(
+            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
+            &m_maintenanceAuthenticator->manager);
+    }
 
     return true;
 }

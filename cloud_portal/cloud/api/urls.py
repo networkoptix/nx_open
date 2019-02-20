@@ -2,6 +2,7 @@ __author__ = 'noptix'
 
 from django.conf.urls import url
 from api.views import account, systems, common, utils
+from notifications.views import send
 
 urlpatterns = [
     url(r'^account-autocomplete/$', account.AccountAutocomplete.as_view(), name='account-autocomplete',),
@@ -35,6 +36,7 @@ urlpatterns = [
     url(r'^systems/(?P<system_id>.+?)/?$',           systems.system),
     url(r'^systems/?$',                              systems.list_systems),
 
-
     url(r'^ping$',                                   common.ping),
+
+    url(r'feedback/?$',                              send.send_event),
 ]

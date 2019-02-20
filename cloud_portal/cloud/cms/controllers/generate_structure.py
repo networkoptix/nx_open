@@ -5,7 +5,7 @@ import io
 from collections import OrderedDict
 from PIL import Image  # get Pillow
 from zipfile import ZipFile
-from ..models import DataStructure, Context
+from ..models import Context, DataStructure, ProductType
 
 IGNORE_DIRECTORIES = ('help',)
 IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns', 'jpg', 'jpeg')
@@ -169,7 +169,10 @@ def iterate_contexts(file_iterator):
 
 def process_files(file_iterator, product):
     log_errors = []
-    structure = OrderedDict([('product', product.name), ('canPreview', product.can_preview), ('contexts', [])])
+    structure = OrderedDict([('product', product.name),
+                             ('type', ProductType.PRODUCT_TYPES[product.product_type.type]),
+                             ('can_preview', product.can_preview),
+                             ('contexts', [])])
     find_context('root', '.', structure, product.name)
     for short_name, context_name, data in iterate_contexts(file_iterator):
         context = find_context(context_name, context_name, structure, product.name)
@@ -179,9 +182,9 @@ def process_files(file_iterator, product):
     return [structure], log_errors
 
 
-def from_zip(file_descriptor, product_name):
-    return process_files(iterate_zip(file_descriptor), product_name)
+def from_zip(file_descriptor, product):
+    return process_files(iterate_zip(file_descriptor), product)
 
 
-def from_directory(directory, product_name):
-    return process_files(iterate_directory(directory), product_name)
+def from_directory(directory, product):
+    return process_files(iterate_directory(directory), product)

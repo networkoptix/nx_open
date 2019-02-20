@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "vi_VN",
   "language_name": "Tiếng Việt",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Trình xem nâng cao",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Có thể xem video trực tiếp, duyệt kho lưu trữ, kiểm soát PTZ"
     },
     "Administrator": {
       "label": "Giám sát viên",
@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "forbidden": "Bạn không có quyền thực hiện công việc này",
     "accountNotActivated": "Tài khoản này chưa được kích hoạt. <a href=\"/activate\">Gửi liên kết kích hoạt lại</a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "Tài khoản này tạm thời bị chặn, xin vui lòng thử lại sau vài phút.",
     "notFound": "Không tìm thấy",
     "alreadyExists": "Tài khoản này đã tồn tại",
     "unknownError": "Đã xảy ra lỗi không mong muốn",
@@ -137,13 +137,21 @@
     "cantOpenClient": "Ứng dụng %VMS_NAME% ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
     "lostConnection": "Kết nối với {{systemName}} bị mất",
     "thisSystem": "hệ thống",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "tốt",
+    "fair": "công bằng",
+    "minLength": "quá ngắn",
     "minLengthMessage": "Mật khẩu phải chứa ít nhất 8 ký tự",
+    "required": "không chính xác",
     "requiredMessage": "Chỉ sử dụng chữ cái Latin, số và ký hiệu bàn phím, tránh các khoảng trống đầu và cuối",
+    "weak": "yếu",
     "weakMessage": "Sử dụng số, chữ hoa và chữ thường và ký tự đặc biệt để làm cho mật khẩu của bạn mạnh mẽ hơn",
     "strongMessage": "Mật khẩu mạnh!",
+    "common": "quá phổ biến",
     "commonMessage": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới",
     "missingMessage": "Mật khẩu là bắt buộc"
   },
@@ -174,10 +182,10 @@
     "confirmUnshareFromMeAction": "Ngắt kết nối",
     "confirmUnshare": "Người dùng này sẽ không thể truy cập vào Hệ thống. Bạn có chắc không?",
     "confirmUnshareTitle": "Xóa người dùng?",
-    "confirmUnshareAction": "Xóa bỏ",
+    "confirmUnshareAction": "Xoá",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
   },
   "account": {
@@ -279,7 +287,7 @@
       "copyActiveText": "sao chép vào clipboard"
     },
     "systemOffline": "Hệ thống offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "KHÔNG CÓ MÁY ẢNH",
     "cameraStates": {
       "offline": "Ẩn",
       "error": "Lỗi",
@@ -296,9 +304,9 @@
     },
     "searchCamPlaceholder": "Tìm kiếm",
     "resolution": {
-      "auto": "tự động",
-      "high": "cao (H)",
-      "low": "thấp (L)"
+      "auto": "Tự động",
+      "high": "Cao (H)",
+      "low": "Thấp (L)"
     },
     "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
     "voiceCommands": {

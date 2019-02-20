@@ -1,0 +1,121 @@
+<nx-pre-loader type="page" *ngIf="plugin == undefined"></nx-pre-loader>
+
+<div *ngIf="plugin">
+
+    <div class="row m-0 pt-3 pl-4">
+        <button class="btn btn-default btn-back" routerLink="/integrations">
+            <span class="back-arrow"></span>
+            <span translate>All integrations</span>
+        </button>
+    </div>
+
+    <nx-layout-right [loading]="!plugin">
+        <nx-block first-element *ngIf="plugin && (plugin.information || plugin.overview)">
+            <header>
+                {{plugin.information.name}}
+            </header>
+
+            <nx-section *ngIf="plugin.information.logo">
+                <div class="card--body-logo"
+                     [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
+                </div>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.overview && plugin.overview.description">
+                <div [innerHtml]="plugin.overview.description"></div>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.overview && plugin.overview.overviewVideo">
+                <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
+            </nx-section>
+            <nx-section *ngIf="plugin.overview && plugin.overview.screenshots">
+                <nx-carousel [screenshots]="plugin.overview.screenshots"></nx-carousel>
+            </nx-section>
+        </nx-block>
+
+        <nx-block side-element type="gray">
+            <header translate>
+                Contact
+            </header>
+            <nx-section>
+                <div class="d-inline-flex flex-wrap align-center justify-content-center w-100">
+                    <button class="btn btn-primary m-1" (click)="sendInquiry()">Business Inquiry</button>
+                    <button class="btn btn-primary m-1" (click)="requestSupport()">Request Support</button>
+                </div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.support">
+            <header translate>
+                Support
+            </header>
+
+            <nx-section *ngIf="plugin.support.supportInformation">
+                <div [innerHtml]="plugin.support.supportInformation"></div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.information.companyName">
+            <header>
+                {{plugin.information.companyName}}
+            </header>
+
+            <nx-section *ngIf="plugin.information.companyInfo">
+                <div [innerHtml]="plugin.information.companyInfo"></div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.downloadFiles && plugin.downloadFiles.length > 0">
+            <header translate>
+                Downloads
+            </header>
+
+            <nx-section>
+                <div *ngFor="let platform of plugin.downloadFiles" class="mt-3">
+                    <div *ngIf="platform.name">{{ platform.name}}</div>
+                    <div>
+                        <a href="{{ platform.url }}">{{ platform.file }}</a>
+                    </div>
+                </div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block *ngIf="plugin && plugin.instructions">
+            <header translate>
+                Instructions
+            </header>
+
+            <nx-section *ngIf="plugin.instructions.instructionVideo">
+                <nx-external-video [src]="plugin.instructions.instructionVideo"></nx-external-video>
+            </nx-section>
+            <nx-section *ngIf="plugin.instructions.screenshots">
+                <nx-carousel [screenshots]="plugin.instructions.screenshots"></nx-carousel>
+            </nx-section>
+
+            <nx-section>
+                <div [innerHtml]="plugin.instructions.downloadLinks"></div>
+            </nx-section>
+            <nx-section>
+                <div [innerHtml]="plugin.instructions.installationInstructions"></div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block *ngIf="plugin && plugin.additionalInformation">
+            <header translate>
+                Additional information
+            </header>
+            <nx-section *ngIf="plugin.additionalInformation.additionalVideo">
+                <nx-external-video [src]="plugin.additionalInformation.additionalVideo"></nx-external-video>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.additionalInformation.additionalInformation">
+                <div [innerHtml]="plugin.additionalInformation.additionalInformation"></div>
+            </nx-section>
+            <nx-section *ngIf="plugin.additionalInformation.usefulLinks">
+                <div class="mt-3"
+                     [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
+            </nx-section>
+        </nx-block>
+    </nx-layout-right>
+</div>
+

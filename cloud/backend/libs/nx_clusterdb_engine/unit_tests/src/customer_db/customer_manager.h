@@ -16,6 +16,8 @@ enum class ResultCode
     error,
 };
 
+std::string toString(ResultCode);
+
 class CustomerManager
 {
 public:

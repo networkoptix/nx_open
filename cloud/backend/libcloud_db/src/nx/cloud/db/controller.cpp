@@ -212,6 +212,11 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
 
+    // Temporary fix allowing maintenance/log/* and maintenance/malloc_info to
+    // be authenticated by htdigest authenticator.
+    m_authRestrictionList->allow({std::nullopt, std::nullopt, "/cdb/maintenance/log/.*"}, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow({std::nullopt, std::nullopt, "/cdb/maintenance/malloc_info"}, nx::network::http::AuthMethod::noAuth);
+
     m_transportSecurityManager =
         std::make_unique<AccessBlocker>(m_settings);
 

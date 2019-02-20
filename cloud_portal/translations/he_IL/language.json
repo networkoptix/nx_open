@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "he_IL",
   "language_name": "עברית",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "צופה מתקדם",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
     },
     "Administrator": {
       "label": "מנהל",
@@ -123,7 +123,7 @@
     "wrongCodeRestore": "קוד האישור כבר בשימוש או שגוי",
     "forbidden": "אין לך הרשאות לביצוע פעולה זו",
     "accountNotActivated": "חשבון זה אינו פעיל עדיין. <a href=\"/activate\"> שלח שוב קישור להפעלה </a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "חשבון זה נחסם באופן זמני. נסה שוב בעוד מספר דקות.",
     "notFound": "לא נמצא",
     "alreadyExists": "חשבון זה כבר קיים",
     "unknownError": "אירעה שגיאה בלתי צפויה",
@@ -137,13 +137,21 @@
     "cantOpenClient": "%VMS_NAME% יישום לא אותר. <a href=\"/download\"> הורדה</a>",
     "lostConnection": "החיבור ל- {{systemName}} אבד",
     "thisSystem": "המערכת",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות",
+    "DUPLICATE_MEDIASERVER_FOUND": "שרתים כפולים נמצאו באחת המערכות.<br>הסר שרתים ישנים מכל מערכת שאתה מנסה למזג ונסה שוב.",
+    "mergedSystemIsOffline": "אחת המערכות הממוזגות אינה מקוונת. ודא שהן מקוונות ונסה שוב."
   },
   "passwordRequirements": {
+    "good": "טוב",
+    "fair": "הוגן",
+    "minLength": "קצר מדי",
     "minLengthMessage": "הסיסמה חייבת להכיל 8 תווים לפחות",
+    "required": "שגוי",
     "requiredMessage": "השתמש רק באותיות לטיניות, מספרים וסמלים במקלדת, הימנע מרווחים בהתחלה ובסוף",
+    "weak": "חלש",
     "weakMessage": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
     "strongMessage": "סיסמא חזקה!",
+    "common": "נפוץ מדי",
     "commonMessage": "סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם",
     "missingMessage": "נדרשת סיסמא"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "מחיקה",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "מיזוג המערכת הושלם",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
   },
   "account": {
@@ -279,7 +287,7 @@
       "copyActiveText": "הועתק ללוח"
     },
     "systemOffline": "השרת אינו זמין",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": ". אין מצלמות",
     "cameraStates": {
       "offline": "לא מקוון",
       "error": "שגיאה",

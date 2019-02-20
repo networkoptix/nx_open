@@ -1,0 +1,43 @@
+
+<nx-pre-loader type="page" *ngIf="!list.length"></nx-pre-loader>
+
+<div class="row p-0 m-0" *ngIf="list.length">
+    <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xl-3 p-2">
+
+        <a class="plugin m-0"
+           [routerLink]="['/integrations', plugin.id]">
+
+            <nx-block fixed-height hoverable>
+                <header>
+                    <div class="card--header-logo"
+                         [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
+                    </div>
+                    <div class="card--header-info">
+                        <div class="version">v. {{ plugin.information.version }}</div>
+                        <div class="platforms">
+                            <div *ngFor="let icon of plugin.information.platforms.icons">
+                                <img [src]="icon.src">
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <nx-section>
+                    <div class="card--body-name"><h3 [innerHtml]="plugin.information.name"></h3></div>
+                    <div class="card--body-descr">{{plugin.information.shortDescription}}</div>
+                </nx-section>
+
+                <footer>
+                    <h3 class="float-left m-0 mt-1 mr-1" *ngIf="plugin.pending">
+                        <span class="badge badge-danger">In Review</span>
+                    </h3>
+                    <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
+                        <span class="badge">{{type}}</span>
+                    </h3>
+                </footer>
+            </nx-block>
+        </a>
+
+    </div>
+</div>
+

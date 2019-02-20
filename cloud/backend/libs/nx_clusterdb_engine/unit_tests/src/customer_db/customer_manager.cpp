@@ -4,6 +4,21 @@
 
 namespace nx::clusterdb::engine::test {
 
+std::string toString(ResultCode result)
+{
+    switch (result)
+    {
+        case ResultCode::ok:
+            return "ok";
+        case ResultCode::error:
+            return "error";
+    }
+
+    return "unknown";
+}
+
+//-------------------------------------------------------------------------------------------------
+
 CustomerManager::CustomerManager(
     SyncronizationEngine* syncronizationEngine,
     dao::CustomerDao* customerDao,

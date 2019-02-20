@@ -6,11 +6,11 @@
 
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
-#include "../abstract_transaction_transport.h"
+#include "abstract_transaction_transport.h"
+#include "transaction_transport_header.h"
 #include "../compatible_ec2_protocol_version.h"
 #include "../transaction_processor.h"
 #include "../transaction_log_reader.h"
-#include "../transaction_transport_header.h"
 
 namespace nx::clusterdb::engine { class CommandLog; }
 
@@ -63,9 +63,10 @@ protected:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
+    const OutgoingCommandFilter& m_outgoingCommandFilter;
     const std::string m_systemId;
     const vms::api::PeerData m_localPeer;
-    const vms::api::PeerData m_remotePeer;
+    vms::api::PeerData m_remotePeer;
     std::unique_ptr<AbstractCommandPipeline> m_commandPipeline;
     bool m_canSendCommands = false;
     /**
@@ -90,6 +91,8 @@ private:
         const QByteArray& serializedCommand,
         CommandTransportHeader transportHeader);
 
+    bool peerAlreadyHasCommand(const CommandHeader& header) const;
+
     bool isHandshakeCommand(int commandType) const;
 
     void processHandshakeCommand(
@@ -103,6 +106,8 @@ private:
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
         vms::api::TranState readedUpTo);
+
+    void sendTransactions(std::vector<dao::TransactionLogRecord> serializedTransactions);
 
     void enableOutputChannel();
 };

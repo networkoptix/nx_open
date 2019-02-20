@@ -62,18 +62,18 @@
                             </td>
                             <td class="left-border right-border">
                                 <b>Webová stránka</b> <br>
-                                <a href="%COMPANY_LINK%">%ODKAZ_NA_SPOLEČNOST%</a>
+                                <a href="%COMPANY_LINK%">%COMPANY_LINK%</a>
                             </td>
                         {{/system}}
                         {{^system}}
                             <td class="right-border">
                                 <b>Webová stránka</b> <br>
-                                <a href="%COMPANY_LINK%">%ODKAZ_NA_SPOLEČNOST%</a>
+                                <a href="%COMPANY_LINK%">%COMPANY_LINK%</a>
                             </td>
                         {{/system}}
                         <td class="left-border">
                             <b>Podpora</b> <br>
-                            <a href="%SUPPORT_LINK%">%TEXT_ODKAZU_PODPORY%</a>
+                            <a href="%SUPPORT_LINK%">%SUPPORT_LINK_TEXT%</a>
                         </td>
                     </tr>
                     </tbody>

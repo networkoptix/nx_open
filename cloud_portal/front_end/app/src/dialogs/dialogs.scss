@@ -2,13 +2,28 @@
 @import '../../../app/styles/custom/custom_palette';
 @import '../../../app/styles/theme_variables';
 
-.modal {
-    &-backdrop {
-        background-color : $modal-backdrop-bg;
-        transition       : none;
 
-        &.show {
-            opacity : $modal-backdrop-opacity;
+
+@keyframes slide-up-fade-in {
+    0% {
+        opacity   : 0;
+        transform : translate(0px, -40px);
+    }
+    50% {
+        opacity   : 0.8;
+    }
+    100% {
+        opacity   : 1;
+        transform : translate(0px, 0px);
+    }
+}
+
+.modal {
+    &-holder {
+        animation : slide-up-fade-in ease .3s;
+    
+        .modal-dialog {
+            margin-top : 96px; // double the header height
         }
     }
 
@@ -91,8 +106,6 @@
         background-color : $light1;
 
         label {
-            font-size   : $font-size-base;
-            font-weight : normal;
             margin      : 0 0 .5rem;
             padding     : 0;
         }

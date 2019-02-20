@@ -12,7 +12,7 @@
 #include <nx/vms/api/types/connection_types.h>
 
 #include "request_path.h"
-#include "../p2p_websocket/websocket_transaction_transport.h"
+#include "../p2p_websocket/connection.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
@@ -49,7 +49,7 @@ void Connector::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 void Connector::connect(Handler completionHandler)
 {
     m_connectionId = QnUuid::createUuid().toSimpleString().toStdString();
-    
+
     m_completionHandler = std::move(completionHandler);
 
     auto httpClient = std::make_unique<network::http::AsyncClient>();
@@ -100,7 +100,7 @@ void Connector::handlePipelineStart(SystemError::ErrorCode resultCode)
 
     NX_DEBUG(this, "Established connection to %1", m_remoteNodeUrl);
 
-    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::Connection>(
         m_protocolVersionRange,
         m_commandLog,
         m_systemId,

@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Váš systém</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Přejmenovat systém</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Přejmenovat systém</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sloučit s jiným systémem</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sloučit s jiným systémem</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -51,8 +51,8 @@
         <div class="merge-info-text">
             <p>V závislosti na velikosti databáze může operace trvat až několik hodin.</p>
             <p>Dokud nebude sloučení dokončeno, můžete se k tomuto systému přihlásit a sledovat živé video, ale nemůžete měnit žádné nastavení.</p>
-            <p>Po dokončení sloučení budou všichni uživatelé a kamery z tohoto systému opět k dispozici
-                v <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Systém a tento systém budou smazány.</p>
+            <p>When merge is finished, all users and cameras from this system will become available
+                in System "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", and this system will be deleted.</p>
         </div>
     </div>
 </div>

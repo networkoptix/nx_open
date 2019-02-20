@@ -90,6 +90,7 @@ do
             write_my_cnf
 
             python manage.py filldata
+            python manage.py filldata --preview=True &
 
             find /app/app/static | xargs touch
             exec gunicorn cloud.wsgi --capture-output --workers ${PORTAL_WORKERS} --bind :5000 --log-level=debug --timeout 300
@@ -99,7 +100,7 @@ do
             rm -f /tmp/*.pid
 
             echo $'\n'Notifications started: Version $VERSION$'\n'
-            exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
+            exec celery worker -A notifications -l debug --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         broadcast_notifications)
             write_my_cnf

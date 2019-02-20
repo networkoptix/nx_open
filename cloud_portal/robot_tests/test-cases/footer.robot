@@ -1,7 +1,6 @@
 *** Settings ***
 Resource          ../resource.robot
-Test Setup        Restart
-#Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+Test Teardown     Restart
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 
@@ -12,10 +11,12 @@ ${url}             ${ENV}
 
 *** Keywords ***
 Restart
-    Go To    ${url}
+    Close Browser
+    Open Browser and go to URL    ${url}
+
 *** Test Cases ***
 About page is correctly displayed
-    [tags]    C41541
+    [tags]    C41541    Threaded
     Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
     Click Link    ${FOOTER ABOUT LINK}
@@ -24,13 +25,24 @@ About page is correctly displayed
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
 
 Known limitations". Support link is clickable and lead to the proper site
-    [tags]    C41543
+    [tags]    C41543    Threaded
     Wait Until Element Is Visible    ${FOOTER KNOWN LIMITS LINK}
     Click Link    ${FOOTER KNOWN LIMITS LINK}
     Location Should Be    ${ENV}${KNOWN LIMITATIONS URL}
+    Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
+    Click Link    ${REMOTE CONNECTIVITY TILE LINK}
+   ${tabs}    Get Window Handles
+    Select Window    @{tabs}[1]
+    Location Should Contain    ${SUPPORT URL}
+    Select Window    @{tabs}[0]
+    Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
+    Click Link    ${SUPPORT TILE LINK}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[2]
+    Location Should Contain    ${SUPPORT URL}
 
 Support leads to the proper support site
-    [tags]    C41544
+    [tags]    C41544    Threaded
     Wait Until Element Is Visible    ${FOOTER SUPPORT LINK}
     Click Link    ${FOOTER SUPPORT LINK}
     ${tabs}    Get Window Handles
@@ -38,23 +50,23 @@ Support leads to the proper support site
     Location Should Contain    ${SUPPORT URL}
 
 Terms leads to the proper EULA site
-    [tags]    C41545
+    [tags]    C41545    Threaded
     Wait Until Element Is Visible    ${FOOTER TERMS LINK}
     Click Link    ${FOOTER TERMS LINK}
     Location Should Be    ${ENV}${TERMS URL}
 
 Privacy leads to the proper page
-    [tags]    C41546
+    [tags]    C41546    Threaded
     Wait Until Element Is Visible    ${FOOTER PRIVACY LINK}
     Click Link    ${FOOTER PRIVACY LINK}
     Location Should Be    ${PRIVACY POLICY URL}
 
 Copyright leads to the proper site
-    [tags]    C41547
+    [tags]    C41547    Threaded
     Wait Until Element Is Visible    ${FOOTER COPYRIGHT LINK}
     Click Link    ${FOOTER COPYRIGHT LINK}
     ${tabs}    Get Window Handles
-    Select Window    @{tabs}[2]
+    Select Window    @{tabs}[1]
     Location Should Be    ${COPYRIGHT URL}
 
 Change interface language

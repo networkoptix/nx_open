@@ -11,10 +11,10 @@
 
 #include "request_path.h"
 #include "server_side_command_pipeline.h"
-#include "../p2p_websocket/websocket_transaction_transport.h"
+#include "../p2p_websocket/connection.h"
+#include "../util.h"
 #include "../../compatible_ec2_protocol_version.h"
 #include "../../connection_manager.h"
-#include "../../http/sync_connection_request_handler.h"
 
 namespace nx::clusterdb::engine::transport::p2p::http {
 
@@ -73,7 +73,7 @@ void Acceptor::openServerCommandChannel(
     localPeer.protoVersion = remotePeerData.protoVersion;
     nx::p2p::serializePeerData(*response, localPeer, remotePeerData.dataFormat);
 
-    auto multipartMessageBodySource = 
+    auto multipartMessageBodySource =
         std::make_unique<nx::network::http::MultipartMessageBodySource>(
             "28cc020ef6044ccaa9a524d3303a4cd2");
     auto commandPipeline = std::make_unique<ServerSideCommandPipeline>(
@@ -87,7 +87,7 @@ void Acceptor::openServerCommandChannel(
             connectionId,
             systemId,
             std::exchange(commandPipeline, nullptr),
-            localPeer,  
+            localPeer,
             remotePeerData))
     {
         return completionHandler(nx::network::http::StatusCode::forbidden);
@@ -143,11 +143,11 @@ nx::network::http::StatusCode::Value Acceptor::forwardMessageToConnection(
         [message = std::move(message), &messageProcessed](
             AbstractConnection* connection) mutable
         {
-            auto p2pConnection = dynamic_cast<websocket::WebsocketCommandTransport*>(connection);
+            auto p2pConnection = dynamic_cast<websocket::Connection*>(connection);
             if (!p2pConnection)
                 return;
 
-            auto commandPipeline = 
+            auto commandPipeline =
                 dynamic_cast<ServerSideCommandPipeline*>(&p2pConnection->p2pTransport());
             if (!commandPipeline)
                 return;
@@ -211,7 +211,7 @@ bool Acceptor::registerNewConnection(
     const auto userAgent = nx::network::http::getHeaderValue(
         requestContext.request.headers, "User-Agent").toStdString();
 
-    auto connection = std::make_unique<websocket::WebsocketCommandTransport>(
+    auto connection = std::make_unique<websocket::Connection>(
         m_protocolVersionRange,
         m_commandLog,
         systemId,

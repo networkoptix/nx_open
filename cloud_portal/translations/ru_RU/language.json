@@ -10,7 +10,7 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -137,13 +137,21 @@
     "cantOpenClient": "Приложение %VMS_NAME% не обнаружено. <a href=\"/download\">Скачать</a>",
     "lostConnection": "Подключение к {{systemName}} потеряно",
     "thisSystem": "система",
-    "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются"
+    "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются",
+    "DUPLICATE_MEDIASERVER_FOUND": "В одной из систем были обнаружены дубликаты серверов.<br>Удалите старые серверы из каждой системы, которую вы пытаетесь объединить, и повторите попытку.",
+    "mergedSystemIsOffline": "Одна из объединяемых систем находится в автономном режиме. Убедитесь, что они в сети, и попробуйте еще раз."
   },
   "passwordRequirements": {
+    "good": "хорошее",
+    "fair": "средний",
+    "minLength": "короткий",
     "minLengthMessage": "Пароль должен содержать не менее 8 символов",
+    "required": "некорректный",
     "requiredMessage": "Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
+    "weak": "слабый",
     "weakMessage": "Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
     "strongMessage": "Надежный пароль!",
+    "common": "часто встречающийся",
     "commonMessage": "Этот пароль входит в список самых популярных паролей в мире",
     "missingMessage": "Пароль обязателен для заполнения"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Удалить",
     "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
-    "successMerge": "Система {{systemName}} была объединена с {{systemName}}",
+    "successMerge": "Слияние системы завершено",
     "permissionsRemoved": "{{email}} был лишен полномочий"
   },
   "account": {

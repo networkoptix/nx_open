@@ -6,7 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/aio_service.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -115,7 +115,7 @@ protected:
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
         m_peerConnections.push_back(connection.get());
-        pool().addConnection(peerName, std::move(connection));
+        pool().addConnection(peerName, "", std::move(connection));
         ++m_connectionsEstablishedCount;
     }
 

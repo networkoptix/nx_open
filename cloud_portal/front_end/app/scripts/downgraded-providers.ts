@@ -1,5 +1,5 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 declare var angular: angular.IAngularStatic;
 

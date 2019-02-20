@@ -5,7 +5,7 @@ from django.core.mail.backends.smtp import EmailBackend
 from email.MIMEImage import MIMEImage  # python 2
 import json
 import os
-from cms.models import customization_cache, check_update_cache
+from cms.models import cloud_portal_customization_cache, check_update_cache, get_cloud_portal_product
 from cms.controllers import filldata 
 from django.core.cache import cache
 
@@ -44,7 +44,7 @@ def email_cache(customization_name, cache_type, value=None, force=None):
 def send(email, msg_type, message, language_code, customization_name):
 
     config = {
-        'portal_url': customization_cache(customization_name, "portal_url")
+        'portal_url': cloud_portal_customization_cache(customization_name, "portal_url")
     }
 
     subject = get_email_title(customization_name, language_code, msg_type)
@@ -56,16 +56,16 @@ def send(email, msg_type, message, language_code, customization_name):
     email_html_body = pystache.render(message_html_template, {"message": message, "config": config})
     email_txt_body = pystache.render(message_txt_template, {"message": message, "config": config})
 
-    email_from_name = customization_cache(customization_name, "mail_from_name")
-    email_from_email = customization_cache(customization_name, "mail_from_email")
+    email_from_name = cloud_portal_customization_cache(customization_name, "mail_from_name")
+    email_from_email = cloud_portal_customization_cache(customization_name, "mail_from_email")
     email_from = '%s <%s>' % (email_from_name, email_from_email)
 
     mail_obj = EmailBackend(
-        host=customization_cache(customization_name, "smtp_host"),
-        port=int(customization_cache(customization_name, "smtp_port")),
-        password=str(customization_cache(customization_name, "smtp_password")),
-        username=str(customization_cache(customization_name, "smtp_user")),
-        use_tls=customization_cache(customization_name, "smtp_tls"),
+        host=cloud_portal_customization_cache(customization_name, "smtp_host"),
+        port=int(cloud_portal_customization_cache(customization_name, "smtp_port")),
+        password=str(cloud_portal_customization_cache(customization_name, "smtp_password")),
+        username=str(cloud_portal_customization_cache(customization_name, "smtp_user")),
+        use_tls=cloud_portal_customization_cache(customization_name, "smtp_tls"),
     )
 
     msg = EmailMultiAlternatives(
@@ -109,6 +109,8 @@ def read_file(customization_name, filename, language_code=""):
     files_cache = email_cache(customization_name, 'files')
     translated_name = filename.replace("{{language}}", language_code)
     if translated_name not in files_cache:
-        files_cache[translated_name] = filldata.read_customized_file(filename, customization_name, language_code)
+        files_cache[translated_name] = filldata.read_customized_file(filename,
+                                                                     get_cloud_portal_product(customization_name),
+                                                                     language_code)
         email_cache(customization_name, 'files', files_cache)
     return files_cache[translated_name]

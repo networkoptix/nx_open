@@ -6,17 +6,20 @@
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
-            'configService', 'languageService',
+            'nxConfigService', 'languageService',
 
             function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider,
-                      configService, languageService) {
+                      nxConfigService, languageService) {
     
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
             
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
+    
+                // Check if page is displayed inside an iframe
+                $scope.isInIframe = ($window.location !== $window.parent.location);
     
                 function delayedUpdateSystemInfo() {
                     var pollingSystemUpdate = $poll(function () {
@@ -41,11 +44,21 @@
                         state: true, // hide it
                         loc: 'ViewPageCtrl - inIframe'
                     });
+                    $rootScope.$emit('nx.layout.footer', {
+                        state: true, // hide it
+                        loc: 'ViewPageCtrl - inIframe'
+                    });
                 }
+                
                 function systemError(){
                     dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
                         $scope.currentSystem.name || LANG.errorCodes.thisSystem), 'warning');
-                    $location.path('/systems');
+    
+                    if ($scope.isInIframe) {
+                        $location.path(CONFIG.viewsDir + '404.html');
+                    } else {
+                        $location.path('/systems');
+                    }
                 }
                 authorizationCheckService
                     .requireLogin()
@@ -85,14 +98,21 @@
                 var cancelSubscription = $scope.$on('unauthorized_' + $routeParams.systemId, function () {
                     dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
                         $scope.currentSystem.info.name || LANG.errorCodes.thisSystem), 'warning');
-                    $location.path('/systems');
+    
+                    if ($scope.isInIframe) {
+                        $location.path(CONFIG.viewsDir + '404.html');
+                    } else {
+                        $location.path('/systems');
+                    }
                 });
 
                 $scope.$on('$destroy', function () {
                     cancelSubscription();
                     // Reset visibility state
-                    $rootScope.$emit('nx.layout.header', {state: false});
-                    $rootScope.$emit('nx.layout.footer', {state: false});
+                    if (!$scope.isInIframe) {
+                        $rootScope.$emit('nx.layout.header', {state: false});
+                        $rootScope.$emit('nx.layout.footer', {state: false});
+                    }
                 });
-            } ]);
+            }]);
 })();

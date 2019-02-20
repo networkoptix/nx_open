@@ -100,6 +100,7 @@ public:
      */
     int tcpBacklogSize;
     std::chrono::milliseconds connectionInactivityPeriod;
+    std::string maintenanceHtdigestPath;
 
     Http();
 };

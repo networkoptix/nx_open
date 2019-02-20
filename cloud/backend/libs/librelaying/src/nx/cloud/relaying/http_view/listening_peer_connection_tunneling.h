@@ -8,7 +8,7 @@
 namespace nx::cloud::relaying {
 
 class NX_RELAYING_API ListeningPeerConnectionTunnelingServer:
-    public nx::network::http::tunneling::TunnelAuthorizer<std::string>
+    public nx::network::http::tunneling::TunnelAuthorizer<relay::api::BeginListeningRequest>
 {
 public:
     ListeningPeerConnectionTunnelingServer(
@@ -26,7 +26,7 @@ protected:
 
 private:
     using TunnelingServer =
-        nx::network::http::tunneling::Server<std::string /*listeningPeerName*/>;
+        nx::network::http::tunneling::Server<relay::api::BeginListeningRequest>;
 
     relaying::AbstractListeningPeerManager* m_listeningPeerManager = nullptr;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool = nullptr;
@@ -34,7 +34,7 @@ private:
 
     void onBeginListeningCompletion(
         CompletionHandler completionHandler,
-        const std::string& peerName,
+        relay::api::BeginListeningRequest request,
         network::http::Response* httpResponse,
         relay::api::ResultCode resultCode,
         relay::api::BeginListeningResponse response,
@@ -42,7 +42,7 @@ private:
 
     void saveNewTunnel(
         std::unique_ptr<network::AbstractStreamSocket> connection,
-        const std::string& listeningPeerName);
+        const relay::api::BeginListeningRequest& request);
 };
 
 } // namespace nx::cloud::relaying
