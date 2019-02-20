@@ -38,7 +38,7 @@ getLibraryDependencies()
     local binaryPath=$1
     local libraryDirFilter=$2
 
-    echo "`ldd $binaryPath | ag $libraryDirFilter | cut -d '=' -f 1 | sed 's/[ \t]*//g'`"
+    echo "`ldd $binaryPath | grep $libraryDirFilter | cut -d '=' -f 1 | sed 's/[ \t]*//g'`"
 }
 
 # [in] STAGE_LIB
