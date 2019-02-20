@@ -25,7 +25,7 @@ enum class StreamIndex
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
-StreamIndex oppositeStreamIndex(StreamIndex streamIndex);
+StreamIndex NX_VMS_API oppositeStreamIndex(StreamIndex streamIndex);
 
 } // namespace nx::vms::api
 
