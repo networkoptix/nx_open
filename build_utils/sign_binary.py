@@ -7,7 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 chunk_size = 1024 * 1024
 
-DEFAULT_TIMEOUT = 30
+DEFAULT_TIMEOUT = 120
 DEFAULT_RETRIES = 10
 
 
@@ -76,12 +76,12 @@ def main():
         help='Trusted timestamping')
     parser.add_argument(
         '--retries',
-        help='Max retries count (10)',
+        help='Max retries count ({})'.format(DEFAULT_RETRIES),
         type=int,
         default=DEFAULT_RETRIES)
     parser.add_argument(
         '--timeout',
-        help='Request timeout in seconds (30)',
+        help='Request timeout in seconds ({})'.format(DEFAULT_TIMEOUT),
         type=int,
         default=DEFAULT_TIMEOUT)
     args = parser.parse_args()
