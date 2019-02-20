@@ -19,26 +19,42 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *
  * Usage:
  * ```
- *  const std::string line = switch_(
- *      count,
- *      0, []{ return "none"; },
- *      1, []{ return "single"; },
- *      default_, []{ return "many"; }
+ *  const std::string line = nx::utils::switch_(count,
+ *      0, [](){ return "none"; },
+ *      1, [](){ return "single"; },
+ *      nx::utils::default_, [](){ return "many"; }
  *  );
  * ```
  *
  * Equivalent of:
  * ```
- * std::string line;
- * switch (count)
- * {
- *     case 0: line = "none";
- *     case 1: line = "single";
- *     default: line = "many";
- * }
+ *  std::string line;
+ *  switch (count)
+ *  {
+ *      case 0: line = "none";
+ *      case 1: line = "single";
+ *      default: line = "many";
+ *  }
  * ```
  *
- * But keeps `line` const and supports `count` of any type.
+ * Advantages: keeps `line` const and supports `count` of any type.
+ * ```
+ *  nx::utils::switch_(input.read(),
+ *      "help", [](){ printHelp(); },
+ *      "save", [&](){ save(value.toInt()); },
+ *  );
+ * ```
+ *
+ * Equivalent of:
+ * ```
+ *  const auto inputValue = input.read();
+ *  if (inputValue == "help")
+ *      printHelp();
+ *  else if (inputValue == "save")
+ *      save(value.toInt());
+ *  else
+ *      NX_ASSERT(false, "Unmatched switch value");
+ * ```
  */
 template<typename Value, typename Match, typename Action, typename... Tail>
 auto switch_(const Value& value, const Match& match, const Action& action,
@@ -55,7 +71,7 @@ auto switch_(const Value& value, const Match& match, const Action& action,
 }
 
 /**
- * Enum safe switch, asserts if non of the cases is selected.
+ * Enum-safe switch, raises error if none of the cases was selected.
  *
  * Usage:
  * ```
@@ -67,16 +83,15 @@ auto switch_(const Value& value, const Match& match, const Action& action,
  * });
  * ```
  */
-#define NX_ENUM_SWITCH(VALUE, BODY) ( \
-    [&] { \
-        const auto mux_enum_switch_value_ = (VALUE); \
-        switch(mux_enum_switch_value_) \
+#define NX_ENUM_SWITCH(VALUE, BODY) ([&]() \
+    { \
+        const auto nx_enum_switch_value_ = (VALUE); \
+        switch(nx_enum_switch_value_) \
         BODY \
         NX_CRITICAL(false, lm("Unmatched switch value: %1").arg( \
-            static_cast<int>(mux_enum_switch_value_))); \
-        throw std::exception(); /*< Insted of required return. */ \
-    }() \
-)
+            static_cast<int>(nx_enum_switch_value_))); \
+        throw std::exception(); /*< Instead of the required return. */ \
+    }())
 
 } // namespace utils
 } // namespace nx
