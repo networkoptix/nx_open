@@ -119,6 +119,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         },
         &m_mutex)
 {
+    NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
 
     connect(
