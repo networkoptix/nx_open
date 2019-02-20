@@ -442,7 +442,7 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
             return ResultCode::ioError;
     }
 
-    // #TODO #akulikov Clear non-default downloads directories?
+    // We won't delete custom user directories.
     if (it->absoluteDirectoryPath.contains(m_downloadsDirectory.absolutePath()))
     {
         QDir dir = QFileInfo(it->absoluteDirectoryPath).absoluteDir();
