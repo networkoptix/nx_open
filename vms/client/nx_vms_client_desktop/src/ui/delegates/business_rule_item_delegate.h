@@ -50,6 +50,13 @@ protected:
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
+private:
+    QWidget* createSourceEditor(QWidget* parent, const QModelIndex& index) const;
+    QWidget* createTargetEditor(QWidget* parent, const QModelIndex& index) const;
+    QWidget* createEventEditor(QWidget* parent, const QModelIndex& index) const;
+    QWidget* createActionEditor(QWidget* parent, const QModelIndex& index) const;
+    QWidget* createAggregationEditor(QWidget* parent, const QModelIndex& index) const;
+
 private slots:
     void at_editor_commit();
 
