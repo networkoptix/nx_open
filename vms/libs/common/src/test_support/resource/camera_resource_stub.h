@@ -24,8 +24,18 @@ public:
 
     void setLicenseType(Qn::LicenseType licenseType);
 
+    virtual bool setProperty(
+        const QString& key,
+        const QString& value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
+
+    virtual bool setProperty(
+        const QString& key,
+        const QVariant& value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
+
 protected:
-    virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual Qn::LicenseType calculateLicenseType() const override;
     virtual QnCameraUserAttributePool* userAttributesPool() const override;
 

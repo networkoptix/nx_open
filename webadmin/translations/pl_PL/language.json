@@ -33,7 +33,7 @@
         "error": "Błąd:",
         "restartNeeded": "Zmiany zostały zapisane. Uruchomić ponownie serwer używając nowych ustawień?",
         "settingsSaved": "Ustawienia zostały zapisane",
-        "confirmHardwareRestart": "Uruchomić ponownie system operacyjny serwera?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "Przywrócić wszystkie ustawienia serwera? Archiwum zostanie zachowane, ale ustawienia sieciowe zostaną zresetowane.",
         "confirmRestoreSettingsNotNetwork": "Zresetować konfigurację serwera? Archiwum i ustawienia sieci zostaną zachowane.",
         "unavailable": "Niedostępny",
@@ -42,13 +42,15 @@
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Wszyscy użytkownicy chmury zostaną usunięci.</span><br><br>System będzie dostępny w sieci lokalnej dla lokalnego konta administratora.",
         "confirmDisconnectFromCloudAction": "Rozłącz",
         "disconnectedFromCloudSuccess": "System został odłączony od {{CLOUD_NAME}}",
-        "confirmDisconnectFromSystem": "Odłącz serwer z bieżącego systemu",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "Odłącz",
-        "disconnectedFromSystemSuccess": "Serwer został odłączony od systemu",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "System został podłączony pomyślnie",
         "createLocalOwnerTitle": "Utwórz lokalnego administratora",
         "confirmChangePassword": "Zmień hasło administratora",
-        "confirmChangePasswordTitle": "Zmienić hasło systemu? Wpłynie to na konto 'admin' i na hasło root na niektórych serwerach",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Zapisz nowe hasło",
         "nx1ControlHint": "Aplikacja klienta została uruchomiona. Użyj klawiatury/myszy lub aplikacji mobilnej, aby nią sterować."
     },
@@ -66,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Włącz przekazywanie połączenia do chmury",
         "cloudConnectUdpHolePunchingEnabled": "Włącz UDP hole punching w połączeniach do chmury",
         "cloudHost": "Serwer w chmurze",
-        "cloudSystemID": "ID systemu w chmurze",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Zablokowani producenci",
         "ec2AliveUpdateIntervalSec": "Interwał sprawdzania pracy systemu (sek.)",
         "ec2ConnectionKeepAliveTimeoutSec": "Limit czasu na wznowienie połączenia (sek.)",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "Interwał raportu statystycznego",
         "statisticsReportUpdateDelay": "Raport statystyczny - opóźnienie aktualizacji",
         "synchronizeTimeWithInternet": "Synchronizuj czas z Internetem",
-        "systemName": "Nazwa systemu",
+        "SystemName": "Nazwa systemu",
         "takeCameraOwnershipWithoutLock": "Nie blokuj kamery przy podłączaniu",
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
         "primaryTimeServer": "Podstawowy serwer synchronizacji czasu",
@@ -123,7 +125,8 @@
         "trafficEncryptionForced": "Wymuszaj szyfrowanie transmisji",
         "videoTrafficEncryptionForced": "Wymuszaj szyfrowanie transmisji wideo",
         "updateStatus": "Aktualizacja statusu",
-        "watermarkSettings": "Ustawienia znaku wodnego"
+        "watermarkSettings": "Ustawienia znaku wodnego",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info": {
         "tabs": {
@@ -133,21 +136,22 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "System jest nieosiągalny lub nie istnieje.",
+        "SystemIsUnreacheble": "System jest nieosiągalny lub nie istnieje.",
         "incorrectCurrentPassword": "Nieprawidłowe bieżące hasło",
         "incorrectRemotePassword": "Nieprawidłowy login lub hasło.",
         "incompatibleVersion": "System jest nieosiągalny, nie istnieje lub ma niezgodną wersję.",
         "wrongUrl": "Nie można podłączyć się do serwera.",
-        "newSystemError": "Nie można złączyć systemów. Zdalny system nie jest skonfigurowany.",
-        "safeMode": "Nie można złączyć systemów. Zdalny system pracuje w trybie awaryjnym.",
-        "configError": "Nie można złączyć systemów. Być może jeden z nich pracuje w trybie awaryjnym.",
-        "cloudError": "Nie można złączyć systemów. Jeden z nich jest podłączony do chmury, z której trzeba go najpierw odłączyć.",
-        "cloudBothError": "Nie można złączyć systemów. Oba systemy są podłączone do chmury. Trzeba z niej odłączyć przynajmniej jeden z nich.",
-        "cloudHostConflict": "Nie można złączyć systemów, ponieważ serwery mają różne hosty w chmurze",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "Uwaga! Zamierzasz złączyć systemy na licencjach Starter. Tylko jedna taka licencja może być wykorzystywana w złączonym systemie, więc druga z licencji zostanie dezaktywowana. Złączyć mimo to?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Błąd połączenia: ",
         "unknownError": "Nieznany błąd",
-        "mergeFailed": "Błąd złączania: ",
+        "mergeFailed": "Błąd złączania",
         "mergeSucceed": "Złączono pomyślnie.",
         "newSystemDisplayName": "Nowy system",
         "incompatibleProtocol": "niezgodna wersja",
@@ -173,7 +177,7 @@
         "started": "Aktualizacja została uruchomiona. To zajmie kilka minut",
         "upToDate": "Aktualizacja nie powiodła się. Ta wersja jest już zainstalowana.",
         "invalidFile": "Aktualizacja nie powiodła się. Ten plik nie jest poprawnym pakietem aktualizacyjnym.",
-        "incompatibleSystem": "Aktualizacja nie powiodła się. Ten plik jest przeznaczony dla innego systemu.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "Aktualizacja nie powiodła się. Niewystarczająca przestrzeń do wyodrębnienia archiwum. Proszę sprawdzić dostępną przestrzeń dyskową.",
         "installationError": "Aktualizowanie nie powiodło się. Nie można wykonać skryptu instalacji.",
         "selectFiles": "Wybierz pliki"
@@ -186,5 +190,52 @@
     },
     "pageTitles": {
         "default": "Interfejs WWW {{PRODUCT_NAME}}"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pauza",
+            "help": "help | show commands",
+            "collapse all servers": "zwiń wszystkie serwery",
+            "collapse server": "collapse server + [server name]",
+            "play": "odtwarzaj",
+            "clear search": "wyczyść wyszukiwanie",
+            "live": "go to live | show me live",
+            "expand all servers": "rozwiń wszystkie serwery",
+            "stop listening": "przestań słuchać",
+            "expand server": "expand server + [server name]",
+            "view": "pokaż + [nazwa kamery]"
+        },
+        "systemOffline": "Serwer jest odłączony",
+        "cameraLinks": {
+            "copyToClipboard": "kopiuj do schowka",
+            "highStream": "Wysoki strumień",
+            "copyDefaultText": "kopiuj",
+            "unknown": "Nieznany",
+            "lowStream": "Niski strumień",
+            "transcoding": "Transkodowanie",
+            "copyActiveText": "skopiowano do schowka"
+        },
+        "searchCamPlaceholder": "Szukaj",
+        "cameraStates": {
+            "noFormat": "Ta przeglądarka nie obsługuje odtwarzania wideo z tej kamery.",
+            "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
+            "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
+            "unauthorized": "Wymagane uwierzytelnienie",
+            "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium.",
+            "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
+            "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
+            "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
+            "error": "Błąd",
+            "offline": "Offline",
+            "noData": "Brak danych",
+            "flashRequired": "Aby odtwarzać filmy wideo, proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a>."
+        },
+        "chromeCastWarning": "Chromecast wymaga dużej ilości zasobów i może powodować problemy na serwerze.",
+        "resolution": {
+            "high": "Wysoki",
+            "auto": "Auto",
+            "low": "Niski"
+        }
     }
 }

@@ -33,6 +33,16 @@
         <source>System Servers</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Customer Support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ARM support policy</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AccessibleResourcesWidget</name>
@@ -306,6 +316,11 @@
         <location/>
         <source>Start</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>on the next day</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -687,6 +702,11 @@
         <source>This camera supports zoom</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Detect motion during archive import</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInfoWidget</name>
@@ -754,6 +774,11 @@
         <location/>
         <source>Camera rules</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Logical ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -853,8 +878,8 @@
     </message>
     <message>
         <location/>
-        <source>Select Devices…</source>
-        <translation></translation>
+        <source>Select Cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1015,11 +1040,6 @@
         <location/>
         <source>Address</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>?</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -1506,6 +1526,7 @@
                     &quot;type&quot;: &quot;SpinBox&quot;,
                     &quot;name&quot;: &quot;number&quot;,
                     &quot;caption&quot;: &quot;Spin Box&quot;,
+                    &quot;description&quot;: &quot;A number&quot;,
                     &quot;defaultValue&quot;: 42,
                     &quot;value&quot;: 42,
                     &quot;minValue&quot;: 0,
@@ -1515,6 +1536,7 @@
                     &quot;type&quot;: &quot;DoubleSpinBox&quot;,
                     &quot;name&quot;: &quot;double&quot;,
                     &quot;caption&quot;: &quot;Double Spin Box&quot;,
+                    &quot;description&quot;: &quot;A real number&quot;,
                     &quot;defaultValue&quot;: 3.14,
                     &quot;value&quot;: 3.14,
                     &quot;minValue&quot;: 0.0,
@@ -1524,6 +1546,7 @@
                     &quot;type&quot;: &quot;ComboBox&quot;,
                     &quot;name&quot;: &quot;combobox&quot;,
                     &quot;caption&quot;: &quot;Combo Box&quot;,
+                    &quot;description&quot;: &quot;A choice&quot;,
                     &quot;defaultValue&quot;: &quot;value2&quot;,
                     &quot;value&quot;: &quot;value2&quot;,
                     &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
@@ -1532,6 +1555,7 @@
                     &quot;type&quot;: &quot;CheckBox&quot;,
                     &quot;name&quot;: &quot;checkbox&quot;,
                     &quot;caption&quot;: &quot;Check Box&quot;,
+                    &quot;description&quot;: &quot;True or False&quot;,
                     &quot;defaultValue&quot;: true,
                     &quot;value&quot;: true
                 },
@@ -1547,12 +1571,14 @@
                                 {
                                     &quot;type&quot;: &quot;Button&quot;,
                                     &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;
+                                    &quot;caption&quot;: &quot;Button 1&quot;,
+                                    &quot;description&quot;: &quot;Action 1&quot;
                                 },
                                 {
                                     &quot;type&quot;: &quot;Button&quot;,
                                     &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;
+                                    &quot;caption&quot;: &quot;Button 2&quot;,
+                                    &quot;description&quot;: &quot;Action 2&quot;
                                 }
                             ]
                         }
@@ -1706,11 +1732,6 @@
     </message>
     <message>
         <location/>
-        <source>Admin DN</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Password</source>
         <translation></translation>
     </message>
@@ -1727,6 +1748,11 @@
     <message>
         <location/>
         <source>Search Timeout (s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Admin DN or CN</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1756,309 +1782,6 @@
         <location/>
         <source>Disable imported users</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>LegacyArchiveLengthWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_archive_length_widget.ui"/>
-        <source>Fixed Archive Length</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min. Days</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max. Days</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LegacyCameraScheduleWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_camera_schedule_widget.ui"/>
-        <source>Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Activate License...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Record Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Do Not Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Bitrate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>FPS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quality</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show Quality</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show FPS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pre-Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Post-Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copying Schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copy Schedule to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Apply changes before copying schedule.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LegacyCameraSettingsStreamsPanel</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_streams_panel.ui"/>
-        <source>Edit Streams...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LegacyExpertSettingsWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_expert_settings_widget.ui"/>
-        <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera stream and profile settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>It will increase bitrate for camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Disable secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Detection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Force motion detection for stream:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Do not archive primary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Do not archive secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Media Streaming</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RTP transport:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>TCP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>UDP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>PTZ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Preferred PTZ preset type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Native</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Native camera presets will not be avaliable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>This camera supports pan and tilt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>This camera supports zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Logical ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Generate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LegacyImageControlWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_image_control_widget.ui"/>
-        <source>Image Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default Rotation</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LegacyIoPortSettingsWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_ioport_settings_widget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable tile interface</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2190,19 +1913,6 @@
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>LicensesProposeWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/licenses_propose_widget.ui"/>
-        <source>Licensing</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Activate License...</source>
         <translation></translation>
     </message>
 </context>
@@ -2400,54 +2110,16 @@
     </message>
 </context>
 <context>
-    <name>MultipleCameraSettingsWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/multiple_camera_settings_widget.ui"/>
-        <source>General</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Authentication</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Login:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Audio</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Expert</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
-        <source>Dialog</source>
+        <source>Show all layouts</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Show all layouts</source>
-        <translation></translation>
+        <source>Select Layouts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3336,134 +3008,6 @@
     </message>
 </context>
 <context>
-    <name>SingleCameraSettingsWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/single_camera_settings_widget.ui"/>
-        <source>General</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Address</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ping</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Authentication</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Advanced</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Expert</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Audio</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion is not available for this camera.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Detection</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Fisheye</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>I/O ports</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Model</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Firmware</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Vendor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audio</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Login</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Web Page</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>MAC Address</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensitivity</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>SmtpAdvancedSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
@@ -3876,13 +3420,13 @@
     </message>
     <message>
         <location/>
-        <source>Detect motion in uploaded video</source>
+        <source>Sensitivity</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Sensitivity</source>
-        <translation></translation>
+        <source>Detect motion</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3895,50 +3439,6 @@
     <message>
         <location/>
         <source>Upload Footage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Upload File...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Upload Folder...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>WearableMotionWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_wearable_motion_widget.ui"/>
-        <source>Motion Detection</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Detect motion in uploaded video</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensitivity</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>WearableProgressWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_wearable_progress_widget.ui"/>
-        <source>Cancel</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>WearableUploadWidget</name>
-    <message>
-        <location filename="../src/nx/vms/client/desktop/resource_properties/camera/legacy/legacy_wearable_upload_widget.ui"/>
-        <source>Upload Video</source>
         <translation></translation>
     </message>
     <message>

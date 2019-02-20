@@ -768,10 +768,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Only single license is allowed for this device</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This license type requires higher software version</source>
         <translation></translation>
     </message>
@@ -782,6 +778,14 @@
     <message>
         <source>Server with matching Hardware ID not found</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Only one starter license is allowed per System.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You already have one active starter license.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

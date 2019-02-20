@@ -12,7 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <client_core/client_core_module.h>
 #include <ui/style/resource_icon_cache.h>
-
+#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
 
 namespace {
 
@@ -28,6 +28,8 @@ ViewNodeData getResourceNodeData(
     auto data = ViewNodeDataBuilder()
         .withText(resourceNameColumn, resource->getName())
         .withIcon(resourceNameColumn, qnResIconCache->icon(resource))
+        .withData(resourceNameColumn, cameraExtraStatusRole,
+            QVariant::fromValue(getCameraExtraStatus(resource)))
         .data();
 
     if (checkable)

@@ -726,6 +726,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "mpeg2video",
         this);
 
+    m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        "maxEventLogRecords",
+        100 * 1000, //< Default value.
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -943,7 +948,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
-        << m_maxWebMTranscoders;
+        << m_maxWebMTranscoders
+        << m_maxEventLogRecordsAdaptor;
 
     if (isHanwhaEnabledCustomization())
     {
@@ -1417,6 +1423,16 @@ int QnGlobalSettings::keepAliveProbeCount() const
 void QnGlobalSettings::setKeepAliveProbeCount(int newProbeCount)
 {
     m_ec2KeepAliveProbeCountAdaptor->setValue(newProbeCount);
+}
+
+int QnGlobalSettings::maxEventLogRecords() const
+{
+    return m_maxEventLogRecordsAdaptor->value();
+}
+
+void QnGlobalSettings::setMaxEventLogRecords(int value)
+{
+    m_maxEventLogRecordsAdaptor->setValue(value);
 }
 
 std::chrono::seconds QnGlobalSettings::aliveUpdateInterval() const

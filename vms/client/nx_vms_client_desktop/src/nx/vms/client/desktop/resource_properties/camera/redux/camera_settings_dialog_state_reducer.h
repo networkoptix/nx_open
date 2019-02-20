@@ -28,8 +28,8 @@ public:
     static State setRecordingShowFps(State state, bool value);
     static State setRecordingShowQuality(State state, bool value);
     static State toggleCustomBitrateVisible(State state);
-    static State setCustomRecordingBitrateMbps(State state, float mbps);
-    static State setCustomRecordingBitrateNormalized(State state, float value);
+    static State setRecordingBitrateMbps(State state, float mbps);
+    static State setRecordingBitrateNormalized(State state, float value);
     static State setMinRecordingDaysAutomatic(State state, bool value);
     static State setMinRecordingDaysValue(State state, int value);
     static State setMaxRecordingDaysAutomatic(State state, bool value);

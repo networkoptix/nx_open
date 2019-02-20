@@ -2065,7 +2065,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
         int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if (checkedButtons != -1)
+        {
+            checkedButtons &= ~Qn::MotionSearchButton; //< Handled by MotionSearchSynchronizer.
             resourceWidget->setCheckedButtons(checkedButtons);
+        }
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if (!widget)

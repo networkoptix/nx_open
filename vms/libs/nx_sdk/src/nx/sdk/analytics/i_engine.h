@@ -7,6 +7,7 @@
 #include <nx/sdk/i_plugin_event.h>
 
 #include "i_device_agent.h"
+#include "i_engine_info.h"
 #include "i_action.h"
 
 namespace nx {
@@ -43,9 +44,15 @@ public:
     virtual IPlugin* plugin() const = 0;
 
     /**
-     * Called before other methods. Server provides the set of settings stored in its database,
-     * combined with the values received from the plugin via pluginSideSettings() (if any), for
-     * this Engine instance.
+     * Called right after the Engine creation (before all other methods) or when some
+     * Engine-related change occurs on the Server side (e.g. Engine name is changed).
+     */
+    virtual void setEngineInfo(const IEngineInfo* engineInfo) = 0;
+
+    /**
+     * Called after `setEngineInfo()` and before all other methods. Server provides the set of
+     * settings stored in its database, combined with the values received from the plugin via
+     * pluginSideSettings() (if any), for this Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null. Valid only during
      *     the call.
@@ -60,7 +67,7 @@ public:
      * merges the received values with the ones in its database.
      *
      * @return Engine settings that are stored on the plugin side, or null if there are no such
-     * settings.
+     *     settings.
      */
     virtual IStringMap* pluginSideSettings() const = 0;
 

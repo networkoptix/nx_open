@@ -283,6 +283,7 @@ void QnSecurityCamResource::setMaxFps(int fps)
     // because setMaxFps function should not save parameters.
     setProperty(ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(capability)));
+    m_cachedCameraMediaCapabilities.reset();
 }
 int QnSecurityCamResource::reservedSecondStreamFps() const
 {
@@ -929,9 +930,8 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
     QString fixedFirmware;
     for (const QChar symbol: firmware)
     {
-        if (symbol.toLatin1() < 32) //< non-printable symbols
-            continue;
-        fixedFirmware.append(symbol);
+        if (symbol.isPrint())
+            fixedFirmware.append(symbol);
     }
     setProperty(ResourcePropertyKey::kFirmware, fixedFirmware);
 }

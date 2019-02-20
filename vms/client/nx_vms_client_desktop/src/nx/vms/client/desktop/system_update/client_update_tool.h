@@ -72,6 +72,11 @@ public:
     bool shouldInstallThis(const UpdateContents& contents) const;
 
     /**
+     * Checks if this client version is already installed.
+     */
+    bool isVersionInstalled(const nx::utils::SoftwareVersion& version) const;
+
+    /**
      * Asks tool to get update for client.
      * If client should download update - it will start downloading.
      * If client already has this update - it goes to readyReboot.

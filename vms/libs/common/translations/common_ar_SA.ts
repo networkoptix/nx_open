@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ar" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation type="unfinished">MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">These Systems are built with different %1 URL. Merge is not allowed.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation type="unfinished">System Event</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation type="unfinished">System already bound to cloud (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation type="unfinished">Server is not connected to the Internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation type="unfinished">Failed to save cloud credentials to local DB</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation type="unfinished">Failed to save cloud owner to local DB</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation type="unfinished">Could not connect to cloud: %1</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation type="unfinished">Camera plugin error. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation type="unfinished">Could not find decoder for codec %1.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation type="unfinished">Could not initialize resampling context, error code: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation type="unfinished">Could not allocate sample buffers, error code: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation type="unfinished">Free</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation type="unfinished">Free license</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>Time</translation>
     </message>
@@ -497,6 +532,286 @@
     <message>
       <source>Bridge Licenses</source>
       <translation type="unfinished">Bridge Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -565,10 +880,6 @@
       <translation type="unfinished">Invalid type</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation type="unfinished">Only single license is allowed for this device</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation type="unfinished">This license type requires higher software version</translation>
     </message>
@@ -580,6 +891,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -590,50 +909,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-        <numerusform>%n Camera(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-        <numerusform>%n camera(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-        <numerusform>%n Device(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-        <numerusform>%n device(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>Cameras</translation>
@@ -666,28 +941,6 @@
       <source>device</source>
       <translation>device</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation type="unfinished">I/O Modules</translation>
@@ -703,6 +956,72 @@
     <message>
       <source>I/O module</source>
       <translation type="unfinished">I/O module</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -730,67 +1049,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation type="unfinished">Hardware ID: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>Lowest</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Low</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Medium</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>High</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Best</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
     </message>
   </context>
   <context>
@@ -837,212 +1095,6 @@
     <message>
       <source>Unnamed System</source>
       <translation type="unfinished">Unnamed System</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>OK</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation type="unfinished">Not Found</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation type="unfinished">Not Implemented</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation type="unfinished">Unsupported Transport</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation type="unfinished">Internal Server Error</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation type="unfinished">Invalid Parameter</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1121,6 +1173,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Unknown error.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1657,6 +1751,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation type="unfinished">Exit fullscreen</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation type="unfinished">Open layout</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

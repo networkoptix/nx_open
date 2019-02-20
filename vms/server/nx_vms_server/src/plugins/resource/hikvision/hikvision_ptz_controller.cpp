@@ -369,7 +369,7 @@ void IsapiPtzController::loadCapabilities(
     }
     if (const auto presetNumber = capabilities.integer("maxPresetNum"))
     {
-        m_capabilities |= Ptz::PresetsPtzCapability;
+        m_capabilities |= Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability;
         m_maxPresetNumber = *presetNumber;
         if (const auto name = capabilities.child("PresetNameCap"))
         {

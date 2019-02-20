@@ -14,11 +14,9 @@ class MediaServerVideoCameraMock:
 public:
     MediaServerVideoCameraMock();
 
-    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() override;
-    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() override;
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
-        bool ensureInitialized = true) override;
+        bool ensureInitialized = true, bool createIfNotExist = true) override;
 
     virtual int copyLastGop(
         StreamIndex streamIndex,

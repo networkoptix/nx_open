@@ -4,8 +4,6 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
-#include <utils/common/watermark_settings.h>
-#include <nx/vms/client/desktop/watermark/watermark_edit_settings.h>
 
 #include <core/resource/device_dependent_strings.h>
 
@@ -13,7 +11,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-#include <nx/vms/client/desktop/ini.h>
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     base_type(parent),

@@ -770,6 +770,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permissions),
+    (debug)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )

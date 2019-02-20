@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="da" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation type="unfinished">Enable</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -56,10 +67,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation type="unfinished">SAFE MODE</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation type="unfinished">INCOMPATIBLE</translation>
     </message>
@@ -70,6 +77,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation type="unfinished">UNREACHABLE</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation type="unfinished">SAFE MODE</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -83,20 +94,21 @@
       <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation type="unfinished">Connect to Another Server...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation type="unfinished">Connect to Server...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation type="unfinished">Loading...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
     </message>
   </context>
 </TS>

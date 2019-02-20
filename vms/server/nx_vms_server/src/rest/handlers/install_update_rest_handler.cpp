@@ -9,7 +9,8 @@ namespace {
 
 bool allParticipantsAreReadyForInstall(
     const detail::IfParticipantPredicate& ifParticipantPredicate,
-    const QnRestConnectionProcessor* processor)
+    const QnRestConnectionProcessor* processor,
+    QnMediaServerModule* serverModule)
 {
     auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), QnRequestParamList());
@@ -19,7 +20,7 @@ bool allParticipantsAreReadyForInstall(
         processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(ifParticipantPredicate,processor->commonModule(),
+    detail::checkUpdateStatusRemotely(ifParticipantPredicate, serverModule,
         "/ec2/updateStatus", &reply, &context);
 
     return !reply.isEmpty() && std::all_of(reply.cbegin(), reply.cend(),
@@ -143,7 +144,7 @@ int QnInstallUpdateRestHandler::executePost(
             &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
     }
 
-    if (!allParticipantsAreReadyForInstall(ifParticipantPredicate, processor))
+    if (!allParticipantsAreReadyForInstall(ifParticipantPredicate, processor, serverModule()))
     {
         return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
             "Not all servers in the system are ready for install",

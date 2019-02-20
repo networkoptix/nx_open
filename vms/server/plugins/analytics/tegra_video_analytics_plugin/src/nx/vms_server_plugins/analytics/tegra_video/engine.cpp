@@ -22,9 +22,9 @@ Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
 }
 
 IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* /*deviceInfo*/, Error* /*outError*/)
+    const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
-    return new DeviceAgent(this);
+    return new DeviceAgent(this, deviceInfo);
 }
 
 std::string Engine::manifest() const

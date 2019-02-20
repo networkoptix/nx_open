@@ -69,7 +69,7 @@ private:
 
 private:
     QnRtspClient* m_owner = nullptr;
-    RtspTransport m_transport = RtspTransport::tcp;
+    RtspTransport m_transport = RtspTransport::notDefined;
 
     nx::streaming::rtp::RtcpSenderReport m_senderReport;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_mediaSocket;
@@ -157,6 +157,8 @@ public:
 
     void setTransport(RtspTransport transport);
     RtspTransport getTransport() const { return m_transport; }
+
+    RtspTransport getPreferedTransport() const { return m_prefferedTransport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);

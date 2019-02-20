@@ -74,7 +74,7 @@ void ImageOverlaySettingsWidget::browseForFile()
         this,
         tr("Select file..."),
         m_lastImageDir,
-        QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter));
+        QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter()));
 
     dialog.setFileMode(QFileDialog::ExistingFile);
 

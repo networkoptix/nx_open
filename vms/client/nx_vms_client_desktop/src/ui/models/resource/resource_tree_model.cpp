@@ -22,6 +22,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -475,9 +476,13 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (layout->isFile())
         {
-            if (isLoggedIn)
-                return m_rootNodes[NodeType::localResources];
-            return rootNode;
+            if (layout->isOnline())
+            {
+                if (isLoggedIn)
+                    return m_rootNodes[NodeType::localResources];
+                return rootNode;
+            }
+            return bastardNode;
         }
 
         if (layout->isShared())
@@ -1039,6 +1044,16 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
             [this, aviResource]()
             {
                 for (auto node: m_nodesByResource.value(aviResource))
+                    updateNodeParent(node);
+            });
+    }
+
+    if (const auto fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
+    {
+        connect(fileLayoutResource, &QnFileLayoutResource::statusChanged, this,
+            [this, fileLayoutResource]()
+            {
+                for (auto node: m_nodesByResource.value(fileLayoutResource))
                     updateNodeParent(node);
             });
     }

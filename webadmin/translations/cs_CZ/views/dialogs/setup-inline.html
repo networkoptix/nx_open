@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Systém nelze nastavit</h2>
-    <p class="master-description">Systém nelze nakonfigurovat. <br>
+    <p class="master-description">The System cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -66,13 +66,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Pokročilé nastavení systému</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Pokročilé nastavení systému</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -142,7 +142,7 @@
     </div>
     <h2>{{Config.cloud.productName}} účet</h2>
     <p class="master-description">
-        Pro použití cloudového systému {{Config.cloud.productName}}je vyžadován účet
+        An account is required to use the cloud System {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Vytvořit nový účet </button>&nbsp;&nbsp;
@@ -280,7 +280,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Připojit server k existujícímu systému</h2>
+    <h2>Connect the server to the existing System</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -292,7 +292,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Stávající adresa URL systému (https: // host: port)"
+ placeholder="Existing System URL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -332,26 +332,26 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Slučování systémů...</h2>
+    <h2>Slučování systémů ...</h2>
     <p class="master-description">Může to trvat několik minut</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Slučování systémů...</h2>
-    <p class="master-description">Pokus o připojení k systému</p>
+    <h2>Slučování systémů ...</h2>
+    <p class="master-description">Trying to connect to the System</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Systémy nelze sloučit</h2>
+    <h2>Cannot merge Systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Zkusit znovu </button>
-        <button class="btn btn-default" ng-click="skip()"> Nastavit samostatný systém </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
     </p>
 </div>
 
@@ -417,8 +417,8 @@
         Na serveru nastavte připojení k Internetu, abyste se mohli připojit k <br> odkudkoliv pomocí {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
-        <button class="btn btn-default" ng-click="skip()"> Nastavit místní systém </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Konfigurace nastavení sítě</a>
@@ -432,8 +432,8 @@
         Zkontrolujte připojení k Internetu.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
-        <button class="btn btn-default" ng-click="skip()"> Nastavit místní systém </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -444,8 +444,8 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
-        <button class="btn btn-default" ng-click="skip()"> Nastavit místní systém </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 

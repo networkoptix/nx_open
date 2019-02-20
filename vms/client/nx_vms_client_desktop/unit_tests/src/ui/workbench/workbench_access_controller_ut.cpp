@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/workbench/workbench_access_controller.h>
@@ -20,11 +21,6 @@
 namespace {
 const QString userName1 = QStringLiteral("unit_test_user_1");
 const QString userName2 = QStringLiteral("unit_test_user_2");
-}
-
-void PrintTo(const Qn::Permissions& val, ::std::ostream* os)
-{
-    *os << QnLexical::serialized(val).toStdString();
 }
 
 class QnWorkbenchAccessControllerTest: public testing::Test
@@ -69,7 +65,11 @@ protected:
 
     QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, const QnUuid &parentId = QnUuid())
     {
-        QnLayoutResourcePtr layout(new QnLayoutResource());
+        QnLayoutResourcePtr layout;
+        if (flags.testFlag(Qn::exported_layout))
+            layout.reset(new QnFileLayoutResource());
+        else
+            layout.reset(new QnLayoutResource());
         layout->setId(QnUuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);

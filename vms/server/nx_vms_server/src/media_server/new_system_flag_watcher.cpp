@@ -21,6 +21,8 @@ QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent):
 
 void QnNewSystemServerFlagWatcher::update()
 {
+    QnMutexLocker lock(& m_mutex);
+
     auto server = commonModule()->currentServer();
     NX_ASSERT(server);
     if (!server)

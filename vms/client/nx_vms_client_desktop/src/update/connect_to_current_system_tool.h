@@ -34,6 +34,12 @@ public:
     utils::MergeSystemsStatus::Value mergeError() const;
     QString mergeErrorMessage() const;
     QnUpdateResult updateResult() const;
+    QnUuid getTargetId() const;
+    QnUuid getOriginalId() const;
+    bool wasServerIncompatible() const;
+    nx::utils::SoftwareVersion getServerVersion() const;
+    /** Get name of the server being merged. */
+    QString getServerName() const;
 
 public slots:
     void cancel();
@@ -53,9 +59,12 @@ private:
     QnUuid m_targetId;
     QnUuid m_originalTargetId;
     QString m_adminPassword;
+    QString m_serverName;
+    nx::utils::SoftwareVersion m_serverVersion;
+    bool m_wasIncompatible = false;
 
     QPointer<QnMergeSystemsTool> m_mergeTool;
-    QPointer<QnMediaServerUpdateTool> m_updateTool;
+    //QPointer<QnMediaServerUpdateTool> m_updateTool;
     utils::MergeSystemsStatus::Value m_mergeError = utils::MergeSystemsStatus::ok;
     QString m_mergeErrorMessage;
     QnUpdateResult m_updateResult;

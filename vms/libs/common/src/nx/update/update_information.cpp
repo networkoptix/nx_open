@@ -21,6 +21,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::brokenPackageError, "local update package is corrupted")
     (nx::update::InformationError::missingPackageError, "missing files in the update package")
     (nx::update::InformationError::incompatibleVersion, "incompatible version")
+    (nx::update::InformationError::incompatibleCloudHost, "incompatible cloud host")
     (nx::update::InformationError::notFoundError, "not found")
     (nx::update::InformationError::noNewVersion, "no new version"))
 
@@ -51,7 +52,6 @@ bool UpdateContents::isValidToInstall() const
         && unsuportedSystemsReport.empty()
         && !info.version.isEmpty()
         && invalidVersion.empty()
-        && clientPackage.isValid()
         && error == nx::update::InformationError::noError;
 }
 

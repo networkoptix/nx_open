@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
-    <name>AsyncImageWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>ไม่มมีข้อมูล</translation>
-    </message>
-  </context>
-  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -68,6 +61,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ComboBoxUtils</name>
+    <message>
+      <source>multiple values</source>
+      <translation>หลายค่า</translation>
+    </message>
+  </context>
+  <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
@@ -82,8 +82,16 @@ to view more bookmarks</source>
       <translation>การติดตั้งสมบูรณ์</translation>
     </message>
     <message>
-      <source>Installation has been cancelled</source>
-      <translation>ยกเลิกการติดตั้ง</translation>
+      <source>Getting update information from the server</source>
+      <translation type="unfinished">Getting update information from the server</translation>
+    </message>
+    <message>
+      <source>Downloading update package</source>
+      <translation type="unfinished">Downloading update package</translation>
+    </message>
+    <message>
+      <source>Installing</source>
+      <translation type="unfinished">Installing</translation>
     </message>
   </context>
   <context>
@@ -199,10 +207,6 @@ to view more bookmarks</source>
     <message>
       <source>Open...</source>
       <translation>เปิด...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>ไฟล์(s)...</translation>
     </message>
     <message>
       <source>Folder...</source>
@@ -792,36 +796,12 @@ to view more bookmarks</source>
       <translation>Unpin Tree</translation>
     </message>
     <message>
-      <source>Show Tree</source>
-      <translation>แสดง Tree</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>ซ่อน Tree</translation>
-    </message>
-    <message>
       <source>Show Timeline</source>
       <translation>แสดง Timeline</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
       <translation>ซ่อน Timeline</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation>แสดงการแจ้งเตือน</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation>ซ่อนการแจ้งเตือน</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>การแจ้งเตือน Pin</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>การแจ้งเตือน Unpin</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
@@ -844,24 +824,12 @@ to view more bookmarks</source>
       <translation>ทำ Showreel</translation>
     </message>
     <message>
-      <source>Wearable Camera...</source>
-      <translation>เพิ่มกล้องใหม่</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation>เพิ่มกล้องใหม่</translation>
-    </message>
-    <message>
       <source>Upload File...</source>
       <translation>อัปโหลดไฟล์</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
       <translation>อัปโหลดโฟลเดอร์</translation>
-    </message>
-    <message>
-      <source>Start Analytics...</source>
-      <translation>เริ่มต้นวิเคราะห์</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -895,56 +863,89 @@ to view more bookmarks</source>
       <source>Export Bookmarks...</source>
       <translation type="unfinished">Export Bookmarks...</translation>
     </message>
-  </context>
-  <context>
-    <name>CustomHorizontalHeader</name>
     <message>
-      <source>5 minutes</source>
-      <translation>5 นาที</translation>
+      <source>Forget password</source>
+      <translation type="unfinished">Forget password</translation>
     </message>
     <message>
-      <source>Hour</source>
-      <translation>ชั่วโมง</translation>
+      <source>Cancel Upload...</source>
+      <translation>ยกเลิกการอัปโหลด</translation>
     </message>
     <message>
-      <source>Day</source>
-      <translation>วัน</translation>
+      <source>Copy Schedule...</source>
+      <translation>คัดคอกกำหนดการ...</translation>
     </message>
     <message>
-      <source>Week</source>
-      <translation>สัปดาห์</translation>
+      <source>Analytics Engine Settings...</source>
+      <translation type="unfinished">Analytics Engine Settings...</translation>
     </message>
     <message>
-      <source>Month</source>
-      <translation>เดือน</translation>
+      <source>Show Thumbnails</source>
+      <translation>แสดงภาพขนาดย่อ</translation>
     </message>
     <message>
-      <source>For the last 5 min</source>
-      <translation>สำหรับ 5 นาทีสุดท้าย</translation>
+      <source>Hide Thumbnails</source>
+      <translation>ซ่อนภาพขนาดย่อ</translation>
     </message>
     <message>
-      <source>For the last hour</source>
-      <translation>สำหรับชั่วโมงสุดท้าย</translation>
+      <source>Pin Panel</source>
+      <translation>แผง Pin</translation>
     </message>
     <message>
-      <source>For the last day</source>
-      <translation>สำหรับวันสุดท้าย</translation>
+      <source>Unpin Panel</source>
+      <translation>เอาออกจากแผง</translation>
     </message>
     <message>
-      <source>For the last week</source>
-      <translation>สำหรับสัปดาห์ที่ผ่านมา</translation>
+      <source>Virtual Camera...</source>
+      <translation type="unfinished">Virtual Camera...</translation>
     </message>
     <message>
-      <source>For the last month</source>
-      <translation>สำหรับเดือนที่แล้ว</translation>
+      <source>New Virtual Camera...</source>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
     <message>
-      <source>All data</source>
-      <translation>ข้อมูลทั้งหมด</translation>
+      <source>Show Tree</source>
+      <translation>แสดง Tree</translation>
     </message>
     <message>
-      <source>For all data</source>
-      <translation>สำหรับข้อมูลทั้งหมด</translation>
+      <source>Hide Tree</source>
+      <translation>ซ่อน Tree</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation>แสดงการแจ้งเตือน</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation>ซ่อนการแจ้งเตือน</translation>
+    </message>
+    <message>
+      <source>Files...</source>
+      <translation type="unfinished">Files...</translation>
+    </message>
+    <message>
+      <source>Switch to Notifications tab</source>
+      <translation type="unfinished">Switch to Notifications tab</translation>
+    </message>
+    <message>
+      <source>Switch to Motion tab</source>
+      <translation type="unfinished">Switch to Motion tab</translation>
+    </message>
+    <message>
+      <source>Switch to Bookmarks tab</source>
+      <translation type="unfinished">Switch to Bookmarks tab</translation>
+    </message>
+    <message>
+      <source>Switch to Events tab</source>
+      <translation type="unfinished">Switch to Events tab</translation>
+    </message>
+    <message>
+      <source>Switch to Objects tab</source>
+      <translation type="unfinished">Switch to Objects tab</translation>
+    </message>
+    <message>
+      <source>Objects Frames and Info...</source>
+      <translation type="unfinished">Objects Frames and Info...</translation>
     </message>
   </context>
   <context>
@@ -987,6 +988,29 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EncryptedLayoutStrings</name>
+    <message>
+      <source>Please enter a valid password</source>
+      <translation type="unfinished">Please enter a valid password</translation>
+    </message>
+    <message>
+      <source>The password is not valid.</source>
+      <translation type="unfinished">The password is not valid.</translation>
+    </message>
+    <message>
+      <source>Encrypted layout</source>
+      <translation type="unfinished">Encrypted layout</translation>
+    </message>
+    <message>
+      <source>The file %1 is encrypted. Please enter the password:</source>
+      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+    </message>
+    <message>
+      <source>Please re-enter password for layout %1:</source>
+      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1000,34 +1024,18 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>ExportSettingsDialog</name>
+    <name>FileExtensions</name>
     <message>
-      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>การตั้งค่าที่เลือกจะต้องมีการแปลงรหัส จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
+      <source>Pictures</source>
+      <translation>รูปภาพ</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>ไม่แนะนำให้ใช้รูปแบบ AVI เพื่อส่งออกการบันทึกที่ไม่ต่อเนื่องพร้อมเสียง</translation>
+      <source>Video</source>
+      <translation>วิดีโอ</translation>
     </message>
     <message>
-      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>เราขอแนะนำให้ส่งออกวิดีโอจากกล้องนี้เป็น &quot;Multi Video&quot; เพื่อหลีกเลี่ยงการลดขนาด</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>คุณกำลังจะส่งออกวิดีโอยาว อาจต้องใช้พื้นที่ฮาร์ดดิสก์เป็นจำนวนมากและใช้เวลาหลายนาทีในการดำเนินการ</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>ไฟล์. EXE ที่เอ็กซ์พอร์ตจะมีขนาดมากกว่า 4 GB และไม่สามารถเปิดได้ด้วยการดับเบิลคลิกใน Windows สามารถเล่นได้เฉพาะใน %1 Client</translation>
-    </message>
-    <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>แฟ้มภายในเครื่อง เครื่องมือตรวจสอบเซิร์ฟเวอร์ และเว็บเพจจะไม่ถูกส่งออก</translation>
-    </message>
-    <message>
-      <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>การตั้งค่าไม่พร้อมใช้งานสำหรับไฟล์. NOV และ .EXE</translation>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -1197,31 +1205,15 @@ to view more bookmarks</source>
       <source>Password should contain different types of symbols.</source>
       <translation>รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน</translation>
     </message>
-    <message>
-      <source>Short</source>
-      <translation>สั้น</translation>
-    </message>
-    <message>
-      <source>Common</source>
-      <translation>ทั่วไป</translation>
-    </message>
-    <message>
-      <source>This password is in list of the most popular passwords.</source>
-      <translation>รหัสผ่านนี้อยู่ในรายการรหัสผ่านยอดนิยม</translation>
-    </message>
-    <message>
-      <source>Incorrect</source>
-      <translation>ไม่ถูกต้อง</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
         <numerusform>รหัสผ่านควรมี %n ชุดค่าผสมที่แตกต่างกันของอักขระสัญลักษณ์หรือตัวเลข</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>สั้น</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
@@ -1252,8 +1244,24 @@ to view more bookmarks</source>
       </translation>
     </message>
     <message>
+      <source>Common</source>
+      <translation>ทั่วไป</translation>
+    </message>
+    <message>
+      <source>This password is in list of the most popular passwords.</source>
+      <translation>รหัสผ่านนี้อยู่ในรายการรหัสผ่านยอดนิยม</translation>
+    </message>
+    <message>
+      <source>Incorrect</source>
+      <translation>ไม่ถูกต้อง</translation>
+    </message>
+    <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
       <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์ %1 เท่านั้น</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
+      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -1307,6 +1315,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzInstrument</name>
+    <message>
+      <source>Layout is locked</source>
+      <translation type="unfinished">Layout is locked</translation>
+    </message>
+  </context>
+  <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
@@ -1340,8 +1355,12 @@ to view more bookmarks</source>
       <translation>พารามิเตอร์ 1 ห้ามว่าง.</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>ไม่มี</translation>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x86) (*.exe)</translation>
     </message>
   </context>
   <context>
@@ -1380,14 +1399,6 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>สร้าง สำหรับ %1-%2 กับ %3.</translation>
-    </message>
-    <message>
-      <source>Customer Support</source>
-      <translation>ฝ่ายสนับสนุนลูกค้า</translation>
-    </message>
-    <message>
-      <source>Client is not connected to any System</source>
-      <translation>ไคลเอ็นต์ไม่ได้เชื่อมต่อกับระบบใด ๆ</translation>
     </message>
   </context>
   <context>
@@ -1452,29 +1463,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnArchiveLengthWidget</name>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>ค่าต่ำสุดที่สูงจะนำไปสู่การลดความยาวที่เก็บถาวรลงบนอุปกรณ์อื่น ๆ</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>ค่าต่ำสุดที่สูงสามารถนำไปสู่เก็บลดลงบนกล้องอื่น ๆ</translation>
-    </message>
-    <message>
-      <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation>เก็บถาวรสามารถลบในกรณีถ้ามีไม่มีช่องว่างสำหรับบันทึกใหม่</translation>
-    </message>
-    <message>
-      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation>ตั้งค่า min และ Max กำหนดอายุเก็บซึ่งควรจะเก็บไว้สำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation>ถ้า &quot;อัตโนมัติ&quot; ตัวเลือกถูกเปิดใช้ คลิปที่เก่าที่สุดในบรรดากล้องทั้งหมดจะถูกลบก่อน</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
@@ -1526,14 +1514,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera actions</source>
       <translation>การกระทำของกล้อง</translation>
-    </message>
-    <message>
-      <source>Details for %1 session(s) of %2</source>
-      <translation>รายละเอียดสำหรับ %1 เซสชันของ %2</translation>
-    </message>
-    <message>
-      <source>Details for %1 camera(s) of %2</source>
-      <translation>รายละเอียดสำหรับ %1 กล้องจาก %2</translation>
     </message>
     <message>
       <source>No sessions</source>
@@ -1588,6 +1568,20 @@ to view more bookmarks</source>
     <message>
       <source>Audit trail replay</source>
       <translation>ตรวจสอบการใช้งาน replay</translation>
+    </message>
+    <message numerus="yes">
+      <source>Details for %n sessions of %1</source>
+      <comment>Total number will be substituted as %1</comment>
+      <translation type="unfinished">
+        <numerusform>Details for %n sessions of %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Details for %n cameras of %1</source>
+      <comment>Total number will be substituted as %1</comment>
+      <translation type="unfinished">
+        <numerusform>Details for %n cameras of %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1659,12 +1653,6 @@ to view more bookmarks</source>
     <message>
       <source>Database restored</source>
       <translation>เรียกคืน ฐานข้อมูล</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n action(s)</source>
-      <translation>
-        <numerusform>%n การกระทำ(s)</numerusform>
-      </translation>
     </message>
     <message>
       <source>Session begins</source>
@@ -1745,6 +1733,16 @@ to view more bookmarks</source>
     <message>
       <source>Filled circle mark means the archive is still available</source>
       <translation>เครื่องหมายวงกลมที่เต็มไปหมายความว่าที่เก็บถาวรยังคงมีอยู่</translation>
+    </message>
+    <message>
+      <source>Update installed</source>
+      <translation type="unfinished">Update installed</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n actions</source>
+      <translation type="unfinished">
+        <numerusform>%n actions</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1913,12 +1911,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
-    <message numerus="yes">
-      <source>%n Server(s)</source>
-      <translation>
-        <numerusform>%n เซอร์ฟเวอร์</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Error: %1</source>
       <translation>ผิดพลาด: %1</translation>
@@ -1981,6 +1973,12 @@ to view more bookmarks</source>
       <source>Any Camera</source>
       <translation>กล้องใดก็ได้</translation>
     </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n เซิร์ฟเวอร์</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnBusinessRuleWidget</name>
@@ -2017,6 +2015,10 @@ to view more bookmarks</source>
     <message>
       <source>Any Camera</source>
       <translation>กล้องใดก็ได้</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -2099,162 +2101,6 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>ช่วงเวลาของการดำเนินการ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAdditionDialog</name>
-    <message>
-      <source>Initializing scan...</source>
-      <translation>เริ่มต้นการสแกน...</translation>
-    </message>
-    <message>
-      <source>First address in range is greater than the last one.</source>
-      <translation>ที่อยู่ลำดับแรกในช่วงทมีค่ามากกว่าอยู่ท้ายสุด.</translation>
-    </message>
-    <message>
-      <source>Scanning online hosts...</source>
-      <translation>สแกนโฮสต์ออนไลน์...</translation>
-    </message>
-    <message>
-      <source>Select target server...</source>
-      <translation>เลือกเซิร์ฟเวอร์เป้าหมาย...</translation>
-    </message>
-    <message>
-      <source>Examples:</source>
-      <translation>ตัวอย่าง:</translation>
-    </message>
-    <message>
-      <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>ระบุช่วงที่อยู่ IP ห้ามมากกว่า 255.</translation>
-    </message>
-    <message>
-      <source>Server went offline - search aborted.</source>
-      <translation>เซิร์ฟเวอร์ออฟไลน์ยกเลิกการค้นหา.</translation>
-    </message>
-    <message>
-      <source>Server has been removed - search aborted.</source>
-      <translation>เพิ่มเซิร์ฟเวอร์จะถูกลบออก การค้นหายกเลิก.</translation>
-    </message>
-    <message>
-      <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>ฟิลที่อยู่อุปกรณ์จะต้องมี URL ที่ถูกต้องที่อยู่ IP หรือการเชื่อมโยง RTSP.</translation>
-    </message>
-    <message>
-      <source>No devices selected.</source>
-      <translation>อุปกรณ์ที่ไม่ได้ถูกเลือก.</translation>
-    </message>
-    <message>
-      <source>Please select at least one device</source>
-      <translation>กรุณาเลือกอย่างน้อยหนึ่งอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Server is offline, devices can only be added to an online server.</source>
-      <translation>เซิร์ฟเวอร์ออฟไลน์ อุปกรณ์จะสามารถเพิ่มได้ตอนที่เซิร์ฟเวอร์ออนไลน์เท่านั้น.</translation>
-    </message>
-    <message>
-      <source>Server has been removed - cannot add devices.</source>
-      <translation>เซิร์ฟเวอร์ได้ถูกลบออก - ไม่สามารถเพิ่มอุปกรณ์.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n devices found</source>
-      <translation>
-        <numerusform>%n อุปกรณ์ที่พบ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Add devices to %1</source>
-      <translation>เพิ่มอุปกรณ์ %1</translation>
-    </message>
-    <message>
-      <source>Add devices...</source>
-      <translation>เพิ่มอุปกรณ์...</translation>
-    </message>
-    <message>
-      <source>Finishing searching...</source>
-      <translation>จบการค้นหา...</translation>
-    </message>
-    <message>
-      <source>Scanning hosts...</source>
-      <translation>กำลังสแกนโฮสต์...</translation>
-    </message>
-    <message>
-      <source>Scanning host...</source>
-      <extracomment>Scanning host... (0 devices found)</extracomment>
-      <translation>กำลังสแกนโฮสต์...</translation>
-    </message>
-    <message>
-      <source>Server offline</source>
-      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
-    </message>
-    <message>
-      <source>Device adding is possible for online servers only.</source>
-      <translation>เพิ่มอุปกรณ์เป็นไปได้สำหรับเซิร์ฟเวอร์ออนไลน์เท่านั้น</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n devices added.</source>
-      <translation>
-        <numerusform>%n อุปกรณ์ที่พบ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>It might take them a few moments to appear.</source>
-      <translation>อาจใช้เวลาสักครู่เพื่อให้ปรากฏ</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to add %n devices</source>
-      <translation>
-        <numerusform>ไม่สามารถย้าย %n อุปกรณ์</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device search failed</source>
-      <translation>การค้นหาอุปกรณ์ล้มเหลว</translation>
-    </message>
-    <message>
-      <source>No devices found</source>
-      <translation> ไม่พบอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>All devices already added</source>
-      <translation>เพิ่มอุปกรณ์ทั้งหมดแล้ว</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAdvancedParamsWidget</name>
-    <message>
-      <source>Loading values...</source>
-      <translation>ค่ากำลังโหลด...</translation>
-    </message>
-    <message>
-      <source>Applying changes...</source>
-      <translation>ใช้การเปลี่ยนแปลง...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-      <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
-    </message>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>โมดูล I / O นี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>กล้องนี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>การตั้งค่า</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation type="unfinished">Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>ไม่มีการตั้งค่า</translation>
     </message>
   </context>
   <context>
@@ -2353,39 +2199,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnCameraExpertSettingsWidget</name>
-    <message>
-      <source>Primary</source>
-      <translation>หลัก</translation>
-    </message>
-    <message>
-      <source>Secondary</source>
-      <translation>รอง</translation>
-    </message>
-    <message>
-      <source>Edge</source>
-      <translation>ขอบ</translation>
-    </message>
-    <message numerus="yes">
-      <source>This ID is already used on the following %n cameras: %1</source>
-      <translation>
-        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: %1</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>ช่วยแก้ไขปัญหาคุณภาพของภาพในกล้องบางรุ่น สำหรับคนอื่น ๆ จะทำให้อัตราบิตเพิ่มขึ้นอย่างมีนัยสำคัญ</translation>
-    </message>
-    <message>
-      <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>หมายเลขที่กำหนดเองที่สามารถกำหนดให้กับกล้องเพื่อระบุและเข้าถึงได้อย่างรวดเร็ว</translation>
-    </message>
-    <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>เซิร์ฟเวอร์จะไม่เปลี่ยนแปลงการตั้งค่ากล้องใด ๆ ระบบจะรับและใช้สตรีมมิ่งกล้องตามที่เป็นอยู่</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
@@ -2414,16 +2227,6 @@ to view more bookmarks</source>
     <message>
       <source>Select All</source>
       <translation>เลือกทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Devices List for %1</source>
-      <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-      <translation>รายชื่ออุปกรณ์สำหรับ %1</translation>
-    </message>
-    <message>
-      <source>Cameras List for %1</source>
-      <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-      <translation>รายชื่อกล้องสำหรับ %1</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -2462,6 +2265,16 @@ to view more bookmarks</source>
     <message>
       <source>No cameras</source>
       <translation>ไม่มีกล้อง</translation>
+    </message>
+    <message>
+      <source>Devices List for %1</source>
+      <comment>%1 will be substituted with a server name</comment>
+      <translation>รายชื่ออุปกรณ์สำหรับ %1</translation>
+    </message>
+    <message>
+      <source>Cameras List for %1</source>
+      <comment>%1 will be substituted with a server name</comment>
+      <translation>รายชื่อกล้องสำหรับ %1</translation>
     </message>
   </context>
   <context>
@@ -2502,36 +2315,9 @@ to view more bookmarks</source>
       <source>ID</source>
       <translation>ไอดี</translation>
     </message>
-  </context>
-  <context>
-    <name>QnCameraMotionMaskWidget</name>
     <message>
-      <source>Too many motion windows</source>
-      <translation>มีหน้าต่างเคลื่อนไหวมากเกินไป</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
-      <translation>จำนวนหน้าต่างการเคลื่อนไหวสูงสุดสำหรับกล้องปัจจุบันคือ %1 และ %2 หน้าต่างการเคลื่อนไหวถูกเลือกไว้ในขณะนี้</translation>
-    </message>
-    <message>
-      <source>Too many motion sensitivity settings</source>
-      <translation>การตั้งค่าความไวในการเคลื่อนไหวมากเกินไป</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>จำนวนสูงสุดของการตั้งค่าความไวแสงสำหรับกล้องปัจจุบันเป็น %1 และ %2 การตั้งค่าที่เลือกในปัจจุบัน</translation>
-    </message>
-    <message>
-      <source>Too many motion areas</source>
-      <translation>พื้นที่เคลื่อนไหวมากเกินไป</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
-      <translation>จำนวนพื้นที่เคลื่อนไหวสูงสุดสำหรับกล้องปัจจุบันคือ %1 และ %2 เขตการเคลื่อนไหวที่เลือกอยู่ในขณะนี้</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>การตั้งค่าความไวแสงสูงสุดสำหรับเซ็นเซอร์ของกล้องในปัจจุบันคือ %1 และ %2 การตั้งค่าปัจจุบันถูกเลือกไว้</translation>
+      <source>Logical ID</source>
+      <translation>รหัสตรรกะ</translation>
     </message>
   </context>
   <context>
@@ -2585,189 +2371,6 @@ to view more bookmarks</source>
     <message>
       <source>Recording is disabled for %1</source>
       <translation>การบันทึกถูกปิดไว้ สำหรับ %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraScheduleWidget</name>
-    <message>
-      <source>Off</source>
-      <translation>ปิด</translation>
-    </message>
-    <message>
-      <source>On</source>
-      <translation>เปิด</translation>
-    </message>
-    <message>
-      <source>Recording Schedule</source>
-      <translation>ตารางเวลาการบันทึก</translation>
-    </message>
-    <message>
-      <source>based on server time</source>
-      <translation>ขึ้นอยู่กับเวลาของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Not enough licenses to enable recording</source>
-      <translation>ใบอนุญาตไม่เพียงพอที่จะใช้ในการบันทึก</translation>
-    </message>
-    <message>
-      <source>License limit exceeded, recording will not be enabled.</source>
-      <translation>เกินจำนวนใบอนุญาตการบันทึกจะไม่เปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>Turn on selector at the top of the window to enable recording.</source>
-      <translation>เปิดตัวเลือกที่ด้านบนของหน้าต่างเพื่อเปิดใช้งานการบันทึก</translation>
-    </message>
-    <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>เลือกพื้นที่ตามตารางเวลาเพื่อใช้พารามิเตอร์ที่เลือกกับ</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>ตั้งค่าพารามิเตอร์การบันทึกและเลือกพื้นที่บนตารางกำหนดเวลาเพื่อใช้</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งานหรือไม่รองรับ</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>ไม่สนับสนุนสตรีมมิงแบบคู่สำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>ไม่สนับสนุนการสตรีมแบบคู่และการตรวจจับการเคลื่อนไหวสำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Mbit/s</source>
-      <translation>Mbit / s</translation>
-    </message>
-    <message>
-      <source>Less Settings</source>
-      <translation>การตั้งค่าภายในระบบ</translation>
-    </message>
-    <message>
-      <source>More Settings</source>
-      <translation>การตั้งค่าเพิ่มเติม</translation>
-    </message>
-    <message>
-      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>การตั้งค่าคุณภาพจะกำหนดอัตราการบีบอัดเท่านั้นและไม่มีผลต่อความละเอียด ต่ำสุดปานกลางสูงและดีที่สุดคือค่าบิตเรทที่ตั้งไว้ล่วงหน้า</translation>
-    </message>
-    <message>
-      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation>ก่อนอื่นให้เลือกตัวเลือกการบันทึกจากนั้นใช้วันและเวลาในตารางการบันทึก (0 บล็อกคือ 12:00 น. ถึง 1:00 น., 23 บล็อกคือ 23:00 น. ถึง 12:00 น.)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraSettingsDialog</name>
-    <message>
-      <source>Device Settings</source>
-      <translation>การตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Devices Settings</source>
-      <translation>การตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>การตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Cameras Settings</source>
-      <translation>การตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings</source>
-      <translation>การตั้งค่าโมดูล I/O</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings</source>
-      <translation>การตั้งค่าโมดูล I/O</translation>
-    </message>
-    <message>
-      <source>Show on Layout</source>
-      <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>บันทึกเหตุการณ์...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>ข้อกำหนดอุปกรณ์...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>ข้อกำหนดอุปกรณ์...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>ข้อกำหนดกล้อง...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>ข้อกำหนดกล้อง...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>ข้อกำหนดโมดูล I/O...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>กฎระเบียบโมดูล I/O...</translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n devices are not saved:</source>
-      <translation>
-        <numerusform>การเปลี่ยนแปลงอุปกรณ์ต่อไปนี้ %n จะไม่ได้รับการบันทึก:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
-        <numerusform>การเปลี่ยนแปลงใน %n กล้องต่อไปนี้จะไม่ได้รับการบันทึก:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
-        <numerusform>การเปลี่ยนแปลงต่อไปนี้ %n โมดูล I / O ไม่ได้รับการบันทึก:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another camera?</source>
-      <translation>ใช้การเปลี่ยนแปลงก่อนเปลี่ยนไปใช้กล้องอื่นหรือไม่?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraSettingsWidget</name>
-    <message>
-      <source>Cannot edit properties for items of different types.</source>
-      <translation>ไม่สามารถแก้ไขคุณสมบัติสำหรับรายการประเภทที่แตกต่างกัน.</translation>
-    </message>
-    <message>
-      <source>No device selected.</source>
-      <translation>อุปกรณ์ไม่ได้เลือก.</translation>
-    </message>
-    <message>
-      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>ไม่สามารถแก้ไขคุณสมบัติสำหรับเพิ่มกล้องได้หลายแบบ</translation>
-    </message>
-    <message>
-      <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>ไม่สามารถแก้ไขคุณสมบัติสำหรับเพิ่มกล้องได้หลายแบบ</translation>
     </message>
   </context>
   <context>
@@ -2872,6 +2475,10 @@ to %1</source>
     <message>
       <source>Invalid password</source>
       <translation>รหัสผ่านไม่ถูกต้อง</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่</translation>
     </message>
   </context>
   <context>
@@ -3035,10 +2642,6 @@ to %1</source>
       <translation>ดาวน์โหลด Client เวอร์ชัน %1 หรือไม่?</translation>
     </message>
     <message>
-      <source>Download</source>
-      <translation>ดาวน์โหลด</translation>
-    </message>
-    <message>
       <source>Restart</source>
       <translation>รีสตาร์ท</translation>
     </message>
@@ -3103,6 +2706,18 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>การเชื่อมต่อกับ %1 ยังไม่พร้อม ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของเซิร์ฟเวอร์ หรือลองใหม่อีกครั้ง</translation>
     </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่</translation>
+    </message>
+    <message>
+      <source>Download &amp;&amp; Install</source>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <source>Failed to enter compatibility mode for version %1</source>
+      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -3141,16 +2756,20 @@ to %1</source>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
       <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
     </message>
+    <message>
+      <source>Server API</source>
+      <translation>เซิร์ฟเวอร์ API</translation>
+    </message>
+    <message>
+      <source>To generate Generic Event, please refer to %1.</source>
+      <translation>เพื่อสร้างเหตุการณ์ทั่วไปโปรดดูที่%1.</translation>
+    </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
       <translation>บันทึกการสำรองฐานข้อมูล...</translation>
-    </message>
-    <message>
-      <source>Database Backup Files (*.db)</source>
-      <translation>ฐานข้อมูล Backup ไฟล์ (*.db)</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
@@ -3214,44 +2833,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnDefaultPasswordAlertBar</name>
-    <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>กล้องนี้ต้องใช้รหัสผ่านเพื่อตั้งค่า</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras requires password to be set up.</source>
-      <translation>บางกล้องที่เลือกจะต้องใช้รหัสผ่านเพื่อตั้งค่า</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>ขอให้ผู้ดูแลระบบของคุณทำเช่นนั้น</translation>
-    </message>
-    <message>
-      <source>Set Password</source>
-      <translation>ตั้งรหัสผ่าน</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
-    </message>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>รูปแบบตัวอย่างของอุปกรณ์ป้อนข้อมูล%1 ไม่สนับสนุน.</translation>
-    </message>
-    <message>
-      <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>ไม่พบตัวเข้ารหัสเสียง &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>ไม่ได้เลือกอุปกรณ์เสียงหลัก</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
@@ -3284,6 +2865,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>ระบบเสียงไม่สนับสนุนรูปแบบเสียง 44.1 kHz และ 48 kHz โปรดเลือกอุปกรณ์เสียงอื่นหรือ &quot;none&quot; ในการตั้งค่าการบันทึกหน้าจอ</translation>
+    </message>
+    <message>
+      <source>Configured codec: %1 not found, h263p will used</source>
+      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
     </message>
   </context>
   <context>
@@ -3352,6 +2937,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>คุณจะไม่สามารถเชื่อมต่อกับระบบนี้กับบัญชี %1 หลังจากที่คุณยกเลิกการเชื่อมต่อระบบนี้จาก %1</translation>
     </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่</translation>
+    </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
@@ -3382,18 +2971,6 @@ to %1</source>
       <source>Clear Filter</source>
       <translation>ล้าง Filter</translation>
     </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>บันทึกเหตุการณ์ตั้งแต่วันที่ %1 ถึง %2 -%n เหตุการณ์ที่พบ(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n event(s) found</source>
-      <translation>
-        <numerusform>บันทึกเหตุการณ์สำหรับ%1 - %n เหตุการณ์ที่พบ(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export selected events to file</source>
       <translation>เลือกเหตุการณ์ส่งออก</translation>
@@ -3405,6 +2982,20 @@ to %1</source>
     <message>
       <source>No events</source>
       <translation>ไม่พบเหตุการณ์</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - %n events found</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3474,6 +3065,13 @@ to %1</source>
       <source>Subject removed</source>
       <translation>ลบหัวเรื่องแล้ว</translation>
     </message>
+    <message numerus="yes">
+      <source>%1 (%n cameras)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n cameras)</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnExecHttpRequestActionWidget</name>
@@ -3495,25 +3093,6 @@ to %1</source>
     <message>
       <source>%1 has no PTZ presets</source>
       <translation>%1 ไม่มีการตั้งค่าล่วงหน้าของ PTZ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
-    <message>
-      <source>Copy archive length settings</source>
-      <translation>คัดลอกเก็บการตั้งค่าความยาว</translation>
-    </message>
-    <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>ประเภทการเคลื่อนไหวไม่ได้รับการสนับสนุนโดยบางกล้อง.</translation>
-    </message>
-    <message>
-      <source>Recording cannot be enabled for some cameras.</source>
-      <translation>การบันทึกไม่สามารถเปิดใช้งานสำหรับบางกล้อง.</translation>
-    </message>
-    <message>
-      <source>Schedule settings are not compatible with some devices.</source>
-      <translation>การตั้งค่าตารางเวลาเข้ากันได้กับอุปกรณ์บางอย่าง.</translation>
     </message>
   </context>
   <context>
@@ -3570,46 +3149,14 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnFisheyeCalibrationWidget</name>
-    <message>
-      <source>Loading preview, please wait...</source>
-      <translation>กำลังโหลดตัวอย่าง กรุณารอสักอยู่...</translation>
-    </message>
-    <message>
-      <source>Auto calibration failed</source>
-      <translation>การสอบเทียบอัตโนมัติล้มเหลว</translation>
-    </message>
-    <message>
-      <source>Image is not round.</source>
-      <translation>ภาพไม่กลม</translation>
-    </message>
-    <message>
-      <source>Image might be too dim.</source>
-      <translation>ภาพอาจจะมืดเกินไป</translation>
-    </message>
-    <message>
-      <source>Invalid input image.</source>
-      <translation>รูปภาพสำหรับป้อนข้อมูลไม่ถูกต้อง</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>ข้อผิดพลาดภายใน</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFisheyeSettingsWidget</name>
-    <message>
-      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>ใช้การตั้งค่านี้เพื่อชดเชยความผิดเพี้ยนถ้ากล้องจะติดตั้งตรงในแนวตั้ง หรือแนวนอน</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFullscreenCameraActionWidget</name>
-    <message numerus="yes">
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation>
-        <numerusform>กล้องนี้ไม่ได้อยู่ในรูปแบบที่เลือก การดำเนินการจะทำงานถ้ากล้องถูกทริกเกอร์ดำเนินการก่อน</numerusform>
-      </translation>
+    <message>
+      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
+      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
+      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
     </message>
   </context>
   <context>
@@ -3793,18 +3340,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnImageControlWidget</name>
+    <name>QnInputDialog</name>
     <message>
-      <source>%1 degrees</source>
-      <translation>%1 องศา</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>อัตโนมัติ</translation>
-    </message>
-    <message>
-      <source>multiple values</source>
-      <translation>หลายค่า</translation>
+      <source>Please enter a value.</source>
+      <translation type="unfinished">Please enter a value.</translation>
     </message>
   </context>
   <context>
@@ -4067,10 +3606,6 @@ to %1</source>
       <translation>เลือกแฟ้มคีย์การเปิดใช้งานที่ถูกต้องเพื่อดำเนินการต่อ</translation>
     </message>
     <message>
-      <source>This device accepts single channel license only</source>
-      <translation>อุปกรณ์นี้ยอมรับใบอนุญาตช่องสัญญาณเดียวเท่านั้น</translation>
-    </message>
-    <message>
       <source>Database error occurred.</source>
       <translation>มีข้อผิดพลาดของฐานข้อมูล</translation>
     </message>
@@ -4093,18 +3628,6 @@ to %1</source>
     <message>
       <source>License already activated on another server</source>
       <translation>ใบอนุญาตใช้งานอยู่แล้วบนเซิร์ฟเวอร์อื่น</translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %n %1 are required</source>
-      <translation>
-        <numerusform>อย่างน้อย %n %1 ที่ต้องการ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n %1 are currently in use</source>
-      <translation>
-        <numerusform>%n %1 มีใช้อยู่ในปัจจุบัน</numerusform>
-      </translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -4212,6 +3735,24 @@ to %1</source>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>ใบอนุญาตนี้ได้เปิดใช้งานแล้วและเชื่อมโยงกับ Hardware ID %1 ใน %2</translation>
     </message>
+    <message>
+      <source>Every license can be deactivated only a few times.</source>
+      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1  มีใช้อยู่ในปัจจุบัน</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4232,43 +3773,12 @@ to %1</source>
       <translation>ไม่สามารถเปิดไฟล์นี้</translation>
     </message>
     <message>
-      <source>All files</source>
-      <translation>ไฟล์ทั้งหมด</translation>
-    </message>
-    <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>โปรดส่งอีเมลพร้อมรหัสสัญญาอนุญาตและรหัสฮาร์ดแวร์ที่ให้ไว้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>โปรดส่ง ID คีย์ใบอนุญาตและฮาร์ดแวร์ให้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use licenses for selected %n devices</source>
-      <translation>
-        <numerusform>ใช้ใบอนุญาตสำหรับอุปกรณ์ที่เลือก %n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Use licenses for selected %n cameras</source>
-      <translation>
-        <numerusform>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Use licenses for selected %n I/O modules</source>
-      <translation>
-        <numerusform>ใช้ใบอนุญาตสำหรับ%n เลือกโมดูล I/O</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Use licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -4405,10 +3915,6 @@ to %1</source>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
-      <source>Pictures %1</source>
-      <translation>รูปภาพ %1</translation>
-    </message>
-    <message>
       <source>Preparing Image...</source>
       <translation>กำลังเตรียมภาพ...</translation>
     </message>
@@ -4530,13 +4036,13 @@ to %1</source>
         <numerusform>ตั้งค่าสำหรับกล้อง %n ทั้งหมด</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Area Zoom</source>
+      <translation type="unfinished">Area Zoom</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
-    <message>
-      <source>http(s)://host:port</source>
-      <translation>http (s): // โฮสต์: พอร์ต</translation>
-    </message>
     <message>
       <source>%1 (current)</source>
       <translation>%1 (ปัจจุบัน)</translation>
@@ -4622,29 +4128,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnMultipleCameraSettingsWidget</name>
-    <message>
-      <source>Secondary stream disabled for these cameras</source>
-      <translation>สตรีมทุติยภูมิถูกปิดใช้งานสำหรับกล้องเหล่านี้</translation>
-    </message>
-    <message>
-      <source>Set Recording to &quot;Always&quot;</source>
-      <translation>ตั้งค่าการบันทึกเป็น &quot;Always&quot;</translation>
-    </message>
-    <message>
-      <source>Enable Secondary Stream</source>
-      <translation>เปิดใช้สตรีมรอง</translation>
-    </message>
-    <message>
-      <source>multiple values</source>
-      <translation>หลายค่า</translation>
-    </message>
-    <message>
-      <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>ไม่สามารถตั้งค่าตัวเลือกการบันทึก &quot;Motion + ต่ำ - Res&quot;</translation>
-    </message>
-  </context>
-  <context>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
@@ -4701,14 +4184,6 @@ to %1</source>
   <context>
     <name>QnNewWearableCameraDialog</name>
     <message>
-      <source>Wearable Camera</source>
-      <translation>เพิ่มกล้องใหม่</translation>
-    </message>
-    <message>
-      <source>Wearable Camera %1</source>
-      <translation>เพิ่มกล้องใหม่ %1</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>ชื่อ</translation>
     </message>
@@ -4716,14 +4191,13 @@ to %1</source>
       <source>Name cannot be empty</source>
       <translation>ชื่อไม่สามารถเว้นช่องว่างได้</translation>
     </message>
-  </context>
-  <context>
-    <name>QnNotificationListWidget</name>
-    <message numerus="yes">
-      <source>%n more notifications</source>
-      <translation>
-        <numerusform>%n การแจ้งเตือนเพิ่มเติม</numerusform>
-      </translation>
+    <message>
+      <source>Virtual Camera</source>
+      <translation type="unfinished">Virtual Camera</translation>
+    </message>
+    <message>
+      <source>Virtual Camera %1</source>
+      <translation type="unfinished">Virtual Camera %1</translation>
     </message>
   </context>
   <context>
@@ -4782,21 +4256,6 @@ to %1</source>
     <message>
       <source>Uploading sound...</source>
       <translation>กำลังอัปโหลดเสียง...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnNotificationsCollectionWidget</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>การเตือน: %1</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>รับทราบ</translation>
-    </message>
-    <message>
-      <source>Set Passwords</source>
-      <translation>ตั้งรหัสผ่าน</translation>
     </message>
   </context>
   <context>
@@ -4935,12 +4394,6 @@ to %1</source>
         <numerusform>ทัวร์มี %n ตำแหน่งเหมือนกัน</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>about %n minute(s)</source>
-      <translation>
-        <numerusform>ประมาณ%n นาที(s)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>less than a minute</source>
       <translation>น้อยกว่าหนึ่งนาที</translation>
@@ -4964,6 +4417,12 @@ to %1</source>
     <message>
       <source>Tour Time: %1.</source>
       <translation>เวลาทัวร์ %1.</translation>
+    </message>
+    <message numerus="yes">
+      <source>about %n minutes</source>
+      <translation type="unfinished">
+        <numerusform>about %n minutes</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5075,70 +4534,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRecordingStatsModel</name>
-    <message>
-      <source>Average bitrate for the recorded period</source>
-      <translation>บิตเรตเฉลี่ยสำหรับระยะเวลาที่บันทึกไว้</translation>
-    </message>
-    <message>
-      <source>Space</source>
-      <translation>ช่องว่าง</translation>
-    </message>
-    <message>
-      <source>Calendar Days</source>
-      <translation>วันปฏิทิน</translation>
-    </message>
-    <message>
-      <source>less than an hour</source>
-      <translation>น้อยกว่าหนึ่งชั่วโมง</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Mbps</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>ว่างเปล่า</translation>
-    </message>
-    <message>
-      <source>Devices with non-empty archive</source>
-      <translation>อุปกรณ์ที่มีเก็บถาวรไม่ว่างเปล่า</translation>
-    </message>
-    <message>
-      <source>Cameras with non-empty archive</source>
-      <translation>กล้องที่มีที่เก็บถาวรไม่ว่างเปล่า</translation>
-    </message>
-    <message>
-      <source>Storage space occupied by devices</source>
-      <translation>พื้นที่จัดเก็บที่ถูกครอบครองโดยอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Storage space occupied by cameras</source>
-      <translation>พื้นที่จัดเก็บที่ถูกครอบครองโดยกล้อง</translation>
-    </message>
-    <message>
-      <source>Device</source>
-      <translation>อุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>กล้อง</translation>
-    </message>
-    <message>
-      <source>Archived duration in calendar days since the first recording</source>
-      <translation>ระยะเวลาในการเก็บไว้ในปฏิทินวันนับตั้งแต่บันทึกเสียงครั้งแรก</translation>
-    </message>
+    <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
       <translation>กล้อง จากเซิร์ฟเวอร์อื่น และลบกล้อง</translation>
-    </message>
-    <message>
-      <source>%1 TB</source>
-      <translation>%1 Tb</translation>
-    </message>
-    <message>
-      <source>%1 GB</source>
-      <translation>%1 Gb</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5161,40 +4560,52 @@ to %1</source>
         <numerusform>รวม %1 %n โมดูล I / O</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Bitrate</source>
-      <translation>บิตเรท</translation>
-    </message>
   </context>
   <context>
-    <name>QnRecordingStatusHelper</name>
+    <name>QnRecordingStatsModel</name>
     <message>
-      <source>Not recording</source>
-      <translation>ไม่ได้ทำการบันทึก</translation>
+      <source>Space</source>
+      <translation>ช่องว่าง</translation>
     </message>
     <message>
-      <source>Recording everything</source>
-      <translation>บันทึกทุกอย่าง</translation>
+      <source>Calendar Days</source>
+      <translation>วันปฏิทิน</translation>
     </message>
     <message>
-      <source>Recording motion only</source>
-      <translation>บันทึกการเคลื่อนไหวเท่านั้น</translation>
+      <source>less than an hour</source>
+      <translation>น้อยกว่าหนึ่งชั่วโมง</translation>
     </message>
     <message>
-      <source>Recording motion and low quality</source>
-      <translation>การเคลื่อนไหวและการบันทึกที่มีคุณภาพต่ำ</translation>
+      <source>%1 Mbps</source>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
-      <source>Continuous</source>
-      <translation>ต่อเนื่อง</translation>
+      <source>empty</source>
+      <translation>ว่างเปล่า</translation>
     </message>
     <message>
-      <source>Motion only</source>
-      <translation>การเคลื่อนไหวเท่านั้น</translation>
+      <source>Device</source>
+      <translation>อุปกรณ์</translation>
     </message>
     <message>
-      <source>Motion + Lo-Res</source>
-      <translation>การเคลื่อนไหว + Lo-Res</translation>
+      <source>Camera</source>
+      <translation>กล้อง</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 Tb</translation>
+    </message>
+    <message>
+      <source>%1 GB</source>
+      <translation>%1 Gb</translation>
+    </message>
+    <message>
+      <source>Current Bitrate</source>
+      <translation type="unfinished">Current Bitrate</translation>
+    </message>
+    <message>
+      <source>no data for forecast</source>
+      <translation type="unfinished">no data for forecast</translation>
     </message>
   </context>
   <context>
@@ -5237,24 +4648,68 @@ to %1</source>
   <context>
     <name>QnResourceBrowserWidget</name>
     <message>
-      <source>Any Type</source>
-      <translation>ทุกชนิด</translation>
+      <source>Local files</source>
+      <translation type="unfinished">Local files</translation>
     </message>
     <message>
-      <source>Video Files</source>
-      <translation>ไฟล์วีดีโอ</translation>
+      <source>No local files</source>
+      <translation type="unfinished">No local files</translation>
     </message>
     <message>
-      <source>Image Files</source>
-      <translation>ไฟล์รูปภาพ</translation>
+      <source>Nothing found</source>
+      <translation>ไม่พบสิ่งใด</translation>
     </message>
     <message>
-      <source>Live Devices</source>
-      <translation>อุปกรณ์สด</translation>
+      <source>add to current layout</source>
+      <translation>เพิ่มในรูปแบบปัจจุบัน</translation>
     </message>
     <message>
-      <source>Live Cameras</source>
-      <translation>กล้องสด</translation>
+      <source>open all at a new layout</source>
+      <translation>เปิดทุกรูปแบบใหม่</translation>
+    </message>
+    <message>
+      <source>open all</source>
+      <translation type="unfinished">open all</translation>
+    </message>
+    <message>
+      <source>All types</source>
+      <translation>ทุกประเภท</translation>
+    </message>
+    <message>
+      <source>Servers</source>
+      <translation>เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>เค้าโครง</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>Showreels</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>สร้างจอแสดงผลใหม่ (Video Wall)</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>เว็บเพจ:</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>ผู้ใช้งาน</translation>
+    </message>
+    <message>
+      <source>Local Files</source>
+      <translation>ไฟล์ท้องถิ่น</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>ค้นหา</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>กล้องและอุปกรณ์</translation>
     </message>
   </context>
   <context>
@@ -5329,6 +4784,18 @@ to %1</source>
       <source>Showreel</source>
       <translation>showreel</translation>
     </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>กล้องและอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Videowalls</source>
+      <translation>videowalls</translation>
+    </message>
+    <message>
+      <source>Analytics Engines</source>
+      <translation type="unfinished">Analytics Engines</translation>
+    </message>
   </context>
   <context>
     <name>QnResourceTreeModelOtherSystemsNode</name>
@@ -5373,13 +4840,6 @@ to %1</source>
     <message>
       <source>URL already added</source>
       <translation>URL ที่เพิ่มไว้แล้ว</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnScheduleGridWidget</name>
-    <message>
-      <source>All</source>
-      <translation>ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -5430,13 +4890,6 @@ to %1</source>
     <message>
       <source>Creator</source>
       <translation>ผู้สร้าง</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSearchLineEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>ค้นหา</translation>
     </message>
   </context>
   <context>
@@ -5891,69 +5344,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSingleCameraSettingsWidget</name>
-    <message>
-      <source>Device Settings</source>
-      <translation>การตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>การตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings</source>
-      <translation>การตั้งค่าโมดูล I/O</translation>
-    </message>
-    <message>
-      <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>การตรวจจับการเคลื่อนไหวจะทำงานได้ก็ต่อเมื่อมีการดูกล้องเท่านั้น เปิดใช้งานการบันทึกเพื่อให้สามารถทำงานได้ตลอดเวลา</translation>
-    </message>
-    <message>
-      <source>FPS too high</source>
-      <translation>FPS สูงเกินไป</translation>
-    </message>
-    <message>
-      <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-      <translation>FPS ในกำหนดการลดลงจาก %1 ถึง %2 ซึ่งเป็นค่าสูงสุดสำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-      <translation>สำหรับการตรวจจับการเคลื่อนไหวของซอฟต์แวร์จะมีการสำรองเฟรม FPS ไว้สำหรับสตรีมทุติยภูมิ</translation>
-    </message>
-    <message>
-      <source>FPS in the schedule was lowered from %1 to %2.</source>
-      <translation>FPS ในกำหนดการลดลงจาก %1 ถึง %2</translation>
-    </message>
-    <message>
-      <source>Secondary stream disabled for this camera</source>
-      <translation>สตรีมทุติยภูมิปิดใช้งานสำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Set Recording to &quot;Always&quot;</source>
-      <translation>ตั้งค่าการบันทึกเป็น &quot;Always&quot;</translation>
-    </message>
-    <message>
-      <source>Enable Secondary Stream</source>
-      <translation>เปิดใช้สตรีมรอง</translation>
-    </message>
-    <message>
-      <source>Reset motion regions to default?</source>
-      <translation>รีเซ็ตพื้นที่เคลื่อนไหวเป็นค่าเริ่มต้นหรือไม่</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>ไม่สามารถดำเนินการดังกล่าวให้ได้</translation>
-    </message>
-    <message>
-      <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>ไม่สามารถตั้งค่าตัวเลือกการบันทึก &quot;Motion + ต่ำ - Res&quot;</translation>
-    </message>
-    <message>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>ที่เก็บข้อมูลที่อัปโหลดจะถูกลบโดยอัตโนมัติหากไม่มีพื้นที่ว่างในที่จัดเก็บข้อมูลเซิร์ฟเวอร์ ภาพที่เก่าที่สุดในบรรดากล้องทั้งหมดบนเซิร์ฟเวอร์จะถูกลบออกก่อน</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
@@ -6213,6 +5603,26 @@ to %1</source>
       <comment>TB - terabytes</comment>
       <translation>เทราไบต์</translation>
     </message>
+    <message>
+      <source>Last 5 minutes</source>
+      <translation type="unfinished">Last 5 minutes</translation>
+    </message>
+    <message>
+      <source>Last 60 minutes</source>
+      <translation type="unfinished">Last 60 minutes</translation>
+    </message>
+    <message>
+      <source>Last 24 hours</source>
+      <translation type="unfinished">Last 24 hours</translation>
+    </message>
+    <message>
+      <source>Longest period available</source>
+      <translation type="unfinished">Longest period available</translation>
+    </message>
+    <message>
+      <source>Forecast available only for cameras with enabled recording.</source>
+      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageConfigWidget</name>
@@ -6464,6 +5874,10 @@ to %1</source>
       <source>Users</source>
       <translation>ผู้ใช้งาน</translation>
     </message>
+    <message>
+      <source>Analytics</source>
+      <translation type="unfinished">Analytics</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6478,10 +5892,6 @@ to %1</source>
     <message>
       <source>Email server is not set</source>
       <translation>เซิร์ฟเวอร์อีเมลที่ไม่ได้ตั้งค่า</translation>
-    </message>
-    <message>
-      <source>System is in safe mode</source>
-      <translation>ระบบในเซฟโหมด</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -6534,10 +5944,6 @@ to %1</source>
     <message>
       <source>Learn more</source>
       <translation>เรียนรู้เพิ่มเติม</translation>
-    </message>
-    <message>
-      <source>System is running in safe mode.</source>
-      <translation>ระบบใช้ในเซฟโหมด</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -6605,6 +6011,30 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ตรวจสอบ %1 &amp;mdash; เชื่อมต่อกับระบบของคุณจากทุกที่!</translation>
     </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>กล้องบางตัวต้องใช้รหัสผ่านในการตั้งค่า</translation>
+    </message>
+    <message>
+      <source>No server has internet access for time synchronization</source>
+      <translation type="unfinished">No server has internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>The System is in safe mode</source>
+      <translation type="unfinished">The System is in safe mode</translation>
+    </message>
+    <message>
+      <source>The System has no internet access for time synchronization</source>
+      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>No online server in the System has internet access for time synchronization.</source>
+      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+    </message>
+    <message>
+      <source>The System is running in safe mode.</source>
+      <translation type="unfinished">The System is running in safe mode.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6625,10 +6055,6 @@ to %1</source>
       <translation>อนุญาตให้ระบบเพิ่มประสิทธิภาพการตั้งค่ากล้อง</translation>
     </message>
     <message>
-      <source>Tracks and logs all user actions.</source>
-      <translation>ติดตามและบันทึกการทำงานของผู้ใช้ทั้งหมด</translation>
-    </message>
-    <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
       <translation>รวมถึงข้อมูลเกี่ยวกับระบบเช่นรุ่นกล้องและรุ่นของเฟิร์มแวร์จำนวนเซิร์ฟเวอร์เป็นต้น</translation>
     </message>
@@ -6640,16 +6066,20 @@ to %1</source>
   <context>
     <name>QnTableExportHelper</name>
     <message>
-      <source>HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</source>
-      <translation>ไฟล์ HTML (*.html);;Spread Sheet (CSV) ไฟล์ (*.csv)</translation>
-    </message>
-    <message>
       <source>Close all programs which may use this file and try again</source>
       <translation>ปิดโปรแกรมทั้งหมดที่อาจใช้ไฟล์นี้และลองอีกครั้ง</translation>
     </message>
     <message>
       <source>File used by another process</source>
       <translation>ไฟล์ที่ใช้โดยกระบวนการอื่น</translation>
+    </message>
+    <message>
+      <source>HTML file</source>
+      <translation type="unfinished">HTML file</translation>
+    </message>
+    <message>
+      <source>Spread Sheet (CSV) File</source>
+      <translation type="unfinished">Spread Sheet (CSV) File</translation>
     </message>
   </context>
   <context>
@@ -6682,73 +6112,19 @@ to %1</source>
       <translation>ไม่มีเซิร์ฟเวอร์ที่มีการเข้าถึงอินเทอร์เน็ต เวลาไม่ได้ซิงโครไนซ์</translation>
     </message>
     <message>
-      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>เวลาของระบบจะตรงกับอินเทอร์เน็ตและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์</translation>
+      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
     </message>
     <message>
-      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>เวลาของระบบถูกซิงโครไนซ์กับเวลาท้องถิ่นบนเซิร์ฟเวอร์ที่เลือกและไม่ได้ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์อื่น</translation>
+      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
-      <source>Live</source>
-      <translation>ช่วงเวลา</translation>
-    </message>
-    <message>
       <source>No thumbnails available</source>
       <translation>ไม่มีภาพขนาดย่อ</translation>
-    </message>
-    <message>
-      <source>dd</source>
-      <comment>Format for displaying days on timeline.</comment>
-      <translation>dd</translation>
-    </message>
-    <message>
-      <source>MMMM</source>
-      <comment>Format for displaying months on timeline.</comment>
-      <translation>MMMM</translation>
-    </message>
-    <message>
-      <source>yyyy</source>
-      <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy hh:mm</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy hh:mm</source>
-      <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy h ap</source>
-      <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy</source>
-      <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-      <source>yyyy</source>
-      <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy h:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6837,6 +6213,10 @@ to %1</source>
     <message>
       <source>Could not install updates on one or more servers.</source>
       <translation>ไม่สามารถติดตั้งการปรับปรุงในหนึ่งหรือหลายเซิร์ฟเวอร์ได้.</translation>
+    </message>
+    <message>
+      <source>Update has been cancelled silently.</source>
+      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -7202,40 +6582,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWearableProgressWidget</name>
-    <message>
-      <source>Stop uploading?</source>
-      <translation>หยุดการอัปโหลดหรือไม่</translation>
-    </message>
-    <message>
-      <source>Already uploaded files will be kept.</source>
-      <translation>อัปโหลดไปแล้วไฟล์จะถูกเก็บไว้</translation>
-    </message>
-    <message>
-      <source>(%1 of %2)</source>
-      <translation>(%1 ใน %2)</translation>
-    </message>
-    <message>
-      <source>Uploading %1...</source>
-      <translation>กำลังอัปโหลด %1...</translation>
-    </message>
-    <message>
-      <source>Finalizing %1...</source>
-      <translation>กำลังสรุป %1...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWearableUploadWidget</name>
-    <message>
-      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>ผู้ใช้ &quot;%1&quot; กำลังอัปโหลดวิดีโอกับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Another user is currently uploading footage to this camera.</source>
-      <translation>มีผู้ใช้รายอื่นกำลังอัปโหลดภาพไปยังกล้องนี้</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -7283,10 +6629,6 @@ to %1</source>
       <translation>บุ๊คมาร์ค สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
     </message>
     <message>
-      <source>Press %1 to search bookmarks</source>
-      <translation>กด%1 ค้นหาถึงบุ๊กมาร์ค</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
@@ -7316,11 +6658,6 @@ to %1</source>
       <translation>เชื่อมต่อกับเซิร์ฟเวอร์...</translation>
     </message>
     <message>
-      <source>%1 in %2</source>
-      <comment>%1 is user name, %2 is name of system</comment>
-      <translation>%1 ใน %2</translation>
-    </message>
-    <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ กำแพงวิดีโอจะถูกปิด</translation>
     </message>
@@ -7332,16 +6669,20 @@ to %1</source>
   <context>
     <name>QnWorkbenchContext</name>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>การใช้ซอฟต์แวร์คุณต้องยอมรับข้อตกลงใบอนุญาตของผู้ใช้</translation>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
     </message>
     <message>
-      <source>Accept</source>
-      <translation>ยอมรับ</translation>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
     </message>
     <message>
-      <source>Decline</source>
-      <translation>ปฏิเสธ</translation>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
     </message>
   </context>
   <context>
@@ -7455,24 +6796,16 @@ to %1</source>
       <translation>บันทึกเป็น...</translation>
     </message>
     <message>
-      <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-      <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
-    </message>
-    <message>
       <source>Failed to start recording</source>
       <translation>ไม่สามารถเริ่มบันทึกได้</translation>
+    </message>
+    <message>
+      <source>AVI (Audio/Video Interleaved)</source>
+      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchScreenshotHandler</name>
-    <message>
-      <source>PNG Image (*.png)</source>
-      <translation>PNG ภาพ (*.png)</translation>
-    </message>
-    <message>
-      <source>JPEG Image (*.jpg)</source>
-      <translation>JPEG ภาพ (*.jpg)</translation>
-    </message>
     <message>
       <source>Save Screenshot As...</source>
       <translation>บันทึกหน้าจอเป็น...</translation>
@@ -7516,6 +6849,14 @@ to %1</source>
     <message>
       <source>Failed to take screenshot</source>
       <translation>ไม่สามารถใช้ภาพหน้าจอ</translation>
+    </message>
+    <message>
+      <source>PNG Image</source>
+      <translation type="unfinished">PNG Image</translation>
+    </message>
+    <message>
+      <source>JPEG Image</source>
+      <translation type="unfinished">JPEG Image</translation>
     </message>
   </context>
   <context>
@@ -7631,18 +6972,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>All files (*.*)</source>
-      <translation>ทุกไฟล์ (*.*)</translation>
-    </message>
-    <message>
-      <source>Video (%1)</source>
-      <translation>วิดีโอ (%1)</translation>
-    </message>
-    <message>
-      <source>Open Wearable Camera Recordings...</source>
-      <translation>เปิดบันทึกกล้อง</translation>
-    </message>
-    <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>รองรับเฉพาะไฟล์วิดีโอที่มี timestamp ที่ถูกต้องเท่านั้น</translation>
     </message>
@@ -7653,10 +6982,6 @@ to %1</source>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
       <translation>ไม่สามารถเริ่มอัปโหลดขณะที่ผู้ใช้รายอื่นกำลังอัปโหลดภาพวิดีโอไปยังกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Failed to add wearable camera</source>
-      <translation>ไม่สามารถเพิ่มกล้องได้</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -7682,12 +7007,6 @@ to %1</source>
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <translation>
         <numerusform>ไฟล์ที่เลือกครอบคลุมช่วงเวลาที่วิดีโอกำลังอัปโหลดอยู่</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation>
-        <numerusform>คุณสามารถอัปโหลดไฟล์เหล่านี้ไปยังอินสแตนซ์อื่น ๆ ของ Wearable Camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7755,28 +7074,59 @@ to %1</source>
       <translation>ตรวจสอบว่ามีพื้นที่ว่างเพียงพอสำหรับการจัดเก็บข้อมูลเซิร์ฟเวอร์</translation>
     </message>
     <message>
+      <source>Not enough space on server storage</source>
+      <translation>พื้นที่ว่างไม่เพียงพอในการจัดเก็บข้อมูลไปยังเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>หยุดการอัปโหลดหรือไม่</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>อัปโหลดไปแล้วไฟล์จะถูกเก็บไว้</translation>
+    </message>
+    <message>
+      <source>Uploading footage</source>
+      <translation>กำลังอัปโหลดวิดีโอ</translation>
+    </message>
+    <message>
+      <source>Failed to add virtual camera</source>
+      <translation type="unfinished">Failed to add virtual camera</translation>
+    </message>
+    <message>
+      <source>Open Virtual Camera Recordings...</source>
+      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      </translation>
+    </message>
+    <message>
       <source>%1 has unsupported format.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 - มีรูปแบบที่ไม่สนับสนุน</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 - ไม่มี timestamp</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 เก่ากว่าที่อนุญาตในการตั้งค่าที่เก็บถาวรของกล้อง</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 - ครอบคลุมระยะเวลาที่มีการอัปโหลดวิดีโอแล้ว</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 - ครอบคลุมระยะเวลาที่ถูกอัพโหลดวิดีโอ</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation>พื้นที่ว่างไม่เพียงพอในการจัดเก็บข้อมูลไปยังเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -7959,10 +7309,71 @@ to %1</source>
       <translation>หยุด</translation>
     </message>
     <message numerus="yes">
-      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation>
-        <numerusform>แฟ้มวิดีโอบางจะถูกอัพโหลด %n กล้อง:</numerusform>
+      <source>Some video files are still being uploaded to %n virtual cameras:</source>
+      <translation type="unfinished">
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>StreamQualityStrings</name>
+    <message>
+      <source>Lowest</source>
+      <translation>ต่ำสุด</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>ต่ำ</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>ปานกลาง</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>สูง</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>ดีสุด</translation>
+    </message>
+    <message>
+      <source>Preset</source>
+      <translation>ตั้งล่วงหน้า</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>ไม่ได้กำหนด</translation>
+    </message>
+    <message>
+      <source>Lst</source>
+      <extracomment>Short for &apos;Lowest&apos;</extracomment>
+      <translation>LST</translation>
+    </message>
+    <message>
+      <source>Lo</source>
+      <extracomment>Short for &apos;Low&apos;</extracomment>
+      <translation>Lo</translation>
+    </message>
+    <message>
+      <source>Me</source>
+      <extracomment>Short for &apos;Medium&apos;</extracomment>
+      <translation>ME</translation>
+    </message>
+    <message>
+      <source>Hi</source>
+      <extracomment>Short for &apos;High&apos;</extracomment>
+      <translation>สวัสดี</translation>
+    </message>
+    <message>
+      <source>Bst</source>
+      <extracomment>Short for &apos;Best&apos;</extracomment>
+      <translation>Bst</translation>
+    </message>
+    <message>
+      <source>Ps</source>
+      <extracomment>Short for &apos;Preset&apos;</extracomment>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -7972,6 +7383,34 @@ to %1</source>
       <translation>
         <numerusform>%n ผู้ใช้</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>TimelineCursorLayout</name>
+    <message>
+      <source>Live</source>
+      <translation>ช่วงเวลา</translation>
+    </message>
+  </context>
+  <context>
+    <name>UpdateStrings</name>
+    <message>
+      <source>This Linux platform is no longer supported</source>
+      <translation type="unfinished">This Linux platform is no longer supported</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported</source>
+      <translation type="unfinished">This OS version is no longer supported</translation>
+    </message>
+    <message>
+      <source>This %1 version is no longer supported</source>
+      <comment>%1 is OS name, e.g. Windows</comment>
+      <translation type="unfinished">This %1 version is no longer supported</translation>
+    </message>
+    <message>
+      <source>%1 %2 is no longer supported</source>
+      <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
+      <translation type="unfinished">%1 %2 is no longer supported</translation>
     </message>
   </context>
   <context>
@@ -8002,14 +7441,469 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
-      <source>Dynamic</source>
-      <translation>ไดนามิก</translation>
+      <source>Hide information</source>
+      <translation>ซ่อนข้อมูล</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>แสดงข้อมูล</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>ซ่อนภาพขนาดย่อ</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>แสดงภาพขนาดย่อ</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>วันสุดท้าย</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 วันที่แล้ว</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 วันที่แล้ว</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>เลือกในแทบเวลา</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>ตลอดเวลา</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ไม่มี</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation type="unfinished">Devices on layout</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation type="unfinished">Cameras on layout</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation type="unfinished">Any device</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation type="unfinished">Any camera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>เลือกกล้อง</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
+    <message>
+      <source>Show Always</source>
+      <translation type="unfinished">Show Always</translation>
+    </message>
+    <message>
+      <source>Show Only with &quot;Objects&quot; Tab</source>
+      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
+    <message>
+      <source>Unknown object</source>
+      <translation>วัตถุที่ไม่รู้จัก</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
+    <message>
+      <source>No objects</source>
+      <translation>วัตถุ</translation>
+    </message>
+    <message>
+      <source>No objects detected</source>
+      <translation>ไม่พบวัตถุใด ๆ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects</source>
+      <translation type="unfinished">
+        <numerusform>%n objects</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any type</source>
+      <translation>ทุกชนิด</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation type="unfinished">Select area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation type="unfinished">Select some area on the video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>unnamed analytics engine</source>
+      <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>ไม่มมีข้อมูล</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>ไม่มีบุ๊กมาร์ก</translation>
+    </message>
+    <message>
+      <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
+      <translation>เลือกระยะเวลาหนึ่งในเส้นเวลาและคลิกด้วยปุ่มเมาส์ขวาเพื่อสร้างบุ๊กมาร์ก</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>บุ๊คมาร์ค %n</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
+    <message>
+      <source>Loading values...</source>
+      <translation>ค่ากำลังโหลด...</translation>
+    </message>
+    <message>
+      <source>Applying changes...</source>
+      <translation>ใช้การเปลี่ยนแปลง...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
+    <message>
+      <source>This I/O module has no advanced settings</source>
+      <translation>โมดูล I / O นี้ไม่มีการตั้งค่าขั้นสูง</translation>
+    </message>
+    <message>
+      <source>This camera has no advanced settings</source>
+      <translation>กล้องนี้ไม่มีการตั้งค่าขั้นสูง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
+    <message>
+      <source>Login</source>
+      <translation>ชื่อผู้ใช้</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>รหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraExpertSettingsWidget</name>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic RTP transport type</comment>
+      <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic PTZ preset type</comment>
+      <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+      <source>System</source>
+      <comment>System PTZ preset type</comment>
+      <translation>ระบบ</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <comment>Native PTZ preset type</comment>
+      <translation>พื้นเมือง</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
+      <translation>เซิร์ฟเวอร์จะไม่เปลี่ยนแปลงการตั้งค่ากล้องใด ๆ ระบบจะรับและใช้สตรีมมิ่งกล้องตามที่เป็นอยู่</translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>ช่วยแก้ไขปัญหาคุณภาพของภาพในกล้องบางรุ่น สำหรับคนอื่น ๆ จะทำให้อัตราบิตเพิ่มขึ้นอย่างมีนัยสำคัญ</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>หมายเลขที่กำหนดเองที่สามารถกำหนดให้กับกล้องเพื่อระบุและเข้าถึงได้อย่างรวดเร็ว</translation>
+    </message>
+    <message>
+      <source>Primary</source>
+      <comment>Primary stream for motion detection</comment>
+      <translation>หลัก</translation>
+    </message>
+    <message>
+      <source>Secondary</source>
+      <comment>Secondary stream for motion detection</comment>
+      <translation>รอง</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras:</source>
+      <translation>
+        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: </numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraInfoWidget</name>
+    <message>
+      <source>Device Rules</source>
+      <translation>ข้อกำหนดอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera Rules</source>
+      <translation>ข้อกำหนดกล้อง</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules</source>
+      <translation>ข้อกำหนดโมดูล I/O</translation>
+    </message>
+    <message>
+      <source>More Info</source>
+      <translation>ข้อมูลเพิ่มเติม</translation>
+    </message>
+    <message>
+      <source>Less Info</source>
+      <translation>ข้อมูลน้อยลง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
+    <message numerus="yes">
+      <source>Use License</source>
+      <translation>
+        <numerusform>ใช้ใบอนุญาต</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
+    <message>
+      <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation>การตรวจจับการเคลื่อนไหวจะทำงานได้ก็ต่อเมื่อมีการดูกล้องเท่านั้น เปิดใช้งานการบันทึกเพื่อให้สามารถทำงานได้ตลอดเวลา</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion detection rectangles for current camera is reached</source>
+      <translation>จำนวนสูงสุดของรูปสี่เหลี่ยมผืนผ้าการตรวจจับการเคลื่อนไหวสำหรับกล้องในปัจจุบันถึงแล้ว</translation>
+    </message>
+    <message>
+      <source>Maximum number of ignore motion rectangles for current camera is reached</source>
+      <translation>จำนวนสูงสุดของรูปสี่เหลี่ยมผืนผ้าการตรวจจับการเคลื่อนไหวสำหรับกล้องในปัจจุบันถึงแล้ว</translation>
+    </message>
+    <message>
+      <source>Maximum number of detect motion rectangles for current camera is reached</source>
+      <translation>จำนวนสูงสุดของรูปสี่เหลี่ยมผืนผ้าการตรวจจับการเคลื่อนไหวสำหรับกล้องในปัจจุบันถึงแล้ว</translation>
+    </message>
+    <message>
+      <source>Reset motion regions to default?</source>
+      <translation>รีเซ็ตพื้นที่เคลื่อนไหวเป็นค่าเริ่มต้นหรือไม่</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone.</source>
+      <translation>ไม่สามารถดำเนินการดังกล่าวให้ได้</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraScheduleWidget</name>
+    <message>
+      <source>License limit exceeded, recording will not be enabled.</source>
+      <translation>เกินจำนวนใบอนุญาตการบันทึกจะไม่เปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>Recording Schedule</source>
+      <translation>ตารางเวลาการบันทึก</translation>
+    </message>
+    <message>
+      <source>based on server time</source>
+      <translation>ขึ้นอยู่กับเวลาของเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to.</source>
+      <translation>เลือกพื้นที่ตามตารางเวลาเพื่อใช้พารามิเตอร์ที่เลือกกับ</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
+      <translation>ตั้งค่าพารามิเตอร์การบันทึกและเลือกพื้นที่บนตารางกำหนดเวลาเพื่อใช้</translation>
+    </message>
+    <message>
+      <source>Turn on selector at the top of the window to enable recording.</source>
+      <translation>เปิดตัวเลือกที่ด้านบนของหน้าต่างเพื่อเปิดใช้งานการบันทึก</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>ค่าต่ำสุดที่สูงจะนำไปสู่การลดความยาวที่เก็บถาวรลงบนอุปกรณ์อื่น ๆ</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>ค่าต่ำสุดที่สูงสามารถนำไปสู่เก็บลดลงบนกล้องอื่น ๆ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have any cameras</source>
+      <translation type="unfinished">You do not have any cameras</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>ทั่วไป</translation>
+    </message>
+    <message>
+      <source>Recording</source>
+      <translation>กำลังบันทึก</translation>
+    </message>
+    <message>
+      <source>I/O Ports</source>
+      <translation>พอร์ต I / O</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation>การเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <source>Fisheye</source>
+      <translation>ฟิชอาย</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>ขั้นสูง</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>เว็บเพจ:</translation>
+    </message>
+    <message>
+      <source>Analytics</source>
+      <translation type="unfinished">Analytics</translation>
+    </message>
+    <message>
+      <source>Expert</source>
+      <translation>ระดับผู้เชี่ยวชาญ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n devices are not saved:</source>
+      <translation>
+        <numerusform>การเปลี่ยนแปลงอุปกรณ์ต่อไปนี้ %n จะไม่ได้รับการบันทึก:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n cameras are not saved:</source>
+      <translation>
+        <numerusform>การเปลี่ยนแปลงใน %n กล้องต่อไปนี้จะไม่ได้รับการบันทึก:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n I/O Modules are not saved:</source>
+      <translation>
+        <numerusform>การเปลี่ยนแปลงต่อไปนี้ %n โมดูล I / O ไม่ได้รับการบันทึก:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Apply changes before switching to another camera?</source>
+      <translation>ใช้การเปลี่ยนแปลงก่อนเปลี่ยนไปใช้กล้องอื่นหรือไม่?</translation>
+    </message>
+    <message>
+      <source>Device Settings</source>
+      <translation>การตั้งค่าอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Devices Settings</source>
+      <translation>การตั้งค่าอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera Settings</source>
+      <translation>การตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <source>Cameras Settings</source>
+      <translation>การตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings</source>
+      <translation>การตั้งค่าโมดูล I/O</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings</source>
+      <translation>การตั้งค่าโมดูล I/O</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 มีการใช้</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more required</source>
+      <translation>
+        <numerusform>ต้องการอีก %n</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
       <translation>สตรีมหลัก</translation>
@@ -8024,7 +7918,298 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ExportProcess</name>
+    <name>nx::vms::client::desktop::ClientUpdateTool</name>
+    <message>
+      <source>Update file is not found</source>
+      <translation type="unfinished">Update file is not found</translation>
+    </message>
+    <message>
+      <source>Update package is corrupted</source>
+      <translation type="unfinished">Update package is corrupted</translation>
+    </message>
+    <message>
+      <source>Failed to download update package: %1</source>
+      <translation type="unfinished">Failed to download update package: %1</translation>
+    </message>
+    <message>
+      <source>Update package is corrupted: %1</source>
+      <translation type="unfinished">Update package is corrupted: %1</translation>
+    </message>
+    <message>
+      <source>This update is already installed.</source>
+      <translation type="unfinished">This update is already installed.</translation>
+    </message>
+    <message>
+      <source>This version is not installed.</source>
+      <translation type="unfinished">This version is not installed.</translation>
+    </message>
+    <message>
+      <source>Invalid version format.</source>
+      <translation type="unfinished">Invalid version format.</translation>
+    </message>
+    <message>
+      <source>Broken update package.</source>
+      <translation type="unfinished">Broken update package.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install client update.</source>
+      <translation type="unfinished">Not enough space on disk to install client update.</translation>
+    </message>
+    <message>
+      <source>Install package has been lost.</source>
+      <translation type="unfinished">Install package has been lost.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>ข้อผิดพลาดภายใน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>คัดลอก</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>คัดลอกจากคลิปบอร์ด</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>วาง</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>วางจากคลิปบอร์ด</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>คัดลอกแล้ว.</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation>วาง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>กล้องนี้ต้องใช้รหัสผ่านเพื่อตั้งค่า</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>ขอให้ผู้ดูแลระบบของคุณทำเช่นนั้น</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>ตั้งรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
+    <message>
+      <source>Start address</source>
+      <translation>ที่อยู่เริ่มต้นทาง</translation>
+    </message>
+    <message>
+      <source>End address</source>
+      <translation>ที่อยู่ปลายทาง</translation>
+    </message>
+    <message>
+      <source>IP / Hostname / RTSP link / UDP link</source>
+      <translation>ลิงค์ IP / Hostname / RTSP / UDP</translation>
+    </message>
+    <message>
+      <source>Examples:</source>
+      <translation>ตัวอย่าง:</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
+    </message>
+    <message>
+      <source>Device search failed</source>
+      <translation>การค้นหาอุปกรณ์ล้มเหลว</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to add %n devices</source>
+      <translation>
+        <numerusform>ไม่สามารถย้าย %n อุปกรณ์</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Scan</source>
+      <translation>ค้นหา</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>ค้นหา</translation>
+    </message>
+    <message>
+      <source>Initializing scan...</source>
+      <translation>เริ่มต้นการสแกน...</translation>
+    </message>
+    <message>
+      <source>Scanning online hosts...</source>
+      <translation>สแกนโฮสต์ออนไลน์...</translation>
+    </message>
+    <message>
+      <source>Checking host...</source>
+      <translation type="unfinished">Checking host...</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation>เสร็จ</translation>
+    </message>
+    <message>
+      <source>Aborted</source>
+      <translation>ยกเลิกเรียบร้อยแล้ว</translation>
+    </message>
+    <message>
+      <source>Searching...</source>
+      <translation>กำลังค้นหา</translation>
+    </message>
+    <message>
+      <source>No devices found</source>
+      <translation> ไม่พบอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>All devices are already added</source>
+      <translation type="unfinished">All devices are already added</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices are being added. You can close this dialog or start a new search</source>
+      <translation type="unfinished">
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>เพิ่มอุปกรณ์ทั้งหมด</translation>
+    </message>
+    <message numerus="yes">
+      <source>Add %n Devices</source>
+      <translation>
+        <numerusform>เพิ่มอุปกรณ์</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Address field cannot be empty</source>
+      <translation type="unfinished">Address field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventPanel::Private</name>
+    <message>
+      <source>Notifications</source>
+      <comment>Notifications tab title</comment>
+      <translation>การแจ้งเตือน</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <comment>Motion tab title</comment>
+      <translation>การเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <comment>Bookmarks tab title</comment>
+      <translation>บุ๊คมาร์ค</translation>
+    </message>
+    <message>
+      <source>Events</source>
+      <comment>Events tab title</comment>
+      <translation>เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <comment>Analytics tab title</comment>
+      <translation>วัตถุ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventSearchWidget</name>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation type="unfinished">Any camera issue</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation type="unfinished">Any event</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>ไม่พบเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>No events occured</source>
+      <translation>ไม่มีเหตุการณ์ที่เกิดขึ้น</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n กิจกรรม</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>unnamed analytics engine</source>
+      <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventTile</name>
+    <message numerus="yes">
+      <source>...and %n more</source>
+      <translation>
+        <numerusform>... และ %n เพิ่มเติม</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportPasswordWidget</name>
+    <message>
+      <source>Please enter the password.</source>
+      <translation type="unfinished">Please enter the password.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
       <translation>สื่อที่ไม่สนับสนุนสำหรับการส่งออกข้อมูล</translation>
@@ -8055,11 +8240,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
     <message>
-      <source>exported</source>
-      <translation>การส่งออก</translation>
+      <source>Copy archive length settings</source>
+      <translation>คัดลอกเก็บการตั้งค่าความยาว</translation>
     </message>
+    <message>
+      <source>Schedule motion type is not supported by some cameras.</source>
+      <translation>ประเภทการเคลื่อนไหวไม่ได้รับการสนับสนุนโดยบางกล้อง.</translation>
+    </message>
+    <message>
+      <source>Recording cannot be enabled for some cameras.</source>
+      <translation>การบันทึกไม่สามารถเปิดใช้งานสำหรับบางกล้อง.</translation>
+    </message>
+    <message>
+      <source>Schedule settings are not compatible with some devices.</source>
+      <translation>การตั้งค่าตารางเวลาเข้ากันได้กับอุปกรณ์บางอย่าง.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
       <translation>ส่งออก</translation>
@@ -8124,9 +8324,41 @@ to %1</source>
       <source>Bookmark Info</source>
       <translation>ข้อมูลบุ๊กมาร์ก</translation>
     </message>
+    <message>
+      <source>exported</source>
+      <translation>การส่งออก</translation>
+    </message>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>การตั้งค่าที่เลือกจะต้องมีการแปลงรหัส จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>ไม่แนะนำให้ใช้รูปแบบ AVI เพื่อส่งออกการบันทึกที่ไม่ต่อเนื่องพร้อมเสียง</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>เราขอแนะนำให้ส่งออกวิดีโอจากกล้องนี้เป็น &quot;Multi Video&quot; เพื่อหลีกเลี่ยงการลดขนาด</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>ไฟล์. EXE ที่เอ็กซ์พอร์ตจะมีขนาดมากกว่า 4 GB และไม่สามารถเปิดได้ด้วยการดับเบิลคลิกใน Windows สามารถเล่นได้เฉพาะใน %1 Client</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>การตั้งค่าไม่พร้อมใช้งานสำหรับไฟล์. NOV และ .EXE</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>แฟ้มภายในเครื่อง เครื่องมือตรวจสอบเซิร์ฟเวอร์ และเว็บเพจจะไม่ถูกส่งออก</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
+      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+    </message>
   </context>
   <context>
-    <name>nx::client::desktop::FilenamePanel</name>
+    <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
       <translation>โฟลเดอร์</translation>
@@ -8145,21 +8377,89 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::HintButton</name>
+    <name>nx::vms::client::desktop::FisheyeCalibrationWidget</name>
+    <message>
+      <source>Loading preview, please wait...</source>
+      <translation>กำลังโหลดตัวอย่าง กรุณารอสักอยู่...</translation>
+    </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>การสอบเทียบอัตโนมัติล้มเหลว</translation>
+    </message>
+    <message>
+      <source>Image is not round</source>
+      <translation type="unfinished">Image is not round</translation>
+    </message>
+    <message>
+      <source>Image might be too dim</source>
+      <translation type="unfinished">Image might be too dim</translation>
+    </message>
+    <message>
+      <source>Invalid input image</source>
+      <translation type="unfinished">Invalid input image</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>ข้อผิดพลาดภายใน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>ใช้การตั้งค่านี้เพื่อชดเชยความผิดเพี้ยนถ้ากล้องจะติดตั้งตรงในแนวตั้ง หรือแนวนอน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FoundDevicesModel</name>
+    <message>
+      <source>Brand</source>
+      <translation>แบรนด์สินค้า</translation>
+    </message>
+    <message>
+      <source>Model</source>
+      <translation>รุ่น</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation>ที่อยู่</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices total</source>
+      <translation type="unfinished">
+        <numerusform>%n devices total</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
       <translation>คลิกเพื่ออ่านรายละเอียดเพิ่มเติม</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <name>nx::vms::client::desktop::ImageControlWidget</name>
+    <message>
+      <source>Auto</source>
+      <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+      <source>%1 degrees</source>
+      <translation>%1 องศา</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
       <translation>เลือกไฟล์...</translation>
-    </message>
-    <message>
-      <source>Pictures (%1)</source>
-      <translation>รูปภาพ (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8171,7 +8471,18 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <name>nx::vms::client::desktop::LabelSelectionManager</name>
+    <message>
+      <source>Copy</source>
+      <translation>คัดลอก</translation>
+    </message>
+    <message>
+      <source>Copy Link Location</source>
+      <translation type="unfinished">Copy Link Location</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
       <translation>เซลล์</translation>
@@ -8193,10 +8504,6 @@ to %1</source>
       <translation>เลือกไฟล์...</translation>
     </message>
     <message>
-      <source>Pictures %1</source>
-      <translation>รูปภาพ %1</translation>
-    </message>
-    <message>
       <source>Picture cannot be read</source>
       <translation>ไม่สามารถอ่านรูปภาพได้</translation>
     </message>
@@ -8210,7 +8517,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
       <translation>เซลล์</translation>
@@ -8221,7 +8528,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
       <translation>ทั่วไป</translation>
@@ -8232,7 +8539,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
       <translation>ไม่มมีข้อมูล</translation>
@@ -8243,46 +8550,400 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
-      <source>Secondary Stream</source>
-      <translation>สตรีมรอง</translation>
+      <source>Server is not specified</source>
+      <translation>ไม่ได้ระบุเซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>I/O Module ID</source>
-      <translation>รหัสโมดูล I / O</translation>
+      <source>Server offline</source>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>รหัสกล้อง</translation>
+      <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+      <translation>ฟิลที่อยู่อุปกรณ์จะต้องมี URL ที่ถูกต้องที่อยู่ IP หรือการเชื่อมโยง RTSP.</translation>
     </message>
     <message>
-      <source>Audio Stream</source>
-      <translation>สตรีมเสียง</translation>
+      <source>First address in range is greater than the last one.</source>
+      <translation>ที่อยู่ลำดับแรกในช่วงทมีค่ามากกว่าอยู่ท้ายสุด.</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>สตรีมหลัก</translation>
+      <source>The specified IP address range has more than 255 addresses.</source>
+      <translation>ระบุช่วงที่อยู่ IP ห้ามมากกว่า 255.</translation>
     </message>
     <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมแล้วลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมวิดีโอและลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>โมดูล I/O มีสตรีมไม่มีเสียง</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>กล้องไม่มีสตรีมรอง</translation>
+      <source>Can&apos;t start searching process</source>
+      <translation>สามารถเริ่มการค้นหา&apos;t</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::RadassActionFactory</name>
+    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
+    <message>
+      <source>Motion</source>
+      <translation>การเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+    <message>
+      <source>Bookmark it...</source>
+      <translation>การบันทึก บุ๊คมาร์ค...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
+    <message>
+      <source>Release notes</source>
+      <translation>หมายเหตุการเผยแพร่</translation>
+    </message>
+    <message>
+      <source>Checking for updates automatically</source>
+      <translation type="unfinished">Checking for updates automatically</translation>
+    </message>
+    <message>
+      <source>Check for updates</source>
+      <translation type="unfinished">Check for updates</translation>
+    </message>
+    <message>
+      <source>Force check</source>
+      <translation type="unfinished">Force check</translation>
+    </message>
+    <message>
+      <source>Disable Automatically Checking</source>
+      <translation type="unfinished">Disable Automatically Checking</translation>
+    </message>
+    <message>
+      <source>Check Once</source>
+      <translation type="unfinished">Check Once</translation>
+    </message>
+    <message>
+      <source>Check Automatically</source>
+      <translation type="unfinished">Check Automatically</translation>
+    </message>
+    <message>
+      <source>Download in External Browser</source>
+      <translation>ดาวน์โหลดในเบราเซอร์ภายนอก</translation>
+    </message>
+    <message>
+      <source>Copy Link to Clipboard</source>
+      <translation>คัดลอกลิงก์ไปยังคลิปบอร์ด</translation>
+    </message>
+    <message>
+      <source>You have already installed this version.</source>
+      <translation type="unfinished">You have already installed this version.</translation>
+    </message>
+    <message>
+      <source>Unable to check updates on the internet</source>
+      <translation type="unfinished">Unable to check updates on the internet</translation>
+    </message>
+    <message>
+      <source>Build not found</source>
+      <translation type="unfinished">Build not found</translation>
+    </message>
+    <message>
+      <source>Cannot update from the selected file</source>
+      <translation type="unfinished">Cannot update from the selected file</translation>
+    </message>
+    <message>
+      <source>Invalid update information</source>
+      <translation type="unfinished">Invalid update information</translation>
+    </message>
+    <message>
+      <source>Downgrade to earlier versions is not possible</source>
+      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+    </message>
+    <message>
+      <source>Update file is not found</source>
+      <translation type="unfinished">Update file is not found</translation>
+    </message>
+    <message>
+      <source>Upgrade package is broken</source>
+      <translation type="unfinished">Upgrade package is broken</translation>
+    </message>
+    <message>
+      <source>Missing update package for some servers</source>
+      <translation type="unfinished">Missing update package for some servers</translation>
+    </message>
+    <message>
+      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation>อินสแตนซ์ %1 ที่ไม่สามารถใช้ร่วมกันได้ ในการยกเลิกการเชื่อมต่อระบบจาก %1 ก่อน</translation>
+    </message>
+    <message>
+      <source>No update package available</source>
+      <translation type="unfinished">No update package available</translation>
+    </message>
+    <message>
+      <source>Select Update File...</source>
+      <translation>เลือกไฟล์อัพเดต...</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>อัปเดตไฟล์</translation>
+    </message>
+    <message>
+      <source>Some servers are offline and will not be updated. Skip them?</source>
+      <translation>เซิร์ฟเวอร์บางเครื่องอยู่ในสถานะออฟไลน์และจะไม่ได้รับการอัพเดท ข้ามไปได้หรือไม่</translation>
+    </message>
+    <message>
+      <source>Ready to install client updates</source>
+      <translation type="unfinished">Ready to install client updates</translation>
+    </message>
+    <message>
+      <source>Install now</source>
+      <translation>ติดตั้งเดี๋ยวนี้</translation>
+    </message>
+    <message>
+      <source>Later</source>
+      <translation>เปิดในภายหลัง</translation>
+    </message>
+    <message>
+      <source>Updates downloaded</source>
+      <translation>ดาวน์โหลดการปรับปรุงเรียบร้อยแล้ว</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages</source>
+      <translation>ไม่สามารถดาวน์โหลดแพคเกจโปรแกรมปรับปรุงได้</translation>
+    </message>
+    <message>
+      <source>Please make sure there is enough free storage space and network connection is stable.</source>
+      <translation>โปรดตรวจสอบว่ามีเนื้อที่ว่างเพียงพอและการเชื่อมต่อเครือข่ายมีเสถียรภาพ</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact Customer Support.</source>
+      <translation>หากปัญหายังคงมีอยู่โปรดติดต่อฝ่ายบริการลูกค้า</translation>
+    </message>
+    <message>
+      <source>Try again</source>
+      <translation>ลองใหม่อีกครั้ง</translation>
+    </message>
+    <message>
+      <source>Cancel Update</source>
+      <translation>ยกเลิกการอัปเดต</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some servers</source>
+      <translation>ไม่สามารถดาวน์โหลดแพคเกจโปรแกรมปรับปรุงสำหรับเซิร์ฟเวอร์บางเครื่องได้</translation>
+    </message>
+    <message>
+      <source>Please make sure they have enough free storage space and stable network connection.</source>
+      <translation>โปรดตรวจสอบว่ามีเนื้อที่ว่างเพียงพอและการเชื่อมต่อเครือข่ายมีเสถียรภาพ</translation>
+    </message>
+    <message>
+      <source>Update completed</source>
+      <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
+    </message>
+    <message>
+      <source>Update completed, but some servers have failed an update</source>
+      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+    </message>
+    <message>
+      <source>Nx Witness Client will be restarted to the updated version.</source>
+      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>ตกลง</translation>
+    </message>
+    <message>
+      <source>Failed to install updates to servers:</source>
+      <translation type="unfinished">Failed to install updates to servers:</translation>
+    </message>
+    <message>
+      <source>Downloading updates...</source>
+      <translation>กำลังดาวน์โหลดการอัปเดต...</translation>
+    </message>
+    <message>
+      <source>Pushing updates...</source>
+      <translation type="unfinished">Pushing updates...</translation>
+    </message>
+    <message>
+      <source>Upload</source>
+      <translation type="unfinished">Upload</translation>
+    </message>
+    <message>
+      <source>Upload &amp;&amp; Install</source>
+      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>ดาวน์โหลด</translation>
+    </message>
+    <message>
+      <source>Download &amp;&amp; Install</source>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation type="unfinished">Select Another Build</translation>
+    </message>
+    <message>
+      <source>Browse for Another File...</source>
+      <translation type="unfinished">Browse for Another File...</translation>
+    </message>
+    <message>
+      <source>Update to Specific Build</source>
+      <translation>อัปเดตการสร้างเฉพาะ</translation>
+    </message>
+    <message>
+      <source>Uploading updates...</source>
+      <translation type="unfinished">Uploading updates...</translation>
+    </message>
+    <message>
+      <source>Downloading client package...</source>
+      <translation type="unfinished">Downloading client package...</translation>
+    </message>
+    <message>
+      <source>Installing updates...</source>
+      <translation>กำลังติดตั้งโปรแกรม...</translation>
+    </message>
+    <message>
+      <source>Installing client updates...</source>
+      <translation type="unfinished">Installing client updates...</translation>
+    </message>
+    <message>
+      <source>Updating to ...</source>
+      <translation>กำลังอัพเดทเป็น</translation>
+    </message>
+    <message>
+      <source>Ready to update to</source>
+      <translation>พร้อมอัพเดทแล้ว</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>ติดตั้งการปรับปรุง</translation>
+    </message>
+    <message>
+      <source>System updated to</source>
+      <translation type="unfinished">System updated to</translation>
+    </message>
+    <message>
+      <source>System update in process</source>
+      <translation>การอัปเดตระบบในกระบวนการ</translation>
+    </message>
+    <message>
+      <source>Continue in Background</source>
+      <translation>ดำเนินการต่อในเบื้องหลัง</translation>
+    </message>
+    <message>
+      <source>Specific Build</source>
+      <translation>สร้างเฉพาะ</translation>
+    </message>
+    <message>
+      <source>Browse for Update File</source>
+      <translation>เรียกค้นไฟล์อัปเดต</translation>
+    </message>
+    <message>
+      <source>Update from mediaservers</source>
+      <translation type="unfinished">Update from mediaservers</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>อัพเดตล่าสุดที่มีให้</translation>
+    </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation type="unfinished">Missing update package for the client</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation type="unfinished">Finish Update</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation type="unfinished">The latest version is already installed</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation type="unfinished">This version is already installed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n เค้าโครง</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have any layouts</source>
+      <translation type="unfinished">You do not have any layouts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationListModel::Private</name>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>การเตือน: %1</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>รับทราบ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
+    <message>
+      <source>No new notifications</source>
+      <translation type="unfinished">No new notifications</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
+    <message>
+      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
+      <translation>ผู้ใช้บางคนสวม&apos;t มีการเข้าถึงรูปแบบที่เลือก การดำเนินการจะไม่ทำงานสำหรับพวกเขา</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout. Action will not work.</source>
+      <translation>ไม่มีผู้ใช้ที่เลือกมีสิทธิ์ในการเลือกเค้าโครงที่เลือก การกระทำจะไม่ทำงาน</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners. </source>
+      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น </translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>เลือกเค้าโครง</translation>
+    </message>
+    <message>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>เลือกผู้ใช้เพียงรายเดียวใน &quot;แสดงเป็น&quot; บรรทัดเพื่อแสดงเค้าโครงในเครื่องของเขาในรายการนี้</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners.</source>
+      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+    </message>
+    <message>
+      <source>None of selected user roles contain users. Action will not work.</source>
+      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PresentedStateDelegate</name>
+    <message>
+      <source>Added</source>
+      <translation>เพิ่มแล้ว</translation>
+    </message>
+    <message>
+      <source>Adding</source>
+      <translation>เพิ่ม</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
       <translation>อัตโนมัติ</translation>
@@ -8301,14 +8962,14 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::RadassActionHandler</name>
+    <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
       <translation>ตั้งค่าเค้าโครงละเอียดเป็น &quot;Auto&quot; ในการเพิ่มประสิทธิภาพ</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
@@ -8317,7 +8978,306 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
+    <message>
+      <source>Not recording</source>
+      <translation>ไม่ได้ทำการบันทึก</translation>
+    </message>
+    <message>
+      <source>Recording everything</source>
+      <translation>บันทึกทุกอย่าง</translation>
+    </message>
+    <message>
+      <source>Recording motion only</source>
+      <translation>บันทึกการเคลื่อนไหวเท่านั้น</translation>
+    </message>
+    <message>
+      <source>Recording motion and low quality</source>
+      <translation>การเคลื่อนไหวและการบันทึกที่มีคุณภาพต่ำ</translation>
+    </message>
+    <message>
+      <source>Continuous</source>
+      <translation>ต่อเนื่อง</translation>
+    </message>
+    <message>
+      <source>Motion only</source>
+      <translation>การเคลื่อนไหวเท่านั้น</translation>
+    </message>
+    <message>
+      <source>Motion + Low-Res</source>
+      <translation type="unfinished">Motion + Low-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScheduleGridWidget</name>
+    <message>
+      <source>All</source>
+      <translation>ทั้งหมด</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>การตั้งค่าคุณภาพจะกำหนดอัตราการบีบอัดเท่านั้นและไม่มีผลต่อความละเอียด ต่ำสุดปานกลางสูงและดีที่สุดคือค่าบิตเรทที่ตั้งไว้ล่วงหน้า</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit / s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>การตั้งค่าภายในระบบ</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>การตั้งค่าเพิ่มเติม</translation>
+    </message>
+    <message>
+      <source>Dual-Streaming not supported for this camera</source>
+      <translation>ไม่สนับสนุนสตรีมมิงแบบคู่สำหรับกล้องนี้</translation>
+    </message>
+    <message>
+      <source>Dual-Streaming and motion detection not supported for this camera</source>
+      <translation>ไม่สนับสนุนการสตรีมแบบคู่และการตรวจจับการเคลื่อนไหวสำหรับกล้องนี้</translation>
+    </message>
+    <message>
+      <source>Motion detection disabled</source>
+      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
+      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <source>Motion detection disabled or not supported</source>
+      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งานหรือไม่รองรับ</translation>
+    </message>
+    <message>
+      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SearchLineEdit</name>
+    <message>
+      <source>Search</source>
+      <translation>ค้นหา</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>ติดตามและบันทึกการทำงานของผู้ใช้ทั้งหมด</translation>
+    </message>
+    <message>
+      <source>User will be automatically logged out after this period of time.</source>
+      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
+    </message>
+    <message>
+      <source>minutes</source>
+      <translation>นาที</translation>
+    </message>
+    <message>
+      <source>hours</source>
+      <translation>ชั่วโมง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
+    <message>
+      <source>Skipped</source>
+      <translation>ข้าม</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation>ดาวน์โหลดแล้ว</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdatesModel</name>
+    <message>
+      <source>Current Version</source>
+      <translation>เวอร์ชั่นปัจจุบัน</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>สถานะ</translation>
+    </message>
+    <message>
+      <source>Message</source>
+      <translation>ข้อความ</translation>
+    </message>
+    <message>
+      <source>Store Update Files</source>
+      <translation type="unfinished">Store Update Files</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>ไคลเอนต์</translation>
+    </message>
+    <message>
+      <source>Component</source>
+      <translation type="unfinished">Component</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
+    <message>
+      <source>Motion</source>
+      <translation>การเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <source>Bookmark it...</source>
+      <translation>การบันทึก บุ๊คมาร์ค...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation type="unfinished">Select area on the video to filter results</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>No motion</source>
+      <translation>ไม่มีการเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <source>No motion detected</source>
+      <translation>ไม่พบการเคลื่อนไหว</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n motion events</source>
+      <translation>
+        <numerusform>กิจกรรมเคลื่อนไหว %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>เลือกกล้อง</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ไม่มี</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>ไปถ่ายทอดสด</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
+    <message numerus="yes">
+      <source>Email address is not set for %n users</source>
+      <translation type="unfinished">
+        <numerusform>Email address is not set for %n users</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>ตั้งรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TileInteractionHandler</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... และ %n อื่น ๆ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No available archive</source>
+      <translation type="unfinished">No available archive</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
+    <message>
+      <source>Server</source>
+      <translation>เซอร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Time Zone</source>
+      <translation type="unfinished">Time Zone</translation>
+    </message>
+    <message>
+      <source>Date</source>
+      <translation>วันที่</translation>
+    </message>
+    <message>
+      <source>Server OS Time</source>
+      <translation type="unfinished">Server OS Time</translation>
+    </message>
+    <message>
+      <source>VMS Time</source>
+      <translation type="unfinished">VMS Time</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
+    <message>
+      <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
+      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+    </message>
+    <message>
+      <source>Synchronized with the Internet</source>
+      <translation type="unfinished">Synchronized with the Internet</translation>
+    </message>
+    <message>
+      <source>Synchronized with the local time at the selected server</source>
+      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+    </message>
+    <message>
+      <source>Not synchronized. Each server uses its own local time.</source>
+      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+    </message>
+    <message>
+      <source>Equal to the server local time</source>
+      <translation type="unfinished">Equal to the server local time</translation>
+    </message>
+    <message>
+      <source>No Internet connection. Time is not being synchronized.</source>
+      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+    </message>
+    <message>
+      <source>Time Server is offline. Time is not being synchronized.</source>
+      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
       <translation>ยาว</translation>
@@ -8328,7 +9288,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::UploadWorker</name>
+    <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
       <translation>ไม่สามารถเปิดไฟล์ &quot;%1&quot;</translation>
@@ -8338,8 +9298,8 @@ to %1</source>
       <translation>ไม่สามารถคำนวณ md5 สำหรับไฟล์ &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Could not create upload on the server side</source>
-      <translation>ไม่สามารถสร้างการอัปโหลดทางฝั่งเซิร์ฟเวอร์</translation>
+      <source>Could not create upload on the server side: %1</source>
+      <translation type="unfinished">Could not create upload on the server side: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -8355,32 +9315,75 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WearableWorker</name>
+    <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
+    <message>
+      <source>Motion is being detected only during video uploading.</source>
+      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+    </message>
+    <message>
+      <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
+      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WearableCameraUploadWidget</name>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation>มีผู้ใช้รายอื่นกำลังอัปโหลดภาพไปยังกล้องนี้</translation>
+    </message>
+    <message>
+      <source>User %1 is currently uploading footage to this camera.</source>
+      <translation>ผู้ใช้ %1 กำลังอัปโหลดวิดีโอกับกล้องนี้</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <comment>Uploaded and total number of files will be substituted</comment>
+      <translation>(%1 ใน %2)</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <comment>Filename will be substituted</comment>
+      <translation>กำลังสรุป %1...</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <comment>Filename will be substituted</comment>
+      <translation>กำลังอัปโหลด %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
       <translation>ไม่สามารถส่งคำขอไปยังเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <name>nx::vms::client::desktop::WebWidget</name>
     <message>
-      <source>%1 Analytics</source>
-      <translation>%1 วิเคราะห์</translation>
+      <source>Failed to load page</source>
+      <translation>ไม่สามารถโหลดรายการ</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>บุ๊คมาร์ค %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>การส่งออกวิดีโอ</translation>
+    </message>
     <message>
       <source>Stop Export</source>
       <translation>หยุดการส่งออก</translation>
     </message>
     <message>
-      <source>Export completed</source>
-      <translation>การส่งออกเสร็จสมบูรณ์</translation>
-    </message>
-    <message>
-      <source>Export failed</source>
-      <translation>ส่งออกล้มเหลว</translation>
+      <source>Minimize</source>
+      <translation>ย่อขนาด</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -8392,89 +9395,20 @@ to %1</source>
       <translation>%1 ถูกใช้โดยส่งออกอื่น</translation>
     </message>
     <message>
+      <source>Export completed</source>
+      <translation>การส่งออกเสร็จสมบูรณ์</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>ส่งออกล้มเหลว</translation>
+    </message>
+    <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>ไม่สามารถส่งออกระยะเวลาที่เลือกสำหรับกล้องปัจจุบันได้</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>บุ๊คมาร์ค %n</numerusform>
-      </translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
       <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>ไม่สามารถสร้างไฟล์ที่ส่งออก%1...</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>ไม่รู้จักข้อผิดพลาดที่เกิดขึ้น.</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>กำลังส่งออกไปที่ "%1"...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>ไม่สามารถส่งออกอุปกรณ์ %1.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>ไม่สามารถส่งออก กล้อง %1.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>ไม่สามารถส่งออกโมดูล I/O%1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>ไฟล์ที่ใช้ในการบันทึกแล้ว</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>โปรดเลือกชื่ออื่นหรือรอจนกว่าการบันทึกจะเสร็จสิ้น</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>รูปแบบการส่งออก</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>ไฟล์ EXE ที่มากกว่า 4 GB ไม่สามารถเปิดโดยคลิกสองครั้งเนื่องจากมีข้อจำกัดของ Windows</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>ส่งออกไปยัง EXE หรือไม่?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>ไม่สามารถส่งออกวิดีโอได้หลายรายการ</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -8485,28 +9419,19 @@ to %1</source>
       <translation>โปรดลบไฟล์ในระบบทั้งหมดออกจากเค้าโครงและลองอีกครั้ง</translation>
     </message>
     <message>
-      <source>Save local layout as...</source>
-      <translation>บันทึกหน้าต่างเป็น...</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>การส่งออก</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 สื่อไฟล์ (*.nov)</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>ทำให้ไฟล์อ่านอย่างเดียว.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>ส่งออก</translation>
+      <source>Starting export...</source>
+      <translation type="unfinished">Starting export...</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <name>nx::vms::client::desktop::detail::BaseInputField</name>
+    <message>
+      <source>multiple values</source>
+      <translation>หลายค่า</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
       <translation>คุณสามารถตั้งค่าเหตุการณ์ Analytics ได้ในกล้องบางเครื่อง</translation>
@@ -8516,62 +9441,61 @@ to %1</source>
       <translation>เลือกกล้องโดยใช้ปุ่มด้านบนเพื่อดูรายการกิจกรรมที่สนับสนุน</translation>
     </message>
     <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
-    </message>
-    <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
       <translation>ฟิลด์นี้เป็นตัวพิมพ์เล็กและใหญ่</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
-      <source>Copy</source>
-      <comment>to Clipboard</comment>
-      <translation>คัดลอก</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>คัดลอกจากคลิปบอร์ด</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <comment>from Clipboard</comment>
-      <translation>วาง</translation>
-    </message>
-    <message>
-      <source>Paste from Clipboard</source>
-      <translation>วางจากคลิปบอร์ด</translation>
-    </message>
-    <message>
-      <source>Copied</source>
-      <comment>to Clipboard</comment>
-      <translation>คัดลอกแล้ว.</translation>
-    </message>
-    <message>
-      <source>Pasted</source>
-      <comment>from Clipboard</comment>
-      <translation>วาง</translation>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
       <translation>ลากโครงร่างหรือกล้องถ่ายรูปที่นี่เพื่อเพิ่มลงใน showreel</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <message>
+      <source>Any Plugin</source>
+      <translation type="unfinished">Any Plugin</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>ฟิลด์นี้เป็นตัวพิมพ์เล็กและใหญ่</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>All Users</source>
+      <translation>ผู้ใช้ทั้งหมด</translation>
+    </message>
     <message>
       <source>Users</source>
       <translation>ผู้ใช้งาน</translation>
@@ -8580,13 +9504,9 @@ to %1</source>
       <source>Custom Users</source>
       <translation>ผู้ใช้ที่กำหนดเอง</translation>
     </message>
-    <message>
-      <source>All Users</source>
-      <translation>ผู้ใช้ทั้งหมด</translation>
-    </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
       <translation>สลับกับปุ่มลัด</translation>
@@ -8597,26 +9517,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>หยุด Showreel</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>เริ่ม Showreel</translation>
-    </message>
+    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Tour</source>
       <translation>หยุดทัวร์</translation>
     </message>
     <message>
+      <source>Stop Showreel</source>
+      <translation>หยุด Showreel</translation>
+    </message>
+    <message>
       <source>Start Tour</source>
       <translation>เริ่มต้น ทัวร์</translation>
     </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>เริ่ม Showreel</translation>
+    </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
@@ -8629,7 +9549,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Please fill up information about yourself and reason for license deactivation</source>
       <translation>โปรดกรอกข้อมูลเกี่ยวกับตัวคุณและเหตุผลในการยกเลิกการใช้งานใบอนุญาต</translation>
@@ -8652,7 +9572,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>อีเมล</translation>
+      <translation>อีเมลล์</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8663,6 +9583,10 @@ to %1</source>
       <translation>- เลือกมาหนึ่งอย่าง -</translation>
     </message>
     <message>
+      <source>I am upgrading my machine</source>
+      <translation>ฉันกำลังอัพเกรดเครื่องของฉัน</translation>
+    </message>
+    <message>
       <source>I accidentally assigned the license to a wrong machine</source>
       <translation>ฉันตั้งใจได้กำหนดสิทธิ์การใช้งานเครื่องไม่ถูกต้อง</translation>
     </message>
@@ -8670,20 +9594,17 @@ to %1</source>
       <source>Other Reason</source>
       <translation>เหตุผลอื่น</translation>
     </message>
-    <message>
-      <source>I am upgrading my machine</source>
-      <translation>ฉันกำลังอัพเกรดเครื่องของฉัน</translation>
-    </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
-      <source>Go to Live</source>
-      <translation>ไปถ่ายทอดสด</translation>
+      <source>Layout is full</source>
+      <translation type="unfinished">Layout is full</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message>
+      <source>Failed to change password</source>
+      <translation>ไม่สามารถเปลี่ยนรหัสผ่าน</translation>
+    </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
       <translation>
@@ -8729,32 +9650,24 @@ to %1</source>
       <translation>ย้าย</translation>
     </message>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>เค้าโครงถูกล็อคและไม่สามารถเปลี่ยนแปลงได้.</translation>
+      <source>Virtual Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
     </message>
     <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>สกุลไฟล์ที่รองรับทั้งหมด (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
-    </message>
-    <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>วีดีโอ (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
-    </message>
-    <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>รูปภาพ (*.jpg *.png *.gif *.bmp *.tiff)</translation>
-    </message>
-    <message>
-      <source>All files (*.*)</source>
-      <translation>ทุกไฟล์ (*.*)</translation>
+      <source>Layout is locked and cannot be changed</source>
+      <translation type="unfinished">Layout is locked and cannot be changed</translation>
     </message>
     <message>
       <source>Open File</source>
       <translation>เปิดไฟล์</translation>
     </message>
     <message>
+      <source>All Supported</source>
+      <translation type="unfinished">All Supported</translation>
+    </message>
+    <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -8767,10 +9680,6 @@ to %1</source>
     <message>
       <source>Preview Search for %1</source>
       <translation>ค้นหาตัวอย่างสำหรับ%1</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation>ยกเลิกการเพิ่มอุปกรณ์หรือไม่?</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
@@ -8815,20 +9724,12 @@ to %1</source>
       <translation>อัปโหลดภาพไม่สำเร็จ</translation>
     </message>
     <message>
-      <source>Client</source>
-      <translation>ไคลเอนต์</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>เซอร์ฟเวอร์</translation>
+      <source>Components of System have different versions:</source>
+      <translation>ส่วนประกอบของระบบมีเวอร์ชันต่างกัน:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
       <translation>โปรดอัปเดตคอมโพเนนต์ทั้งหมดเป็นเวอร์ชัน %1</translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>ส่วนประกอบของระบบมีเวอร์ชันต่างกัน:</translation>
     </message>
     <message>
       <source>Update...</source>
@@ -8841,6 +9742,10 @@ to %1</source>
     <message>
       <source>Beta version %1</source>
       <translation>รุ่น ทดสอบ %1</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation>โปรดอัพเดทเป็นแพทช์หรือรุ่นที่พร้อมใช้งานถัดไปเมื่อพร้อมใช้งาน</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
@@ -8858,29 +9763,20 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>ไม่สามารถเปิดเว็บเซิร์ฟเวอร์ได้</translation>
     </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>ไม่สามารถย้ายกล้องระหว่างเซิร์ฟเวอร์ได้</translation>
+    <message numerus="yes">
+      <source>Failed to change password on %n cameras of %1</source>
+      <comment>Total number of cameras will be substituted as %1</comment>
+      <translation type="unfinished">
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Failed to change password</source>
-      <translation>ไม่สามารถเปลี่ยนรหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>Failed to change password on %1 of %2 cameras</source>
-      <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only!</source>
-      <translation>คำเตือน! โครงสร้างนี้มีไว้เพื่อการทดสอบเท่านั้น!</translation>
-    </message>
-    <message>
-      <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation>โปรดอัพเดทเป็นแพทช์หรือรุ่นที่พร้อมใช้งานถัดไปเมื่อพร้อมใช้งาน</translation>
+      <source>This build is for testing purposes only.</source>
+      <translation type="unfinished">This build is for testing purposes only.</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
       <translation>ใช้ลูกศรบนแป้นพิมพ์เพื่อเปลี่ยนรูปแบบ เมื่อต้องการออกจาก showreel ให้กด Esc</translation>
@@ -8891,25 +9787,28 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
     <message>
-      <source>Switch by %1</source>
-      <translation>เปลี่ยนโดย %1</translation>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>เปลี่ยนโดย</translation>
     </message>
     <message>
       <source>Display for</source>
+      <comment>Time selector will follow</comment>
       <translation>แสดงผลสำหรับ</translation>
     </message>
     <message>
       <source>Display selected for</source>
+      <comment>Time will follow</comment>
       <translation>เลือกรายการที่เลือกไว้แล้ว</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation>showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
@@ -8921,7 +9820,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
       <translation>บันทึกเค้าโครงเป็น</translation>

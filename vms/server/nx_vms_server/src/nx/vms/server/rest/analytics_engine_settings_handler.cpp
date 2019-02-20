@@ -14,9 +14,36 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/rest/utils.h>
 
+#include <nx/vms/api/analytics/settings_response.h>
+
 namespace nx::vms::server::rest {
 
 using namespace nx::network;
+
+namespace {
+
+JsonRestResponse makeSettingsResponse(
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine)
+{
+    nx::vms::api::analytics::SettingsResponse response;
+    response.values = QJsonObject::fromVariantMap(engine->settingsValues());
+
+    const auto parentPlugin = engine->plugin();
+    if (!NX_ASSERT(parentPlugin))
+    {
+        return makeResponse(
+            QnRestResult::Error::InternalServerError,
+            lm("Unable to access the parent Plugin of the Engine, %1").args(engine));
+    }
+
+    response.model = parentPlugin->manifest().engineSettingsModel;
+
+    JsonRestResponse result(http::StatusCode::ok);
+    result.json.setReply(response);
+    return result;
+}
+
+} // namespace
 
 AnalyticsEngineSettingsHandler::AnalyticsEngineSettingsHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -43,9 +70,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executeGet(const JsonRestReques
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    JsonRestResponse response(http::StatusCode::ok);
-    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
-    return response;
+    return makeSettingsResponse(engine);
 }
 
 JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
@@ -81,10 +106,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     engine->setSettingsValues(settings.toVariantMap());
     engine->saveProperties();
 
-    JsonRestResponse response(http::StatusCode::ok);
-    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
-
-    return response;
+    return makeSettingsResponse(engine);
 }
 
 } // namespace nx::vms::server::rest

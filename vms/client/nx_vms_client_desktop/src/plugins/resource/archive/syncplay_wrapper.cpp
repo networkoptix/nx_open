@@ -13,6 +13,8 @@
 #include "core/resource/resource.h"
 #include <core/resource/security_cam_resource.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
 
@@ -122,6 +124,15 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 }
 
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
+{
+    if (nx::vms::client::desktop::ini().compatibilityIsMediaPaused)
+        return isMediaPausedUncached();
+
+    Q_D(const QnArchiveSyncPlayWrapper);
+    return d->paused || d->readers.empty();
+}
+
+bool QnArchiveSyncPlayWrapper::isMediaPausedUncached() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QnMutexLocker lock( &d->timeMutex );
@@ -796,13 +807,13 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
         return;
     d->enabled = true;
     d->speed = currentSpeed;
-    bool isPaused = (currentSpeed == 0);
+    d->paused = (currentSpeed == 0);
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader->isEnabled())
         {
             bool isItemPaused = info.reader->isMediaPaused();
-            if (!isItemPaused && isPaused)
+            if (!isItemPaused && d->paused)
                 info.reader->pauseMedia();
 
             if (currentTime != qint64(AV_NOPTS_VALUE)) {
@@ -813,7 +824,7 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
             else {
                 info.reader->setSpeed(currentSpeed);
             }
-            if (isItemPaused && !isPaused)
+            if (isItemPaused && !d->paused)
                 info.reader->resumeMedia();
 
             info.reader->setNavDelegate(this);

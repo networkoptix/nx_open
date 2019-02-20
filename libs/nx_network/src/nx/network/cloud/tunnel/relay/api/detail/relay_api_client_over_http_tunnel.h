@@ -47,6 +47,7 @@ private:
 
     void openTunnel(
         const nx::utils::Url& url,
+        network::http::tunneling::TunnelValidatorFactoryFunc tunnelValidatorFactoryFunc,
         ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler);
 
     void processServerTunnelResult(
