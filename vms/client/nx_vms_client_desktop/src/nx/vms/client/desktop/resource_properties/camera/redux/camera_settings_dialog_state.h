@@ -137,6 +137,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         CombinedValue supportsMotionStreamOverride = CombinedValue::None;
         CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
         CombinedValue supportsRecording = CombinedValue::None;
+        CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;

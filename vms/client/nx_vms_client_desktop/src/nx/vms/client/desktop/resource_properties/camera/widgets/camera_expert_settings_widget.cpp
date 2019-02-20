@@ -70,8 +70,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     combo_box_utils::insertMultipleValuesItem(ui->comboBoxTransport);
     ui->comboBoxTransport->addItem(tr("Auto", "Automatic RTP transport type"),
         QVariant::fromValue(vms::api::RtpTransportType::automatic));
-    ui->comboBoxTransport->addItem(lit("TCP"), QVariant::fromValue(vms::api::RtpTransportType::tcp));
-    ui->comboBoxTransport->addItem(lit("UDP"), QVariant::fromValue(vms::api::RtpTransportType::udp));
+    ui->comboBoxTransport->addItem("TCP", QVariant::fromValue(vms::api::RtpTransportType::tcp));
+    ui->comboBoxTransport->addItem("UDP", QVariant::fromValue(vms::api::RtpTransportType::udp));
 
     ui->preferredPtzPresetTypeComboBox->clear();
     combo_box_utils::insertMultipleValuesItem(ui->preferredPtzPresetTypeComboBox);
@@ -346,6 +346,32 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ::setReadOnly(ui->checkBoxSecondaryRecorder, state.readOnly);
 
     // Media Streaming.
+
+    if (state.devicesDescription.isUdpMulticastTransportAllowed == CombinedValue::All)
+    {
+        const auto index = ui->comboBoxTransport->findData(
+            QVariant::fromValue(vms::api::RtpTransportType::udpMulticast));
+
+        if (index < 0)
+        {
+            ui->comboBoxTransport->addItem(
+                tr("UDP Multicast"),
+                QVariant::fromValue(vms::api::RtpTransportType::udpMulticast));
+        }
+    }
+    else
+    {
+        const auto index = ui->comboBoxTransport->findData(
+            QVariant::fromValue(vms::api::RtpTransportType::udpMulticast));
+
+        const auto currentIndex = ui->comboBoxTransport->currentIndex();
+        if (index >= 0)
+        {
+            ui->comboBoxTransport->removeItem(index);
+            if (index == currentIndex)
+                ui->comboBoxTransport->setCurrentIndex(0);
+        }
+    }
 
     if (state.expert.rtpTransportType.hasValue())
     {

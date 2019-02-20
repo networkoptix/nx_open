@@ -391,6 +391,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
+
     const bool ptzCapabilitiesChanged = (state.canForcePanTiltCapabilities()
         && state.expert.forcedPtzPanTiltCapability.valueOr(true))
         || (state.canForcePanTiltCapabilities()
@@ -525,6 +526,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasDualStreamingInternal(); });
+
+    state.devicesDescription.isUdpMulticastTransportAllowed = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->hasCameraCapabilities(Qn::CameraCapability::MulticastStreamCapability);
+        });
 
     state.devicesDescription.hasRemoteArchiveCapability = combinedValue(cameras,
         [](const Camera& camera)
