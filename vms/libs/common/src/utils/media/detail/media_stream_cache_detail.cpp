@@ -210,7 +210,6 @@ int MediaStreamCache::getMaxBitrate() const
     return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 
-// TODO: write tests
 /**
     Returns packet with timestamp == \a timestamp or packet with closest (from the left) timestamp.
     In other words, this methods performs lower_bound in timestamp-sorted (using 'greater'

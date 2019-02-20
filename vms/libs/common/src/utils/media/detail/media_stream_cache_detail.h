@@ -20,7 +20,6 @@
 
 namespace detail {
 
-// TODO: this class doesn't take into account channelNumber. It cause bugs for multichannel devices.
 class MediaStreamCache
 {
 public:
@@ -54,7 +53,6 @@ public:
     */
     int getMaxBitrate() const;
 
-    // TODO: Make channelNumber required.
     //!Returns packet with timestamp == \a desiredTimestamp or packet with closest (from the left) timestamp
     /*!
         In other words, this methods performs lower_bound in timestamp-sorted (using 'greater' comparision) array of data packets
@@ -64,12 +62,12 @@ public:
         quint64 desiredTimestamp,
         bool findKeyFrameOnly,
         quint64* const foundTimestamp,
-        int channelNumber = 0) const;
+        int channelNumber) const;
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket(
         quint64 timestamp,
         quint64* const foundTimestamp,
-        int channelNumber = 0) const;
+        int channelNumber) const;
 
     nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& keyFrameFoundSubscription();
     nx::utils::Subscription<>& streamTimeDiscontinuityFoundSubscription();

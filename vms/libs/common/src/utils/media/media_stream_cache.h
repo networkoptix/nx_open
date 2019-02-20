@@ -38,7 +38,7 @@ public:
     public:
         SequentialReadContext(
             MediaStreamCache* cache,
-            quint64 startTimestamp );
+            quint64 startTimestamp);
         ~SequentialReadContext();
 
         //!If no next frame returns NULL

@@ -47,25 +47,24 @@ MediaStreamCache::SequentialReadContext::~SequentialReadContext()
 QnAbstractDataPacketPtr MediaStreamCache::SequentialReadContext::getNextFrame()
 {
     auto strongCacheRef = m_sharedCache.lock();
-    if( !strongCacheRef )
+    if (!strongCacheRef)
         return QnAbstractDataPacketPtr();
 
-    if( m_firstFrame )
+    if (m_firstFrame)
     {
-        // TODO: Add channel support.
+        // TODO: Add channel support. Remove 0s, check HLS.
         QnAbstractDataPacketPtr packet = strongCacheRef->findByTimestamp(
-            m_startTimestamp,
-            true,
-            &m_currentTimestamp );
-        if( !packet )
+            m_startTimestamp, true, &m_currentTimestamp, 0);
+        if (!packet)
             return QnAbstractDataPacketPtr();
         m_firstFrame = false;
         return packet;
     }
 
-    QnAbstractDataPacketPtr packet = strongCacheRef->getNextPacket( m_currentTimestamp, &m_currentTimestamp );
-    if( packet )
-        strongCacheRef->moveBlocking( m_blockingID, m_currentTimestamp );
+    QnAbstractDataPacketPtr packet = strongCacheRef->getNextPacket(
+        m_currentTimestamp, &m_currentTimestamp, 0);
+    if (packet)
+        strongCacheRef->moveBlocking(m_blockingID, m_currentTimestamp);
     return packet;
 }
 
