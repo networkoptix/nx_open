@@ -232,8 +232,13 @@ void CommonHttpConnection::forwardTransactionToProcessor(
 
     // NOTE: Transport sequence MUST be valid for compatibility with VMS <= 3.2.
     // Although, it is not used by this implementation.
-    if (m_prevReceivedTransportSequence)
-        NX_ASSERT(transportHeader.sequence > *m_prevReceivedTransportSequence);
+    if (m_prevReceivedTransportSequence &&
+        transportHeader.sequence <= *m_prevReceivedTransportSequence)
+    {
+        NX_DEBUG(this, "systemId %1, connection %2. Received command with transport sequence %3 "
+            "while expecting greater than %4", m_systemId, m_connectionId, transportHeader.sequence,
+            *m_prevReceivedTransportSequence);
+    }
     m_prevReceivedTransportSequence = transportHeader.sequence;
 
     if (!m_gotTransactionEventHandler)
