@@ -706,11 +706,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         onvifTimeouts(),
         getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     _onvifDevice__GetCapabilitiesResponse capabilitiesResponse;
+
     /*
      Warning! The capabilitiesResponse lifetime must be not more then deviceSoapWrapper lifetime,
      because DeviceSoapWrapper destructor destroys internals of _onvifDevice__GetCapabilitiesResponse.
     */
-
     auto result = initOnvifCapabilitiesAndUrls(deviceSoapWrapper, &capabilitiesResponse); //< step 1
     if (!checkResultAndSetStatus(result))
         return result;
@@ -780,6 +780,10 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
 CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     const _onvifDevice__GetCapabilitiesResponse& /*onvifCapabilities*/)
 {
+    // TODO: Now we think that all Onvif cameras has ability to multicast media.
+    // Investigate if there is some API to figure out if it's true.
+    setCameraCapability(Qn::CameraCapability::MulticastStreamCapability, true);
+
     auto result = fetchAndSetVideoSource();
     if (!result)
         return result;
