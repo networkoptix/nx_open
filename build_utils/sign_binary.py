@@ -51,10 +51,15 @@ def sign_binary(
                 fd.write(chunk)
 
         return 0
+    except requests.exceptions.ReadTimeout as e:
+        print('ERROR: Connection to the signing server has timed out' +
+              ' ({} seconds, {} retries)'.format(timeout, max_retries))
+        print(e)
+        return 1
     except requests.exceptions.ConnectionError as e:
         print('ERROR: Connection to the signing server cannot be established.')
         print(e)
-        return 1
+        return 2
 
 
 def main():
@@ -69,8 +74,16 @@ def main():
         '-t', '--trusted-timestamping',
         action='store_true',
         help='Trusted timestamping')
-    parser.add_argument('--retries', help='Max retries count (10)', type=int, default=DEFAULT_RETRIES)
-    parser.add_argument('--timeout', help='Request timeout in seconds (30)', type=int, default=DEFAULT_TIMEOUT)
+    parser.add_argument(
+        '--retries',
+        help='Max retries count (10)',
+        type=int,
+        default=DEFAULT_RETRIES)
+    parser.add_argument(
+        '--timeout',
+        help='Request timeout in seconds (30)',
+        type=int,
+        default=DEFAULT_TIMEOUT)
     args = parser.parse_args()
 
     return sign_binary(
