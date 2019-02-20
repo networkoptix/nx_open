@@ -322,14 +322,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     updateDisplay();
     updateDewarpingParams();
-
-    /* Set up static text. */
-    for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
-    {
-        m_sensStaticText[i].setText(QString::number(i));
-        m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
-    }
-
     updateAspectRatio();
     updatePtzController();
 
@@ -1281,7 +1273,9 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
 
     for (int i = 0; i < channelCount(); ++i)
     {
-        QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight));
+        QRect rect = gridRect
+            .translated(-channelGridOffset(i))
+            .intersected(QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight));
         if (rect.isEmpty())
             continue;
 
@@ -1376,89 +1370,9 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const
         m_motionSensitivity.clear();
     }
 
-    invalidateMotionLabelPositions();
     invalidateBinaryMotionMask();
 
     m_motionSensitivityValid = true;
-}
-
-bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int sensitivity)
-{
-    ensureMotionSensitivity();
-
-    bool changed = false;
-    if (d->camera)
-    {
-        QnConstResourceVideoLayoutPtr layout = d->camera->getVideoLayout();
-
-        for (int i = 0; i < layout->channelCount(); ++i)
-        {
-            QRect r(0, 0, MotionGrid::kWidth, MotionGrid::kHeight);
-            r.translate(channelGridOffset(i));
-            r = gridRect.intersected(r);
-            r.translate(-channelGridOffset(i));
-            if (!r.isEmpty())
-            {
-                m_motionSensitivity[i].addRect(sensitivity, r);
-                changed = true;
-            }
-        }
-    }
-
-    if (sensitivity == 0)
-        invalidateBinaryMotionMask();
-
-    invalidateMotionLabelPositions();
-
-    return changed;
-}
-
-bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, int sensitivity)
-{
-    ensureMotionSensitivity();
-
-    int channel = 0;
-    QPoint channelPos = gridPos;
-    if (d->camera)
-    {
-        QnConstResourceVideoLayoutPtr layout = d->camera->getVideoLayout();
-
-        for (int i = 0; i < layout->channelCount(); ++i)
-        {
-            QRect r(channelGridOffset(i), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
-            if (r.contains(channelPos))
-            {
-                channelPos -= r.topLeft();
-                channel = i;
-                break;
-            }
-        }
-    }
-
-    if (!m_motionSensitivity[channel].updateSensitivityAt(channelPos, sensitivity))
-        return false;
-
-    invalidateBinaryMotionMask();
-    invalidateMotionLabelPositions();
-
-    return true;
-}
-
-void QnMediaResourceWidget::clearMotionSensitivity()
-{
-    for (int i = 0; i < channelCount(); i++)
-        m_motionSensitivity[i] = QnMotionRegion();
-    m_motionSensitivityValid = true;
-
-    invalidateBinaryMotionMask();
-    invalidateMotionLabelPositions();
-}
-
-const QList<QnMotionRegion> &QnMediaResourceWidget::motionSensitivity() const
-{
-    ensureMotionSensitivity();
-
-    return m_motionSensitivity;
 }
 
 void QnMediaResourceWidget::ensureBinaryMotionMask() const
@@ -1468,7 +1382,10 @@ void QnMediaResourceWidget::ensureBinaryMotionMask() const
 
     ensureMotionSensitivity();
     for (int i = 0; i < channelCount(); ++i)
-        QnMetaDataV1::createMask(m_motionSensitivity[i].getMotionMask(), reinterpret_cast<char *>(m_binaryMotionMask[i]));
+	{
+        QnMetaDataV1::createMask(m_motionSensitivity[i].getMotionMask(),
+			reinterpret_cast<char*>(m_binaryMotionMask[i]));
+	}
 }
 
 void QnMediaResourceWidget::invalidateBinaryMotionMask() const
@@ -1492,69 +1409,6 @@ void QnMediaResourceWidget::ensureMotionSelectionCache()
 void QnMediaResourceWidget::invalidateMotionSelectionCache()
 {
     m_motionSelectionCacheValid = false;
-}
-
-void QnMediaResourceWidget::ensureMotionLabelPositions() const
-{
-    /* Ensure motion sensitivity.
-     * m_motionLabelPositionsValid may be cleared in process. */
-    ensureMotionSensitivity();
-
-    if (m_motionLabelPositionsValid)
-        return;
-
-    MotionGrid grid;
-
-    /* Clear existing positions without freeing memory to avoid unnecessary reallocations: */
-    m_motionLabelPositions.resize(m_motionSensitivity.size());
-    for (auto& positionArrays : m_motionLabelPositions)
-        for (auto& positionArray : positionArrays)
-            positionArray.resize(0);
-
-    /* Analyze motion sensitivity for each channel: */
-    for (int channel = 0; channel < m_motionSensitivity.size(); ++channel)
-    {
-        /* Clear grid initially: */
-        grid.reset();
-
-        /* Fill grid with sensitivity numbers: */
-        for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)
-        {
-            for (const auto& rect : m_motionSensitivity[channel].getRectsBySens(sensitivity))
-                grid.fillRect(rect, sensitivity);
-        }
-
-        /* Label takes 1x2 cells. Find good areas to fit labels in,
-         * going from the top to the bottom, from the left to the right:
-         */
-        for (int y = 0; y < MotionGrid::kHeight - 1; ++y)
-        {
-            for (int x = 0; x < MotionGrid::kWidth; ++x)
-            {
-                QPoint pos(x, y);
-                int sensitivity = grid[pos];
-
-                /* If there's no motion detection region, or we already labeled it: */
-                if (sensitivity == 0)
-                    continue;
-
-                /* If a label doesn't fit: */
-                if (grid[{x, y + 1}] != sensitivity)
-                    continue;
-
-                /* Add label position: */
-                m_motionLabelPositions[channel][sensitivity] << pos;
-
-                /* Clear processed region: */
-                grid.clearRegion(pos);
-            }
-        }
-    }
-}
-
-void QnMediaResourceWidget::invalidateMotionLabelPositions() const
-{
-    m_motionLabelPositionsValid = false;
 }
 
 void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
@@ -1732,8 +1586,6 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         paintMotionGrid(painter, channel, rect,
             d->motionMetadataProvider->metadata(timestamp, channel));
 
-        paintMotionSensitivity(painter, channel, rect);
-
         /* Motion selection. */
         if (!m_motionSelection[channel].isEmpty())
         {
@@ -1882,52 +1734,6 @@ void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect,
     painter->fillRect(
         Geometry::subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
         palette().highlight());
-}
-
-void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect)
-{
-    QPoint channelOffset = channelGridOffset(channel);
-
-    qreal xStep = rect.width() / MotionGrid::kWidth;
-    qreal yStep = rect.height() / MotionGrid::kHeight;
-    qreal xOffset = channelOffset.x() + 0.1;
-    qreal yOffset = channelOffset.y();
-    qreal fontIncrement = 1.2;
-
-    painter->setPen(Qt::black);
-    QFont font;
-    font.setPointSizeF(yStep * fontIncrement);
-    font.setBold(true);
-    painter->setFont(font);
-
-    ensureMotionLabelPositions();
-
-    /* Zero sensitivity is skipped as there should not be painted zeros */
-    for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)
-    {
-        m_sensStaticText[sensitivity].prepare(painter->transform(), font);
-
-        for (const auto& pos : m_motionLabelPositions[channel][sensitivity])
-        {
-            painter->drawStaticText(
-                (pos.x() + xOffset) * xStep,
-                (pos.y() + yOffset) * yStep,
-                m_sensStaticText[sensitivity]);
-        }
-    }
-}
-
-void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect)
-{
-    ensureMotionSensitivity();
-    if (m_motionSensitivity.size() > channel)
-    {
-        paintFilledRegionPath(painter,
-            rect,
-            m_motionSensitivity[channel].getMotionMaskPath(),
-            qnGlobals->motionMaskColor(),
-            qnGlobals->motionMaskColor());
-    }
 }
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
@@ -2854,16 +2660,6 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
 QnScrollableTextItemsWidget* QnMediaResourceWidget::bookmarksContainer()
 {
     return m_bookmarksContainer;
-}
-
-QVector<QColor> QnMediaResourceWidget::motionSensitivityColors() const
-{
-    return m_motionSensitivityColors;
-}
-
-void QnMediaResourceWidget::setMotionSensitivityColors(const QVector<QColor>& value)
-{
-    m_motionSensitivityColors = value;
 }
 
 void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
