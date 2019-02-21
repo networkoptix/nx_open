@@ -570,24 +570,24 @@
             "type": "array",
             "value": [
               {
-                "id": "Camera",
-                "label": "camera"
+                "id": "camera",
+                "label": "Camera"
               },
               {
                 "id": "multiSensorCamera",
                 "label": "Multi-Sensor Camera"
               },
               {
-                "id": "Encoder",
-                "label": "encoder"
+                "id": "encoder",
+                "label": "Encoder"
               },
               {
-                "id": "DVR",
-                "label": "dvr"
+                "id": "dvr",
+                "label": "DVR"
               },
               {
-                "id": "Other",
-                "label": "other"
+                "id": "other",
+                "label": "Other"
               }
             ]
           },

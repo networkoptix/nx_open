@@ -149,7 +149,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     addFilterTypes() {
         this.hardwareTypes = JSON.parse(this.config.campage.supportedHardwareTypes);
         this.hardwareTypes.forEach(type => {
-            type.label = this.lang.campage[type.label];
+            type.label = this.lang.campage[type.id];
         });
 
         this.filterModel.multiselects = [
