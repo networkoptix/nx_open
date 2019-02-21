@@ -2,11 +2,11 @@
 
 #include <rest/server/request_handler.h>
 
-class QnServerControlHandler: public QnRestRequestHandler
+class QnDebugHandler: public QnRestRequestHandler
 {
     Q_OBJECT
 
-public:
+protected:
     virtual int executeGet(
         const QString& path,
         const QnRequestParamList& params,
@@ -21,5 +21,11 @@ public:
         const QByteArray& srcBodyContentType,
         QByteArray& responseMessageBody,
         QByteArray& contentType,
+        const QnRestConnectionProcessor* owner) override;
+
+    virtual void afterExecute(
+        const QString& path,
+        const QnRequestParamList& params,
+        const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
 };
