@@ -246,8 +246,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
-    ui->releaseDescriptionLabel->setOpenExternalLinks(true);
-
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
         [this]()
         {
@@ -298,6 +296,9 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->browseUpdate->setVisible(false);
 
     ui->releaseNotesLabel->setText(QString("<a href='notes'>%1</a>").arg(tr("Release notes")));
+
+    setWarningFrame(ui->releaseDescriptionLabel);
+    ui->releaseDescriptionLabel->setOpenExternalLinks(true);
     ui->releaseDescriptionLabel->setText(QString());
 
     QTimer* updateTimer = new QTimer(this);

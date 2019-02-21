@@ -287,10 +287,6 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="styleSheet">
-                <string notr="true">border: 1px solid red;
-border-radius: 2px;</string>
-               </property>
                <property name="text">
                 <string notr="true">&lt;Here will be release description (if not empty)&gt;</string>
                </property>
@@ -592,7 +588,7 @@ border-radius: 2px;</string>
        <number>8</number>
       </property>
       <property name="topMargin">
-       <number>16</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
        <number>8</number>
