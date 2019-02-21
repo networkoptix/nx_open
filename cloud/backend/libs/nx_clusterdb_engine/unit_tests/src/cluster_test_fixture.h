@@ -17,6 +17,8 @@ namespace nx::clusterdb::engine::test {
 class Peer
 {
 public:
+    Peer();
+
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
@@ -26,10 +28,12 @@ public:
     void connectTo(const Peer& other);
     Customer addRandomData();
     bool hasData(const std::vector<Customer>& data);
+    Customer modifyRandomly(const Customer& data);
 
     void setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter);
 
 private:
+    const std::string m_nodeId;
     nx::utils::test::ModuleLauncher<CustomerDbNode> m_process;
 };
 

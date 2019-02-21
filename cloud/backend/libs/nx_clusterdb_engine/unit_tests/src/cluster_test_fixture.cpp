@@ -4,10 +4,17 @@
 
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
+#include <nx/utils/uuid.h>
 
 #include <nx/clusterdb/engine/http/http_paths.h>
 
 namespace nx::clusterdb::engine::test {
+
+Peer::Peer():
+    m_nodeId(QnUuid::createUuid().toSimpleString().toStdString())
+{
+    m_process.addArg("-p2pDb/nodeId", m_nodeId.c_str());
+}
 
 nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
 {
@@ -52,11 +59,8 @@ Customer Peer::addRandomData()
     customer.fullName = nx::utils::generateRandomName(7).toStdString();
     customer.address = nx::utils::generateRandomName(7).toStdString();
 
-    std::promise<ResultCode> done;
-    process().moduleInstance()->customerManager().saveCustomer(
-        customer,
-        [&done](ResultCode resultCode) { done.set_value(resultCode); });
-    const auto resultCode = done.get_future().get();
+    const auto resultCode =
+        process().moduleInstance()->customerManager().saveCustomer(customer);
     if (resultCode != ResultCode::ok)
         throw std::runtime_error(toString(resultCode));
 
@@ -85,6 +89,20 @@ bool Peer::hasData(const std::vector<Customer>& expected)
     }
 
     return true;
+}
+
+Customer Peer::modifyRandomly(const Customer& data)
+{
+    Customer modified = data;
+    modified.fullName = nx::utils::generateRandomName(7).toStdString();
+    modified.address = nx::utils::generateRandomName(7).toStdString();
+
+    const auto resultCode =
+        process().moduleInstance()->customerManager().saveCustomer(modified);
+    if (resultCode != ResultCode::ok)
+        throw std::runtime_error(toString(resultCode));
+
+    return modified;
 }
 
 void Peer::setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter)

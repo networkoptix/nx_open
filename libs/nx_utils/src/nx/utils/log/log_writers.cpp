@@ -53,9 +53,11 @@ void File::write(Level /*level*/, const QString& message)
 
 QString File::makeFileName(size_t backupNumber) const
 {
+    static constexpr char kExtensionWithSeparator[] = ".log";
+
     auto baseFileName = m_settings.name;
-    if (baseFileName.endsWith(".log"))
-        baseFileName.truncate(baseFileName.size() - strlen(".log"));
+    if (baseFileName.endsWith(kExtensionWithSeparator))
+        baseFileName.chop(strlen(kExtensionWithSeparator));
 
     if (backupNumber == 0)
     {

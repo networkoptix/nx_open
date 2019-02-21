@@ -17,6 +17,8 @@
 
 namespace {
 
+static constexpr char kCdbGuid[] = "{674bafd7-4eec-4bba-84aa-a1baea7fc6db}";
+
 const QLatin1String kEndpointsToListen("listenOn");
 const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3346");
 
@@ -388,6 +390,8 @@ void Settings::loadSettings()
             kDefaultMediaServerConnectionIdlePeriod));
 
     m_p2pDb.load(settings());
+    // NOTE: Intentionally not allowing overriding this value.
+    m_p2pDb.nodeId = kCdbGuid;
 
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();

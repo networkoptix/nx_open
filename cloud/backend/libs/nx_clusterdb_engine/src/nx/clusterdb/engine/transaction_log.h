@@ -289,7 +289,9 @@ private:
 
     /** Fills transaction state cache. */
     nx::sql::DBResult fillCache();
-    nx::sql::DBResult fetchTransactionState(nx::sql::QueryContext* connection);
+    void fetchTransactionState(nx::sql::QueryContext* queryContext);
+    void restoreTransactionSequence(nx::sql::QueryContext* queryContext);
+
     /**
      * Selects transactions from DB by condition.
      */
@@ -351,6 +353,10 @@ private:
         const std::string& systemId);
 
     std::tuple<int, vms::api::Timestamp> generateNewTransactionAttributes(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId);
+
+    nx::sql::DBResult saveActualSequence(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId);
 

@@ -10,11 +10,10 @@
 namespace nx::cloud::db {
 
 MaintenanceManager::MaintenanceManager(
-    const QnUuid& moduleGuid,
     clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
     const nx::sql::InstanceController& dbInstanceController)
     :
-    m_moduleGuid(moduleGuid),
+    m_moduleGuid(syncronizationEngine->peerId()),
     m_syncronizationEngine(syncronizationEngine),
     m_dbInstanceController(dbInstanceController)
 {

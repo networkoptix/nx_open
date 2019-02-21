@@ -31,6 +31,9 @@ public:
         const Customer& customer,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
 
+    /** Synchronous version of saveCustomer(). */
+    ResultCode saveCustomer(const Customer& customer);
+
     void removeCustomer(
         const std::string& id,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
