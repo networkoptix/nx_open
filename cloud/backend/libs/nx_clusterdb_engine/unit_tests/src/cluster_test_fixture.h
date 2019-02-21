@@ -28,10 +28,12 @@ public:
     void connectTo(const Peer& other);
     Customer addRandomData();
     bool hasData(const std::vector<Customer>& data);
+    Customer modifyRandomly(const Customer& data);
 
     void setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter);
 
 private:
+    const std::string m_nodeId;
     nx::utils::test::ModuleLauncher<CustomerDbNode> m_process;
 };
 

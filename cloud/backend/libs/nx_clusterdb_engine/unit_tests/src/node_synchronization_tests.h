@@ -189,13 +189,30 @@ TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_sim
     this->thenPeersSynchronizedEventually();
 }
 
+TYPED_TEST_P(Synchronization, DISABLED_command_sequence_is_not_reused)
+{
+    this->givenSynchronizedPeers(2);
+
+    const auto data = this->peer(0).addRandomData();
+    this->thenPeersSynchronizedEventually();
+
+    this->peer(1).modifyRandomly(data);
+    this->thenPeersSynchronizedEventually();
+
+    this->peer(0).process().restart();
+    this->peer(0).connectTo(this->peer(1));
+    this->peer(0).addRandomData();
+
+    this->thenPeersSynchronizedEventually();
+}
 
 REGISTER_TYPED_TEST_CASE_P(Synchronization,
     peer_can_be_explicitly_connected_to_another_one,
     connected_peers_exchange_data,
     peers_connected_as_a_chain_are_synchronized,
     with_outgoing_command_filter,
-    peer_can_receive_same_data_from_multiple_peers_simultaneously
+    peer_can_receive_same_data_from_multiple_peers_simultaneously,
+    DISABLED_command_sequence_is_not_reused
 );
 
 } // namespace nx::clusterdb::engine::test
