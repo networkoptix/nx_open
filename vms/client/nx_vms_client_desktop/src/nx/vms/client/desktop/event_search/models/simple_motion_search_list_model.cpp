@@ -315,6 +315,7 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     if ((sourceEnd - sourceBegin) > maximumCount())
     {
         NX_WARNING(this, "Unexpected update, resetting.");
+        progressRollback.rollback();
         clear();
         requestFetch();
         return;
@@ -375,6 +376,7 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     }
     else if (rowCount() < fetchBatchSize())
     {
+        progressRollback.rollback();
         requestFetch();
     }
 }
