@@ -17,7 +17,7 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
 /**
  * The switch statement for any types and return values.
  *
- * Usage:
+ * # Usage example 1:
  * ```
  *  const std::string line = nx::utils::switch_(count,
  *      0, [](){ return "none"; },
@@ -25,7 +25,6 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *      nx::utils::default_, [](){ return "many"; }
  *  );
  * ```
- *
  * Equivalent of:
  * ```
  *  std::string line;
@@ -36,15 +35,15 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *      default: line = "many";
  *  }
  * ```
+ * Advantage here: keeps `line` const.
  *
- * Advantages: keeps `line` const and supports `count` of any type.
+ * # Usage example 2:
  * ```
  *  nx::utils::switch_(input.read(),
  *      "help", [](){ printHelp(); },
  *      "save", [&](){ save(value.toInt()); },
  *  );
  * ```
- *
  * Equivalent of:
  * ```
  *  const auto inputValue = input.read();
@@ -55,6 +54,7 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *  else
  *      NX_ASSERT(false, "Unmatched switch value");
  * ```
+ * Advantages here: supports switching by value of any type; run-time check for umnatched values.
  */
 template<typename Value, typename Match, typename Action, typename... Tail>
 auto switch_(const Value& value, const Match& match, const Action& action,
@@ -71,27 +71,32 @@ auto switch_(const Value& value, const Match& match, const Action& action,
 }
 
 /**
- * Enum-safe switch, raises error if none of the cases was selected.
+ * Enum-safe switch. If there is no default case and the value does not match any case, issues a
+ * compile-time warning and fails a run-time assertion.
+ *
+ * ATTENTION: Each case should end with `return` rather than `break`, otherwise a run-time
+ * assertion will fail but no compile-time diagnostics will be provided.
  *
  * Usage:
  * ```
- * // Asserts if `value == Enum::value3` or contains some other garbage.
- * const std::string& string = NX_ENUM_SWITCH(value,
+ * const std::string string = NX_ENUM_SWITCH(value,
  * {
  *     case Enum::value1: return "value1";
  *     case Enum::value2: return "value2";
  * });
  * ```
  */
-#define NX_ENUM_SWITCH(VALUE, BODY) ([&]() \
+#define NX_ENUM_SWITCH(VALUE, BODY) ( \
+    [&]() \
     { \
         const auto nx_enum_switch_value_ = (VALUE); \
-        switch(nx_enum_switch_value_) \
+        switch (nx_enum_switch_value_) \
         BODY \
         NX_CRITICAL(false, lm("Unmatched switch value: %1").arg( \
             static_cast<int>(nx_enum_switch_value_))); \
         throw std::exception(); /*< Instead of the required return. */ \
-    }())
+    }() \
+)
 
 } // namespace utils
 } // namespace nx
