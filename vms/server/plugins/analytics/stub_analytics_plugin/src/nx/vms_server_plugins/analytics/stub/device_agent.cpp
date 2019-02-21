@@ -276,32 +276,31 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
-    ++currentEventTypeIndex;
     std::string caption;
     std::string description;
-    if (currentEventTypeIndex > 1)
+    bool isActive;
+    
+    if (m_eventTypeId == kLineCrossingEventType)
     {
-        if (m_eventTypeId == kLineCrossingEventType)
-        {
-            m_eventTypeId = kObjectInTheAreaEventType;
-            caption = "Object in the Area (caption)";
-            description = "Object in the Area (description)";
-        }
-        else
-        {
-            m_eventTypeId = kLineCrossingEventType;
-            caption = "Line Crossing (caption)";
-            description = "Line Crossing (description)";
-        }
-        currentEventTypeIndex = 0;
+        m_eventTypeId = kObjectInTheAreaEventType;
+        caption = "Object in the Area (caption)";
+        description = "Object in the Area (description)";
+        isActive = 1;
+    }
+    else
+    {
+        m_eventTypeId = kLineCrossingEventType;
+        caption = "Line Crossing (caption)";
+        description = "Line Crossing (description)";
+        isActive = 0;
     }
 
     auto eventMetadata = makePtr<EventMetadata>();
     eventMetadata->setCaption(caption);
     eventMetadata->setDescription(description);
     eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    eventMetadata->setIsActive(currentEventTypeIndex == 1);
     eventMetadata->setTypeId(m_eventTypeId);
+    eventMetadata->setIsActive(isActive);
 
     auto eventMetadataPacket = new EventMetadataPacket();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
@@ -310,7 +309,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
 
     NX_OUTPUT << "Firing event: "
         << "type: " << m_eventTypeId
-        << ", isActive: " << ((currentEventTypeIndex == 1) ? "true" : "false");
+        << ", isActive: " << ((isActive) ? "true" : "false");
 
     return eventMetadataPacket;
 }

@@ -72,7 +72,6 @@ private:
 
     bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;
-    int currentEventTypeIndex = 0;
     int m_objectCounter = 0;
     int m_currentObjectIndex = -1;
     nx::sdk::Uuid m_objectId;
