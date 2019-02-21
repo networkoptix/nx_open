@@ -46,8 +46,6 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.searchBy = JSON.parse(this.CONFIG.integration.searchFields);
-
         // Example URI
         // /integrations?search=node
         this.uri
@@ -86,19 +84,11 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     setFilter() {
-        function searchByFields(fields, item, query) {
-            // item['information'][this.searchBy[0].value]
-
-            let result = false;
-            fields.forEach((field) => {
-                try {
-                    result = result || item[field.section][field.value].toLowerCase().indexOf(query) > -1;
-                } catch (e) {
-                    console.error('Misconfigured integration search params ->', e);
-                }
-            });
-
-            return result;
+        function searchBy(item, query) {
+            return (item.information.name && item.information.name.toLowerCase().indexOf(query) > -1 ||
+                    item.information.companyName && item.information.companyName.toLowerCase().indexOf(query) > -1 ||
+                    item.information.shortDescription && item.information.shortDescription.toLowerCase().indexOf(query) > -1 ||
+                    item.overview && item.overview.description.toLowerCase().indexOf(query) > -1);
         }
 
         this.elements = this.allElements.map(obj => ({ ...obj }));
@@ -107,7 +97,7 @@ export class NxIntegrationsComponent implements OnInit {
             const query = this.filterModel.query.toLowerCase();
 
             this.elements = this.elements.filter(item => {
-                if (searchByFields(this.searchBy, item, query)) {
+                if (searchBy(item, query)) {
                     // this.markMatch(item, text);
                     return item;
                 }

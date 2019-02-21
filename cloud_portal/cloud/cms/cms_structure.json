@@ -480,45 +480,6 @@
         ]
       },
       {
-        "name": "Integration page",
-        "is_global": true,
-        "description": "Integrations",
-        "hidden": true,
-        "translatable": false,
-        "values": [
-          {
-            "label": "Fields to filter by",
-            "name": "%INTEGRATION_SEARCH_FIELDS%",
-            "description": "Defines the fields used to search",
-            "advanced": true,
-            "optional": false,
-            "type": "array",
-            "value": [
-              {
-                "name": "name",
-                "value": "name",
-                "section": "information"
-              },
-              {
-                "name": "companyName",
-                "value": "companyName",
-                "section": "information"
-              },
-              {
-                "name": "shortDescription",
-                "value": "shortDescription",
-                "section": "information"
-              },
-              {
-                "name": "description",
-                "value": "description",
-                "section": "overview"
-              }
-            ]
-          }
-        ]
-      },
-      {
         "name": "Camera page",
         "is_global": true,
         "description": "Settings for camera page",

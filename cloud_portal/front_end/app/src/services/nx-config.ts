@@ -298,8 +298,6 @@ export class NxConfigService {
                 carouselImageEnter: '0.25s ease-in',
                 carouselImageLeave: '0.25s ease-out'
             },
-            integration: {
-            },
             campage: {
                 vendorGroups: 4
             },
