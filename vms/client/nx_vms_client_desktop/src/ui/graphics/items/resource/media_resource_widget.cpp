@@ -1250,9 +1250,11 @@ bool QnMediaResourceWidget::forceShowPosition() const
     if (!qnRuntime->isVideoWallMode())
         return false;
 
-    return d->display()
+    const bool isPlayingArchive = d->display()
         && d->display()->camDisplay()
-        && d->display()->camDisplay()->isRealTimeSource();
+        && !d->display()->camDisplay()->isRealTimeSource();
+
+    return isPlayingArchive;
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
