@@ -882,7 +882,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
                 url.userName());
 
             // Try login with cloud user if we do not have an option from the credentials store.
-            if (!credentials.isValid())
+            if (!credentials.isValid() && qnCloudStatusWatcher->credentials().user == url.userName())
                 credentials = qnCloudStatusWatcher->credentials();
 
             if (credentials.isValid())
