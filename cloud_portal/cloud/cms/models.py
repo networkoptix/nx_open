@@ -44,7 +44,8 @@ def customization_cache(customization_name, value=None, force=False):
             'smtp_port': customization.read_global_value('%SMTP_PORT%'),
             'smtp_user': customization.read_global_value('%SMTP_USER%'),
             'smtp_password': customization.read_global_value('%SMTP_PASSWORD%'),
-            'smtp_tls': customization.read_global_value('%SMTP_TLS%')
+            'smtp_tls': customization.read_global_value('%SMTP_TLS%'),
+            'support_link': customization.read_global_value('%SUPPORT_LINK%')
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])

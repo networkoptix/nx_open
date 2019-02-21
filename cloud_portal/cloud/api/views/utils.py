@@ -11,7 +11,7 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
-from cms.models import Customization, UserGroupsToCustomizationPermissions
+from cms.models import Customization, UserGroupsToCustomizationPermissions, customization_cache
 
 logger = logging.getLogger(__name__)
 
@@ -207,9 +207,12 @@ def downloads(request):
 def get_settings(request):
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
 
+    support_link = customization_cache(settings.CUSTOMIZATION, 'support_link')
+
     settings_object = {
-        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST,
-        'publicDownloads':customization.public_downloads,
-        'publicReleases':customization.public_release_history
+        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads': customization.public_downloads,
+        'publicReleases': customization.public_release_history,
+        'supportLink': support_link
     }
     return Response(settings_object)

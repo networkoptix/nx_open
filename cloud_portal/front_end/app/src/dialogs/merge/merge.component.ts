@@ -12,10 +12,9 @@ export class MergeModalContent {
     @Input() language;
     @Input() closable;
 
-
+    config: any;
     latestBuildUrl: string;
     masterId: string;
-    maxServers: number;
     merging: any;
     multipleSystems: boolean;
     outOfDate: boolean;
@@ -40,14 +39,14 @@ export class MergeModalContent {
                 @Inject('configService') private configService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
                 @Inject('cloudApiService') private cloudApi: any) {
-        this.maxServers = this.configService.config.maxServers;
+        this.config = this.configService.config;
 
     }
 
     // Add system can merge where added to systems form api call
     checkMergeAbility(system) {
         if (!system.id) {
-            return '';
+            return undefined;
         }
         if (system.stateOfHealth === 'offline' || !system.isOnline) {
             return 'offline';
@@ -59,15 +58,14 @@ export class MergeModalContent {
     }
 
     setTargetSystem(system) {
+        this.systemMergeable = undefined;
+        this.targetSystem = {... system};
         if (!system.id) {
-            this.targetSystem = {... system};
-            this.systemMergeable = '';
             return;
         }
 
         return this.systemService(system.id, this.user.email).update().then((system) => {
-            this.targetSystem = {... system};
-            this.targetSystem.name = this.targetSystem.info.name;
+            this.targetSystem = {...this.targetSystem, ...system};
             this.systemMergeable = this.checkMergeAbility(system);
 
             return Promise.all([
@@ -75,9 +73,7 @@ export class MergeModalContent {
                 this.targetSystem.mediaserver.getMediaServers()
             ]).then(res => {
                 this.tooManySystems = res.map(req => req.data.length)
-                    .reduce((acc, cur) => acc + cur) > this.maxServers;
-            }).catch(err => {
-                this.state = 'error';
+                    .reduce((acc, cur) => acc + cur) > this.config.maxServers;
             });
         });
     }
@@ -105,6 +101,8 @@ export class MergeModalContent {
     }
 
     ngOnInit() {
+        console.log(this.configService.config);
+        this.systemMergeable = undefined;
         this.systemsSelect = [{name: '- - - -', id: ''}];
         this.wrongPassword = false;
         this.masterId = this.system.id;

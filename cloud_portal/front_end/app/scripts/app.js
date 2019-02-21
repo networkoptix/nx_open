@@ -93,6 +93,7 @@ window.L = {};
                     appState.trafficRelayHost = response.trafficRelayHost;
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
+                    appState.supportLink = response.supportLink;
                     angular.extend(CONFIG, appState);
                 });
 

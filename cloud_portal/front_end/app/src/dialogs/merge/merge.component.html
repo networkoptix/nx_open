@@ -43,15 +43,15 @@
             </div>
             <p *ngIf="systemMergeable =='offline'"
                class="help-block-no-height warning-label" translate>
-                <span translate>System</span><span>&nbsp;"{{targetSystem.name}}"&nbsp;</span>
+                <span translate>System</span><span>&nbsp;"{{targetSystem.info.name}}"&nbsp;</span>
                 <span translate>is offline and cannot be merged with the current one.</span>
             </p>
             <p *ngIf="systemMergeable =='cannotMerge'"
                class="help-block-no-height warning-label" translate>
-                <span translate>System</span><span>&nbsp;"{{targetSystem.name}}"&nbsp;</span>
+                <span translate>System</span><span>&nbsp;"{{targetSystem.info.name}}"&nbsp;</span>
                 <span translate>is incompatible and cannot be merged with the current one.</span>
             </p>
-            <p *ngIf="systemMergeable == ''"
+            <p *ngIf="systemMergeable == undefined || systemMergeable == ''"
                class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
             <div *ngIf="targetSystem.id">
                 <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Took System name and settings from</div>
@@ -87,7 +87,7 @@
                                     <circle cx="8" cy="8" r="4"></circle>
                                 </svg>
                             </span>
-                            <span [innerHtml]="targetSystem.name"></span>
+                            <span *ngIf="targetSystem.info" [innerHtml]="targetSystem.info.name"></span>
                         </label>
                     </div>
                 </div>
@@ -100,23 +100,15 @@
             <button class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
         </div>
     </div>
-    <div *ngIf="state == 'error'">
-        <div class="modal-body" translate>
-            A error has occurred while getting information from one of the systems you are trying to merge. Please try again.
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-default" (click)="activeModal.close()" translate>Ok</button>
-        </div>
-    </div>
     <div *ngIf="state == 'warning'">
         <div class="modal-body">
             <p>
                 <span translate>There will be more than</span>
-                &nbsp;{{ maxServers }}&nbsp;
+                &nbsp;{{ config.maxServers }}&nbsp;
                 <span translate>servers in the merged System.</span>
             </p>
             <p translate>Systems of such size may work but will be unstable and have troubles with updates and synchronisation.</p>
-            <p translate>We'd recommend consulting with <a>support</a> before proceeding.</p>
+            <p translate>We'd recommend consulting with <a [href]="config.supportLink" target="_blank">support</a> before proceeding.</p>
         </div>
         <div class="modal-footer">
             <button class="btn btn-default" (click)="updateState()" translate>Merge Anyway</button>
