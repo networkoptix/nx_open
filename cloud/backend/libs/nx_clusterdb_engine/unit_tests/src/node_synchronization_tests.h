@@ -100,6 +100,34 @@ protected:
         }
     }
 
+    void addRandomDataToPeers(const std::vector<int>& peerIds)
+    {
+        for (int peerId: peerIds)
+        {
+            for (int j = 0; j < 17; ++j)
+                this->peer(peerId).addRandomData();
+        }
+    }
+
+    void startConnectedPeers(const std::vector<int>& ids)
+    {
+        std::optional<int> firstPeerId;
+        for (int peerId: ids)
+        {
+            ASSERT_TRUE(this->peer(peerId).process().startAndWaitUntilStarted());
+            if (!firstPeerId)
+                firstPeerId = peerId;
+            else
+                peer(peerId).connectTo(peer(*firstPeerId));
+        }
+    }
+
+    void stopPeers(const std::vector<int> peerIds)
+    {
+        for (int peerId: peerIds)
+            this->peer(peerId).process().stop();
+    }
+
 private:
     transport::ConnectorFactory::Function m_factoryFunctionBak;
 };
@@ -156,7 +184,7 @@ TYPED_TEST_P(Synchronization, with_outgoing_command_filter)
     this->thenPeersAreAbleToSynchronizeNewData({0, 1});
 }
 
-TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_simultaneously)
+TYPED_TEST_P(Synchronization, DISABLED_peer_can_receive_same_data_from_multiple_peers_simultaneously)
 {
     constexpr int count = 4;
 
@@ -167,35 +195,34 @@ TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_sim
      *     1
      *     |
      *     0
+     *
+     * Verifying that peer 1 properly forwards all data from 2&3 to 0.
      */
 
+    const std::vector<int> peerGroup1 = {0, 1};
+    const std::vector<int> peerGroup2 = {2, 3};
+
     this->givenSynchronizedPeers(count);
-    this->peer(0).process().stop();
-    this->peer(1).process().stop();
 
-    for (int i = 2; i < this->peerCount(); ++i)
-    {
-        for(int j = 0; j < 17; ++j)
-            this->peer(i).addRandomData();
-    }
-    this->thenPeersSynchronizedEventually({2, 3});
+    this->stopPeers(peerGroup1);
 
-    ASSERT_TRUE(this->peer(0).process().startAndWaitUntilStarted());
-    ASSERT_TRUE(this->peer(1).process().startAndWaitUntilStarted());
-    this->peer(0).connectTo(this->peer(1));
+    this->addRandomDataToPeers(peerGroup2);
+    this->thenPeersSynchronizedEventually(peerGroup2);
+
+    this->startConnectedPeers(peerGroup1);
+
     for (int i = 2; i < this->peerCount(); ++i)
         this->peer(1).connectTo(this->peer(i));
 
     this->thenPeersSynchronizedEventually();
 }
 
-
 REGISTER_TYPED_TEST_CASE_P(Synchronization,
     peer_can_be_explicitly_connected_to_another_one,
     connected_peers_exchange_data,
     peers_connected_as_a_chain_are_synchronized,
     with_outgoing_command_filter,
-    peer_can_receive_same_data_from_multiple_peers_simultaneously
+    DISABLED_peer_can_receive_same_data_from_multiple_peers_simultaneously
 );
 
 } // namespace nx::clusterdb::engine::test
