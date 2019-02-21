@@ -129,6 +129,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         &m_mutex),
     m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); }, &m_mutex)
 {
+    NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
 
     connect(

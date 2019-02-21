@@ -37,11 +37,11 @@ private:
     struct TunnelContext
     {
         std::string urlPath;
-        std::unique_ptr<network::http::AsyncMessagePipeline> connection;
+        std::unique_ptr<nx_http::AsyncMessagePipeline> connection;
         std::tuple<ApplicationData...> requestData;
     };
 
-    using Tunnels = std::map<network::http::AsyncMessagePipeline*, TunnelContext>;
+    using Tunnels = std::map<nx_http::AsyncMessagePipeline*, TunnelContext>;
 
     mutable QnMutex m_mutex;
     Tunnels m_tunnelsInProgress;
@@ -59,23 +59,23 @@ private:
     void closeConnection(
         const QnMutexLockerBase& lock,
         SystemError::ErrorCode /*closeReason*/,
-        network::http::AsyncMessagePipeline* /*connection*/);
+        nx_http::AsyncMessagePipeline* /*connection*/);
 
     std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
-        network::http::Response* response);
+        nx_http::Response* response);
 
     void openUpTunnel(
-        network::http::HttpServerConnection* connection,
+        nx_http::HttpServerConnection* connection,
         const std::string& requestPath,
         ApplicationData... requestData);
 
     void onMessage(
-        network::http::AsyncMessagePipeline* tunnel,
-        network::http::Message /*httpMessage*/);
+        nx_http::AsyncMessagePipeline* tunnel,
+        nx_http::Message /*httpMessage*/);
 
     bool validateOpenUpChannelMessage(
         const TunnelContext& tunnelContext,
-        const network::http::Message& message);
+        const nx_http::Message& message);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
 }
 
 template<typename ...ApplicationData>
-network::http::RequestResult
+nx_http::RequestResult
     GetPostTunnelServer<ApplicationData...>::processOpenTunnelRequest(
         const RequestContext& requestContext,
         ApplicationData... requestData)
@@ -122,7 +122,7 @@ network::http::RequestResult
     NX_VERBOSE(this, lm("Open GET/POST tunnel. Url %1")
         .args(requestContext.request.requestLine.url.path()));
 
-    network::http::RequestResult requestResult(
+    nx_http::RequestResult requestResult(
         nx::network::http::StatusCode::ok);
 
     requestResult.dataSource = prepareCreateDownTunnelResponse(requestContext.response);
@@ -130,7 +130,7 @@ network::http::RequestResult
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, requestData = std::make_tuple(std::move(requestData)...),
             requestPath = requestContext.request.requestLine.url.path().toStdString()](
-                network::http::HttpServerConnection* connection) mutable
+                nx_http::HttpServerConnection* connection) mutable
         {
             auto allArgs = std::tuple_cat(
                 std::make_tuple(this, connection, requestPath),
@@ -169,7 +169,7 @@ std::unique_ptr<AbstractMsgBodySource>
 
 template<typename ...ApplicationData>
 void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
-    network::http::HttpServerConnection* connection,
+    nx_http::HttpServerConnection* connection,
     const std::string& requestPath,
     ApplicationData... requestData)
 {
@@ -200,8 +200,8 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
 
 template<typename ...ApplicationData>
 void GetPostTunnelServer<ApplicationData...>::onMessage(
-    network::http::AsyncMessagePipeline* tunnel,
-    network::http::Message message)
+    nx_http::AsyncMessagePipeline* tunnel,
+    nx_http::Message message)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -233,10 +233,10 @@ void GetPostTunnelServer<ApplicationData...>::onMessage(
 template<typename ...ApplicationData>
 bool GetPostTunnelServer<ApplicationData...>::validateOpenUpChannelMessage(
     const TunnelContext& tunnelContext,
-    const network::http::Message& message)
+    const nx_http::Message& message)
 {
-    if (message.type != network::http::MessageType::request ||
-        message.request->requestLine.method != network::http::Method::post ||
+    if (message.type != nx_http::MessageType::request ||
+        message.request->requestLine.method != nx_http::Method::post ||
         message.request->requestLine.url.path().toStdString() != tunnelContext.urlPath)
     {
         return false;
@@ -248,7 +248,7 @@ bool GetPostTunnelServer<ApplicationData...>::validateOpenUpChannelMessage(
 template<typename ...ApplicationData>
 void GetPostTunnelServer<ApplicationData...>::closeConnection(
     SystemError::ErrorCode closeReason,
-    network::http::AsyncMessagePipeline* connection)
+    nx_http::AsyncMessagePipeline* connection)
 {
     QnMutexLocker lock(&m_mutex);
     closeConnection(lock, closeReason, connection);
@@ -258,7 +258,7 @@ template<typename ...ApplicationData>
 void GetPostTunnelServer<ApplicationData...>::closeConnection(
     const QnMutexLockerBase& /*lock*/,
     SystemError::ErrorCode /*closeReason*/,
-    network::http::AsyncMessagePipeline* connection)
+    nx_http::AsyncMessagePipeline* connection)
 {
     m_tunnelsInProgress.erase(connection);
 }

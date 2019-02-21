@@ -120,7 +120,7 @@ StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData...>::validateOpe
 }
 
 template<typename ...ApplicationData>
-network::http::RequestResult
+nx_http::RequestResult
     ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
         const RequestContext& /*requestContext*/,
         ApplicationData... requestData)

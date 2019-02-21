@@ -41,3 +41,30 @@ public:
 };
 
 } // namespace nx::cloud::relay::api
+    void setClientEndpoint(SocketAddress endpoint);
+    const SocketAddress& clientEndpoint() const;
+
+    nx_http::Message toHttpMessage() const;
+    bool parse(const nx_http::Message& message);
+
+private:
+    nx::String m_clientPeerName;
+    SocketAddress m_clientEndpoint;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API KeepAliveNotification
+{
+public:
+    static constexpr char kHttpMethod[] = "KEEP_ALIVE";
+
+    nx_http::Message toHttpMessage() const;
+
+    /**
+     * Example: "UPDATE /relay/client/connection NXRELAY/0.1".
+     */
+    bool parse(const nx_http::Message& message);
+};
+
+} // namespace nx::cloud::relay::api
