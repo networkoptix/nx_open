@@ -182,7 +182,7 @@ private:
     void processRemoteDownloading();
     void processRemoteInstalling();
 
-    void updateInfoVisibility();
+    void updateVersionInfoVisibility();
     bool isChecking() const;
 
     bool processUploaderChanges(bool force = false);
