@@ -109,7 +109,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
 }
 
 void TransactionDataObject::saveRecentTransactionSequence(
-    nx::sql::QueryContext* queryContext,
+    nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId,
     const std::string& peerId,
     int sequence)
@@ -120,7 +120,7 @@ void TransactionDataObject::saveRecentTransactionSequence(
 
 std::map<std::string /*systemId*/, int /*sequence*/>
     TransactionDataObject::fetchRecentTransactionSequence(
-        nx::sql::QueryContext* queryContext,
+        nx::sql::QueryContext* /*queryContext*/,
         const std::string& peerId)
 {
     QnMutexLocker lk(&m_mutex);
