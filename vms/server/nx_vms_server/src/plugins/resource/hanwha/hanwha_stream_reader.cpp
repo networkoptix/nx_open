@@ -26,6 +26,35 @@ static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
 
+static const QString kHanwhaTcp("TCP");
+static const QString kHanwhaUdp("UDP");
+
+QString toHanwhaStreamingType(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    if (rtpTransport == nx::vms::api::RtpTransportType::udpMulticast)
+        return kHanwhaRtpMulticast;
+
+    return kHanwhaRtpUnicast;
+}
+
+QString toHanwhaTransportProtocol(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    switch (rtpTransport)
+    {
+        case RtpTransportType::automatic:
+        case RtpTransportType::tcp:
+            return kHanwhaTcp;
+        case RtpTransportType::udp:
+        case RtpTransportType::udpMulticast:
+            return kHanwhaUdp;
+        default:
+            NX_ASSERT(false, "Invalid RTP transport");
+            return kHanwhaTcp;
+    }
+}
+
 } // namespace
 
 HanwhaStreamReader::HanwhaStreamReader(
@@ -173,13 +202,16 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         return CameraDiagnostics::NoErrorResult();
     }
 
+    const nx::vms::api::RtpTransportType preferredRtpTransport =
+        m_hanwhaResource->preferredRtpTransport();
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaStreamingModeProperty, kHanwhaFullMode},
-        {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
-        {kHanwhaTransportProtocolProperty, rtpTransport()},
+        {kHanwhaStreamingTypeProperty, toHanwhaStreamingType(preferredRtpTransport)},
+        {kHanwhaTransportProtocolProperty, toHanwhaTransportProtocol(preferredRtpTransport)},
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 
