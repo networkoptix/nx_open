@@ -59,6 +59,8 @@ public:
     quint32 getSSRC() const { return ssrc; }
 
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteRtcpPort = rtcpPort;}
+
+    void updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort);
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
@@ -66,6 +68,7 @@ public:
     void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
 private:
     void processRtcpData();
+    void updateSockets();
 
 private:
     QnRtspClient* m_owner = nullptr;

@@ -27,6 +27,32 @@ QnMutex QnRtspClient::m_guidMutex;
 
 namespace {
 const QString METADATA_STR(lit("ffmpeg-metadata"));
+
+struct RtspPorts
+{
+    quint16 mediaPort = 0;
+    quint16 rtcpPort = 0;
+};
+
+RtspPorts parsePorts(const QString& parameterString)
+{
+    const auto nameAndValue = parameterString.splitRef('=');
+    if (nameAndValue.size() != 2)
+        return {};
+
+    const auto ports = nameAndValue[1].split('-');
+    if (nameAndValue.size() != 2)
+        return {};
+
+    const auto mediaPort = ports[0].toUInt();
+    const auto rtcpPort = ports[1].toUInt();
+
+    if (!mediaPort || !rtcpPort)
+        return {};
+
+    return {mediaPort, rtcpPort};
+}
+
 } // namespace
 
 const QByteArray QnRtspClient::kPlayCommand("PLAY");
@@ -101,6 +127,7 @@ void QnRtspIoDevice::bindToMulticastAddress(const QHostAddress& address, const Q
         m_mediaSocket->joinGroup(address.toString(), interfaceAddress);
     if (m_rtcpSocket)
         m_rtcpSocket->joinGroup(address.toString(), interfaceAddress);
+
     m_multicastAddress = address;
 }
 
@@ -137,34 +164,22 @@ void QnRtspIoDevice::shutdown()
         m_mediaSocket->shutdown();
 }
 
+void QnRtspIoDevice::updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort)
+{
+    if (m_transport != RtspTransport::multicast)
+        return;
+
+    m_remoteMediaPort = mediaPort;
+    m_remoteRtcpPort = rtcpPort;
+    updateSockets();
+}
+
 void QnRtspIoDevice::setTransport(RtspTransport rtspTransport)
 {
     if (m_transport == rtspTransport)
         return;
     m_transport = rtspTransport;
-    if (m_transport == RtspTransport::tcp)
-    {
-        m_mediaSocket.reset();
-        m_rtcpSocket.reset();
-        return;
-    }
-
-    auto createSocket =
-        [this](int port)
-        {
-            auto result = nx::network::SocketFactory::createDatagramSocket();
-            if (m_transport == RtspTransport::multicast)
-                result->setReuseAddrFlag(true);
-
-            result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
-            result->setRecvTimeout(500);
-            return result;
-        };
-
-    m_mediaSocket =
-        createSocket(m_transport == RtspTransport::multicast ? m_remoteMediaPort : 0);
-    m_rtcpSocket =
-        createSocket(m_transport == RtspTransport::multicast ? m_remoteRtcpPort : 0);
+    updateSockets();
 }
 
 void QnRtspIoDevice::processRtcpData()
@@ -224,6 +239,33 @@ void QnRtspIoDevice::processRtcpData()
             m_reportTimer.restart();
         }
     }
+}
+
+void QnRtspIoDevice::updateSockets()
+{
+    if (m_transport == RtspTransport::tcp)
+    {
+        m_mediaSocket.reset();
+        m_rtcpSocket.reset();
+        return;
+    }
+
+    auto createSocket =
+        [this](int port)
+        {
+            auto result = nx::network::SocketFactory::createDatagramSocket();
+            if (m_transport == RtspTransport::multicast)
+                result->setReuseAddrFlag(true);
+
+            const auto res = result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
+            result->setRecvTimeout(500);
+            return result;
+        };
+
+    m_mediaSocket =
+        createSocket(m_transport == RtspTransport::multicast ? m_remoteMediaPort : 0);
+    m_rtcpSocket =
+        createSocket(m_transport == RtspTransport::multicast ? m_remoteRtcpPort : 0);
 }
 
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
@@ -751,6 +793,18 @@ bool QnRtspClient::sendSetup()
                         if (tmpParams.size() == 2) {
                             track.setRemoteEndpointRtcpPort(tmpParams[1].toInt());
                         }
+                    }
+                }
+                else if (m_transport == RtspTransport::multicast && tmpList[k].startsWith("port"))
+                {
+                    const auto ports = parsePorts(tmpList[k]);
+                    if (ports.mediaPort && ports.rtcpPort)
+                    {
+                        track.ioDevice->updateRemoteMulticastPorts(
+                            ports.mediaPort, ports.rtcpPort);
+
+                        track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
+                            m_tcpSock->getLocalAddress().address.toString());
                     }
                 }
             }
