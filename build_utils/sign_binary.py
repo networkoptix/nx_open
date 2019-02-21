@@ -54,14 +54,15 @@ def sign_binary(
             return 0
         except requests.exceptions.ReadTimeout as e:
             print('ERROR: Connection to the signing server has timed out' +
-                  ' ({} seconds, {} retries)'.format(timeout, max_retries))
+                  ' ({} seconds, {} retries) while signing {}'.format(timeout, max_retries, file))
             print(e)
             if current_try < max_retries:
                 print('Trying again')
             else:
                 return 1
         except requests.exceptions.ConnectionError as e:
-            print('ERROR: Connection to the signing server cannot be established.')
+            print('ERROR: Connection to the signing server cannot be established ' +
+                  'while signing {}'.format(file))
             print(e)
             if current_try < max_retries:
                 print('Trying again')
