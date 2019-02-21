@@ -199,7 +199,6 @@ private:
 
         m_syncronizationEngine = std::make_unique<clusterdb::engine::SyncronizationEngine>(
             std::string(),
-            QnUuid::createUuid(),
             m_settings.p2pDb(),
             nx::clusterdb::engine::ProtocolVersionRange(
                 kMinSupportedProtocolVersion,
