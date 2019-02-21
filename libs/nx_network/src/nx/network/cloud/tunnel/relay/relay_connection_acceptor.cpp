@@ -5,6 +5,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "api/relay_api_client_factory.h"
+
 #include "../../protocol_type.h"
 
 namespace nx::network::cloud::relay {
@@ -166,6 +167,9 @@ void ReverseConnection::dispatchRelayNotificationReceived(
 void ReverseConnection::processOpenTunnelNotification(
     api::OpenTunnelNotification openTunnelNotification)
 {
+    NX_VERBOSE(this, lm("Received OPEN_TUNNEL notification from %1")
+        .args(m_httpPipeline->socket()->getForeignAddress()));
+
     m_streamSocket = std::make_unique<ServerSideReverseStreamSocket>(
         m_httpPipeline->takeSocket(),
         openTunnelNotification.clientEndpoint());

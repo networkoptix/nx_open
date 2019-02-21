@@ -379,6 +379,24 @@ TEST( QnTimePeriodsListTest, overwriteTailOfBigList )
     ASSERT_EQ(makeTimePeriods(10, 5, 5, kBigListLength + 1), sourceList);
 }
 
+TEST( QnTimePeriodsListTest, intersection )
+{
+    EXPECT_EQ(makeTimePeriods(3, 4, 6, 5),
+        QnTimePeriodList::intersection(makeTimePeriods(0, 7, 3, 5), makeTimePeriods(3, 7, 3, 5)));
+
+    EXPECT_EQ(makeTimePeriods(13, 4, 6, 5),
+        QnTimePeriodList::intersection(makeTimePeriods(0, 7, 3, 10), makeTimePeriods(13, 7, 3, 5)));
+
+    QnTimePeriodList expected;
+    expected << QnTimePeriod(0, 5) << QnTimePeriod(10, 5) << QnTimePeriod(40, 5);
+
+    QnTimePeriodList limiter;
+    limiter << QnTimePeriod(0, 20) << QnTimePeriod(40, 10);
+
+    EXPECT_EQ(expected,
+        QnTimePeriodList::intersection(makeTimePeriods(0, 5, 5, 10), limiter));
+}
+
 TEST( QnTimePeriodsListTest, includingPeriods )
 {
     QnTimePeriodList sourceList;

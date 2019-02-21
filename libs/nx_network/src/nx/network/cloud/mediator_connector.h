@@ -106,15 +106,10 @@ private:
     std::unique_ptr<MediatorEndpointProvider> m_mediatorEndpointProvider;
     std::shared_ptr<MediatorStunClient> m_stunClient;
     std::optional<MediatorAddress> m_mockedUpMediatorAddress;
-    std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 
     virtual void stopWhileInAioThread() override;
 
-    void connectToMediatorAsync();
-
     void establishTcpConnectionToMediatorAsync();
-
-    void reconnectToMediator();
 };
 
 } // namespace api

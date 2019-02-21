@@ -60,6 +60,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, allowDeleteLocalFiles, "Allow delete local files from the context menu.");
     NX_INI_FLAG(1, startPlaybackOnTileNavigation, "Start playback if timeline navigation occured after Right Panel tile click or double click.");
     NX_INI_FLAG(0, systemUpdateProgressInformers, "Show Right Panel progress informers during System Update (unfinished functionality).");
+    NX_INI_FLAG(0, compatibilityIsMediaPaused, "Check if all sync play items are paused at every request.");
 };
 
 inline Ini& ini()
