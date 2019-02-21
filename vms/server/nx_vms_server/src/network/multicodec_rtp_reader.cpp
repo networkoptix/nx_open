@@ -5,6 +5,9 @@
 #include <QtCore/QSettings>
 #include <set>
 
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/vms/api/types/rtp_types.h>
+
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/events/network_issue_event.h>
 
@@ -75,6 +78,25 @@ nx::streaming::rtp::TimePolicy getTimePolicy(const QnResourcePtr& res)
         return nx::streaming::rtp::TimePolicy::useCameraTimeIfCorrect;
 
     return nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime;
+}
+
+RtspTransport fromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
+{
+    // TODO: #dmishin figure out why we have two absolutely identical enums for RTP transport.
+    using namespace nx::vms::api;
+    switch (rtpTransport)
+    {
+        case RtpTransportType::automatic:
+            return RtspTransport::notDefined;
+        case RtpTransportType::tcp:
+            return RtspTransport::tcp;
+        case RtpTransportType::udp:
+            return RtspTransport::udp;
+        case RtpTransportType::udpMulticast:
+            return RtspTransport::multicast;
+        default:
+            return RtspTransport::notDefined;
+    }
 }
 
 } // namespace
@@ -562,8 +584,14 @@ RtspTransport QnMulticodecRtpReader::getRtpTransport() const
     NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
     if (m_resource)
     {
-        auto transport =
-            rtspTransportFromString(m_resource->getProperty(QnMediaResource::rtpTransportKey()));
+        const auto rtpTransportString =
+            m_resource->getProperty(QnMediaResource::rtpTransportKey());
+
+        const auto transport =
+            fromRtpTransport(QnLexical::deserialized<nx::vms::api::RtpTransportType>(
+                rtpTransportString,
+                nx::vms::api::RtpTransportType::automatic));
+
         if (transport != RtspTransport::notDefined)
             return transport; //< User defined settings for resource.
         if (m_rtpTransport != RtspTransport::notDefined)
