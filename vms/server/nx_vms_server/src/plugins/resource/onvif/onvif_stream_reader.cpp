@@ -23,10 +23,20 @@
 #include <core/resource/param.h>
 #include <core/resource_management/resource_properties.h>
 
+#include <nx/vms/api/types/rtp_types.h>
+
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif_resource.h"
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 15;
+
+static onvifXsd__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
+{
+    if (rtpTransport == nx::vms::api::RtpTransportType::udpMulticast)
+        return onvifXsd__StreamType::RTP_Multicast;
+
+    return onvifXsd__StreamType::RTP_Unicast;
+}
 
 struct CameraInfoParams
 {
@@ -352,7 +362,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     request.StreamSetup = &streamSetup;
     request.StreamSetup->Transport = &transport;
-    request.StreamSetup->Stream = onvifXsd__StreamType::RTP_Unicast;
+    request.StreamSetup->Stream = streamTypeFromRtpTransport(m_onvifRes->preferredRtpTransport());
     request.StreamSetup->Transport->Tunnel = 0;
     request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
     request.ProfileToken = profileToken;
