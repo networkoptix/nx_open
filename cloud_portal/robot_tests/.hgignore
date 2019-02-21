@@ -4,5 +4,5 @@
 /*.tar
 /*.deb
 syntax: glob
-/Docker/Video
-/Docker/Data
+Docker/Video
+Docker/Data
