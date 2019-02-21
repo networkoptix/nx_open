@@ -44,7 +44,6 @@ has system name, owner and OpenInNx button visible on systems page
     [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
 
 should show Open in NX client button for online system
     [tags]    C41893    Threaded

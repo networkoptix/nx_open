@@ -224,7 +224,7 @@ ${SUPPORT TILE LINK}                  //h2[contains(text(),"${SUPPORT}")]/..//a[
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
 
 #Footer
-${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT}")]/span[contains(text(),"${PRODUCT_NAME}")]/..
+${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]/..
 ${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITATIONS}")]
 ${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
 ${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]

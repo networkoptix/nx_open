@@ -1,9 +1,9 @@
 {
     "PRODUCT_NAME"             :    "Nx Cloud",
     "VMS_NAME"                 :    "Nx Witness",
-    "PRIVACY POLICY URL"       :    "https://cloud-dev2.hdw.mx/content/privacy",
-    "SUPPORT URL"              :    "/content/support",
-    "WEBSITE URL"              :    "http://networkoptix.com",
+    "PRIVACY POLICY URL"       :    "https://www.networkoptix.com/privacy-policy/",
+    "SUPPORT URL"              :    "https://support.networkoptix.com/hc/en-us",
+    "WEBSITE URL"              :    "https://networkoptix.com",
     "ABOUT URL"                :    "/content/about",
     "KNOWN LIMITATIONS URL"    :    "/content/faq",
     "TERMS URL"                :    "/content/eula",

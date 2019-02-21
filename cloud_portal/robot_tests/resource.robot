@@ -17,7 +17,7 @@ ${options}    true
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${options}"=="false"    Regular Open Browser    ${url}
+    run keyword if    "${options}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
     Set Selenium Speed    0
     Set Selenium Timeout    20
