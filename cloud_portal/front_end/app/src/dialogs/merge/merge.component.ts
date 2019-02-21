@@ -101,7 +101,6 @@ export class MergeModalContent {
     }
 
     ngOnInit() {
-        console.log(this.configService.config);
         this.systemMergeable = undefined;
         this.systemsSelect = [{name: '- - - -', id: ''}];
         this.wrongPassword = false;
