@@ -193,6 +193,26 @@ int CommandLogCache::generateTransactionSequence(
     return currentSequence;
 }
 
+int CommandLogCache::lastTransactionSequence(
+    const vms::api::PersistentIdData& tranStateKey)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_rawData.transactionState.values.find(tranStateKey);
+    return it == m_rawData.transactionState.values.end() ? 0 : it.value();
+}
+
+void CommandLogCache::shiftTransactionSequenceTo(
+    const vms::api::PersistentIdData& tranStateKey,
+    int value)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    int& currentSequence = m_rawData.transactionState.values[tranStateKey];
+    currentSequence = std::max(currentSequence, value);
+
+    m_committedData.transactionState.values[tranStateKey] = currentSequence;
+}
+
 void CommandLogCache::shiftTransactionSequence(
     const vms::api::PersistentIdData& tranStateKey,
     int delta)

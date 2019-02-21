@@ -189,7 +189,7 @@ TYPED_TEST_P(Synchronization, peer_can_receive_same_data_from_multiple_peers_sim
     this->thenPeersSynchronizedEventually();
 }
 
-TYPED_TEST_P(Synchronization, DISABLED_command_sequence_is_not_reused)
+TYPED_TEST_P(Synchronization, command_sequence_is_not_reused)
 {
     this->givenSynchronizedPeers(2);
 
@@ -212,7 +212,7 @@ REGISTER_TYPED_TEST_CASE_P(Synchronization,
     peers_connected_as_a_chain_are_synchronized,
     with_outgoing_command_filter,
     peer_can_receive_same_data_from_multiple_peers_simultaneously,
-    DISABLED_command_sequence_is_not_reused
+    command_sequence_is_not_reused
 );
 
 } // namespace nx::clusterdb::engine::test

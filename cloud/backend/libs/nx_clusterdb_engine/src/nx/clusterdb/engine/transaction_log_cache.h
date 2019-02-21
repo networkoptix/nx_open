@@ -60,16 +60,25 @@ public:
     void rollback(TranId tranId);
 
     void updateTimestampSequence(TranId tranId, quint64 newValue);
+
     void insertOrReplaceTransaction(
         TranId tranId,
         const CommandHeader& transaction,
         const QByteArray& transactionHash);
+
     /**
      * @return nullptr if tranId is unknown.
      */
     const VmsDataState* state(TranId tranId) const;
     vms::api::Timestamp generateTransactionTimestamp(TranId tranId);
     int generateTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
+    int lastTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
+
+    /**
+     * Makes sure the sequence is not less than value.
+     */
+    void shiftTransactionSequenceTo(const vms::api::PersistentIdData& tranStateKey, int value);
+
     void shiftTransactionSequence(const vms::api::PersistentIdData& tranStateKey, int delta);
 
     vms::api::TranState committedTransactionState() const;

@@ -108,4 +108,24 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     return nx::sql::DBResult::ok;
 }
 
+void TransactionDataObject::saveRecentTransactionSequence(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId,
+    const std::string& peerId,
+    int sequence)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_recentSequences[peerId][systemId] = sequence;
+}
+
+std::map<std::string /*systemId*/, int /*sequence*/>
+    TransactionDataObject::fetchRecentTransactionSequence(
+        nx::sql::QueryContext* queryContext,
+        const std::string& peerId)
+{
+    QnMutexLocker lk(&m_mutex);
+    auto it = m_recentSequences.find(peerId);
+    return it != m_recentSequences.end() ? it->second : std::map<std::string, int>();
+}
+
 } // namespace nx::clusterdb::engine::dao::memory

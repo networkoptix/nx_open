@@ -109,4 +109,45 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     return nx::sql::DBResult::ok;
 }
 
+void TransactionDataObject::saveRecentTransactionSequence(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId,
+    const std::string& peerId,
+    int sequence)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        REPLACE INTO node_command_sequence (system_id, peer_id, sequence)
+        VALUES (?, ?, ?)
+    )sql");
+
+    query->bindValue(0, systemId);
+    query->bindValue(1, peerId);
+    query->bindValue(2, sequence);
+
+    query->exec();
+}
+
+std::map<std::string /*systemId*/, int /*sequence*/>
+    TransactionDataObject::fetchRecentTransactionSequence(
+        nx::sql::QueryContext* queryContext,
+        const std::string& peerId)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        SELECT system_id, sequence FROM node_command_sequence WHERE peer_id = ?
+    )sql");
+    query->bindValue(0, peerId);
+    query->exec();
+
+    std::map<std::string, int> result;
+    while (query->next())
+    {
+        result[query->value("system_id").toString().toStdString()] =
+            query->value("sequence").toInt();
+    }
+
+    return result;
+}
+
 } // namespace nx::clusterdb::engine::dao::rdb
