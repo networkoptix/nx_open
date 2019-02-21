@@ -16,9 +16,7 @@ from api.helpers.exceptions import APIRequestException, APIException, APILogicEx
 
 logger = logging.getLogger(__name__)
 
-# Django GenericIpAddressField has max length of 39 chars
-# https://docs.djangoproject.com/en/2.2/_modules/django/db/models/fields/#GenericIPAddressField
-IP_MAX_LENGTH = 39
+IP_MAX_LENGTH = 255
 
 
 class AccountBackend(ModelBackend):

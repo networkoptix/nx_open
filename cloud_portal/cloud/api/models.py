@@ -77,7 +77,7 @@ class Account(PermissionsMixin):
 
 class AccountLoginHistory(models.Model):
     action = models.CharField(max_length=64)
-    ip = models.GenericIPAddressField(null=True)
+    ip = models.CharField(max_length=255, null=True)
     email = models.CharField(max_length=256, null=True)
     date = models.DateTimeField(auto_now_add=True)
 
