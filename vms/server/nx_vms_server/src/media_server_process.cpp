@@ -2629,7 +2629,8 @@ void MediaServerProcess::registerRestHandlers(
      * <br/>ATTENTION: Works only if enabled by mediaserver.ini.
      * %param[opt]:option crash Intentionally crashes the Server.
      * %param[opt]:option fullDump If specified together with "crash", creates full crash dump.
-     * %param[opt]:option exit Terminates the Server normally, via "exit(64)".
+     * %param[opt]:option exit Terminates the Server via "exit(64)".
+     * %param[opt]:option stop Stops the Server via "restartServer(0)".
      * %permissions Owner.
      */
     reg("api/debug", new QnDebugHandler(), kAdmin);

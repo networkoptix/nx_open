@@ -5,11 +5,12 @@
 #include <nx/utils/switch.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/network/http/http_types.h>
+#include <media_server_process.h>
 #include <mediaserver_ini.h>
 
 namespace {
 
-enum class Action { invalid, crash, exit };
+enum class Action { invalid, crash, exit, stop };
 
 static Action actionFromParams(const QnRequestParamList& params)
 {
@@ -19,6 +20,7 @@ static Action actionFromParams(const QnRequestParamList& params)
         const Action paramAction = nx::utils::switch_(param.first,
             "crash", [](){ return Action::crash; },
             "exit", [](){ return Action::exit; },
+            "stop", [](){ return Action::stop; },
             nx::utils::default_, [](){ return Action::invalid; });
 
         if (paramAction != Action::invalid)
@@ -85,6 +87,10 @@ int QnDebugHandler::executeGet(
             qWarning() << messagePrefix << "Exiting the Server via `exit(64)`";
             break;
 
+        case Action::stop:
+            qWarning() << messagePrefix << "Stopping the Server via `restartServer(0)`";
+            break;
+
         default:
             qWarning() << messagePrefix << "Ignoring - unsupported params";
             return nx::network::http::StatusCode::forbidden;
@@ -103,6 +109,10 @@ int QnDebugHandler::executeGet(
 
         case Action::exit:
             qWarning() << messagePrefix << "Exiting the Server via `exit(64)`";
+            return nx::network::http::StatusCode::ok;
+
+        case Action::stop:
+            qWarning() << messagePrefix << "Stopping the Server via `restartServer(0)`";
             return nx::network::http::StatusCode::ok;
 
         case Action::invalid:
@@ -154,6 +164,10 @@ void QnDebugHandler::afterExecute(
         case Action::exit:
             exit(64);
 
+        case Action::stop:
+            restartServer(0);
+            return;
+
         case Action::invalid:
             return;
 
@@ -173,6 +187,10 @@ void QnDebugHandler::afterExecute(
 
         case Action::exit:
             exit(64);
+
+        case Action::stop:
+            restartServer(0);
+            return;
 
         case Action::invalid:
             return;
