@@ -103,9 +103,13 @@ QString QnAdamResourceSearcher::executeAsciiCommand(
     return result;
 }
 
-QString QnAdamResourceSearcher::getAdamModuleName(nx::modbus::QnModbusClient& client)
+QString QnAdamResourceSearcher::getAdamModel(nx::modbus::QnModbusClient& client)
 {
-    return executeAsciiCommand(client, "$01M");
+    const auto moduleName = executeAsciiCommand(client, "$01M");
+    if (moduleName.isEmpty())
+        return {};
+
+    return "ADAM-" + moduleName;
 }
 
 QString QnAdamResourceSearcher::getAdamModuleFirmware(nx::modbus::QnModbusClient& client)
@@ -121,27 +125,23 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
     NX_VERBOSE(this, lm("CheckHostAddr requested with URL [%1]").args(url));
 
     QList<QnResourcePtr> result;
-    if( !url.scheme().isEmpty() && doMultichannelCheck )
+    if (!url.scheme().isEmpty() && doMultichannelCheck)
         return result;
 
     SocketAddress endpoint(url.host(), url.port(nx::modbus::kDefaultModbusPort));
 
     nx::modbus::QnModbusClient modbusClient(endpoint);
 
-    if(!modbusClient.connect())
+    if (!modbusClient.connect())
         return result;
 
-    auto moduleName = getAdamModuleName(modbusClient);
-
-    if(moduleName.isEmpty())
+    const auto model = getAdamModel(modbusClient);
+    if (model.isEmpty())
         return result;
 
     auto firmware = getAdamModuleFirmware(modbusClient);
-
-    if(firmware.isEmpty())
+    if (firmware.isEmpty())
         return result;
-
-    auto model = lit("ADAM-") + moduleName;
 
     QnUuid typeId = qnResTypePool->getResourceTypeId(kAdamResourceType, model);
     if (typeId.isNull())
@@ -234,7 +234,16 @@ QnResourceList QnAdamResourceSearcher::findResources()
                         lit("AdvantechADAM"),
                         secRes->getModel());
                     if (typeId.isNull())
+                    {
+                        // Trying to fix some bug occuring in 3.2.
+                        QUrl url;
+                        url.setScheme(lit("http"));
+                        url.setHost(remoteEndpoint.address.toString());
+                        url.setPort(nx::modbus::kDefaultModbusPort);
+                        auto res = checkHostAddr(url, {}, false);
+                        result.append(res);
                         continue;
+                    }
 
                     QnAdamResourcePtr resource(new QnAdamResource());
                     resource->setTypeId(typeId);
