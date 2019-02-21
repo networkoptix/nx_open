@@ -758,6 +758,9 @@ ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
     if (!file.open(QFile::ReadWrite))
         return ResultCode::ioError;
 
+    if (size <= 0)
+        return ResultCode::ok;
+
     bool ok = false;
 
     #if defined(WIN32)
