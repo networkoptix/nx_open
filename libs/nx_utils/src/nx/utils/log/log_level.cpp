@@ -140,8 +140,7 @@ Filter::Filter(const QRegularExpression& source):
 }
 
 Filter::Filter(const QString& source):
-    Filter(QRegularExpression(source,
-		QRegularExpression::CaseInsensitiveOption | QRegularExpression::OptimizeOnFirstUsageOption))
+    Filter(QRegularExpression(source, QRegularExpression::CaseInsensitiveOption))
 {
 }
 
@@ -152,7 +151,7 @@ Filter::Filter(const Tag& tag):
 
 bool Filter::isValid() const
 {
-    return m_filter.isValid();
+    return m_valid;
 }
 
 bool Filter::accepts(const Tag& tag) const
