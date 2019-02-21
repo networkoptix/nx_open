@@ -75,7 +75,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (!m_camera->isInitialized() && !m_camera->initialize())
+    if (!m_camera->initialize())
         return nxcip::NX_IO_ERROR;
 
     if (encoderIndex > 1 || encoderIndex < 0)
@@ -142,10 +142,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
         };
 
     if (errorToString(m_camera->lastError()))
-    {
-        m_camera->setLastError(0);
         return;
-    }
 
     *errorString = '\0';
 }

@@ -1225,7 +1225,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
         case NodeType::sharedLayouts:
         {
             if (m_parent && m_parent->type() == NodeType::role)
-                return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
+                return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
         }
@@ -1268,21 +1268,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
 CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
 {
-    CameraExtraStatus result;
-    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return result;
-
-    if (camera->getStatus() == Qn::Recording)
-        result |= CameraExtraStatusFlag::recording;
-
-    if (camera->isLicenseUsed())
-        result |= CameraExtraStatusFlag::scheduled;
-
-    if (camera->statusFlags().testFlag(Qn::CameraStatusFlag::CSF_HasIssuesFlag))
-        result |= CameraExtraStatusFlag::buggy;
-
-    return result;
+    return getCameraExtraStatus(m_resource);
 }
 
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)

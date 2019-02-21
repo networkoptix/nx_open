@@ -73,6 +73,7 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
     result->setAttribute(Qt::WA_Hover);
     result->setAutoFillBackground(false);
     result->setTextChangedSignalFilterMs(kTextFilterDelay.count());
+    result->setFocusPolicy(Qt::ClickFocus);
     setPaletteColor(result, QPalette::Shadow, Qt::transparent);
     return result;
 }
@@ -102,6 +103,7 @@ QToolButton* createCheckableToolButton(QWidget* parent)
     auto result = new CustomPainted<QToolButton>(parent);
     result->setCustomPaintFunction(paintFunction);
     result->setCheckable(true);
+    result->setFocusPolicy(Qt::NoFocus);
     return result;
 }
 
@@ -143,10 +145,19 @@ AbstractSearchWidget::Private::Private(
     setupTimeSelection();
     setupCameraSelection();
 
-    installEventHandler(q, QEvent::Show, this, &Private::requestFetchIfNeeded);
-
     installEventHandler(q, {QEvent::Show, QEvent::Hide}, this,
-        [this, q]() { m_mainModel->setLivePaused(!q->isVisible()); });
+        [this, q]()
+        {
+            const bool hidden = !q->isVisible();
+            m_mainModel->setLivePaused(hidden);
+            if (hidden)
+                return;
+
+            q->setFocus();
+            requestFetchIfNeeded();
+        });
+
+    q->setFocusPolicy(Qt::ClickFocus);
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setInterval(kQueuedFetchMoreDelay);
@@ -235,6 +246,7 @@ void AbstractSearchWidget::Private::setupRibbon()
 {
     ui->ribbon->setModel(m_visualModel.data());
     ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
+    ui->ribbon->setFocusPolicy(Qt::NoFocus);
     ui->ribbon->scrollBar()->ensurePolished();
     setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
         colorTheme()->color("dark5"));
@@ -335,6 +347,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     ui->timeSelectionButton->setSelectable(false);
     ui->timeSelectionButton->setDeactivatable(true);
     ui->timeSelectionButton->setIcon(qnSkin->icon("text_buttons/calendar.png"));
+    ui->timeSelectionButton->setFocusPolicy(Qt::NoFocus);
 
     auto timeMenu = q->createDropdownMenu();
     auto addMenuAction =
@@ -436,6 +449,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
     ui->cameraSelectionButton->setSelectable(false);
     ui->cameraSelectionButton->setDeactivatable(true);
     ui->cameraSelectionButton->setIcon(qnSkin->icon("text_buttons/camera.png"));
+    ui->cameraSelectionButton->setFocusPolicy(Qt::NoFocus);
 
     auto cameraMenu = q->createDropdownMenu();
     auto addMenuAction =
@@ -481,7 +495,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         tr("Devices on layout"), tr("Cameras on layout"));
 
     addDeviceDependentAction(addMenuAction("<current camera>", Cameras::current, true),
-        tr("Current device"), tr("Current camera"));
+        tr("Selected device"), tr("Selected camera"));
 
     cameraMenu->addSeparator();
 
@@ -554,10 +568,10 @@ QString AbstractSearchWidget::Private::currentDeviceText() const
 
     const auto camera = m_mainModel->cameraSet()->singleCamera();
     if (!camera)
-        return kTemplate.arg(tr("Current camera"), tr("none", "No currently selected camera"));
+        return kTemplate.arg(tr("Selected camera"), tr("none", "No currently selected camera"));
 
     const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
-        QnCameraDeviceStringSet("<unused>", tr("Current camera"), tr("Current device")), camera);
+        QnCameraDeviceStringSet("<unused>", tr("Selected camera"), tr("Selected device")), camera);
 
     return kTemplate.arg(baseText, camera->getName());
 };
@@ -737,10 +751,11 @@ void AbstractSearchWidget::Private::setPlaceholderPixmap(const QPixmap& value)
 
 SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
 {
-    auto result = new nx::vms::client::desktop::SelectableTextButton(ui->filters);
+    auto result = new SelectableTextButton(ui->filters);
     result->setFlat(true);
     result->setDeactivatable(true);
     result->setSelectable(false);
+    result->setFocusPolicy(Qt::NoFocus);
     result->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     ui->filtersLayout->addWidget(result, 0, Qt::AlignLeft);
     return result;

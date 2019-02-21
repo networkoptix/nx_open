@@ -1,4 +1,3 @@
-# Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 cmake_minimum_required(VERSION 3.3.2)
 
 # Needed for proper RPATH in MacOS.
@@ -59,6 +58,14 @@ target_compile_definitions(nx_kit
     PRIVATE NX_KIT_API=${NX_KIT_API_EXPORT_MACRO}
     INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
+
+# Set the maximum warning level.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wall -Wextra -Werror)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(/W4 /WX)
+endif()
+
 
 set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
 if(nxKitWithTests)

@@ -2,7 +2,6 @@
 
 #include "../notification_list_widget.h"
 
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QTabWidget>
 
 #include <ui/workbench/workbench_context_aware.h>

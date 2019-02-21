@@ -4,25 +4,22 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/utils/uuid.h>
-#include <common/common_module_aware.h>
-
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class PluginEventModel: public QnCommonModuleAware, public QStandardItemModel
+class PluginEventModel: public QStandardItemModel
 {
+    Q_OBJECT
+
 public:
     enum DataRole
     {
         PluginIdRole = Qt::UserRole + 1
     };
 
-    PluginEventModel(QObject* parent = nullptr);
-    virtual ~PluginEventModel() override;
+    using QStandardItemModel::QStandardItemModel;
 
     void buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines);
-
     bool isValid() const;
 };
 

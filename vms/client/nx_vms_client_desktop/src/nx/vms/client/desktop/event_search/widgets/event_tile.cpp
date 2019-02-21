@@ -1,8 +1,9 @@
 #include "event_tile.h"
 #include "ui_event_tile.h"
 
-#include <QtCore/QUrl>
+#include <QtCore/QScopedPointer>
 #include <QtCore/QTimer>
+#include <QtCore/QUrl>
 #include <QtGui/QPainter>
 #include <QtGui/QDesktopServices>
 

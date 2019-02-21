@@ -12,6 +12,8 @@
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 
+#include <nx/vms/api/analytics/settings_response.h>
+
 namespace nx::vms::server::rest {
 
 using namespace nx::network;
@@ -37,11 +39,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestReques
     const QString& deviceId = request.params[kDeviceIdParameter];
     const QString& engineId = request.params[kAnalyticsEngineIdParameter];
 
-    const QVariantMap& settings = analyticsManager->getSettings(deviceId, engineId);
-    JsonRestResponse result(http::StatusCode::ok);
-    result.json.setReply(QJsonObject::fromVariantMap(settings));
-
-    return result;
+    return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
@@ -72,12 +70,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
     const QString& engineId = request.params[kAnalyticsEngineIdParameter];
 
     analyticsManager->setSettings(deviceId, engineId, settings.toVariantMap());
-
-    const QVariantMap& updatedSettings = analyticsManager->getSettings(deviceId, engineId);
-    JsonRestResponse result(http::StatusCode::ok);
-    result.json.setReply(QJsonObject::fromVariantMap(updatedSettings));
-
-    return result;
+    return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
 
 std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputParameters(
@@ -134,6 +127,57 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
     }
 
     return std::nullopt;
+}
+
+std::optional<QJsonObject> DeviceAnalyticsSettingsHandler::deviceAgentSettingsModel(
+    const QString& engineId) const
+{
+    const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
+        serverModule(), engineId);
+
+    if (!engine)
+    {
+        const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
+        NX_WARNING(this, message);
+        return std::nullopt;
+    }
+
+    return engine->manifest().deviceAgentSettingsModel;
+}
+
+JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
+    const nx::vms::server::analytics::Manager* analyticsManager,
+    const QString& engineId,
+    const QString& deviceId) const
+{
+    NX_ASSERT(analyticsManager);
+    if (!analyticsManager)
+    {
+        return makeResponse(
+            QnRestResult::InternalServerError,
+            "Unable to access an analytics manager");
+    }
+
+    JsonRestResponse result(http::StatusCode::ok);
+    nx::vms::api::analytics::SettingsResponse response;
+
+    const QVariantMap& settings = analyticsManager->getSettings(deviceId, engineId);
+    response.values = QJsonObject::fromVariantMap(settings);
+
+    const auto settingsModel = deviceAgentSettingsModel(engineId);
+    if (!settingsModel)
+    {
+        const auto message =
+            lm("Unable to find DeviceAgent settings model for the Engine with id %1")
+            .args(engineId);
+
+        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+    }
+
+    response.model = *settingsModel;
+    result.json.setReply(response);
+
+    return result;
 }
 
 } // namespace nx::vms::server::rest

@@ -26,9 +26,10 @@ public:
     bool init();
 
 private:
-    bool clearActionDescriptorList();
     bool initPluginResources();
     bool initEngineResources();
+
+    void updateActiveEngines(QSet<QnUuid> activeEngines);
 
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,

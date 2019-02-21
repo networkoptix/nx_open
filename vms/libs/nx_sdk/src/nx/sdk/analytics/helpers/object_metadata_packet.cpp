@@ -26,7 +26,9 @@ const IObjectMetadata* ObjectMetadataPacket::at(int index) const
     if (index < 0 || index >= (int) m_objects.size())
         return nullptr;
 
-    return m_objects[index];
+    auto& objectMetadata = m_objects[index];
+    objectMetadata->addRef();
+    return objectMetadata.get();
 }
 
 void ObjectMetadataPacket::setTimestampUs(int64_t timestampUs)
@@ -39,10 +41,11 @@ void ObjectMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void ObjectMetadataPacket::addItem(const IObjectMetadata* object)
+void ObjectMetadataPacket::addItem(const IObjectMetadata* objectMetadata)
 {
-    NX_KIT_ASSERT(object);
-    m_objects.push_back(object);
+    NX_KIT_ASSERT(objectMetadata);
+    objectMetadata->addRef();
+    m_objects.push_back(toPtr(objectMetadata));
 }
 
 void ObjectMetadataPacket::clear()

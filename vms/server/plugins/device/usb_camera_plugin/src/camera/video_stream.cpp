@@ -8,12 +8,10 @@
 #include <utils/media/frame_type_extractor.h>
 
 #include "camera.h"
-#include "buffered_stream_consumer.h"
 #include "device/video/utils.h"
 #include "ffmpeg/utils.h"
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 namespace {
 
@@ -43,164 +41,127 @@ static bool isKeyFrame(const ffmpeg::Packet* packet)
 }
 #endif
 
+static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
+    const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
+{
+    static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList =
+    {
+        nxcip::AV_CODEC_ID_H263,
+        nxcip::AV_CODEC_ID_H264,
+        nxcip::AV_CODEC_ID_MJPEG
+    };
+
+    for (const auto codecId: kVideoCodecPriorityList)
+    {
+        for (const auto& descriptor: codecDescriptorList)
+        {
+            if (codecId == descriptor->toNxCompressionType())
+                return descriptor;
+        }
+    }
+    if (!codecDescriptorList.empty())
+        return codecDescriptorList[0];
+
+    return nullptr;
+}
+
 } // namespace
 
-VideoStream::VideoStream(
-    const std::weak_ptr<Camera>& camera,
-    const CodecParameters& codecParams)
+VideoStream::VideoStream(const std::string& url, nxpl::TimeProvider* timeProvider)
     :
-    m_camera(camera),
-    m_codecParams(codecParams),
-    m_timeProvider(camera.lock()->timeProvider())
+    m_url(url),
+    m_timeProvider(timeProvider)
 {
 }
 
 VideoStream::~VideoStream()
 {
-    stop();
-    m_timeProvider->releaseRef();
+    uninitializeInput();
 }
 
-std::string VideoStream::ffmpegUrl() const
+bool VideoStream::isVideoCompressed()
 {
-    if (auto cam = m_camera.lock())
-        return cam->ffmpegUrl();
-    return {};
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    return m_codecParams.codecId != AV_CODEC_ID_NONE;
 }
 
-void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
+void VideoStream::updateUrl(const std::string& url)
 {
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    m_packetConsumerManager.addConsumer(consumer);
-    if (pluggedIn() && m_terminated)
-        start();
-}
-
-void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
-{
-    std::lock_guard<std::mutex> lock(m_threadStartMutex);
-    m_packetConsumerManager.removeConsumer(consumer);
-
-    if (m_packetConsumerManager.empty())
-        stop();
-
-    // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
-    if (nx::utils::AppInfo::isRaspberryPi())
-        m_streamState = csModified;
-}
-
-bool VideoStream::ioError() const
-{
-    return m_ioError;
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    NX_DEBUG(this, "update url: %1", url);
+    m_needReinitialization = true;
+    m_url = url;
 }
 
 bool VideoStream::pluggedIn() const
 {
-    return !device::video::getDeviceName(ffmpegUrl().c_str()).empty();
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    return !device::video::getDeviceName(m_url.c_str()).empty();
 }
 
 std::string VideoStream::ffmpegUrlPlatformDependent() const
 {
     return
 #ifdef _WIN32
-        std::string("video=@device_pnp_") + ffmpegUrl();
+        std::string("video=@device_pnp_") + m_url;
 #else
-        ffmpegUrl();
+        m_url;
 #endif
 }
 
-void VideoStream::start()
+CodecParameters VideoStream::getDefaultVideoParameters()
 {
-    stop();
-    m_terminated = false;
-    m_videoThread = std::thread(&VideoStream::run, this);
-}
+    nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
+    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecId(nxCodecID);
 
-void VideoStream::stop()
-{
-    m_terminated = true;
-    if (m_videoThread.joinable())
-        m_videoThread.join();
-}
-
-void VideoStream::run()
-{
-    while (!m_terminated)
-    {
-        if (!ensureInitialized())
-            continue;
-
-        std::shared_ptr<ffmpeg::Packet> packet;
-        int status = readFrame(packet);
-        checkIoError(status);
-        if (status < 0)
+    auto resolutionList = device::video::getResolutionList(m_url, m_compressionTypeDescriptor);
+    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
+        [](const device::video::ResolutionData& a, const device::video::ResolutionData& b)
         {
-            setLastError(status);
-            if (m_ioError)
-                break;
-        }
+            return a.height < b.height && a.fps <= b.fps;
+        });
 
-        if (!packet)
-            continue;
-
-        m_packetConsumerManager.pushPacket(packet);
-    }
-    uninitialize();
-}
-
-bool VideoStream::ensureInitialized()
-{
-    bool needInit;
-    bool needUninit;
+    if (it != resolutionList.end())
     {
-        needUninit = m_streamState == csModified;
-        needInit = needUninit || m_streamState == csOff;
+        int maxBitrate =
+            device::video::getMaxBitrate(m_url.c_str(), m_compressionTypeDescriptor);
+        return CodecParameters(
+            ffmpegCodecID,
+            it->fps,
+            maxBitrate,
+            nxcip::Resolution(it->width, it->height));
     }
 
-    if (needUninit)
-        uninitialize();
-
-    if (needInit)
-    {
-        int status = initialize();
-        checkIoError(status);
-        if (status < 0)
-        {
-            setLastError(status);
-            if (m_ioError)
-                m_terminated = true;
-        }
-    }
-
-    return m_streamState == csInitialized;
+    // Should never reach here if m_compressionTypeDescriptor is valid
+    return CodecParameters();
 }
 
 int VideoStream::initialize()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_compressionTypeDescriptor)
+        return 0;
 
-    int result = initializeInputFormat();
-    if (result < 0)
-        return result;
+    auto codecList = device::video::getSupportedCodecs(m_url);
+    m_compressionTypeDescriptor = getPriorityDescriptor(codecList);
+    // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
+    if (!m_compressionTypeDescriptor)
+        return AVERROR(ENODEV);
 
-    m_streamState = csInitialized;
-    return 0;
+    m_codecParams = getDefaultVideoParameters();
+    return true;
 }
 
-void VideoStream::uninitialize()
+void VideoStream::uninitializeInput()
 {
-    // Some cameras segfault if they are unintialized while there are still packets, so need flush
-    m_packetConsumerManager.flush();
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_inputFormat.reset(nullptr);
-
-        m_streamState = csOff;
-    }
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_inputFormat.reset(nullptr);
+    m_needReinitialization = true;
 }
 
 AVCodecParameters* VideoStream::getCodecParameters()
 {
+    std::scoped_lock<std::mutex> lock(m_mutex);
     if (!m_inputFormat)
         return nullptr;
     AVStream* stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
@@ -210,8 +171,15 @@ AVCodecParameters* VideoStream::getCodecParameters()
     return stream->codecpar;
 }
 
-int VideoStream::initializeInputFormat()
+int VideoStream::getMaxBitrate()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return device::video::getMaxBitrate(m_url, m_compressionTypeDescriptor);
+}
+
+int VideoStream::initializeInput()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
     int result = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
     if (result < 0)
@@ -220,7 +188,6 @@ int VideoStream::initializeInputFormat()
     setInputFormatOptions(inputFormat);
 
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
-    checkIoError(result);
     if (result < 0)
         return result;
 
@@ -230,15 +197,11 @@ int VideoStream::initializeInputFormat()
 
 void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
 {
-    if (auto cam = m_camera.lock())
-    {
-        NX_DEBUG(this, "Camera %1 attempting to open video stream with params: %2",
-            cam->toString(),
-            m_codecParams.toString());
-    }
+    NX_DEBUG(this, "Camera %1 attempting to open video stream with params: %2",
+        m_url,
+        m_codecParams.toString());
 
     AVFormatContext * context = inputFormat->formatContext();
-
     if (m_codecParams.codecId != AV_CODEC_ID_NONE)
         context->video_codec_id = m_codecParams.codecId;
 
@@ -247,50 +210,43 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     // So, two things may help: instructing the AVFormatContext not to buffer packets when it can
     // avoid it, and increasing the default real time buffer size from 3041280 (3M) to 20M.
     context->flags |= AVFMT_FLAG_NOBUFFER; //< Could be helpful for Linux too.
+    context->flags |= AVFMT_FLAG_NONBLOCK;
 
     if (m_codecParams.fps > 0)
-    {
         inputFormat->setFps(m_codecParams.fps);
-    }
 
     if (m_codecParams.resolution.width * m_codecParams.resolution.height > 0)
-    {
-        inputFormat->setResolution(
-            m_codecParams.resolution.width,
-            m_codecParams.resolution.height);
-    }
+        inputFormat->setResolution(m_codecParams.resolution.width, m_codecParams.resolution.height);
 
     // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
-        if (auto cam = m_camera.lock())
-        {
-            // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
-            device::video::setBitrate(
-                ffmpegUrl(),
-                m_codecParams.bitrate,
-                cam->compressionTypeDescriptor());
-        }
+        // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
+        device::video::setBitrate(
+            m_url,
+            m_codecParams.bitrate,
+            m_compressionTypeDescriptor);
     }
 }
 
-int VideoStream::readFrame(std::shared_ptr<ffmpeg::Packet>& result)
+int VideoStream::nextPacket(std::shared_ptr<ffmpeg::Packet>& result)
 {
+    if (!pluggedIn())
+        return AVERROR(EIO);
+
+    int status;
+    if (m_needReinitialization)
+    {
+        uninitializeInput();
+        status = initializeInput();
+        if (status < 0)
+            return status;
+        m_needReinitialization = false;
+    }
     auto packetTemp = std::make_shared<ffmpeg::Packet>(
         m_inputFormat->videoCodecId(), AVMEDIA_TYPE_VIDEO);
 
-    int status;
-    if (m_inputFormat->formatContext()->flags & AVFMT_FLAG_NONBLOCK)
-    {
-        using namespace std::chrono_literals;
-        status = m_inputFormat->readFrameNonBlock(packetTemp->packet(), 1000ms);
-        if (status == AVERROR(EAGAIN))
-            status = AVERROR(EIO); //< Treating a one second timeout as an io error.
-    }
-    else
-    {
-        status = m_inputFormat->readFrame(packetTemp->packet());
-    }
+    status = m_inputFormat->readFrame(packetTemp->packet());
     if (status < 0)
         return status;
 
@@ -309,6 +265,18 @@ int VideoStream::readFrame(std::shared_ptr<ffmpeg::Packet>& result)
     // Setting timestamp here because primary stream needs it even if there is no decoding.
     result->setTimestamp(m_timeProvider->millisSinceEpoch());
     return status;
+}
+
+std::vector<device::video::ResolutionData> VideoStream::resolutionList() const
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    return device::video::getResolutionList(m_url, m_compressionTypeDescriptor);
+}
+
+CodecParameters VideoStream::codecParameters()
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    return m_codecParams;
 }
 
 void VideoStream::setFps(float fps)
@@ -343,16 +311,14 @@ void VideoStream::setBitrate(int bitrate)
         return;
 
     m_codecParams.bitrate = bitrate;
-    m_streamState = csModified;
+    m_needReinitialization = true;
 }
 
 CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParameters& params) const
 {
     std::vector<device::video::ResolutionData> resolutionList;
-
     // Assumes list is in ascending resolution order
-    if (auto cam = m_camera.lock())
-        resolutionList = cam->resolutionList();
+    resolutionList = device::video::getResolutionList(m_url, m_compressionTypeDescriptor);
 
     // Try to find an exact match first
     for (const auto & resolution : resolutionList)
@@ -416,24 +382,8 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
         AVCodecID codecId = m_codecParams.codecId;
         m_codecParams = codecParams;
         m_codecParams.codecId = codecId;
-        m_streamState = csModified;
+        m_needReinitialization = true;
     }
 }
 
-bool VideoStream::checkIoError(int ffmpegError)
-{
-    m_ioError =
-        ffmpegError == AVERROR(ENODEV) || //< Linux.
-        ffmpegError == AVERROR(EIO) || //< Windows.
-        ffmpegError == AVERROR(EBUSY); //< Device is busy during initialization.
-    return m_ioError;
-}
-
-void VideoStream::setLastError(int ffmpegError)
-{
-    if (auto cam = m_camera.lock())
-        cam->setLastError(ffmpegError);
-}
-
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

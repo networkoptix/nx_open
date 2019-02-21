@@ -21,8 +21,8 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(Engine* engine):
-    VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT)
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
+    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;
 
@@ -200,12 +200,12 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
 
     for (const auto& rect: rects)
     {
-        auto objectMetadata = new ObjectMetadata();
+        auto objectMetadata = makePtr<ObjectMetadata>();
         objectMetadata->setId(UuidHelper::randomUuid());
         objectMetadata->setTypeId(m_objectTypeId);
         objectMetadata->setBoundingBox(IObjectMetadata::Rect(rect.x, rect.y, rect.w, rect.h));
 
-        objectMetadataPacket->addItem(objectMetadata);
+        objectMetadataPacket->addItem(objectMetadata.get());
     }
     metadataPackets->push_back(objectMetadataPacket);
 

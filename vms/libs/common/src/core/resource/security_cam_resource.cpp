@@ -265,7 +265,7 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 int QnSecurityCamResource::getMaxFps() const
 {
     const auto capabilities = cameraMediaCapability();
-    int result = capabilities.streamCapabilities.value(MotionStreamType::primary).maxFps;
+    int result = capabilities.streamCapabilities.value(StreamIndex::primary).maxFps;
     if (result > 0)
         return result;
 
@@ -277,12 +277,13 @@ int QnSecurityCamResource::getMaxFps() const
 void QnSecurityCamResource::setMaxFps(int fps)
 {
     nx::media::CameraMediaCapability capability = cameraMediaCapability();
-    capability.streamCapabilities[MotionStreamType::primary].maxFps = fps;
+    capability.streamCapabilities[StreamIndex::primary].maxFps = fps;
 
     // We use direct setProperty() call instead of setCameraMediaCapability(),
     // because setMaxFps function should not save parameters.
     setProperty(ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(capability)));
+    m_cachedCameraMediaCapabilities.reset();
 }
 int QnSecurityCamResource::reservedSecondStreamFps() const
 {
@@ -373,7 +374,7 @@ QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::motionStreamInde
 
 void QnSecurityCamResource::setMotionStreamIndex(MotionStreamIndex value)
 {
-    const QString valueStr = (value.isForced || value.index == MotionStreamType::undefined)
+    const QString valueStr = (value.isForced || value.index == StreamIndex::undefined)
         ? QnLexical::serialized(value.index)
         : QString();
     setProperty(kForcedMotionStreamKey, valueStr);
@@ -733,8 +734,8 @@ bool QnSecurityCamResource::hasMotion() const
     if (motionType == Qn::MotionType::MT_SoftwareGrid)
     {
         return hasDualStreaming()
-            || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability)
-            || !getProperty(kForcedMotionStreamKey).isEmpty();
+            || getCameraCapabilities().testFlag(Qn::PrimaryStreamSoftMotionCapability)
+            || motionStreamIndex().isForced;
     }
     return motionType != Qn::MotionType::MT_NoMotion;
 }
@@ -761,10 +762,10 @@ Qn::MotionType QnSecurityCamResource::calculateMotionType() const
 QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionStreamIndex() const
 {
     const auto forcedMotionStreamStr = getProperty(kForcedMotionStreamKey).toLower();
-    const auto forcedMotionStream = QnLexical::deserialized<MotionStreamType>(
-            forcedMotionStreamStr, MotionStreamType::undefined);
+    const auto forcedMotionStream = QnLexical::deserialized<StreamIndex>(
+            forcedMotionStreamStr, StreamIndex::undefined);
 
-    if (forcedMotionStream != MotionStreamType::undefined)
+    if (forcedMotionStream != StreamIndex::undefined)
         return {forcedMotionStream, /*isForced*/ true};
 
     // Motion on primary stream is preferred only if we have no dual streaming at all.
@@ -772,8 +773,8 @@ QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::calculateMotionS
         && getCameraCapabilities().testFlag(Qn::PrimaryStreamSoftMotionCapability);
 
     const auto selectedMotionStream = preferMotionOnPrimaryStream
-        ? MotionStreamType::primary
-        : MotionStreamType::secondary;
+        ? StreamIndex::primary
+        : StreamIndex::secondary;
 
     return {selectedMotionStream, /*isForced*/ false};
 }
@@ -929,9 +930,8 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
     QString fixedFirmware;
     for (const QChar symbol: firmware)
     {
-        if (symbol.toLatin1() < 32) //< non-printable symbols
-            continue;
-        fixedFirmware.append(symbol);
+        if (symbol.isPrint())
+            fixedFirmware.append(symbol);
     }
     setProperty(ResourcePropertyKey::kFirmware, fixedFirmware);
 }
@@ -1199,10 +1199,14 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value)
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    const auto& settings = commonModule()->globalSettings();
+    const auto commonModule = this->commonModule();
+    if (commonModule)
+	{
+        const auto& settings = commonModule->globalSettings();
+        if (settings && !settings->isCameraSettingsOptimizationEnabled())
+            return true;
+	}
 
-    if (settings && !settings->isCameraSettingsOptimizationEnabled())
-        return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->cameraControlDisabled;
 }
@@ -1434,18 +1438,18 @@ bool QnSecurityCamResource::isAnalyticsDriverEvent(nx::vms::api::EventType event
     return eventType == nx::vms::api::EventType::analyticsSdkEvent;
 }
 
-Qn::ConnectionRole QnSecurityCamResource::toConnectionRole(MotionStreamType index)
+Qn::ConnectionRole QnSecurityCamResource::toConnectionRole(StreamIndex index)
 {
-    return index == MotionStreamType::primary
+    return index == StreamIndex::primary
         ? Qn::CR_LiveVideo
         : Qn::CR_SecondaryLiveVideo;
 }
 
-nx::vms::api::MotionStreamType QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
+nx::vms::api::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
 {
     return role == Qn::CR_SecondaryLiveVideo
-        ? MotionStreamType::secondary
-        : MotionStreamType::primary;
+        ? StreamIndex::secondary
+        : StreamIndex::primary;
 }
 
 nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
@@ -1555,5 +1559,7 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 
 QnResourceData QnSecurityCamResource::resourceData() const
 {
-    return commonModule()->resourceDataPool()->data(toSharedPointer(this));
+    if (const auto commonModule = this->commonModule())
+        return commonModule->resourceDataPool()->data(toSharedPointer(this));
+    return {};
 }

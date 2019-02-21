@@ -23,8 +23,8 @@ set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
-set(updateFeedUrl "http://updates.hdwitness.com/updates.json")
-set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
+set(updateFeedUrl "http://updates.vmsproxy.com/updates.json")
+set(releaseNotesUrl "http://updates.vmsproxy.com/releasenotes.json")
 
 set(mac_certificate_file_password "qweasd123")
 

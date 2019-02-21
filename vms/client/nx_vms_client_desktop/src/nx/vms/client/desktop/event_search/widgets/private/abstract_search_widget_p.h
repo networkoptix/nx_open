@@ -36,7 +36,7 @@ class AbstractSearchWidget::Private:
     using base_type = QWidget;
 
     AbstractSearchWidget* const q;
-    const QScopedPointer<Ui::AbstractSearchWidget> ui;
+    nx::utils::ImplPtr<Ui::AbstractSearchWidget> ui;
 
 public:
     Private(AbstractSearchWidget* q, AbstractSearchListModel* model);

@@ -9,17 +9,17 @@ QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& 
     m_mutex(QnMutex::Recursive),
     m_role(Qn::CR_Default)
 {
+    NX_DEBUG(this, "New");
 }
 
 QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 {
+    NX_DEBUG(this, "Delete");
     stop();
 }
 
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 {
-    NX_VERBOSE(this, "Check if data can be accepted");
-
     // need to read only if all queues has more space and at least one queue is exist
     QnMutexLocker mutex( &m_mutex );
     for (int i = 0; i < m_dataprocessors.size(); ++i)
@@ -46,6 +46,7 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractMediaDataReceptor*
     {
         NX_DEBUG(this, "Add data processor: %1", dp);
         m_dataprocessors.push_back(dp);
+        dp->consumers += 1;
     }
     else
     {
@@ -66,11 +67,19 @@ bool QnAbstractStreamDataProvider::needConfigureProvider() const
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractMediaDataReceptor* dp)
 {
+    if (!dp)
+        return;
+
     QnMutexLocker mutex (&m_mutex);
     if (m_dataprocessors.removeOne(dp))
+    {
+        dp->consumers -= 1;
         NX_DEBUG(this, "Remove data processor: %1", dp);
+    }
     else
+    {
         NX_WARNING(this, "Remove not added data processor: %1", dp);
+    }
 }
 
 void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)

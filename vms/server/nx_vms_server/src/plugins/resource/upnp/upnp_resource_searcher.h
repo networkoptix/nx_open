@@ -21,11 +21,11 @@ public:
 protected:
     virtual QnResourceList findResources() override;
     /**
-     * @param discoveryAddr Local interface address, device has been discovered on
-     * @param host Discovered device address
-     * @param devInfo Parameters, received by parsing \a xmlDevInfo
-     * @param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
-     * @param auth Authentication data
+     * @param discoveryAddr Local interface address, device has been discovered on.
+     * @param host Discovered device address.
+     * @param devInfo Parameters, received by parsing \a xmlDevInfo.
+     * @param xmlDevInfo Xml data as defined in [UPnP Device Architecture 1.1, section 2.3].
+     * @param auth Authentication data.
      */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,

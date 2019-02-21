@@ -56,8 +56,15 @@ void QnResourceTreeModelLayoutNodeManager::primaryNodeAdded(QnResourceTreeModelN
     connect(layout, &QnLayoutResource::itemAdded, node,
         [node](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
-            chainCall<QnResourceTreeModelLayoutNode>(node,
-                &QnResourceTreeModelLayoutNode::addItem, item);
+            if (node->resourcePool()->getResourceById(item.resource.id))
+            {
+                chainCall<QnResourceTreeModelLayoutNode>(
+                    node, &QnResourceTreeModelLayoutNode::addItem, item);
+            }
+            else
+            {
+                NX_ASSERT(false, "Attempt to add tree node for nonexistent resource");
+            }
         });
 
     connect(layout, &QnLayoutResource::itemRemoved, node,

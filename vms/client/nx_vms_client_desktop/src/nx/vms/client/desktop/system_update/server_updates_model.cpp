@@ -26,7 +26,11 @@ ServerUpdatesModel::ServerUpdatesModel(
     m_tracker = tracker;
     // Dat strange thingy.
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(),
-        &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this, &ServerUpdatesModel::updateVersionColumn);
+        &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this,
+        [this]()
+        {
+            forceUpdateColumn(VersionColumn);
+        });
 
     connect(m_tracker.get(), &PeerStateTracker::itemAdded,
         this, &ServerUpdatesModel::atItemAdded);
@@ -173,12 +177,13 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
     return base_type::flags(index);
 }
 
-void ServerUpdatesModel::updateVersionColumn()
+void ServerUpdatesModel::forceUpdateColumn(Columns column)
 {
     int count = m_tracker->peersCount();
     if (!count)
         return;
-    emit dataChanged(index(0, VersionColumn), index(count - 1, VersionColumn));
+    NX_ASSERT(column < Columns::ColumnCount);
+    emit dataChanged(index(0, column), index(count - 1, column));
 }
 
 void ServerUpdatesModel::atItemAdded(UpdateItemPtr item)
@@ -218,7 +223,7 @@ void ServerUpdatesModel::atItemChanged(UpdateItemPtr item)
 void ServerUpdatesModel::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
     m_targetVersion = version;
-    updateVersionColumn();
+    forceUpdateColumn(VersionColumn);
 }
 
 QnServerUpdatesColors ServerUpdatesModel::colors() const

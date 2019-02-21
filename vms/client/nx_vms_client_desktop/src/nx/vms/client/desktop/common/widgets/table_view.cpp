@@ -1,5 +1,6 @@
 #include "table_view.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtCore/QPointer>
 #include <QtGui/QPainter>
 #include <QtWidgets/QHeaderView>
@@ -217,6 +218,25 @@ QItemSelectionModel::SelectionFlags TableView::selectionCommand(
     const auto result = base_type::selectionCommand(index, event);
     emit selectionChanging(result, index, event);
     return result;
+}
+
+void TableView::updateGeometries()
+{
+    // Looks like standard QTableView doesn't reserve bottom viewport margin for horizontal
+    // scroll bar.
+
+    if (m_updating)
+        return;
+
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
+
+    base_type::updateGeometries();
+    if (!horizontalScrollBar()->isVisible())
+        return;
+
+    auto margins = viewportMargins();
+    margins.setBottom(margins.bottom() + horizontalScrollBar()->height());
+    setViewportMargins(margins);
 }
 
 } // namespace nx::vms::client::desktop

@@ -9,6 +9,8 @@ namespace nx::cloud::relay::api {
 class NX_NETWORK_API OpenTunnelNotification
 {
 public:
+    static constexpr char kHttpMethod[] = "OPEN_TUNNEL";
+
     void setClientPeerName(nx::String name);
     const nx::String& clientPeerName() const;
 
@@ -28,6 +30,8 @@ private:
 class NX_NETWORK_API KeepAliveNotification
 {
 public:
+    static constexpr char kHttpMethod[] = "KEEP_ALIVE";
+
     nx::network::http::Message toHttpMessage() const;
 
     /**

@@ -12,14 +12,14 @@ namespace event {
 
 PluginEvent::PluginEvent(
     qint64 timeStamp,
-    const AnalyticsEngineResourcePtr& engineResource,
+    const QnUuid& engineResourceId,
     const QString& caption,
     const QString& description,
     nx::vms::api::EventLevel level,
     const QnSecurityCamResourcePtr& device)
     :
     base_type(EventType::pluginEvent, QnResourcePtr(), timeStamp),
-    m_resourceId(engineResource->getId()),
+    m_resourceId(engineResourceId),
     m_caption(caption),
     m_description(description)
 {

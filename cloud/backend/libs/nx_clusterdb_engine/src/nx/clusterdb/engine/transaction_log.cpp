@@ -83,7 +83,7 @@ nx::sql::DBResult CommandLog::saveLocalTransaction(
     lock.unlock();
 
     NX_DEBUG(
-        QnLog::EC2_TRAN_LOG.join(this),
+        this,
         lm("systemId %1. Generated new command %2 (hash %3)")
         .args(systemId, toString(transactionSerializer->header()), transactionHash));
 
@@ -227,7 +227,7 @@ nx::sql::DBResult CommandLog::fillCache()
             cacheFilledPromise.set_value(dbResult);
         });
 
-    NX_DEBUG(this, lm("Tranaction log cache filled up"));
+    NX_DEBUG(this, lm("Transaction log cache filled up"));
 
     // Waiting for completion.
     future.wait();
@@ -262,7 +262,7 @@ nx::sql::DBResult CommandLog::fetchTransactionState(
     }
     catch (const std::exception& e)
     {
-        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this),
+        NX_ERROR(this,
             lm("Error loading transaction log. %1").arg(e.what()));
         throw;
     }
@@ -383,9 +383,8 @@ nx::sql::DBResult CommandLog::saveToDb(
         Qn::SerializationFormat::UbjsonFormat,
         m_supportedProtocolRange.currentVersion());
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG,
-        lm("systemId %1. Saving command %2 (hash %3) to log")
-            .args(systemId, toString(commandHeader), commandHash));
+    NX_DEBUG(this, lm("systemId %1. Saving command %2 (hash %3) to log")
+        .args(systemId, toString(commandHeader), commandHash));
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
         queryContext,

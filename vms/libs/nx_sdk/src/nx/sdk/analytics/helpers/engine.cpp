@@ -20,14 +20,23 @@ namespace analytics {
 class PrintPrefixMaker
 {
 public:
-    std::string makePrintPrefix(const std::string& overridingPrintPrefix, const IPlugin* plugin)
+    std::string makePrintPrefix(
+        const std::string& overridingPrintPrefix,
+        const IPlugin* plugin,
+        const IEngineInfo* engineInfo = nullptr)
     {
         NX_KIT_ASSERT(plugin);
         NX_KIT_ASSERT(plugin->name());
 
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
-        return std::string("[") + plugin->name() + " Engine] ";
+
+        std::string printPrefix = std::string("[") + plugin->name() + "_engine";
+        if (engineInfo)
+            printPrefix += std::string("_") + engineInfo->id();
+
+        printPrefix += "] ";
+        return printPrefix;
     }
 
 private:
@@ -44,7 +53,8 @@ Engine::Engine(
     const std::string& printPrefix)
     :
     logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, plugin)),
-    m_plugin(plugin)
+    m_plugin(plugin),
+    m_overridingPrintPrefix(printPrefix)
 {
     NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
@@ -77,6 +87,12 @@ void Engine::pushPluginEvent(
 Engine::~Engine()
 {
     NX_PRINT << "Destroyed " << this;
+}
+
+void Engine::setEngineInfo(const IEngineInfo* engineInfo)
+{
+    logUtils.setPrintPrefix(
+        PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
 }
 
 void Engine::setSettings(const IStringMap* settings)
@@ -117,8 +133,10 @@ void Engine::executeAction(IAction* action, Error* outError)
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
+    const auto actionParams = toPtr(action->params());
+
     if (!logUtils.convertAndOutputStringMap(
-        &params, action->params(), "params", /*outputIndent*/ 4))
+        &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
         *outError = Error::unknownError;

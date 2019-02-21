@@ -127,6 +127,10 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const = 0;
 
+    bool handleRemoteAnalyticsNotification(
+        const nx::vms::api::ResourceParamWithRefData& param,
+        ec2::NotificationSource source);
+
 public slots:
 
     void on_licenseChanged(const QnLicensePtr &license);
@@ -143,7 +147,9 @@ private slots:
         const QnUuid& resourceId,
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source);
-    void on_resourceParamChanged(const nx::vms::api::ResourceParamWithRefData& param);
+    void on_resourceParamChanged(
+        const nx::vms::api::ResourceParamWithRefData& param,
+        ec2::NotificationSource source);
     void on_resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
     void on_resourceRemoved(const QnUuid& resourceId);
     void on_resourceStatusRemoved(const QnUuid& resourceId);

@@ -7,8 +7,8 @@
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
+        <numerusform>Bajtů</numerusform>
+        <numerusform>Bajtů</numerusform>
         <numerusform>Bytes</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
@@ -16,13 +16,13 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobajtů</numerusform>
         <numerusform>Kilobytes</numerusform>
         <numerusform>Kilobytes</numerusform>
         <numerusform>Kilobytes</numerusform>
@@ -31,13 +31,13 @@
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabajtů</numerusform>
         <numerusform>Megabytes</numerusform>
         <numerusform>Megabytes</numerusform>
         <numerusform>Megabytes</numerusform>
@@ -46,13 +46,13 @@
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabajtů</numerusform>
         <numerusform>Gigabytes</numerusform>
         <numerusform>Gigabytes</numerusform>
         <numerusform>Gigabytes</numerusform>
@@ -61,13 +61,13 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabajtů</numerusform>
         <numerusform>Terabytes</numerusform>
         <numerusform>Terabytes</numerusform>
         <numerusform>Terabytes</numerusform>
@@ -76,13 +76,13 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabajtů</numerusform>
         <numerusform>Petabytes</numerusform>
         <numerusform>Petabytes</numerusform>
         <numerusform>Petabytes</numerusform>
@@ -91,14 +91,14 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Žádný</translation>
     </message>
   </context>
   <context>
@@ -120,52 +120,12 @@
       <translation>Tento účet není aktivován. Prosím zkontrolujte Váš email.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Tento účet je zablokován.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Požadovaná funkce není implementována.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Neznámá oblast.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Chybný požadavek.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Neplatný nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Oprávnění již nejsou platná.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Byla přijata neplatná data.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Neznámá chyba.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Neočekávaná chyba sítě. Zkontrolujte prosím připojení k Internetu a zkuste to znovu.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Neplatné přihlášení.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Požadovaný objekt nebyl nalezen.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Objekt již existuje.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -173,14 +133,17 @@
       <translation>Interní chyba %1. Kontaktujte tým technické podpory.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Je nám líto, služba %1 je dočasně nedostupná. Děláme vše pro to, abychom ji obnovili. Prosím zkuste to znovu později.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Příliš mnoho pokusů. Zkuste to znovu za chvíli.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Je nám líto, služba %1 nemohla zpracovat Váš požadavek. Zkuste to prosím znovu za pár okamžiků.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
@@ -199,19 +162,19 @@
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>Nelze nalézt audio enkodér &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Nelze inicializovat audio enkodér.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
+      <translation>Formát vzoru vstupního zařízení %1 není podporován.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation type="unfinished">Primary audio device is not selected.</translation>
+      <translation>Není vybráno primární zvukové zařízení.</translation>
     </message>
   </context>
   <context>
@@ -243,90 +206,90 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>msek</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>sek</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>hodiny</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>dny</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>týdny</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>měsíce</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>roky</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+        <numerusform>milisekund</numerusform>
+        <numerusform>milisekund</numerusform>
+        <numerusform>milisekund</numerusform>
         <numerusform>milliseconds</numerusform>
       </translation>
     </message>
@@ -334,7 +297,7 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation type="unfinished">
-        <numerusform>seconds</numerusform>
+        <numerusform>sekundy</numerusform>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
         <numerusform>seconds</numerusform>
@@ -344,7 +307,7 @@
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation type="unfinished">
-        <numerusform>minutes</numerusform>
+        <numerusform>minuty</numerusform>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
         <numerusform>minutes</numerusform>
@@ -354,7 +317,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation type="unfinished">
-        <numerusform>hours</numerusform>
+        <numerusform>hodiny</numerusform>
         <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
@@ -364,7 +327,7 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation type="unfinished">
-        <numerusform>days</numerusform>
+        <numerusform>dny</numerusform>
         <numerusform>days</numerusform>
         <numerusform>days</numerusform>
         <numerusform>days</numerusform>
@@ -374,7 +337,7 @@
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation type="unfinished">
-        <numerusform>weeks</numerusform>
+        <numerusform>týdny</numerusform>
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
@@ -384,7 +347,7 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation type="unfinished">
-        <numerusform>months</numerusform>
+        <numerusform>měsíce</numerusform>
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
@@ -394,7 +357,7 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation type="unfinished">
-        <numerusform>years</numerusform>
+        <numerusform>roky</numerusform>
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>

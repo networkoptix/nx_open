@@ -562,14 +562,6 @@ struct RadassController::Private
             return;
 
         QnCamDisplay* display = consumer->display;
-
-        // Do not try HQ for small items.
-        if (isSmallOrMediumItem(display))
-        {
-            trace("Consumer is not big enough", consumer);
-            return;
-        }
-
         if (consumer->lqReason == LqReason::performanceInFf)
         {
             const float oldSpeed = consumer->toLqSpeed;
@@ -597,6 +589,12 @@ struct RadassController::Private
             return;
         }
 
+        // Do not try HQ for small items.
+        if (isSmallOrMediumItem(display))
+        {
+            trace("Consumer is not big enough", consumer);
+            return;
+        }
 
         // If item go to LQ because of small, return to HQ without delay.
         if (consumer->lqReason == LqReason::smallItem)

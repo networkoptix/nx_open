@@ -1,7 +1,6 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
-
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/models/event_list_model.h>
 
 namespace nx::vms::client::desktop {
@@ -20,7 +19,7 @@ protected:
 
 private:
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

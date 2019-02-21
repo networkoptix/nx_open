@@ -784,17 +784,21 @@ Handle ServerConnection::lookupDetectedObjects(
         targetThread);
 }
 
-Handle ServerConnection::updateActionStart(const nx::update::Information& info, QThread* targetThread)
+Handle ServerConnection::updateActionStart(
+    const nx::update::Information& info, QThread* targetThread)
 {
-    auto callback = [](bool /*success*/, rest::Handle /*handle*/, EmptyResponseType /*response*/)
+    auto callback =
+        [](bool /*success*/, rest::Handle /*handle*/, EmptyResponseType /*response*/)
         {
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, targetThread);
+    return executePost<EmptyResponseType>(
+        "/ec2/startUpdate", QnRequestParamList(), contentType, request, callback, targetThread);
 }
 
-Handle ServerConnection::getUpdateInfo(Result<nx::update::Information>::type&& callback, QThread* targetThread)
+Handle ServerConnection::getUpdateInfo(
+    Result<nx::update::Information>::type&& callback, QThread* targetThread)
 {
     QnRequestParamList params;
     return executeGet("/ec2/updateInformation", params, callback, targetThread);
@@ -808,15 +812,18 @@ Handle ServerConnection::checkForUpdates(const QString& changeset,
     return executeGet("/ec2/updateInformation", params, callback, targetThread);
 }
 
-Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
+Handle ServerConnection::updateActionStop(
+    std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
-    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
                 callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    return executePost<EmptyResponseType>(lit("/ec2/cancelUpdate"),
+    return executePost<EmptyResponseType>("/ec2/cancelUpdate",
         QnRequestParamList(),
         contentType, QByteArray(),
         internalCallback, targetThread);
@@ -825,7 +832,9 @@ Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& c
 Handle ServerConnection::updateActionFinish(bool skipActivePeers,
     std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
-    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
                 callback(handle, success);
@@ -837,7 +846,7 @@ Handle ServerConnection::updateActionFinish(bool skipActivePeers,
     if (skipActivePeers)
         params.insert("ignorePendingPeers", "true");
 
-    return executePost<EmptyResponseType>(lit("/ec2/finishUpdate"),
+    return executePost<EmptyResponseType>("/ec2/finishUpdate",
         params,
         contentType, QByteArray(),
         internalCallback, targetThread);
@@ -848,7 +857,8 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
     QThread* targetThread)
 {
     auto internalCallback =
-        [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
+        [callback=std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
                 callback(handle, success);
@@ -861,12 +871,13 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
             peerList += ",";
         peerList += peer.toString();
     }
-    return executePost<EmptyResponseType>(lit("/api/installUpdate"),
+    return executePost<EmptyResponseType>("/api/installUpdate",
         QnRequestParamList{{ lit("peers"), peerList }},
         contentType, QByteArray(), internalCallback, targetThread);
 }
 
-Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback, QThread* targetThread)
+Handle ServerConnection::getUpdateStatus(
+    Result<UpdateStatusAll>::type callback, QThread* targetThread)
 {
     QnRequestParamList params;
     return executeGet("/ec2/updateStatus", params, callback, targetThread);
@@ -876,7 +887,7 @@ Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback,
 
 Handle ServerConnection::getEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -888,7 +899,10 @@ Handle ServerConnection::getEngineAnalyticsSettings(
             [callback = std::move(callback)](
                 bool success, Handle requestId, const QnJsonRestResult& result)
             {
-                callback(success, requestId, result.deserialized<QJsonObject>());
+                callback(
+                    success,
+                    requestId,
+                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
             }),
         targetThread);
 }
@@ -896,7 +910,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -909,7 +923,10 @@ Handle ServerConnection::setEngineAnalyticsSettings(
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {
-            callback(success, requestId, result.deserialized<QJsonObject>());
+            callback(
+                success,
+                requestId,
+                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
         },
         targetThread);
 }
@@ -917,7 +934,7 @@ Handle ServerConnection::setEngineAnalyticsSettings(
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QJsonObject>::type&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -930,7 +947,10 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
             [callback = std::move(callback)](
                 bool success, Handle requestId, const QnJsonRestResult& result)
             {
-                callback(success, requestId, result.deserialized<QJsonObject>());
+                callback(
+                    success,
+                    requestId,
+                    result.deserialized<nx::vms::api::analytics::SettingsResponse>());
             }),
         targetThread);
 }
@@ -939,7 +959,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+    Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executePost<QnJsonRestResult>(
@@ -953,7 +973,10 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {
-            callback(success, requestId, result.deserialized<QJsonObject>());
+            callback(
+                success,
+                requestId,
+                result.deserialized<nx::vms::api::analytics::SettingsResponse>());
         },
         targetThread);
 }

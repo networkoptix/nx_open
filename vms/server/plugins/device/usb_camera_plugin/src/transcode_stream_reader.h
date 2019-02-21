@@ -1,23 +1,22 @@
 #pragma once
 #include <atomic>
 
-#include "stream_reader.h"
+#include "camera/camera.h"
 #include "ffmpeg/video_transcoder.h"
 
 namespace nx::usb_cam {
 
-class TranscodeStreamReader: public AbstractStreamReader
+class TranscodeStreamReader
 {
 public:
     TranscodeStreamReader(const std::shared_ptr<Camera>& camera);
 
-    virtual int processPacket(
-        const std::shared_ptr<ffmpeg::Packet>& source,
-        std::shared_ptr<ffmpeg::Packet>& result) override;
+    int transcode(
+        const std::shared_ptr<ffmpeg::Packet>& source, std::shared_ptr<ffmpeg::Packet>& result);
 
-    virtual void setFps(float fps) override;
-    virtual void setResolution(const nxcip::Resolution& resolution) override;
-    virtual void setBitrate(int bitrate) override;
+    void setFps(float fps);
+    void setResolution(const nxcip::Resolution& resolution);
+    void setBitrate(int bitrate);
 
 private:
     std::shared_ptr<ffmpeg::Packet> nextPacket();

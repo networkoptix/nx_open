@@ -1,20 +1,20 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
 
 #include <client/client_globals.h>
 
 #include <nx/api/mediaserver/image_request.h>
+#include <nx/utils/impl_ptr.h>
 
 #include "image_provider.h"
 
 namespace nx::vms::client::desktop {
 
 /**
-* This class allows receiving of thumbnails via http request to server or from local files.
-* Every setRequest() call will bring a new screenshot.
-*/
+ * This class allows receiving of thumbnails via http request to server or from local files.
+ * Every setRequest() call will bring a new screenshot.
+ */
 class ResourceThumbnailProvider: public ImageProvider
 {
     Q_OBJECT
@@ -40,7 +40,7 @@ protected:
 
 private:
     struct Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

@@ -6,7 +6,6 @@
 
 #include <nx/analytics/replacement_merge_executor.h>
 #include <nx/analytics/scoped_merge_executor.h>
-#include <nx/analytics/device_descriptor_merge_executor.h>
 #include <nx/analytics/multiresource_descriptor_container.h>
 #include <nx/analytics/property_descriptor_storage_factory.h>
 
@@ -36,8 +35,6 @@ using ActionTypeDescriptorMap = std::map<
     EngineId,
     std::map<ActionTypeId, nx::vms::api::analytics::ActionTypeDescriptor>>;
 
-using DeviceDescriptorMap = std::map<DeviceId, nx::vms::api::analytics::DeviceDescriptor>;
-
 using PluginDescriptorContainer = MultiresourceDescriptorContainer<
     PropertyDescriptorStorageFactory<nx::vms::api::analytics::PluginDescriptor, PluginId>,
     ReplacementMergeExecutor<nx::vms::api::analytics::PluginDescriptor>>;
@@ -64,9 +61,5 @@ using ActionTypeDescriptorContainer = MultiresourceDescriptorContainer<
         EngineId,
         ActionTypeId>,
     ReplacementMergeExecutor<nx::vms::api::analytics::ActionTypeDescriptor>>;
-
-using DeviceDescriptorContainer = MultiresourceDescriptorContainer<
-    PropertyDescriptorStorageFactory<nx::vms::api::analytics::DeviceDescriptor, DeviceId>,
-    DeviceDescriptorMergeExecutor>;
 
 } // namespace nx::analytics

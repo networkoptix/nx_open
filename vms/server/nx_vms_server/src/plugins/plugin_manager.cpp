@@ -56,15 +56,48 @@ static QString libNameFromFileInfo(const QFileInfo& fileInfo)
     return libName;
 }
 
-static QFileInfoList pluginFileInfoList(const QString& dirToSearchIn)
+static QFileInfoList pluginFileInfoList(const QString& dirToSearchIn, bool searchInnerDirs = true)
 {
     QDir pluginDir(dirToSearchIn);
-    const auto entries = pluginDir.entryInfoList(QStringList(), QDir::Files | QDir::Readable);
+    QDir::Filters filters = QDir::Files | QDir::Readable;
     QFileInfoList filteredEntries;
+
+    if (searchInnerDirs)
+        filters |= QDir::Dirs | QDir::NoDotAndDotDot;
+
+    const auto entries = pluginDir.entryInfoList(/*nameFilters*/ QStringList(), filters);
+
     for (const auto& entry: entries)
     {
-        if (!libNameFromFileInfo(entry).isEmpty())
-            filteredEntries << entry;  //< It is a plugin entry.
+        if (entry.isDir())
+        {
+            if (pluginsIni().tryAllLibsInPluginDir)
+            {
+                filteredEntries << pluginFileInfoList(
+                    entry.absoluteFilePath(),
+                    /*searchInnerDirs*/ false);
+            }
+            else
+            {
+                const QDir entryAsDir = entry.absoluteFilePath();
+                const auto pluginDirEntries = entryAsDir.entryInfoList(
+                    /*nameFilters*/ QStringList(), QDir::Files | QDir::Readable);
+
+                for (const auto& pluginDirEntry: pluginDirEntries)
+                {
+                    if (libNameFromFileInfo(pluginDirEntry) == entry.fileName())
+                    {
+                        filteredEntries << pluginDirEntry;
+                        break;
+                    }
+                }
+            }
+        }
+        else //< entry is a file.
+        {
+            if (!libNameFromFileInfo(entry).isEmpty())
+                filteredEntries << entry;  //< It is a plugin entry.
+        }
     }
     return filteredEntries;
 }
@@ -86,7 +119,7 @@ void PluginManager::loadPluginsFromDirWithBlackList(
         }
 
         loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
-        // Ignore return value - an error is aleady logged.
+        // Ignore return value - an error is already logged.
     }
 }
 
@@ -110,7 +143,7 @@ void PluginManager::loadPluginsFromDirWithWhiteList(
         }
 
         loadNxPlugin(settingsHolder, fileInfo.absoluteFilePath(), libName);
-        // Ignore return value - an error is aleady logged.
+        // Ignore return value - an error is already logged.
     }
 }
 
