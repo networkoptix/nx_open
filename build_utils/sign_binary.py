@@ -7,7 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 chunk_size = 1024 * 1024
 
-DEFAULT_TIMEOUT = 1200
+DEFAULT_TIMEOUT = 600
 DEFAULT_RETRIES = 10
 
 
@@ -34,13 +34,13 @@ def sign_binary(
         'file': open(file, 'rb')
     }
 
-    retries = Retry(
-        total=max_retries,
-        backoff_factor=0.1)
-
-    session = requests.Session()
-    session.mount(url, HTTPAdapter(max_retries=retries))
     for current_try in range(1, max_retries + 1):
+        print('Signing file {}'.format(file))
+        retries = Retry(
+            total=max_retries,
+            backoff_factor=0.1)
+        session = requests.Session()
+        session.mount(url, HTTPAdapter(max_retries=retries))
         try:
             r = session.post(url, params=params, files=files, timeout=timeout)
             if r.status_code != 200:
