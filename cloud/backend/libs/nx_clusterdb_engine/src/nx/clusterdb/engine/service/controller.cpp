@@ -12,7 +12,6 @@ Controller::Controller(
     :
     m_syncronizationEngine(
         applicationId,
-        QnUuid::createUuid(), //< moduleId. TODO.
         settings.synchronization(),
         ProtocolVersionRange::any,
         &model->queryExecutor())

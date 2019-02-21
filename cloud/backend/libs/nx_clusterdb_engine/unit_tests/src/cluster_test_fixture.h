@@ -17,6 +17,8 @@ namespace nx::clusterdb::engine::test {
 class Peer
 {
 public:
+    Peer();
+
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 

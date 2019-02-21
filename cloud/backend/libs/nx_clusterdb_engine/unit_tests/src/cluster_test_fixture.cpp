@@ -4,10 +4,17 @@
 
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
+#include <nx/utils/uuid.h>
 
 #include <nx/clusterdb/engine/http/http_paths.h>
 
 namespace nx::clusterdb::engine::test {
+
+Peer::Peer():
+    m_nodeId(QnUuid::createUuid().toSimpleString().toStdString())
+{
+    m_process.addArg("-p2pDb/nodeId", m_nodeId.c_str());
+}
 
 nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
 {
