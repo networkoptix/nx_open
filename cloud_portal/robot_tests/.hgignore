@@ -3,5 +3,5 @@
 /*.html
 /*.tar
 /*.deb
-/Docker/Video
-/Docker/Data
+/Docker/Video/*
+/Docker/Data/*
