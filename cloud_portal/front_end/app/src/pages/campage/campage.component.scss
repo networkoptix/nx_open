@@ -44,6 +44,10 @@
             th {
                 &:nth-child(n+7) {
                     width : 5%;
+    
+                    & > div {
+                        justify-content: center;
+                    }
                 }
             }
             
