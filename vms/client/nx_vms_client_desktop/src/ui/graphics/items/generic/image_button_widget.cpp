@@ -613,10 +613,11 @@ void QnImageButtonWidget::updateFromDefaultAction()
         m_actionIconOverridden = false;
     }
 
+    setVisible(m_action->isVisible());
     setToolTip(m_action->toolTip());
     setCheckable(m_action->isCheckable());
     setChecked(m_action->isChecked());
-    setEnabled(m_action->isEnabled()); // TODO: #Elric do backsync?
+    setEnabled(m_action->isEnabled());
 }
 
 bool QnImageButtonWidget::isDynamic() const
