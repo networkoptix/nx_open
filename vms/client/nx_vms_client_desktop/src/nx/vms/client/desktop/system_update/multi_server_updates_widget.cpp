@@ -2156,7 +2156,7 @@ void MultiServerUpdatesWidget::loadDataToUi()
     syncDebugInfoToUi();
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StatusMessageColumn, !m_showDebugData);
 
-    updateVersionInfoVisibility();
+    syncVersionInfoVisibility();
 
     if (auto layout = ui->versionStackedWidget->currentWidget()->layout(); NX_ASSERT(layout))
         layout->activate();
@@ -2164,7 +2164,7 @@ void MultiServerUpdatesWidget::loadDataToUi()
     ui->controlsVerticalLayout->activate();
 }
 
-void MultiServerUpdatesWidget::updateVersionInfoVisibility()
+void MultiServerUpdatesWidget::syncVersionInfoVisibility()
 {
     const bool hasError = !ui->errorLabel->text().isEmpty();
     ui->errorLabel->setVisible(hasError);

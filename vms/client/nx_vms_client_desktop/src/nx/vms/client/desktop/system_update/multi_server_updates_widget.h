@@ -172,6 +172,7 @@ private:
     void syncRemoteUpdateStateToUi();
     void syncProgress();
     void syncStatusVisibility();
+    void syncVersionInfoVisibility();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
@@ -182,7 +183,6 @@ private:
     void processRemoteDownloading();
     void processRemoteInstalling();
 
-    void updateVersionInfoVisibility();
     bool isChecking() const;
 
     bool processUploaderChanges(bool force = false);
