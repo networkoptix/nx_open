@@ -16,6 +16,10 @@ from api.helpers.exceptions import APIRequestException, APIException, APILogicEx
 
 logger = logging.getLogger(__name__)
 
+# Django GenericIpAddressField has max length of 39 chars
+# https://docs.djangoproject.com/en/2.2/_modules/django/db/models/fields/#GenericIPAddressField
+IP_MAX_LENGTH = 39
+
 
 class AccountBackend(ModelBackend):
     @staticmethod
@@ -114,8 +118,10 @@ class AccountManager(db.models.Manager):
         return self._create_user(email, password, **extra_fields)
 
 
+# Truncate IPs greater than IP_MAX_LENGTH
 def get_ip(request):
-    return request.META.get('HTTP_X_FORWARDED_FOR')
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    return ip if len(ip) <= IP_MAX_LENGTH else ip[:IP_MAX_LENGTH]
 
 
 @receiver(user_logged_in)
