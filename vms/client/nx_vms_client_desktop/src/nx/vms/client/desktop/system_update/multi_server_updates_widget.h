@@ -183,7 +183,6 @@ private:
     void processRemoteInstalling();
 
     void updateInfoVisibility();
-    void updateTopPanelLayout();
     bool isChecking() const;
 
     bool processUploaderChanges(bool force = false);

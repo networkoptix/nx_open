@@ -1992,9 +1992,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     syncVersionReport(m_updateReport);
     m_updateLocalStateChanged = false;
-
-    updateInfoVisibility();
-    updateTopPanelLayout();
 }
 
 bool MultiServerUpdatesWidget::stateHasProgress(WidgetUpdateState state)
@@ -2160,7 +2157,11 @@ void MultiServerUpdatesWidget::loadDataToUi()
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StatusMessageColumn, !m_showDebugData);
 
     updateInfoVisibility();
-    updateTopPanelLayout();
+
+    if (auto layout = ui->versionStackedWidget->currentWidget()->layout(); NX_ASSERT(layout))
+        layout->activate();
+
+    ui->controlsVerticalLayout->activate();
 }
 
 void MultiServerUpdatesWidget::updateInfoVisibility()
@@ -2173,14 +2174,6 @@ void MultiServerUpdatesWidget::updateInfoVisibility()
 
     const bool hasReleaseNotes = !m_updateInfo.info.releaseNotesUrl.isEmpty();
     ui->releaseNotesLabel->setVisible(hasReleaseNotes && !hasError);
-}
-
-void MultiServerUpdatesWidget::updateTopPanelLayout()
-{
-    if (auto layout = ui->versionStackedWidget->currentWidget()->layout(); NX_ASSERT(layout))
-        layout->activate();
-
-    ui->controlsVerticalLayout->activate();
 }
 
 void MultiServerUpdatesWidget::syncDebugInfoToUi()
