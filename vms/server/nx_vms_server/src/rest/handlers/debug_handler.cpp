@@ -9,7 +9,7 @@
 
 namespace {
 
-enum class Action { invalid, crash, exit, newValue };
+enum class Action { invalid, crash, exit };
 
 static Action actionFromParams(const QnRequestParamList& params)
 {
