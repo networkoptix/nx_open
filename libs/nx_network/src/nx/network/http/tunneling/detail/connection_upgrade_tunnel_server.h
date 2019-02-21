@@ -40,7 +40,7 @@ private:
     virtual StatusCode::Value validateOpenTunnelRequest(
         const RequestContext& requestContext) override;
 
-    virtual network::http::RequestResult processOpenTunnelRequest(
+    virtual RequestResult processOpenTunnelRequest(
         const RequestContext& requestContext,
         ApplicationData... requestData) override;
 };
@@ -67,7 +67,7 @@ void ConnectionUpgradeTunnelServer<ApplicationData...>::registerRequestHandlers(
 {
     using namespace std::placeholders;
 
-    const auto path = 
+    const auto path =
         this->requestPath().empty()
         ? url::joinPath(basePath, kConnectionUpgradeTunnelPath)
         : this->requestPath();
@@ -120,10 +120,9 @@ StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData...>::validateOpe
 }
 
 template<typename ...ApplicationData>
-nx_http::RequestResult
-    ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
-        const RequestContext& /*requestContext*/,
-        ApplicationData... requestData)
+RequestResult ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
+    const RequestContext& /*requestContext*/,
+    ApplicationData... requestData)
 {
     RequestResult requestResult(StatusCode::switchingProtocols);
     requestResult.connectionEvents.onResponseHasBeenSent =
@@ -138,7 +137,7 @@ nx_http::RequestResult
                 &ConnectionUpgradeTunnelServer::reportTunnel,
                 std::move(allArgs));
         };
-    
+
     return requestResult;
 }
 
