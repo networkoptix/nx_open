@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <atomic>
+#include <thread>
 
 #include <QtCore/QString>
 
@@ -17,35 +18,39 @@ public:
         int count = 1;
         int livePercent = 100;
         bool useSsl = false;
+        std::chrono::milliseconds timeout {5000};
 
         QString toString()
         {
-            return QString("Config:") +
+            return
                 "\nserver: " + server +
                 "\nuser: " + user +
                 "\npassword: " + password +
-                "\nuseSsl: " + useSsl +
+                "\nuse ssl: " + QString::number(useSsl) +
                 "\ncount: " + QString::number(count) +
-                "\nlivePercent: " + QString::number(livePercent) +
+                "\nlive percent: " + QString::number(livePercent) + "%"
+                "\ntimeout: " + QString::number(timeout.count()) + "ms"
                 "\n";
         }
     };
 public:
-    RtspPerf(const Config& config): m_config(config) {}
+    RtspPerf(const Config& config): m_sessions(config.count), m_config(config) {}
     void run();
 
 private:
     bool getCamerasUrls(const QString& server, std::vector<QString>& cameras);
-    void startSession(const QString& url, bool live);
+    void startSessions(const std::vector<QString>& urls);
 
-    struct Statistic
+    struct Session
     {
+        void run(const QString& url, const Config& config, bool live);
         std::atomic<uint64_t> totalBytesRead = 0;
-        std::atomic<uint64_t> failedStreams = 0;
-        std::atomic<uint64_t> successStreams = 0;
+        std::atomic<bool> failed = true;
+        std::thread worker;
     };
 
 private:
+    std::vector<Session> m_sessions;
+    std::atomic<int64_t> m_totalFailed = 0;
     Config m_config;
-    Statistic m_stat;
 };

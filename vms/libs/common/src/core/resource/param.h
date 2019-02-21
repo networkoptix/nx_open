@@ -52,8 +52,9 @@ namespace ResourcePropertyKey
     static const QString kPtzTargetId("ptzTargetId");
     static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
     static const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
-    static const QString kUserIsAllowedToOverridePtzCapabilities(
-        "userIsAllowedToOverridePtzCapabilities");
+
+    static const QString kPtzCapabilitiesUserIsAllowedToModify(
+        "ptzCapabilitiesUserIsAllowedToModify");
     static const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
     static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabilities");
     static const QString kCombinedSensorsDescription("combinedSensorsDescription");

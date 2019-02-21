@@ -1388,16 +1388,29 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
     }
 
-    const bool hasContinuousMovemement = m_ptzCapabilities[core::ptz::Type::operational] &
-        Ptz::ContinuousPtrzCapabilities;
+    Ptz::Capabilities ptzCapabilitiesAllowedToBeModifiedByUser;
+    if (isAnalogEncoder() || isProxiedAnalogEncoder())
+    {
+        // We can't reliably determine if there's PTZ caps for analogous cameras
+        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+        ptzCapabilitiesAllowedToBeModifiedByUser = Ptz::Capability::ContinuousPtzCapabilities;
+    }
+    else if (hasSerialPort())
+    {
+        const Ptz::Capabilities operationalPtzCapabilites =
+            m_ptzCapabilities[core::ptz::Type::operational];
 
-    // We can't reliably determine if there's PTZ caps for analogous cameras
-    // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
-    const bool userIsAllowedToModifyCapabilities = (!hasContinuousMovemement && hasSerialPort())
-        || isAnalogEncoder()
-        || isProxiedAnalogEncoder();
+        const bool hasPanOrTilt = operationalPtzCapabilites & Ptz::ContinuousPanTiltCapabilities;
+        const bool hasZoom = operationalPtzCapabilites.testFlag(Ptz::ContinuousZoomCapability);
 
-    setIsUserAllowedToModifyPtzCapabilities(userIsAllowedToModifyCapabilities);
+        if (!hasPanOrTilt)
+            ptzCapabilitiesAllowedToBeModifiedByUser |= Ptz::ContinuousPanTiltCapabilities;
+
+        if (!hasZoom)
+            ptzCapabilitiesAllowedToBeModifiedByUser |= Ptz::ContinuousZoomCapability;
+    }
+
+    setPtzCapabilitesUserIsAllowedToModify(ptzCapabilitiesAllowedToBeModifiedByUser);
 
     return CameraDiagnostics::NoErrorResult();
 }

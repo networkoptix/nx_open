@@ -169,7 +169,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     const auto capabilities = ptz::capabilities(controller);
     if (capabilities.testFlag(Ptz::NativePresetsPtzCapability)
         && !capabilities.testFlag(Ptz::NoNxPresetsPtzCapability)
-        || camera->isUserAllowedToModifyPtzCapabilities())
+        || camera->ptzCapabilitiesUserIsAllowedToModify() != Ptz::Capability::NoPtzCapabilities)
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(

@@ -9,13 +9,17 @@ QSet<QnMediaServerResourcePtr> participantServers(
     QnCommonModule* commonModule)
 {
     const auto systemName = commonModule->globalSettings()->systemName();
+    const auto localSystemId = commonModule->globalSettings()->localSystemId();
     auto servers = QSet<QnMediaServerResourcePtr>::fromList(
         commonModule->resourcePool()->getAllServers(Qn::Online));
 
     for (const auto& moduleInformation: commonModule->moduleDiscoveryManager()->getAll())
     {
-        if (moduleInformation.systemName != systemName)
+        if (moduleInformation.systemName != systemName
+            || moduleInformation.localSystemId != localSystemId)
+        {
             continue;
+        }
 
         const auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
             moduleInformation.id);

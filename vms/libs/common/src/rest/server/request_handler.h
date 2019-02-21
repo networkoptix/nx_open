@@ -86,12 +86,6 @@ public:
     /** In derived classes, report all url params carrying camera id. */
     virtual QStringList cameraIdUrlParams() const { return {}; }
 
-    virtual void afterExecute(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QnRestConnectionProcessor* owner);
-
 protected:
     /**
      * @return Http status code.
@@ -142,6 +136,12 @@ protected:
             QByteArray& result,
             QByteArray& resultContentType,
             const QnRestConnectionProcessor* owner);
+
+    virtual void afterExecute(
+        const QString& path,
+        const QnRequestParamList& params,
+        const QByteArray& body,
+        const QnRestConnectionProcessor* owner);
 
 protected:
     void setPath(const QString& path) { m_path = path; }
