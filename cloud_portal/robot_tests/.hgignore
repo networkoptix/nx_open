@@ -3,5 +3,6 @@
 /*.html
 /*.tar
 /*.deb
-/Docker/Video/*
-/Docker/Data/*
+syntax: glob
+/Docker/Video/**
+/Docker/Data/**
