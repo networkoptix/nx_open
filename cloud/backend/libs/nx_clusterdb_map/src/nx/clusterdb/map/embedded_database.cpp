@@ -16,10 +16,8 @@ EmbeddedDatabase::EmbeddedDatabase(
     :
     /*m_settings(settings),
     m_queryExecutor(queryExecutor),*/
-    m_moduleId(QnUuid::createUuid()),
     m_syncEngine(
         kApplicationId,
-        m_moduleId,
         settings.dataSyncEngineSettings,
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         queryExecutor),
