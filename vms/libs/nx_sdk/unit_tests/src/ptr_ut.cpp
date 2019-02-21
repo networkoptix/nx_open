@@ -67,7 +67,8 @@ void assertEq(
     ASSERT_TRUE(expected == actual); //< operator==()
     ASSERT_FALSE(expected != actual); //< operator!=()
 
-    ASSERT_EQ(expectedRefCount, actual->refCountThreadUnsafe());
+    ASSERT_EQ(expectedRefCount, refCount(actual.get())); //< Test refCount(const IRefCountable*).
+    ASSERT_EQ(expectedRefCount, refCount(actual)); //< Test refCount(const Ptr<>&).
 
     // This is the only correct way to access the ref counter of an arbitrary interface.
     const int increasedRefCount = actual->addRef();

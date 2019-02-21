@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include <nx/sdk/helpers/ref_countable_registry.h>
+#include <nx/sdk/interface.h>
 
 namespace nx {
 namespace sdk {
@@ -83,11 +83,7 @@ public:
     RefCountable& operator=(const RefCountable&) = delete;
     RefCountable(RefCountable&&) = delete;
     RefCountable& operator=(RefCountable&&) = delete;
-
-    virtual ~RefCountable()
-    {
-        RefCountableRegistry::notifyDestroyed(this, refCount());
-    }
+    virtual ~RefCountable() = default;
 
     using IRefCountable::queryInterface; //< Enable const overload.
 
@@ -97,14 +93,24 @@ public:
     int refCount() const { return m_refCountableHolder.refCount(); }
 
 protected:
-    RefCountable(): m_refCountableHolder(static_cast<const RefCountableInterface*>(this))
-    {
-        RefCountableRegistry::notifyCreated(this, refCount());
-    }
+    RefCountable(): m_refCountableHolder(static_cast<const RefCountableInterface*>(this)) {}
 
 private:
     const RefCountableHolder m_refCountableHolder;
 };
+
+/**
+ * Intended for debug. Is not thread-safe.
+ * @return Reference counter, or 0 if the pointer is null.
+ */
+inline int refCount(const IRefCountable* refCountable)
+{
+    if (!refCountable)
+        return 0;
+
+    /*unused*/ (void) refCountable->addRef();
+    return refCountable->releaseRef();
+}
 
 } // namespace sdk
 } // namespace nx

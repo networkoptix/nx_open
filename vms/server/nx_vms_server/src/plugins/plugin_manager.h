@@ -97,7 +97,7 @@ private:
         const QString& libName);
 
 private:
-    nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
+    const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
     QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
 
     // For compatibility with the old-SDK-based plugins, we store pointers to the base interface

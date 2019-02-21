@@ -108,9 +108,9 @@ To install the plugin, just copy its library file to the dedicated folder in the
 Server installation directory:
 ```
 # Windows:
-C:\Program Files\Network Optix\Nx MetaVMS\MediaServer\plugins\
+C:\Program Files\Network Optix\Nx Witness\MediaServer\plugins\
 
 # Linux:
-/opt/networkoptix-metavms/mediaserver/bin/plugins/
+/opt/networkoptix/mediaserver/bin/plugins/
 ```
 ATTENTION: After copying the plugin library, the Server has to be restarted.

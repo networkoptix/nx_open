@@ -35,6 +35,7 @@ function(nx_add_server_plugin target)
 
     target_compile_definitions(${target}
         PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
+        INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
     )
 endfunction()
 

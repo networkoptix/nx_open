@@ -39,15 +39,6 @@ struct PluginsIniConfig: public nx::kit::IniConfig
     NX_INI_FLAG(false, tryAllLibsInPluginDir,
         "Attempt to load each dynamic library from each plugin directory instead of only the one\n"
         "with the plugin_name equal to the directory name.");
-
-    NX_INI_FLAG(false, useRefCountableRegistry,
-        "Turn on a debugging mechanism that tracks ref-countable object creation and deletion to\n"
-        "detect leaks and double-frees. An assertion will fail if a discrepancy is detected.\n"
-        "The Server and each Plugin have their own instance of such registry, tracking objects\n"
-        "created/destroyed in the respective module.");
-
-    NX_INI_FLAG(false, verboseRefCountableRegistry,
-        "Turn on verbose output of the ref-countable registry (if it is enabled).");
 };
 
 inline PluginsIniConfig& pluginsIni()
