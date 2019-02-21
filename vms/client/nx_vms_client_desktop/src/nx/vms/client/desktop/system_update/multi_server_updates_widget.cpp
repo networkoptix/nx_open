@@ -1280,6 +1280,9 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         if (!m_peersIssued.contains(id))
             continue;
 
+        if (item->incompatible)
+            continue;
+
         if (item->installed)
         {
             if (m_peersActive.contains(id))
@@ -1500,6 +1503,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     {
         StatusCode state = item->state;
         auto id = item->id;
+
+        if (item->incompatible)
+            continue;
         //if (!m_peersIssued.contains(id))
         //    continue;
         if (item->installed)
