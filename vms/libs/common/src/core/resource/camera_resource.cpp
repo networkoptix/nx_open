@@ -246,6 +246,13 @@ int QnVirtualCameraResource::issuesTimeoutMs() {
     return ISSUE_KEEP_TIMEOUT_MS;
 }
 
+nx::vms::api::RtpTransportType QnVirtualCameraResource::preferredRtpTransport() const
+{
+    return QnLexical::deserialized(
+        getProperty(QnMediaResource::rtpTransportKey()),
+        nx::vms::api::RtpTransportType::automatic);
+}
+
 CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 {
     const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
