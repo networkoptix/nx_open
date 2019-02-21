@@ -29,7 +29,7 @@ public:
 
 private:
     bool getCamerasUrls(const QString& server, std::vector<QString>& cameras);
-    void startSessions(const std::vector<QString>& urls);
+    void startSessionsThread(const std::vector<QString>& urls);
 
     struct Session
     {

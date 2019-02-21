@@ -88,28 +88,32 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
     return true;
 }
 
-void RtspPerf::startSessions(const std::vector<QString>& urls)
+void RtspPerf::startSessionsThread(const std::vector<QString>& urls)
 {
-    for (int i = 0; i < (int)m_sessions.size(); ++i)
+    while (true)
     {
-        if (m_sessions[i].failed)
+        for (int i = 0; i < (int)m_sessions.size(); ++i)
         {
-            bool live = i < m_config.count * m_config.livePercent / 100;
-            QString url = urls[i % urls.size()];
-            m_sessions[i].failed = false;
-            if (m_sessions[i].worker.joinable())
-                m_sessions[i].worker.join();
-            m_sessions[i].worker = std::thread([url, live, this, i]() {
-                m_sessions[i].run(url, m_config, live);
-            });
-            ++m_totalFailed;
-
-            if (m_totalFailed > 0 && m_config.startInterval == std::chrono::milliseconds::zero())
+            if (m_sessions[i].failed)
             {
-                m_currentStartInterval = std::min(m_currentStartInterval * 2, kMaxStartInterval);
+                bool live = i < m_config.count * m_config.livePercent / 100;
+                QString url = urls[i % urls.size()];
+                m_sessions[i].failed = false;
+                if (m_sessions[i].worker.joinable())
+                    m_sessions[i].worker.join();
+                m_sessions[i].worker = std::thread([url, live, this, i]() {
+                    m_sessions[i].run(url, m_config, live);
+                });
+                ++m_totalFailed;
+
+                if (m_totalFailed > 0 && m_config.startInterval == std::chrono::milliseconds::zero())
+                {
+                    m_currentStartInterval = std::min(m_currentStartInterval * 2, kMaxStartInterval);
+                }
+                std::this_thread::sleep_for(m_currentStartInterval);
             }
-            std::this_thread::sleep_for(m_currentStartInterval);
         }
+        std::this_thread::sleep_for(m_currentStartInterval);
     }
 }
 
@@ -126,14 +130,12 @@ void RtspPerf::run()
     m_currentStartInterval = m_config.startInterval != std::chrono::milliseconds::zero() ?
         m_config.startInterval : kMinStartInterval;
     BitrateCounter bitrateCounter;
+    auto startSessionThread = std::thread([urls, this]() { startSessionsThread(urls); });
     while (true)
     {
-        startSessions(urls);
         std::this_thread::sleep_for(kStatisticPrintInterval);
-
         int64_t totalBytesRead = 0;
         int64_t successSessions = 0;
-
         for (const auto& session: m_sessions)
         {
             totalBytesRead += session.totalBytesRead;
@@ -142,7 +144,7 @@ void RtspPerf::run()
         }
         float bitrate = bitrateCounter.update(totalBytesRead);
         NX_ALWAYS(this, "Total bitrate %1 MBit/s, worked sessions %2, failed %3, bytes read %4",
-            QString::number(bitrate, 'f', 3), successSessions, m_totalFailed, totalBytesRead);
+            QString::number(bitrate, 'f', 3), successSessions, std::max<int64_t>(m_totalFailed, 0), totalBytesRead);
     }
 }
 
