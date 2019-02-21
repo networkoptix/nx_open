@@ -7,7 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 chunk_size = 1024 * 1024
 
-DEFAULT_TIMEOUT = 120
+DEFAULT_TIMEOUT = 600
 DEFAULT_RETRIES = 10
 
 
@@ -34,32 +34,41 @@ def sign_binary(
         'file': open(file, 'rb')
     }
 
-    retries = Retry(
-        total=max_retries,
-        backoff_factor=0.1)
+    for current_try in range(1, max_retries + 1):
+        print('Signing file {}'.format(file))
+        retries = Retry(
+            total=max_retries,
+            backoff_factor=0.1)
+        session = requests.Session()
+        session.mount(url, HTTPAdapter(max_retries=retries))
+        try:
+            r = session.post(url, params=params, files=files, timeout=timeout)
+            if r.status_code != 200:
+                print('ERROR: {}'.format(r.text))
+                return r.status_code
 
-    session = requests.Session()
-    session.mount(url, HTTPAdapter(max_retries=retries))
-    try:
-        r = session.post(url, params=params, files=files, timeout=timeout)
-        if r.status_code != 200:
-            print('ERROR: {}'.format(r.text))
-            return r.status_code
+            with open(output, 'wb') as fd:
+                for chunk in r.iter_content(chunk_size=chunk_size):
+                    fd.write(chunk)
 
-        with open(output, 'wb') as fd:
-            for chunk in r.iter_content(chunk_size=chunk_size):
-                fd.write(chunk)
-
-        return 0
-    except requests.exceptions.ReadTimeout as e:
-        print('ERROR: Connection to the signing server has timed out' +
-              ' ({} seconds, {} retries)'.format(timeout, max_retries))
-        print(e)
-        return 1
-    except requests.exceptions.ConnectionError as e:
-        print('ERROR: Connection to the signing server cannot be established.')
-        print(e)
-        return 2
+            return 0
+        except requests.exceptions.ReadTimeout as e:
+            print('ERROR: Connection to the signing server has timed out' +
+                  ' ({} seconds, {} retries) while signing {}'.format(timeout, max_retries, file))
+            print(e)
+            if current_try < max_retries:
+                print('Trying again')
+            else:
+                return 1
+        except requests.exceptions.ConnectionError as e:
+            print('ERROR: Connection to the signing server cannot be established ' +
+                  'while signing {}'.format(file))
+            print(e)
+            if current_try < max_retries:
+                print('Trying again')
+            else:
+                return 2
+    return 3
 
 
 def main():
