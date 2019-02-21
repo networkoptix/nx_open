@@ -362,6 +362,12 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 
     NX_VERBOSE(this, "Added %1, removed %2, updated %3 chunks", numAdded, numRemoved, numUpdated);
 
+    if (!m_data.empty())
+    {
+        setFetchedTimeWindow(QnTimePeriod::fromInterval(
+            m_data.back().startTime(), m_data.front().startTime()));
+    }
+
     if (rowCount() > maximumCount())
     {
         NX_VERBOSE(this, "Truncating to maximum count");
