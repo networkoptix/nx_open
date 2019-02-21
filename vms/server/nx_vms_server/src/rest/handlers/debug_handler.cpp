@@ -69,29 +69,8 @@ int QnDebugHandler::executeGet(
         return nx::network::http::StatusCode::forbidden;
     }
 
-// TODO: Remove either branch after NX_ENUM_SWITCH is either approved or removed.
-#if 0
-    switch (actionFromParams(params))
-    {
-        case Action::crash:
-        {
-            const auto options = crashActionOptionsFromParams(params);
-            qWarning() << messagePrefix << "Intentionally crashing the server"
-                << (options.useFullDump ? "with full crash dump" : "");
-            break;
-        }
-
-        case Action::exit:
-            qWarning() << messagePrefix << "Exiting the Server via `exit(64)`";
-            break;
-
-        default:
-            qWarning() << messagePrefix << "Ignoring - unsupported params";
-            return nx::network::http::StatusCode::forbidden;
-    }
-    return nx::network::http::StatusCode::ok;
-#else // 0
-    return NX_ENUM_SWITCH(actionFromParams(params),
+    const auto action = actionFromParams(params);
+    switch (action)
     {
         case Action::crash:
         {
@@ -108,8 +87,10 @@ int QnDebugHandler::executeGet(
         case Action::invalid:
             qWarning() << messagePrefix << "Ignoring - unsupported params";
             return nx::network::http::StatusCode::forbidden;
-    });
-#endif // 0
+    }
+
+    NX_ASSERT(false, lm("Unexpected enum value: %1").arg(static_cast<int>(action)));
+    return nx::network::http::StatusCode::forbidden;
 }
 
 int QnDebugHandler::executePost(
@@ -137,10 +118,8 @@ void QnDebugHandler::afterExecute(
     // Params have to be parsed again in this method, because currently there is no way to pass
     // data from executeGet() to afterExecute() - the instance of this handler is shared between
     // all requests of this API method.
-
-// TODO: Remove either branch after NX_ENUM_SWITCH is either approved or removed.
-#if 0
-    switch (actionFromParams(params))
+    const auto action = actionFromParams(params);
+    switch (action)
     {
         case Action::crash:
         {
@@ -148,7 +127,7 @@ void QnDebugHandler::afterExecute(
 
             int* crashPtr = nullptr;
             *crashPtr = 0; //< Intentional crash.
-            break;
+            return;
         }
 
         case Action::exit:
@@ -156,26 +135,7 @@ void QnDebugHandler::afterExecute(
 
         case Action::invalid:
             return;
-
-        default:
-            NX_ASSERT(false);
     }
-#else // 0
-    NX_ENUM_SWITCH(actionFromParams(params),
-    {
-        case Action::crash:
-        {
-            tuneCrashDump(crashActionOptionsFromParams(params).useFullDump);
 
-            int* crashPtr = nullptr;
-            *crashPtr = 0; //< Intentional crash.
-        }
-
-        case Action::exit:
-            exit(64);
-
-        case Action::invalid:
-            return;
-    });
-#endif // 0
+    NX_ASSERT(false, lm("Unexpected enum value: %1").arg(static_cast<int>(action)));
 }
