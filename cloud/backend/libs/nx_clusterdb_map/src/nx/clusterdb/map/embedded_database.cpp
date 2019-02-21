@@ -14,10 +14,8 @@ EmbeddedDatabase::EmbeddedDatabase(
     const nx::clusterdb::engine::SynchronizationSettings& dataSyncSettings,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor)
     :
-    m_moduleId(QnUuid::createUuid()),
     m_syncEngine(
         kApplicationId,
-        m_moduleId,
         dataSyncSettings,
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         queryExecutor),

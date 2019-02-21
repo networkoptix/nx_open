@@ -21,7 +21,6 @@ public:
     Database& database();
 
 private:
-    QnUuid m_moduleId;
     nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
     Database m_database;
 };

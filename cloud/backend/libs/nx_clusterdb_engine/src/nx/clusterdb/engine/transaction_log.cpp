@@ -44,11 +44,18 @@ void CommandLog::startDbTransaction(
         [this, systemId, dbOperationsFunc = std::move(dbOperationsFunc)](
             nx::sql::QueryContext* queryContext) -> nx::sql::DBResult
         {
+            // TODO: #ak This DB transaction is supposed for queries accessing systemId data only.
+            // There should be some kind of a validation (e.g., asserts in some methods of this class).
+
             {
                 QnMutexLocker lock(&m_mutex);
                 getDbTransactionContext(lock, queryContext, systemId);
             }
-            return dbOperationsFunc(queryContext);
+            const auto resultCode = dbOperationsFunc(queryContext);
+            if (resultCode != nx::sql::DBResult::ok)
+                return resultCode;
+
+            return saveActualSequence(queryContext, systemId);
         },
         std::move(onDbUpdateCompleted));
 }
@@ -216,26 +223,30 @@ nx::sql::DBResult CommandLog::fillCache()
     nx::utils::promise<nx::sql::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
-    NX_DEBUG(this, lm("Filling transaction log cache"));
+    NX_DEBUG(this, "Filling transaction log cache");
 
-    // Starting async operation.
-    using namespace std::placeholders;
-    m_dbManager->executeSelect(
-        std::bind(&CommandLog::fetchTransactionState, this, _1),
-        [&cacheFilledPromise](nx::sql::DBResult dbResult)
-        {
-            cacheFilledPromise.set_value(dbResult);
-        });
+    try
+    {
+        m_dbManager->executeSelectQuerySync(
+            [this](nx::sql::QueryContext* queryContext)
+            {
+                fetchTransactionState(queryContext);
+                restoreTransactionSequence(queryContext);
+                // TODO: #ak Remove when executeSelectQuerySync supports void as return type.
+                return /*dummy*/ 0;
+            });
 
-    NX_DEBUG(this, lm("Transaction log cache filled up"));
-
-    // Waiting for completion.
-    future.wait();
-    return future.get();
+        NX_DEBUG(this, "Transaction log cache filled up");
+        return nx::sql::DBResult::ok;
+    }
+    catch (const nx::sql::Exception& e)
+    {
+        NX_DEBUG(this, "Error filling in transaction log cache. %1", e.what());
+        return e.dbResult();
+    }
 }
 
-nx::sql::DBResult CommandLog::fetchTransactionState(
-    nx::sql::QueryContext* queryContext)
+void CommandLog::fetchTransactionState(nx::sql::QueryContext* queryContext)
 {
     NX_DEBUG(this, lm("Fetching transactions"));
 
@@ -256,16 +267,7 @@ nx::sql::DBResult CommandLog::fetchTransactionState(
         ORDER BY tl.system_id, timestamp_hi, timestamp DESC
         )sql");
 
-    try
-    {
-        selectTransactionStateQuery.exec();
-    }
-    catch (const std::exception& e)
-    {
-        NX_ERROR(this,
-            lm("Error loading transaction log. %1").arg(e.what()));
-        throw;
-    }
+    selectTransactionStateQuery.exec();
 
     NX_DEBUG(this, lm("Fetched transactions"));
 
@@ -303,8 +305,26 @@ nx::sql::DBResult CommandLog::fetchTransactionState(
 
     NX_DEBUG(this, lm("Restored transaction logs of %1 systems. %2 states total")
         .args(m_systemIdToTransactionLog.size(), count));
+}
 
-    return nx::sql::DBResult::ok;
+void CommandLog::restoreTransactionSequence(nx::sql::QueryContext* queryContext)
+{
+    // Restoring only sequence of the current peer.
+    const auto currentPeerSequenceBySystemId =
+        m_transactionDataObject->fetchRecentTransactionSequence(
+            queryContext,
+            m_peerId.toSimpleString().toStdString());
+
+    QnMutexLocker lock(&m_mutex);
+
+    for (const auto& systemIdAndSequence: currentPeerSequenceBySystemId)
+    {
+        vms::api::PersistentIdData peerKey(
+            m_peerId, QnUuid::fromArbitraryData(systemIdAndSequence.first));
+
+        auto vmsTranLog = getTransactionLogContext(lock, systemIdAndSequence.first);
+        vmsTranLog->cache.shiftTransactionSequenceTo(peerKey, systemIdAndSequence.second);
+    }
 }
 
 nx::sql::DBResult CommandLog::fetchTransactions(
@@ -519,6 +539,27 @@ void CommandLog::updateTimestampHiInCache(
     QnMutexLocker lock(&m_mutex);
     getTransactionLogContext(lock, systemId)->cache.updateTimestampSequence(
         getDbTransactionContext(lock, queryContext, systemId).cacheTranId, newValue);
+}
+
+nx::sql::DBResult CommandLog::saveActualSequence(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId)
+{
+    int sequence = 0;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        sequence = getTransactionLogContext(lock, systemId)->cache.lastTransactionSequence(
+            vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)));
+    }
+
+    m_transactionDataObject->saveRecentTransactionSequence(
+        queryContext,
+        systemId,
+        m_peerId.toSimpleString().toStdString(),
+        sequence);
+
+    return nx::sql::DBResult::ok;
 }
 
 void CommandLog::removeSystemsMarkedForDeletion(

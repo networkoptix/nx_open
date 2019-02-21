@@ -28,7 +28,7 @@ public:
 
 private:
     const QnUuid m_systemId;
-    nx::clusterdb::engine::SyncronizationEngine* m_syncEngine;
+    nx::clusterdb::engine::SyncronizationEngine* m_syncEngine = nullptr;
     dao::StructureUpdater m_structureUpdater;
     EventProvider m_eventProvider;
     DataManager m_dataManager;

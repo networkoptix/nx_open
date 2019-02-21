@@ -24,7 +24,6 @@ class MaintenanceManager
 {
 public:
     MaintenanceManager(
-        const QnUuid& moduleGuid,
         clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
         const nx::sql::InstanceController& dbInstanceController);
     ~MaintenanceManager();

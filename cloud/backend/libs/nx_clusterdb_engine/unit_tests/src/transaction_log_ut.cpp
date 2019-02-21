@@ -13,6 +13,7 @@
 #include <nx_ec/ec_proto_version.h>
 
 #include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/clusterdb/engine/dao/rdb/structure_updater.h>
 #include <nx/clusterdb/engine/outgoing_transaction_dispatcher.h>
 #include <nx/clusterdb/engine/transaction_log.h>
 
@@ -42,6 +43,8 @@ public:
     {
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
+
+        dao::rdb::StructureUpdater updater(&queryExecutor());
 
         m_factoryFuncBak =
              clusterdb::engine::dao::TransactionDataObjectFactory::instance()
