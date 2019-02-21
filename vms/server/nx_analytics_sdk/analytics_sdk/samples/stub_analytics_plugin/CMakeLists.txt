@@ -37,17 +37,15 @@ target_link_libraries(stub_analytics_plugin PRIVATE
 )
 
 if(WIN32)
-    set(API_IMPORT_MACRO "__declspec(dllimport)")
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
-    set(API_IMPORT_MACRO "")
     set(API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
 target_compile_definitions(stub_analytics_plugin
-    PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
-    INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
-    PRIVATE NX_SDK_API=
+    PRIVATE
+        NX_PLUGIN_API=${API_EXPORT_MACRO}
+        NX_SDK_API=${API_EXPORT_MACRO}
 )
 
 if(NOT WIN32)
@@ -66,6 +64,9 @@ target_link_libraries(stub_analytics_plugin_ut PRIVATE
     stub_analytics_plugin
 )
 target_compile_definitions(stub_analytics_plugin_ut
-    PRIVATE NX_SDK_API=
+    PRIVATE
+        # Unit test executable neither exports nor imports anything.
+        NX_PLUGIN_API=
+        NX_SDK_API=
 )
 add_test(NAME stub_analytics_plugin_ut COMMAND stub_analytics_plugin_ut)

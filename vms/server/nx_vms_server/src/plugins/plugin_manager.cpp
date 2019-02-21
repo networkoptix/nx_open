@@ -29,9 +29,16 @@ static QStringList stringToList(const QString& s)
 }
 
 PluginManager::PluginManager(QObject* parent):
-    QObject(parent),
-    m_utilityProvider(new nx::vms::server::plugins::UtilityProvider())
+    QObject(parent)
 {
+    if (pluginsIni().useRefCountableRegistry)
+    {
+        // Turn on Server's RefCountableRegistry, residing in lib nx_sdk.
+        createNxRefCountableRegistry(
+            "vms_server", pluginsIni().verboseRefCountableRegistry);
+    }
+
+    m_utilityProvider.reset(new nx::vms::server::plugins::UtilityProvider());
 }
 
 PluginManager::~PluginManager()
@@ -217,12 +224,24 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    if (const auto entryPoint = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
+    if (pluginsIni().useRefCountableRegistry)
+    {
+        // Create Plugin's RefCountableRegistry, if it exports its creation function.
+        if (const auto createNxRefCountableRegistryFunc =
+            reinterpret_cast<RefCountableRegistry::CreateNxRefCountableRegistryFunc>(
+                lib.resolve(RefCountableRegistry::kCreateNxRefCountableRegistryFuncName)))
+        {
+            createNxRefCountableRegistryFunc(
+                libName.toStdString().c_str(), pluginsIni().verboseRefCountableRegistry);
+        }
+    }
+
+    if (const auto entryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib.resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
 
-        const auto plugin = entryPoint();
+        const auto plugin = entryPointFunc();
         if (!plugin)
         {
             NX_ERROR(this, "Failed to load Nx old SDK plugin [%1]: entry function returned null",

@@ -62,6 +62,7 @@ private:
         {
             this->addRef();
             return static_cast<DerivedInterface*>(this);
+
         }
         return BaseInterface::queryInterface(id);
     }
