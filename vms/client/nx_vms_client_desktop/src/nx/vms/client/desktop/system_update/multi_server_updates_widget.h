@@ -45,7 +45,7 @@ class MultiServerUpdatesWidget:
 
 public:
     MultiServerUpdatesWidget(QWidget* parent = nullptr);
-    ~MultiServerUpdatesWidget();
+    virtual ~MultiServerUpdatesWidget() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
@@ -59,9 +59,6 @@ public:
     virtual bool hasChanges() const override;
 
     virtual bool canDiscardChanges() const override;
-
-    bool cancelUpdatesCheck();
-    bool isChecking() const;
 
 protected:
     /** This one is called by timer periodically. */
@@ -174,7 +171,6 @@ private:
     void syncUpdateCheckToUi();
     void syncRemoteUpdateStateToUi();
     void syncProgress();
-    void syncReportToUi();
     void syncStatusVisibility();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
@@ -185,7 +181,10 @@ private:
     void processRemoteUpdateInformation();
     void processRemoteDownloading();
     void processRemoteInstalling();
-    void processRemoteCanceling();
+
+    void updateInfoVisibility();
+    void updateTopPanelLayout();
+    bool isChecking() const;
 
     bool processUploaderChanges(bool force = false);
 
