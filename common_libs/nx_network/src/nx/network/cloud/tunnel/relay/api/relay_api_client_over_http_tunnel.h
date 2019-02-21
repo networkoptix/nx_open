@@ -47,6 +47,7 @@ private:
 
     void openTunnel(
         const QUrl& url,
+        nx_http::tunneling::TunnelValidatorFactoryFunc tunnelValidatorFactoryFunc,
         ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler);
 
     void processServerTunnelResult(

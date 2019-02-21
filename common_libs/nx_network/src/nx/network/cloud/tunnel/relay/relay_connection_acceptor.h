@@ -5,6 +5,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/abstract_stream_socket_acceptor.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/reverse_connection_acceptor.h>
 #include <nx/network/socket_common.h>
@@ -62,7 +63,10 @@ private:
         nx::cloud::relay::api::BeginListeningResponse response,
         std::unique_ptr<AbstractStreamSocket> streamSocket);
 
-    void relayNotificationReceived(nx_http::Message message);
+    void dispatchRelayNotificationReceived(nx_http::Message message);
+
+    void processOpenTunnelNotification(
+        nx::cloud::relay::api::OpenTunnelNotification openTunnelNotification);
 };
 
 } // namespace detail

@@ -26,9 +26,9 @@ protected:
     virtual StatusCode::Value validateOpenTunnelRequest(
         const RequestContext& requestContext);
 
-    virtual network::http::RequestResult processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* const response,
+    virtual nx_http::RequestResult processOpenTunnelRequest(
+        const nx_http::Request& request,
+        nx_http::Response* const response,
         ApplicationData... requestData) = 0;
 
     /**

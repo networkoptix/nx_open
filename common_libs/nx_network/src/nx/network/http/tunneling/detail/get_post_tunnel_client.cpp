@@ -42,6 +42,7 @@ const Response& GetPostTunnelClient::response() const
 void GetPostTunnelClient::openDownChannel()
 {
     m_httpClient = std::make_unique<nx_http::AsyncClient>();
+    m_httpClient->setAdditionalHeaders(customHeaders());
     if (m_timeout)
     {
         m_httpClient->setResponseReadTimeout(*m_timeout);
@@ -53,13 +54,13 @@ void GetPostTunnelClient::openDownChannel()
         std::bind(&GetPostTunnelClient::onDownChannelOpened, this));
     m_httpClient->doGet(
         m_tunnelUrl,
-        std::bind(&GetPostTunnelClient::cleanupFailedTunnel, this));
+        [this]() { cleanUpFailedTunnel(); });
 }
 
 void GetPostTunnelClient::onDownChannelOpened()
 {
     if (!m_httpClient->hasRequestSuccesed())
-        return cleanupFailedTunnel();
+        return cleanUpFailedTunnel();
 
     m_connection = m_httpClient->takeSocket();
     m_openTunnelResponse = std::move(*m_httpClient->response());
@@ -100,20 +101,10 @@ void GetPostTunnelClient::handleOpenUpTunnelResult(
     std::size_t /*bytesTransferred*/)
 {
     if (systemErrorCode != SystemError::noError)
-    {
-        return reportFailure({
-            systemErrorCode,
-            StatusCode::serviceUnavailable,
-            nullptr});
-    }
+        return reportFailure(OpenTunnelResult(systemErrorCode));
 
     if (!resetConnectionAttributes())
-    {
-        return reportFailure({
-            SystemError::getLastOSErrorCode(),
-            StatusCode::serviceUnavailable,
-            nullptr});
-    }
+        return reportFailure(OpenTunnelResult(SystemError::getLastOSErrorCode()));
 
     reportSuccess();
 }

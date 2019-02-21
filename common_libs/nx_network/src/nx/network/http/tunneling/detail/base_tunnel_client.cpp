@@ -1,6 +1,42 @@
 #include "base_tunnel_client.h"
 
-namespace nx_http::tunneling::detail {
+#include <nx/utils/log/log_message.h>
+
+namespace nx_http::tunneling {
+
+std::string toString(ResultCode code)
+{
+    switch (code)
+    {
+        case ResultCode::ok: return "ok";
+        case ResultCode::httpUpgradeFailed: return "httpUpgradeFailed";
+        case ResultCode::ioError: return "ioError";
+    }
+
+    return "unknown";
+}
+
+OpenTunnelResult::OpenTunnelResult(std::unique_ptr<AbstractStreamSocket> connection):
+    connection(std::move(connection))
+{
+}
+
+OpenTunnelResult::OpenTunnelResult(SystemError::ErrorCode sysError):
+    resultCode(ResultCode::ioError),
+    sysError(sysError)
+{
+}
+
+std::string OpenTunnelResult::toString() const
+{
+    return lm("Result %1, sys error %2, HTTP status %3")
+        .args(tunneling::toString(resultCode), SystemError::toString(sysError),
+            StatusCode::toString(httpStatus)).toStdString();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace detail {
 
 BaseTunnelClient::BaseTunnelClient(
     const QUrl& baseTunnelUrl,
@@ -22,23 +58,52 @@ void BaseTunnelClient::bindToAioThread(
         m_connection->bindToAioThread(aioThread);
 }
 
+ClientFeedbackFunction BaseTunnelClient::takeFeedbackFunction()
+{
+    return std::exchange(m_clientFeedbackFunction, nullptr);
+}
+
+void BaseTunnelClient::setCustomHeaders(HttpHeaders headers)
+{
+    m_customHeaders = std::move(headers);
+}
+
+const HttpHeaders& BaseTunnelClient::customHeaders() const
+{
+    return m_customHeaders;
+}
+
 void BaseTunnelClient::stopWhileInAioThread()
 {
     m_httpClient.reset();
     m_connection.reset();
 }
 
-void BaseTunnelClient::cleanupFailedTunnel()
+void BaseTunnelClient::cleanUpFailedTunnel()
+{
+    cleanUpFailedTunnel(m_httpClient.get());
+}
+
+void BaseTunnelClient::cleanUpFailedTunnel(AsyncClient* httpClient)
 {
     OpenTunnelResult result;
-    result.sysError = m_httpClient->lastSysErrorCode();
-    if (m_httpClient->response())
+    result.resultCode = ResultCode::ioError;
+    result.sysError = httpClient->lastSysErrorCode();
+    if (httpClient->response())
     {
         result.httpStatus =
-            (StatusCode::Value) m_httpClient->response()->statusLine.statusCode;
+            (StatusCode::Value) httpClient->response()->statusLine.statusCode;
     }
-    m_httpClient.reset();
 
+    reportFailure(std::move(result));
+}
+
+void BaseTunnelClient::cleanUpFailedTunnel(
+    SystemError::ErrorCode systemErrorCode)
+{
+    OpenTunnelResult result;
+    result.resultCode = ResultCode::ioError;
+    result.sysError = systemErrorCode;
     reportFailure(std::move(result));
 }
 
@@ -60,10 +125,9 @@ void BaseTunnelClient::reportSuccess()
 {
     nx::utils::swapAndCall(
         m_completionHandler,
-        OpenTunnelResult{
-            SystemError::noError,
-            StatusCode::ok,
-            std::exchange(m_connection, nullptr)});
+        OpenTunnelResult(std::exchange(m_connection, nullptr)));
 }
 
-} // namespace nx_http::tunneling::detail
+} // namespace detail
+
+} // namespace nx_http::tunneling

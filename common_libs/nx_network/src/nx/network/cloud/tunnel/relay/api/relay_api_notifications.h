@@ -4,14 +4,13 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
 
-namespace nx {
-namespace cloud {
-namespace relay {
-namespace api {
+namespace nx::cloud::relay::api {
 
 class NX_NETWORK_API OpenTunnelNotification
 {
 public:
+    static constexpr char kHttpMethod[] = "OPEN_TUNNEL";
+
     void setClientPeerName(nx::String name);
     const nx::String& clientPeerName() const;
 
@@ -26,7 +25,19 @@ private:
     SocketAddress m_clientEndpoint;
 };
 
-} // namespace api
-} // namespace relay
-} // namespace cloud
-} // namespace nx
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API KeepAliveNotification
+{
+public:
+    static constexpr char kHttpMethod[] = "KEEP_ALIVE";
+
+    nx_http::Message toHttpMessage() const;
+
+    /**
+     * Example: "UPDATE /relay/client/connection NXRELAY/0.1".
+     */
+    bool parse(const nx_http::Message& message);
+};
+
+} // namespace nx::cloud::relay::api

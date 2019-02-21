@@ -1,6 +1,7 @@
 #include "mediator_connector.h"
 
 #include <nx/network/socket_factory.h>
+#include <nx/network/stun/client_connection_validator.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 
@@ -25,6 +26,9 @@ MediatorConnector::MediatorConnector():
     stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
     m_stunClient = std::make_shared<stun::AsyncClientWithHttpTunneling>(
         stunClientSettings);
+    m_stunClient->setTunnelValidatorFactory([](auto connection, const nx_http::Response&) {
+        return std::make_unique<nx::stun::ClientConnectionValidator>(
+            std::move(connection)); });
 
     bindToAioThread(getAioThread());
 

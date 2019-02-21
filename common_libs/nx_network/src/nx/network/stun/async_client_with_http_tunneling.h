@@ -67,6 +67,8 @@ public:
 
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 
+    void setTunnelValidatorFactory(nx_http::tunneling::TunnelValidatorFactoryFunc func);
+
 private:
     struct HandlerContext
     {
@@ -98,6 +100,7 @@ private:
     std::map<int, RequestContext> m_activeRequests;
     OnConnectionClosedHandler m_connectionClosedHandler;
     ConnectHandler m_userConnectHandler;
+    nx_http::tunneling::TunnelValidatorFactoryFunc m_tunnelValidatorFactory;
 
     virtual void stopWhileInAioThread() override;
 
