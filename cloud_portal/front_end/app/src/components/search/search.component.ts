@@ -135,6 +135,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
+        this.numberOfOptionsSelected();
         const normalizedValue = this.isBlank(value) ? '' : value;
         this._renderer.setProperty(this._elementRef.nativeElement, 'value', normalizedValue);
     }
@@ -204,8 +205,9 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         }
 
         this.numberFilters = 0;
-
+        this.setRouteParams();
         this.onChangeCallback(this.localFilter);
+
         return false;
     }
 
@@ -239,6 +241,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
         if (this.localFilter.selects && this.localFilter.selects.length) {
             this.localFilter.selects.forEach((select) => {
+                queryParams[select.id] = undefined;
                 if (+select.selected.value !== 0) {
                     queryParams[select.id] = select.selected.name;
                 }
@@ -247,6 +250,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
         if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
             this.localFilter.multiselects.forEach((select) => {
+                queryParams[select.id] = undefined;
                 if (select.selected && select.selected.length) {
                     queryParams[select.id] = select.selected.join(',');
                 }
