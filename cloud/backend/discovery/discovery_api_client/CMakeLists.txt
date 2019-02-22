@@ -1,7 +1,11 @@
-nx_add_target(nx_discovery_api_client LIBRARY NO_MOC
-    PUBLIC_LIBS
-        nx_network
-)
+set(library_type)
+if(WINDOWS)
+    set(library_type LIBRARY_TYPE SHARED)
+endif()
+
+nx_add_target(nx_discovery_api_client LIBRARY ${library_type} NO_MOC
+    WERROR_IF NOT WINDOWS
+    PUBLIC_LIBS nx_network)
 
 target_compile_definitions(nx_discovery_api_client
     PRIVATE NX_DISCOVERY_CLIENT_API=${API_EXPORT_MACRO}
