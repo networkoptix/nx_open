@@ -29,20 +29,6 @@ std::optional<std::string> calculateUpperBound(const std::string& str)
     return std::nullopt;
 }
 
-std::optional<std::string> calculateLowerBound(const std::string& str)
-{
-    if (!str.empty())
-    {
-        std::string upperBound = str;
-        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
-        {
-            if (--(*rit) != 0)
-                return upperBound;
-        }
-    }
-    return std::nullopt;
-}
-
 std::string randomBinaryString()
 {
     std::string s;
