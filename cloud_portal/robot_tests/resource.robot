@@ -13,13 +13,14 @@ ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
 ${options}    true
 @{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
+${speed}    0
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
     run keyword if    "${options}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
-    Set Selenium Speed    0
+    Set Selenium Speed    ${speed}
     Set Selenium Timeout    20
     Check Language
     Go To    ${url}
