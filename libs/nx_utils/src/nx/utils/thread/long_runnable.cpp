@@ -60,6 +60,15 @@ public:
         NX_ASSERT(runnable && m_created.contains(runnable));
 
         m_created.remove(runnable);
+        if (m_created.isEmpty())
+            m_waitCondition.wakeAll();
+    }
+
+    void waitForDestruction()
+    {
+        QnMutexLocker lock(&m_mutex);
+        while (!m_created.isEmpty())
+            m_waitCondition.wait(&m_mutex);
     }
 
 private:
@@ -130,6 +139,7 @@ QnLongRunnablePool::QnLongRunnablePool(QObject *parent):
 QnLongRunnablePool::~QnLongRunnablePool()
 {
     stopAll();
+    d->waitForDestruction();
 }
 
 void QnLongRunnablePool::stopAll()
