@@ -67,11 +67,6 @@ void DiscoveryClient::RequestContext::startTimer(
     m_timer.start(timeout, std::move(timerEvent));
 }
 
-void DiscoveryClient::RequestContext::stopTimerSync()
-{
-    m_timer.cancelSync();
-}
-
 void DiscoveryClient::RequestContext::cancelSync()
 {
     m_httpClient.cancelPostedCallsSync();

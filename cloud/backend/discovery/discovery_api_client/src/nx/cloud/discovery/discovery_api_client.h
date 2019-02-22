@@ -90,7 +90,6 @@ private:
         void startTimer(
             const std::chrono::milliseconds& timeout,
             nx::network::aio::TimerEventHandler timerEvent);
-        void stopTimerSync();
 
         void cancelSync();
 
