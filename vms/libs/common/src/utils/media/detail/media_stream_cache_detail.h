@@ -23,6 +23,11 @@ namespace detail {
 class MediaStreamCache
 {
 public:
+    // If the duration between requested timestamp and the one found in findByTimestamp is bigger
+    // than that value -- the frame is considered as not found.
+    static constexpr std::chrono::seconds kMaxTimestampDeviation{10};
+
+public:
     /*!
         \param desiredCacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis 
             is dropped unless data is blocked by \a MediaStreamCache::blockData call
