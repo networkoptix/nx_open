@@ -106,16 +106,17 @@ def access_roles(request, system_id):
 def disconnect(request):
     require_params(request, ('system_id', 'password'))
 
-    if request.user.is_authenticated():
-        try:
-            cloud_api.System.unbind(request.user.email, request.data['password'], request.data['system_id'])
-        except APINotAuthorisedException:
-            raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
-                                      error_data={'password': ['Not recognized.']})
-    else:
-        require_params(request, ('email', 'password'))
-        email = request.data['email'].lower()
+    try:
+        if request.user.is_authenticated():
+            email = request.user.email
+        else:
+            require_params(request, ('email',))
+            email = request.data['email'].lower()
+
         cloud_api.System.unbind(email, request.data['password'], request.data['system_id'])
+    except APINotAuthorisedException:
+        raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
+                                  error_data={'password': ['Not recognized.']})
 
     return api_success()
 
