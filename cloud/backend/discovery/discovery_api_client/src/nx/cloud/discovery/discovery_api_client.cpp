@@ -217,7 +217,8 @@ void DiscoveryClient::setupRegisterNodeRequest()
                 }
                 else
                 {
-                    NX_ERROR(this, lm("Error deserializing register node response"));
+                    NX_ERROR(this, lm("Error deserializing register node response: %1")
+                        .arg(messageBody));
                 }
             }
 
@@ -231,16 +232,14 @@ void DiscoveryClient::setupOnlineNodesRequest()
     m_onlineNodesRequest = std::make_unique<RequestContext>(
         [this](nx::network::http::BufferType messageBody)
         {
-            // All error logging is done by lambda in setupRegisterNodeRequest().
+            // All error logging related to server failure is done by lambda in
+            // setupRegisterNodeRequest().
             bool error = m_onlineNodesRequest->failed();
 
             if (auto response = m_registerNodeRequest->response())
             {
-                if (!nx::network::http::StatusCode::isSuccessCode(
-                    response->statusLine.statusCode))
-                {
-                    error = true;
-                }
+                error |=
+                    !nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode);
             }
 
             if (!error)
@@ -250,7 +249,8 @@ void DiscoveryClient::setupOnlineNodesRequest()
                 if (ok)
                     updateOnlineNodes(onlineNodes);
                 else
-                    NX_ERROR(this, lm("Error deserializing online nodes response"));
+                    NX_ERROR(this, lm("Error deserializing online nodes response: %1")
+                        .arg(messageBody));
             }
 
             // Restart request regardless of errors.
