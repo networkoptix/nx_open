@@ -245,7 +245,6 @@ private:
 
 private:
     std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;
-    pthread_mutex_t m_MultiplexerLock;
 
 private:
     std::unique_ptr<CCache<CInfoBlock>> m_cache;            // UDT network information cache
