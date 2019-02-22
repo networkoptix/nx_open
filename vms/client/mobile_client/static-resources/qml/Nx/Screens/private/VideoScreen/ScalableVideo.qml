@@ -236,6 +236,7 @@ ZoomableFlickable
         sourceItem: visible ? content.videoOutput : null
         helper: control.resourceHelper
         anchors.fill: content
+        videoCenterHeightOffsetFactor: control.videoCenterHeightOffsetFactor
     }
 
     FisheyeInteractor
