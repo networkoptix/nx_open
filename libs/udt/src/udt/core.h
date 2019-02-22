@@ -496,19 +496,17 @@ private: // Receiving related data
 private: // synchronization: mutexes and conditions
     std::mutex m_ConnectionLock;            // used to synchronize connection operation
 
-    pthread_cond_t m_SendBlockCond;              // used to block "send" call
-    pthread_mutex_t m_SendBlockLock;             // lock associated to m_SendBlockCond
+    std::condition_variable m_SendBlockCond;              // used to block "send" call
+    std::mutex m_SendBlockLock;             // lock associated to m_SendBlockCond
 
-    pthread_mutex_t m_AckLock;                   // used to protected sender's loss list when processing ACK
+    std::mutex m_AckLock;                   // used to protected sender's loss list when processing ACK
 
-    pthread_cond_t m_RecvDataCond;               // used to block "recv" when there is no data
-    pthread_mutex_t m_RecvDataLock;              // lock associated to m_RecvDataCond
+    std::condition_variable m_RecvDataCond; // used to block "recv" when there is no data
+    std::mutex m_RecvDataLock;              // lock associated to m_RecvDataCond
 
-    pthread_mutex_t m_SendLock;                  // used to synchronize "send" call
+    std::mutex m_SendLock;                  // used to synchronize "send" call
     std::mutex m_RecvLock;                  // used to synchronize "recv" call
 
-    void initSynch();
-    void destroySynch();
     void releaseSynch();
 
 private: // Trace

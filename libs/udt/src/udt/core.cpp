@@ -89,9 +89,6 @@ static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future 
 
 CUDT::CUDT()
 {
-    // Initilize mutex and condition variables
-    initSynch();
-
     m_Linger.l_onoff = 1;
     m_Linger.l_linger = 180;
 
@@ -101,9 +98,6 @@ CUDT::CUDT()
 CUDT::CUDT(const CUDT& ancestor):
     std::enable_shared_from_this<CUDT>()
 {
-    // Initilize mutex and condition variables
-    initSynch();
-
     // Default UDT configurations
     m_iMSS = ancestor.m_iMSS;
     m_bSynSending = ancestor.m_bSynSending;
@@ -134,9 +128,6 @@ CUDT::~CUDT()
     // This workaround is here to prevent a segfault:
     if (m_multiplexer)
         m_multiplexer->sendQueue().sndUList().remove(this);
-
-    // release mutex/condtion variables
-    destroySynch();
 
     // destroy the data structures
     delete m_pSndBuffer;
@@ -185,7 +176,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
     }
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
-    CGuard sendguard(m_SendLock);
+    std::lock_guard<std::mutex> sendguard(m_SendLock);
     std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     switch (optName)
@@ -916,15 +907,9 @@ int CUDT::shutdown(int /*how*/)
     m_bBroken = true;
 
     // signal a waiting "recv" call if there is any data available
-#ifndef _WIN32
-    pthread_mutex_lock(&m_RecvDataLock);
+    std::unique_lock<std::mutex> lock(m_RecvDataLock);
     if (m_bSynRecving)
-        pthread_cond_signal(&m_RecvDataCond);
-    pthread_mutex_unlock(&m_RecvDataLock);
-#else
-    if (m_bSynRecving)
-        SetEvent(m_RecvDataCond);
-#endif
+        m_RecvDataCond.notify_all();
 
     return 0;
 }
@@ -938,7 +923,8 @@ void CUDT::close()
     {
         uint64_t entertime = CTimer::getTime();
 
-        while (!m_bBroken && m_bConnected && (m_pSndBuffer->getCurrBufSize() > 0) && (CTimer::getTime() - entertime < m_Linger.l_linger * 1000000ULL))
+        while (!m_bBroken && m_bConnected && (m_pSndBuffer->getCurrBufSize() > 0) &&
+            (CTimer::getTime() - entertime < m_Linger.l_linger * 1000000ULL))
         {
             // linger has been checked by previous close() call and has expired
             if (m_ullLingerExpiration >= entertime)
@@ -953,14 +939,7 @@ void CUDT::close()
                 return;
             }
 
-#ifndef _WIN32
-            timespec ts;
-            ts.tv_sec = 0;
-            ts.tv_nsec = 1000000;
-            nanosleep(&ts, NULL);
-#else
-            Sleep(1);
-#endif
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 
@@ -1017,7 +996,7 @@ void CUDT::close()
     }
 
     // waiting all send and recv calls to stop
-    CGuard sendguard(m_SendLock);
+    std::lock_guard<std::mutex> sendguard(m_SendLock);
     std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
     // CLOSED.
@@ -1038,7 +1017,7 @@ int CUDT::send(const char* data, int len)
     if (len <= 0)
         return 0;
 
-    CGuard sendguard(m_SendLock);
+    std::lock_guard<std::mutex> sendguard(m_SendLock);
 
     if (m_pSndBuffer->getCurrBufSize() == 0)
     {
@@ -1055,34 +1034,28 @@ int CUDT::send(const char* data, int len)
         else
         {
             // wait here during a blocking sending
-#ifndef _WIN32
-            pthread_mutex_lock(&m_SendBlockLock);
+            std::unique_lock<std::mutex> lock(m_SendBlockLock);
             if (m_iSndTimeOut < 0)
             {
-                while (!m_bBroken && m_bConnected && !isClosing() && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
-                    pthread_cond_wait(&m_SendBlockCond, &m_SendBlockLock);
+                while (!m_bBroken && m_bConnected && !isClosing() &&
+                    (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
+                {
+                    m_SendBlockCond.wait(lock);
+                }
             }
             else
             {
-                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
-                while (!m_bBroken && m_bConnected && !isClosing() && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth && (CTimer::getTime() < exptime))
-                    pthread_cond_wait_monotonic_timepoint(&m_SendBlockCond, &m_SendBlockLock, exptime);
+                const uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
+                for (auto currentTime = CTimer::getTime();
+                    !m_bBroken && m_bConnected && !isClosing() &&
+                        (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) &&
+                        m_bPeerHealth && (currentTime < exptime);
+                    currentTime = CTimer::getTime())
+                {
+                    m_SendBlockCond.wait_for(lock, std::chrono::microseconds(exptime - currentTime));
+                }
             }
-            pthread_mutex_unlock(&m_SendBlockLock);
-#else
-            if (m_iSndTimeOut < 0)
-            {
-                while (!m_bBroken && m_bConnected && !isClosing() && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
-                    WaitForSingleObject(m_SendBlockCond, INFINITE);
-            }
-            else
-            {
-                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
-
-                while (!m_bBroken && m_bConnected && !isClosing() && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth && (CTimer::getTime() < exptime))
-                    WaitForSingleObject(m_SendBlockCond, DWORD((exptime - CTimer::getTime()) / 1000));
-            }
-#endif
+            lock.unlock();
 
             // check the connection status
             if (m_bBroken || isClosing())
@@ -1147,46 +1120,28 @@ int CUDT::recv(char* data, int len)
     if (0 == m_pRcvBuffer->getRcvDataSize())
     {
         if (!m_bSynRecving)
+        {
             throw CUDTException(6, 2, 0);
+        }
         else
         {
-#ifndef _WIN32
-            pthread_mutex_lock(&m_RecvDataLock);
+            std::unique_lock<std::mutex> lock(m_RecvDataLock);
             if (m_iRcvTimeOut < 0)
             {
                 while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
-                    pthread_cond_wait(&m_RecvDataCond, &m_RecvDataLock);
+                    m_RecvDataCond.wait(lock);
             }
             else
             {
-                uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
-                while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
+                const uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
+                for (auto currentTime = CTimer::getTime();
+                    !m_bBroken && m_bConnected && !isClosing() &&
+                        (0 == m_pRcvBuffer->getRcvDataSize()) && currentTime < exptime;
+                    currentTime = CTimer::getTime())
                 {
-                    pthread_cond_wait_monotonic_timepoint(&m_RecvDataCond, &m_RecvDataLock, exptime);
-                    if (CTimer::getTime() >= exptime)
-                        break;
+                    m_RecvDataCond.wait_for(lock, std::chrono::microseconds(exptime - currentTime));
                 }
             }
-            pthread_mutex_unlock(&m_RecvDataLock);
-#else
-            if (m_iRcvTimeOut < 0)
-            {
-                while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
-                    WaitForSingleObject(m_RecvDataCond, INFINITE);
-            }
-            else
-            {
-                uint64_t enter_time = CTimer::getTime();
-
-                while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
-                {
-                    int diff = int(CTimer::getTime() - enter_time) / 1000;
-                    if (diff >= m_iRcvTimeOut)
-                        break;
-                    WaitForSingleObject(m_RecvDataCond, DWORD(m_iRcvTimeOut - diff));
-                }
-            }
-#endif
         }
     }
 
@@ -1227,7 +1182,7 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     if (len > m_iSndBufSize * m_iPayloadSize)
         throw CUDTException(5, 12, 0);
 
-    CGuard sendguard(m_SendLock);
+    std::lock_guard<std::mutex> sendguard(m_SendLock);
 
     if (m_pSndBuffer->getCurrBufSize() == 0)
     {
@@ -1240,38 +1195,34 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     if ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len)
     {
         if (!m_bSynSending)
+        {
             throw CUDTException(6, 1, 0);
+        }
         else
         {
             // wait here during a blocking sending
-#ifndef _WIN32
-            pthread_mutex_lock(&m_SendBlockLock);
+            std::unique_lock<std::mutex> lock(m_SendBlockLock);
             if (m_iSndTimeOut < 0)
             {
-                while (!m_bBroken && m_bConnected && !isClosing() && ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len))
-                    pthread_cond_wait(&m_SendBlockCond, &m_SendBlockLock);
+                while (!m_bBroken && m_bConnected && !isClosing() &&
+                    ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len))
+                {
+                    m_SendBlockCond.wait(lock);
+                }
             }
             else
             {
-                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
-                while (!m_bBroken && m_bConnected && !isClosing() && ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len) && (CTimer::getTime() < exptime))
-                    pthread_cond_wait_monotonic_timepoint(&m_SendBlockCond, &m_SendBlockLock, exptime);
+                const auto exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
+                for (auto currentTime = CTimer::getTime();
+                    !m_bBroken && m_bConnected && !isClosing() &&
+                        ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len) &&
+                        (currentTime < exptime);
+                    currentTime = CTimer::getTime())
+                {
+                    m_SendBlockCond.wait_for(lock, std::chrono::microseconds(exptime - currentTime));
+                }
             }
-            pthread_mutex_unlock(&m_SendBlockLock);
-#else
-            if (m_iSndTimeOut < 0)
-            {
-                while (!m_bBroken && m_bConnected && !isClosing() && ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len))
-                    WaitForSingleObject(m_SendBlockCond, INFINITE);
-            }
-            else
-            {
-                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
-
-                while (!m_bBroken && m_bConnected && !isClosing() && ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len) && (CTimer::getTime() < exptime))
-                    WaitForSingleObject(m_SendBlockCond, DWORD((exptime - CTimer::getTime()) / 1000));
-            }
-#endif
+            lock.unlock();
 
             // check the connection status
             if (m_bBroken || isClosing())
@@ -1352,37 +1303,26 @@ int CUDT::recvmsg(char* data, int len)
 
     do
     {
-#ifndef _WIN32
-        pthread_mutex_lock(&m_RecvDataLock);
-
+        std::unique_lock<std::mutex> lock(m_RecvDataLock);
         if (m_iRcvTimeOut < 0)
         {
-            while (!m_bBroken && m_bConnected && !isClosing() && (0 == (res = m_pRcvBuffer->readMsg(data, len))))
-                pthread_cond_wait(&m_RecvDataCond, &m_RecvDataLock);
+            while (!m_bBroken && m_bConnected && !isClosing() &&
+                (0 == (res = m_pRcvBuffer->readMsg(data, len))))
+            {
+                m_RecvDataCond.wait(lock);
+            }
         }
         else
         {
-            uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
-            if (pthread_cond_wait_monotonic_timepoint(&m_RecvDataCond, &m_RecvDataLock, exptime) == ETIMEDOUT)
+            if (m_RecvDataCond.wait_for(lock, std::chrono::milliseconds(m_iRcvTimeOut)) ==
+                std::cv_status::timeout)
+            {
                 timeout = true;
+            }
 
             res = m_pRcvBuffer->readMsg(data, len);
         }
-        pthread_mutex_unlock(&m_RecvDataLock);
-#else
-        if (m_iRcvTimeOut < 0)
-        {
-            while (!m_bBroken && m_bConnected && !isClosing() && (0 == (res = m_pRcvBuffer->readMsg(data, len))))
-                WaitForSingleObject(m_RecvDataCond, INFINITE);
-        }
-        else
-        {
-            if (WaitForSingleObject(m_RecvDataCond, DWORD(m_iRcvTimeOut)) == WAIT_TIMEOUT)
-                timeout = true;
-
-            res = m_pRcvBuffer->readMsg(data, len);
-        }
-#endif
+        lock.unlock();
 
         if (m_bBroken || isClosing())
             throw CUDTException(2, 1, 0);
@@ -1415,7 +1355,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
     if (size <= 0)
         return 0;
 
-    CGuard sendguard(m_SendLock);
+    std::lock_guard<std::mutex> sendguard(m_SendLock);
 
     if (m_pSndBuffer->getCurrBufSize() == 0)
     {
@@ -1449,15 +1389,13 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
 
         unitsize = int((tosend >= block) ? block : tosend);
 
-#ifndef _WIN32
-        pthread_mutex_lock(&m_SendBlockLock);
-        while (!m_bBroken && m_bConnected && !isClosing() && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
-            pthread_cond_wait(&m_SendBlockCond, &m_SendBlockLock);
-        pthread_mutex_unlock(&m_SendBlockLock);
-#else
-        while (!m_bBroken && m_bConnected && !isClosing() && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
-            WaitForSingleObject(m_SendBlockCond, INFINITE);
-#endif
+        std::unique_lock<std::mutex> sendBlockLock(m_SendBlockLock);
+        while (!m_bBroken && m_bConnected && !isClosing() &&
+            (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth)
+        {
+            m_SendBlockCond.wait(sendBlockLock);
+        }
+        sendBlockLock.unlock();
 
         if (m_bBroken || isClosing())
             throw CUDTException(2, 1, 0);
@@ -1536,15 +1474,11 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
             throw CUDTException(4, 4);
         }
 
-#ifndef _WIN32
-        pthread_mutex_lock(&m_RecvDataLock);
-        while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
-            pthread_cond_wait(&m_RecvDataCond, &m_RecvDataLock);
-        pthread_mutex_unlock(&m_RecvDataLock);
-#else
-        while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
-            WaitForSingleObject(m_RecvDataCond, INFINITE);
-#endif
+        {
+            std::unique_lock<std::mutex> lock(m_RecvDataLock);
+            while (!m_bBroken && m_bConnected && !isClosing() && (0 == m_pRcvBuffer->getRcvDataSize()))
+                m_RecvDataCond.wait(lock);
+        }
 
         if (!m_bConnected)
             throw CUDTException(2, 2, 0);
@@ -1643,69 +1577,27 @@ void CUDT::CCUpdate()
 
     if (m_llMaxBW <= 0)
         return;
+
     const double minSP = 1000000.0 / (double(m_llMaxBW) / m_iMSS) * m_ullCPUFrequency;
     if (m_ullInterval < minSP)
         m_ullInterval = minSP;
 }
 
-void CUDT::initSynch()
-{
-#ifndef _WIN32
-    pthread_mutex_init(&m_SendBlockLock, NULL);
-    pthread_cond_init_monotonic(&m_SendBlockCond);
-    pthread_mutex_init(&m_RecvDataLock, NULL);
-    pthread_cond_init_monotonic(&m_RecvDataCond);
-    pthread_mutex_init(&m_SendLock, NULL);
-    pthread_mutex_init(&m_AckLock, NULL);
-#else
-    m_SendBlockLock = CreateMutex(NULL, false, NULL);
-    m_SendBlockCond = CreateEvent(NULL, false, false, NULL);
-    m_RecvDataLock = CreateMutex(NULL, false, NULL);
-    m_RecvDataCond = CreateEvent(NULL, false, false, NULL);
-    m_SendLock = CreateMutex(NULL, false, NULL);
-    m_AckLock = CreateMutex(NULL, false, NULL);
-#endif
-}
-
-void CUDT::destroySynch()
-{
-#ifndef _WIN32
-    pthread_mutex_destroy(&m_SendBlockLock);
-    pthread_cond_destroy(&m_SendBlockCond);
-    pthread_mutex_destroy(&m_RecvDataLock);
-    pthread_cond_destroy(&m_RecvDataCond);
-    pthread_mutex_destroy(&m_SendLock);
-    pthread_mutex_destroy(&m_AckLock);
-#else
-    CloseHandle(m_SendBlockLock);
-    CloseHandle(m_SendBlockCond);
-    CloseHandle(m_RecvDataLock);
-    CloseHandle(m_RecvDataCond);
-    CloseHandle(m_SendLock);
-    CloseHandle(m_AckLock);
-#endif
-}
-
 void CUDT::releaseSynch()
 {
-#ifndef _WIN32
-    // wake up user calls
-    pthread_mutex_lock(&m_SendBlockLock);
-    pthread_cond_signal(&m_SendBlockCond);
-    pthread_mutex_unlock(&m_SendBlockLock);
+    {
+        std::lock_guard<std::mutex> sendguard(m_SendLock);
+    }
 
-    pthread_mutex_lock(&m_SendLock);
-    pthread_mutex_unlock(&m_SendLock);
+    {
+        std::unique_lock<std::mutex> lock(m_SendBlockLock);
+        m_SendBlockCond.notify_all();
+    }
 
-    pthread_mutex_lock(&m_RecvDataLock);
-    pthread_cond_signal(&m_RecvDataCond);
-    pthread_mutex_unlock(&m_RecvDataLock);
-#else
-    SetEvent(m_SendBlockCond);
-    WaitForSingleObject(m_SendLock, INFINITE);
-    ReleaseMutex(m_SendLock);
-    SetEvent(m_RecvDataCond);
-#endif
+    {
+        std::unique_lock<std::mutex> lock(m_RecvDataLock);
+        m_RecvDataCond.notify_all();
+    }
 
     m_RecvLock.lock();
     m_RecvLock.unlock();
@@ -1755,15 +1647,11 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 m_pRcvBuffer->ackData(acksize);
 
                 // signal a waiting "recv" call if there is any data available
-#ifndef _WIN32
-                pthread_mutex_lock(&m_RecvDataLock);
-                if (m_bSynRecving)
-                    pthread_cond_signal(&m_RecvDataCond);
-                pthread_mutex_unlock(&m_RecvDataLock);
-#else
-                if (m_bSynRecving)
-                    SetEvent(m_RecvDataCond);
-#endif
+                {
+                    std::unique_lock<std::mutex> lock(m_RecvDataLock);
+                    if (m_bSynRecving)
+                        m_RecvDataCond.notify_all();
+                }
 
                 // acknowledge any waiting epolls to read
                 s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_IN, true);
@@ -1774,7 +1662,9 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                     break;
             }
             else
+            {
                 break;
+            }
 
             // Send out the ACK only if has not been received by the sender before
             if (CSeqNo::seqcmp(m_iRcvLastAck, m_iRcvLastAckAck) > 0)
@@ -1988,7 +1878,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             }
 
             // protect packet retransmission
-            CGuard ackLocker(m_AckLock);
+            std::unique_lock<std::mutex> ackLocker(m_AckLock);
 
             int offset = CSeqNo::seqoff(m_iSndLastDataAck, ack);
             if (offset <= 0)
@@ -2011,15 +1901,11 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
             ackLocker.unlock();
 
-#ifndef _WIN32
-            pthread_mutex_lock(&m_SendBlockLock);
-            if (m_bSynSending)
-                pthread_cond_signal(&m_SendBlockCond);
-            pthread_mutex_unlock(&m_SendBlockLock);
-#else
-            if (m_bSynSending)
-                SetEvent(m_SendBlockCond);
-#endif
+            {
+                std::unique_lock<std::mutex> sendBlockLock(m_SendBlockLock);
+                if (m_bSynSending)
+                    m_SendBlockCond.notify_all();
+            }
 
             // acknowledde any waiting epolls to write
             s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, true);
@@ -2197,13 +2083,6 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             //performing ACK on existing data to provide data already-in-buffer to recv
             checkTimers(true);
 
-            //if ((m_pRcvBuffer->getRcvDataSize() == 0) &&
-            //    (m_pRcvBuffer->m_iLastAckPos == 0))
-            //{
-            //    //checkTimers did not ACKed existing data
-            //    int x = 0;
-            //}
-
             // Signal the sender and recver if they are waiting for data.
             releaseSynch();
             CTimer::triggerEvent();
@@ -2260,7 +2139,7 @@ int CUDT::packData(CPacket& packet, uint64_t& ts)
     if ((packet.m_iSeqNo = m_pSndLossList->getLostSeq()) >= 0)
     {
         // protect m_iSndLastDataAck from updating by ACK processing
-        CGuard ackguard(m_AckLock);
+        std::lock_guard<std::mutex> ackLocker(m_AckLock);
 
         int offset = CSeqNo::seqoff(m_iSndLastDataAck, packet.m_iSeqNo);
         if (offset < 0)
