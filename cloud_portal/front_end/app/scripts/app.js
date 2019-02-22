@@ -98,6 +98,7 @@ window.L = {};
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;
                     
+                    appState.supportLink = response.supportLink;
                     angular.extend(CONFIG, appState);
                     
                     CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
