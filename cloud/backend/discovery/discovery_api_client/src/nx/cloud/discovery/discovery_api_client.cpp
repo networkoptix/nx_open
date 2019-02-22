@@ -12,8 +12,6 @@ namespace nx::cloud::discovery {
 
 namespace {
 
-static const std::chrono::milliseconds kNow(0);
-
 static std::set<Node> moveToSet(std::vector<Node>& nodes)
 {
     std::set<Node> nodeSet;
