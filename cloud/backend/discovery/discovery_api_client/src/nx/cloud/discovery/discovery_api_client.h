@@ -48,8 +48,15 @@ public:
      */
     void updateInformation(const std::string& infoJson);
 
+    /**
+     * Get the list of nodes registered with the server, including the Node returned by node()
+     */
     std::vector<Node> onlineNodes() const;
-    Node DiscoveryClient::node() const;
+
+    /**
+     * Get the Node representing this DiscoveryClient.
+     */
+    Node node() const;
 
     void setOnNodeDiscovered(NodeDiscoveredHandler handler);
     void setOnNodeLost(NodeLostHandler handler);
