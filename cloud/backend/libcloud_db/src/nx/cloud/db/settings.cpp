@@ -17,6 +17,8 @@
 
 namespace {
 
+static constexpr char kCdbGuid[] = "{674bafd7-4eec-4bba-84aa-a1baea7fc6db}";
+
 const QLatin1String kEndpointsToListen("listenOn");
 const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3346");
 
@@ -240,11 +242,6 @@ nx::utils::log::Settings Settings::logging() const
     return m_logging;
 }
 
-const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
-{
-    return m_vmsSynchronizationLogging;
-}
-
 const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -332,7 +329,6 @@ void Settings::loadSettings()
 
     //log
     m_logging.load(settings(), QLatin1String("log"));
-    m_vmsSynchronizationLogging.load(settings(), QLatin1String("syncroLog"));
 
     //DB
     m_dbConnectionOptions.loadFromSettings(settings());
@@ -394,6 +390,8 @@ void Settings::loadSettings()
             kDefaultMediaServerConnectionIdlePeriod));
 
     m_p2pDb.load(settings());
+    // NOTE: Intentionally not allowing overriding this value.
+    m_p2pDb.nodeId = kCdbGuid;
 
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();

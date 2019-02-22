@@ -55,7 +55,7 @@ GenericTransport::GenericTransport(
 
 GenericTransport::~GenericTransport()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Closing connection to %2")
+    NX_DEBUG(this, lm("systemId %1. Closing connection to %2")
         .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
 }
 
@@ -106,7 +106,7 @@ void GenericTransport::sendTransaction(
         {
             if (peerAlreadyHasCommand(transactionSerializer->header()))
             {
-                NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+                NX_VERBOSE(this,
                     "Not sending command %1 to %2 since remote peer must have it",
                     engine::toString(transactionSerializer->header()),
                     m_commonTransportHeaderOfRemoteTransaction);
@@ -116,7 +116,7 @@ void GenericTransport::sendTransaction(
             if (isHandshakeCommand(transactionSerializer->header().command)
                 || m_canSendCommands)
             {
-                NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), "Sending command %1 to %2",
+                NX_VERBOSE(this, "Sending command %1 to %2",
                     engine::toString(transactionSerializer->header()),
                     m_commonTransportHeaderOfRemoteTransaction);
                 m_commandPipeline->sendTransaction(
@@ -125,7 +125,7 @@ void GenericTransport::sendTransaction(
                 return;
             }
 
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing sending command %1 to %2")
+            NX_DEBUG(this, lm("Postponing sending command %1 to %2")
                 .args(engine::toString(transactionSerializer->header()),
                     m_commonTransportHeaderOfRemoteTransaction));
 
@@ -142,7 +142,7 @@ void GenericTransport::sendTransaction(
 
 void GenericTransport::start()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("Starting outgoing transaction channel to %1")
             .arg(m_commonTransportHeaderOfRemoteTransaction));
 
@@ -192,7 +192,7 @@ void GenericTransport::processCommandData(
 
     if (!commandData)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to deserialized %1 command received from (%2, %3)")
             .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
         m_commandPipeline->closeConnection();
@@ -292,7 +292,7 @@ void GenericTransport::onTransactionsReadFromLog(
 
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("systemId %1. Error reading transaction log (%2). Closing connection to the peer %3")
                 .args(m_systemId, toString(resultCode),
                     m_commonTransportHeaderOfRemoteTransaction));
@@ -300,7 +300,7 @@ void GenericTransport::onTransactionsReadFromLog(
         return;
     }
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("systemId %1. Read %2 transactions from transaction log (result %3). "
            "Posting them to the send queue to %4")
             .args(m_systemId, serializedTransactions.size(), toString(resultCode),
@@ -316,7 +316,7 @@ void GenericTransport::onTransactionsReadFromLog(
     if (resultCode == ResultCode::partialContent ||
         m_tranStateToSynchronizeTo.containsDataMissingIn(m_remotePeerTranState))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("systemId %1. Synchronize to (%2), already synchronized to (%3)")
             .args(m_systemId, stateToString(m_tranStateToSynchronizeTo),
                 stateToString(m_remotePeerTranState)));
@@ -338,7 +338,7 @@ void GenericTransport::onTransactionsReadFromLog(
     }
     else
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. "
+        NX_DEBUG(this, lm("systemId %1. "
             "Done initial synchronization to (%2)")
                 .args(m_systemId, stateToString(m_remotePeerTranState)));
     }
@@ -366,7 +366,7 @@ void GenericTransport::sendTransactions(
 
 void GenericTransport::enableOutputChannel()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("systemId %1. Enabled output channel to the peer %2")
             .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
 

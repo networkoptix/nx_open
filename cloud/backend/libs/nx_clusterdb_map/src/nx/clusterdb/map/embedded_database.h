@@ -24,7 +24,6 @@ private:
     /*const Settings& m_settings;
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;*/
 
-    QnUuid m_moduleId;
     nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
     Database m_database;
 };

@@ -40,6 +40,16 @@ public:
         std::int64_t maxSequence,
         std::vector<dao::TransactionLogRecord>* const transactions) override;
 
+    virtual void saveRecentTransactionSequence(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        const std::string& peerId,
+        int sequence) override;
+
+    virtual std::map<std::string /*systemId*/, int /*sequence*/> fetchRecentTransactionSequence(
+        nx::sql::QueryContext* queryContext,
+        const std::string& peerId) override;
+
 private:
     struct TransactionSourceKey
     {
@@ -82,6 +92,8 @@ private:
     QnMutex m_mutex;
     TransactionDictionary m_transactions;
     const int m_transactionFormatVersion;
+    std::map<std::string /*peerId*/,
+        std::map<std::string /*systemId*/, int /*sequence*/>> m_recentSequences;
 };
 
 } // namespace nx::clusterdb::engine::dao::memory

@@ -34,7 +34,6 @@ public:
      */
     SyncronizationEngine(
         const std::string& applicationId,
-        const QnUuid& peerId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
@@ -75,7 +74,7 @@ public:
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
 private:
-    QnUuid m_peerId;
+    const QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingCommandDispatcher m_outgoingTransactionDispatcher;

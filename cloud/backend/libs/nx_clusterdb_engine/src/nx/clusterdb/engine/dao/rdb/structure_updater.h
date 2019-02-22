@@ -4,7 +4,7 @@
 
 namespace nx::clusterdb::engine::dao::rdb {
 
-class StructureUpdater
+class NX_DATA_SYNC_ENGINE_API StructureUpdater
 {
 public:
     /**

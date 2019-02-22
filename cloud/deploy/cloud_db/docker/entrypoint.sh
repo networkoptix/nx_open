@@ -1,6 +1,8 @@
 #!/usr/local/bin/dumb-init /bin/bash
 
-mkdir -p /tmp/core
+mkdir -p /tmp/core /opt/networkoptix/cloud_db/etc
+
+echo "$SECRETS" > /opt/networkoptix/cloud_db/etc/secrets
 
 MEDIATOR_STUN_PORT=${MEDIATOR_STUN_PORT:-3345}
 MEDIATOR_HTTP_PORT=${MEDIATOR_HTTP_PORT:-3355}

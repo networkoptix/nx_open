@@ -68,6 +68,15 @@ void CustomerManager::saveCustomer(
         });
 }
 
+ResultCode CustomerManager::saveCustomer(const Customer& customer)
+{
+    std::promise<ResultCode> done;
+    saveCustomer(
+        customer,
+        [&done](ResultCode resultCode) { done.set_value(resultCode); });
+    return done.get_future().get();
+}
+
 void CustomerManager::removeCustomer(
     const std::string& id,
     nx::utils::MoveOnlyFunc<void(ResultCode)> handler)

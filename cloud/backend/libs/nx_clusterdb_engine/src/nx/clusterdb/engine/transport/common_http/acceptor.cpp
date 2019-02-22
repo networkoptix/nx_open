@@ -89,7 +89,7 @@ void CommonHttpAcceptor::createConnection(
     const auto systemId = extractSystemIdFromHttpRequest(requestContext);
     if (systemId.empty())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Ignoring createTransactionConnection request without systemId from %1")
             .args(httpConnection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
@@ -98,7 +98,7 @@ void CommonHttpAcceptor::createConnection(
     ConnectionRequestAttributes connectionRequestAttributes;
     if (!fetchDataFromConnectRequest(requestContext.request, &connectionRequestAttributes))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
                 httpConnection->socket()->getForeignAddress()));
@@ -108,7 +108,7 @@ void CommonHttpAcceptor::createConnection(
     if (!m_protocolVersionRange.isCompatible(
             connectionRequestAttributes.remotePeerProtocolVersion))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
                 httpConnection->socket()->getForeignAddress(),
@@ -116,7 +116,7 @@ void CommonHttpAcceptor::createConnection(
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
         .args(connectionRequestAttributes.remotePeer.id, systemId,
             httpConnection->socket()->getForeignAddress(),
@@ -157,7 +157,7 @@ void CommonHttpAcceptor::createConnection(
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
                 httpConnection->socket()->getForeignAddress(),
@@ -196,7 +196,7 @@ void CommonHttpAcceptor::pushTransaction(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 without required header %3")
+        NX_DEBUG(this, lm("Received %1 request from %2 without required header %3")
             .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
         return completionHandler(nx::network::http::StatusCode::badRequest);
@@ -217,7 +217,7 @@ void CommonHttpAcceptor::pushTransaction(
 
     if (!connectionFound)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Received %1 request from %2 for unknown connection %3")
             .args(request.requestLine.url.path(),
                 connection->socket()->getForeignAddress(), connectionId));
@@ -226,14 +226,14 @@ void CommonHttpAcceptor::pushTransaction(
 
     if (!foundConnectionOfExpectedType)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Received %1 request from %2 for connection %3 of unexpected type")
             .args(request.requestLine.url.path(),
                 connection->socket()->getForeignAddress(), connectionId));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+    NX_VERBOSE(this,
         lm("Received %1 request from %2 for connection %3")
         .args(request.requestLine.url.path(),
             connection->socket()->getForeignAddress(), connectionId));
