@@ -99,18 +99,5 @@ private:
     const RefCountableHolder m_refCountableHolder;
 };
 
-/**
- * Intended for debug. Is not thread-safe.
- * @return Reference counter, or 0 if the pointer is null.
- */
-inline int refCount(const IRefCountable* refCountable)
-{
-    if (!refCountable)
-        return 0;
-
-    /*unused*/ (void) refCountable->addRef();
-    return refCountable->releaseRef();
-}
-
 } // namespace sdk
 } // namespace nx
