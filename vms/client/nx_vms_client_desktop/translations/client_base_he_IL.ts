@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>מקבל מידע מעודכן מהשרת</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>מוריד את חבילת העדכונים</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>מתקין</translation>
     </message>
   </context>
   <context>
@@ -865,7 +865,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>שכחתי סיסמאות</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -877,7 +877,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>הגדרות מנוע אנליטיקה...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -897,11 +897,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>מצלמה וירטואלית...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>מצלמה וירטואלית חדשה...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +925,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>עבור לכרטיסיית הודעות</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>עבור לכרטיסיית תנועה</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>עבור לכרטיסיית סימניות</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>עבור לכרטיסיית אירועים</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>עבור לכרטיסיית אובייקטים</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>מסגרות אובייקטים ומידע...</translation>
     </message>
   </context>
   <context>
@@ -991,23 +991,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>הזן סיסמה חוקית</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>הסיסמה אינה חוקית.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>פריסה מוצפנת</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>הקובץ %1 מוצפן. הזן את הסיסמה:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>הזן מחדש את הסיסמה עבור פריסה %1:</translation>
     </message>
   </context>
   <context>
@@ -1188,11 +1188,11 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
         <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
-        <numerusform>שם הקובץ אינו יכול להכיל את התווים הבאים:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
       </translation>
     </message>
   </context>
@@ -1342,7 +1342,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>הפריסה נעולה</translation>
     </message>
   </context>
   <context>
@@ -1614,21 +1614,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>פרטים עבור %n שיחות של %1</numerusform>
+        <numerusform>פרטים עבור %n שיחות של %1</numerusform>
+        <numerusform>פרטים עבור %n שיחות של %1</numerusform>
+        <numerusform>פרטים עבור %n שיחות של %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
+        <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
+        <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
+        <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1784,15 +1784,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>העדכון הותקן</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n פעולות</numerusform>
+        <numerusform>%n פעולות</numerusform>
+        <numerusform>%n פעולות</numerusform>
+        <numerusform>%n פעולות</numerusform>
       </translation>
     </message>
   </context>
@@ -2087,7 +2087,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>כפיית אישור תעבוד רק לאירועים גנריים אם במשתני המצלמה נעשה שימוש ב-URL של האירוע הגנרי</translation>
     </message>
   </context>
   <context>
@@ -2637,6 +2637,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>כשל חיבור המערכת אל %1</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -2800,11 +2804,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>הורד והתקן</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>נכשלה כניסה למצב תאימות לגרסה %1</translation>
     </message>
   </context>
   <context>
@@ -2956,7 +2960,7 @@ to %1</source>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>קידוד מוגדר: %1 לא נמצא, ייעשה שימוש ב- h263p</translation>
     </message>
   </context>
   <context>
@@ -3074,21 +3078,21 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
+        <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
+        <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
+        <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
+        <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
+        <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
+        <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
       </translation>
     </message>
   </context>
@@ -3174,11 +3178,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n מצלמות)</numerusform>
+        <numerusform>%1 (%n מצלמות)</numerusform>
+        <numerusform>%1 (%n מצלמות)</numerusform>
+        <numerusform>%1 (%n מצלמות)</numerusform>
       </translation>
     </message>
   </context>
@@ -3261,11 +3265,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>מצלמה זו אינה נמצאת כעת בפריסה שנבחרה. הפעולה תתבצע אם המצלמה תתווסף לפני הפעלתה.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>המצלמה אינה נמצאת כעת בחלק מהפריסות שנבחרו. הפעולה תתבצע אם המצלמה תתווסף לפני הפעלתה.</translation>
     </message>
   </context>
   <context>
@@ -3452,7 +3456,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>אנא הכנס ערך.</translation>
     </message>
   </context>
   <context>
@@ -3873,7 +3877,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>כל רישיון יכול להיות מושבת רק פעמים ספורות.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4183,7 +4187,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>הגדלת איזור</translation>
     </message>
   </context>
   <context>
@@ -4338,11 +4342,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>מצלמה וירטואלית</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>מצלמה וירטואלית %1</translation>
     </message>
   </context>
   <context>
@@ -4571,11 +4575,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>בערך %n דקות</numerusform>
+        <numerusform>בערך %n דקות</numerusform>
+        <numerusform>בערך %n דקות</numerusform>
+        <numerusform>בערך %n דקות</numerusform>
       </translation>
     </message>
   </context>
@@ -4764,11 +4768,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>קצב תקשורת נוכחי</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>אין נתונים לתחזית</translation>
     </message>
   </context>
   <context>
@@ -4818,11 +4822,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>קבצים מקומיים</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>אין קבצים מקומיים</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4838,7 +4842,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>פתח הכל</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4897,10 +4901,6 @@ to %1</source>
     <message>
       <source>Select Cameras...</source>
       <translation>בחר מצלמות...</translation>
-    </message>
-    <message>
-      <source>Select users...</source>
-      <translation>בחר משתמשים...</translation>
     </message>
   </context>
   <context>
@@ -4963,7 +4963,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>מנועי אנליטיקה</translation>
     </message>
   </context>
   <context>
@@ -5796,23 +5796,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>5 הדקות האחרונות</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>60 דקות אחרונות</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>24 שעות אחרונות</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>התקופה הזמינה הארוכה ביותר</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>תחזית זמינה רק עבור מצלמות עם הקלטה פעילה.</translation>
     </message>
   </context>
   <context>
@@ -6208,23 +6208,23 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>לאף שרת יש גישה לאינטרנט עבור סנכרון זמן</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>המערכת במצב בטוח</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>למערכת אין גישה לאינטרנט לסנכרון זמן</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>לאף שרת מקוון במערכת יש גישה לאינטרנט עבור סנכרון זמן.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>המערכת פועלת במצב בטוח.</translation>
     </message>
   </context>
   <context>
@@ -6266,11 +6266,11 @@ to %1</source>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>קובץ HTML</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>קובץ גיליון אלקטרוני (CSV)</translation>
     </message>
   </context>
   <context>
@@ -6304,11 +6304,11 @@ to %1</source>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>זמן המערכת מסונכרן עם האינטרנט ואינו תלוי בזמן המקומי בשרתים.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרתים שנבחרו ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
     </message>
   </context>
   <context>
@@ -6319,11 +6319,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>לחץ לדיבור</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>התקן קלט לא נבחר</translation>
@@ -6335,6 +6331,10 @@ to %1</source>
     <message>
       <source>Network error</source>
       <translation>שגיאת רשת</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>לחץ לדיבור</translation>
     </message>
   </context>
   <context>
@@ -6422,7 +6422,7 @@ to %1</source>
     </message>
     <message>
       <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
+      <translation>העדכון בוטל בשקט.</translation>
     </message>
   </context>
   <context>
@@ -6885,19 +6885,19 @@ to %1</source>
     <name>QnWorkbenchContext</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>נא לעיין ולהסכים ל %1 בכדי להמשיך</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>כדי להשתמש בתוכנה עליך לקבל את הסכם הרישיון למשתמש קצה</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>אני מסכים</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>אני לא מסכים</translation>
     </message>
   </context>
   <context>
@@ -6909,10 +6909,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>שרתים מהמערכת השנייה יופיעו בעץ המשאבים.</translation>
-    </message>
-    <message>
-      <source>Failed to merge Systems</source>
-      <translation>מיזוג המערכות נכשל</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
@@ -6946,6 +6942,18 @@ to %1</source>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 לא ניתן למזג מערכות</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -7025,7 +7033,7 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -7076,11 +7084,11 @@ to %1</source>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>קובץ PNG</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>קובץ JPEG</translation>
     </message>
   </context>
   <context>
@@ -7219,11 +7227,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
       </translation>
     </message>
     <message>
@@ -7232,29 +7240,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
-        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
+        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
       </translation>
     </message>
     <message>
@@ -7271,47 +7279,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
         <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>הקבצים שנבחרו נרשמו ב- %1, אך ניתן להעלות רק קבצים שנרשמו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של מצלמה.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
+        <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
+        <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
+        <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
-        <numerusform>קבצים שנבחריו נרשמו בין %1 ו- %2, אך רק קבצים שנרשמו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של מצלמה.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      <translation>
+        <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
+        <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
+        <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
+        <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
-        <numerusform>אין הרבה מקום פנוי על אחסון השרתים. כמה הקלטות ישנות עשויות להימחק כדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
       </translation>
     </message>
     <message>
@@ -7348,19 +7356,19 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>הוספת מצלמה וירטואלית נכשלה</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>פתח הקלטות מצלמה וירטואלית...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
+        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
       </translation>
     </message>
     <message>
@@ -7621,11 +7629,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
+        <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
+        <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
+        <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
       </translation>
     </message>
   </context>
@@ -7713,21 +7721,21 @@ to %1</source>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>פלטפורמת לינוקס זו אינה נתמכת עוד</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>גירסת מערכת הפעלה זו אינה נתמכת עוד</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>גרסה %1 זו אינה נתמכת עוד</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 אינו נתמך עוד</translation>
     </message>
   </context>
   <context>
@@ -7802,23 +7810,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>התקנים על פריסה</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>מצלמות על פריסה</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>כל התקן</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>כל מצלמה</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>התקן נבחר</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7829,11 +7837,11 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>הצג תמיד</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>הצג רק עם לשונית &quot;אובייקטים&quot;</translation>
     </message>
   </context>
   <context>
@@ -7844,7 +7852,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>מצלמה שהוסרה</translation>
     </message>
   </context>
   <context>
@@ -7859,11 +7867,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n אובייקטים</numerusform>
+        <numerusform>%n אובייקטים</numerusform>
+        <numerusform>%n אובייקטים</numerusform>
+        <numerusform>%n אובייקטים</numerusform>
       </translation>
     </message>
     <message>
@@ -7872,11 +7880,11 @@ to %1</source>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>בחר אזור</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>בחר אזור כלשהו בווידאו...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7884,7 +7892,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>מנוע אנליטיקה ללא שם</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7892,11 +7900,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>הזן נתונים</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>הפעולה דורשת להזין מספר נתונים.</translation>
     </message>
   </context>
   <context>
@@ -7910,7 +7918,7 @@ to %1</source>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>מצלמה שהוסרה</translation>
     </message>
   </context>
   <context>
@@ -8121,16 +8129,16 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>אין לך כלל מצלמות</translation>
     </message>
   </context>
   <context>
@@ -8268,43 +8276,43 @@ to %1</source>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>קובץ העדכון לא נמצא</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>חבילת העדכון פגומה</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>הורדת חבילת העדכון נכשלה: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>חבילת העדכון פגומה: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>עדכון זה כבר מותקן.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>גירסה זו אינה מותקנת.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>פורמט גרסה לא חוקי.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>חבילת עדכון אינה תקינה.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
+      <translation>אין מספיק מקום בדיסק כדי להתקין את עדכון הלקוח.</translation>
     </message>
     <message>
       <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
+      <translation>חבילת ההתקנה אבדה.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -8350,7 +8358,7 @@ to %1</source>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>לחלק מהמצלמות שנבחרו נדרשת סיסמה להגדרה.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8434,15 +8442,15 @@ to %1</source>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>כל ההתקנים כבר הוספו</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
+        <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
+        <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
+        <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
       </translation>
     </message>
     <message>
@@ -8460,7 +8468,7 @@ to %1</source>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>שדה הכתובת אינו יכול להיות ריק</translation>
     </message>
   </context>
   <context>
@@ -8495,39 +8503,39 @@ to %1</source>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>אירועי שרת</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>ארוע אנליטיקה</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>כל בעיה בהתקן</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>כל בעיה במצלמה</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>כל אירוע שרת</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>בעיות בהתקן</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>בעיות במצלמה</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>כל אירוע</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>כל אירוע אנליטיקה</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8548,7 +8556,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>מנוע אנליטיקה ללא שם</translation>
     </message>
   </context>
   <context>
@@ -8567,7 +8575,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>נא הזן את הסיסמה.</translation>
     </message>
   </context>
   <context>
@@ -8716,7 +8724,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>אתה עומד לייצא סרטון ארוך. הפעולה עשויה לדרוש הרבה שטח אחסון רב ולהימשך זמן משמעותי.</translation>
     </message>
   </context>
   <context>
@@ -8788,20 +8796,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n חדש</numerusform>
+        <numerusform>%n חדש</numerusform>
+        <numerusform>%n חדש</numerusform>
+        <numerusform>%n חדש</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n סה"כ התקנים</numerusform>
+        <numerusform>%n סה"כ התקנים</numerusform>
+        <numerusform>%n סה"כ התקנים</numerusform>
+        <numerusform>%n סה"כ התקנים</numerusform>
       </translation>
     </message>
   </context>
@@ -8846,7 +8854,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>העתק מיקום קישור</translation>
     </message>
   </context>
   <context>
@@ -8952,7 +8960,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>מצלמה שהוסרה</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8967,27 +8975,27 @@ to %1</source>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>חפש עדכונים זמינים באופן אוטומטי</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>בדוק עדכונים</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>כפה בדיקה</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>השבת בדיקה אוטומטית</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>בדוק פעם אחת</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>בדוק באופן אוטומטי</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8999,39 +9007,39 @@ to %1</source>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>כבר התקנת את הגירסה הזו.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>אין אפשרות לבדוק עדכונים באינטרנט</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>גרסה לא נמצאה</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>לא ניתן לעדכן מקובץ זה</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>פרטי עדכון לא חוקיים</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>שנמוך לגרסאות קודמות אינו אפשרי</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>קובץ העדכון לא נמצא</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>חבילת שדרוג אינה תקינה</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>חבילת עדכון חסרה עבור שרתים מסוימים</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -9040,7 +9048,7 @@ to %1</source>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>אין עדכונים זמינים</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -9056,7 +9064,7 @@ to %1</source>
     </message>
     <message>
       <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
+      <translation>מוכן להתקנת עדכוני לקוח</translation>
     </message>
     <message>
       <source>Install now</source>
@@ -9104,11 +9112,11 @@ to %1</source>
     </message>
     <message>
       <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+      <translation>העדכון הושלם, אך חלק מהשרתים נכשלו בעדכון</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>תוכנת הקליינט תופעל מחדש לגרסה המעודכנת.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9116,7 +9124,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
+      <translation>התקנת עדכונים נכשלה לשרתים:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -9124,15 +9132,15 @@ to %1</source>
     </message>
     <message>
       <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
+      <translation>מתקין עדכונים...</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>העלאה</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>טען והתקן</translation>
     </message>
     <message>
       <source>Download</source>
@@ -9140,15 +9148,15 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>הורד והתקן</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>בחר גרסה אחרת</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>בחר קובץ אחר...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -9156,11 +9164,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>מעלה עדכונים...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>מוריד את חבילת תוכנת הקליינט...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -9168,7 +9176,7 @@ to %1</source>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>מתקין עדכון לקליינט...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -9184,7 +9192,7 @@ to %1</source>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>המערכת עודכנה ל</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -9204,7 +9212,7 @@ to %1</source>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>עדכון משרתים אחרים</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -9212,20 +9220,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>חסרה חבילת העדכון עבור תוכנת הקליינט</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>סיים עדכון</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -9233,11 +9241,15 @@ to %1</source>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>הגירסה האחרונה כבר מותקנת</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>גירסה זו כבר מותקנת</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
   </context>
   <context>
@@ -9253,7 +9265,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>אין לך פריסות</translation>
     </message>
   </context>
   <context>
@@ -9302,7 +9314,7 @@ to %1</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>אף אחד מהתפקידים שנבחרו אינו מכיל משתמשים. הפעולה לא תעבוד.</translation>
     </message>
   </context>
   <context>
@@ -9382,7 +9394,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>תנועה + רזולוציה נמוכה</translation>
     </message>
   </context>
   <context>
@@ -9450,7 +9462,7 @@ to %1</source>
     </message>
     <message>
       <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
+      <translation>המשתמש יתנתק באופן אוטומטי לאחר פרק זמן זה.</translation>
     </message>
     <message>
       <source>minutes</source>
@@ -9469,11 +9481,11 @@ to %1</source>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>מותקן</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>מתקין...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9496,7 +9508,7 @@ to %1</source>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>שמור קובצי עדכון</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9504,7 +9516,7 @@ to %1</source>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>רכיב</translation>
     </message>
   </context>
   <context>
@@ -9522,7 +9534,7 @@ to %1</source>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>בחר אזור בסרטון כדי לסנן את התוצאות</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9551,11 +9563,11 @@ to %1</source>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>התקן נבחר</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>מדיה נבחרת</translation>
     </message>
     <message>
       <source>none</source>
@@ -9574,11 +9586,11 @@ to %1</source>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
+        <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
+        <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
+        <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
       </translation>
     </message>
     <message>
@@ -9599,16 +9611,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
+        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>אין ארכיון זמין</translation>
     </message>
   </context>
   <context>
@@ -9619,7 +9631,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>איזור זמן</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9627,42 +9639,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>זמן שרת</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>זמן מערכת הקלטה</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>זמן, משותף ומסונכרן בין כל השרתים. יכול להיות שונה עם זמן מערכת הפעלה על כל שרת מסוים.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>מסונכרן זמן עם האינטרנט</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>מסונכרן עם הזמן המקומי בשרת שנבחר</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>לא מסונכרן. כל שרת משתמש בזמן המקומי שלו.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>זהה לזמן המקומי של השרת</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>אין חיבור אינטרנט. הזמן אינו מסונכרן.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>שרת השעון אינו מקוון. הזמן אינו מסונכרן.</translation>
     </message>
   </context>
   <context>
@@ -9688,7 +9700,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>לא ניתן ליצור העלאה בצד השרת: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9707,11 +9719,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>תנועה מזוהה רק במהלך העלאת וידאו.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>הפעלה או השבתה של הגדרה זו אינה משנה דבר בארכיון הקיים.</translation>
     </message>
   </context>
   <context>
@@ -9812,7 +9824,7 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>מתחיל ייצוא...</translation>
     </message>
   </context>
   <context>
@@ -9860,7 +9872,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>כל תוסף</translation>
     </message>
   </context>
   <context>
@@ -9991,7 +10003,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>הפריסה מלאה</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -10061,7 +10073,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>מצלמות וירטואליות אינן ניתנות להעברה בין שרתים</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -10073,7 +10085,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>כולם נתמכים</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -10179,16 +10191,16 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
+        <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
+        <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
+        <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>גרסה זו היא למטרות בדיקה בלבד.</translation>
     </message>
   </context>
   <context>

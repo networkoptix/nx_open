@@ -23,14 +23,12 @@ get_distributable_plugins_list(server_plugins_optional_list nx_server_plugins_op
 
 if(WINDOWS)
     add_subdirectory(wix)
-elseif(LINUX AND box STREQUAL "none") #< Desktop Linux.
+elseif((LINUX AND box STREQUAL "none") OR (box STREQUAL "tx1")) #< Desktop Linux or Tegra.
     add_subdirectory(deb)
 elseif(MACOSX)
     add_subdirectory(dmg)
 elseif(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     add_subdirectory(tar)
-elseif(box STREQUAL "tx1")
-    add_subdirectory(tgz)
 endif()
 
 if(withUnitTestsArchive)

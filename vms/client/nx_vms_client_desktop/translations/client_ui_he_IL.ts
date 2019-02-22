@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>מדיניות תמיכה ב- ARM</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>ביום הבא</translation>
     </message>
   </context>
   <context>
@@ -665,12 +665,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>פורט מדיה מותאם אישית</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>בטח בשעת המצלמה</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>פריסטים של המצלמה לא יהיו זמינים.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +705,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>זיהוי תנועה במהלך ייבוא ארכיון</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>רמז</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1089,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>הוסף התקנים</translation>
     </message>
     <message>
       <location/>
@@ -1230,7 +1230,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>הגנה עם סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -1588,7 +1588,7 @@
         }
     ]
 }</source>
-      <translation type="unfinished">{
+      <translation>{
     &quot;items&quot;: [
         {
             &quot;type&quot;: &quot;TextField&quot;,
@@ -1767,7 +1767,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>גודל טבלה מינימלי</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Admin DN או CN</translation>
     </message>
   </context>
   <context>
@@ -2141,7 +2141,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>בדוק האם יש עדכונים</translation>
     </message>
     <message>
       <location/>
@@ -2166,7 +2166,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>הורד והתקן</translation>
     </message>
     <message>
       <location/>
@@ -2181,7 +2181,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>הגדרות עדכון מתקדמות</translation>
     </message>
     <message>
       <location/>
@@ -2194,12 +2194,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>הצג את כל הפריסות</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>בחר פריסות</translation>
     </message>
   </context>
   <context>
@@ -2212,12 +2212,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>מצלמה וירטואלית חדשה...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;מצלמה וירטואלית&quot; היא אחסון וירטואלי עבור קבצי וידאו, אשר יכול להיות נטען על כל שרת על המערכת שלך להיות נגיש על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -2286,22 +2286,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>רמה:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>שגיאה</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>אזהרה</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>מידע</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2450,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>הפעל מחדש לגרסה המעודכנת כאשר אתה מוכן</translation>
     </message>
   </context>
   <context>
@@ -2845,7 +2845,7 @@
     <message>
       <location/>
       <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
+      <translation>בדיקת פילטר</translation>
     </message>
     <message>
       <location/>
@@ -2855,7 +2855,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>גרור כל קובץ תמונה או וידאו לחלון היישום כדי להפעיל אותם</translation>
     </message>
   </context>
   <context>
@@ -2969,7 +2969,7 @@
     <message>
       <location/>
       <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <translation>הגבל את משך הפעילות</translation>
     </message>
     <message>
       <location/>
@@ -3219,7 +3219,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>תחזית בסיס על נתונים שנרשמו במהלך</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3380,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>זמן מערכת הקלטה</translation>
     </message>
   </context>
   <context>
@@ -3388,17 +3388,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>סנכרן זמן עם האינטרנט</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>זמן מערכת הקלטה</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>אל תסנכרן זמן בין שרתים</translation>
     </message>
   </context>
   <context>
@@ -3506,7 +3506,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>זיהוי תנועה</translation>
     </message>
   </context>
   <context>

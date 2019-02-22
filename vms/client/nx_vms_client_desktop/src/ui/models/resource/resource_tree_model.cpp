@@ -354,8 +354,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return rootNode;
 
     case NodeType::users:
-        if (m_scope == UsersScope)
-            return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
         if (m_scope == FullScope && isAdmin)
             return rootNode;
         return bastardNode;
@@ -405,7 +403,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case NodeType::edge:
     {
         /* Only admins can see edge nodes. */
-        if (!isAdmin || m_scope == UsersScope)
+        if (!isAdmin)
             return bastardNode;
 
         if (m_scope == CamerasScope)
@@ -442,10 +440,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     /* No users nodes must be created here. */
     NX_ASSERT(!node->resourceFlags().testFlag(Qn::user));
     if (node->resourceFlags().testFlag(Qn::user))
-        return bastardNode;
-
-    /* In UsersScope all other nodes should be hidden. */
-    if (m_scope == UsersScope)
         return bastardNode;
 
     if (node->resourceFlags().testFlag(Qn::server))
@@ -554,14 +548,12 @@ ResourceTreeNodeType QnResourceTreeModel::rootNodeTypeForScope() const
 {
     switch (m_scope)
     {
-    case QnResourceTreeModel::CamerasScope:
-        return accessController()->hasGlobalPermission(GlobalPermission::admin)
-            ? NodeType::servers
-            : NodeType::userResources;
-    case QnResourceTreeModel::UsersScope:
-        return NodeType::users;
-    default:
-        return NodeType::root;
+        case QnResourceTreeModel::CamerasScope:
+            return accessController()->hasGlobalPermission(GlobalPermission::admin)
+                ? NodeType::servers
+                : NodeType::userResources;
+        default:
+            return NodeType::root;
     }
 }
 
@@ -953,9 +945,6 @@ Qt::DropActions QnResourceTreeModel::supportedDropActions() const
 // -------------------------------------------------------------------------- //
 void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource)
 {
-    if (m_scope == UsersScope)
-        return;
-
     NX_ASSERT(resource);
     if (!resource)
         return;

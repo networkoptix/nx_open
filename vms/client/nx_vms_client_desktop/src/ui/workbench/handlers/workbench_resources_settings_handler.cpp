@@ -241,8 +241,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
 
     const bool hasVideo = camera->hasVideo();
 
-    QScopedPointer<QnResourceSelectionDialog> dialog(
-        new QnResourceSelectionDialog(QnResourceSelectionDialog::Filter::cameras, parent));
+    QScopedPointer<QnResourceSelectionDialog> dialog(new QnResourceSelectionDialog(parent));
 
     const auto dialogDelegate = new ExportScheduleResourceSelectionDialogDelegate(
         parent, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);

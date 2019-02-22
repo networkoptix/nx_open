@@ -2641,6 +2641,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Не удалось подключить систему к %1</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -4902,10 +4906,6 @@ to %1</source>
       <source>Select Cameras...</source>
       <translation>Выберите камеры...</translation>
     </message>
-    <message>
-      <source>Select users...</source>
-      <translation>Выберите пользователей...</translation>
-    </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
@@ -6323,11 +6323,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Нажмите и говорите</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>Устройство ввода не выбрано</translation>
@@ -6339,6 +6335,10 @@ to %1</source>
     <message>
       <source>Network error</source>
       <translation>Сетевая ошибка</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Нажмите и говорите</translation>
     </message>
   </context>
   <context>
@@ -6915,10 +6915,6 @@ to %1</source>
       <translation>Серверы с другой системы будут отображаться в дереве ресурсов.</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>Не удалось объединить системы</translation>
-    </message>
-    <message>
       <source>Failed to update Server</source>
       <translation>Не удалось обновить сервер</translation>
     </message>
@@ -6950,6 +6946,18 @@ to %1</source>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 системы не могут быть объединены</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -7929,11 +7937,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладок</numerusform>
+        <numerusform>%n закладок</numerusform>
       </translation>
     </message>
   </context>
@@ -9243,6 +9251,10 @@ to %1</source>
       <source>This version is already installed</source>
       <translation type="unfinished">This version is already installed</translation>
     </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9762,11 +9774,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладок</numerusform>
+        <numerusform>%n закладок</numerusform>
       </translation>
     </message>
     <message>

@@ -114,26 +114,6 @@
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>เหตุการณ์ของระบบ</translation>
     </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>ระบบผูกพันกับ cloud (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>เซิร์ฟเวอร์ไม่ได้เชื่อมต่อกับอินเทอร์เน็ต</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>ไม่สามารถบันทึกข้อมูลประจำตัวของระบบคลาวด์ไปยัง DB ในระบบ</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>ไม่สามารถบันทึกข้อมูลประจำตัวของระบบคลาวด์ไปยัง DB ในระบบ</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>ไม่สามารถเชื่อมต่อกับระบบคลาวด์: %1</translation>
-    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

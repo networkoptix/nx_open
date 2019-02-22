@@ -880,6 +880,11 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         {
             auto credentials = nx::vms::client::core::helpers::getCredentials(localSystemId,
                 url.userName());
+
+            // Try login with cloud user if we do not have an option from the credentials store.
+            if (!credentials.isValid() && qnCloudStatusWatcher->credentials().user == url.userName())
+                credentials = qnCloudStatusWatcher->credentials();
+
             if (credentials.isValid())
             {
                 url.setPassword(credentials.password);

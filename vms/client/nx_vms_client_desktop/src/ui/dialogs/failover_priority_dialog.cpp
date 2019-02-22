@@ -163,7 +163,7 @@ private:
 
 
 QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/):
-    base_type(QnResourceSelectionDialog::Filter::cameras, parent),
+    base_type(parent),
     m_customColumnDelegate(new QnFailoverPriorityResourceModelDelegate(this))
 {
     setWindowTitle(tr("Failover Priority"));

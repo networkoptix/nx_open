@@ -22,7 +22,6 @@
 
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
-#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
@@ -486,15 +485,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog::Filter target;
-    if (vms::event::requiresCameraResource(m_model->actionType()))
-        target = QnResourceSelectionDialog::Filter::cameras;
-    else if (vms::event::requiresUserResource(m_model->actionType()))
-        target = QnResourceSelectionDialog::Filter::users;
-    else
-        return;
-
-    if (target == QnResourceSelectionDialog::Filter::users)
+    if (vms::event::requiresUserResource(m_model->actionType()))
     {
         SubjectSelectionDialog dialog(this);
         dialog.setCheckedSubjects(m_model->actionResources());
@@ -536,7 +527,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         params.allUsers = dialog.allUsers();
         m_model->setActionParams(params);
     }
-    else
+    else if (vms::event::requiresCameraResource(m_model->actionType()))
     {
         bool dialogAccepted = false;
         QnUuidSet selectedCameras = m_model->actionResources();

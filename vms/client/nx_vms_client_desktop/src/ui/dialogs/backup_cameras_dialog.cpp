@@ -154,8 +154,8 @@ namespace {
     };
 }
 
-QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
-    base_type(QnResourceSelectionDialog::Filter::cameras, parent)
+QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent):
+    base_type(parent)
 {
     const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),

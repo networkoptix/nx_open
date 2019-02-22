@@ -288,7 +288,7 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     // Received startTimeMs covers newly added chunks, but not potentially modified last chunk.
     // This is a workaround.
     if (!m_data.empty())
-        startTimeMs = qMin(startTimeMs, m_data.front().startTimeMs);
+        startTimeMs = std::clamp(startTimeMs, m_data.back().startTimeMs, m_data.front().startTimeMs);
 
     NX_VERBOSE(this, "Updating, from %1", utils::timestampToDebugString(startTimeMs));
 
@@ -311,6 +311,15 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 
     const auto sourceEnd = std::lower_bound(periods.cbegin(), periods.cend(),
         periodToUpdate.endTime(), ascendingLowerBoundPredicate);
+
+    if ((sourceEnd - sourceBegin) > maximumCount())
+    {
+        NX_WARNING(this, "Unexpected update, resetting.");
+        progressRollback.rollback();
+        clear();
+        requestFetch();
+        return;
+    }
 
     const auto targetBegin = std::lower_bound(m_data.rbegin(), m_data.rend(),
         periodToUpdate.startTime(), ascendingLowerBoundPredicate);
@@ -354,10 +363,21 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 
     NX_VERBOSE(this, "Added %1, removed %2, updated %3 chunks", numAdded, numRemoved, numUpdated);
 
+    if (!m_data.empty())
+    {
+        setFetchedTimeWindow(QnTimePeriod::fromInterval(
+            m_data.back().startTime(), m_data.front().startTime()));
+    }
+
     if (rowCount() > maximumCount())
     {
         NX_VERBOSE(this, "Truncating to maximum count");
         truncateToMaximumCount();
+    }
+    else if (rowCount() < fetchBatchSize())
+    {
+        progressRollback.rollback();
+        requestFetch();
     }
 }
 

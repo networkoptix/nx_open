@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <QtGui/QImage>
+#include <cmath>
 
 namespace nx::utils::graphics {
 
@@ -105,7 +106,7 @@ std::vector<float> BlurFilter::createKernel(int size) const
 
     for (int i = 0; i <= size; i++)
     {
-        kernel[size + i] = exp(- 4.5 * pow((float)i / size, 2)); //< = (3 * sigma) ^ 2 / 2 .
+        kernel[size + i] = std::exp(- 4.5 * std::pow((float)i / size, 2)); //< = (3 * sigma) ^ 2 / 2 .
         sum += kernel[size + i];
     }
 

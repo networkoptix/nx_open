@@ -114,26 +114,6 @@
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Rendszereseménye</translation>
     </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>A rendszer már csatlakozott a felhőhöz (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>A szerver nem csatlakozik az internethez.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>Nem sikerült menteni a felhő hitelesítő adatait a helyi DB-re</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>Nem sikerült menteni a felhő tulajdonosát a helyi DB-re</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>Nem sikerült csatlakozni a felhőhöz: %1</translation>
-    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
