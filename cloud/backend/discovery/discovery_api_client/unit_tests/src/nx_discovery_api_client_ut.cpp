@@ -178,7 +178,7 @@ protected:
         while(onlineNodes.size() != 1)
         {
             sleep();
-            onlineNodes = clientContext(0)->client->onlineNodes();
+            onlineNodes = clientContext(/*clientIndex*/0)->client->onlineNodes();
         }
 
         Node lostNode;
@@ -227,9 +227,9 @@ private:
         std::unique_ptr<discovery::DiscoveryClient> client;
     };
 
-    ClientContext* clientContext(size_t index)
+    ClientContext* clientContext(size_t clientIndex)
     {
-        return m_clients[index].get();
+        return m_clients[clientIndex].get();
     }
 
     void assertNodeEquality(const Node&a, const Node& b)
