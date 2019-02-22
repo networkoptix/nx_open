@@ -60,7 +60,6 @@ protected:
     void givenDiscoveryClientAlreadyRegisteredWithServer()
     {
         givenDiscoveryClient();
-        qDebug() << "before register: " << clientContext(0)->infoJson.c_str();
         whenClientRegistersWithServer();
         thenClientRegistrationSucceeded();
     }
@@ -270,11 +269,9 @@ private:
 
     void waitForCallback()
     {
-        qDebug() << "waiting";
         std::unique_lock<std::mutex> lock(m_mutex);
         m_wait.wait(lock, [this]() { return m_callbackFired.load(); });
         m_callbackFired = false;
-        qDebug() << "callback fired";
     }
 
     void callbackFired()

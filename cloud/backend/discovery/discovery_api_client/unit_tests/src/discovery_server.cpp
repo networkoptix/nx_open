@@ -132,11 +132,8 @@ Node DiscoveryServer::updateNode(
     if (!nodeContext.isInitialized)
         initializeNodeContext(nodeInfo.nodeId, nodeEndpoint, &nodeContext);
 
-    ++nodeContext.updates;
     nodeContext.node.infoJson = nodeInfo.infoJson;
     nodeContext.node.expirationTime = system_clock::now() + seconds(3);
-
-    startTimer(nodeContext);
 
     return nodeContext.node;
 }
@@ -155,13 +152,11 @@ void DiscoveryServer::initializeNodeContext(
     const nx::network::SocketAddress& clientEndpoint,
     NodeContext* outNodeContext)
 {
-    outNodeContext->initializedAt = system_clock::now();
-    qDebug() << nodeId.c_str() << ": first init at:"
-        << duration_cast<milliseconds>(outNodeContext->initializedAt.time_since_epoch()).count();
     outNodeContext->node.nodeId = nodeId;
     outNodeContext->node.host = clientEndpoint.toStdString();
     outNodeContext->timer.bindToAioThread(getAioThread());
     outNodeContext->isInitialized = true;
+    startTimer(*outNodeContext);
 }
 
 void DiscoveryServer::startTimer(NodeContext& nodeContext)
@@ -170,18 +165,9 @@ void DiscoveryServer::startTimer(NodeContext& nodeContext)
         std::chrono::milliseconds(100),
         [this, &nodeContext]()
         {
-            QnMutexLocker lock(&m_mutex);
             if (nodeContext.node.expirationTime <= system_clock::now())
             {
-                auto nowMsec = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-                auto initAtMsec =
-                    duration_cast<milliseconds>(nodeContext.initializedAt.time_since_epoch());
-
-                qDebug() << nodeContext.node.nodeId.c_str()
-                    << "expired at:" << nowMsec.count()
-                    << ", lifetime:" << (nowMsec - initAtMsec).count() << "milliseconds."
-                    << "number of updates:" << nodeContext.updates;
-
+                QnMutexLocker lock(&m_mutex);
                 nodeContext.timer.pleaseStopSync();
                 m_onlineNodes.erase(nodeContext.node.nodeId);
             }

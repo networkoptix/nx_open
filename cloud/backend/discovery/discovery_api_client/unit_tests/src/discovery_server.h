@@ -31,8 +31,6 @@ private:
         Node node;
         nx::network::aio::Timer timer;
         bool isInitialized = false;
-        std::chrono::system_clock::time_point initializedAt;
-        uint64_t updates = 0;
     };
 
     virtual void stopWhileInAioThread() override;
