@@ -152,7 +152,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if platform == "linux" and box == "none":
+    if (platform == "linux" and box == "none") or (box == "tx1"):
         sync("cifs-utils")
 
     if platform == "windows":

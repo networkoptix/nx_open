@@ -32,14 +32,14 @@ MediaStreamCache::MediaStreamCache(
     m_inactivityTimer.restart();
 }
 
-//!Implementation of QnAbstractMediaDataReceptor::canAcceptData
+//! Implementation of QnAbstractMediaDataReceptor::canAcceptData
 bool MediaStreamCache::canAcceptData() const
 {
     return true;
 }
 
-//!Implementation of QnAbstractMediaDataReceptor::putData
-void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
+//! Implementation of QnAbstractMediaDataReceptor::putData
+void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
 {
     std::vector<std::function<void()>> eventsToDeliver;
     auto eventsToDeliverGuard = nx::utils::makeScopeGuard(
@@ -49,31 +49,32 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
                 deliverEvent();
         });
 
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
-    const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
-    NX_VERBOSE(this, lit("HLS. MediaStreamCache. got frame %1, is_key_frame=%2").
-        arg(data->timestamp).arg(isKeyFrame));
-    if( m_packetsByTimestamp.empty() && !isKeyFrame )
-        return; //cache data MUST start with key frame
+    NX_CRITICAL(mediaPacket);
 
-    if( m_prevPacketSrcTimestamp == -1 )
+    const bool isKeyFrame = mediaPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+    NX_VERBOSE(this, "Got frame [%1], isKeyFrame [%2], channel [%3]",
+        data->timestamp, isKeyFrame, mediaPacket->channelNumber);
+
+    if (m_packetsByTimestamp.empty() && !isKeyFrame)
+        return; // Cache data MUST start with key frame.
+
+    if (m_prevPacketSrcTimestamp == -1)
         m_prevPacketSrcTimestamp = data->timestamp;
 
-    if( qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF )
+    if (qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF)
         eventsToDeliver.push_back([this]() { m_onDiscontinue.notify(); });
 
     m_prevPacketSrcTimestamp = data->timestamp;
 
-    //searching position to insert to. in most cases (or in every case in case of h.264@baseline) insertion is done to the end
+    // Searching position to insert to. In most cases (or in every case in case of h.264@baseline)
+    // insertion is done to the end.
     PacketContainerType::iterator posToInsert = m_packetsByTimestamp.end();
-    for( PacketContainerType::reverse_iterator
-        rIt = m_packetsByTimestamp.rbegin();
-        rIt != m_packetsByTimestamp.rend();
-        ++rIt )
+    for (auto rIt = m_packetsByTimestamp.rbegin(); rIt != m_packetsByTimestamp.rend(); ++rIt)
     {
-        if (rIt->timestamp <= data->timestamp)
+        if (rIt->timestamp <= static_cast<quint64>(data->timestamp))
         {
             posToInsert = rIt.base();
             break;
@@ -82,26 +83,25 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     m_packetsByTimestamp.insert(
         posToInsert,
-        MediaPacketContext(data->timestamp, data, isKeyFrame));
-    if( mediaPacket )
-        m_cacheSizeInBytes += mediaPacket->dataSize();
+        {quint64(data->timestamp), data, isKeyFrame, int(mediaPacket->channelNumber)});
 
+    m_cacheSizeInBytes += mediaPacket->dataSize();
     clearCacheIfNeeded(&lk);
 
-    if( !isKeyFrame )
-        return; //no sense to perform this operation more than once per GOP
+    if(!isKeyFrame)
+        return; // No sense to perform this operation more than once per GOP.
 
 #ifdef DEBUG_OUTPUT
-    std::cout<<"Media cache size "<<(m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp)) / 1000000<<" sec"
-        ", "<<m_cacheSizeInBytes<<" bytes"<<
-        ", m_packetsByTimestamp.size() = "<<m_packetsByTimestamp.size()<<
-        //", QnAbstractMediaData count "<<QnAbstractMediaData_instanceCount.load()<<
-        //", QnByteArray_bytesAllocated "<<QnByteArray_bytesAllocated.load()<<
-        std::endl;
-
+    NX_VERBOSE(this, "Media cache size %1 sec, %2 bytes, m_packetsByTimestamp.size() = %3",
+        (m_packetsByTimestamp.empty()
+            ? 0
+            : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp))
+            / 1000000,
+        m_cacheSizeInBytes,
+        m_packetsByTimestamp.size());
     static int malloc_statsCounter = 0;
     ++malloc_statsCounter;
-    if( malloc_statsCounter == 10 )
+    if (malloc_statsCounter == 10)
     {
         malloc_stats();
         malloc_statsCounter = 0;
@@ -109,16 +109,13 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 #endif
     
     eventsToDeliver.push_back(
-        [this, timestamp = data->timestamp]()
-        {
-            m_onKeyFrame.notify(timestamp); 
-        });
+        [this, timestamp = data->timestamp]() { m_onKeyFrame.notify(timestamp); });
 }
 
 void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
 {
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
-    if(maxTimestamp - m_packetsByTimestamp.front().timestamp <= m_cacheSizeUsec)
+    if (maxTimestamp - m_packetsByTimestamp.front().timestamp <= quint64(m_cacheSizeUsec))
         return;
 
     //determining left-most position of active blockings
@@ -164,7 +161,7 @@ void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
 
 void MediaStreamCache::clear()
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     m_prevPacketSrcTimestamp = -1;
     m_cacheSizeInBytes = 0;
@@ -173,13 +170,13 @@ void MediaStreamCache::clear()
 
 quint64 MediaStreamCache::startTimestamp() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_packetsByTimestamp.empty() ? 0 : m_packetsByTimestamp.begin()->timestamp;
 }
 
 quint64 MediaStreamCache::currentTimestamp() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_packetsByTimestamp.empty() ? 0 : m_packetsByTimestamp.rbegin()->timestamp;
 }
 
@@ -190,7 +187,7 @@ quint64 MediaStreamCache::currentTimestamp() const
 */
 qint64 MediaStreamCache::duration() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     if( m_packetsByTimestamp.empty() )
         return 0;
     return m_packetsByTimestamp.rbegin()->timestamp - m_packetsByTimestamp.begin()->timestamp;
@@ -198,13 +195,13 @@ qint64 MediaStreamCache::duration() const
 
 size_t MediaStreamCache::sizeInBytes() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_cacheSizeInBytes;
 }
 
 int MediaStreamCache::getMaxBitrate() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     const qint64 durationUSec = m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.rbegin()->timestamp - m_packetsByTimestamp.begin()->timestamp);
     if( durationUSec == 0 )
         return -1;
@@ -213,63 +210,58 @@ int MediaStreamCache::getMaxBitrate() const
     return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 
-//!Returns packet with timestamp == \a timestamp or packet with closest (from the left) timestamp
-/*!
-    In other words, this methods performs lower_bound in timestamp-sorted (using 'greater' comparision) array of data packets
+/**
+    Returns packet with timestamp == \a timestamp or packet with closest (from the left) timestamp.
+    In other words, this methods performs lower_bound in timestamp-sorted (using 'greater'
+    comparision) array of data packets.
 */
-QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
-    quint64 desiredTimestamp,
-    bool findKeyFrameOnly,
-    quint64* const foundTimestamp ) const
+QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimestamp,
+    bool findKeyFrameOnly, quint64* const foundTimestamp, int channelNumber) const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     m_inactivityTimer.restart();
 
-    if( m_packetsByTimestamp.empty() )
-        return QnAbstractDataPacketPtr();
-
-    PacketContainerType::const_iterator it = std::lower_bound(
-        m_packetsByTimestamp.cbegin(),
-        m_packetsByTimestamp.cend(),
-        desiredTimestamp,
-        []( const MediaStreamCache::MediaPacketContext& one, quint64 two ) -> bool {
-            return one.timestamp < two;
-        } );
-    if( it == m_packetsByTimestamp.cend() )
-        --it;
-    for( ;; )
-    {
-        if( it == m_packetsByTimestamp.cend() )
-            return QnAbstractDataPacketPtr();
-
-        if( findKeyFrameOnly && !it->isKeyFrame )
+    const auto it = std::lower_bound(
+        m_packetsByTimestamp.cbegin(), m_packetsByTimestamp.cend(), desiredTimestamp,
+        [](const MediaStreamCache::MediaPacketContext& one, quint64 two) -> bool
         {
-            //searching for I-frame
-            if( it == m_packetsByTimestamp.cbegin() )
-                return QnAbstractDataPacketPtr();
-            --it;
-            continue;
-        }
+            return one.timestamp < two;
+        });
 
-        *foundTimestamp = it->timestamp;
-        return it->packet;
-    }
+    const auto result = std::find_if(std::make_reverse_iterator(it), m_packetsByTimestamp.crend(),
+        [channelNumber, findKeyFrameOnly](const auto& value)
+        {
+            if (value.channelNumber != channelNumber)
+                return false;
+            if (!findKeyFrameOnly)
+                return true;
+            if (value.isKeyFrame)
+                return true;
+            return false;
+        });
+
+    if (result == m_packetsByTimestamp.crend())
+        return {};
+    *foundTimestamp = result->timestamp;
+    return result->packet;
 }
 
-QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const
+QnAbstractDataPacketPtr MediaStreamCache::getNextPacket(
+    quint64 timestamp, quint64* const foundTimestamp, int channelNumber) const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
+    // Next frame after the one to start search from.
     PacketContainerType::const_iterator it = std::upper_bound(
-        m_packetsByTimestamp.cbegin(),
-        m_packetsByTimestamp.cend(),
-        timestamp,
-        []( quint64 one, const MediaStreamCache::MediaPacketContext& two ) -> bool {
-            return one < two.timestamp;
-        } );
-    if( it == m_packetsByTimestamp.end() )
-        return QnAbstractDataPacketPtr();
+        m_packetsByTimestamp.cbegin(), m_packetsByTimestamp.cend(), timestamp,
+        [](quint64 bound, const auto& frame) { return bound < frame.timestamp; });
+
+    it = std::find_if(it, m_packetsByTimestamp.cend(),
+        [channelNumber](const auto& value) { return value.channelNumber == channelNumber; });
+
+    if (it == m_packetsByTimestamp.cend())
+        return {};
 
     *foundTimestamp = it->timestamp;
     return it->packet;
@@ -287,7 +279,7 @@ nx::utils::Subscription<>& MediaStreamCache::streamTimeDiscontinuityFoundSubscri
 
 int MediaStreamCache::blockData( quint64 timestamp )
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     //searching for a free blockingID
     int blockingID = 0;
@@ -321,7 +313,7 @@ int MediaStreamCache::blockData( quint64 timestamp )
 //!Updates position of blocking \a blockingID to \a timestampToMoveTo
 void MediaStreamCache::moveBlocking( int blockingID, quint64 timestampToMoveTo )
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     std::map<int, quint64>::iterator it = m_dataBlockings.find( blockingID );
     if( it == m_dataBlockings.end() )
@@ -336,7 +328,7 @@ void MediaStreamCache::moveBlocking( int blockingID, quint64 timestampToMoveTo )
 //!Removed blocking \a blockingID
 void MediaStreamCache::unblockData( int blockingID )
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     std::map<int, quint64>::iterator it = m_dataBlockings.find( blockingID );
     if( it == m_dataBlockings.end() )
@@ -349,7 +341,7 @@ void MediaStreamCache::unblockData( int blockingID )
 
 qint64 MediaStreamCache::inactivityPeriod() const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
     return m_inactivityTimer.elapsed();
 }
 

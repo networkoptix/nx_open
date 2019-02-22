@@ -1,6 +1,7 @@
 #include "mediator_connector.h"
 
 #include <nx/network/socket_factory.h>
+#include <nx/network/stun/client_connection_validator.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 
@@ -20,23 +21,13 @@ namespace { static network::stun::AbstractAsyncClient::Settings s_stunClientSett
 
 MediatorConnector::MediatorConnector(const std::string& cloudHost):
     m_mediatorEndpointProvider(
-        std::make_unique<MediatorEndpointProvider>(cloudHost)),
-    m_fetchEndpointRetryTimer(
-        std::make_unique<nx::network::RetryTimer>(
-            s_stunClientSettings.reconnectPolicy))
+        std::make_unique<MediatorEndpointProvider>(cloudHost))
 {
-    // NOTE: Reconnect to mediator is handled by this class, not by STUN client.
-
-    auto stunClientSettings = s_stunClientSettings;
-    stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
     m_stunClient = std::make_shared<MediatorStunClient>(
-        std::move(stunClientSettings),
+        s_stunClientSettings,
         m_mediatorEndpointProvider.get());
 
     bindToAioThread(getAioThread());
-
-    m_stunClient->setOnConnectionClosedHandler(
-        std::bind(&MediatorConnector::reconnectToMediator, this));
 }
 
 MediatorConnector::~MediatorConnector()
@@ -52,7 +43,6 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     m_stunClient->bindToAioThread(aioThread);
     if (m_mediatorEndpointProvider)
         m_mediatorEndpointProvider->bindToAioThread(aioThread);
-    m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
 std::unique_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
@@ -153,25 +143,6 @@ void MediatorConnector::stopWhileInAioThread()
     m_stunClient.reset();
     if (m_mediatorEndpointProvider)
         m_mediatorEndpointProvider->pleaseStopSync();
-    m_fetchEndpointRetryTimer.reset();
-}
-
-void MediatorConnector::connectToMediatorAsync()
-{
-    m_mediatorEndpointProvider->fetchMediatorEndpoints(
-        [this](nx::network::http::StatusCode::Value resultCode)
-        {
-            if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
-            {
-                // Retry after some delay.
-                m_fetchEndpointRetryTimer->scheduleNextTry(
-                    [this]() { connectToMediatorAsync(); });
-            }
-            else
-            {
-                establishTcpConnectionToMediatorAsync();
-            }
-        });
 }
 
 void MediatorConnector::establishTcpConnectionToMediatorAsync()
@@ -186,37 +157,10 @@ void MediatorConnector::establishTcpConnectionToMediatorAsync()
         createStunTunnelUrl,
         [this, createStunTunnelUrl](SystemError::ErrorCode code)
         {
-            if (code == SystemError::noError)
-            {
-                m_fetchEndpointRetryTimer->reset();
-                // TODO: #ak m_stunClient is expected to invoke "reconnected" handler here.
-            }
-            else
+            if (code != SystemError::noError)
             {
                 NX_DEBUG(this, lm("Failed to connect to mediator on %1. %2")
                     .args(createStunTunnelUrl, SystemError::toString(code)));
-                reconnectToMediator();
-            }
-        });
-}
-
-void MediatorConnector::reconnectToMediator()
-{
-    NX_DEBUG(this, lm("Connection to mediator has been broken. Reconnecting..."));
-
-    m_fetchEndpointRetryTimer->scheduleNextTry(
-        [this]()
-        {
-            if (m_mockedUpMediatorAddress)
-            {
-                NX_DEBUG(this, lm("Using mocked up mediator URL %1")
-                    .args(*m_mockedUpMediatorAddress));
-                establishTcpConnectionToMediatorAsync();
-            }
-            else
-            {
-                // Fetching mediator URL again.
-                connectToMediatorAsync();
             }
         });
 }
