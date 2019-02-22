@@ -64,9 +64,6 @@ using namespace std;
 
 CUDTUnited* CUDT::s_UDTUnited = nullptr;
 
-const UDTSOCKET CUDT::INVALID_SOCK = -1;
-const int CUDT::ERROR = -1;
-
 const UDTSOCKET UDT::INVALID_SOCK = CUDT::INVALID_SOCK;
 const int UDT::ERROR = CUDT::ERROR;
 
@@ -75,10 +72,6 @@ const int32_t CSeqNo::m_iMaxSeqNo = 0x7FFFFFFF;
 const int32_t CAckNo::m_iMaxAckSeqNo = 0x7FFFFFFF;
 const int32_t CMsgNo::m_iMsgNoTH = 0xFFFFFFF;
 const int32_t CMsgNo::m_iMaxMsgNo = 0x1FFFFFFF;
-
-const int CUDT::m_iVersion = 4;
-const int CUDT::m_iSYNInterval = 10000;
-const int CUDT::m_iSelfClockInterval = 64;
 
 /*
 static const int CTRL_HANDSHAKE = 0;            //000 - Handshake
@@ -93,84 +86,21 @@ static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer si
 static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
 
 */
-constexpr const int kDefaultRecvWindowSize = 25600;
-
-// Mimimum recv buffer size is 32 packets
-constexpr const int kMinRecvBufferSize = 32;
-//Rcv buffer MUST NOT be bigger than Flight Flag size
-constexpr const int kDefaultRecvBufferSize =
-kDefaultRecvWindowSize < 8192
-    ? kDefaultRecvWindowSize
-    : 8192;
-
-constexpr const int kDefaultSendBufferSize =
-kDefaultRecvWindowSize < 8192
-    ? kDefaultRecvWindowSize
-    : 8192;
 
 CUDT::CUDT()
 {
-    m_pSndBuffer = NULL;
-    m_pRcvBuffer = NULL;
-    m_pSndLossList = NULL;
-    m_pRcvLossList = NULL;
-    m_pACKWindow = NULL;
-    m_pSndTimeWindow = NULL;
-    m_pRcvTimeWindow = NULL;
-
-    m_pPeerAddr = NULL;
-
     // Initilize mutex and condition variables
     initSynch();
 
-    // Default UDT configurations
-    m_iMSS = kDefaultMtuSize;
-    m_bSynSending = true;
-    m_bSynRecving = true;
-    m_iFlightFlagSize = kDefaultRecvWindowSize;
-    m_iSndBufSize = kDefaultSendBufferSize;
-    m_iRcvBufSize = kDefaultRecvBufferSize;
     m_Linger.l_onoff = 1;
     m_Linger.l_linger = 180;
-    m_iUDPSndBufSize = 65536;    //TODO #ak why it is not calculated somehow?
-    m_iUDPRcvBufSize = m_iRcvBufSize * m_iMSS;
-    m_iSockType = UDT_STREAM;
-    m_iIPversion = AF_INET;
-    m_bRendezvous = false;
-    m_iSndTimeOut = -1;
-    m_iRcvTimeOut = -1;
-    m_bReuseAddr = true;
-    m_llMaxBW = -1;
 
     m_pCCFactory = new CCCFactory<CUDTCC>;
-    m_pCC = NULL;
-    m_pCache = NULL;
-
-    // Initial status
-    m_bOpened = false;
-    m_bListening = false;
-    m_bConnecting = false;
-    m_bConnected = false;
-    m_bClosing = false;
-    m_bShutdown = false;
-    m_bBroken = false;
-    m_bPeerHealth = true;
-    m_ullLingerExpiration = 0;
 }
 
 CUDT::CUDT(const CUDT& ancestor):
     std::enable_shared_from_this<CUDT>()
 {
-    m_pSndBuffer = NULL;
-    m_pRcvBuffer = NULL;
-    m_pSndLossList = NULL;
-    m_pRcvLossList = NULL;
-    m_pACKWindow = NULL;
-    m_pSndTimeWindow = NULL;
-    m_pRcvTimeWindow = NULL;
-
-    m_pPeerAddr = NULL;
-
     // Initilize mutex and condition variables
     initSynch();
 
@@ -193,19 +123,7 @@ CUDT::CUDT(const CUDT& ancestor):
     m_llMaxBW = ancestor.m_llMaxBW;
 
     m_pCCFactory = ancestor.m_pCCFactory->clone();
-    m_pCC = NULL;
     m_pCache = ancestor.m_pCache;
-
-    // Initial status
-    m_bOpened = false;
-    m_bListening = false;
-    m_bConnecting = false;
-    m_bConnected = false;
-    m_bClosing = false;
-    m_bShutdown = false;
-    m_bBroken = false;
-    m_bPeerHealth = true;
-    m_ullLingerExpiration = 0;
 }
 
 CUDT::~CUDT()
@@ -569,7 +487,6 @@ void CUDT::open()
 
     m_iEXPCount = 1;
     m_iBandwidth = 1;
-    m_iDeliveryRate = 16;
     m_iAckSeqNo = 0;
     m_ullLastAckTime = 0;
 
