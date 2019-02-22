@@ -286,7 +286,7 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node>& onlineNodes)
     auto onlineNodeSet = moveToSet(onlineNodes);
 
     std::vector<Node> discoveredNodes;
-    std::vector<Node> lostNodes;
+    std::vector<std::string> lostNodes;
 
     // Nodes that are not present in onlineNodeSet and not m_onlineNodes are newly online.
     for (const auto& node : onlineNodeSet)
@@ -299,7 +299,7 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node>& onlineNodes)
     for (const auto& node : m_onlineNodes)
     {
         if (onlineNodeSet.find(node) == onlineNodeSet.end())
-            lostNodes.emplace_back(node);
+            lostNodes.emplace_back(node.nodeId);
     }
 
     // Update m_onlineNodes before emitting events, as events might access onlineNodes()
@@ -311,8 +311,8 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node>& onlineNodes)
     for (const auto& node : discoveredNodes)
         emitNodeDiscovered(node);
 
-    for (const auto& node : lostNodes)
-        emitNodeLost(node.nodeId);
+    for (const auto& nodeId : lostNodes)
+        emitNodeLost(nodeId);
 }
 
 void DiscoveryClient::emitNodeDiscovered(const Node& node)
