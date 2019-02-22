@@ -122,20 +122,20 @@
             <div class="form-group">
                 <label for="password" translate>Password</label>
                 <input class="form-control"
-                       [(ngModel)]="password" #templatePassword="ngModel"
+                       [(ngModel)]="password" #mergePassword="ngModel"
                        id="password" autocomplete="new-password"
                        name="password" type="password"
                        required nxFocusMe>
-                <div *ngIf="templatePassword.invalid && templatePassword.touched && !wrongPassword">
+                <div *ngIf="mergePassword.invalid && mergePassword.touched && !wrongPassword">
                     <label class="input-error" translate>Password is required</label>
                 </div>
-                <div *ngIf="templatePassword.invalid && wrongPassword">
+                <div *ngIf="mergePassword.invalid && wrongPassword">
                     <label class="input-error" translate>Wrong password</label>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-            <nx-process-button [buttonDisabled]="templatePassword.invalid"
+            <nx-process-button [buttonDisabled]="mergePassword.invalid"
                                [process]="merging"
                                [form]="mergeForm"
                                actionType="primary"

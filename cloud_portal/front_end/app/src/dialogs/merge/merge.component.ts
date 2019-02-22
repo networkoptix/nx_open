@@ -112,7 +112,7 @@ export class MergeModalContent {
                 this.user = user;
                 this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
                 this.multipleSystems = this.systems.length > 1;
-                this.outOfDate = false && this.multipleSystems && !this.system.canMerge;
+                this.outOfDate = this.multipleSystems && !this.system.canMerge;
                 this.showMergeForm = this.multipleSystems && !this.outOfDate;
                 this.makeSelectorList(this.systems);
                 this.targetSystem = {... this.systemsSelect[0]};
@@ -136,13 +136,18 @@ export class MergeModalContent {
                     return this.language.errorCodes[error.errorText] || error.errorText;
                 },
                 vmsRequestFailure: (error) => {
-                    return this.language.errorCodes[error.errorText] || error.errorText;
+                    const errorText = this.language.errorCodes[error.errorText] || error.errorText;
+                    let errorData = '';
+                    if (!(errorText in this.language.errorCodes) && error.errorData) {
+                        errorData = JSON.stringify(error.errorData);
+                    }
+                    return errorData ? `${errorText}\nError Data: ${errorData}` : errorText;
                 },
                 wrongPassword: () => {
-                    this.mergeForm.controls['templatePassword'].setErrors({'wrongPassword': true});
+                    this.mergeForm.controls['mergePassword'].setErrors({'wrongPassword': true});
                     this.password = '';
 
-                    this.renderer.selectRootElement('#templatePassword').focus();
+                    this.renderer.selectRootElement('#mergePassword').focus();
                     this.wrongPassword = true;
 
                 },
