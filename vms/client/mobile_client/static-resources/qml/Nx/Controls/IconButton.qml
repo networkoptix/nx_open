@@ -11,6 +11,7 @@ AbstractButton
     property color normalIconColor: "transparent"
     property color checkedIconColor: normalIconColor
     property color checkedBackgroundColor: ColorTheme.contrast1
+    property int checkedPadding: 0
     property color backgroundColor: "transparent"
     property color disabledBackgroundColor: "transparent"
 
@@ -53,15 +54,17 @@ AbstractButton
         Rectangle
         {
             anchors.fill: parent
-            radius: Math.min(width, height)
+            radius: Math.min(width, height) / 2
             visible: !control.pressed
             color: control.enabled ? control.backgroundColor : control.disabledBackgroundColor
         }
 
         Rectangle
         {
-            anchors.fill: parent
-            radius: Math.min(width, height)
+            anchors.centerIn: parent
+            width: parent.width - control.checkedPadding * 2
+            height: parent.height - control.checkedPadding * 2
+            radius: Math.min(width, height) / 2
             visible: control.checkable && control.checked
             color: control.checkedBackgroundColor
         }

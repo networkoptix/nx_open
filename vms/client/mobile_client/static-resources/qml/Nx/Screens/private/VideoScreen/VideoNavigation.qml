@@ -503,6 +503,7 @@ Item
                 icon.width: 24
                 icon.height: 24
                 padding: 0
+                checkedPadding: 4
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
                 visible: videoNavigation.hasArchive
