@@ -8,50 +8,13 @@
 
 #include <nx/utils/url.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_async_client.h>
 
 #include <nx/network/aio/timer.h>
 
+#include "node.h"
+
 namespace nx::cloud::discovery {
-
-struct NodeInfo
-{
-    std::string nodeId;
-    /* The object under "info" key */
-    std::string infoJson;
-};
-
-#define NodeInfo_Fields (nodeId)(infoJson)
-
-struct Node
-{
-    std::string nodeId;
-    std::string host;
-    /* http time format */
-    std::chrono::system_clock::time_point expirationTime;
-    /* The object under "info" key */
-    std::string infoJson;
-
-    bool operator==(const Node& right) const
-    {
-        // TODO do other fields need to be compared? they are volatile.
-        return nodeId == right.nodeId;
-    }
-
-    bool operator<(const Node& right)const
-    {
-        return nodeId < right.nodeId;
-    }
-};
-
-#define Node_Fields (nodeId)(host)(expirationTime)(infoJson)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (NodeInfo)(Node),
-    (json))
-
-//-------------------------------------------------------------------------------------------------
 
 using NodeDiscoveredHandler = nx::utils::MoveOnlyFunc<void(Node)>;
 
@@ -65,7 +28,7 @@ using NodeLostHandler = nx::utils::MoveOnlyFunc<void(std::string /*nodeId*/)>;
 class NX_DISCOVERY_CLIENT_API DiscoveryClient:
     public nx::network::aio::BasicPollable
 {
-    using BaseType = nx::network::aio::BasicPollable;
+    using base_type = nx::network::aio::BasicPollable;
 
 public:
     DiscoveryClient(
@@ -76,8 +39,6 @@ public:
     ~DiscoveryClient();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-    virtual void stopWhileInAioThread() override;
-
 
     /** Starts the process of registering node in the discovery service. */
     void start();
@@ -88,45 +49,55 @@ public:
     void updateInformation(const std::string& infoJson);
 
     std::vector<Node> onlineNodes() const;
+    Node DiscoveryClient::node() const;
 
     void setOnNodeDiscovered(NodeDiscoveredHandler handler);
     void setOnNodeLost(NodeLostHandler handler);
 
 private:
-    void setupDiscoveryServiceUrl(const std::string& clusterId);
+    virtual void stopWhileInAioThread() override;
 
-    void startRegisterNode();
+    void setupDiscoveryServiceUrl(const std::string& clusterId);
+    void setupRegisterNodeRequest();
+    void setupOnlineNodesRequest();
+
+    void startRegisterNodeRequest();
     void startOnlineNodesRequest();
 
-    void updateOnlineNodes(const std::vector<Node>& discoveredNodes);
+    void updateOnlineNodes(std::vector<Node>& discoveredNodes);
 
     void emitNodeDiscovered(const Node& node);
     void emitNodeLost(const std::string& nodeId);
 
 private:
     using ResponseReceivedHandler = nx::utils::MoveOnlyFunc<void(QByteArray messageBody)>;
-    struct RequestContext
+    class RequestContext
     {
+    public:
         RequestContext(ResponseReceivedHandler responseReceived);
 
         void bindToAioThread(
             nx::network::aio::AbstractAioThread* aioThread);
-        void stopWhileInAioThread();
+        void pleaseStopSync();
 
-        void start(nx::network::aio::TimerEventHandler timerEvent);
-        void stop();
+        void startTimer(
+            const std::chrono::milliseconds& timeout,
+            nx::network::aio::TimerEventHandler timerEvent);
+        void stopTimerSync();
+
+        void cancelSync();
 
         void doGet(const nx::utils::Url& url);
         void doPost(const nx::utils::Url& url, const QByteArray& messagBody);
 
     private:
-        void clearMessageBody();
-        void updateMessageBody();
-
-    private:
         QByteArray m_messageBody;
         nx::network::http::AsyncClient m_httpClient;
         nx::network::aio::Timer m_timer;
+
+        std::mutex m_mutex;
+        std::condition_variable m_wait;
+        std::atomic_bool m_ready = false;
     };
 
     nx::utils::Url m_discoveryServiceUrl;
