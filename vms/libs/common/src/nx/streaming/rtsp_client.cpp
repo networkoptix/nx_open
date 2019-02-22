@@ -44,8 +44,8 @@ RtspPorts parsePorts(const QString& parameterString)
     if (nameAndValue.size() != 2)
         return {};
 
-    const auto mediaPort = ports[0].toUInt();
-    const auto rtcpPort = ports[1].toUInt();
+    const auto mediaPort = ports[0].toUShort();
+    const auto rtcpPort = ports[1].toUShort();
 
     if (!mediaPort || !rtcpPort)
         return {};
