@@ -101,7 +101,6 @@ private:
         const nx::network::http::Response* response() const;
 
     private:
-        nx::network::http::BufferType m_messageBody;
         nx::network::http::AsyncClient m_httpClient;
         nx::network::aio::Timer m_timer;
     };

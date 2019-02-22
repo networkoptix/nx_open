@@ -39,8 +39,8 @@ DiscoveryClient::RequestContext::RequestContext(ResponseReceivedHandler response
     m_httpClient.setOnDone(
         [this, responseReceived = std::move(responseReceived)]()
         {
-            m_messageBody = m_httpClient.fetchMessageBodyBuffer();
-            responseReceived(std::exchange(m_messageBody, {}));
+            auto messageBody = m_httpClient.fetchMessageBodyBuffer();
+            responseReceived(std::move(messageBody));
         });
 }
 
