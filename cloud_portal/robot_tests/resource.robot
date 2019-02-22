@@ -127,7 +127,7 @@ Get Email Link
     Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get NX Links From Email    ${email}    ${link type}
     log    ${links}
-    Delete Email    ${email}
+    Delete All Emails
     Close Mailbox
     Return From Keyword    ${links}
 
