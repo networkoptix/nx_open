@@ -35,13 +35,31 @@ static std::vector<Node> toVector(const std::set<Node>& nodes)
 // RequestContext
 
 DiscoveryClient::RequestContext::RequestContext(
+    const nx::utils::Url& discoveryServiceUrl,
     ResponseReceivedHandler responseReceived)
+    :
+    m_discoveryServiceUrl(discoveryServiceUrl)
 {
     m_httpClient.setOnDone(
         [this, responseReceived = std::move(responseReceived)]()
         {
-            m_messageBody = m_httpClient.fetchMessageBodyBuffer();
-            responseReceived(std::exchange(m_messageBody, {}));
+            if (m_httpClient.failed())
+            {
+                if (!m_errorLogged)
+                {
+                    m_errorLogged = true;
+                    NX_ERROR(this,
+                        lm("Failed to connect to discovery server at: ").arg(
+                            m_discoveryServiceUrl).toQString());
+                }
+                responseReceived(QByteArray());
+            }
+            else
+            {
+                m_errorLogged = false;
+                m_messageBody = m_httpClient.fetchMessageBodyBuffer();
+                responseReceived(std::exchange(m_messageBody, {}));
+            }
         });
 }
 
@@ -83,6 +101,11 @@ void DiscoveryClient::RequestContext::doPost(
     m_httpClient.setRequestBody(
         std::make_unique<nx::network::http::BufferSource>("application/json", messageBody));
     m_httpClient.doPost(url);
+}
+
+bool DiscoveryClient::RequestContext::failed() const
+{
+    return m_httpClient.failed();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -175,6 +198,7 @@ void DiscoveryClient::setupDiscoveryServiceUrl(const std::string& clusterId)
 void DiscoveryClient::setupRegisterNodeRequest()
 {
     m_registerNodeRequest = std::make_unique<RequestContext>(
+        m_discoveryServiceUrl,
         [this](QByteArray messageBody)
         {
             bool ok = false;
@@ -184,7 +208,7 @@ void DiscoveryClient::setupRegisterNodeRequest()
                 QnMutexLocker lock(&m_mutex);
                 m_thisNode = std::move(node);
             }
-            else
+            else if(!m_registerNodeRequest->failed())
             {
                 NX_ERROR(this, lm("Error deserializing register node response"));
             }
@@ -196,13 +220,14 @@ void DiscoveryClient::setupRegisterNodeRequest()
 void DiscoveryClient::setupOnlineNodesRequest()
 {
     m_onlineNodesRequest = std::make_unique<RequestContext>(
+        m_discoveryServiceUrl,
         [this](QByteArray messageBody)
         {
             bool ok = false;
             auto onlineNodes = QJson::deserialized(messageBody, std::vector<Node>(), &ok);
             if (ok)
                 updateOnlineNodes(onlineNodes);
-            else
+            else if (!m_onlineNodesRequest->failed())
                 NX_ERROR(this, lm("Error deserializing online nodes response"));
 
             startOnlineNodesRequest();

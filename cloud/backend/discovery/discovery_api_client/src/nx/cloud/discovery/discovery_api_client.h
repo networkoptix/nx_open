@@ -81,7 +81,9 @@ private:
     class RequestContext
     {
     public:
-        RequestContext(ResponseReceivedHandler responseReceived);
+        RequestContext(
+            const nx::utils::Url& discoveryServiceUrl,
+            ResponseReceivedHandler responseReceived);
 
         void bindToAioThread(
             nx::network::aio::AbstractAioThread* aioThread);
@@ -96,19 +98,20 @@ private:
         void doGet(const nx::utils::Url& url);
         void doPost(const nx::utils::Url& url, const QByteArray& messagBody);
 
+        bool failed() const;
+
     private:
+        const nx::utils::Url& m_discoveryServiceUrl;
         QByteArray m_messageBody;
         nx::network::http::AsyncClient m_httpClient;
         nx::network::aio::Timer m_timer;
 
-        std::mutex m_mutex;
-        std::condition_variable m_wait;
-        std::atomic_bool m_ready = false;
+        std::atomic_bool m_errorLogged = false;
     };
 
+private:
     nx::utils::Url m_discoveryServiceUrl;
-    Node m_thisNode;
-    Node m_thisNodeInfo;
+    NodeInfo m_thisNodeInfo;
 
     NodeDiscoveredHandler m_nodeDiscoveredHandler;
     NodeLostHandler m_nodeLostHandler;
@@ -117,6 +120,7 @@ private:
     std::unique_ptr<RequestContext> m_onlineNodesRequest;
 
     std::set<Node> m_onlineNodes;
+    Node m_thisNode;
 
     mutable QnMutex m_mutex;
 };
