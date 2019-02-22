@@ -11,7 +11,7 @@ import { NxModalMessageComponent }    from './message/message.component';
 @Injectable()
 export class NxDialogsService {
 
-    constructor(@Inject('ngToast') private toast: any,
+    constructor(// @Inject('ngToast') private toast: any,
                 private loginModal: NxModalLoginComponent,
                 private genericModal: NxModalGenericComponent,
                 private disconnectModal: NxModalDisconnectComponent,
@@ -24,20 +24,20 @@ export class NxDialogsService {
     }
 
     dismiss() {
-        this.toast.dismiss();
+        // this.toast.dismiss();
     }
 
     notify(message, type, hold?) {
         type = type || 'info';
         hold = hold || false;
 
-        return this.toast.create({
-            className       : type,
-            content         : message,
-            dismissOnTimeout: !hold,
-            dismissOnClick  : !hold,
-            dismissButton   : hold
-        });
+        // return this.toast.create({
+        //     className       : type,
+        //     content         : message,
+        //     dismissOnTimeout: !hold,
+        //     dismissOnClick  : !hold,
+        //     dismissButton   : hold
+        // });
     }
 
     confirm(message, title, actionLabel, actionType?, cancelLabel?) {
