@@ -22,9 +22,9 @@ static std::string generateInfoJson(const std::string& nodeId)
         "}";
 }
 
-void sleep(const std::chrono::milliseconds timeout = std::chrono::milliseconds(10))
+void sleep()
 {
-    std::this_thread::sleep_for(timeout);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 } // namespace
@@ -109,13 +109,10 @@ protected:
     void whenBothClientsRegister()
     {
         for (int i = 0; i < 2; ++i)
-        {
             whenClientRegistersWithServer(i);
-            sleep(std::chrono::seconds(1));
-        }
 
         // Wait for first client to become aware of second
-        while (clientContext(0)->client->onlineNodes().size() < 2)
+        while (clientContext(0)->client->onlineNodes().size() != 2)
             sleep();
     }
 
