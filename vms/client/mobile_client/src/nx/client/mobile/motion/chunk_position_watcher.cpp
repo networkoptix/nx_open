@@ -25,7 +25,7 @@ qint64 chooseNearestTimeMs(
         ? jumpTimeMs < targetTimeMs
         : jumpTimeMs > targetTimeMs;
 
-    return  useJumpTime && periods.containTime(jumpTimeMs)
+    return useJumpTime && periods.containTime(jumpTimeMs)
         ? jumpTimeMs
         : targetTimeMs;
 }
@@ -47,7 +47,7 @@ qint64 getChunkTime(
 
     if (searchForward)
     {
-        if (it->contains(position)) // Here we have current chunk
+        if (it->contains(position)) //< Here we have current chunk.
             ++it;
 
         const qint64 targetTimeMs = it == periods.cend()
@@ -56,6 +56,7 @@ qint64 getChunkTime(
         return chooseNearestTimeMs(position, targetTimeMs, periods);
     }
 
+    // Search backward.
     if (it->contains(position) && it != periods.cbegin())
         --it;
 
@@ -74,6 +75,7 @@ struct ChunkPositionWatcher::Private: public QObject
     void updateChunksInformation();
     void updateProviderConnections();
     void updateTimePeriods();
+    void disconnectCurrentProvider();
 
     ChunkPositionWatcher* const q;
 
@@ -81,7 +83,7 @@ struct ChunkPositionWatcher::Private: public QObject
     qint64 prevChunkStartTimeMs = DATETIME_INVALID;
     qint64 nextChunkStartTimeMs = DATETIME_INVALID;
 
-    QnCameraChunkProvider* provider = nullptr;
+    QPointer<QnCameraChunkProvider> provider;
     QnTimePeriodList periods;
 
     bool motionSearchMode = false;
@@ -98,13 +100,18 @@ void ChunkPositionWatcher::Private::updateChunksInformation()
     nextChunkStartTimeMs = getChunkTime(position, periods, true);
 }
 
+void ChunkPositionWatcher::Private::disconnectCurrentProvider()
+{
+    if (provider)
+        provider->disconnect(this);
+}
+
 void ChunkPositionWatcher::Private::updateProviderConnections()
 {
     if (!provider)
         return;
 
-    if (provider)
-        provider->disconnect(this);
+    disconnectCurrentProvider();
 
     connect(provider, &QnCameraChunkProvider::loadingMotionChanged, this,
         [this]()
@@ -187,8 +194,7 @@ void ChunkPositionWatcher::setChunkProvider(QnCameraChunkProvider* value)
     if (d->provider == value)
         return;
 
-    if (d->provider)
-        d->provider->disconnect(this);
+    d->disconnectCurrentProvider();
 
     d->provider = value;
     emit chunkProviderChanged();

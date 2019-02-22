@@ -9,7 +9,7 @@ IconButton
     backgroundColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
     disabledBackgroundColor: ColorTheme.transparent(ColorTheme.base1, 0.1)
 
-    icon.source: forward ? lp("/images/playback_ffd.svg") : lp("/images/playback_rwd.svg")
+    icon.source: forward ? lp("/images/playback_fwd.svg") : lp("/images/playback_rwd.svg")
     icon.width: 24
     icon.height: icon.height
     padding: 0

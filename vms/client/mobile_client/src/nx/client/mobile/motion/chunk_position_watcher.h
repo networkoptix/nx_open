@@ -5,6 +5,7 @@
 
 class QnCameraChunkProvider;
 
+// TODO: #ynikitenkov Move it to the nx::vms::client::mobile namespace in 19.2
 namespace nx {
 namespace client {
 namespace mobile {
@@ -32,8 +33,8 @@ class ChunkPositionWatcher: public Connective<QObject>
 public:
     static void registerQmlType();
 
-    ChunkPositionWatcher(QObject* parent = nullptr);
-    virtual ~ChunkPositionWatcher();
+    explicit ChunkPositionWatcher(QObject* parent = nullptr);
+    virtual ~ChunkPositionWatcher() override;
 
     bool motionSearchMode() const;
     void setMotionSearchMode(bool value);
