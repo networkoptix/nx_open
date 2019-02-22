@@ -25,11 +25,12 @@ ViewNodeData getResourceNodeData(
     const QString& extraText,
     bool checkable)
 {
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     auto data = ViewNodeDataBuilder()
         .withText(resourceNameColumn, resource->getName())
         .withIcon(resourceNameColumn, qnResIconCache->icon(resource))
         .withData(resourceNameColumn, cameraExtraStatusRole,
-            QVariant::fromValue(getCameraExtraStatus(resource)))
+            QVariant::fromValue(getCameraExtraStatus(camera)))
         .data();
 
     if (checkable)

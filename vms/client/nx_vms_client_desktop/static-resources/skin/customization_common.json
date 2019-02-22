@@ -807,21 +807,6 @@
         }
     },
 
-    "QnMediaResourceWidget": {
-        "motionSensitivityColors": [
-            "light16",
-            "#627cd6",
-            "#23a4cb",
-            "#31baa2",
-            "#79bc66",
-            "#b8bc37",
-            "#fba405",
-            "#e97119",
-            "#d24729",
-            "#c22626"
-        ]
-    },
-
     "nx::vms::client::desktop::CameraMotionSettingsWidget": {
         "sensitivityColors": [
             "light16",

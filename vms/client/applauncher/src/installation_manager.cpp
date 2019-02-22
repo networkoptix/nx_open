@@ -8,6 +8,7 @@
 #include <applauncher_app_info.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/file_system.h>
 
 #include <utils/common/app_info.h>
 #include <utils/update/zip_utils.h>
@@ -373,39 +374,17 @@ QString InstallationManager::installationDirForVersion(
 }
 
 // We create a dummy file to test if we have enough space for unpacked data.
-// This trick is the easiest cross-platform way of checking for space.
-bool dummySpaceCheck(const QDir& dir, qint64 checkedSize, qint64* actuallyWritten = nullptr)
+bool dummySpaceCheck(const QDir& dir, qint64 size)
 {
-    if (actuallyWritten)
-        *actuallyWritten = 0;
     QFile dummyFile(dir.filePath("dummytest.tmp"));
     if (!dummyFile.open(QFile::OpenModeFlag::WriteOnly))
         return false;
 
-    // QFile::resize does not suit this test. We should actually write some data to make sure
-    // we have this space available. I've tested QFile::resize with ext4 filesystem with 1GB
-    // limit: it is completely OK to dummyFile.resize(2GB). But consequental writing / of 2GB
-    // crearly fails on 1GB mark.
-    bool success = true;
-    qint64 bytesLeft = checkedSize;
-    constexpr int kBlockSize = 515;
-    std::vector<char> emptyData(kBlockSize, 0);
-    while (bytesLeft > 0)
-    {
-        qint64 writeSize = qMin<qint64>(bytesLeft, kBlockSize);
-        qint64 written = dummyFile.write(&emptyData.front(), writeSize);
-        if (written < 0)
-        {
-            success = false;
-            break;
-        }
-        bytesLeft -= written;
-    }
+    const bool success = nx::utils::file_system::reserveSpace(dummyFile, size);
 
-    if (actuallyWritten)
-        *actuallyWritten = checkedSize - bytesLeft;
     dummyFile.close();
     dummyFile.remove();
+
     return success;
 }
 
@@ -438,12 +417,9 @@ InstallationManager::ResultType InstallationManager::installZip(
 
     QnZipExtractor extractor(fileName, targetDir);
 
-    qint64 spaceAvailable = 0;
-    if (!dummySpaceCheck(targetDir, extractor.estimateUnpackedSize(), &spaceAvailable))
+    if (!dummySpaceCheck(targetDir, (qint64) extractor.estimateUnpackedSize()))
     {
-        NX_ERROR(this,
-            lm("InstallationManager: Not enough space to install %1. Only %2 bytes are available")
-            .args(fileName, QString::number(spaceAvailable)));
+        NX_ERROR(this, "InstallationManager: Not enough space to install %1.", fileName);
         return ResultType::notEnoughSpace;
     }
 

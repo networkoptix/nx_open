@@ -85,18 +85,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
     ui->iconLabel->setScaledContents(true);
 
-    static const auto styleTemplateRaw = QString::fromLatin1(R"qss(
-        .QWidget {
-            border-style: solid;
-            border-color: %1;
-            border-width: 1px;
-            border-radius: 2;
-        })qss");
-
-    const auto color = qnGlobals->errorTextColor();
-
-    static const auto styleTemplate = styleTemplateRaw.arg(color.name(QColor::HexArgb));
-    ui->warningContainer->setStyleSheet(styleTemplate);
+    setWarningFrame(ui->warningContainer);
 
     connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraExpertSettingsWidget::loadState);
@@ -386,11 +375,16 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Preset types are now displayed only if they are editable.
     // Greyed out uneditable preset types are no longer displayed.
 
-    ui->groupBoxPtzControl->setVisible(
-        state.canSwitchPtzPresetTypes() || state.canForcePtzCapabilities());
+    ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()
+        || state.canForcePanTiltCapabilities()
+        || state.canForceZoomCapability());
 
     ui->preferredPtzPresetTypeWidget->setVisible(state.canSwitchPtzPresetTypes());
-    ui->forcedPtzWidget->setVisible(state.canForcePtzCapabilities());
+    ui->forcedPtzWidget->setVisible(state.canForcePanTiltCapabilities()
+        || state.canForceZoomCapability());
+
+    ui->forcedPanTiltCheckBox->setVisible(state.canForcePanTiltCapabilities());
+    ui->forcedZoomCheckBox->setVisible(state.canForceZoomCapability());
 
     ui->presetTypeLimitationsLabel->setVisible(state.canSwitchPtzPresetTypes()
         && state.expert.preferredPtzPresetType.hasValue()
@@ -412,11 +406,14 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         }
     }
 
-    if (state.canForcePtzCapabilities())
+    if (state.canForcePanTiltCapabilities())
     {
         check_box_utils::setupTristateCheckbox(ui->forcedPanTiltCheckBox,
             state.expert.forcedPtzPanTiltCapability);
+    }
 
+    if (state.canForceZoomCapability())
+    {
         check_box_utils::setupTristateCheckbox(ui->forcedZoomCheckBox,
             state.expert.forcedPtzZoomCapability);
     }

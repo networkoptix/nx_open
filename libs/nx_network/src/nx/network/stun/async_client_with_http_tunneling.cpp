@@ -32,7 +32,7 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
         m_httpTunnelingClient->bindToAioThread(aioThread);
 }
 
-void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler handler)
+void AsyncClientWithHttpTunneling::connect(const utils::Url& url, ConnectHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
     m_url = url;
@@ -173,7 +173,7 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
             decltype(m_activeRequests) activeRequests;
             activeRequests.swap(m_activeRequests);
             for (auto& requestContext: activeRequests)
-                requestContext.second.handler(reason, nx::network::stun::Message());
+                requestContext.second.handler(reason, Message());
         });
 }
 
@@ -290,7 +290,7 @@ void AsyncClientWithHttpTunneling::createStunClient(
     m_stunClient->setOnConnectionClosedHandler(
         std::bind(&AsyncClientWithHttpTunneling::onStunConnectionClosed, this, _1));
     m_stunClient->setIndicationHandler(
-        nx::network::stun::kEveryIndicationMethod,
+        kEveryIndicationMethod,
         std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
         this);
 }
@@ -318,7 +318,7 @@ void AsyncClientWithHttpTunneling::dispatchIndication(
 
     auto it = m_indicationHandlers.find(indication.header.method);
     if (it == m_indicationHandlers.end())
-        it = m_indicationHandlers.find(nx::network::stun::kEveryIndicationMethod);
+        it = m_indicationHandlers.find(kEveryIndicationMethod);
 
     if (it == m_indicationHandlers.end())
     {

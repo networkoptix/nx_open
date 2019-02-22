@@ -86,12 +86,11 @@ const int kAutoExpandThreshold = 50;
 
 } // namespace
 
-QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* parent):
+QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::ResourceSelectionDialog),
     m_resourceModel(NULL),
     m_delegate(NULL),
-    m_filter(filter),
     m_updating(false)
 {
     ui->setupUi(this);
@@ -114,63 +113,26 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
             ui->treeWidget->setContentsMargins(0, 0, margin, 0);
         });
 
-    switch (m_filter)
-    {
-        case Filter::users:
-            setWindowTitle(tr("Select users..."));
-            ui->detailsWidget->hide();
-            resize(minimumSize());
-            break;
-
-        case Filter::cameras:
-            setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("Select Devices..."),
-                tr("Select Cameras...")));
-            break;
-
-        default:
-            NX_ASSERT(false, "Should never get here");
-            ui->detailsWidget->hide();
-            resize(minimumSize());
-            break;
-    }
+    setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+        tr("Select Devices..."),
+        tr("Select Cameras...")));
 
     initModel();
 }
 
 void QnResourceSelectionDialog::initModel()
 {
-    QnResourceTreeModel::Scope scope;
-
-    switch (m_filter)
-    {
-        case Filter::users:
-            scope = QnResourceTreeModel::UsersScope;
-            break;
-        case Filter::cameras:
-            scope = QnResourceTreeModel::CamerasScope;
-            break;
-        default:
-            NX_ASSERT(false, "Should never get here");
-            scope = QnResourceTreeModel::FullScope;
-            break;
-    }
-
-    m_resourceModel = new QnResourceTreeModel(scope, this);
+    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::CamerasScope, this);
 
     // Auto expand if and only if server count <= 1 or cameras count <= 50.
-    if (scope == QnResourceTreeModel::CamerasScope)
-    {
     if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
-        {
-            int numServers = treeRoot->children().size();
-            int numResources = treeRoot->childrenRecursive().size() - numServers;
-            bool expandAll = numServers <= 1 || numResources <= kAutoExpandThreshold;
+    {
+        int numServers = treeRoot->children().size();
+        int numResources = treeRoot->childrenRecursive().size() - numServers;
+        bool expandAll = numServers <= 1 || numResources <= kAutoExpandThreshold;
 
-            auto expandPolicy = [expandAll](const QModelIndex& index) { return expandAll; };
-            ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
-        }
+        auto expandPolicy = [expandAll](const QModelIndex& index) { return expandAll; };
+        ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
     }
 
     connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,
@@ -198,12 +160,9 @@ void QnResourceSelectionDialog::initModel()
 
     ui->delegateFrame->setVisible(false);
 
-    if (m_filter == Filter::cameras)
-    {
-        connect(ui->resourcesWidget->treeView(), &QAbstractItemView::entered, this,
-            &QnResourceSelectionDialog::updateThumbnail);
-        updateThumbnail(QModelIndex());
-    }
+    connect(ui->resourcesWidget->treeView(), &QAbstractItemView::entered, this,
+        &QnResourceSelectionDialog::updateThumbnail);
+    updateThumbnail(QModelIndex());
 
     at_resourceModel_dataChanged();
 }
@@ -244,21 +203,8 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
         auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto id = idx.data(Qn::UuidRole).value<QnUuid>();
 
-        switch (m_filter)
-        {
-            case QnResourceSelectionDialog::Filter::cameras:
-                if (resource.dynamicCast<QnVirtualCameraResource>())
-                    result.insert(resource->getId());
-                break;
-            case QnResourceSelectionDialog::Filter::users:
-                if (resource.dynamicCast<QnUserResource>())
-                    result.insert(resource->getId());
-                if (nodeType == ResourceTreeNodeType::role)
-                    result.insert(id);
-                break;
-            default:
-                break;
-        }
+        if (resource.dynamicCast<QnVirtualCameraResource>())
+            result.insert(resource->getId());
     }
     return result;
 }

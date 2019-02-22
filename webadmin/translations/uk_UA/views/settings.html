@@ -37,17 +37,17 @@
                     <div>
                         <h3>Скидання сервера</h3>
                         <p>Ця дія поверне цей сервер до налаштувань за замовчуванням (очистить базу даних і скине конфігурацію).
-                            The server will be detached from the current System. Відеоархів залишиться незмінним.</p>
+                            Сервер буде від'єднаний від поточної системи. Відеоархів залишиться незмінним.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Повернути типові налаштування</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Detach server from the System</h3>
-                        <p>This action will detach server from the System keeping database, local users and configuration.
+                        <h3>Від'єднати сервер від системи</h3>
+                        <p>Ця дія відключить сервер від системи зі збереженням бази даних, локальних користувачів і конфігурації.
                             Відеоархів залишиться незмінним. <b>Хмарні користувачі будуть видалені.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Від'єднати від системи</button></p>
                     </div>
                     <div>
-                        <h3>Перезапуск</h3>
+                        <h3>Перезавантажити</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Перезапустіть сервер</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Перезавантажити</button></p>
                     </div>
                     <div ng-if="user.isOwner">
@@ -91,7 +91,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
+                            <p>Ця система пов'язана з {{Config.cloud.productName}}, власник системи: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Відключитися від {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -99,10 +99,9 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
-                                <a ng-if="!mode.liteClient"
+                            <uib-alert type="warning">Ця система не пов’язана з {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></uib-alert>
+                                   target="_blank">Докладніше</a></uib-alert>
                             <uib-alert type="error" ng-if="!hasInternetOnServer">Для виконання установки {{Config.cloud.productName}} необхідно підключити сервера до мережі Інтернет</uib-alert>
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Для підключення системи до {{Config.cloud.productName}} необхідне підключення до мережі Інтернет</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button

@@ -66,6 +66,9 @@ bool NX_UTILS_API isUsb(const QString& devName);
 
 bool NX_UTILS_API isRelativePathSafe(const QString& path);
 
+bool NX_UTILS_API reserveSpace(QFile& file, qint64 size);
+bool NX_UTILS_API reserveSpace(const QString& fileName, qint64 size);
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx

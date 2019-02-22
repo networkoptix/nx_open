@@ -244,6 +244,9 @@ public:
         const QnTimePeriodList& periods,
         std::chrono::milliseconds detailLevel);
 
+    static QnTimePeriodList intersection(
+        const QnTimePeriodList& first, const QnTimePeriodList& second);
+
     /**
      * Include a period to the period list
      *

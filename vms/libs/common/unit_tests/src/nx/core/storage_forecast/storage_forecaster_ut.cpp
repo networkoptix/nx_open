@@ -44,6 +44,13 @@ TEST(storage_forecast, Basic)
     for (int i = 0; i < 5; i++)
         ASSERT_TRUE(forecast[i] == recordingStats[i].archiveDurationSecs);
 
+    //  1 day for cam 1, 2 days for cam 2, 2 days for cam 3, 3 days for cam 4,  6 days for cam 5:
+    doForecast(allCameras, kSecsInDay * (1 * 1000 + 2 * 2000 + 2 * 3000 + 3 * 4000 + 6 * 5000),
+        recordingStats);
+    forecast = {1 * kSecsInDay, 2 * kSecsInDay, 2 * kSecsInDay, 3 * kSecsInDay, 6 * kSecsInDay};
+    for (int i = 0; i < 5; i++)
+        ASSERT_TRUE(forecast[i] == recordingStats[i].archiveDurationSecs);
+
     //  Enough for all cams + a lot of space:
     doForecast(allCameras, kSecsInDay * (1 * 1000 + 3 * 2000 + 2 * 3000
         + 3 * 4000 + 7 * 5000 + 100000), recordingStats);

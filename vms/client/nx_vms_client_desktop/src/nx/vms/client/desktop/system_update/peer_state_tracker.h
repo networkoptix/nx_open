@@ -36,9 +36,10 @@ struct UpdateItem
     /** Current version of the component. */
     nx::utils::SoftwareVersion version;
     Component component;
+
+    bool incompatible = false;
     /** Flag for servers, that can be updated using legacy 3.2 system. */
     bool onlyLegacyUpdate = false;
-    bool legacyUpdateUsed = false;
     /** Client is uploading files to this server. */
     bool uploading = false;
     bool offline = false;
