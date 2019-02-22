@@ -21,13 +21,7 @@ static constexpr char kClusterId[] = "clusterId";
 DiscoveryServer::DiscoveryServer(const std::string& clusterId):
     m_clusterId(clusterId)
 {
-    bindToAioThread(getAioThread());
     registerRequestHandlers(&m_httpServer.httpMessageDispatcher());
-}
-
-DiscoveryServer::~DiscoveryServer()
-{
-    pleaseStopSync();
 }
 
 bool DiscoveryServer::bindAndListen()
@@ -40,28 +34,6 @@ nx::utils::Url DiscoveryServer::url() const
     return nx::network::url::Builder().
         setScheme(kUrlSchemeName)
         .setEndpoint(m_httpServer.serverAddress());
-}
-
-void DiscoveryServer::bindToAioThread(nx::network::aio::AbstractAioThread * aioThread)
-{
-    base_type::bindToAioThread(aioThread);
-
-    m_httpServer.bindToAioThread(aioThread);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        for (auto& element : m_onlineNodes)
-            element.second.timer.bindToAioThread(aioThread);
-    }
-}
-
-void DiscoveryServer::stopWhileInAioThread()
-{
-    base_type::stopWhileInAioThread();
-
-    QnMutexLocker lock(&m_mutex);
-    for (auto& element : m_onlineNodes)
-        element.second.timer.pleaseStopSync();
 }
 
 void DiscoveryServer::registerRequestHandlers(
@@ -125,58 +97,39 @@ Node DiscoveryServer::updateNode(
     const NodeInfo& nodeInfo,
     const nx::network::SocketAddress& nodeEndpoint)
 {
-    std::shared_ptr<nx::network::aio::Timer> timer;
-
     QnMutexLocker lock(&m_mutex);
-    NodeContext& nodeContext = m_onlineNodes[nodeInfo.nodeId];
-    if (!nodeContext.isInitialized)
-        initializeNodeContext(nodeInfo.nodeId, nodeEndpoint, &nodeContext);
+    Node& node = m_onlineNodes[nodeInfo.nodeId];
 
-    nodeContext.node.infoJson = nodeInfo.infoJson;
-    nodeContext.node.expirationTime = system_clock::now() + seconds(3);
+    if (node.nodeId.empty())
+        node.nodeId = nodeInfo.nodeId;
 
-    return nodeContext.node;
+    if (node.host.empty())
+        node.host = nodeEndpoint.toStdString();
+
+    node.infoJson = nodeInfo.infoJson;
+    node.expirationTime = system_clock::now() + seconds(3);
+
+    return node;
 }
 
-std::vector<Node> DiscoveryServer::getOnlineNodes() const
+std::vector<Node> DiscoveryServer::getOnlineNodes()
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<Node> onlineNodes;
-    std::transform(m_onlineNodes.begin(), m_onlineNodes.end(),
-        std::back_inserter(onlineNodes), [](const auto& element) { return element.second.node; });
+    for (auto it = m_onlineNodes.begin(); it != m_onlineNodes.end();)
+    {
+        if (it->second.expirationTime <= system_clock::now())
+        {
+            it = m_onlineNodes.erase(it);
+        }
+        else
+        {
+            onlineNodes.emplace_back(it->second);
+            ++it;
+        }
+
+    }
     return onlineNodes;
 }
-
-void DiscoveryServer::initializeNodeContext(
-    const std::string& nodeId,
-    const nx::network::SocketAddress& clientEndpoint,
-    NodeContext* outNodeContext)
-{
-    outNodeContext->node.nodeId = nodeId;
-    outNodeContext->node.host = clientEndpoint.toStdString();
-    outNodeContext->timer.bindToAioThread(getAioThread());
-    outNodeContext->isInitialized = true;
-    startTimer(*outNodeContext);
-}
-
-void DiscoveryServer::startTimer(NodeContext& nodeContext)
-{
-    nodeContext.timer.start(
-        std::chrono::milliseconds(100),
-        [this, &nodeContext]()
-        {
-            if (nodeContext.node.expirationTime <= system_clock::now())
-            {
-                QnMutexLocker lock(&m_mutex);
-                nodeContext.timer.pleaseStopSync();
-                m_onlineNodes.erase(nodeContext.node.nodeId);
-            }
-            else
-            {
-                startTimer(nodeContext);
-            }
-        });
-};
-
 
 } // namespace nx::cloud::discovery::test

@@ -77,13 +77,12 @@ private:
     void emitNodeLost(const std::string& nodeId);
 
 private:
-    using ResponseReceivedHandler = nx::utils::MoveOnlyFunc<void(QByteArray messageBody)>;
+    using ResponseReceivedHandler =
+        nx::utils::MoveOnlyFunc<void(nx::network::http::BufferType messageBody)>;
     class RequestContext
     {
     public:
-        RequestContext(
-            const nx::utils::Url& discoveryServiceUrl,
-            ResponseReceivedHandler responseReceived);
+        RequestContext(ResponseReceivedHandler responseReceived);
 
         void bindToAioThread(
             nx::network::aio::AbstractAioThread* aioThread);
@@ -96,17 +95,15 @@ private:
         void cancelSync();
 
         void doGet(const nx::utils::Url& url);
-        void doPost(const nx::utils::Url& url, const QByteArray& messagBody);
+        void doPost(const nx::utils::Url& url, const nx::network::http::BufferType& messagBody);
 
         bool failed() const;
+        const nx::network::http::Response* response() const;
 
     private:
-        const nx::utils::Url& m_discoveryServiceUrl;
-        QByteArray m_messageBody;
+        nx::network::http::BufferType m_messageBody;
         nx::network::http::AsyncClient m_httpClient;
         nx::network::aio::Timer m_timer;
-
-        std::atomic_bool m_errorLogged = false;
     };
 
 private:
