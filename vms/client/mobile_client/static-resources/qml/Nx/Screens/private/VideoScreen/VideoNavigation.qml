@@ -585,9 +585,16 @@ Item
                 visible: opacity > 0
 
                 resourceId: videoScreenController.resourceId
-                anchors.left: buttonsPanel.showZoomControls
-                    ? zoomButtonsRow.right
-                    : calendarButton.right
+                anchors.left:
+                {
+                    if (buttonsPanel.showZoomControls)
+                        return zoomButtonsRow.right
+
+                    return motionSearchModeButton.visible
+                        ? motionSearchModeButton.right
+                        : calendarButton.right
+                }
+
                 anchors.right: parent.right
                 anchors.rightMargin: -4
 
