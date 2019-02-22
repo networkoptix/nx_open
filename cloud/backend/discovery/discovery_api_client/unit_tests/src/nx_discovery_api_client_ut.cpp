@@ -121,9 +121,9 @@ protected:
         clientContext(1)->client.reset();
     }
 
-    void whenWaitForNodeDiscoveredEvent(size_t clientIndex = 0)
+    void whenWaitForNodeDiscoveredEvent()
     {
-        whenClientRegistersWithServer(clientIndex);
+        whenClientRegistersWithServer(/*clientIndex*/ 0);
         waitForCallback();
     }
 
@@ -153,9 +153,9 @@ protected:
         andOnlineNodesContainsClientNode();
     }
 
-    void thenGetOnlineNodesSucceeded(size_t clientIndex = 0)
+    void thenGetOnlineNodesSucceeded()
     {
-        auto context = clientContext(clientIndex);
+        auto context = clientContext(/*clientIndex*/ 0);
         m_onlineNodes = context->client->onlineNodes();
         while (m_onlineNodes.empty())
         {
@@ -168,13 +168,13 @@ protected:
 
     void andInfoJsonIsUpdated()
     {
-        auto context = clientContext(0);
+        auto context = clientContext(/*clientIndex*/ 0);
         ASSERT_EQ(context->infoJson, context->client->node().infoJson);
     }
 
     void andFirstClientDoesNotHaveSecondInOnlineNodeList()
     {
-        auto onlineNodes = clientContext(0)->client->onlineNodes();
+        auto onlineNodes = clientContext(/*clientIndex*/ 0)->client->onlineNodes();
         while(onlineNodes.size() != 1)
         {
             sleep();
@@ -190,7 +190,7 @@ protected:
 
     void andLostNodeIdMatchesExpectedId()
     {
-        ASSERT_EQ(m_lostNodeId, clientContext(1)->nodeId);
+        ASSERT_EQ(m_lostNodeId, clientContext(/*clientIndex*/ 1)->nodeId);
     }
 
     void andDiscoveredNodeMatchesExpectedNode()
