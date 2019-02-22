@@ -33,6 +33,7 @@ def get_settings_from_cache():
         'publicDownloads': customization_cache['public_downloads'],
         'publicReleases': customization_cache['public_releases'],
         'sortSupportedDevices': customization_cache['sort_supported_devices'],
+        'supportLink': customization_cache['support_link'],
         'supportedResolutions': customization_cache['supported_resolutions'],
         'supportedHardwareTypes': customization_cache['supported_hardware_types'],
         'searchTags': customization_cache['search_tags']
