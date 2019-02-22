@@ -704,9 +704,13 @@ QnVirtualCameraResource::DeviceAgentManifestMap
 
 QSet<QnUuid> QnVirtualCameraResource::activeAnalyticsEngines() const
 {
-    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
-    const auto runtimeInfo = runtimeInfoManager->item(getParentServer()->getId());
-    return runtimeInfo.data.activeAnalyticsEngines;
+    if (const auto parentServer = getParentServer())
+    {
+        const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
+        const auto runtimeInfo = runtimeInfoManager->item(parentServer->getId());
+        return runtimeInfo.data.activeAnalyticsEngines;
+    }
+    return QSet<QnUuid>();
 }
 
 QHash<QnUuid, QVariantMap> QnVirtualCameraResource::deviceAgentSettingsValues() const

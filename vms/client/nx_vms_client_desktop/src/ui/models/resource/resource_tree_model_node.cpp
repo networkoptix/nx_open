@@ -1268,7 +1268,9 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
 CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
 {
-    return getCameraExtraStatus(m_resource);
+    if (const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
+        return getCameraExtraStatus(camera);
+    return CameraExtraStatus();
 }
 
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)

@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/file_system.h>
 #include <utils/common/synctime.h>
 
 using namespace std::chrono;
@@ -752,8 +753,12 @@ ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
     if (!file.open(QFile::ReadWrite))
         return ResultCode::ioError;
 
-    if (!file.resize(size))
+    if (!nx::utils::file_system::reserveSpace(file, size))
+    {
+        file.close();
+        file.remove();
         return ResultCode::noFreeSpace;
+    }
 
     return ResultCode::ok;
 }

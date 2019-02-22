@@ -16,7 +16,7 @@ enum class CameraExtraStatusFlag
 Q_DECLARE_FLAGS(CameraExtraStatus, CameraExtraStatusFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CameraExtraStatus)
 
-CameraExtraStatus getCameraExtraStatus(QnResourcePtr resource);
+CameraExtraStatus getCameraExtraStatus(const QnVirtualCameraResourcePtr& camera);
 
 } // namespace nx::vms::client::desktop
 

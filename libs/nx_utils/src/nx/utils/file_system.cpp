@@ -4,7 +4,7 @@
 
 #if defined(Q_OS_UNIX)
     #include <unistd.h>
-    #include <QtCore/QStandardPaths>
+    #include <fcntl.h>
 #endif
 
 #if defined(Q_OS_MAC)
@@ -14,11 +14,13 @@
 
 #if defined(Q_OS_WIN)
     #include <windows.h>
+    #include <io.h>
 #endif
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
 
 namespace {
 
@@ -322,6 +324,30 @@ bool isRelativePathSafe(const QString& path)
 
     // TODO: It makes sense to add some more security cheks e.g. symlinks, etc.
     return true;
+}
+
+bool reserveSpace(QFile& file, qint64 size)
+{
+    if (size <= 0)
+        return true;
+
+    #if defined(Q_OS_WIN)
+        return _chsize_s(file.handle(), size) == 0;
+    #elif defined(Q_OS_MAC)
+        fstore_t store = {F_ALLOCATECONTIG | F_ALLOCATEALL, F_PEOFPOSMODE, 0, size, 0};
+        return fcntl(file.handle(), F_PREALLOCATE | F_ALLOCATEALL, &store) == 0;
+    #else
+        return posix_fallocate(file.handle(), 0, size) == 0;
+    #endif
+}
+
+bool reserveSpace(const QString& fileName, qint64 size)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly))
+        return false;
+
+    return reserveSpace(file, size);
 }
 
 } // namespace file_system

@@ -40,8 +40,7 @@ public:
     enum Scope
     {
         FullScope,
-        CamerasScope,
-        UsersScope
+        CamerasScope
     };
 
     explicit QnResourceTreeModel(Scope scope, QObject* parent);

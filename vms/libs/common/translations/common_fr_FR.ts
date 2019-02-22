@@ -114,26 +114,6 @@
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Événement système</translation>
     </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>Système déjà lié au nuage (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>Serveur n’est pas connecté à Internet.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>Échec enregistrement d'informations d'ID du nuage dans la BD locale</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>Échec enregistrement du propriétaire du nuage dans la BD locale</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>Échec de connexion au nuage: %1</translation>
-    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

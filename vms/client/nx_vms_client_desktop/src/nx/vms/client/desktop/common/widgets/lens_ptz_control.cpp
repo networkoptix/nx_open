@@ -531,11 +531,7 @@ void LensPtzControl::drawButton(QPainter* painter, const Button& button) const
     const QPixmap& pixmap = (button.isClicked != button.isHovered) ? button.hover : button.normal;
 
     if (!pixmap.isNull())
-    {
-        auto icon = pixmap.rect();
-        QPointF centeredCorner = button.rect.center() - icon.center();
-        painter->drawPixmap(centeredCorner, pixmap);
-    }
+        painter->drawPixmap(button.rect, pixmap);
 }
 
 QPointF LensPtzControl::screenToLocal(const QPointF& pos) const

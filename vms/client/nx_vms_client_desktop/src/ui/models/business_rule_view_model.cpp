@@ -115,17 +115,17 @@ QSet<QnUuid> filterActionResources(
     const QSet<QnUuid>& ids,
     vms::api::ActionType actionType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
     if (actionType == vms::api::ActionType::fullscreenCameraAction)
     {
-        return FullscreenActionHelper::layoutIds(model) | FullscreenActionHelper::cameraIds(model);
+        return toIds(resourcePool->getResourcesByIds<QnLayoutResource>(ids))
+            | toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
     }
-    if (actionType == vms::api::ActionType::exitFullscreenAction)
+    else if (actionType == vms::api::ActionType::exitFullscreenAction)
     {
-        return ExitFullscreenActionHelper::layoutIds(model);
+        return toIds(resourcePool->getResourcesByIds<QnLayoutResource>(ids));
     }
-
-
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     if (vms::event::requiresCameraResource(actionType))
         return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));

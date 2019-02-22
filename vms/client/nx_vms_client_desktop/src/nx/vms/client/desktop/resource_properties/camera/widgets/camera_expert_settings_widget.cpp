@@ -85,18 +85,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
     ui->iconLabel->setScaledContents(true);
 
-    static const auto styleTemplateRaw = QString::fromLatin1(R"qss(
-        .QWidget {
-            border-style: solid;
-            border-color: %1;
-            border-width: 1px;
-            border-radius: 2;
-        })qss");
-
-    const auto color = qnGlobals->errorTextColor();
-
-    static const auto styleTemplate = styleTemplateRaw.arg(color.name(QColor::HexArgb));
-    ui->warningContainer->setStyleSheet(styleTemplate);
+    setWarningFrame(ui->warningContainer);
 
     connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraExpertSettingsWidget::loadState);

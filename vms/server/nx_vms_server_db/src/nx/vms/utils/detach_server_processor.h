@@ -2,7 +2,7 @@
 
 #include <nx/network/http/http_types.h>
 
-#include "vms_utils.h"
+#include <nx/vms/utils/vms_utils.h>
 
 struct QnJsonRestResult;
 class QnCommonModule;
