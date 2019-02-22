@@ -217,6 +217,7 @@
       },
       {
         "name": "Landing page",
+        "id": "%LANDING_LAYOUT%",
         "file_path": "static/lang_{{language}}/views/static/landing.html",
         "url": "/content/about",
         "translatable": true,

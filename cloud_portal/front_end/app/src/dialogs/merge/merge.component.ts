@@ -1,15 +1,16 @@
-import { Component, Inject, Input, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef }       from '@ng-bootstrap/ng-bootstrap';
-import { Component, Inject, Input, OnInit, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Location }                                            from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
-import { NxConfigService }                                     from '../../services/nx-config';
+import {
+    Component, Inject, Input, Renderer2,
+    ViewChild, ViewEncapsulation
+}                                                from '@angular/core';
+import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Location }                              from '@angular/common';
+import { EmailValidator }                        from '@angular/forms';
+import { NxConfigService }                       from '../../services/nx-config';
 
 @Component({
-    selector: 'nx-modal-merge-content',
+    selector   : 'nx-modal-merge-content',
     templateUrl: 'merge.component.html',
-    styleUrls: ['merge.component.scss']
+    styleUrls  : ['merge.component.scss']
 })
 export class MergeModalContent {
     @Input() system;
@@ -64,13 +65,13 @@ export class MergeModalContent {
 
     setTargetSystem(system) {
         this.systemMergeable = undefined;
-        this.targetSystem = {... system};
+        this.targetSystem = { ...system };
         if (!system.id) {
             return;
         }
 
         return this.systemService(system.id, this.user.email).update().then((system) => {
-            this.targetSystem = {...this.targetSystem, ...system};
+            this.targetSystem = { ...this.targetSystem, ...system };
             this.systemMergeable = this.checkMergeAbility(system);
 
             return Promise.all([
@@ -78,7 +79,7 @@ export class MergeModalContent {
                 this.targetSystem.mediaserver.getMediaServers()
             ]).then(res => {
                 this.tooManySystems = res.map(req => req.data.length)
-                    .reduce((acc, cur) => acc + cur) > this.config.maxServers;
+                                         .reduce((acc, cur) => acc + cur) > this.config.maxServers;
             });
         });
     }
@@ -96,18 +97,18 @@ export class MergeModalContent {
     }
 
     makeSelectorList(systems) {
-        this.systemsSelect = [{name: '- - - -', id: ''}];
+        this.systemsSelect = [{ name: '- - - -', id: '' }];
         systems.forEach(element => {
             this.systemsSelect.push({
                 name: this.addStatus(element),
-                id: element.id
+                id  : element.id
             });
         });
     }
 
     ngOnInit() {
         this.systemMergeable = undefined;
-        this.systemsSelect = [{name: '- - - -', id: ''}];
+        this.systemsSelect = [{ name: '- - - -', id: '' }];
         this.wrongPassword = false;
         this.masterId = this.system.id;
         this.account
@@ -120,7 +121,7 @@ export class MergeModalContent {
                 this.outOfDate = this.multipleSystems && !this.system.canMerge;
                 this.showMergeForm = this.multipleSystems && !this.outOfDate;
                 this.makeSelectorList(this.systems);
-                this.targetSystem = {... this.systemsSelect[0]};
+                this.targetSystem = { ...this.systemsSelect[0] };
                 this.systemMergeable = this.checkMergeAbility(this.targetSystem);
             });
 
@@ -136,11 +137,11 @@ export class MergeModalContent {
             }
             return this.cloudApi.merge(masterSystemId, slaveSystemId, this.password);
         }, {
-            errorCodes: {
+            errorCodes    : {
                 mergedSystemIsOffline: (error) => {
                     return this.language.errorCodes[error.errorText] || error.errorText;
                 },
-                vmsRequestFailure: (error) => {
+                vmsRequestFailure    : (error) => {
                     const errorText = this.language.errorCodes[error.errorText] || error.errorText;
                     let errorData = '';
                     if (!(errorText in this.language.errorCodes) && error.errorData) {
@@ -148,8 +149,8 @@ export class MergeModalContent {
                     }
                     return errorData ? `${errorText}\nError Data: ${errorData}` : errorText;
                 },
-                wrongPassword: () => {
-                    this.mergeForm.controls['mergePassword'].setErrors({'wrongPassword': true});
+                wrongPassword        : () => {
+                    this.mergeForm.controls['mergePassword'].setErrors({ 'wrongPassword': true });
                     this.password = '';
 
                     this.renderer.selectRootElement('#mergePassword').focus();
@@ -162,9 +163,9 @@ export class MergeModalContent {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
                 anotherSystemId: this.targetSystem.id,
-                role: this.masterId === this.system.id ?
-                    this.config.systemStatuses.master :
-                    this.config.systemStatuses.slave
+                role           : this.masterId === this.system.id ?
+                        this.config.systemStatuses.master :
+                        this.config.systemStatuses.slave
             });
         });
 
@@ -188,10 +189,10 @@ export class MergeModalContent {
 }
 
 @Component({
-    selector: 'nx-modal-merge',
-    template: '',
+    selector     : 'nx-modal-merge',
+    template     : '',
     encapsulation: ViewEncapsulation.None,
-    styleUrls: []
+    styleUrls    : []
 })
 
 export class NxModalMergeComponent {
@@ -206,9 +207,9 @@ export class NxModalMergeComponent {
         // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(MergeModalContent,
                 {
-                            windowClass: 'modal-holder',
-                            backdrop: 'static'
-                        });
+                    windowClass: 'modal-holder',
+                    backdrop   : 'static'
+                });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.closable = true;

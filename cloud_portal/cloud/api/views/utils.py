@@ -21,6 +21,10 @@ logger = logging.getLogger(__name__)
 def get_settings_from_cache():
     customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')
     return {
+        'landingLayoutFull': customization_cache['landing_layout_full'],
+        'landingLayout': customization_cache['landing_layout'],
+        'productName': customization_cache['product_name'],
+        'vmsName': customization_cache['vms_name'],
         'copyrightYear': customization_cache['copyright_year'],
         'companyName': customization_cache['company_name'],
         'companyLink': customization_cache['company_link'],

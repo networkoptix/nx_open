@@ -97,8 +97,12 @@ window.L = {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;
-                    
                     appState.supportLink = response.supportLink;
+                    appState.productName = response.productName;
+                    appState.vmsName = response.vmsName;
+                    appState.landingLayout = response.landingLayout;
+                    appState.landingLayoutFull = response.landingLayoutFull;
+                    
                     angular.extend(CONFIG, appState);
                     
                     CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;

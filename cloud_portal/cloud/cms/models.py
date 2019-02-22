@@ -78,7 +78,11 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'sort_supported_devices': product.read_global_value("%SORT_SUPPORTED_DEVICES%"),
                 'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
                 'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
-                'search_tags': product.read_global_value("%SEARCH_TAGS%")
+                'search_tags': product.read_global_value("%SEARCH_TAGS%"),
+                'product_name': product.read_global_value("%PRODUCT_NAME%"),
+                'vms_name': product.read_global_value("%VMS_NAME%"),
+                'landing_layout': product.read_global_value("%LAYOUT%"),
+                'landing_layout_full': product.read_global_value("%LANDING_LAYOUT%")
             }
         }
         cache.set(customization_name, data)
