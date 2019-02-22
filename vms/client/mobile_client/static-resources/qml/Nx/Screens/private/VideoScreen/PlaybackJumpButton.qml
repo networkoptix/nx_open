@@ -12,7 +12,7 @@ IconButton
     icon.source: forward ? lp("/images/playback_fwd.svg") : lp("/images/playback_rwd.svg")
     icon.width: 24
     icon.height: icon.height
-    padding: 0
-    width: 40
+    padding: 8
+    width: 56
     height: width
 }

@@ -478,6 +478,7 @@ Item
             {
                 id: calendarButton
 
+                padding: 0
                 visible: videoNavigation.canViewArchive
                 anchors.verticalCenter: parent.verticalCenter
                 icon.source: lp("/images/calendar.png")
@@ -494,8 +495,6 @@ Item
             {
                 id: motionSearchModeButton
 
-                width: 40
-                height: width
                 checked: false
                 checkable: true
                 anchors.left:  calendarButton.right
@@ -503,6 +502,7 @@ Item
                 icon.source: lp("/images/motion.svg")
                 icon.width: 24
                 icon.height: 24
+                padding: 0
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
                 visible: videoNavigation.hasArchive
@@ -520,6 +520,7 @@ Item
                 {
                     id: zoomOutButton
 
+                    padding: 0
                     icon.source: lp("/images/minus.png")
                     enabled: d.hasArchive
                     onClicked: timeline.zoomOut()
@@ -529,6 +530,7 @@ Item
                 {
                     id: zoomInButton
 
+                    padding: 0
                     icon.source: lp("/images/plus.png")
                     enabled: d.hasArchive
                     onClicked: timeline.zoomIn()
