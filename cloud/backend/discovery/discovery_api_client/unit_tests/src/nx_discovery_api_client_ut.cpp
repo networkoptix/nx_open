@@ -72,7 +72,7 @@ protected:
 
     void givenSubscriptionToNodeDiscoveredEvent()
     {
-        clientContext(0)->client->setOnNodeDiscovered(
+        clientContext(/*clientIndex*/ 0)->client->setOnNodeDiscovered(
             [this](Node node)
             {
                 m_nodeDiscoveredWasTriggered = true;
@@ -83,7 +83,7 @@ protected:
 
     void givenSubscriptionToNodeLostEvent()
     {
-        clientContext(0)->client->setOnNodeLost(
+        clientContext(/*clientIndex*/ 0)->client->setOnNodeLost(
             [this](const std::string& nodeId)
             {
                 m_nodeLostWasTriggered = true;
@@ -94,31 +94,31 @@ protected:
 
     void whenClientUpdatesInfoJson()
     {
-        auto context = clientContext(0);
+        auto context = clientContext(/*clientIndex*/ 0);
         context->infoJson = generateInfoJson(context->nodeId);
         context->client->updateInformation(context->infoJson);
     }
 
     void thenUpdateInfoJsonSucceeded()
     {
-        auto context = clientContext(0);
+        auto context = clientContext(/*clientIndex*/ 0);
         while (context->client->node().infoJson != context->infoJson)
             sleep();
     }
 
     void whenBothClientsRegister()
     {
-        for (int i = 0; i < 2; ++i)
-            whenClientRegistersWithServer(i);
+        for (size_t clientIndex = 0; clientIndex < 2; ++clientIndex)
+            whenClientRegistersWithServer(clientIndex);
 
         // Wait for first client to become aware of second
-        while (clientContext(0)->client->onlineNodes().size() != 2)
+        while (clientContext(/*clientIndex*/ 0)->client->onlineNodes().size() != 2)
             sleep();
     }
 
     void whenSecondClientGoesOffline()
     {
-        clientContext(1)->client.reset();
+        clientContext(/*clientIndex*/ 1)->client.reset();
     }
 
     void whenWaitForNodeDiscoveredEvent()
@@ -197,12 +197,12 @@ protected:
     {
         // discovery client emits discovery event when it finds itself for the first time,
         // so compare discovered node with itself
-        compareNodeAndContext(clientContext(0), m_discoveredNode);
+        compareNodeAndContext(clientContext(/*clientIndex*/ 0), m_discoveredNode);
     }
 
-    void andOnlineNodesContainsClientNode(size_t clientIndex = 0)
+    void andOnlineNodesContainsClientNode()
     {
-        auto context = clientContext(clientIndex);
+        auto context = clientContext(/*clientIndex*/ 0);
         Node node = context->client->node();
         while (node.nodeId.empty())
         {
