@@ -60,14 +60,12 @@ public:
         NX_ASSERT(runnable && m_created.contains(runnable));
 
         m_created.remove(runnable);
-        if (m_created.isEmpty())
-            m_waitCondition.wakeAll();
     }
 
 private:
     void waitAllLocked()
     {
-        while (!m_running.isEmpty() || !m_created.isEmpty())
+        while (!m_running.isEmpty())
             m_waitCondition.wait(&m_mutex);
     }
 
