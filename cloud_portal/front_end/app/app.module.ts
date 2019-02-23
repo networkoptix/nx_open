@@ -46,6 +46,10 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
             url.toString().startsWith('/right') ||
             url.toString().startsWith('/integrations');
         // return false;
+
+        /* Temporary downgraded components - routing is handled by AJS */
+        // url.toString().startsWith('/') ||
+        // url.toString().startsWith('/login') ||
         // url.toString().startsWith('/download') ||
         // url.toString().startsWith('/downloads') ||
         // url.toString().startsWith('/browser');

@@ -37,7 +37,7 @@
     .search-input {
         width         : 200px;
         height        : 40px;
-        padding-left  : 40px;
+        padding-left  : 48px;
         padding-right : 40px;
         font-size     : 15px;
         font-family   : $font-family-regular;
@@ -73,12 +73,15 @@
     
     .search-clear {
         position    : absolute;
-        right       : 10px;
+        right       : 2px;
         top         : 0;
         bottom      : 0;
         line-height : 40px;
         margin      : auto;
-        cursor      : pointer
+        cursor      : pointer;
+        width       : rem(36px);
+        height      : rem(36px);
+        padding     : 0;
     }
     
     .pagination {

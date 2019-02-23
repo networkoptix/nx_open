@@ -84,7 +84,7 @@ def generate_languages_files(languages, template_filename):
         if os.path.exists(i18n_json_filename):
             copyfile(i18n_json_filename, "static/lang_" + lang + "/language_i18n.json")
         else:
-            sys.stderr.write('WARNING: ' + i18n_json_filename + ' don\'t exist.\n')
+            sys.stderr.write('ERROR: For BORIS to fix -> ' + i18n_json_filename + ' don\'t exist.\n')
 
 languages = sys.argv[1:]
 if not languages:

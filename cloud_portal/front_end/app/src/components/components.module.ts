@@ -30,6 +30,7 @@ import { NxActiveSystemDropdown }    from './dropdowns/active-system/active-syst
 import { NxSystemsDropdown }         from './dropdowns/systems/systems.component';
 import { NxPermissionsDropdown }     from './dropdowns/permissions/permissions.component';
 import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select.component';
+import { NxLandingDisplayComponent } from './landing-display/landing-display.component';
 
 @NgModule({
     imports        : [
@@ -63,6 +64,7 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxVendorListComponent,
         NxSearchComponent,
         NxFooterComponent,
+        NxLandingDisplayComponent,
     ],
     entryComponents: [
         NxGenericDropdown,
@@ -87,6 +89,7 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxVendorListComponent,
         NxSearchComponent,
         NxFooterComponent,
+        NxLandingDisplayComponent,
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -103,6 +106,7 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxVendorListComponent,
         NxSearchComponent,
         NxFooterComponent,
+        NxLandingDisplayComponent,
 
         NxRibbonService,
     ],
@@ -129,6 +133,7 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxVendorListComponent,
         NxSearchComponent,
         NxFooterComponent,
+        NxLandingDisplayComponent,
         MenuModule,
     ]
 })
@@ -148,7 +153,8 @@ angular
         .directive('nxProcessButton', downgradeComponent({ component: NxProcessButtonComponent }) as angular.IDirectiveFactory)
         .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory)
         .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory)
-        .directive('nxFooter', downgradeComponent({component: NxFooterComponent}) as angular.IDirectiveFactory);
+        .directive('nxFooter', downgradeComponent({component: NxFooterComponent}) as angular.IDirectiveFactory)
+        .directive('nxLandingDisplay', downgradeComponent({component: NxLandingDisplayComponent}) as angular.IDirectiveFactory);
 
 angular
         .module('cloudApp.services')

@@ -1,11 +1,12 @@
 import { Component, OnDestroy, AfterViewInit } from '@angular/core';
 import { ActivatedRoute }                      from '@angular/router';
-import { IntegrationService }                  from '../integration.service';
-import { DomSanitizer }                        from '@angular/platform-browser';
-import { NxRibbonService }                     from '../../../components/ribbon/ribbon.service';
-import { NxConfigService }                     from '../../../services/nx-config';
-import { NxModalMessageComponent }             from '../../../dialogs/message/message.component';
-import { NxLanguageProviderService }           from '../../../services/nx-language-provider';
+import { IntegrationService }        from '../integration.service';
+import { DomSanitizer }              from '@angular/platform-browser';
+import { NxRibbonService }           from '../../../components/ribbon/ribbon.service';
+import { NxConfigService }           from '../../../services/nx-config';
+import { NxModalMessageComponent }   from '../../../dialogs/message/message.component';
+import { NxLanguageProviderService } from '../../../services/nx-language-provider';
+import { TranslateService }          from '@ngx-translate/core';
 
 @Component({
     selector   : 'integration-detail-component',
@@ -35,7 +36,8 @@ export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
                 private configService: NxConfigService,
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
-                private language: NxLanguageProviderService) {
+                private language: NxLanguageProviderService,
+                private translate: TranslateService) {
 
         this.setupDefaults();
     }
@@ -52,8 +54,8 @@ export class NxIntegrationDetailsComponent implements AfterViewInit, OnDestroy {
 
                             if (this.plugin && this.plugin.pending) {
                                 this.ribbonService.show(
-                                        this.lang.integration.previewRibbonText,
-                                        this.lang.integration.backToEditText,
+                                        this.lang[this.translate.currentLang].integration.previewRibbonText,
+                                        this.lang[this.translate.currentLang].integration.backToEditText,
                                         this.config.links.admin.product.replace('%ID%', this.plugin.id)
                                 );
                             }

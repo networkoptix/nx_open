@@ -549,7 +549,9 @@
                     $scope.camerasProvider
                         .getServerTimeOffset($scope.activeCamera.parentId)
                         .then(function (serverOffset) {
-                            window.timeManager.setOffset(serverOffset);
+                            if (serverOffset) {
+                                window.timeManager.setOffset(serverOffset);
+                            }
                             updateVideoSource(timeFromUrl);
                             timeFromUrl = null;
                         });

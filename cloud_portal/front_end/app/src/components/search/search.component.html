@@ -14,8 +14,10 @@
                        name="query"
                        autocomplete="off"
                        placeholder="Search"/>
-                <span class="glyphicon close-icon search-clear"
-                      [hidden]="!localFilter.query" (click)="resetQuery()"></span>
+
+                <button class="search-clear btn btn-clear" [hidden]="!localFilter.query" (click)="resetQuery()">
+                    <span class="glyphicon-close"></span>
+                </button>
             </div>
         </div>
 

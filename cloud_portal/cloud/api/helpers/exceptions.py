@@ -60,7 +60,8 @@ class ErrorCodes(Enum):
                     ErrorCodes.ok,
                     ErrorCodes.not_authorized,
                     ErrorCodes.not_found,
-                    ErrorCodes.wrong_old_password):
+                    ErrorCodes.wrong_old_password,
+                    ErrorCodes.wrong_password):
             return logging.INFO
         if self in (ErrorCodes.account_blocked,
                     ErrorCodes.forbidden,

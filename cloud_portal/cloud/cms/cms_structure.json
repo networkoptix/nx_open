@@ -217,6 +217,7 @@
       },
       {
         "name": "Landing page",
+        "id": "%LANDING_LAYOUT%",
         "file_path": "static/lang_{{language}}/views/static/landing.html",
         "url": "/content/about",
         "translatable": true,
@@ -480,41 +481,6 @@
         ]
       },
       {
-        "name": "Integration page",
-        "is_global": true,
-        "description": "Integrations",
-        "hidden": true,
-        "translatable": false,
-        "values": [
-          {
-            "label": "Fields to filter by",
-            "name": "%INTEGRATION_SEARCH_FIELDS%",
-            "description": "Defines the fields used to search",
-            "advanced": true,
-            "optional": false,
-            "type": "array",
-            "value": [
-              {
-                "value": "name",
-                "name": "name"
-              },
-              {
-                "value": "companyName",
-                "name": "companyName"
-              },
-              {
-                "value": "shortDescription",
-                "name": "shortDescription"
-              },
-              {
-                "value": "description",
-                "name": "description"
-              }
-            ]
-          }
-        ]
-      },
-      {
         "name": "Camera page",
         "is_global": true,
         "description": "Settings for camera page",
@@ -593,10 +559,6 @@
               {
                 "value": "10039296",
                 "name": "10mp"
-              },
-              {
-                "value": "15824256",
-                "name": "16mp"
               }
             ]
           },
@@ -609,24 +571,24 @@
             "type": "array",
             "value": [
               {
-                "id": "Camera",
-                "label": "camera"
+                "id": "camera",
+                "label": "Camera"
               },
               {
                 "id": "multiSensorCamera",
                 "label": "Multi-Sensor Camera"
               },
               {
-                "id": "Encoder",
-                "label": "encoder"
+                "id": "encoder",
+                "label": "Encoder"
               },
               {
-                "id": "DVR",
-                "label": "dvr"
+                "id": "dvr",
+                "label": "DVR"
               },
               {
-                "id": "Other",
-                "label": "other"
+                "id": "other",
+                "label": "Other"
               }
             ]
           },

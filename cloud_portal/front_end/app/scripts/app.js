@@ -97,6 +97,11 @@ window.L = {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.supportLink = response.supportLink;
+                    appState.productName = response.productName;
+                    appState.vmsName = response.vmsName;
+                    appState.landingLayout = response.landingLayout;
+                    appState.landingLayoutFull = response.landingLayoutFull;
                     
                     angular.extend(CONFIG, appState);
                     
@@ -321,14 +326,15 @@ window.L = {};
                                 controller: 'DebugCtrl'
                             })
                             .when('/login', {
-                                title: lang.pageTitles.login,
-                                templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                controller: 'StartPageCtrl',
-                                resolve: {
-                                    test: ['$route', function ($route) {
-                                        $route.current.params.callLogin = true;
-                                    }]
-                                }
+                                template: '<landing-component></landing-component>'
+                                // title: lang.pageTitles.login,
+                                // templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                // controller: 'StartPageCtrl',
+                                // resolve: {
+                                //     test: ['$route', function ($route) {
+                                //         $route.current.params.callLogin = true;
+                                //     }]
+                                // }
                             })
                             .when('/admin', {
                                 resolve: {
@@ -361,7 +367,7 @@ window.L = {};
                                 }],
                                 resolve: {
                                     getPlatform: [ '$route', function ($route) {
-                                        return $route.current.params.platform
+                                        return $route.current.params.platform;
                                     }]
                                 }
                             })
@@ -392,9 +398,7 @@ window.L = {};
                                 template: ''
                             })
                             .when('/', {
-                                title: ''/*lang.pageTitles.startPage*/,
-                                templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                controller: 'StartPageCtrl'
+                                template: '<landing-component></landing-component>'
                             })
                             .otherwise({
                                 title: lang.pageTitles.pageNotFound,

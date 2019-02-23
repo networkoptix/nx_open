@@ -76,10 +76,14 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'public_downloads': product.read_global_value("%PUBLIC_DOWNLOADS%"),
                 'public_releases': product.read_global_value("%PUBLIC_RELEASE_HISTORY%"),
                 'sort_supported_devices': product.read_global_value("%SORT_SUPPORTED_DEVICES%"),
+                'support_link': product.read_global_value("%SUPPORT_LINK%"),
                 'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
                 'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
                 'search_tags': product.read_global_value("%SEARCH_TAGS%"),
-                'integration_search_fields': product.read_global_value("%INTEGRATION_SEARCH_FIELDS%")
+                'product_name': product.read_global_value("%PRODUCT_NAME%"),
+                'vms_name': product.read_global_value("%VMS_NAME%"),
+                'landing_layout': product.read_global_value("%LAYOUT%"),
+                'landing_layout_full': product.read_global_value("%LANDING_LAYOUT%")
             }
         }
         cache.set(customization_name, data)

@@ -33,7 +33,8 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
     constructor(private configService: NxConfigService,
                 private ribbonService: NxRibbonService,
-                private language: NxLanguageProviderService) {
+                private language: NxLanguageProviderService,
+                private translate: TranslateService) {
 
         this.setupDefaults();
     }
@@ -79,8 +80,8 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
             if (haveInReview) {
                 this.ribbonService.show(
-                        this.lang.integration.previewRibbonText,
-                        this.lang.integration.backToEditText,
+                        this.lang[this.translate.currentLang].integration.previewRibbonText,
+                        this.lang[this.translate.currentLang].integration.backToEditText,
                         this.config.links.admin.product.replace('%ID%/pages/', '')
                 );
             }

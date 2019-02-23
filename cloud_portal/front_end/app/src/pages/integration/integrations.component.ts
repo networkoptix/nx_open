@@ -1,6 +1,7 @@
 import { Component, OnInit }  from '@angular/core';
 import { IntegrationService } from './integration.service';
 import { NxUriService }       from '../../services/uri.service';
+import { NxConfigService }    from '../../services/nx-config';
 
 @Component({
     selector   : 'integrations-component',
@@ -9,7 +10,8 @@ import { NxUriService }       from '../../services/uri.service';
 })
 
 export class NxIntegrationsComponent implements OnInit {
-
+    private CONFIG: any = {};
+    private searchBy: any;
     private allElements: any;
     private elements: any;
     private emptyFilter: any = {};
@@ -25,6 +27,8 @@ export class NxIntegrationsComponent implements OnInit {
     };
 
     private setupDefaults() {
+        this.CONFIG = this.config.getConfig();
+
         this.allElements = [];
 
         this.emptyFilter = {
@@ -35,7 +39,8 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     constructor(private uri: NxUriService,
-                private integrations: IntegrationService) {
+                private integrations: IntegrationService,
+                private config: NxConfigService) {
 
         this.setupDefaults();
     }
@@ -60,12 +65,11 @@ export class NxIntegrationsComponent implements OnInit {
                         }
                     },
                     error => {
-                        console.error('Error -> ', error);
+                        console.error('Integration plugins error -> ', error);
                     });
     }
 
     setTags() {
-
         this.allElements.forEach((integration) => {
             integration.information.type.forEach((type) => {
                 const found = this.filterModel.tags.some((tag) => tag.id === type);
@@ -80,17 +84,20 @@ export class NxIntegrationsComponent implements OnInit {
     }
 
     setFilter() {
+        function searchBy(item, query) {
+            return (item.information.name && item.information.name.toLowerCase().indexOf(query) > -1 ||
+                    item.information.companyName && item.information.companyName.toLowerCase().indexOf(query) > -1 ||
+                    item.information.shortDescription && item.information.shortDescription.toLowerCase().indexOf(query) > -1 ||
+                    item.overview && item.overview.description.toLowerCase().indexOf(query) > -1);
+        }
+
         this.elements = this.allElements.map(obj => ({ ...obj }));
 
         if (this.filterModel.query !== '') {
             const query = this.filterModel.query.toLowerCase();
 
             this.elements = this.elements.filter(item => {
-                if (item.information['name'].toLowerCase().indexOf(query) > -1 ||
-                        item.information['companyName'].toLowerCase().indexOf(query) > -1 ||
-                        item.information['shortDescription'].toLowerCase().indexOf(query) > -1 ||
-                        item.overview['description'].toLowerCase().indexOf(query) > -1) {
-
+                if (searchBy(item, query)) {
                     // this.markMatch(item, text);
                     return item;
                 }
@@ -122,42 +129,5 @@ export class NxIntegrationsComponent implements OnInit {
         const pattern = new RegExp(text, 'gm');
         item.name = item.name.replace(pattern, '<span class="marked">' + text + '</span>');
     }
-
-    // searchFilterFor(text) {
-    //     this.elements = this.allElements.map(obj => ({ ...obj }));
-    //
-    //     if ('' !== text) {
-    //         this.elements = this.elements.filter(item => {
-    //             if (item.information.name.indexOf(text) > -1 ||
-    //                     item.information.companyName.indexOf(text) > -1 ||
-    //                     item.information.shortDescription.indexOf(text) > -1 ||
-    //                     item.overview.description.indexOf(text) > -1) {
-    //
-    //                 // this.markMatch(item, text);
-    //                 return item;
-    //             }
-    //         });
-    //     }
-    // }
-
-    // setFilter(value, target) {
-    //     let showAll = true;
-    //     this.selectors[target] = value; // model is not updated yet
-    //
-    //     if (this.filterModel.query === '') {
-    //         this.elements = this.allElements.map(obj => ({ ...obj }));
-    //     }
-    //
-    //     this.elements = this.elements.filter(item => {
-    //         if (this.selectors[item.type]) {
-    //             showAll = false;
-    //             return item;
-    //         }
-    //     });
-    //
-    //     if (showAll) {
-    //         this.elements = this.allElements.map(obj => ({ ...obj }));
-    //     }
-    // }
 }
 

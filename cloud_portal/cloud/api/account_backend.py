@@ -16,6 +16,8 @@ from api.helpers.exceptions import APIRequestException, APIException, APILogicEx
 
 logger = logging.getLogger(__name__)
 
+IP_MAX_LENGTH = 255
+
 
 class AccountBackend(ModelBackend):
     @staticmethod
@@ -135,8 +137,10 @@ class AccountManager(db.models.Manager):
 
 
 
+# Truncate IPs greater than IP_MAX_LENGTH
 def get_ip(request):
-    return request.META.get('HTTP_X_FORWARDED_FOR')
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    return ip if len(ip) <= IP_MAX_LENGTH else ip[:IP_MAX_LENGTH]
 
 
 @receiver(user_logged_in)
