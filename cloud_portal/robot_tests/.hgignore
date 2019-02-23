@@ -1,0 +1,8 @@
+/*.png
+/*.xml
+/*.html
+/*.tar
+/*.deb
+syntax: glob
+Docker/Video
+Docker/Data

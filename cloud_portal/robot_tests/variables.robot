@@ -119,7 +119,6 @@ ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invit
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON TEXT}"]
 
-${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
 ${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success && !loading' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]
@@ -225,12 +224,12 @@ ${SUPPORT TILE LINK}                  //h2[contains(text(),"${SUPPORT}")]/..//a[
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
 
 #Footer
-${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT}")]/span[contains(text(),"${PRODUCT_NAME}")]/..
+${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]
 ${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITATIONS}")]
 ${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
 ${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]
 ${FOOTER PRIVACY LINK}               //footer//a[contains(text(),"${PRIVACY}")]
-${FOOTER COPYRIGHT LINK}             //footer//a[contains(text(),"${COPYRIGHT TEXT}")]
+${FOOTER COPYRIGHT LINK}             //footer//a[contains(text(),"${COPYRIGHT SYMBOL}") and contains(text(),"${YEAR}") and contains(text(),"${COMPANY}")]
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]

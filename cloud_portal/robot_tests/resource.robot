@@ -13,13 +13,14 @@ ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
 ${options}    true
 @{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
+${speed}    0
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${options}"=="false"    Regular Open Browser    ${url}
+    run keyword if    "${options}"=="false"    Regular Open Browser
     ...          ELSE    Open Browser With Options
-    Set Selenium Speed    0
+    Set Selenium Speed    ${speed}
     Set Selenium Timeout    20
     Check Language
     Go To    ${url}
@@ -46,9 +47,9 @@ Set Chrome Options
 Check Language
 #    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
-    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
+    ${status}=    Run Keyword And Return Status    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
     Register Keyword To Run On Failure    Failure Tasks
-    Run Keyword If    "${status}"=="FAIL"    Set Language
+    Run Keyword If    "${status}"=="False"    Set Language
 
 Set Language
     [arguments]    ${lang}=${LANGUAGE}
@@ -127,7 +128,7 @@ Get Email Link
     Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get NX Links From Email    ${email}    ${link type}
     log    ${links}
-    Delete Email    ${email}
+    Delete All Emails
     Close Mailbox
     Return From Keyword    ${links}
 
@@ -155,7 +156,7 @@ Restore password
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    Sleep    .5
+    Sleep    5
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
