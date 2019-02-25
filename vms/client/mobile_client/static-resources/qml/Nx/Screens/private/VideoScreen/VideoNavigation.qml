@@ -753,7 +753,6 @@ Item
                 visible: d.hasArchive && videoNavigation.canViewArchive
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: 8
 
                 onClicked:
                 {
@@ -767,7 +766,6 @@ Item
                 visible: d.hasArchive && videoNavigation.canViewArchive
                 anchors.left: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.leftMargin: 8
 
                 onClicked:
                 {
