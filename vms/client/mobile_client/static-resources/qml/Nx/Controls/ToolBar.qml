@@ -19,6 +19,7 @@ ToolBarBase
         id: leftButton
         anchors.verticalCenter: parent.verticalCenter
         x: 8
+        padding: 0
         visible: icon != ""
         onClicked: leftButtonClicked()
         alwaysCompleteHighlightAnimation: false

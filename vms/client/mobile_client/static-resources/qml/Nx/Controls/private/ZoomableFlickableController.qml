@@ -17,6 +17,8 @@ Object
     signal clicked()
     signal doubleClicked(real mouseX, real mouseY)
 
+    property bool draggingGesture: false
+
     Object
     {
         id: pinchAreaHandler
@@ -133,6 +135,9 @@ Object
 
             onPositionChanged:
             {
+                if (target.pressed)
+                    controller.draggingGesture = true
+
                 if (!mouseAreaHandler.doubleTapDownPos)
                     return
 
@@ -145,7 +150,6 @@ Object
                     var minDoubleTapStartLength = 15
                     if (currentVector.length() > minDoubleTapStartLength)
                         mouseAreaHandler.doubleTapScaleMode = controller.allowCompositeEvents
-
                 }
 
                 if (!mouseAreaHandler.doubleTapScaleMode)
@@ -178,6 +182,8 @@ Object
 
             onCanceled:
             {
+                controller.draggingGesture = false
+
                 delayedClickTimer.stop()
                 mouseAreaHandler.doubleTapScaleMode = false
                 mouseAreaHandler.doubleTapDownPos = undefined
@@ -185,6 +191,8 @@ Object
 
             onReleased:
             {
+                controller.draggingGesture = false
+
                 if (clickFilterTimer.running
                     && !doubleClickFilterTimer.running
                     && mouseAreaHandler.downPos.x == mouse.x
