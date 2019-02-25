@@ -112,20 +112,8 @@ void ChunkPositionWatcher::Private::updateProviderConnections()
         return;
 
     disconnectCurrentProvider();
-
-    connect(provider, &QnCameraChunkProvider::loadingMotionChanged, this,
-        [this]()
-        {
-            if (!provider->isLoadingMotion() && motionSearchMode)
-                updateTimePeriods();
-        });
-
-    connect(provider, &QnCameraChunkProvider::loadingChanged, this,
-        [this]()
-        {
-            if (!provider->isLoading() && !motionSearchMode)
-                updateTimePeriods();
-        });
+    connect(provider, &QnCameraChunkProvider::timePeriodsUpdated,
+        this, &Private::updateTimePeriods);
 
     updateTimePeriods();
 }
