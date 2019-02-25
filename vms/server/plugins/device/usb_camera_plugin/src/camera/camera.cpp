@@ -4,124 +4,114 @@
 
 #include <nx/utils/log/log.h>
 
-#include "discovery_manager.h"
 #include "device/video/utils.h"
 
-namespace nx {
-namespace usb_cam {
-
-namespace {
-
-static size_t getPriorityCodecIndex(
-    const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
-    const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
-{
-    for (const auto codecId : videoCodecPriorityList)
-    {
-        size_t index = 0;
-        for (const auto& descriptor : codecDescriptorList)
-        {
-            if (codecId == descriptor->toNxCompressionType())
-                return index;
-            ++index;
-        }
-    }
-    return codecDescriptorList.size();
-}
-
-static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
-    const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
-    const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
-{
-    size_t index = getPriorityCodecIndex(videoCodecPriorityList, codecDescriptorList);
-    if (index < codecDescriptorList.size())
-        return codecDescriptorList[index];
-    else if (codecDescriptorList.size() > 0)
-        return codecDescriptorList[0];
-    return nullptr;
-}
-
-} // namespace 
-
-//--------------------------------------------------------------------------------------------------
-// Camera
-
-const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList =
-{
-    nxcip::AV_CODEC_ID_H263
-    ,nxcip::AV_CODEC_ID_H264
-    ,nxcip::AV_CODEC_ID_MJPEG
-};
+namespace nx::usb_cam {
 
 Camera::Camera(
-    DiscoveryManager * discoveryManager,
+    const std::string& url,
     const nxcip::CameraInfo& cameraInfo,
-    nxpl::TimeProvider* const timeProvider):
-    m_discoveryManager(discoveryManager),
+    nxpl::TimeProvider* const timeProvider)
+    :
     m_cameraInfo(cameraInfo),
-    m_timeProvider(timeProvider)
+    m_timeProvider(timeProvider),
+    m_packetBuffer(toString())
 {
+    m_videoStream = std::make_unique<VideoStream>(url, m_timeProvider);
+    m_audioStream = std::make_unique<AudioStream>(m_cameraInfo.auxiliaryData, m_timeProvider);
 }
 
 void Camera::setCredentials(const char * username, const char * password)
 {
-    strncpy( m_cameraInfo.defaultLogin, username, sizeof(m_cameraInfo.defaultLogin)-1 );
-    strncpy( m_cameraInfo.defaultPassword, password, sizeof(m_cameraInfo.defaultPassword)-1 );
+    strncpy(m_cameraInfo.defaultLogin, username, sizeof(m_cameraInfo.defaultLogin) - 1);
+    strncpy(m_cameraInfo.defaultPassword, password, sizeof(m_cameraInfo.defaultPassword) - 1);
 }
 
 bool Camera::initialize()
 {
-    if (isInitialized())
-        return true;
-
-    auto codecList = device::video::getSupportedCodecs(ffmpegUrl().c_str());
-    m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
-
-    // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
-    if(!m_compressionTypeDescriptor)
+    int status = m_videoStream->initialize();
+    if (status < 0)
     {
-        NX_DEBUG(
-            this,
-            "%1: Failed to obtain a valid compression type descriptor for camera: %2",
-            __func__,
+        NX_DEBUG(this,
+            "Failed to obtain a valid compression type descriptor error: %2, for camera: %1",
+            status,
             toString());
-
-        setLastError(AVERROR(ENODEV));
         return false;
     }
-
-    m_defaultVideoParams = getDefaultVideoParameters();
-
-    m_videoStream = std::make_shared<VideoStream>(
-        weak_from_this(),
-        m_defaultVideoParams);
-
-    m_audioStream = std::make_shared<AudioStream>(
-        info().auxiliaryData,
-        weak_from_this(),
-        m_audioEnabled);
-
-    return isInitialized();
+    return true;
 }
 
-bool Camera::isInitialized() const
+void Camera::uninitialize()
 {
-    return m_compressionTypeDescriptor && m_videoStream && m_audioStream;
+    NX_DEBUG(this, "unititialize");
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    m_keyFrameFound = false;
+    m_videoStream->uninitializeInput();
+    m_audioStream->uninitialize();
 }
 
-std::shared_ptr<AudioStream> Camera::audioStream()
+int Camera::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    return m_audioStream;
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    int status = m_videoStream->nextPacket(packet);
+    if (status < 0 && status != AVERROR(EAGAIN))
+        return status;
+
+    if (status == 0)
+    {
+        if (packet->mediaType() == AVMEDIA_TYPE_VIDEO && !m_keyFrameFound)
+        {
+            if (!packet->keyPacket())
+            {
+                packet.reset();
+                m_lastError = AVERROR(EAGAIN);
+                return AVERROR(EAGAIN);
+            }
+            m_keyFrameFound = true;
+        }
+        packet->setTimestamp(millisSinceEpoch());
+    }
+    else if (status == AVERROR(EAGAIN))
+    {
+        packet.reset();
+        if (m_audioEnabled)
+            status = m_audioStream->nextPacket(packet);
+    }
+    if (packet && m_enablePacketBuffering)
+        m_packetBuffer.pushPacket(packet);
+
+    m_lastError = status;
+    return status;
 }
 
-std::shared_ptr<VideoStream> Camera::videoStream()
+int Camera::nextBufferedPacket(std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    return m_videoStream;
+    packet = m_packetBuffer.pop();
+    if (packet)
+        return 0;
+    return AVERROR(EAGAIN);
 }
 
-std::vector<device::video::ResolutionData> Camera::resolutionList() const
+void Camera::enablePacketBuffering(bool value)
 {
-    return device::video::getResolutionList(ffmpegUrl(), m_compressionTypeDescriptor);
+    m_enablePacketBuffering = value;
+    if (!value)
+        m_packetBuffer.flush();
+}
+
+void Camera::interruptBufferPacketWait()
+{
+    m_packetBuffer.interrupt();
+}
+
+VideoStream& Camera::videoStream()
+{
+    return *m_videoStream;
+}
+
+AudioStream& Camera::audioStream()
+{
+    return *m_audioStream;
 }
 
 bool Camera::hasAudio() const
@@ -132,23 +122,15 @@ bool Camera::hasAudio() const
 void Camera::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
-    if(m_audioStream)
-        m_audioStream->setEnabled(value);
+    if (!m_audioEnabled)
+    {
+        m_audioStream->uninitialize();
+    }
 }
 
 bool Camera::audioEnabled() const
 {
     return m_audioEnabled;
-}
-
-bool Camera::ioError() const
-{
-    return m_videoStream->ioError() || m_audioStream->ioError();
-}
-
-void Camera::setLastError(int errorCode)
-{
-    m_lastError = errorCode;
 }
 
 int Camera::lastError() const
@@ -161,39 +143,8 @@ uint64_t Camera::millisSinceEpoch() const
     return m_timeProvider->millisSinceEpoch();
 }
 
-nxpl::TimeProvider * const Camera::timeProvider() const
-{
-    m_timeProvider->addRef();
-    return m_timeProvider;
-}
-
-const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() const
-{
-    return m_compressionTypeDescriptor;
-}
-
-CodecParameters Camera::defaultVideoParameters() const
-{
-    return m_defaultVideoParams;
-}
-
-std::string Camera::ffmpegUrl() const
-{
-    //return m_cameraManager->ffmpegUrl();
-    return m_discoveryManager->getFfmpegUrl(m_cameraInfo.uid);
-}
-
-std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
-{
-    std::vector<AVCodecID> ffmpegCodecList;
-    for (const auto & nxCodecID : kVideoCodecPriorityList)
-        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecId(nxCodecID));
-    return ffmpegCodecList;
-}
-
 const nxcip::CameraInfo& Camera::info() const
 {
-    //return m_cameraManager->info();
     return m_cameraInfo;
 }
 
@@ -202,44 +153,10 @@ std::string Camera::toString() const
     static const std::string prefix = "{ ";
     static const std::string suffix = " }";
 
-    return
-        prefix 
-        + "name: " + m_cameraInfo.modelName 
-        + ", uid: " + m_cameraInfo.uid 
-        + ", video:" + ffmpegUrl()
-        + ", audio: " + m_cameraInfo.auxiliaryData 
+    return prefix
+        + "name: " + m_cameraInfo.modelName
+        + ", uid: " + m_cameraInfo.uid
         + suffix;
 }
 
-CodecParameters Camera::getDefaultVideoParameters()
-{
-    if(!m_compressionTypeDescriptor)
-        return CodecParameters();
-
-    nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
-    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecId(nxCodecID);
-
-    auto resolutionList = this->resolutionList();
-    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-        [](const device::video::ResolutionData& a, const device::video::ResolutionData& b)
-        {
-            return a.width * a.height < b.width * b.height;
-        });
-
-    if (it != resolutionList.end())
-    {
-        int maxBitrate = 
-            device::video::getMaxBitrate(ffmpegUrl().c_str(), m_compressionTypeDescriptor);
-        return CodecParameters(
-            ffmpegCodecID,
-            it->fps,
-            maxBitrate,
-            nxcip::Resolution(it->width, it->height));
-    }
-
-    // Should never reach here if m_compressionTypeDescriptor is valid
-    return CodecParameters();
-}
-
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

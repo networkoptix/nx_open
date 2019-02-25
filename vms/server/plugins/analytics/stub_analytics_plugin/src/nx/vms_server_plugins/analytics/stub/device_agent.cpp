@@ -4,6 +4,7 @@
 #include <chrono>
 #include <ctime>
 #include <cmath>
+#include <vector>
 
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
@@ -25,15 +26,18 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(Engine* engine):
-    VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
+    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
     m_objectId(nx::sdk::UuidHelper::randomUuid())
 {
 }
 
 DeviceAgent::~DeviceAgent()
 {
-    m_terminated.store(true);
+    {
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_terminated = true;
+    }
     m_pluginEventGenerationLoopCondition.notify_all();
     if (m_pluginEventThread)
         m_pluginEventThread->join();
@@ -42,8 +46,9 @@ DeviceAgent::~DeviceAgent()
 /**
  * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
  * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
- * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
- * which are treated as white-list filters for the respective set.
+ * manifest. Also this manifest should declare supportedEventTypeIds and supportedObjectTypeIds
+ * lists which are treated as white-list filters for the respective set (absent lists are treated
+ * as empty lists, thus, disabling all types from the Engine).
  */
 std::string DeviceAgent::manifest() const
 {
@@ -51,7 +56,8 @@ std::string DeviceAgent::manifest() const
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
-        ")json" + kSuspiciousNoiseEventType + R"json("
+        ")json" + kSuspiciousNoiseEventType + R"json(",
+        ")json" + kObjectInTheAreaEventType + R"json("
     ],
     "supportedObjectTypeIds": [
         ")json" + kCarObjectType + R"json("
@@ -70,6 +76,20 @@ std::string DeviceAgent::manifest() const
             "id": ")json" + kGunshotEventType + R"json(",
             "name": "Gunshot",
             "groupId": ")json" + kSoundRelatedEventGroup + R"json("
+        }
+    ],
+    "objectTypes": [
+        {
+            "id": ")json" + kTruckObjectType + R"json(",
+            "name": "Truck"
+        },
+        {
+            "id": ")json" + kPedestrianObjectType + R"json(",
+            "name": "Pedestrian"
+        },
+        {
+            "id": ")json" + kBicycleObjectType + R"json(",
+            "name": "Bicycle"
         }
     ]
 }
@@ -233,9 +253,13 @@ void DeviceAgent::processPluginEvents()
         // Sleep until the next event needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether
         // the timeout has occurred) and spurious wake-ups are ignored.
-        static const std::chrono::seconds kPluginEventGenerationPeriod{10};
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-        m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+        {
+            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            if (m_terminated)
+                break;
+            static const std::chrono::seconds kPluginEventGenerationPeriod{5};
+            m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+        }
     }
 }
 
@@ -252,31 +276,41 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
-    ++m_counter;
-    if (m_counter > 1)
+    ++currentEventTypeIndex;
+    std::string caption;
+    std::string description;
+    if (currentEventTypeIndex > 1)
     {
         if (m_eventTypeId == kLineCrossingEventType)
+        {
             m_eventTypeId = kObjectInTheAreaEventType;
+            caption = "Object in the Area (caption)";
+            description = "Object in the Area (description)";
+        }
         else
+        {
             m_eventTypeId = kLineCrossingEventType;
-
-        m_counter = 0;
+            caption = "Line Crossing (caption)";
+            description = "Line Crossing (description)";
+        }
+        currentEventTypeIndex = 0;
     }
 
-    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
-    eventMetadata->setCaption("Line crossing (caption)");
-    eventMetadata->setDescription("Line crossing (description)");
+    auto eventMetadata = makePtr<EventMetadata>();
+    eventMetadata->setCaption(caption);
+    eventMetadata->setDescription(description);
     eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    eventMetadata->setIsActive(m_counter == 1);
+    eventMetadata->setIsActive(currentEventTypeIndex == 1);
     eventMetadata->setTypeId(m_eventTypeId);
 
     auto eventMetadataPacket = new EventMetadataPacket();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
     eventMetadataPacket->setDurationUs(0);
-    eventMetadataPacket->addItem(eventMetadata);
+    eventMetadataPacket->addItem(eventMetadata.get());
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << m_eventTypeId << ", isActive: " << ((m_counter == 1) ? "true" : "false");
+        << "type: " << m_eventTypeId
+        << ", isActive: " << ((currentEventTypeIndex == 1) ? "true" : "false");
 
     return eventMetadataPacket;
 }
@@ -289,23 +323,33 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
 
-    auto objectMetadata = new ObjectMetadata();
-
-    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    objectMetadata->setTypeId(kCarObjectType);
+    auto objectMetadata = makePtr<ObjectMetadata>();
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
     const int sequentialNumber = static_cast<int>(intPart);
+    static const std::vector<std::string> kObjectTypes = {
+        kCarObjectType,
+        kHumanFaceObjectType,
+        kTruckObjectType,
+        kPedestrianObjectType,
+        kBicycleObjectType,
+    };
 
     if (m_currentObjectIndex != sequentialNumber)
     {
         m_objectId = UuidHelper::randomUuid();
         m_currentObjectIndex = sequentialNumber;
+        m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
+	++m_currentObjectTypeIndex;
+	if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
+	    m_currentObjectTypeIndex = 0;
     }
 
+    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
+    objectMetadata->setTypeId(m_objectTypeId);
     objectMetadata->setId(m_objectId);
     objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
@@ -332,7 +376,7 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
 
     objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
     objectMetadataPacket->setDurationUs(0);
-    objectMetadataPacket->addItem(objectMetadata);
+    objectMetadataPacket->addItem(objectMetadata.get());
     return objectMetadataPacket;
 }
 

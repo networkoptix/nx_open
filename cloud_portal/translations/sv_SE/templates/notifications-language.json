@@ -6,7 +6,7 @@
     "emailSubject": "Återställ ditt lösenord"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} inbjuder till %PRODUCT_NAME%{{messaging.sharer_name}}{{^message.sharer_name}}Videosystem {{message.system_name}} delades med dig {{/ message.sharer_name}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} inbjuder till %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Videosystem {{message.system_name}} delades med dig {{/message.sharer_name}}"
   },
   "system_shared": {
     "emailSubject": "Videosystemet {{message.system_name}} delades med dig"

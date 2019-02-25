@@ -20,7 +20,6 @@ Multiplexer::Multiplexer(
         32,
         payloadSize,
         ipVersion,
-        1024,
         m_udpChannel.get(),
         m_timer.get()))
 {

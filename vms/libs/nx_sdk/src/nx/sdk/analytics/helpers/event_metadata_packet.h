@@ -2,18 +2,17 @@
 
 #include <vector>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class EventMetadataPacket: public nxpt::CommonRefCounter<IEventMetadataPacket>
+class EventMetadataPacket: public RefCountable<IEventMetadataPacket>
 {
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-
     virtual int64_t timestampUs() const override;
     virtual int64_t durationUs() const override;
 
@@ -29,7 +28,7 @@ private:
     int64_t m_timestampUs = -1;
     int64_t m_durationUs = -1;
 
-    std::vector<const IEventMetadata*> m_events;
+    std::vector<Ptr<const IEventMetadata>> m_events;
 };
 
 } // namespace analytics

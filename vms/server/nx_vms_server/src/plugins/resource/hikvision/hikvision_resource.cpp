@@ -27,11 +27,6 @@ const std::array<Qn::ConnectionRole, 2> kRoles =
     Qn::ConnectionRole::CR_SecondaryLiveVideo
 };
 
-Qn::ConnectionRole toRole(Qn::StreamIndex streamIndex)
-{
-    return streamIndex == Qn::StreamIndex::primary ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
-}
-
 static const nx::utils::log::Tag kHikvisionApiLogTag(QString("hikvision_api_protocols"));
 
 } // namespace
@@ -58,10 +53,10 @@ QString HikvisionResource::defaultCodec() const
 }
 
 nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDriver(
-    Qn::StreamIndex streamIndex)
+    StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
-    const auto capabilities = channelCapabilities(toRole(streamIndex));
+    const auto capabilities = channelCapabilities(toConnectionRole(streamIndex));
     if (!capabilities)
         return base_type::getStreamCapabilityMapFromDriver(streamIndex);
 

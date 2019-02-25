@@ -28,7 +28,7 @@ bool CommandLogCache::isShouldBeIgnored(
     const auto currentSequence = m_committedData.transactionState.values.value(key);
     if (currentSequence >= commandHeader.persistentInfo.sequence)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction (%2, hash %3) "
+        NX_DEBUG(this, lm("systemId %1. Ignoring transaction (%2, hash %3) "
             "because of persistent sequence: %4 <= %5")
             .args(systemId, engine::toString(commandHeader), hash,
                 commandHeader.persistentInfo.sequence, currentSequence));
@@ -45,7 +45,7 @@ bool CommandLogCache::isShouldBeIgnored(
         rez = key < itr->second.updatedBy;
     if (rez)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction (%2 hash %3) "
+        NX_DEBUG(this, lm("systemId %1. Ignoring transaction (%2 hash %3) "
             "because of timestamp: %4 <= %5").args(systemId, engine::toString(commandHeader), hash,
                 commandHeader.persistentInfo.timestamp, lastTime));
         return true;    //< Transaction should be ignored.
@@ -191,6 +191,26 @@ int CommandLogCache::generateTransactionSequence(
     int& currentSequence = m_rawData.transactionState.values[tranStateKey];
     ++currentSequence;
     return currentSequence;
+}
+
+int CommandLogCache::lastTransactionSequence(
+    const vms::api::PersistentIdData& tranStateKey)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_rawData.transactionState.values.find(tranStateKey);
+    return it == m_rawData.transactionState.values.end() ? 0 : it.value();
+}
+
+void CommandLogCache::shiftTransactionSequenceTo(
+    const vms::api::PersistentIdData& tranStateKey,
+    int value)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    int& currentSequence = m_rawData.transactionState.values[tranStateKey];
+    currentSequence = std::max(currentSequence, value);
+
+    m_committedData.transactionState.values[tranStateKey] = currentSequence;
 }
 
 void CommandLogCache::shiftTransactionSequence(

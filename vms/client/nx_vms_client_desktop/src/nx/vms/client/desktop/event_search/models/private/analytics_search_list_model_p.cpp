@@ -3,19 +3,12 @@
 #include <algorithm>
 #include <chrono>
 
-#include <QtCore/QJsonObject>
-
-#include <QtGui/QPalette>
-
-#include <QtQuickWidgets/QQuickWidget>
-#include <QtQuick/QQuickItem>
-
-#include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QHBoxLayout>
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
-#include <analytics/common/object_detection_metadata.h>
 #include <api/server_rest_connection.h>
+#include <analytics/common/object_detection_metadata.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -33,21 +26,17 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/analytics/descriptor_manager.h>
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/core/utils/human_readable.h>
-#include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
-
-#include <common/common_module.h>
-#include <nx/analytics/descriptor_manager.h>
-#include <client_core/client_core_module.h>
-#include <QGroupBox>
-#include <QScrollArea>
 
 namespace nx::vms::client::desktop {
 
@@ -197,6 +186,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(previewParams(object).timestamp);
+
+        case Qn::PreviewStreamSelectionRole:
+            return QVariant::fromValue(
+                nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics);
 
         case Qn::DurationRole:
             return QVariant::fromValue(objectDuration(object));
@@ -458,24 +451,17 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
         auto cameras = q->cameras();
         MetadataReceiverList newMetadataReceivers;
 
-        const auto isOnline =
-            [](const QnVirtualCameraResourcePtr& camera)
-            {
-                const auto status = camera->getStatus();
-                return status == Qn::Online || status == Qn::Recording;
-            };
-
         // Preserve existing receivers that are still relevant.
         for (auto& receiver: m_metadataReceivers)
         {
-            if (cameras.remove(receiver->camera()) && isOnline(receiver->camera()))
+            if (cameras.remove(receiver->camera()) && receiver->camera()->isOnline())
                 newMetadataReceivers.emplace_back(receiver.release());
         }
 
         // Create new receivers if needed.
         for (const auto& camera: cameras)
         {
-            if (isOnline(camera))
+            if (camera->isOnline())
             {
                 newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
 
@@ -751,8 +737,8 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     if (!camera)
         return {};
 
-    nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
-    auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
+    const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
         object.objectTypeId,
         camera);
 
@@ -762,123 +748,18 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         if (!menu->isEmpty())
             menu->addSeparator();
 
-        for (const auto&[actionId, actionDescriptor]: actionById)
+        for (const auto& [actionId, actionDescriptor]: actionById)
         {
             const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, actionDescriptor=actionDescriptor, object, engineId=engineId]()
+                [this, engineId = engineId, actionId = actionDescriptor.id, object, camera]()
                 {
-                    executePluginAction(engineId, actionDescriptor, object);
+                    emit q->pluginActionRequested(engineId, actionId, object, camera, {});
                 }));
         }
     }
 
     return menu;
-}
-
-bool AnalyticsSearchListModel::Private::requestActionSettings(
-    const QJsonObject& settingsModel,
-    QMap<QString, QString>* values) const
-{
-    if (!values)
-        return false;
-
-    QnMessageBox parametersDialog(q->mainWindowWidget());
-    parametersDialog.addButton(QDialogButtonBox::Ok);
-    parametersDialog.addButton(QDialogButtonBox::Cancel);
-    parametersDialog.setText(tr("Enter parameters"));
-    parametersDialog.setInformativeText(tr("Action requires some parameters to be filled."));
-    parametersDialog.setIcon(QnMessageBoxIcon::Information);
-
-    auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
-    view->setClearColor(parametersDialog.palette().window().color());
-    view->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    view->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
-    const auto root = view->rootObject();
-    NX_ASSERT(root);
-
-    if (!root)
-        return false;
-
-    QMetaObject::invokeMethod(
-        root,
-        "loadModel",
-        Qt::DirectConnection,
-        Q_ARG(QVariant, settingsModel.toVariantMap()),
-        Q_ARG(QVariant, {}));
-
-    auto panel = new QScrollArea(&parametersDialog);
-    panel->setFixedHeight(400);
-    auto layout = new QHBoxLayout(panel);
-    layout->addWidget(view);
-
-    parametersDialog.addCustomWidget(panel, QnMessageBox::Layout::Main);
-    if (parametersDialog.exec() != QDialogButtonBox::Ok)
-        return false;
-
-    QVariant result;
-    QMetaObject::invokeMethod(
-        root,
-        "getValues",
-        Qt::DirectConnection,
-        Q_RETURN_ARG(QVariant, result));
-
-    values->clear();
-    const auto resultMap = result.value<QVariantMap>();
-    for (auto iter = resultMap.cbegin(); iter != resultMap.cend(); ++iter)
-        values->insert(iter.key(), iter.value().toString());
-    return true;
-}
-
-void AnalyticsSearchListModel::Private::executePluginAction(
-    const QnUuid& engineId,
-    const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
-    const analytics::storage::DetectedObject& object) const
-{
-    const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(server && server->restConnection());
-    if (!server || !server->restConnection())
-        return;
-
-    const auto resultCallback =
-        [this](bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
-        {
-            if (result.error != QnRestResult::NoError)
-            {
-                QnMessageBox::warning(q->mainWindowWidget(), tr("Failed to execute plugin action"),
-                    result.errorString);
-                return;
-            }
-
-            if (!success)
-                return;
-
-            const auto reply = result.deserialized<AnalyticsActionResult>();
-            if (!reply.messageToUser.isEmpty())
-                QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
-
-            if (!reply.actionUrl.isEmpty())
-                WebViewDialog::showUrl(QUrl(reply.actionUrl));
-        };
-
-    AnalyticsAction actionData;
-    actionData.engineId = engineId;
-    actionData.actionId = actionDescriptor.id;
-    actionData.objectId = object.objectAppearanceId;
-
-    const auto actionParametersDescription = actionDescriptor.parametersModel;
-
-    const auto map = actionParametersDescription.toVariantMap();
-
-    if (!actionParametersDescription.isEmpty())
-    {
-        // Show dialog asking to enter required parameters.
-        if (!requestActionSettings(actionParametersDescription, &actionData.params))
-            return;
-    }
-
-    server->restConnection()->executeAnalyticsAction(
-        actionData, nx::utils::guarded(this, resultCallback), thread());
 }
 
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(

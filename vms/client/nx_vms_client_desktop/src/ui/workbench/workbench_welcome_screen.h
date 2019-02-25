@@ -106,8 +106,6 @@ public slots:
 public slots:
     void hideSystem(const QString& systemId, const QString& localSystemId);
 
-    void moveToBack(const QUuid& localSystemId);
-
 signals:
     void cloudUserNameChanged();
 
@@ -143,6 +141,7 @@ private:
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
 
 private:
     QQuickView* m_view = nullptr;

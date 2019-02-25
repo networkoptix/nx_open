@@ -10,7 +10,6 @@ namespace nx {
 namespace vms {
 namespace network {
 
-
 class ProxyConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
@@ -27,7 +26,7 @@ public:
     std::unique_ptr<::nx::network::AbstractStreamSocket> dstSocket;
     ::nx::utils::Url lastConnectedEndpoint;
     std::chrono::milliseconds connectTimeout;
-	std::chrono::steady_clock::time_point lastIoTimePoint;
+    std::chrono::steady_clock::time_point lastIoTimePoint;
     ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager = nullptr;
 };
 

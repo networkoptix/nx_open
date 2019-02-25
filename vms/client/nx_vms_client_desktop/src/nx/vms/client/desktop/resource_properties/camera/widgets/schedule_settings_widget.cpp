@@ -4,6 +4,8 @@
 #include "../redux/camera_settings_dialog_store.h"
 #include "../utils/schedule_paint_functions.h"
 
+#include <QtGui/QStandardItemModel>
+
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -12,6 +14,7 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/stream_quality_strings.h>
@@ -109,13 +112,13 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
     connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged, store,
         [store](double value)
         {
-            store->setCustomRecordingBitrateMbps(static_cast<float>(value));
+            store->setRecordingBitrateMbps(static_cast<float>(value));
         });
 
     connect(ui->bitrateSlider, &QSlider::valueChanged, store,
         [this, store](int /*value*/)
         {
-            store->setCustomRecordingBitrateNormalized(
+            store->setRecordingBitrateNormalized(
                 normalizedValue(ui->bitrateSlider));
         });
 }
@@ -154,7 +157,7 @@ void ScheduleSettingsWidget::setupUi()
     addQualityItem(Qn::StreamQuality::high);
     addQualityItem(Qn::StreamQuality::highest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData((int)Qn::StreamQuality::high));
-    ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, "
+    ui->qualityLabel->setHint(tr("Quality setting determines the compression rate only, "
         "and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
 
     ui->bitrateSpinBox->setDecimals(nx::core::CameraBitrateCalculator::kBitrateKbpsPrecisionDecimals);
@@ -214,8 +217,6 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
-
     const bool hasDualRecordingOption = state.hasMotion()
         && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
 
@@ -243,10 +244,51 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     const bool automaticBitrate = brush.isAutomaticBitrate();
     ui->qualityComboBox->setEnabled(recordingParamsEnabled);
     setReadOnly(ui->qualityComboBox, state.readOnly);
-    ui->qualityComboBox->setCurrentIndex(
-        ui->qualityComboBox->findData(
-            (int)brush.quality
-            + (automaticBitrate ? 0 : kCustomQualityOffset)));
+
+    const auto qualityItemModel = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model());
+    NX_CRITICAL(qualityItemModel);
+
+    const auto setItemEnabled =
+        [model = qualityItemModel](int index, bool value)
+        {
+            const auto item = model->item(index);
+            if (!NX_ASSERT(item))
+                return;
+
+            auto flags = item->flags();
+            flags.setFlag(Qt::ItemIsEnabled, value);
+            flags.setFlag(Qt::ItemIsSelectable, value);
+            item->setFlags(flags);
+        };
+
+    for (int i = 0; i < ui->qualityComboBox->count(); ++i)
+    {
+        int quality = ui->qualityComboBox->itemData(i).toInt();
+        if (quality >= kCustomQualityOffset)
+            quality -= kCustomQualityOffset;
+
+        setItemEnabled(i, quality >= int(state.recording.minRelevantQuality));
+    }
+
+    const bool fpsLockedBitrate =
+        qFuzzyEquals(state.recording.maxBitrateMpbs, state.recording.minBitrateMbps);
+
+    if (fpsLockedBitrate)
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(int(Qn::StreamQuality::highest)));
+    }
+    else if (brush.quality < state.recording.minRelevantQuality)
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(int(state.recording.minRelevantQuality)));
+    }
+    else
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData((int)brush.quality
+                + (automaticBitrate ? 0 : kCustomQualityOffset)));
+    }
 
     ui->advancedSettingsWidget->setVisible(
         recording.customBitrateAvailable
@@ -255,11 +297,12 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     if (recording.customBitrateAvailable)
     {
-        ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled);
+        ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled && !fpsLockedBitrate);
         ui->bitrateSpinBox->setRange(recording.minBitrateMbps, recording.maxBitrateMpbs);
         ui->bitrateSpinBox->setValue(recording.bitrateMbps);
         setReadOnly(ui->bitrateSpinBox, state.readOnly);
-        setNormalizedValue(ui->bitrateSlider, recording.normalizedCustomBitrateMbps());
+        setNormalizedValue(ui->bitrateSlider,
+            fpsLockedBitrate ? 1.0 : recording.normalizedCustomBitrateMbps());
         setReadOnly(ui->bitrateSlider, state.readOnly);
 
         const auto buttonText = recording.customBitrateVisible
@@ -298,7 +341,6 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
 QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState& state)
 {
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
     const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
     const bool devicesHaveDualStreaming =
         state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;

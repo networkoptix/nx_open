@@ -3,23 +3,27 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common.js');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-const ENV = process.env.ENV = process.env.NODE_ENV = 'prod';
 
 module.exports = merge(common, {
     plugins: [
         new CleanWebpackPlugin([ 'dist' ]),
         new UglifyJSPlugin({}),
         new webpack.HashedModuleIdsPlugin(),
-
+    
         new CopyWebpackPlugin([
-                {
-                    from: '../app/scripts/commonPasswordsList.json',
-                    to  : 'scripts/commonPasswordsList.json'
-                }
+            {
+                from: '../app/scripts/commonPasswordsList.json',
+                to: 'scripts/commonPasswordsList.json'
+            },
+            {
+                // Copy en_US lang file to have correct values
+                // before Boris update translations
+                from: '../app/language_i18n.json',
+                to: '../../translations/en_US/language_i18n.json'
+            }
         ])
     ],
     output: {
@@ -38,13 +42,13 @@ module.exports = merge(common, {
                 test   : /\.s?css$/,
                 exclude: /src/,
                 use    : ExtractTextPlugin.extract({
-                    fallback: "style-loader",
+                    fallback: 'style-loader',
                     use     : [
                         {
                             loader : 'css-loader',
                             options: {
                                 url      : false,
-                                // minimize : true,
+                                minimize : true,
                                 sourceMap: false
                             }
                         },

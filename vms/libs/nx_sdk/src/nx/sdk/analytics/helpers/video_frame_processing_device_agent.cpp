@@ -7,9 +7,12 @@
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/helpers/plugin_event.h>
 #include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_object_metadata_packet.h>
+#include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
@@ -18,15 +21,21 @@ namespace analytics {
 class PrintPrefixMaker
 {
 public:
-    std::string makePrintPrefix(const std::string& overridingPrintPrefix, const IEngine* engine)
+    std::string makePrintPrefix(
+        const std::string& overridingPrintPrefix,
+        const IEngine* engine,
+        const IDeviceInfo* deviceInfo)
     {
         NX_KIT_ASSERT(engine);
         NX_KIT_ASSERT(engine->plugin());
         NX_KIT_ASSERT(engine->plugin()->name());
+        NX_KIT_ASSERT(deviceInfo);
 
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
-        return std::string("[") + engine->plugin()->name() + " DeviceAgent] ";
+
+        return std::string("[") + engine->plugin()->name()
+            + "_device_" + deviceInfo->id() + "] ";
     }
 
 private:
@@ -40,10 +49,11 @@ private:
 
 VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
     IEngine* engine,
+    const IDeviceInfo* deviceInfo,
     bool enableOutput,
     const std::string& printPrefix)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, engine)),
+    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, engine, deviceInfo)),
     m_engine(engine)
 {
     NX_PRINT << "Created " << this;
@@ -57,28 +67,6 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 
-void* VideoFrameProcessingDeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<IDeviceAgent*>(this);
-    }
-
-    if (interfaceId == IID_ConsumingDeviceAgent)
-    {
-        addRef();
-        return static_cast<IConsumingDeviceAgent*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -88,87 +76,125 @@ Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handle
 
 Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
+    const auto logError =
+        [this, func = __func__](Error error, const std::string& message = "")
+        {
+            if (!message.empty() || error != Error::noError || (NX_DEBUG_ENABLE_OUTPUT))
+            {
+                NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
+                    << error << (message.empty() ? "" : ": ") << message;
+            }
+            return error;
+        };
+
     NX_OUTPUT << __func__ << "() BEGIN";
 
     if (!dataPacket)
-    {
-        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: dataPacket is null; "
-            << "discarding the packet.";
-        return Error::unknownError;
-    }
+        return logError(Error::unknownError, "dataPacket is null; discarding it.");
 
     if (dataPacket->timestampUs() < 0)
     {
-        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: "
-            << "dataPacket has invalid timestamp " << dataPacket->timestampUs()
-            << "; discarding the packet.";
-        return Error::unknownError;
+        return logError(Error::unknownError, "dataPacket has invalid timestamp "
+            + nx::kit::utils::toString(dataPacket->timestampUs()) + "; discarding the packet.");
     }
 
-    if (const auto compressedFrame = nxpt::queryInterfacePtr<ICompressedVideoPacket>(
-        dataPacket, IID_CompressedVideoPacket))
+    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
-        {
-            NX_OUTPUT << __func__ << "() END -> unknownError: pushCompressedVideoFrame() failed.";
-            return Error::unknownError;
-        }
+            return logError(Error::unknownError, "pushCompressedVideoFrame() failed.");
     }
-    else if (const auto uncompressedFrame = nxpt::queryInterfacePtr<IUncompressedVideoFrame>(
-        dataPacket, IID_UncompressedVideoFrame))
+    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
-        {
-            NX_PRINT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed.";
-            return Error::unknownError;
-        }
+            return logError(Error::unknownError, "pushUncompressedVideoFrame() failed.");
     }
     else
     {
-        NX_OUTPUT << __func__ << "() END -> noError: Unsupported frame supplied; ignored.";
-        return Error::noError;
-    }
-
-    std::vector<IMetadataPacket*> metadataPackets;
-    if (!pullMetadataPackets(&metadataPackets))
-    {
-        NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed.";
-        return Error::unknownError;
-    }
-
-    if (!metadataPackets.empty())
-    {
-        NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
-            << " metadata packet(s).";
+        return logError(Error::noError, "Server ERROR: Unsupported frame supplied; ignored.");
     }
 
     if (!m_handler)
+        return logError(Error::unknownError, "Server ERROR: setMetadataHandler() was not called.");
+
+    std::vector<IMetadataPacket*> metadataPackets;
+    if (!pullMetadataPackets(&metadataPackets))
+        return logError(Error::unknownError, "pullMetadataPackets() failed.");
+
+    processMetadataPackets(metadataPackets);
+
+    return logError(Error::noError);
+}
+
+void VideoFrameProcessingDeviceAgent::processMetadataPackets(
+    const std::vector<IMetadataPacket*>& metadataPackets)
+{
+    if (!metadataPackets.empty())
     {
-        NX_PRINT << __func__ << "() END -> unknownError: setMetadataHandler() was not called.";
-        return Error::unknownError;
+        NX_OUTPUT << __func__ << "(): Producing " << metadataPackets.size()
+            << " metadata packet(s).";
     }
 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto& metadataPacket: metadataPackets)
-        {
-            if (metadataPacket)
-            {
-                NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
-                if (metadataPacket->timestampUs() == 0)
-                    NX_OUTPUT << __func__ << "(): WARNING: Metadata packet has timestamp 0.";
-                m_handler->handleMetadata(metadataPacket);
-                metadataPacket->releaseRef();
-            }
-            else
-            {
-                NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet found; discarded.";
-            }
-        }
+        for (int i = 0; i < (int) metadataPackets.size(); ++i)
+            processMetadataPacket(toPtr(metadataPackets.at(i)).get(), i);
+    }
+}
+
+void VideoFrameProcessingDeviceAgent::processMetadataPacket(
+    IMetadataPacket* metadataPacket, int packetIndex = -1)
+{
+    const std::string packetIndexName =
+        (packetIndex == -1) ? "" : (std::string(" #") + nx::kit::utils::toString(packetIndex));
+    if (!m_handler)
+    {
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
+        return;
+    }
+    if (!metadataPacket)
+    {
+        NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet" << packetIndexName
+            << " found; discarded.";
+        return;
     }
 
-    NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
+    if (NX_DEBUG_ENABLE_OUTPUT)
+    {
+        std::string packetName;
+        if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
+        {
+            packetName = "Object";
+        }
+        else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
+        {
+            packetName = "Event";
+        }
+        else
+        {
+            NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
+                << " has unknown type.";
+            packetName = "Unknown";
+        }
+        packetName += " metadata packet" + packetIndexName;
+
+        if (metadataPacket->count() == 0)
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
+
+        const std::string itemsName = (metadataPacket->count() == 1)
+            ? (std::string("item of type ") + metadataPacket->at(0)->typeId())
+            : "item(s)";
+
+        NX_OUTPUT << __func__ << "(): " << packetName << " contains "
+            << metadataPacket->count() << " " << itemsName << ".";
+
+        if (metadataPacket->timestampUs() == 0)
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+    }
+
+    NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
+
+    m_handler->handleMetadata(metadataPacket);
 }
 
 const IString* VideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
@@ -176,7 +202,7 @@ const IString* VideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
     return new String(manifest());
 }
 
-void VideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void VideoFrameProcessingDeviceAgent::setSettings(const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
@@ -184,7 +210,7 @@ void VideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::IStringMap* set
     settingsReceived();
 }
 
-nx::sdk::IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
+IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -193,25 +219,10 @@ nx::sdk::IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
 // Tools for the derived class.
 
 void VideoFrameProcessingDeviceAgent::pushMetadataPacket(
-    nx::sdk::analytics::IMetadataPacket* metadataPacket)
+    IMetadataPacket* metadataPacket)
 {
-    if (!metadataPacket)
-    {
-        NX_PRINT << __func__ << "(): ERROR: metadataPacket is null; ignoring";
-        return;
-    }
-
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (!m_handler)
-    {
-        NX_PRINT << __func__ << "(): "
-            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
-    }
-    else
-    {
-        m_handler->handleMetadata(metadataPacket);
-    }
-
+    processMetadataPacket(metadataPacket);
     metadataPacket->releaseRef();
 }
 
@@ -241,6 +252,7 @@ std::string VideoFrameProcessingDeviceAgent::getParamValue(const char* paramName
 
 void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
 {
+    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
     NX_KIT_ASSERT(engine,
         "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
         + nx::kit::utils::toString(this)

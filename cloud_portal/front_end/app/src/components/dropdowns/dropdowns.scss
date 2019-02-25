@@ -1,0 +1,212 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+.dropdown, .dropup {
+    .lang-sm {
+        margin-right : 16px;
+    }
+}
+
+// Special case for dropdowns in header
+header {
+    .dropdown {
+        @media (max-width : $collapse-second-width) {
+            position : inherit !important;
+            
+            .dropdown-menu {
+                right : 0 !important;
+            }
+        }
+        
+        .dropdown-toggle {
+            height : 47px;
+            border : none;
+            
+            @media (max-width : $collapse-first-width) {
+                padding : 5px 27px 5px 5px;
+            }
+            
+            @media (max-width : $collapse-second-width) {
+                padding : 5px 8px !important;
+            }
+        }
+        
+        .dropdown-menu {
+            border-top                 : 1px solid $light6;
+            border-radius              : 0;
+            border-bottom-left-radius  : 2px;
+            border-bottom-right-radius : 2px;
+        }
+    }
+}
+
+.dropdown {
+    &.short {
+        width : 70px;
+        
+        .multi-column {
+            &.columns-2 {
+                width : 300px !important;
+            }
+        }
+    }
+    
+    .dropdown-toggle {
+        display          : flex;
+        padding          : 5px 32px 5px 10px;
+        background-color : $light4;
+        width            : 100%;
+        max-width        : 100%;
+        
+        &::after {
+            display : none !important; // hide standard arrow
+        }
+        
+        .glyphicon {
+            margin : 0 14px 0 4px;
+        }
+        
+        .ellipsis {
+            // set text max-width so dropdown button will match spec width
+            @media (max-width : $collapse-first-width) {
+                max-width : 150px;
+            }
+            
+            @include media-breakpoint-down(xl) {
+                max-width : 172px;
+            }
+            
+            @include media-breakpoint-up(xl) {
+                max-width : 236px;
+            }
+        }
+    }
+    
+    .dropdown-menu {
+        margin-top       : 0;
+        background-color : $light4;
+        box-shadow       : 0 1rem 2rem 0 transparentize($dark15, 0.4);
+        position         : absolute !important;
+        border           : none;
+        border-radius    : 2px;
+        width            : 100%;
+        padding          : 4px 0;
+        
+        &--list {
+            max-height      : 312px;
+            overflow        : auto;
+            padding         : 0;
+            list-style-type : none;
+        }
+        
+        &--footer, &--header {
+            padding         : 0;
+            margin          : 0;
+            list-style-type : none;
+        }
+        
+        .multi-column-dropdown {
+            list-style : none;
+            margin     : 0;
+            padding    : 0;
+        }
+        
+        .dropdown-item-container {
+            position : relative;
+            height   : auto;
+            
+            .dropdown-item {
+                display     : flex;
+                align-items : center;
+                padding     : 0.25rem rem(10px);
+                height      : 26px;
+                line-height : 26px;
+                font-family : $font-family-medium;
+                
+                @media (max-width : $collapse-second-width) {
+                    height : 32px;
+                }
+                
+                &:hover {
+                    background-color : $light5;
+                    color            : $dark9 !important;
+                }
+                
+                &:active {
+                    background-color : $light6 !important;
+                    //color            : $light1 !important;
+                }
+                
+                &.selected {
+                    background-color : $light16 !important;
+                    color            : $light1 !important;
+                    
+                    &:hover {
+                        color : $light1 !important;
+                    }
+                }
+                
+                &:focus {
+                    background-color : $light4;
+                }
+                
+            }
+            
+            nx-checkbox {
+                position : absolute;
+                left     : 10px;
+                top      : 4px;
+                
+                & + label {
+                    position     : absolute;
+                    padding-left : 24px !important;
+                    margin       : 0;
+                    cursor       : pointer;
+                    width        : calc(100% - 10px);
+                }
+            }
+        }
+    }
+    
+    .dropdown-toggle-transparent {
+        background-color : transparent;
+        box-shadow       : none;
+        border-radius    : 0;
+        
+        &:focus {
+            background-color : transparent !important;
+        }
+        
+        &:hover {
+            background-color : $light2 !important;
+            box-shadow       : none !important;
+        }
+        
+        &:active {
+            background-color : $light3 !important;
+            box-shadow       : none !important;
+        }
+    }
+    
+    &.show {
+        .dropdown-toggle {
+            background-color : $light5;
+        }
+        
+        .dropdown-toggle-transparent {
+            background-color : transparentize($light5, 0.75) !important;
+        }
+    }
+    
+    &-divider {
+        height     : auto !important;
+        margin     : 4px 12px;
+        border-top : 1px solid $light6;
+    }
+}
+
+nx-select.ng-invalid:not(.ng-untouched) {
+    .form-control {
+        border-color : #d65029;
+    }
+}

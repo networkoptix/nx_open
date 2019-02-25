@@ -87,7 +87,7 @@ public:
 
     using FileFilter = std::pair<QString, QStringList>;
 
-    static const FileFilter kPicturesFilter;
+    static FileFilter picturesFilter();
     static const FileFilter kVideoFilter;
     static const FileFilter kAllFilesFilter;
 

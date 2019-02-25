@@ -8,7 +8,6 @@ extern "C" {
 
 } // extern "C"
 
-#include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
@@ -63,13 +62,8 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
 
-    if (const auto timeProvider = nxpt::queryInterfacePtr<nxpl::TimeProvider>(
-        m_plugin->pluginContainer(), nxpl::IID_TimeProvider))
-    {
-        m_timeProvider = decltype(m_timeProvider)(
-            timeProvider.get(),
-            [](nxpl::TimeProvider* provider) { provider->releaseRef(); });
-    }
+    m_timeUtilityProvider = queryInterfacePtr<ITimeUtilityProvider>(m_plugin->utilityProvider());
+    NX_KIT_ASSERT(m_timeUtilityProvider);
 }
 
 Engine::~Engine()
@@ -77,19 +71,8 @@ Engine::~Engine()
     NX_PRINT << " Destroyed Engine for " << m_plugin->name();
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<IEngine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
 void Engine::setSettings(const IStringMap* settings)
@@ -131,7 +114,7 @@ const IString* Engine::manifest(Error* error) const
     }
     else
     {
-        for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
+        for (int i = 0; i < (int) m_objectClassDescritions.size(); ++i)
         {
             objectTypesManifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
             if (i < (int) m_objectClassDescritions.size() - 1)
@@ -190,7 +173,7 @@ std::vector<ObjectClassDescription> Engine::objectClassDescritions() const
 
 std::chrono::microseconds Engine::currentTimeUs() const
 {
-    return std::chrono::microseconds(m_timeProvider->millisSinceEpoch() * 1000);
+    return std::chrono::microseconds(m_timeUtilityProvider->vmsSystemTimeSinceEpochMs() * 1000);
 }
 
 std::vector<ObjectClassDescription> Engine::loadObjectClasses() const
@@ -302,6 +285,7 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 namespace {
 
 static const std::string kLibName = "deepstream_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.deepstream",
@@ -314,7 +298,7 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

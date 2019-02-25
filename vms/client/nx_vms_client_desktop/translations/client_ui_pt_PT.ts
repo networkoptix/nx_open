@@ -31,7 +31,17 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation>System Servers</translation>
+      <translation>Servidores do sistema</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Customer Support</source>
+      <translation>Suporte ao cliente</translation>
+    </message>
+    <message>
+      <location/>
+      <source>ARM support policy</source>
+      <translation type="unfinished">ARM support policy</translation>
     </message>
   </context>
   <context>
@@ -57,7 +67,7 @@
     <message>
       <location/>
       <source>Gamma</source>
-      <translation>Gamma</translation>
+      <translation>Gama</translation>
     </message>
     <message>
       <location/>
@@ -85,12 +95,12 @@
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation>Double Buffering</translation>
+      <translation>Buffer Duplo</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>Maximum Live Buffer Length</translation>
+      <translation>Comprimento máximo do buffer ativo</translation>
     </message>
     <message>
       <location/>
@@ -105,17 +115,17 @@
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation>Reset All Warnings</translation>
+      <translation>Redefinir todos os avisos</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>A exibição de Gráficos Intel HD pode enfrentar problemas se o desfoque estiver ativado. Recomendamos que deixe a opção como está.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation>Disable blur</translation>
+      <translation>Desativar desfoque</translation>
     </message>
   </context>
   <context>
@@ -144,7 +154,7 @@
   <context>
     <name>AnalyticsSdkEventWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
       <source>Keywords separated by space</source>
       <translation>Palavras chave separados por espaço</translation>
     </message>
@@ -167,14 +177,9 @@
   <context>
     <name>ArchiveLengthWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
       <translation>Tamanho fixo do arquivo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>Min. Dias</translation>
     </message>
     <message>
       <location/>
@@ -183,8 +188,13 @@
     </message>
     <message>
       <location/>
-      <source>Max. Days</source>
+      <source>Max. days</source>
       <translation>Máx. Dias</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. days</source>
+      <translation>Min. Dias</translation>
     </message>
   </context>
   <context>
@@ -267,7 +277,7 @@
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>All servers are offline. Audit data is not available.</translation>
+      <translation>Todos os servidores estão offline. Dados de auditoria não estão disponíveis.</translation>
     </message>
   </context>
   <context>
@@ -295,17 +305,22 @@
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation>Bitrate limitation could lead to backup failure.</translation>
+      <translation>A limitação da taxa de bits pode levar à falha de backup.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation>Finish</translation>
+      <translation>Terminar</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation>Start</translation>
+      <translation>Começar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>on the next day</source>
+      <translation type="unfinished">on the next day</translation>
     </message>
   </context>
   <context>
@@ -313,7 +328,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation>Backup Settings</translation>
+      <translation>Configurações de backup</translation>
     </message>
     <message>
       <location/>
@@ -328,7 +343,7 @@
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation>Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Só será feito o backup de mais gravações. Processo de backup irá ignorar o material existente.</translation>
     </message>
     <message>
       <location/>
@@ -338,12 +353,12 @@
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation>Backup Archive From</translation>
+      <translation>Arquivo de backup de</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation>Backup Quality</translation>
+      <translation>Qualidade de backup</translation>
     </message>
   </context>
   <context>
@@ -377,7 +392,7 @@
   <context>
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
       <translation>Informação do marcador</translation>
     </message>
@@ -432,7 +447,7 @@
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation>List of tags divided by commas</translation>
+      <translation>Lista de tags divididas por vírgulas</translation>
     </message>
   </context>
   <context>
@@ -488,7 +503,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>At</translation>
+      <translation>Em</translation>
     </message>
   </context>
   <context>
@@ -506,7 +521,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Regras de Evento</translation>
     </message>
     <message>
       <location/>
@@ -520,112 +535,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdditionDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
-      <source>Server is offline</source>
-      <translation>Servidor offline</translation>
-    </message>
-    <message>
-      <location/>
-      <source>IP, hostname, RTSP link...</source>
-      <translation>IP, nome anfitrião, link RTSP...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Address</source>
-      <translation>Endereço</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Scanning...</source>
-      <translation>A Pesquisar...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Stop</source>
-      <translation>Pausa</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Brand</source>
-      <translation>Marca</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Model</source>
-      <translation>Modelo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>New Scan...</source>
-      <translation>Nova Pesquisa...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Add device(s)...</source>
-      <translation>Adicionar Dispositivo(s)...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Discovered Devices:</source>
-      <translation>Dispositivos Encontrados:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Device Address</source>
-      <translation>Endereço de Dispositivo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Start IP</source>
-      <translation>Start IP</translation>
-    </message>
-    <message>
-      <location/>
-      <source>End IP</source>
-      <translation>End IP</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Subnet Scan</source>
-      <translation>Pesquisa &amp;Subnet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Discovery Port</source>
-      <translation>Porta de Pes&amp;quisa</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password</source>
-      <translation>Password</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Login</source>
-      <translation>Login</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Scan</source>
-      <translation>Scan</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Add selected</source>
-      <translation>&amp;Adicionar seleccionado</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/camera_advanced_params_widget.ui"/>
       <source>Category</source>
       <translation>Categoria</translation>
     </message>
@@ -636,9 +548,17 @@
     </message>
   </context>
   <context>
+    <name>CameraCredentialsDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
+      <source>Authentication credentials</source>
+      <translation>Credenciais de autenticação</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
       <translation>Não gravar o stream principal</translation>
     </message>
@@ -649,38 +569,13 @@
     </message>
     <message>
       <location/>
-      <source>RTP transport:</source>
-      <translation>Transporte RTP:</translation>
-    </message>
-    <message>
-      <location/>
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
     <message>
       <location/>
-      <source>TCP</source>
-      <translation>TCP</translation>
-    </message>
-    <message>
-      <location/>
-      <source>UDP</source>
-      <translation>UDP</translation>
-    </message>
-    <message>
-      <location/>
       <source>Restore Defaults</source>
       <translation>Restaurar Padrões</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Force motion detection for stream:</source>
-      <translation>Force motion detection for stream:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation>Warning! Native camera presets will not be avaliable.</translation>
     </message>
     <message>
       <location/>
@@ -715,7 +610,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Secondary Stream</translation>
+      <translation>Fluxo Secundário</translation>
     </message>
     <message>
       <location/>
@@ -759,28 +654,131 @@
     </message>
     <message>
       <location/>
+      <source>Force motion detection for stream</source>
+      <translation>Forçar detecção de movimento para o stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>RTP transport</source>
+      <translation>Transporte RTP</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Custom Media Port</source>
+      <translation type="unfinished">Custom Media Port</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Trust camera timestamp</source>
+      <translation type="unfinished">Trust camera timestamp</translation>
+    </message>
+    <message>
+      <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Tipo de predefinição PTZ preferida:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Nativo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Native camera presets will not be avaliable.</source>
+      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Esta câmera suporta pan e tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Esta câmera suporta zoom</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion during archive import</source>
+      <translation type="unfinished">Detect motion during archive import</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraInfoWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_info_widget.ui"/>
+      <source>Model</source>
+      <translation>Modelo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Vendor</source>
+      <translation>Fabricante</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP Address</source>
+      <translation>Endereço IP</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ping</source>
+      <translation>Ping</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Firmware</source>
+      <translation>Firmware:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera ID</source>
+      <translation>ID da câmara</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Web Page</source>
+      <translation>Página da Web</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Primary Stream</source>
+      <translation>Stream Primário</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>Fluxo Secundário</translation>
+    </message>
+    <message>
+      <location/>
+      <source>MAC Address</source>
+      <translation>Endereço MAC</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show on layout</source>
+      <translation>Mostrar no layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Log</source>
+      <translation>Log de Eventos</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera rules</source>
+      <translation>Regra da câmara</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>ID lógico</translation>
     </message>
   </context>
   <context>
@@ -792,11 +790,37 @@
     </message>
   </context>
   <context>
+    <name>CameraLicensePanelWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
+      <source>Activate License...</source>
+      <translation>Ativar Licença...</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraListDialog</name>
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation>Add Device...</translation>
+      <translation>Adicionar dispositivo...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraMotionSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_motion_settings_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>Detecção de Movimento</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Sensibilidade</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Restaurar</translation>
     </message>
   </context>
   <context>
@@ -808,11 +832,6 @@
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>segundos</translation>
-    </message>
-    <message>
-      <location/>
       <source>Output ID:</source>
       <translation>ID de &amp;Saída:</translation>
     </message>
@@ -820,54 +839,9 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-      <source>Schedule Settings</source>
-      <translation>Definições de Agenda</translation>
-    </message>
-    <message>
-      <location/>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>Qualidade</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Record Always</source>
-      <translation>Gravar Sempre</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion Only</source>
-      <translation>Somente Movimento</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do Not Record</source>
-      <translation>Não Gravar</translation>
-    </message>
-    <message>
-      <location/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_schedule_widget.ui"/>
       <source>Motion Recording</source>
       <translation>Gravação Movimento</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Pre-Recording</source>
-      <translation>Pré-Gravação</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Post-Recording</source>
-      <translation>Pós-Gravação</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy Schedule...</source>
-      <translation>Copiar Agenda...</translation>
     </message>
     <message>
       <location/>
@@ -877,22 +851,12 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation>Activate License...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Show Quality</source>
-      <translation>Show Quality</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Show FPS</source>
-      <translation>Mostrar FPS</translation>
+      <translation>Ativar Licença...</translation>
     </message>
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation>Copying Schedule</translation>
+      <translation>Programação de cópia</translation>
     </message>
     <message>
       <location/>
@@ -901,24 +865,55 @@
     </message>
     <message>
       <location/>
-      <source>Panic Mode:</source>
-      <translation>Panic Mode:</translation>
+      <source>Copy Schedule to...</source>
+      <translation>Copiar agendamento para...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.ui"/>
+      <source>All Cameras</source>
+      <translation>Todas as Câmaras</translation>
     </message>
     <message>
       <location/>
-      <source>Motion + Lo-Res</source>
-      <translation>Movimento + Lo-Res</translation>
+      <source>Select Cameras</source>
+      <translation>Seleccionar Câmaras</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsGeneralTabWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_settings_general_tab_widget.ui"/>
+      <source>Authentication</source>
+      <translation>Autenticação</translation>
     </message>
     <message>
       <location/>
-      <source>Bitrate</source>
-      <translation>Bitrate</translation>
+      <source>Edit Credentials</source>
+      <translation>Editar Credenciais</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Audio</source>
+      <translation>Audio</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable audio</source>
+      <translation>Activar áudio</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Edit Streams...</source>
+      <translation>Editar streams...</translation>
     </message>
   </context>
   <context>
     <name>CameraStreamsDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
       <translation>Endereços de streams</translation>
     </message>
@@ -928,7 +923,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>Change password</translation>
+      <translation>Mudar senha</translation>
     </message>
   </context>
   <context>
@@ -936,7 +931,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Stay logged in</translation>
+      <translation>Permanecer logado</translation>
     </message>
   </context>
   <context>
@@ -992,11 +987,16 @@
       <source>Description contains:</source>
       <translation>Descrição Contém:</translation>
     </message>
+    <message>
+      <location/>
+      <source>Omit Logging</source>
+      <translation>Omitir Registo</translation>
+    </message>
   </context>
   <context>
     <name>CustomSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
       <source>Category</source>
       <translation>Categoria</translation>
     </message>
@@ -1012,6 +1012,89 @@
       <location/>
       <source>Restore from Backup...</source>
       <translation>Restaurar Backup...</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceAdditionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
+      <source>to</source>
+      <translation>para</translation>
+    </message>
+    <message>
+      <location/>
+      <source>SELECT SERVER</source>
+      <translation>SELECCIONE SERVER</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Known Address</source>
+      <translation>Endereço Conhecido</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Subnet Scan</source>
+      <translation>Pesquisa &amp;Subnet</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Address</source>
+      <translation>Endereço</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Hint</source>
+      <translation type="unfinished">Hint</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Port</source>
+      <translation>Porto</translation>
+    </message>
+    <message>
+      <location/>
+      <source>End IP</source>
+      <translation>Ip Final</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Start IP</source>
+      <translation>Ip Inicial</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>Senha</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login</source>
+      <translation>Login</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search</source>
+      <translation>Pesquisar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Stop</source>
+      <translation>Pausa</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add all Devices</source>
+      <translation>Adicionar todos os dispositivos</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add Devices</source>
+      <translation type="unfinished">Add Devices</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>Padrão</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1122,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Regras do Evento...</translation>
     </message>
   </context>
   <context>
@@ -1067,17 +1150,17 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation>Content type</translation>
+      <translation>Tipo de conteúdo</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <location/>
@@ -1109,7 +1192,7 @@
   <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
       <translation>Exportar definições</translation>
     </message>
@@ -1122,7 +1205,7 @@
   <context>
     <name>ExportMediaSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
       <translation>Exportar definições</translation>
     </message>
@@ -1143,9 +1226,22 @@
     </message>
   </context>
   <context>
+    <name>ExportPasswordWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
+      <source>Protect with password</source>
+      <translation type="unfinished">Protect with password</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation>Senha</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
       <translation>Exportar vídeo</translation>
     </message>
@@ -1162,21 +1258,29 @@
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation>Multi Video</translation>
+      <translation>Multi Vídeo</translation>
     </message>
   </context>
   <context>
     <name>FilenamePanel</name>
     <message>
-      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <location filename="../src/nx/vms/client/desktop/common/widgets/filename_panel.ui"/>
       <source>Browse...</source>
       <translation>Procurar...</translation>
     </message>
   </context>
   <context>
+    <name>FilteredResourceSelectionWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
+      <source>Nothing matches your search</source>
+      <translation>Nada corresponde à sua pesquisa</translation>
+    </message>
+  </context>
+  <context>
     <name>FisheyeSettingsWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
       <translation>Montagem em tecto</translation>
     </message>
@@ -1193,7 +1297,7 @@
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation>Fisheye Dewarping</translation>
+      <translation>Dewarping Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -1203,17 +1307,17 @@
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation>Mount Angle Correction:</translation>
+      <translation>Correção do ângulo de montagem:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation>Y Offset</translation>
+      <translation>Deslocamento Y</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>X Offset</translation>
+      <translation>Deslocamento X</translation>
     </message>
     <message>
       <location/>
@@ -1223,7 +1327,7 @@
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation>Ellipticity</translation>
+      <translation>Elipticidade</translation>
     </message>
   </context>
   <context>
@@ -1249,7 +1353,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>Misc</translation>
+      <translation>Outros</translation>
     </message>
     <message>
       <location/>
@@ -1279,17 +1383,17 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation>Local Media Folders</translation>
+      <translation>Pastas de mídia locais</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation>Audio Input</translation>
+      <translation>Entrada de áudio</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation>First Source</translation>
+      <translation>Primeira Fonte</translation>
     </message>
     <message>
       <location/>
@@ -1299,12 +1403,12 @@
     <message>
       <location/>
       <source>Second Source</source>
-      <translation>Second Source</translation>
+      <translation>Segunda Fonte</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation>Run Application when PC Boots up</translation>
+      <translation>Executar aplicativo quando o PC inicializa</translation>
     </message>
   </context>
   <context>
@@ -1317,31 +1421,41 @@
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation>Backup and Restore</translation>
+      <translation>Backup e Restauração</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Security</source>
+      <translation>Segurança</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Encrypting video traffic will significantly increase CPU usage.</source>
+      <translation>A encriptação do tráfego de vídeo irá aumentar significativamente o uso de CPU.</translation>
     </message>
   </context>
   <context>
     <name>ImageControlWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/image_control_widget.ui"/>
       <source>Image Control</source>
       <translation>Controlo de Imagem</translation>
     </message>
     <message>
       <location/>
-      <source>Aspect Ratio</source>
-      <translation>Aspect Ratio</translation>
+      <source>Aspect ratio</source>
+      <translation>Taxa de proporção</translation>
     </message>
     <message>
       <location/>
-      <source>Rotation</source>
-      <translation>Rotation</translation>
+      <source>Default rotation</source>
+      <translation>Rotação padrão</translation>
     </message>
   </context>
   <context>
     <name>ImageOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
       <source>Image</source>
       <translation>Imagem</translation>
     </message>
@@ -1386,13 +1500,194 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation>No image</translation>
+      <translation>Sem imagem</translation>
+    </message>
+  </context>
+  <context>
+    <name>InteractiveSettingsTestDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
+      <source>{
+    &quot;items&quot;: [
+        {
+            &quot;type&quot;: &quot;TextField&quot;,
+            &quot;name&quot;: &quot;text&quot;,
+            &quot;caption&quot;: &quot;Text Field&quot;,
+            &quot;description&quot;: &quot;A text field&quot;,
+            &quot;defaultValue&quot;: &quot;a text&quot;,
+            &quot;value&quot;: &quot;a text&quot;
+        },
+        {
+            &quot;type&quot;: &quot;GroupBox&quot;,
+            &quot;name&quot;: &quot;group&quot;,
+            &quot;caption&quot;: &quot;Group Box&quot;,
+            &quot;items&quot;: [
+                {
+                    &quot;type&quot;: &quot;SpinBox&quot;,
+                    &quot;name&quot;: &quot;number&quot;,
+                    &quot;caption&quot;: &quot;Spin Box&quot;,
+                    &quot;description&quot;: &quot;A number&quot;,
+                    &quot;defaultValue&quot;: 42,
+                    &quot;value&quot;: 42,
+                    &quot;minValue&quot;: 0,
+                    &quot;maxValue&quot;: 100
+                },
+                {
+                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
+                    &quot;name&quot;: &quot;double&quot;,
+                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
+                    &quot;description&quot;: &quot;A real number&quot;,
+                    &quot;defaultValue&quot;: 3.14,
+                    &quot;value&quot;: 3.14,
+                    &quot;minValue&quot;: 0.0,
+                    &quot;maxValue&quot;: 100.0
+                },
+                {
+                    &quot;type&quot;: &quot;ComboBox&quot;,
+                    &quot;name&quot;: &quot;combobox&quot;,
+                    &quot;caption&quot;: &quot;Combo Box&quot;,
+                    &quot;description&quot;: &quot;A choice&quot;,
+                    &quot;defaultValue&quot;: &quot;value2&quot;,
+                    &quot;value&quot;: &quot;value2&quot;,
+                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
+                },
+                {
+                    &quot;type&quot;: &quot;CheckBox&quot;,
+                    &quot;name&quot;: &quot;checkbox&quot;,
+                    &quot;caption&quot;: &quot;Check Box&quot;,
+                    &quot;description&quot;: &quot;True or False&quot;,
+                    &quot;defaultValue&quot;: true,
+                    &quot;value&quot;: true
+                },
+                {
+                    &quot;type&quot;: &quot;GroupBox&quot;,
+                    &quot;name&quot;: &quot;buttons&quot;,
+                    &quot;caption&quot;: &quot;Buttons&quot;,
+                    &quot;items&quot;: [
+                        {
+                            &quot;type&quot;: &quot;Row&quot;,
+                            &quot;name&quot;: &quot;row&quot;,
+                            &quot;items&quot;: [
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button1&quot;,
+                                    &quot;caption&quot;: &quot;Button 1&quot;,
+                                    &quot;description&quot;: &quot;Action 1&quot;
+                                },
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button2&quot;,
+                                    &quot;caption&quot;: &quot;Button 2&quot;,
+                                    &quot;description&quot;: &quot;Action 2&quot;
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}</source>
+      <translation type="unfinished">{
+    &quot;items&quot;: [
+        {
+            &quot;type&quot;: &quot;TextField&quot;,
+            &quot;name&quot;: &quot;text&quot;,
+            &quot;caption&quot;: &quot;Text Field&quot;,
+            &quot;description&quot;: &quot;A text field&quot;,
+            &quot;defaultValue&quot;: &quot;a text&quot;,
+            &quot;value&quot;: &quot;a text&quot;
+        },
+        {
+            &quot;type&quot;: &quot;GroupBox&quot;,
+            &quot;name&quot;: &quot;group&quot;,
+            &quot;caption&quot;: &quot;Group Box&quot;,
+            &quot;items&quot;: [
+                {
+                    &quot;type&quot;: &quot;SpinBox&quot;,
+                    &quot;name&quot;: &quot;number&quot;,
+                    &quot;caption&quot;: &quot;Spin Box&quot;,
+                    &quot;description&quot;: &quot;A number&quot;,
+                    &quot;defaultValue&quot;: 42,
+                    &quot;value&quot;: 42,
+                    &quot;minValue&quot;: 0,
+                    &quot;maxValue&quot;: 100
+                },
+                {
+                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
+                    &quot;name&quot;: &quot;double&quot;,
+                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
+                    &quot;description&quot;: &quot;A real number&quot;,
+                    &quot;defaultValue&quot;: 3.14,
+                    &quot;value&quot;: 3.14,
+                    &quot;minValue&quot;: 0.0,
+                    &quot;maxValue&quot;: 100.0
+                },
+                {
+                    &quot;type&quot;: &quot;ComboBox&quot;,
+                    &quot;name&quot;: &quot;combobox&quot;,
+                    &quot;caption&quot;: &quot;Combo Box&quot;,
+                    &quot;description&quot;: &quot;A choice&quot;,
+                    &quot;defaultValue&quot;: &quot;value2&quot;,
+                    &quot;value&quot;: &quot;value2&quot;,
+                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
+                },
+                {
+                    &quot;type&quot;: &quot;CheckBox&quot;,
+                    &quot;name&quot;: &quot;checkbox&quot;,
+                    &quot;caption&quot;: &quot;Check Box&quot;,
+                    &quot;description&quot;: &quot;True or False&quot;,
+                    &quot;defaultValue&quot;: true,
+                    &quot;value&quot;: true
+                },
+                {
+                    &quot;type&quot;: &quot;GroupBox&quot;,
+                    &quot;name&quot;: &quot;buttons&quot;,
+                    &quot;caption&quot;: &quot;Buttons&quot;,
+                    &quot;items&quot;: [
+                        {
+                            &quot;type&quot;: &quot;Row&quot;,
+                            &quot;name&quot;: &quot;row&quot;,
+                            &quot;items&quot;: [
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button1&quot;,
+                                    &quot;caption&quot;: &quot;Button 1&quot;,
+                                    &quot;description&quot;: &quot;Action 1&quot;
+                                },
+                                {
+                                    &quot;type&quot;: &quot;Button&quot;,
+                                    &quot;name&quot;: &quot;button2&quot;,
+                                    &quot;caption&quot;: &quot;Button 2&quot;,
+                                    &quot;description&quot;: &quot;Action 2&quot;
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}</translation>
+    </message>
+  </context>
+  <context>
+    <name>IoModuleSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
+      <source>Form</source>
+      <translation>Formulário</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable tile interface</source>
+      <translation>Ativar interface do bloco</translation>
     </message>
   </context>
   <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
       <source>Processing Image...Please Wait.</source>
       <translation>A processar imagem...Por favor aguarde.</translation>
     </message>
@@ -1440,7 +1735,7 @@
   <context>
     <name>LayoutGeneralSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
       <translation>Bloqueado</translation>
     </message>
@@ -1471,14 +1766,14 @@
     </message>
     <message>
       <location/>
-      <source>Minimal Size</source>
-      <translation>Tamanho Mínimo</translation>
+      <source>Minimum Grid Size</source>
+      <translation type="unfinished">Minimum Grid Size</translation>
     </message>
   </context>
   <context>
     <name>LayoutSelectionDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
       <translation>Seleccionar layout</translation>
     </message>
@@ -1497,11 +1792,6 @@
     <name>LdapSettingsDialog</name>
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
-      <source>ldap(s)://host:port</source>
-      <translation>ldap(s)://anfitrião:porto</translation>
-    </message>
-    <message>
-      <location/>
       <source>Optional</source>
       <translation>Opcional</translation>
     </message>
@@ -1518,27 +1808,32 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Admin DN</source>
-      <translation>Admin DN</translation>
+      <translation>URL Servidor</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation>Search Base</translation>
+      <translation>Base de pesquisa</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation>Search Filter</translation>
+      <translation>Filtro de pesquisa</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search Timeout (s)</source>
+      <translation>Search Timeout (s)</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Admin DN or CN</source>
+      <translation type="unfinished">Admin DN or CN</translation>
     </message>
   </context>
   <context>
@@ -1561,20 +1856,12 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation>Role to assign to imported users</translation>
+      <translation>Função para atribuir a usuários importados</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation>Disable imported users</translation>
-    </message>
-  </context>
-  <context>
-    <name>LegacyCameraSettingsStreamsPanel</name>
-    <message>
-      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
-      <source>Edit Streams...</source>
-      <translation>Editar streams...</translation>
+      <translation>Desativar usuários importados</translation>
     </message>
   </context>
   <context>
@@ -1630,12 +1917,12 @@
     <message>
       <location/>
       <source>Details...</source>
-      <translation>Details...</translation>
+      <translation>Detalhes...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation>The software is licensed to</translation>
+      <translation>O software está licenciado para</translation>
     </message>
   </context>
   <context>
@@ -1648,7 +1935,7 @@
     <message>
       <location/>
       <source>License issues:</source>
-      <translation>License issues:</translation>
+      <translation>Problemas de licença:</translation>
     </message>
   </context>
   <context>
@@ -1686,7 +1973,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation>Internet Activation</translation>
+      <translation>Ativação pela Internet</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1983,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Invalid License Key</translation>
+      <translation>Chave de licença inválida</translation>
     </message>
     <message>
       <location/>
@@ -1707,19 +1994,6 @@
       <location/>
       <source>Hardware ID</source>
       <translation>ID do Hardware:</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicensesProposeWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
-      <source>Licensing</source>
-      <translation>Licenciamento</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Activate License...</source>
-      <translation>Activate License...</translation>
     </message>
   </context>
   <context>
@@ -1755,7 +2029,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <location/>
@@ -1765,7 +2039,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <location/>
@@ -1813,7 +2087,7 @@
     <message>
       <location/>
       <source>Mode</source>
-      <translation>Mode</translation>
+      <translation>Modo</translation>
     </message>
     <message>
       <location/>
@@ -1823,7 +2097,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>Show additional info in tree</translation>
+      <translation>Mostrar informações adicionais na árvore</translation>
     </message>
     <message>
       <location/>
@@ -1833,7 +2107,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Tour cycle</translation>
+      <translation>Ciclo de tour</translation>
     </message>
     <message>
       <location/>
@@ -1842,67 +2116,126 @@
     </message>
   </context>
   <context>
+    <name>MediaFileSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.ui"/>
+      <source>File Settings</source>
+      <translation>Definições de Ficheiros</translation>
+    </message>
+  </context>
+  <context>
     <name>MessageBox</name>
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation>Do not show this message again</translation>
+      <translation>Não mostrar esta mensagem novamente</translation>
     </message>
   </context>
   <context>
-    <name>MultipleCameraSettingsWidget</name>
+    <name>MultiServerUpdatesWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
-      <source>General</source>
-      <translation>Geral</translation>
+      <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
+      <source>Applying System updates at the end of the week is not recommended.</source>
+      <translation>A aplicação de atualizações do sistema no final da semana não é recomendada.</translation>
     </message>
     <message>
       <location/>
-      <source>Authentication</source>
-      <translation>Autenticação</translation>
+      <source>Check for update</source>
+      <translation type="unfinished">Check for update</translation>
     </message>
     <message>
       <location/>
-      <source>Password:</source>
-      <translation>Password:</translation>
+      <source>Updating to...</source>
+      <translation>Atualizando para...</translation>
     </message>
     <message>
       <location/>
-      <source>Login:</source>
-      <translation>Login:</translation>
+      <source>You have the latest version installed</source>
+      <translation>Você tem a última versão instalada</translation>
     </message>
     <message>
       <location/>
-      <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <source>Download</source>
+      <translation>Descarregar</translation>
     </message>
     <message>
       <location/>
-      <source>Recording</source>
-      <translation>Em gravação</translation>
+      <source>Browse</source>
+      <translation>Procurar</translation>
     </message>
     <message>
       <location/>
-      <source>Expert</source>
-      <translation>Avançado</translation>
+      <source>Download &amp;&amp; Install</source>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Link copied</source>
+      <translation>Link copiado</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Advanced Update Settings</source>
+      <translation type="unfinished">Advanced Update Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
+      <translation>Parece que o processo de actualização está a demorar mais tempo que normal. Por favor aguarde.</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultipleLayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
+      <source>Show all layouts</source>
+      <translation type="unfinished">Show all layouts</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Layouts</source>
+      <translation type="unfinished">Select Layouts</translation>
     </message>
   </context>
   <context>
     <name>NewWearableCameraDialog</name>
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
-      <source>New Wearable Camera...</source>
-      <translation>Nova câmara wearable...</translation>
-    </message>
-    <message>
-      <location/>
       <source>To server</source>
       <translation>Para servidor</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Câmara Wearable&quot; é um armazenamento virtual para arquivos de vídeo, que pode ser carregado em qualquer servidor do seu Sistema e ser acedido por qualquer utilizador.</translation>
+      <source>New Virtual Camera...</source>
+      <translation type="unfinished">New Virtual Camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+    </message>
+  </context>
+  <context>
+    <name>OpenLayoutActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
+      <source>Layout</source>
+      <translation type="unfinished">Layout</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show to</source>
+      <translation>Mostrar a</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select layout...</source>
+      <translation>Seleccionar layout...</translation>
     </message>
   </context>
   <context>
@@ -1925,7 +2258,50 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation>Play to users</translation>
+      <translation>Play para os usuários</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginEventWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <source>Source:</source>
+      <translation>Origem:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>Captura contém:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keywords separated by space</source>
+      <translation>Palavras chave separados por espaço</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>Descrição Contém:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Level:</source>
+      <translation type="unfinished">Level:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>ERROR</source>
+      <translation type="unfinished">ERROR</translation>
+    </message>
+    <message>
+      <location/>
+      <source>WARNING</source>
+      <translation type="unfinished">WARNING</translation>
+    </message>
+    <message>
+      <location/>
+      <source>INFO</source>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -1943,7 +2319,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation>Force Acknowledgment</translation>
+      <translation>Forçar reconhecimento</translation>
     </message>
   </context>
   <context>
@@ -1961,7 +2337,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Events</translation>
+      <translation>Eventos</translation>
     </message>
   </context>
   <context>
@@ -2004,7 +2380,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation>Preview</translation>
+      <translation>Visualizar</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2421,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation>Preview</translation>
+      <translation>Visualizar</translation>
     </message>
   </context>
   <context>
@@ -2053,7 +2429,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation>Choose a specific build</translation>
+      <translation>Escolha uma compilação específica</translation>
     </message>
   </context>
   <context>
@@ -2061,15 +2437,20 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <translation>Marcador</translation>
     </message>
   </context>
   <context>
     <name>QnCompatibilityVersionInstallationDialog</name>
     <message>
-      <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation>Installing Compatibility Version...</translation>
+      <translation>Instalando versão de compatibilidade...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restart to the updated version when ready</source>
+      <translation type="unfinished">Restart to the updated version when ready</translation>
     </message>
   </context>
   <context>
@@ -2082,7 +2463,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
     <message>
       <location/>
@@ -2091,37 +2472,16 @@
     </message>
   </context>
   <context>
-    <name>QnIOPortSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Enable tile interface</source>
-      <translation>Enable tile interface</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLoginToCloudDialog</name>
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>Log in</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Stay logged in</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnMediaFileSettingsDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
-      <source>File Settings</source>
-      <translation>Definições de Ficheiros</translation>
+      <translation>Permanecer logado</translation>
     </message>
   </context>
   <context>
@@ -2139,7 +2499,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
     <message>
       <location/>
@@ -2154,7 +2514,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>The new System will have password and name from System:</translation>
+      <translation>O novo sistema terá senha e nome do sistema:</translation>
     </message>
   </context>
   <context>
@@ -2186,14 +2546,6 @@
     </message>
   </context>
   <context>
-    <name>QnResourceTreeWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/resource_tree_widget.ui"/>
-      <source>Filter</source>
-      <translation>Filtro</translation>
-    </message>
-  </context>
-  <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
@@ -2213,7 +2565,7 @@
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Removing this connection option could lead to System malfunction.</translation>
+      <translation>Remover esta opção de conexão pode levar a um mau funcionamento do sistema.</translation>
     </message>
   </context>
   <context>
@@ -2236,22 +2588,22 @@
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation>Updating to...</translation>
+      <translation>Atualizando para...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation>Link copied</translation>
+      <translation>Link copiado</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation>You have the latest version installed</translation>
+      <translation>Você tem a última versão instalada</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Applying System updates at the end of the week is not recommended.</translation>
+      <translation>A aplicação de atualizações do sistema no final da semana não é recomendada.</translation>
     </message>
   </context>
   <context>
@@ -2287,7 +2639,7 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation>Search users</translation>
+      <translation>Pesquisar usuários</translation>
     </message>
     <message>
       <location/>
@@ -2297,7 +2649,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation>Disable</translation>
+      <translation>Desativar</translation>
     </message>
     <message>
       <location/>
@@ -2307,7 +2659,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Edit Roles...</translation>
+      <translation>Editar Funções...</translation>
     </message>
   </context>
   <context>
@@ -2336,7 +2688,7 @@
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
       <translation>Revisão rápida</translation>
     </message>
@@ -2378,6 +2730,11 @@
       <source>Please wait while the connection is being restored...</source>
       <translation>Por favor aguarde enquanto a ligação é restabelecida...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Server name</source>
+      <translation>Nome do servidor</translation>
+    </message>
   </context>
   <context>
     <name>RecordingBusinessActionWidget</name>
@@ -2398,11 +2755,6 @@
     </message>
     <message>
       <location/>
-      <source>max</source>
-      <translation>máx</translation>
-    </message>
-    <message>
-      <location/>
       <source>Pre-Recording:</source>
       <translation>Pré-Gravação:</translation>
     </message>
@@ -2415,11 +2767,6 @@
       <location/>
       <source>Fixed duration:</source>
       <translation>Duração Fixa:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>seconds</source>
-      <translation>segundos</translation>
     </message>
   </context>
   <context>
@@ -2447,7 +2794,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
     </message>
     <message>
       <location/>
@@ -2476,6 +2823,19 @@
     </message>
   </context>
   <context>
+    <name>RecordingThresholdWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/recording_threshold_widget.ui"/>
+      <source>Pre-Recording</source>
+      <translation>Pré-Gravação</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Post-Recording</source>
+      <translation>Pós-Gravação</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceBrowserWidget</name>
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
@@ -2484,8 +2844,18 @@
     </message>
     <message>
       <location/>
-      <source>Search</source>
-      <translation>Pesquisar</translation>
+      <source>Filter TEST</source>
+      <translation type="unfinished">Filter TEST</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing found</source>
+      <translation>Nada encontrado</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Drag any image or video file to the application window to play them</source>
+      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
     </message>
   </context>
   <context>
@@ -2513,7 +2883,98 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation>Speak to users</translation>
+      <translation>Fale com os usuários</translation>
+    </message>
+  </context>
+  <context>
+    <name>ScheduleSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/schedule_settings_widget.ui"/>
+      <source>Schedule Settings</source>
+      <translation>Definições de Agenda</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Record Always</source>
+      <translation>Gravar Sempre</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Only</source>
+      <translation>Somente Movimento</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion + Lo-Res</source>
+      <translation>Movimento + Lo-Res</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do Not Record</source>
+      <translation>Não Gravar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>Bitrate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality</source>
+      <translation>Qualidade</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show Quality</source>
+      <translation>Mostrar Qualidade</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show FPS</source>
+      <translation>Mostrar FPS</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecuritySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/system_administration/widgets/security_settings_widget.ui"/>
+      <source>Enable audit trail</source>
+      <translation>Activar Trilho de Auditoria</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Allow only secure connections</source>
+      <translation>Permitir apenas conexões seguras</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Encrypt video traffic</source>
+      <translation>Encriptar o tráfego de vídeo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation>Exibir marca d&apos;água com nome do utilizador sobre o vídeo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation>Visualização de marca d&apos;água</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Limit Session Length</source>
+      <translation type="unfinished">Limit Session Length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
+      <translation>para</translation>
     </message>
   </context>
   <context>
@@ -2559,7 +3020,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation>Porto</translation>
     </message>
   </context>
   <context>
@@ -2624,134 +3085,6 @@
       <location/>
       <source>Check Result:</source>
       <translation>Conferir resultado:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SingleCameraSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
-      <source>General</source>
-      <translation>Geral</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Address</source>
-      <translation>Endereço</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ping</source>
-      <translation>Ping</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Authentication</source>
-      <translation>Autenticação</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording</source>
-      <translation>Gravação</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion</source>
-      <translation>Movimento</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Advanced</source>
-      <translation>Avançado</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Expert</source>
-      <translation>Avançado</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Enable Audio</source>
-      <translation>Activar Áudio</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion is not available for this camera.</source>
-      <translation>A Detecção de Movimento não está disponível para esta câmara.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion Detection</source>
-      <translation>Detecção de Movimento</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fisheye</source>
-      <translation>Fisheye</translation>
-    </message>
-    <message>
-      <location/>
-      <source>I/O ports</source>
-      <translation>Portas I/O</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Name</source>
-      <translation>Nome</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Model</source>
-      <translation>Modelo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Firmware</source>
-      <translation>Firmware</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Vendor</source>
-      <translation>Fabricante</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Audio</source>
-      <translation>Audio</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Login</source>
-      <translation>Login</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password</source>
-      <translation>Password</translation>
-    </message>
-    <message>
-      <location/>
-      <source>IP Address</source>
-      <translation>Endereço IP</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Web Page</source>
-      <translation>Página da Web</translation>
-    </message>
-    <message>
-      <location/>
-      <source>MAC Address</source>
-      <translation>Endereço MAC</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Sensitivity</source>
-      <translation>Sensibilidade</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Reset</source>
-      <translation>Restaurar</translation>
     </message>
   </context>
   <context>
@@ -2848,7 +3181,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation>Available to</translation>
+      <translation>Disponível para</translation>
     </message>
     <message>
       <location/>
@@ -2858,7 +3191,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation>Icon</translation>
+      <translation>Ícone</translation>
     </message>
   </context>
   <context>
@@ -2866,22 +3199,27 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation>Current Statistics</translation>
+      <translation>Estatísticas atuais</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation>Forecast for Full Storage Usage</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Additional storage:</source>
-      <translation>Armazenamento adicional:</translation>
+      <translation>Previsão para uso de armazenamento completo</translation>
     </message>
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation>Server is offline. Statistics are not available.</translation>
+      <translation>Servidor está offline. Estatísticas não estão disponíveis.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Additional storage</source>
+      <translation>Armazenamento adicional</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Base forecast on data recorded during</source>
+      <translation type="unfinished">Base forecast on data recorded during</translation>
     </message>
   </context>
   <context>
@@ -2904,27 +3242,27 @@
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation>Storage Locations</translation>
+      <translation>Locais de armazenamento</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation>Reindex Archive</translation>
+      <translation>Reindexar Arquivo</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation>Reindex Backup</translation>
+      <translation>Reindexar Backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation>Backup Archive</translation>
+      <translation>Arquivo de backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation>Backup Settings...</translation>
+      <translation>Configurações de backup...</translation>
     </message>
   </context>
   <context>
@@ -2955,35 +3293,35 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Entrar:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Password:</translation>
+      <translation>Senha:</translation>
     </message>
   </context>
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>Roles</translation>
+      <translation>Função</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation>Show all users</translation>
+      <translation>Mostrar todos os usuários</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation>Select Users</translation>
+      <translation>Selecionar usuários</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation>Nothing matches your search.</translation>
+      <translation>Nada corresponde à sua pesquisa.</translation>
     </message>
   </context>
   <context>
@@ -2995,11 +3333,6 @@
     </message>
     <message>
       <location/>
-      <source>Enable audit trail</source>
-      <translation>Activar Trilho de Auditoria</translation>
-    </message>
-    <message>
-      <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
       <translation>Enviar estatísticas anónimas de uso e de problemas para os criadores do software</translation>
     </message>
@@ -3008,21 +3341,11 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Aviso! Esta opção irá tornar irrelevantes as definições na agenda de gravação em relação à "Qualidade e Frame Rate (FPS)".</translation>
     </message>
-    <message>
-      <location/>
-      <source>Display watermark with username over video</source>
-      <translation>Exibir marca d'água com nome do utilizador sobre o vídeo</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermark Preview</source>
-      <translation>Visualização de marca d'água</translation>
-    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
       <translation>Texto</translation>
     </message>
@@ -3051,21 +3374,39 @@
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>System Time</source>
-      <translation>System Time</translation>
+      <source>Sync time with the Internet</source>
+      <translation>Sincronizar tempo com a Internet</translation>
     </message>
     <message>
       <location/>
-      <source>Sync time with the Internet</source>
-      <translation>Sync time with the Internet</translation>
+      <source>VMS Time</source>
+      <translation type="unfinished">VMS Time</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSynchronizationWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
+      <source>Sync Time with the Internet</source>
+      <translation type="unfinished">Sync Time with the Internet</translation>
+    </message>
+    <message>
+      <location/>
+      <source>VMS Time</source>
+      <translation type="unfinished">VMS Time</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not sync time among servers</source>
+      <translation type="unfinished">Do not sync time among servers</translation>
     </message>
   </context>
   <context>
     <name>TimestampOverlaySettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Timestamp</translation>
+      <translation>Marca Temporal</translation>
     </message>
     <message>
       <location/>
@@ -3088,7 +3429,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>Change Password...</translation>
+      <translation>Mudar senha...</translation>
     </message>
   </context>
   <context>
@@ -3106,7 +3447,7 @@
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation>Delete Role</translation>
+      <translation>Excluir Função</translation>
     </message>
   </context>
   <context>
@@ -3114,12 +3455,12 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation>User Roles</translation>
+      <translation>Funções do usuário</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation>New role</translation>
+      <translation>Nova função</translation>
     </message>
     <message>
       <location/>
@@ -3137,51 +3478,48 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>User Type</translation>
+      <translation>Tipo de usuário</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation>Role</translation>
+      <translation>Função</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Edit Roles...</translation>
+      <translation>Editar Funções...</translation>
     </message>
   </context>
   <context>
-    <name>WearableMotionWidget</name>
+    <name>WearableCameraMotionWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.ui"/>
       <source>Motion Detection</source>
       <translation>Detecção de Movimento</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Detect motion in uploaded video</source>
-      <translation>Detectar movimento no vídeo enviado</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
       <translation>Sensibilidade</translation>
     </message>
-  </context>
-  <context>
-    <name>WearableProgressWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <location/>
+      <source>Detect motion</source>
+      <translation type="unfinished">Detect motion</translation>
     </message>
   </context>
   <context>
-    <name>WearableUploadWidget</name>
+    <name>WearableCameraUploadWidget</name>
     <message>
-      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Upload Video</source>
-      <translation>Upload de vídeo</translation>
+      <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.ui"/>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Footage</source>
+      <translation>Envio de gravações</translation>
     </message>
     <message>
       <location/>
@@ -3231,11 +3569,11 @@
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
-      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>Pré-visualização da marca d'água</translation>
+      <translation>Pré-visualização da marca d&apos;água</translation>
     </message>
     <message>
       <location/>

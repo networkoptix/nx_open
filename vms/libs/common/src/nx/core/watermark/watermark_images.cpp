@@ -1,6 +1,7 @@
 #include "watermark_images.h"
 
 #include <cmath>
+#include <array>
 #include <algorithm>
 
 #include <QtCore/QMap>
@@ -11,6 +12,7 @@
 #include <QtGui/QPainter>
 
 #include <nx/core/watermark/watermark.h>
+#include <utils/graphics/drop_shadow_filter.h>
 
 using nx::core::Watermark;
 
@@ -20,6 +22,15 @@ const QColor kWatermarkColor = QColor(Qt::white);
 const int kWatermarkFontSize = 84; //< Pure magic. It was 42 * 2 before. No more memes.
 constexpr double kFuzzyEqualDiff = 0.02;
 constexpr double kFuzzyEqualRatio = 1.02;
+
+// Predefined watermark image sizes for typical aspect ratios, pair<aspect ratio, image size>.
+// These values are arbitrary, but reasonable.
+const std::array<std::pair<double, QSize>, 5> predefinedSizes = {{
+    {16.0 / 9.0, QSize(1920, 1080)},
+    {4.0 / 3.0,  QSize(1600, 1200)},
+    {1.0,        QSize(1200, 1200)},
+    {3.0 / 4.0,  QSize(1200, 1600)},
+    {9.0 / 16.0, QSize(1080, 1920)}}};
 
 Watermark cachedWatermark;
 QMap<double, QPixmap> watermarkImages;
@@ -55,27 +66,15 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
 
     bool predefinedAspect = false;
     // Setup predefined sizes for a few well-known aspect ratios.
-    // These values are arbitrary, but reasonable.
-    const auto kWideScreenAspectRatio = 16.0 / 9.0;
-    if (fabs(aspectRatio / kWideScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
+    for (int i = 0; i < predefinedSizes.size(); i++)
     {
-        size = QSize(1920, 1080);
-        aspectRatio = kWideScreenAspectRatio;
-        predefinedAspect = true;
-    }
-    const auto kNormalScreenAspectRatio = 4.0 / 3.0;
-    if (fabs(aspectRatio / kNormalScreenAspectRatio - 1.0) < kFuzzyEqualDiff)
-    {
-        size = QSize(1600, 1200);
-        aspectRatio = kNormalScreenAspectRatio;
-        predefinedAspect = true;
-    }
-    const auto kSquareScreenAspectRatio = 1.0; //< We will remove all magic consts!
-    if (fabs(aspectRatio / kSquareScreenAspectRatio - 1) < kFuzzyEqualDiff)
-    {
-        size = QSize(1200, 1200);
-        aspectRatio = kSquareScreenAspectRatio;
-        predefinedAspect = true;
+        if ((fabs(aspectRatio / predefinedSizes[i].first - 1.0) < kFuzzyEqualDiff))
+        {
+            aspectRatio = predefinedSizes[i].first;
+            size = predefinedSizes[i].second;
+            predefinedAspect = true;
+            break;
+        }
     }
 
     // Sometimes `size` uses logical coordinates that are quite big, ~10000.
@@ -105,6 +104,29 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
     watermarkImages[aspectRatio] = pixmap;
 
     return pixmap;
+}
+
+QPixmap createWatermarkTile(const Watermark& watermark, const QSize& size, const QFont& font)
+{
+    QImage tile(size, QImage::Format_ARGB32_Premultiplied);
+    tile.fill(Qt::transparent);
+
+    QPainter painter(&tile);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setPen(kWatermarkColor);
+    painter.setFont(font);
+    painter.drawText(0, 0,size.width(),size.height(),Qt::AlignCenter, watermark.text);
+    painter.end(); //< or we may crush in painter destructor later.
+
+    nx::utils::graphics::DropShadowFilter().filterImage(tile); //< Add shadow.
+
+    QPixmap finalTile(tile.size());
+    finalTile.fill(Qt::transparent);
+    QPainter painter1(&finalTile);
+    painter1.setOpacity(watermark.settings.opacity); //< Use opacity to make watermark semi-transparent.
+    painter1.drawImage(QPoint(0, 0), tile);
+
+    return finalTile;
 }
 
 } // namespace
@@ -143,27 +165,21 @@ QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& 
     xCount = std::max(1, std::min(pixmap.width() / minTileWidth, xCount));
     yCount = std::max(1, std::min(pixmap.height() / minTileHeight, yCount));
 
-    QPainter painter(&pixmap);
-    auto color = kWatermarkColor;
-    color.setAlphaF(watermark.settings.opacity);
-    painter.setRenderHint(QPainter::TextAntialiasing);
-    painter.setPen(color);
-    painter.setFont(font);
-
     width = pixmap.width() / xCount;
     const int height = pixmap.height() / yCount;
+
+    QPixmap tile = createWatermarkTile(watermark, QSize(width, height), font);
+
+    QPainter painter(&pixmap);
     for (int x = 0; x < xCount; x++)
     {
         for (int y = 0; y < yCount; y++)
         {
-            painter.drawText((int)((x * pixmap.width()) / xCount),
-                (int) ((y * pixmap.height()) / yCount),
-                width,
-                height,
-                Qt::AlignCenter,
-                watermark.text);
+            painter.drawPixmap((int)((x * pixmap.width()) / xCount),
+                (int)((y * pixmap.height()) / yCount), tile);
         }
     }
+
     return pixmap;
 }
 

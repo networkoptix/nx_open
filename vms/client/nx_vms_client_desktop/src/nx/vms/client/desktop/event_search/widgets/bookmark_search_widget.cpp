@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +33,8 @@ struct BookmarkSearchWidget::Private
 
     nx::utils::ElapsedTimer sinceLastRequest;
     nx::utils::ElapsedTimer sinceViewUpdated;
+
+    nx::utils::ScopedConnections connections;
 
     void updateVisiblePeriod(BookmarkSearchWidget* q)
     {
@@ -87,16 +90,11 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
 
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/bookmarks.png"));
 
-    connect(this, &AbstractSearchWidget::textFilterChanged,
-        [this](const QString& text)
-        {
-            d->model->setFilterText(text);
-        });
-
     // Track remote bookmark changes by polling.
     QPointer<QTimer> updateTimer = new QTimer(this);
     updateTimer->setInterval(kUpdateTimerResolution);
-    connect(updateTimer.data(), &QTimer::timeout, this, [this]() { d->updateVisiblePeriod(this); });
+    connect(updateTimer.data(), &QTimer::timeout, this,
+        [this]() { d->updateVisiblePeriod(this); });
 
     installEventHandler(this, {QEvent::Show, QEvent::Hide}, this,
         [updateTimer](QObject* /*watched*/, QEvent* event)
@@ -107,11 +105,20 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
                 updateTimer->stop();
         });
 
-    connect(view(), &EventRibbon::visibleRangeChanged, this,
-        [this]() { d->sinceViewUpdated.restart(); });
-
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &BookmarkSearchWidget::updateAllowance);
+
+    // Signals that can potentially be emitted during this widget destruction must be
+    // disconnected in ~Private, so store the connections in d->connections.
+
+    d->connections << connect(this, &AbstractSearchWidget::textFilterChanged,
+        d->model, &BookmarkSearchListModel::setFilterText);
+
+    d->connections << connect(model(), &AbstractSearchListModel::isOnlineChanged,
+        this, &BookmarkSearchWidget::updateAllowance);
+
+    d->connections << connect(view(), &EventRibbon::visibleRangeChanged, this,
+        [this]() { d->sinceViewUpdated.restart(); });
 }
 
 BookmarkSearchWidget::~BookmarkSearchWidget()
@@ -137,7 +144,8 @@ QString BookmarkSearchWidget::itemCounterText(int count) const
 
 bool BookmarkSearchWidget::calculateAllowance() const
 {
-    return accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
+    return model()->isOnline()
+        && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
 }
 
 } // namespace nx::vms::client::desktop

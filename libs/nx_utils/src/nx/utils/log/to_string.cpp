@@ -1,7 +1,7 @@
 #include "to_string.h"
 
 #include <nx/utils/unused.h>
-#include <nx/utils/nx_utils_ini.h>
+#include <nx/utils/log/log.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -58,7 +58,7 @@ QString toString(const QByteArray& value)
 
 QString toString(const QUrl& value)
 {
-    if (nx::utils::ini().displayUrlPasswordInLogs)
+    if (nx::utils::log::showPasswords())
         return value.toString();
     else
         return value.toDisplayString();

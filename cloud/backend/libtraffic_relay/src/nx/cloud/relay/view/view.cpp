@@ -60,10 +60,11 @@ View::View(
     m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
     m_authenticationManager(m_authRestrictionList),
     m_multiAddressHttpServer(
-        &m_authenticationManager,
+        &m_authenticationDispatcher,
         &m_httpMessageDispatcher)
 {
     registerApiHandlers();
+    registerAuthenticators();
     initializeProxy();
     loadSslCertificate();
     startAcceptor();
@@ -113,6 +114,26 @@ std::vector<network::SocketAddress> View::httpsEndpoints() const
 const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
 {
     return m_multiAddressHttpServer;
+}
+
+void View::registerAuthenticators()
+{
+    if (!m_settings.http().maintenanceHtdigestPath.empty())
+    {
+        NX_INFO(
+            this,
+            lm("htdigest authentication for traffic relay maintenance server enabled. File path: %1")
+               .arg(m_settings.http().maintenanceHtdigestPath));
+
+        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
+            m_settings.http().maintenanceHtdigestPath);
+
+        m_authenticationDispatcher.add(
+            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
+            &m_maintenanceAuthenticator->manager);
+    }
+
+    m_authenticationDispatcher.add(std::regex(".*"), &m_authenticationManager);
 }
 
 void View::registerApiHandlers()
@@ -167,10 +188,7 @@ void View::registerApiHandler(
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, args...]() -> std::unique_ptr<Handler>
-        {
-            return std::make_unique<Handler>(args...);
-        },
+        [args...]() { return std::make_unique<Handler>(args...); },
         method);
 }
 

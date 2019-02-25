@@ -197,9 +197,9 @@ void setForcedPtzCapabilities(std::optional<bool> panTilt, std::optional<bool> z
     }
 }
 
-void setRtpTransportType(vms::api::RtpTransportType value, const Cameras& cameras)
+void setRtpTransportType(nx::vms::api::RtpTransportType value, const Cameras& cameras)
 {
-    const auto valueStr = value == vms::api::RtpTransportType::automatic
+    const auto valueStr = value == nx::vms::api::RtpTransportType::automatic
         ? QString()
         : QnLexical::serialized(value);
 
@@ -213,44 +213,29 @@ void setTrustCameraTime(bool value, const Cameras& cameras)
         camera->setTrustCameraTime(value);
 }
 
-void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& cameras)
+void setForcedMotionStreamType(nx::vms::api::StreamIndex value, const Cameras& cameras)
 {
-    const auto isValueSupported =
-        [value](const QnVirtualCameraResourcePtr& camera) -> bool
-        {
-            switch (value)
-            {
-                case vms::api::MotionStreamType::secondary:
-                    return camera->hasDualStreamingInternal();
-                case vms::api::MotionStreamType::edge:
-                    return camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
-                default:
-                    return true;
-            }
-        };
-
-    const auto valueStr = value == vms::api::MotionStreamType::automatic
-        ? QString()
-        : QnLexical::serialized(value);
-
+    const bool isMotionDetectionForced = (value != nx::vms::api::StreamIndex::undefined);
+    const QnSecurityCamResource::MotionStreamIndex index{value, isMotionDetectionForced};
     for (const auto& camera: cameras)
-    {
-        if (isValueSupported(camera))
-            camera->setProperty(QnMediaResource::motionStreamKey(), valueStr);
-    }
+        camera->setMotionStreamIndex(index);
 }
 
 void setWearableMotionEnabled(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
     {
-        if (!camera->hasFlags(Qn::wearable_camera))
-            continue;
+        if (camera->hasFlags(Qn::wearable_camera))
+            camera->setRemoteArchiveMotionDetectionEnabled(value);
+    }
+}
 
-        NX_ASSERT(camera->getDefaultMotionType() == Qn::MotionType::MT_SoftwareGrid);
-        camera->setMotionType(value
-            ? Qn::MotionType::MT_SoftwareGrid
-            : Qn::MotionType::MT_NoMotion);
+void setRemoteArchiveMotionDetection(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (camera->hasCameraCapabilities(Qn::RemoteArchiveCapability))
+            camera->setRemoteArchiveMotionDetectionEnabled(value);
     }
 }
 
@@ -349,7 +334,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         camera->setDewarpingParams(state.singleCameraSettings.fisheyeDewarping());
         camera->setLogicalId(state.singleCameraSettings.logicalId());
 
-        if (state.devicesDescription.hasMotion == State::CombinedValue::All)
+        if (state.devicesDescription.hasMotion == CombinedValue::All)
         {
             camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
                 ? camera->getDefaultMotionType()
@@ -358,7 +343,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             camera->setMotionRegionList(state.singleCameraSettings.motionRegionList());
         }
 
-        if (camera->isIOModule() && state.devicesDescription.isIoModule == State::CombinedValue::All)
+        if (camera->isIOModule() && state.devicesDescription.isIoModule == CombinedValue::All)
         {
             camera->setProperty(ResourcePropertyKey::kIoOverlayStyle, QnLexical::serialized(
                 state.singleIoModuleSettings.visualStyle()));
@@ -376,10 +361,10 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 Qn::CR_SecondaryLiveVideo, /*save*/ false);
         }
 
-        camera->setEnabledAnalyticsEngines(state.analytics.enabledEngines());
+        camera->setUserEnabledAnalyticsEngines(state.analytics.enabledEngines());
     }
 
-    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    if (state.devicesDescription.isWearable == CombinedValue::All)
     {
         if (state.wearableMotion.enabled.hasValue())
         {
@@ -391,7 +376,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     }
 
     if ((state.credentials.login.hasValue() || state.credentials.password.hasValue())
-        && state.devicesDescription.isWearable == State::CombinedValue::None)
+        && state.devicesDescription.isWearable == CombinedValue::None)
     {
         setCredentials(state.credentials, cameras);
     }
@@ -430,7 +415,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             setUseBitratePerGOP(state.expert.useBitratePerGOP(), cameras);
         }
 
-        if (state.devicesDescription.isArecontCamera == State::CombinedValue::None
+        if (state.devicesDescription.isArecontCamera == CombinedValue::None
             && state.expert.cameraControlDisabled.hasValue())
         {
             setCameraControlDisabled(state.expert.cameraControlDisabled(), cameras);
@@ -443,10 +428,16 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.expert.secondaryRecordingDisabled.hasValue())
         setSecondaryRecordingDisabled(state.expert.secondaryRecordingDisabled(), cameras);
 
-    if (state.devicesDescription.supportsMotionStreamOverride == State::CombinedValue::All
-        && state.expert.motionStreamType.hasValue())
+    if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
+        && state.expert.forcedMotionStreamType.hasValue())
     {
-        setMotionStreamType(state.expert.motionStreamType(), cameras);
+        setForcedMotionStreamType(state.expert.forcedMotionStreamType(), cameras);
+    }
+
+    if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All
+		&& state.expert.remoteMotionDetectionEnabled.hasValue())
+    {
+        setRemoteArchiveMotionDetection(state.expert.remoteMotionDetectionEnabled(), cameras);
     }
 
     if (state.canSwitchPtzPresetTypes() && state.expert.preferredPtzPresetType.hasValue())

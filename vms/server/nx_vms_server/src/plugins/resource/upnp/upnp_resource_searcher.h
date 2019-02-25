@@ -10,7 +10,6 @@
 
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-
 class QnMediaServerModule;
 
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
@@ -19,17 +18,15 @@ public:
     QnUpnpResourceSearcher(QnMediaServerModule* serverModule);
     ~QnUpnpResourceSearcher();
 
-    void setSendRequests(bool value);
-
 protected:
     virtual QnResourceList findResources() override;
-    /*!
-        \param discoveryAddr Local interface address, device has been discovered on
-        \param host Discovered device address
-        \param devInfo Parameters, received by parsing \a xmlDevInfo
-        \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
-        \param auth Authentication data
-    */
+    /**
+     * @param discoveryAddr Local interface address, device has been discovered on.
+     * @param host Discovered device address.
+     * @param devInfo Parameters, received by parsing \a xmlDevInfo.
+     * @param xmlDevInfo Xml data as defined in [UPnP Device Architecture 1.1, section 2.3].
+     * @param auth Authentication data.
+     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const nx::network::HostAddress& host,
@@ -41,7 +38,8 @@ protected:
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const nx::network::HostAddress& host);
-    void processSocket(nx::network::AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
+    void processSocket(nx::network::AbstractDatagramSocket* socket,
+        QSet<QByteArray>& processedUuid, QnResourceList& result);
 
 protected:
     void readDeviceXml(
@@ -53,7 +51,7 @@ protected:
         const QByteArray& foundDeviceDescription,
         const nx::network::HostAddress& host,
         const nx::network::HostAddress& sender,
-        QnResourceList& result );
+        QnResourceList& result);
 
 private:
     QMap<QString, nx::network::AbstractDatagramSocket*> m_socketList;
@@ -65,8 +63,7 @@ private:
     QnMediaServerModule* m_serverModule = nullptr;
 };
 
-
-//!\a QnUpnpResourceSearcher-compatible wrapper for \a UPNPSearchHandler
+/** \a QnUpnpResourceSearcher-compatible wrapper for \a UPNPSearchHandler */
 class QnUpnpResourceSearcherAsync
 :
     virtual public QnAbstractNetworkResourceSearcher,
@@ -75,29 +72,33 @@ class QnUpnpResourceSearcherAsync
 public:
     QnUpnpResourceSearcherAsync(QnMediaServerModule* serverModule, const QString& deviceType);
 
-    //!Implementation of QnAbstractNetworkResourceSearcher::findResources
+    /** Implementation of QnAbstractNetworkResourceSearcher::findResources */
     virtual QnResourceList findResources() override;
-    //!Implementation of UPNPSearchHandler::processPacket
+
+    /** Implementation of UPNPSearchHandler::processPacket */
+    virtual bool isEnabled() const override;
+
+    /** Implementation of UPNPSearchHandler::processPacket */
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const nx::network::SocketAddress& discoveredDevAddress,
         const nx::network::upnp::DeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo ) override;
+        const QByteArray& xmlDevInfo) override;
 
-    virtual bool isEnabled() const override;
 protected:
-    /*!
-        \param discoveryAddr Local interface address, device has been discovered on
-        \param host Discovered device address
-        \param devInfo Parameters, received by parsing \a xmlDevInfo
-        \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
-    */
+    /**
+     * @param discoveryAddr Local interface address, device has been discovered on
+     * @param host Discovered device address
+     * @param devInfo Parameters, received by parsing \a xmlDevInfo
+     * @param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
+     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const nx::network::SocketAddress& deviceEndpoint,
         const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
-        QnResourceList& result ) = 0;
+        QnResourceList& result) = 0;
+
 private:
     QnResourceList m_resList;
     QnMutex m_mutex;

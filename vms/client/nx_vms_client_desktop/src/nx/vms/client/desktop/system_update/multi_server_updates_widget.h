@@ -71,8 +71,8 @@ protected:
     bool atCancelCurrentAction();
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
+    void atCloudSettingsChanged();
 
-    void syncStatusVisibility();
     void clearUpdateInfo();
     void pickLocalFile();
     void pickSpecificBuild();
@@ -105,6 +105,8 @@ private:
         readyInstall,
         /** Some servers are installing an update. */
         installing,
+        /** Some servers are installing an update, but it took too long. */
+        installingStalled,
         /** Installation process is complete. */
         complete,
     };
@@ -121,7 +123,7 @@ private:
 
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
-    void checkForInternetUpdates();
+    void checkForInternetUpdates(bool initial = false);
 
     /**
      * Describes all possible display modes for update version.
@@ -173,6 +175,7 @@ private:
     void syncRemoteUpdateStateToUi();
     void syncProgress();
     void syncReportToUi();
+    void syncStatusVisibility();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 

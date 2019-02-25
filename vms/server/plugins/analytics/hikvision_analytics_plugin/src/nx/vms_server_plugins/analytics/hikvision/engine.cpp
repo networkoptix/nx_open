@@ -62,19 +62,8 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         NX_WARNING(this, lm("Can't deserialize driver manifest file"));
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
 void Engine::setSettings(const IStringMap* /*settings*/)
@@ -221,6 +210,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 namespace {
 
 static const std::string kLibName = "hikvision_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.hikvision",
@@ -233,7 +223,7 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

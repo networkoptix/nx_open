@@ -1,5 +1,5 @@
 {
-  "language": "英文_美國",
+  "language": "zh_TW",
   "language_name": "繁体中文",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -137,13 +137,21 @@
     "cantOpenClient": "%VMS_NAME% 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
     "lostConnection": "與 {{systemName}} 的連線斷開了",
     "thisSystem": "系統",
-    "oldSafariNotSupported": "不支持10歲以上的Safari版本"
+    "oldSafariNotSupported": "不支持10歲以上的Safari版本",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "好",
+    "fair": "尚可",
+    "minLength": "太短",
     "minLengthMessage": "密碼必須包含至少 8 個字元",
+    "required": "不正確",
     "requiredMessage": "只能使用拉丁字母, 數字和符號鍵盤, 避免前後空格",
+    "weak": "弱",
     "weakMessage": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "strongMessage": "理想的密碼!",
+    "common": "太常見",
     "commonMessage": "此密碼是很常用的組合",
     "missingMessage": "密碼是必填的"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "刪除",
     "successDisconnected": "系統成功地斷開 %PRODUCT_NAME%",
     "successDeleted": "從您的帳號成功刪除系統 {{systemName}}",
-    "successMerge": "系統 {{systemName}} 已與 {{systemName}} 合併",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "權限從 {{email}} 被移除"
   },
   "account": {

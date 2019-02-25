@@ -101,20 +101,10 @@ void GetPostTunnelClient::handleOpenUpTunnelResult(
     std::size_t /*bytesTransferred*/)
 {
     if (systemErrorCode != SystemError::noError)
-    {
-        return reportFailure({
-            systemErrorCode,
-            StatusCode::serviceUnavailable,
-            nullptr});
-    }
+        return reportFailure(OpenTunnelResult(systemErrorCode));
 
     if (!resetConnectionAttributes())
-    {
-        return reportFailure({
-            SystemError::getLastOSErrorCode(),
-            StatusCode::serviceUnavailable,
-            nullptr});
-    }
+        return reportFailure(OpenTunnelResult(SystemError::getLastOSErrorCode()));
 
     reportSuccess();
 }

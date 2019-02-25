@@ -49,19 +49,16 @@
 #include "data/analytics_data.h"
 
 #include "types/access_rights_types.h"
+#include "types/motion_types.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 void Metatypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     // Fully qualified namespaces are not needed here but are mandatory in all signal declarations.
 
@@ -110,6 +107,8 @@ void Metatypes::initialize()
     qRegisterMetaType<MiscDataList>();
     qRegisterMetaType<ModuleInformation>();
     qRegisterMetaType<ModuleInformationWithAddresses>();
+    qRegisterMetaType<MotionType>();
+    qRegisterMetaType<StreamIndex>();
     qRegisterMetaType<QList<ModuleInformation>>();
     qRegisterMetaType<QList<ModuleInformationWithAddresses>>();
     qRegisterMetaType<P2pStatisticsData>();
@@ -152,6 +151,4 @@ void Metatypes::initialize()
     qRegisterMetaType<WebPageData>();
 };
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api

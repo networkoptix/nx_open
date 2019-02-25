@@ -82,7 +82,8 @@ public slots:
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
+        StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

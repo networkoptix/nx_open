@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-CN" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation>启用</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -56,10 +67,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation>安全模式</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation>不兼容</translation>
     </message>
@@ -70,6 +77,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>不可到达</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation>安全模式</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -83,20 +94,21 @@
       <translation>未找到内容</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>你有没有 %1 的访问权限。某些功能可能不可用。</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>加载中...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation>连接到另一台服务器...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation>连接到服务器...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>加载中...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>你有没有 %1 的访问权限。某些功能可能不可用。</translation>
     </message>
   </context>
 </TS>

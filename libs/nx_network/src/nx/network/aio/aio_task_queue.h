@@ -4,8 +4,6 @@
 #include <deque>
 #include <memory>
 
-#include <QtCore/QElapsedTimer>
-
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_pollset.h"
@@ -238,7 +236,6 @@ public:
 
 private:
     AbstractPollSet* m_pollSet = nullptr;
-    QElapsedTimer m_monotonicClock;
     // TODO #ak: Use cyclic array here to minimize allocations.
     /**
      * NOTE: This variable can be accessed within aio thread only.

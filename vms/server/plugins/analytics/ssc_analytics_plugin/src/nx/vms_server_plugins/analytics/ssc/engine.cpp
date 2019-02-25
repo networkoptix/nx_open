@@ -39,7 +39,7 @@ static const QByteArray defaultConfiguration = /*suppress newline*/1 + R"json(
 )json";
 
 // The following constants are from "SSC System Specification" (page 5).
-static const unsigned int kCommandLength = 4;
+static const int kCommandLength = 4;
 static const char kSTX = 0x02; //< start byte
 static const char kETX = 0x03; //< stop byte
 static const char kMinDigitCode = 0x30;
@@ -70,7 +70,7 @@ int extractLogicalId(const QByteArray& data)
 /** Check if data begins with a correct command. */
 bool isCorrectCommand(const QByteArray& data)
 {
-    NX_ASSERT(data.size() >= kCommandLength);
+    NX_ASSERT((int) data.size() >= kCommandLength);
     const bool commandEnvelopeIsCorrect = (data[0] == kSTX && data[3] == kETX);
 
     const char b1 = data[1];
@@ -272,19 +272,8 @@ void Engine::configureSerialPort(QSerialPort* port, const QString& name, int ind
     NX_PRINT << "Serial port " << name.toStdString() << " configuration finished";
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
 void Engine::setSettings(const IStringMap* settings)
@@ -403,6 +392,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 namespace {
 
 static const std::string kLibName = "ssc_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.ssc",
@@ -415,7 +405,7 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

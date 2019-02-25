@@ -10,8 +10,10 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/app_info.h>
-
-#include <common/static_common_module.h>
+#include <common/common_module.h>
+#include <api/global_settings.h>
+#include <nx/network/socket_global.h>
+#include <api/runtime_info_manager.h>
 
 namespace nx::update {
 
@@ -349,7 +351,7 @@ static InformationError fillUpdateInformation(
     }
 
     // Falling back to previous protocol with update.json
-    if (error == InformationError::httpError )
+    if (error == InformationError::httpError)
         error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
 
     if (error == InformationError::noError)
@@ -364,7 +366,7 @@ static InformationError fillUpdateInformation(
     return error;
 }
 
-Information updateInformationImpl(
+static Information updateInformationImpl(
     const QString& url,
     const QString& publicationKey,
     nx::vms::api::SoftwareVersion currentVersion,
@@ -412,24 +414,15 @@ Information updateInformationImpl(
     return result;
 }
 
-} // namespace
-
-Information updateInformation(
-    const QString& url,
-    const QString& publicationKey,
-    InformationError* error)
-{
-    auto version = qnStaticCommon->engineVersion();
-    return updateInformationImpl(url, publicationKey, version, error, /*checkAlternativeServers*/ true);
-}
-
 static void setErrorMessage (const QString& message, QString* outMessage)
 {
     if (outMessage)
         *outMessage = message;
 };
 
-FindPackageResult findPackage(
+static FindPackageResult findPackage(
+    const QnUuid& moduleGuid,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
@@ -444,6 +437,13 @@ FindPackageResult findPackage(
         return FindPackageResult::noInfo;
     }
 
+    if (!isClient && !updateInformation.participants.isEmpty()
+        && !updateInformation.participants.contains(moduleGuid))
+    {
+        setErrorMessage("This module is not listed in the update participants", outMessage);
+        return FindPackageResult::notParticipant;
+    }
+
     if (updateInformation.cloudHost != cloudHost && boundToCloud)
     {
         setErrorMessage(QString::fromLatin1(
@@ -454,21 +454,21 @@ FindPackageResult findPackage(
         return FindPackageResult::otherError;
     }
 
-    if (nx::utils::SoftwareVersion(updateInformation.version) == qnStaticCommon->engineVersion() && !isClient)
+    if (nx::utils::SoftwareVersion(updateInformation.version) == engineVersion && !isClient)
     {
         setErrorMessage(QString::fromLatin1(
             "Latest update (%1) installed")
-                .arg(qnStaticCommon->engineVersion().toString()),
+                .arg(engineVersion.toString()),
             outMessage);
         return FindPackageResult::latestUpdateInstalled;
     }
 
-    if (nx::utils::SoftwareVersion(updateInformation.version) < qnStaticCommon->engineVersion() && !isClient)
+    if (nx::utils::SoftwareVersion(updateInformation.version) < engineVersion && !isClient)
     {
         setErrorMessage(QString::fromLatin1(
             "The update application version (%1) is less than the peer application version (%2)")
                 .arg(updateInformation.version)
-                .arg(qnStaticCommon->engineVersion().toString()),
+                .arg(engineVersion.toString()),
             outMessage);
         return FindPackageResult::otherError;
     }
@@ -503,7 +503,9 @@ FindPackageResult findPackage(
     return FindPackageResult::otherError;
 }
 
-FindPackageResult findPackage(
+static FindPackageResult findPackage(
+    const QnUuid& moduleGuid,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
@@ -512,22 +514,80 @@ FindPackageResult findPackage(
     nx::update::Package* outPackage,
     QString* outMessage)
 {
+    update::Information updateInformation;
+    const auto deserializeResult = fromByteArray(serializedUpdateInformation,
+        &updateInformation, outMessage);
+    if (deserializeResult != FindPackageResult::ok)
+        return deserializeResult;
+    return findPackage(moduleGuid, engineVersion, systemInformation, updateInformation, isClient,
+        cloudHost, boundToCloud, outPackage, outMessage);
+}
+
+} // namespace
+
+Information updateInformation(
+    const QString& url,
+    const nx::vms::api::SoftwareVersion& engineVersion,
+    const QString& publicationKey,
+    InformationError* error)
+{
+    return updateInformationImpl(url, publicationKey, engineVersion, error,
+        /*checkAlternativeServers*/ true);
+}
+
+FindPackageResult fromByteArray(
+    const QByteArray& serializedUpdateInformation,
+    Information* outInformation,
+    QString* outMessage)
+{
     if (serializedUpdateInformation.isEmpty())
     {
         setErrorMessage("Update information is empty", outMessage);
         return FindPackageResult::noInfo;
     }
-
-    update::Information updateInformation;
-    if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
+    if (!QJson::deserialize(serializedUpdateInformation, outInformation))
     {
         setErrorMessage("Failed to deserialize update information JSON", outMessage);
         return FindPackageResult::otherError;
     }
-
-    return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,
-        outPackage, outMessage);
+    return FindPackageResult::ok;
 }
+
+FindPackageResult findPackage(
+    const QnCommonModule& commonModule,
+    nx::update::Package* outPackage,
+    QString* outMessage)
+{
+    return findPackage(
+        commonModule.moduleGUID(),
+        commonModule.engineVersion(),
+        QnAppInfo::currentSystemInformation(),
+        commonModule.globalSettings()->targetUpdateInformation(),
+        commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !commonModule.globalSettings()->cloudSystemId().isEmpty(),
+        outPackage,
+        outMessage);
+}
+
+FindPackageResult findPackage(
+    const QnCommonModule& commonModule,
+    const Information& updateInformation,
+    nx::update::Package* outPackage,
+    QString* outMessage)
+{
+    return findPackage(
+        commonModule.moduleGUID(),
+        commonModule.engineVersion(),
+        QnAppInfo::currentSystemInformation(),
+        updateInformation,
+        commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
+        nx::network::SocketGlobals::cloud().cloudHost(),
+        !commonModule.globalSettings()->cloudSystemId().isEmpty(),
+        outPackage,
+        outMessage);
+}
+
 
 nx::update::Package* findPackage(
     const QString& component,
@@ -550,13 +610,16 @@ nx::update::Package* findPackage(
 
 std::future<UpdateContents> checkLatestUpdate(
     const QString& updateUrl,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     UpdateCheckCallback&& callback)
 {
     return std::async(std::launch::async,
-        [updateUrl, callback = std::move(callback), thread = QThread::currentThread()]()
+        [updateUrl, callback = std::move(callback), thread = QThread::currentThread(),
+        engineVersion]()
         {
             UpdateContents result;
-            result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
+            result.info = nx::update::updateInformation(updateUrl, engineVersion,
+                nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
             if (callback)
@@ -573,14 +636,17 @@ std::future<UpdateContents> checkLatestUpdate(
 
 std::future<UpdateContents> checkSpecificChangeset(
     const QString& updateUrl,
+    const nx::vms::api::SoftwareVersion& engineVersion,
     const QString& build,
     UpdateCheckCallback&& callback)
 {
     return std::async(std::launch::async,
-        [updateUrl, build, callback = std::move(callback), thread = QThread::currentThread()]()
+        [updateUrl, build, callback = std::move(callback), thread = QThread::currentThread(),
+        engineVersion]()
         {
             UpdateContents result;
-            result.info = nx::update::updateInformation(updateUrl, build, &result.error);
+            result.info = nx::update::updateInformation(updateUrl, engineVersion, build,
+                &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
             if (result.info.version.isEmpty())

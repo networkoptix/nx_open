@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
   <context>
-    <name>AsyncImageWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>НЕМАЄ ДАНИХ</translation>
-    </message>
-  </context>
-  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -68,6 +61,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ComboBoxUtils</name>
+    <message>
+      <source>multiple values</source>
+      <translation>декілька значень</translation>
+    </message>
+  </context>
+  <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
@@ -82,8 +82,16 @@ to view more bookmarks</source>
       <translation>Установку завершено</translation>
     </message>
     <message>
-      <source>Installation has been cancelled</source>
-      <translation>Установка була скасована</translation>
+      <source>Getting update information from the server</source>
+      <translation type="unfinished">Getting update information from the server</translation>
+    </message>
+    <message>
+      <source>Downloading update package</source>
+      <translation type="unfinished">Downloading update package</translation>
+    </message>
+    <message>
+      <source>Installing</source>
+      <translation type="unfinished">Installing</translation>
     </message>
   </context>
   <context>
@@ -199,10 +207,6 @@ to view more bookmarks</source>
     <message>
       <source>Open...</source>
       <translation>Відкрити...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>Файл(и)...</translation>
     </message>
     <message>
       <source>Folder...</source>
@@ -792,36 +796,12 @@ to view more bookmarks</source>
       <translation>Відкріпити дерево</translation>
     </message>
     <message>
-      <source>Show Tree</source>
-      <translation>Показати дерево</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>Сховати дерево</translation>
-    </message>
-    <message>
       <source>Show Timeline</source>
       <translation>Показати шкалу часу</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
       <translation>Сховати шкалу часу</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation>Показувати сповіщення</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation>Приховати сповіщення</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>Прикріпити панель сповіщень</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>Відмінити закріплення панель сповіщень</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
@@ -844,24 +824,12 @@ to view more bookmarks</source>
       <translation>Зробити прокрутку</translation>
     </message>
     <message>
-      <source>Wearable Camera...</source>
-      <translation>Портативна камера...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation>Нова портативнаякамера...</translation>
-    </message>
-    <message>
       <source>Upload File...</source>
       <translation>Завантажити файл...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
       <translation>Завантажити папку...</translation>
-    </message>
-    <message>
-      <source>Start Analytics...</source>
-      <translation>Запустити аналітику...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -893,58 +861,91 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomHorizontalHeader</name>
-    <message>
-      <source>5 minutes</source>
-      <translation>5 хвилин</translation>
+      <translation>Експортувати закладки...</translation>
     </message>
     <message>
-      <source>Hour</source>
-      <translation>Година</translation>
+      <source>Forget password</source>
+      <translation type="unfinished">Forget password</translation>
     </message>
     <message>
-      <source>Day</source>
-      <translation>День</translation>
+      <source>Cancel Upload...</source>
+      <translation>Відмінити завантаження...</translation>
     </message>
     <message>
-      <source>Week</source>
-      <translation>Тиждень</translation>
+      <source>Copy Schedule...</source>
+      <translation>Копіювати розклад...</translation>
     </message>
     <message>
-      <source>Month</source>
-      <translation>Місяць</translation>
+      <source>Analytics Engine Settings...</source>
+      <translation type="unfinished">Analytics Engine Settings...</translation>
     </message>
     <message>
-      <source>For the last 5 min</source>
-      <translation>За останні 5 хв</translation>
+      <source>Show Thumbnails</source>
+      <translation type="unfinished">Show Thumbnails</translation>
     </message>
     <message>
-      <source>For the last hour</source>
-      <translation>За останню годину</translation>
+      <source>Hide Thumbnails</source>
+      <translation type="unfinished">Hide Thumbnails</translation>
     </message>
     <message>
-      <source>For the last day</source>
-      <translation>За останній день</translation>
+      <source>Pin Panel</source>
+      <translation>Прикріпити панель</translation>
     </message>
     <message>
-      <source>For the last week</source>
-      <translation>За останній тиждень</translation>
+      <source>Unpin Panel</source>
+      <translation>Відкріпити панель</translation>
     </message>
     <message>
-      <source>For the last month</source>
-      <translation>За останній місяць</translation>
+      <source>Virtual Camera...</source>
+      <translation type="unfinished">Virtual Camera...</translation>
     </message>
     <message>
-      <source>All data</source>
-      <translation>Всі дані</translation>
+      <source>New Virtual Camera...</source>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
     <message>
-      <source>For all data</source>
-      <translation>Для всіх даних</translation>
+      <source>Show Tree</source>
+      <translation>Показати дерево</translation>
+    </message>
+    <message>
+      <source>Hide Tree</source>
+      <translation>Сховати дерево</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation>Показувати сповіщення</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation>Приховати сповіщення</translation>
+    </message>
+    <message>
+      <source>Files...</source>
+      <translation>Файли...</translation>
+    </message>
+    <message>
+      <source>Switch to Notifications tab</source>
+      <translation type="unfinished">Switch to Notifications tab</translation>
+    </message>
+    <message>
+      <source>Switch to Motion tab</source>
+      <translation type="unfinished">Switch to Motion tab</translation>
+    </message>
+    <message>
+      <source>Switch to Bookmarks tab</source>
+      <translation type="unfinished">Switch to Bookmarks tab</translation>
+    </message>
+    <message>
+      <source>Switch to Events tab</source>
+      <translation type="unfinished">Switch to Events tab</translation>
+    </message>
+    <message>
+      <source>Switch to Objects tab</source>
+      <translation type="unfinished">Switch to Objects tab</translation>
+    </message>
+    <message>
+      <source>Objects Frames and Info...</source>
+      <translation type="unfinished">Objects Frames and Info...</translation>
     </message>
   </context>
   <context>
@@ -987,6 +988,29 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EncryptedLayoutStrings</name>
+    <message>
+      <source>Please enter a valid password</source>
+      <translation type="unfinished">Please enter a valid password</translation>
+    </message>
+    <message>
+      <source>The password is not valid.</source>
+      <translation type="unfinished">The password is not valid.</translation>
+    </message>
+    <message>
+      <source>Encrypted layout</source>
+      <translation type="unfinished">Encrypted layout</translation>
+    </message>
+    <message>
+      <source>The file %1 is encrypted. Please enter the password:</source>
+      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+    </message>
+    <message>
+      <source>Please re-enter password for layout %1:</source>
+      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1003,34 +1027,18 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>ExportSettingsDialog</name>
+    <name>FileExtensions</name>
     <message>
-      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>Вибрані параметри вимагають перекодування. Це збільшить навантаження на процесор і може зайняти значний час.</translation>
+      <source>Pictures</source>
+      <translation>Зображення</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>Формат AVI не рекомендується використовувати для експорту записів з перервами і з аудіодоріжками.</translation>
+      <source>Video</source>
+      <translation>Відео</translation>
     </message>
     <message>
-      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>Ми рекомендуємо експортувати відео з цієї камери як &quot;Multi Video&quot; щоб уникнути погіршення якості.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Ви збираєтеся експортувати довге відео. Для цього може знадобитися понад гігабайт вільного простору на жорсткому диску і зайняти кілька хвилин.</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>Експортований файл .EXE буде мати розмір більше 4 ГБ, і його не можна відкрити, двічі клацнувши в Windows. Його можна відтворити лише у %1 клієнта.</translation>
-    </message>
-    <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Локальні файли, віджети моніторингу серверів і веб-сторінки експортуватися не будуть.</translation>
-    </message>
-    <message>
-      <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>Налаштування недоступні для файлів .NOV та .EXE.</translation>
+      <source>All Files</source>
+      <translation>Всі файли</translation>
     </message>
   </context>
   <context>
@@ -1206,26 +1214,6 @@ to view more bookmarks</source>
       <source>Password should contain different types of symbols.</source>
       <translation>Пароль повинен містити різні типи символів.</translation>
     </message>
-    <message>
-      <source>Short</source>
-      <translation>Короткий</translation>
-    </message>
-    <message>
-      <source>Common</source>
-      <translation>Типовий</translation>
-    </message>
-    <message>
-      <source>This password is in list of the most popular passwords.</source>
-      <translation>Цей пароль знаходиться в списку найпопулярніших паролів.</translation>
-    </message>
-    <message>
-      <source>Incorrect</source>
-      <translation>Некорректний</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>Дозволено лише латинські літери, цифри та символи клавіатури.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1234,6 +1222,10 @@ to view more bookmarks</source>
         <numerusform>Пароль повинен містити %n різних комбінацій символів, символів або цифр</numerusform>
         <numerusform>Пароль повинен містити %n різних комбінацій символів, символів або цифр</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Короткий</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
@@ -1276,8 +1268,24 @@ to view more bookmarks</source>
       </translation>
     </message>
     <message>
+      <source>Common</source>
+      <translation>Типовий</translation>
+    </message>
+    <message>
+      <source>This password is in list of the most popular passwords.</source>
+      <translation>Цей пароль знаходиться в списку найпопулярніших паролів.</translation>
+    </message>
+    <message>
+      <source>Incorrect</source>
+      <translation>Некорректний</translation>
+    </message>
+    <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
       <translation>Дозволено лише латинські літери, цифри та символи клавіатури %1.</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
+      <translation>Дозволено лише латинські літери, цифри та символи клавіатури.</translation>
     </message>
   </context>
   <context>
@@ -1331,6 +1339,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzInstrument</name>
+    <message>
+      <source>Layout is locked</source>
+      <translation type="unfinished">Layout is locked</translation>
+    </message>
+  </context>
+  <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
@@ -1364,8 +1379,12 @@ to view more bookmarks</source>
       <translation>Параметр 1 - null.</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Ні</translation>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Виконуваний %1 медіа файл (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Виконуваний %1 медіа файл (x86) (*.exe)</translation>
     </message>
   </context>
   <context>
@@ -1404,14 +1423,6 @@ to view more bookmarks</source>
     <message>
       <source>Built for %1-%2 with %3.</source>
       <translation>Побудовано для %1-%2 з %3.</translation>
-    </message>
-    <message>
-      <source>Customer Support</source>
-      <translation>Технічна підтримка</translation>
-    </message>
-    <message>
-      <source>Client is not connected to any System</source>
-      <translation>Клієнт не підключений до жодної системи</translation>
     </message>
   </context>
   <context>
@@ -1479,29 +1490,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnArchiveLengthWidget</name>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших пристроях.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших камерах.</translation>
-    </message>
-    <message>
-      <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation>Архів можна видалити, якщо немає місця для нового запису.</translation>
-    </message>
-    <message>
-      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation>Налаштування Min і Max визначають вік архіву, який повинен зберігатися по цій камері.</translation>
-    </message>
-    <message>
-      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation>Якщо включено параментр &quot;Auto&quot;, то зпочатку будуть видалені найстаріші записи серед усіх камер.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
@@ -1553,14 +1541,6 @@ to view more bookmarks</source>
     <message>
       <source>Camera actions</source>
       <translation>Дії для камер</translation>
-    </message>
-    <message>
-      <source>Details for %1 session(s) of %2</source>
-      <translation>Подробиці для %1 сеансу(ів) з %2</translation>
-    </message>
-    <message>
-      <source>Details for %1 camera(s) of %2</source>
-      <translation>Подробиці %1 камери(р) із %2</translation>
     </message>
     <message>
       <source>No sessions</source>
@@ -1630,6 +1610,26 @@ to view more bookmarks</source>
     <message>
       <source>Audit trail replay</source>
       <translation>Відтворити журнал аудиту</translation>
+    </message>
+    <message numerus="yes">
+      <source>Details for %n sessions of %1</source>
+      <comment>Total number will be substituted as %1</comment>
+      <translation type="unfinished">
+        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Details for %n sessions of %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Details for %n cameras of %1</source>
+      <comment>Total number will be substituted as %1</comment>
+      <translation type="unfinished">
+        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Details for %n cameras of %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1701,15 +1701,6 @@ to view more bookmarks</source>
     <message>
       <source>Database restored</source>
       <translation>Відновлена база даних</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n action(s)</source>
-      <translation>
-        <numerusform>%n дія</numerusform>
-        <numerusform>%n дії</numerusform>
-        <numerusform>%n дії</numerusform>
-        <numerusform>%n дії</numerusform>
-      </translation>
     </message>
     <message>
       <source>Session begins</source>
@@ -1790,6 +1781,19 @@ to view more bookmarks</source>
     <message>
       <source>Filled circle mark means the archive is still available</source>
       <translation>Суцільний значок означає, що архів все ще доступний</translation>
+    </message>
+    <message>
+      <source>Update installed</source>
+      <translation type="unfinished">Update installed</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n actions</source>
+      <translation type="unfinished">
+        <numerusform>%n actions</numerusform>
+        <numerusform>%n actions</numerusform>
+        <numerusform>%n actions</numerusform>
+        <numerusform>%n actions</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1970,15 +1974,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
-    <message numerus="yes">
-      <source>%n Server(s)</source>
-      <translation>
-        <numerusform>%n сервер</numerusform>
-        <numerusform>%n серверів</numerusform>
-        <numerusform>%n серверів</numerusform>
-        <numerusform>%n серверів</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Error: %1</source>
       <translation>Помилка: %1</translation>
@@ -2044,6 +2039,15 @@ to view more bookmarks</source>
       <source>Any Camera</source>
       <translation>Будь-яка камера</translation>
     </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n Серверу</numerusform>
+        <numerusform>%n Серверів</numerusform>
+        <numerusform>%n Серверів</numerusform>
+        <numerusform>%n Серверів</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnBusinessRuleWidget</name>
@@ -2080,6 +2084,10 @@ to view more bookmarks</source>
     <message>
       <source>Any Camera</source>
       <translation>Будь-яка камера</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -2162,171 +2170,6 @@ to view more bookmarks</source>
     <message>
       <source>Interval of Action</source>
       <translation>Інтервал спрацьовування</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAdditionDialog</name>
-    <message>
-      <source>Initializing scan...</source>
-      <translation>Ініціалізація сканування...</translation>
-    </message>
-    <message>
-      <source>First address in range is greater than the last one.</source>
-      <translation>Початкова адреса діапазону більша кінцевої.</translation>
-    </message>
-    <message>
-      <source>Scanning online hosts...</source>
-      <translation>Сканування вузлів в мережі...</translation>
-    </message>
-    <message>
-      <source>Select target server...</source>
-      <translation>Виберіть цільовий сервер...</translation>
-    </message>
-    <message>
-      <source>Examples:</source>
-      <translation>Приклади:</translation>
-    </message>
-    <message>
-      <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>Обраний діапазон містить більше 255 ІР-адрес.</translation>
-    </message>
-    <message>
-      <source>Server went offline - search aborted.</source>
-      <translation>Сервер відключений - пошук перервано.</translation>
-    </message>
-    <message>
-      <source>Server has been removed - search aborted.</source>
-      <translation>Сервер був видалений - пошук перервано.</translation>
-    </message>
-    <message>
-      <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>Поле адреси пристрою має містити URL, IP адресу або посилання RTSP.</translation>
-    </message>
-    <message>
-      <source>No devices selected.</source>
-      <translation>Жодного пристрою не вибрано.</translation>
-    </message>
-    <message>
-      <source>Please select at least one device</source>
-      <translation>Виберіть принаймні один пристрій</translation>
-    </message>
-    <message>
-      <source>Server is offline, devices can only be added to an online server.</source>
-      <translation>Сервер відключений. Пристрої можна додавати тільки на включений сервер.</translation>
-    </message>
-    <message>
-      <source>Server has been removed - cannot add devices.</source>
-      <translation>Сервер видалений. Неможливо додати пристрій.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n devices found</source>
-      <translation>
-        <numerusform>Знайдено %n пристрій</numerusform>
-        <numerusform>Знайдено %n пристроїв</numerusform>
-        <numerusform>Знайдено %n пристроїв</numerusform>
-        <numerusform>Знайдено %n пристроїв</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Add devices to %1</source>
-      <translation>Додати пристрої до %1</translation>
-    </message>
-    <message>
-      <source>Add devices...</source>
-      <translation>Додати пристрої...</translation>
-    </message>
-    <message>
-      <source>Finishing searching...</source>
-      <translation>Завершення пошуку...</translation>
-    </message>
-    <message>
-      <source>Scanning hosts...</source>
-      <translation>Сканування вузлів...</translation>
-    </message>
-    <message>
-      <source>Scanning host...</source>
-      <extracomment>Scanning host... (0 devices found)</extracomment>
-      <translation>Сканування вузла...</translation>
-    </message>
-    <message>
-      <source>Server offline</source>
-      <translation>Сервер не в мережі</translation>
-    </message>
-    <message>
-      <source>Device adding is possible for online servers only.</source>
-      <translation>Додавання камери можливо тільки на включені сервера.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n devices added.</source>
-      <translation>
-        <numerusform>%n пристрій додано.</numerusform>
-        <numerusform>%n пристрої додано.</numerusform>
-        <numerusform>%n пристрої додано.</numerusform>
-        <numerusform>%n пристрої додано.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>It might take them a few moments to appear.</source>
-      <translation>Може пройти кілька хвилин, перш ніж вони з'являться в системі.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to add %n devices</source>
-      <translation>
-        <numerusform>Не вдалося додати %n пристрій</numerusform>
-        <numerusform>Не вдалося додати %n пристрої</numerusform>
-        <numerusform>Не вдалося додати %n пристрої</numerusform>
-        <numerusform>Не вдалося додати %n пристрої</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device search failed</source>
-      <translation>Помилка пошуку пристроїв</translation>
-    </message>
-    <message>
-      <source>No devices found</source>
-      <translation>Пристроїв не знайдено</translation>
-    </message>
-    <message>
-      <source>All devices already added</source>
-      <translation>Усі пристрої вже додані</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAdvancedParamsWidget</name>
-    <message>
-      <source>Loading values...</source>
-      <translation>Завантаження значень...</translation>
-    </message>
-    <message>
-      <source>Applying changes...</source>
-      <translation>Застосування змін...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-      <source>Loading...</source>
-      <translation>Завантаження...</translation>
-    </message>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Цей модуль вводу / виводу не має додаткових параметрів</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Ця камера не має додаткових налаштувань</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Налаштування</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation type="unfinished">Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>Немає налаштувань</translation>
     </message>
   </context>
   <context>
@@ -2428,42 +2271,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnCameraExpertSettingsWidget</name>
-    <message>
-      <source>Primary</source>
-      <translation>Первинний</translation>
-    </message>
-    <message>
-      <source>Secondary</source>
-      <translation>Вторинний</translation>
-    </message>
-    <message>
-      <source>Edge</source>
-      <translation>Edge</translation>
-    </message>
-    <message numerus="yes">
-      <source>This ID is already used on the following %n cameras: %1</source>
-      <translation>
-        <numerusform>Цей ідентифікатор вже використовується для наступної %n камери: %1</numerusform>
-        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
-        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
-        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Допомагає вирішити проблеми з якістю зображення на деяких камерах; для інших це призведе до значного збільшення бітрейту.</translation>
-    </message>
-    <message>
-      <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>Довільний номер, який можна призначити камері для швидкої ідентифікації та доступу до неї</translation>
-    </message>
-    <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
@@ -2495,16 +2302,6 @@ to view more bookmarks</source>
     <message>
       <source>Select All</source>
       <translation>Вибрати все</translation>
-    </message>
-    <message>
-      <source>Devices List for %1</source>
-      <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-      <translation>Список пристроїв %1</translation>
-    </message>
-    <message>
-      <source>Cameras List for %1</source>
-      <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-      <translation>Список камер %1</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -2553,6 +2350,16 @@ to view more bookmarks</source>
       <source>No cameras</source>
       <translation>Немає камер</translation>
     </message>
+    <message>
+      <source>Devices List for %1</source>
+      <comment>%1 will be substituted with a server name</comment>
+      <translation>Список пристроїв %1</translation>
+    </message>
+    <message>
+      <source>Cameras List for %1</source>
+      <comment>%1 will be substituted with a server name</comment>
+      <translation>Список камер %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraListModel</name>
@@ -2592,36 +2399,9 @@ to view more bookmarks</source>
       <source>ID</source>
       <translation>ID</translation>
     </message>
-  </context>
-  <context>
-    <name>QnCameraMotionMaskWidget</name>
     <message>
-      <source>Too many motion windows</source>
-      <translation>Занадто багато регіонів детекції руху</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
-      <translation>Максимальна кількість вікон детекції руху для цієї камери %1, а вибрано %2.</translation>
-    </message>
-    <message>
-      <source>Too many motion sensitivity settings</source>
-      <translation>Забагато налаштувань чутливості руху</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Максимальна кількість налаштувань чутливості детекції руху для цієї камери %1, а вибрано %2.</translation>
-    </message>
-    <message>
-      <source>Too many motion areas</source>
-      <translation>Занадто багато регіонів детекції руху</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
-      <translation>Максимальна кількість регіонів детекції руху для цієї камери %1, а вибрано %2.</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Максимальна кількість налаштувань чутливості детекції руху для цієї камери %1, а вибрано %2.</translation>
+      <source>Logical ID</source>
+      <translation>Логічний ID</translation>
     </message>
   </context>
   <context>
@@ -2678,198 +2458,6 @@ to view more bookmarks</source>
     <message>
       <source>Recording is disabled for %1</source>
       <translation>Запис вимкнено для %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraScheduleWidget</name>
-    <message>
-      <source>Off</source>
-      <translation>Викл</translation>
-    </message>
-    <message>
-      <source>On</source>
-      <translation>Вкл</translation>
-    </message>
-    <message>
-      <source>Recording Schedule</source>
-      <translation>Графік запису</translation>
-    </message>
-    <message>
-      <source>based on server time</source>
-      <translation>на основі часу сервера</translation>
-    </message>
-    <message>
-      <source>Not enough licenses to enable recording</source>
-      <translation>Недостатньо ліцензій для включення запису</translation>
-    </message>
-    <message>
-      <source>License limit exceeded, recording will not be enabled.</source>
-      <translation>Перевищено кількість ліцензії, запис не буде активована.</translation>
-    </message>
-    <message>
-      <source>Turn on selector at the top of the window to enable recording.</source>
-      <translation>Увімкніть перемикач у верхній частині вікна для включення запису.</translation>
-    </message>
-    <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>Виберіть області на розкладі для застосування обраних параметрів.</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>Встановіть параметри запису і виберіть області на сітці розкладу, на які застосувати їх.</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Виявлення руху вимкнено або не підтримується</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб переконатися, що воно підтримується і включити його, перейдіть на вкладку &quot;Рух&quot; в налаштуваннях камери.</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Подвійний потік не підтримується для цієї камери</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Подвійний потік та детектор руху не підтримуються для цієї камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Виявлення руху вимкнено</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб увімкнути або налаштувати його, перейдіть на вкладку &quot;Рух&quot; в розділі Параметри камери.</translation>
-    </message>
-    <message>
-      <source>Mbit/s</source>
-      <translation>Мбіт / с</translation>
-    </message>
-    <message>
-      <source>Less Settings</source>
-      <translation>Менше налаштувань</translation>
-    </message>
-    <message>
-      <source>More Settings</source>
-      <translation>Більше налаштувань</translation>
-    </message>
-    <message>
-      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>Налаштування якості визначає тільки ступінь стиснення і не впливає на роздільну здатність. Попередньо налаштовані значення бітрейта: низький, середній, високий і найкращий.</translation>
-    </message>
-    <message>
-      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation>Спочатку виберіть опцію запису, а потім застосуйте її до блоків дня та часу у графіку запису. (0-й блок - 12:00 до 1:00 ранку, блок 23 - з 11:00 до 12:00)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraSettingsDialog</name>
-    <message>
-      <source>Device Settings</source>
-      <translation>Параметри пристрою</translation>
-    </message>
-    <message>
-      <source>Devices Settings</source>
-      <translation>Параметри пристроїв</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Налаштування камери</translation>
-    </message>
-    <message>
-      <source>Cameras Settings</source>
-      <translation>Налаштування камер</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings</source>
-      <translation>Налаштування модуля вводу-виводу</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings</source>
-      <translation>Налаштування модулів вводу-виводу</translation>
-    </message>
-    <message>
-      <source>Show on Layout</source>
-      <translation>Показати на розкладці</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Журнал подій...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>Правила для пристрою...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>Правила для пристроїв...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>Правила для камери...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>Правила для камер...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>Правила модуль введення / виводу...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>Правила модулів введення / виводу...</translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n devices are not saved:</source>
-      <translation>
-        <numerusform>Зміни на наступний %n пристроій не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n пристрої не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n пристрої не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n пристрої не збережено:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
-        <numerusform>Зміни на наступну %n камеру не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n камери не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n камери не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n камери не збережено:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
-        <numerusform>Зміни на наступний %n модуль вводу/виводу не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n модулі вводу/виводу не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n модулі вводу/виводу не збережено:</numerusform>
-        <numerusform>Зміни на наступні %n модулівводу/виводу не збережено:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another camera?</source>
-      <translation>Застосувати зміни перед переходом на іншу камеру?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraSettingsWidget</name>
-    <message>
-      <source>Cannot edit properties for items of different types.</source>
-      <translation>Неможливо редагувати властивості об'єктів різних типів.</translation>
-    </message>
-    <message>
-      <source>No device selected.</source>
-      <translation>Жодного пристрою не вибрано.</translation>
-    </message>
-    <message>
-      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>Властивості для портативних і звичайних камер не можна редагувати одночасно.</translation>
-    </message>
-    <message>
-      <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>Властивості для кількох портативних камер не можна редагувати одночасно.</translation>
     </message>
   </context>
   <context>
@@ -2978,6 +2566,10 @@ to %1</source>
     <message>
       <source>Invalid password</source>
       <translation>Невірний пароль</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Забагато спроб. Спробуйте пізніше.</translation>
     </message>
   </context>
   <context>
@@ -3141,10 +2733,6 @@ to %1</source>
       <translation>Завантажити версію %1?</translation>
     </message>
     <message>
-      <source>Download</source>
-      <translation>Завантажити</translation>
-    </message>
-    <message>
       <source>Restart</source>
       <translation>Перезавантажити</translation>
     </message>
@@ -3209,6 +2797,18 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Підключення до %1 ще не готове. Перевірте з'єднання з Інтернетом або спробуйте пізніше.</translation>
     </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Забагато спроб. Спробуйте пізніше.</translation>
+    </message>
+    <message>
+      <source>Download &amp;&amp; Install</source>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <source>Failed to enter compatibility mode for version %1</source>
+      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -3247,16 +2847,20 @@ to %1</source>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
       <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в описі є збіги з будь-яким з введених ключових слів.</translation>
     </message>
+    <message>
+      <source>Server API</source>
+      <translation>API сервера</translation>
+    </message>
+    <message>
+      <source>To generate Generic Event, please refer to %1.</source>
+      <translation>Для створення довільної події зверністься до %1.</translation>
+    </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
       <translation>Зберегти резервну копію бази даних...</translation>
-    </message>
-    <message>
-      <source>Database Backup Files (*.db)</source>
-      <translation>Файли резервних копій баз даних (*.db)</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
@@ -3320,44 +2924,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnDefaultPasswordAlertBar</name>
-    <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>Ця камера потребує встановлення пароля.</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras requires password to be set up.</source>
-      <translation>Для деяких вибраних камер потрібно встановити пароль.</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>Для цього слід звернутися до системного адміністратора.</translation>
-    </message>
-    <message>
-      <source>Set Password</source>
-      <translation>Встановити паролі</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Неможливо ініціалізувати звуковий кодек.</translation>
-    </message>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Формат пристрою введення %1 не підтримується.</translation>
-    </message>
-    <message>
-      <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>Неможливо виявити звуковий кодек &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Основний аудіопристрій не вибрано.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
@@ -3390,6 +2956,10 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;ні&quot; в налаштуваннях захоплення екрану.</translation>
+    </message>
+    <message>
+      <source>Configured codec: %1 not found, h263p will used</source>
+      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
     </message>
   </context>
   <context>
@@ -3458,6 +3028,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ви не зможете підключитися до цієї системи з вашим обліковим записом %1 після від'єднання цієї системи від %1.</translation>
     </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Забагато спроб. Спробуйте пізніше.</translation>
+    </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
@@ -3488,24 +3062,6 @@ to %1</source>
       <source>Clear Filter</source>
       <translation>Очистити фільтр</translation>
     </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подію</numerusform>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n event(s) found</source>
-      <translation>
-        <numerusform>Журнал подій за %1 - знайдено %n подію</numerusform>
-        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export selected events to file</source>
       <translation>Експортувати вибрані події до файлу</translation>
@@ -3517,6 +3073,26 @@ to %1</source>
     <message>
       <source>No events</source>
       <translation>Немає подій</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Event log for %1 - %n events found</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3598,6 +3174,16 @@ to %1</source>
       <source>Subject removed</source>
       <translation>Тема видалена</translation>
     </message>
+    <message numerus="yes">
+      <source>%1 (%n cameras)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n cameras)</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnExecHttpRequestActionWidget</name>
@@ -3619,25 +3205,6 @@ to %1</source>
     <message>
       <source>%1 has no PTZ presets</source>
       <translation>У %1 немає налаштованих позицій PTZ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
-    <message>
-      <source>Copy archive length settings</source>
-      <translation>Копіювати налаштування довжини архіву</translation>
-    </message>
-    <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>Тип детекції руху в розкладі не підтримується деякими камерами.</translation>
-    </message>
-    <message>
-      <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Неможливо включити запис на деяких камерах.</translation>
-    </message>
-    <message>
-      <source>Schedule settings are not compatible with some devices.</source>
-      <translation>Налаштування розкладу несумісні з деякими пристроями.</translation>
     </message>
   </context>
   <context>
@@ -3694,49 +3261,14 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnFisheyeCalibrationWidget</name>
-    <message>
-      <source>Loading preview, please wait...</source>
-      <translation>Завантаження превью, будь ласка, зачекайте...</translation>
-    </message>
-    <message>
-      <source>Auto calibration failed</source>
-      <translation>Авто калібрування не вдалося</translation>
-    </message>
-    <message>
-      <source>Image is not round.</source>
-      <translation>Зображення не кругле.</translation>
-    </message>
-    <message>
-      <source>Image might be too dim.</source>
-      <translation>Зображення може бути занадто тьмяне.</translation>
-    </message>
-    <message>
-      <source>Invalid input image.</source>
-      <translation>Недійсний образ введення.</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>Внутрішня помилка.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFisheyeSettingsWidget</name>
-    <message>
-      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>Використовуйте цей параметр для компенсації спотворень, якщо камера не встановлена точно вертикально або горизонтально.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFullscreenCameraActionWidget</name>
-    <message numerus="yes">
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation>
-        <numerusform>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</numerusform>
-        <numerusform>Ці камери наразі не використовуються для деяких вибраних макетів. Дія буде працювати, якщо камери будуть додані до початку тригера.</numerusform>
-        <numerusform>Ці камери наразі не використовуються для деяких вибраних макетів. Дія буде працювати, якщо камери будуть додані до початку тригера.</numerusform>
-        <numerusform>Ці камери наразі не використовуються для деяких вибраних макетів. Дія буде працювати, якщо камери будуть додані до початку тригера.</numerusform>
-      </translation>
+    <message>
+      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
+      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
+      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
     </message>
   </context>
   <context>
@@ -3920,18 +3452,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnImageControlWidget</name>
+    <name>QnInputDialog</name>
     <message>
-      <source>%1 degrees</source>
-      <translation>%1 градусів</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Авто</translation>
-    </message>
-    <message>
-      <source>multiple values</source>
-      <translation>декілька значень</translation>
+      <source>Please enter a value.</source>
+      <translation type="unfinished">Please enter a value.</translation>
     </message>
   </context>
   <context>
@@ -4200,10 +3724,6 @@ to %1</source>
       <translation>Виберіть правильний ключ активації для продовження.</translation>
     </message>
     <message>
-      <source>This device accepts single channel license only</source>
-      <translation>Цей пристрій приймає тільки ліцензію на один канал</translation>
-    </message>
-    <message>
       <source>Database error occurred.</source>
       <translation>Помилка бази даних.</translation>
     </message>
@@ -4226,24 +3746,6 @@ to %1</source>
     <message>
       <source>License already activated on another server</source>
       <translation>Ліцензія вже активована на іншому сервері</translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %n %1 are required</source>
-      <translation>
-        <numerusform>Потрібно принаймні %n %1</numerusform>
-        <numerusform>Потрібно принаймні %n %1</numerusform>
-        <numerusform>Потрібно принаймні %n %1</numerusform>
-        <numerusform>Потрібно принаймні %n %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n %1 are currently in use</source>
-      <translation>
-        <numerusform>%n %1 використовується</numerusform>
-        <numerusform>%n %1 використовується</numerusform>
-        <numerusform>%n %1 використовується</numerusform>
-        <numerusform>%n %1 використовується</numerusform>
-      </translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -4372,6 +3874,30 @@ to %1</source>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Ця ліцензія вже активована і пов'язана з апаратним ID%1 на %2</translation>
     </message>
+    <message>
+      <source>Every license can be deactivated only a few times.</source>
+      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 використовується</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Потрібно принаймні %1</numerusform>
+        <numerusform>Потрібно принаймні %1</numerusform>
+        <numerusform>Потрібно принаймні %1</numerusform>
+        <numerusform>Потрібно принаймні %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4392,55 +3918,12 @@ to %1</source>
       <translation>Не вдалося відкрити файл</translation>
     </message>
     <message>
-      <source>All files</source>
-      <translation>Всі файли</translation>
-    </message>
-    <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>Для отримання ліцензійного ключа необхідно відіслати серійний номер і апаратний ID на %1.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>Будь ласка, надішліть наданий ліцензійний ключ і апаратний ID на %1 щоб отримати файл з ключем активації.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use licenses for selected %n devices</source>
-      <translation>
-        <numerusform>Використовувати ліцензію для %n вибраного пристрою</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Use licenses for selected %n cameras</source>
-      <translation>
-        <numerusform>Використовувати ліцензії для %n вибраної камери</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Use licenses for selected %n I/O modules</source>
-      <translation>
-        <numerusform>Використовувати ліцензії для %n вибраного модуля вводу/виводу</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Use licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>Використовувати ліцензію для %n вибраної камери</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -4577,10 +4060,6 @@ to %1</source>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
-      <source>Pictures %1</source>
-      <translation>Картинки %1</translation>
-    </message>
-    <message>
       <source>Preparing Image...</source>
       <translation>Підготовка зображення...</translation>
     </message>
@@ -4705,13 +4184,13 @@ to %1</source>
         <numerusform>Встановити для усіх %n камер</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Area Zoom</source>
+      <translation type="unfinished">Area Zoom</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
-    <message>
-      <source>http(s)://host:port</source>
-      <translation>http(s)://host:port</translation>
-    </message>
     <message>
       <source>%1 (current)</source>
       <translation>%1 (поточна)</translation>
@@ -4797,29 +4276,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnMultipleCameraSettingsWidget</name>
-    <message>
-      <source>Secondary stream disabled for these cameras</source>
-      <translation>Вторинний потік вимкнено для цих камер</translation>
-    </message>
-    <message>
-      <source>Set Recording to &quot;Always&quot;</source>
-      <translation>Встановити запис до &quot;Завжди&quot;</translation>
-    </message>
-    <message>
-      <source>Enable Secondary Stream</source>
-      <translation>Включити вторинний потік</translation>
-    </message>
-    <message>
-      <source>multiple values</source>
-      <translation>декілька значень</translation>
-    </message>
-    <message>
-      <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>Режим запису &quot;Рух + Низьке розширення&quot; не може бути встановлений.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
@@ -4876,14 +4332,6 @@ to %1</source>
   <context>
     <name>QnNewWearableCameraDialog</name>
     <message>
-      <source>Wearable Camera</source>
-      <translation>Портативна камера</translation>
-    </message>
-    <message>
-      <source>Wearable Camera %1</source>
-      <translation>Портативна камера %1</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Ім’я</translation>
     </message>
@@ -4891,17 +4339,13 @@ to %1</source>
       <source>Name cannot be empty</source>
       <translation>Ім'я не може бути порожнім</translation>
     </message>
-  </context>
-  <context>
-    <name>QnNotificationListWidget</name>
-    <message numerus="yes">
-      <source>%n more notifications</source>
-      <translation>
-        <numerusform>%n сповіщеня</numerusform>
-        <numerusform>%n сповіщень</numerusform>
-        <numerusform>%n сповіщень</numerusform>
-        <numerusform>%n сповіщень</numerusform>
-      </translation>
+    <message>
+      <source>Virtual Camera</source>
+      <translation type="unfinished">Virtual Camera</translation>
+    </message>
+    <message>
+      <source>Virtual Camera %1</source>
+      <translation type="unfinished">Virtual Camera %1</translation>
     </message>
   </context>
   <context>
@@ -4960,21 +4404,6 @@ to %1</source>
     <message>
       <source>Uploading sound...</source>
       <translation>Звук завантажується на сервер...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnNotificationsCollectionWidget</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Тривога: %1</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Підтвердити</translation>
-    </message>
-    <message>
-      <source>Set Passwords</source>
-      <translation>Встановити паролі</translation>
     </message>
   </context>
   <context>
@@ -5119,15 +4548,6 @@ to %1</source>
         <numerusform>Маршрут обходу має %n однакових позицій</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>about %n minute(s)</source>
-      <translation>
-        <numerusform>близько %n хв</numerusform>
-        <numerusform>близько %n хв</numerusform>
-        <numerusform>близько %n хв</numerusform>
-        <numerusform>близько %n хв</numerusform>
-      </translation>
-    </message>
     <message>
       <source>less than a minute</source>
       <translation>менше хвилини</translation>
@@ -5151,6 +4571,15 @@ to %1</source>
     <message>
       <source>Tour Time: %1.</source>
       <translation>Час маршруту обходу: %1.</translation>
+    </message>
+    <message numerus="yes">
+      <source>about %n minutes</source>
+      <translation type="unfinished">
+        <numerusform>about %n minutes</numerusform>
+        <numerusform>about %n minutes</numerusform>
+        <numerusform>about %n minutes</numerusform>
+        <numerusform>about %n minutes</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5262,70 +4691,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRecordingStatsModel</name>
-    <message>
-      <source>Average bitrate for the recorded period</source>
-      <translation>Середній бітрейт для записаного періоду</translation>
-    </message>
-    <message>
-      <source>Space</source>
-      <translation>Ємність</translation>
-    </message>
-    <message>
-      <source>Calendar Days</source>
-      <translation>Днів</translation>
-    </message>
-    <message>
-      <source>less than an hour</source>
-      <translation>менш ніж за годину</translation>
-    </message>
-    <message>
-      <source>%1 Mbps</source>
-      <translation>%1 Мбіт/с</translation>
-    </message>
-    <message>
-      <source>empty</source>
-      <translation>порожньо</translation>
-    </message>
-    <message>
-      <source>Devices with non-empty archive</source>
-      <translation>Пристрої з непорожним архівом</translation>
-    </message>
-    <message>
-      <source>Cameras with non-empty archive</source>
-      <translation>Камери з непорожним архівом</translation>
-    </message>
-    <message>
-      <source>Storage space occupied by devices</source>
-      <translation>Сховище, зайняте пристроями</translation>
-    </message>
-    <message>
-      <source>Storage space occupied by cameras</source>
-      <translation>Сховище, зайняте камерами</translation>
-    </message>
-    <message>
-      <source>Device</source>
-      <translation>Пристрій</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Камера</translation>
-    </message>
-    <message>
-      <source>Archived duration in calendar days since the first recording</source>
-      <translation>Тривалість архіву в календарних днях з моменту початку запису</translation>
-    </message>
+    <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
       <translation>Камери з інших серверів, а також віддалені камери</translation>
-    </message>
-    <message>
-      <source>%1 TB</source>
-      <translation>%1 ТБ</translation>
-    </message>
-    <message>
-      <source>%1 GB</source>
-      <translation>%1 Гб</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5357,40 +4726,52 @@ to %1</source>
         <numerusform>Всього %1 %n модулів вводу-виводу</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Bitrate</source>
-      <translation>Бітрейт</translation>
-    </message>
   </context>
   <context>
-    <name>QnRecordingStatusHelper</name>
+    <name>QnRecordingStatsModel</name>
     <message>
-      <source>Not recording</source>
-      <translation>Не записується</translation>
+      <source>Space</source>
+      <translation>Ємність</translation>
     </message>
     <message>
-      <source>Recording everything</source>
-      <translation>Записується постійно</translation>
+      <source>Calendar Days</source>
+      <translation>Днів</translation>
     </message>
     <message>
-      <source>Recording motion only</source>
-      <translation>Записується тільки рух</translation>
+      <source>less than an hour</source>
+      <translation>менш ніж за годину</translation>
     </message>
     <message>
-      <source>Recording motion and low quality</source>
-      <translation>Записується рух і низька якість</translation>
+      <source>%1 Mbps</source>
+      <translation>%1 Мбіт/с</translation>
     </message>
     <message>
-      <source>Continuous</source>
-      <translation>Безперервно</translation>
+      <source>empty</source>
+      <translation>порожньо</translation>
     </message>
     <message>
-      <source>Motion only</source>
-      <translation>Тільки рух</translation>
+      <source>Device</source>
+      <translation>Пристрій</translation>
     </message>
     <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Рух + низк. якість</translation>
+      <source>Camera</source>
+      <translation>Камера</translation>
+    </message>
+    <message>
+      <source>%1 TB</source>
+      <translation>%1 ТБ</translation>
+    </message>
+    <message>
+      <source>%1 GB</source>
+      <translation>%1 Гб</translation>
+    </message>
+    <message>
+      <source>Current Bitrate</source>
+      <translation type="unfinished">Current Bitrate</translation>
+    </message>
+    <message>
+      <source>no data for forecast</source>
+      <translation type="unfinished">no data for forecast</translation>
     </message>
   </context>
   <context>
@@ -5439,24 +4820,68 @@ to %1</source>
   <context>
     <name>QnResourceBrowserWidget</name>
     <message>
-      <source>Any Type</source>
-      <translation>Будь-який</translation>
+      <source>Local files</source>
+      <translation type="unfinished">Local files</translation>
     </message>
     <message>
-      <source>Video Files</source>
-      <translation>Відеофайли</translation>
+      <source>No local files</source>
+      <translation type="unfinished">No local files</translation>
     </message>
     <message>
-      <source>Image Files</source>
-      <translation>Файли зображень</translation>
+      <source>Nothing found</source>
+      <translation>Нічого не знайдено</translation>
     </message>
     <message>
-      <source>Live Devices</source>
-      <translation>Пристрої в режимі реального часу</translation>
+      <source>add to current layout</source>
+      <translation>додати до поточної розкладки</translation>
     </message>
     <message>
-      <source>Live Cameras</source>
-      <translation>Камери в режимі реального часу</translation>
+      <source>open all at a new layout</source>
+      <translation>відкрити все в новій розкладці</translation>
+    </message>
+    <message>
+      <source>open all</source>
+      <translation type="unfinished">open all</translation>
+    </message>
+    <message>
+      <source>All types</source>
+      <translation>Всі типи</translation>
+    </message>
+    <message>
+      <source>Servers</source>
+      <translation>Сервери</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Розкладки</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>Прокрутки</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Відеостіни</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>Веб-сторінки</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Користувачі</translation>
+    </message>
+    <message>
+      <source>Local Files</source>
+      <translation>Локальні файли</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Пошук</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Усі камери та пристрої</translation>
     </message>
   </context>
   <context>
@@ -5531,6 +4956,18 @@ to %1</source>
       <source>Showreel</source>
       <translation>Прокрутка</translation>
     </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Усі камери та пристрої</translation>
+    </message>
+    <message>
+      <source>Videowalls</source>
+      <translation>Відеостіни</translation>
+    </message>
+    <message>
+      <source>Analytics Engines</source>
+      <translation type="unfinished">Analytics Engines</translation>
+    </message>
   </context>
   <context>
     <name>QnResourceTreeModelOtherSystemsNode</name>
@@ -5578,13 +5015,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnScheduleGridWidget</name>
-    <message>
-      <source>All</source>
-      <translation>Усі</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -5600,7 +5030,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Експортувати закладки...</translation>
     </message>
   </context>
   <context>
@@ -5632,13 +5062,6 @@ to %1</source>
     <message>
       <source>Creator</source>
       <translation>Автор</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSearchLineEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Пошук</translation>
     </message>
   </context>
   <context>
@@ -6112,69 +5535,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSingleCameraSettingsWidget</name>
-    <message>
-      <source>Device Settings</source>
-      <translation>Параметри пристрою</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Налаштування камери</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings</source>
-      <translation>Налаштування модуля вводу-виводу</translation>
-    </message>
-    <message>
-      <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Виявлення руху буде працювати тільки при перегляді камери. Увімкніть запис для постійного виявлення руху.</translation>
-    </message>
-    <message>
-      <source>FPS too high</source>
-      <translation>FPS занадто високий</translation>
-    </message>
-    <message>
-      <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-      <translation>FPS в розкладі було знижено з %1 до %2, що є максимальним для цієї камери.</translation>
-    </message>
-    <message>
-      <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-      <translation>2 FPS зарезервовані для програмного виявлення руху на вторинному потоці.</translation>
-    </message>
-    <message>
-      <source>FPS in the schedule was lowered from %1 to %2.</source>
-      <translation>FPS в графіку було знижено з %1 до %2.</translation>
-    </message>
-    <message>
-      <source>Secondary stream disabled for this camera</source>
-      <translation>Вторинний потік вимкнено для цієї камери</translation>
-    </message>
-    <message>
-      <source>Set Recording to &quot;Always&quot;</source>
-      <translation>Встановити запис до &quot;Завжди&quot;</translation>
-    </message>
-    <message>
-      <source>Enable Secondary Stream</source>
-      <translation>Включити вторинний потік</translation>
-    </message>
-    <message>
-      <source>Reset motion regions to default?</source>
-      <translation>Скинути області виявлення руху за замовчуванням?</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Цю дію не можна відмінити.</translation>
-    </message>
-    <message>
-      <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>Режим запису &quot;Рух + Низьке розширення&quot; не може бути встановлений.</translation>
-    </message>
-    <message>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Завантажений архів буде видалений автоматично, як тільки вільне місце на сервері закінчиться. Спочатку будуть видалені найстаріші кадри серед всіх камер на сервері.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
@@ -6437,6 +5797,26 @@ to %1</source>
       <comment>TB - terabytes</comment>
       <translation>ТБ</translation>
     </message>
+    <message>
+      <source>Last 5 minutes</source>
+      <translation type="unfinished">Last 5 minutes</translation>
+    </message>
+    <message>
+      <source>Last 60 minutes</source>
+      <translation type="unfinished">Last 60 minutes</translation>
+    </message>
+    <message>
+      <source>Last 24 hours</source>
+      <translation type="unfinished">Last 24 hours</translation>
+    </message>
+    <message>
+      <source>Longest period available</source>
+      <translation type="unfinished">Longest period available</translation>
+    </message>
+    <message>
+      <source>Forecast available only for cameras with enabled recording.</source>
+      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageConfigWidget</name>
@@ -6688,6 +6068,10 @@ to %1</source>
       <source>Users</source>
       <translation>Користувачі</translation>
     </message>
+    <message>
+      <source>Analytics</source>
+      <translation type="unfinished">Analytics</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6702,10 +6086,6 @@ to %1</source>
     <message>
       <source>Email server is not set</source>
       <translation>Адреса Email не налаштована</translation>
-    </message>
-    <message>
-      <source>System is in safe mode</source>
-      <translation>Система знаходиться в безпечному режимі</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -6758,10 +6138,6 @@ to %1</source>
     <message>
       <source>Learn more</source>
       <translation>Дізнатися більше</translation>
-    </message>
-    <message>
-      <source>System is running in safe mode.</source>
-      <translation>Система працює в безпечному режимі.</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -6829,6 +6205,30 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Перевірте %1 &amp;mdash; підключіться до вашої системи з будь-якого місця!</translation>
     </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Деякі камери вимагають встановлення паролів</translation>
+    </message>
+    <message>
+      <source>No server has internet access for time synchronization</source>
+      <translation type="unfinished">No server has internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>The System is in safe mode</source>
+      <translation type="unfinished">The System is in safe mode</translation>
+    </message>
+    <message>
+      <source>The System has no internet access for time synchronization</source>
+      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>No online server in the System has internet access for time synchronization.</source>
+      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+    </message>
+    <message>
+      <source>The System is running in safe mode.</source>
+      <translation type="unfinished">The System is running in safe mode.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6849,10 +6249,6 @@ to %1</source>
       <translation>Дозволити системі оптимізувати настройки камер</translation>
     </message>
     <message>
-      <source>Tracks and logs all user actions.</source>
-      <translation>Відстежує і реєструє всі дії користувача.</translation>
-    </message>
-    <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
       <translation>Включає інформацію про систему, таку як моделі камер і версії прошивки, кількість серверів і т. д.</translation>
     </message>
@@ -6864,16 +6260,20 @@ to %1</source>
   <context>
     <name>QnTableExportHelper</name>
     <message>
-      <source>HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</source>
-      <translation>HTML файл (*.html);;Файл (CSV) з роздільниками (*.csv)</translation>
-    </message>
-    <message>
       <source>Close all programs which may use this file and try again</source>
       <translation>Закрийте всі програми, які можуть використовувати цей файл, і повторіть спробу</translation>
     </message>
     <message>
       <source>File used by another process</source>
       <translation>Файл використовується іншим процесом</translation>
+    </message>
+    <message>
+      <source>HTML file</source>
+      <translation type="unfinished">HTML file</translation>
+    </message>
+    <message>
+      <source>Spread Sheet (CSV) File</source>
+      <translation type="unfinished">Spread Sheet (CSV) File</translation>
     </message>
   </context>
   <context>
@@ -6906,73 +6306,19 @@ to %1</source>
       <translation>Жоден сервер не має доступу до Інтернету. Час не синхронізується.</translation>
     </message>
     <message>
-      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Системний час синхронізується з Інтернетом і не залежить від локального часу на серверах.</translation>
+      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
     </message>
     <message>
-      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Системний час синхронізується з локальним часом на вибраному сервері і не залежить від локального часу на інших серверах.</translation>
+      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
-      <source>Live</source>
-      <translation>Наживо</translation>
-    </message>
-    <message>
       <source>No thumbnails available</source>
       <translation>Немає доступних мініатюр</translation>
-    </message>
-    <message>
-      <source>dd</source>
-      <comment>Format for displaying days on timeline.</comment>
-      <translation>dd</translation>
-    </message>
-    <message>
-      <source>MMMM</source>
-      <comment>Format for displaying months on timeline.</comment>
-      <translation>ММММ</translation>
-    </message>
-    <message>
-      <source>yyyy</source>
-      <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy hh:mm</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy hh:mm</source>
-      <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy h ap</source>
-      <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy</source>
-      <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-      <source>yyyy</source>
-      <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy h:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7076,6 +6422,10 @@ to %1</source>
     <message>
       <source>Could not install updates on one or more servers.</source>
       <translation>Не вдалося встановити оновлення на одному або декількох серверах.</translation>
+    </message>
+    <message>
+      <source>Update has been cancelled silently.</source>
+      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -7447,40 +6797,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWearableProgressWidget</name>
-    <message>
-      <source>Stop uploading?</source>
-      <translation>Припинити завантаження?</translation>
-    </message>
-    <message>
-      <source>Already uploaded files will be kept.</source>
-      <translation>Вже завантажені файли будуть збережені.</translation>
-    </message>
-    <message>
-      <source>(%1 of %2)</source>
-      <translation>(%1 з %2)</translation>
-    </message>
-    <message>
-      <source>Uploading %1...</source>
-      <translation>Завантаження %1...</translation>
-    </message>
-    <message>
-      <source>Finalizing %1...</source>
-      <translation>Завершення %1...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWearableUploadWidget</name>
-    <message>
-      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Користувач &quot;%1&quot; в даний час завантажує архів на цю камеру.</translation>
-    </message>
-    <message>
-      <source>Another user is currently uploading footage to this camera.</source>
-      <translation>Інший користувач в даний час завантажує архів на цю камеру.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
@@ -7528,10 +6844,6 @@ to %1</source>
       <translation>Закладка може бути додана тільки на сервер, що знаходиться в мережі.</translation>
     </message>
     <message>
-      <source>Press %1 to search bookmarks</source>
-      <translation>Натисніть %1 для пошуку закладок</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Сервер не в мережі</translation>
     </message>
@@ -7564,11 +6876,6 @@ to %1</source>
       <translation>Підключитися до сервера...</translation>
     </message>
     <message>
-      <source>%1 in %2</source>
-      <comment>%1 is user name, %2 is name of system</comment>
-      <translation>%1 в %2</translation>
-    </message>
-    <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Неможливо під'єднатися до сервера. Відеостіна буде закрита.</translation>
     </message>
@@ -7580,16 +6887,20 @@ to %1</source>
   <context>
     <name>QnWorkbenchContext</name>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Для використання програмного забезпечення ви повинні прийняти ліцензійну угоду кінцевого користувача</translation>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
     </message>
     <message>
-      <source>Accept</source>
-      <translation>Прийняти</translation>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
     </message>
     <message>
-      <source>Decline</source>
-      <translation>Відхилити</translation>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
     </message>
   </context>
   <context>
@@ -7712,24 +7023,16 @@ to %1</source>
       <translation>Зберегти запис як...</translation>
     </message>
     <message>
-      <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-      <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
-    </message>
-    <message>
       <source>Failed to start recording</source>
       <translation>Не вдалося розпочати запис</translation>
+    </message>
+    <message>
+      <source>AVI (Audio/Video Interleaved)</source>
+      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchScreenshotHandler</name>
-    <message>
-      <source>PNG Image (*.png)</source>
-      <translation>Зображення PNG (*.png)</translation>
-    </message>
-    <message>
-      <source>JPEG Image (*.jpg)</source>
-      <translation>JPEG зображення (*.jpg)</translation>
-    </message>
     <message>
       <source>Save Screenshot As...</source>
       <translation>Зберегти знімок екрану як...</translation>
@@ -7773,6 +7076,14 @@ to %1</source>
     <message>
       <source>Failed to take screenshot</source>
       <translation>Не вдалося зробити знімок екрану</translation>
+    </message>
+    <message>
+      <source>PNG Image</source>
+      <translation type="unfinished">PNG Image</translation>
+    </message>
+    <message>
+      <source>JPEG Image</source>
+      <translation type="unfinished">JPEG Image</translation>
     </message>
   </context>
   <context>
@@ -7894,18 +7205,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Всі файли (*.*)</translation>
-    </message>
-    <message>
-      <source>Video (%1)</source>
-      <translation>Відео (%1)</translation>
-    </message>
-    <message>
-      <source>Open Wearable Camera Recordings...</source>
-      <translation>Відкрити записи портативної камери...</translation>
-    </message>
-    <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>Підтримуються лише відеофайли з правильними мітками часу.</translation>
     </message>
@@ -7916,10 +7215,6 @@ to %1</source>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
       <translation>Неможливо почати завантаження, так як інший користувач в даний час завантажує архів на цю камеру.</translation>
-    </message>
-    <message>
-      <source>Failed to add wearable camera</source>
-      <translation>Не вдалося додати портативну камеру</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -7954,15 +7249,6 @@ to %1</source>
         <numerusform>Вибрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
         <numerusform>Вибрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
         <numerusform>Вибрані файли охоплюють періоди, для яких відео вже завантажені</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation>
-        <numerusform>Ви можете завантажити цей файл в інший екземпляр портативної камери.</numerusform>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8048,28 +7334,62 @@ to %1</source>
       <translation>Переконайтеся, що на сервері є достатньо місця.</translation>
     </message>
     <message>
+      <source>Not enough space on server storage</source>
+      <translation>Недостатньо місця на сервері</translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Припинити завантаження?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>Вже завантажені файли будуть збережені.</translation>
+    </message>
+    <message>
+      <source>Uploading footage</source>
+      <translation>Завантаження кадрів</translation>
+    </message>
+    <message>
+      <source>Failed to add virtual camera</source>
+      <translation type="unfinished">Failed to add virtual camera</translation>
+    </message>
+    <message>
+      <source>Open Virtual Camera Recordings...</source>
+      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      </translation>
+    </message>
+    <message>
       <source>%1 has unsupported format.</source>
+      <comment>Filename will be substituted</comment>
       <translation>Формат файлу %1 не підтримується.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
+      <comment>Filename will be substituted</comment>
       <translation>Файл %1 не містить часових міток.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
+      <comment>Filename will be substituted</comment>
       <translation>Файл %1 давніший, ніж дозволено в налаштуваннях архіву камери.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 охоплює період, за який відео вже завантажено.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
+      <comment>Filename will be substituted</comment>
       <translation>%1 охоплює період, за який завантажується відео.</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation>Недостатньо місця на сервері</translation>
     </message>
   </context>
   <context>
@@ -8303,13 +7623,74 @@ to %1</source>
       <translation>Зупинити</translation>
     </message>
     <message numerus="yes">
-      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation>
-        <numerusform>Цей відео файл до сих пір завантажується в %n портативну камеру:</numerusform>
-        <numerusform>Деякі відео файли до сих пір завантажуються в %n портативну камеру:</numerusform>
-        <numerusform>Деякі відео файли до сих пір завантажуються в %n портативну камеру:</numerusform>
-        <numerusform>Деякі відео файл(и) до сих пір завантажуються в %n портативну камеру:</numerusform>
+      <source>Some video files are still being uploaded to %n virtual cameras:</source>
+      <translation type="unfinished">
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>StreamQualityStrings</name>
+    <message>
+      <source>Lowest</source>
+      <translation>Найнижча</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Низький</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Середній</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Високий</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>Найкраще</translation>
+    </message>
+    <message>
+      <source>Preset</source>
+      <translation>Пресет</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Не визначено</translation>
+    </message>
+    <message>
+      <source>Lst</source>
+      <extracomment>Short for &apos;Lowest&apos;</extracomment>
+      <translation>Найг</translation>
+    </message>
+    <message>
+      <source>Lo</source>
+      <extracomment>Short for &apos;Low&apos;</extracomment>
+      <translation>Низьк</translation>
+    </message>
+    <message>
+      <source>Me</source>
+      <extracomment>Short for &apos;Medium&apos;</extracomment>
+      <translation>Середн</translation>
+    </message>
+    <message>
+      <source>Hi</source>
+      <extracomment>Short for &apos;High&apos;</extracomment>
+      <translation>Вис</translation>
+    </message>
+    <message>
+      <source>Bst</source>
+      <extracomment>Short for &apos;Best&apos;</extracomment>
+      <translation>Кращ</translation>
+    </message>
+    <message>
+      <source>Ps</source>
+      <extracomment>Short for &apos;Preset&apos;</extracomment>
+      <translation>Перед</translation>
     </message>
   </context>
   <context>
@@ -8322,6 +7703,34 @@ to %1</source>
         <numerusform>%n користувачі</numerusform>
         <numerusform>%n користувачі</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>TimelineCursorLayout</name>
+    <message>
+      <source>Live</source>
+      <translation>Наживо</translation>
+    </message>
+  </context>
+  <context>
+    <name>UpdateStrings</name>
+    <message>
+      <source>This Linux platform is no longer supported</source>
+      <translation type="unfinished">This Linux platform is no longer supported</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported</source>
+      <translation type="unfinished">This OS version is no longer supported</translation>
+    </message>
+    <message>
+      <source>This %1 version is no longer supported</source>
+      <comment>%1 is OS name, e.g. Windows</comment>
+      <translation type="unfinished">This %1 version is no longer supported</translation>
+    </message>
+    <message>
+      <source>%1 %2 is no longer supported</source>
+      <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
+      <translation type="unfinished">%1 %2 is no longer supported</translation>
     </message>
   </context>
   <context>
@@ -8352,14 +7761,499 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
-      <source>Dynamic</source>
-      <translation>Динамічний</translation>
+      <source>Hide information</source>
+      <translation>Сховати інформацію</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Показати інформацію</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Сховати мініатюри</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Показувати мініатюри</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Останній день</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Останні 7 днів</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Останні 30 днів</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Вибрано на часовій шкалі</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Будь-який час</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ні</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation type="unfinished">Devices on layout</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation type="unfinished">Cameras on layout</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation type="unfinished">Any device</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation type="unfinished">Any camera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Вибрана камера</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
+    <message>
+      <source>Show Always</source>
+      <translation type="unfinished">Show Always</translation>
+    </message>
+    <message>
+      <source>Show Only with &quot;Objects&quot; Tab</source>
+      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
+    <message>
+      <source>Unknown object</source>
+      <translation>Невідомий об'єкт</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
+    <message>
+      <source>No objects</source>
+      <translation>Немає об'єктів</translation>
+    </message>
+    <message>
+      <source>No objects detected</source>
+      <translation>Не виявлено жодного об'єкта</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects</source>
+      <translation type="unfinished">
+        <numerusform>%n objects</numerusform>
+        <numerusform>%n objects</numerusform>
+        <numerusform>%n objects</numerusform>
+        <numerusform>%n objects</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any type</source>
+      <translation>Будь-який тип</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation type="unfinished">Select area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation type="unfinished">Select some area on the video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>У вибраній ділянці</translation>
+    </message>
+    <message>
+      <source>unnamed analytics engine</source>
+      <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Не вдалося виконати дії плагіна</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>НЕМАЄ ДАНИХ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Немає закладок</translation>
+    </message>
+    <message>
+      <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
+      <translation>Виберіть певний період на часовій шкалі та клацніть правою кнопкою миші на ньому, щоб створити закладку.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладки</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
+    <message>
+      <source>Loading values...</source>
+      <translation>Завантаження значень...</translation>
+    </message>
+    <message>
+      <source>Applying changes...</source>
+      <translation>Застосування змін...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
+    <message>
+      <source>This I/O module has no advanced settings</source>
+      <translation>Цей модуль вводу / виводу не має додаткових параметрів</translation>
+    </message>
+    <message>
+      <source>This camera has no advanced settings</source>
+      <translation>Ця камера не має додаткових налаштувань</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
+    <message>
+      <source>Login</source>
+      <translation>Логін</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Пароль</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraExpertSettingsWidget</name>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic RTP transport type</comment>
+      <translation>Авто</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic PTZ preset type</comment>
+      <translation>Авто</translation>
+    </message>
+    <message>
+      <source>System</source>
+      <comment>System PTZ preset type</comment>
+      <translation>Система</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <comment>Native PTZ preset type</comment>
+      <translation>Оригінальне</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
+      <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є. </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Допомагає вирішити проблеми з якістю зображення на деяких камерах; для інших це призведе до значного збільшення бітрейту.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Довільний номер, який можна призначити камері для швидкої ідентифікації та доступу до неї</translation>
+    </message>
+    <message>
+      <source>Primary</source>
+      <comment>Primary stream for motion detection</comment>
+      <translation>Первинний</translation>
+    </message>
+    <message>
+      <source>Secondary</source>
+      <comment>Secondary stream for motion detection</comment>
+      <translation>Вторинний</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras:</source>
+      <translation>
+        <numerusform>Цей ідентифікатор вже використовується для наступної %n камери:</numerusform>
+        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
+        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
+        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraInfoWidget</name>
+    <message>
+      <source>Device Rules</source>
+      <translation>Правила для пристрою</translation>
+    </message>
+    <message>
+      <source>Camera Rules</source>
+      <translation>Правила для камери</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules</source>
+      <translation>Правила модуль введення / виводу</translation>
+    </message>
+    <message>
+      <source>More Info</source>
+      <translation>Більше інформації</translation>
+    </message>
+    <message>
+      <source>Less Info</source>
+      <translation>Менше інформації</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
+    <message numerus="yes">
+      <source>Use License</source>
+      <translation>
+        <numerusform>Використовувати ліцензію</numerusform>
+        <numerusform>Використовувати ліцензії</numerusform>
+        <numerusform>Використовувати ліцензії</numerusform>
+        <numerusform>Використовувати ліцензії</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
+    <message>
+      <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation>Виявлення руху буде працювати тільки при перегляді камери. Увімкніть запис для постійного виявлення руху.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion detection rectangles for current camera is reached</source>
+      <translation>Досягнута максимальна кількість зон виявлення руху для поточної камери</translation>
+    </message>
+    <message>
+      <source>Maximum number of ignore motion rectangles for current camera is reached</source>
+      <translation>Досягнута максимальна кількість зон виявлення руху, які слід ігнорувати для поточної камери</translation>
+    </message>
+    <message>
+      <source>Maximum number of detect motion rectangles for current camera is reached</source>
+      <translation>Досягнута максимальна кількість зон виявлення руху для поточної камери</translation>
+    </message>
+    <message>
+      <source>Reset motion regions to default?</source>
+      <translation>Скинути області виявлення руху за замовчуванням?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone.</source>
+      <translation>Цю дію не можна відмінити.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraScheduleWidget</name>
+    <message>
+      <source>License limit exceeded, recording will not be enabled.</source>
+      <translation>Перевищено кількість ліцензії, запис не буде активована.</translation>
+    </message>
+    <message>
+      <source>Recording Schedule</source>
+      <translation>Графік запису</translation>
+    </message>
+    <message>
+      <source>based on server time</source>
+      <translation>на основі часу сервера</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to.</source>
+      <translation>Виберіть області на розкладі для застосування обраних параметрів.</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
+      <translation>Встановіть параметри запису і виберіть області на сітці розкладу, на які застосувати їх.</translation>
+    </message>
+    <message>
+      <source>Turn on selector at the top of the window to enable recording.</source>
+      <translation>Увімкніть перемикач у верхній частині вікна для включення запису.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших пристроях.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших камерах.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have any cameras</source>
+      <translation type="unfinished">You do not have any cameras</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Загальні</translation>
+    </message>
+    <message>
+      <source>Recording</source>
+      <translation>Запис</translation>
+    </message>
+    <message>
+      <source>I/O Ports</source>
+      <translation>Порти вводу-виводу</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation>Рух</translation>
+    </message>
+    <message>
+      <source>Fisheye</source>
+      <translation>Риб'яче око</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>Розширені</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Веб сторінка</translation>
+    </message>
+    <message>
+      <source>Analytics</source>
+      <translation type="unfinished">Analytics</translation>
+    </message>
+    <message>
+      <source>Expert</source>
+      <translation>Експрет</translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n devices are not saved:</source>
+      <translation>
+        <numerusform>Зміни на наступний %n пристроій не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n пристрої не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n пристрої не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n пристрої не збережено:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n cameras are not saved:</source>
+      <translation>
+        <numerusform>Зміни на наступну %n камеру не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n камери не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n камери не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n камери не збережено:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n I/O Modules are not saved:</source>
+      <translation>
+        <numerusform>Зміни на наступний %n модуль вводу/виводу не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n модулі вводу/виводу не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n модулі вводу/виводу не збережено:</numerusform>
+        <numerusform>Зміни на наступні %n модулівводу/виводу не збережено:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Apply changes before switching to another camera?</source>
+      <translation>Застосувати зміни перед переходом на іншу камеру?</translation>
+    </message>
+    <message>
+      <source>Device Settings</source>
+      <translation>Параметри пристрою</translation>
+    </message>
+    <message>
+      <source>Devices Settings</source>
+      <translation>Параметри пристроїв</translation>
+    </message>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Налаштування камери</translation>
+    </message>
+    <message>
+      <source>Cameras Settings</source>
+      <translation>Налаштування камер</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings</source>
+      <translation>Налаштування модуля вводу-виводу</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings</source>
+      <translation>Налаштування модулів вводу-виводу</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 використовується</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+        <numerusform>%1 використовуються</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more required</source>
+      <translation>
+        <numerusform>%n потрібно більше</numerusform>
+        <numerusform>%n потрібно більше</numerusform>
+        <numerusform>%n потрібно більше</numerusform>
+        <numerusform>%n потрібно більше</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
       <translation>Основний потік</translation>
@@ -8374,7 +8268,313 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ExportProcess</name>
+    <name>nx::vms::client::desktop::ClientUpdateTool</name>
+    <message>
+      <source>Update file is not found</source>
+      <translation type="unfinished">Update file is not found</translation>
+    </message>
+    <message>
+      <source>Update package is corrupted</source>
+      <translation type="unfinished">Update package is corrupted</translation>
+    </message>
+    <message>
+      <source>Failed to download update package: %1</source>
+      <translation type="unfinished">Failed to download update package: %1</translation>
+    </message>
+    <message>
+      <source>Update package is corrupted: %1</source>
+      <translation type="unfinished">Update package is corrupted: %1</translation>
+    </message>
+    <message>
+      <source>This update is already installed.</source>
+      <translation type="unfinished">This update is already installed.</translation>
+    </message>
+    <message>
+      <source>This version is not installed.</source>
+      <translation type="unfinished">This version is not installed.</translation>
+    </message>
+    <message>
+      <source>Invalid version format.</source>
+      <translation type="unfinished">Invalid version format.</translation>
+    </message>
+    <message>
+      <source>Broken update package.</source>
+      <translation type="unfinished">Broken update package.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install client update.</source>
+      <translation type="unfinished">Not enough space on disk to install client update.</translation>
+    </message>
+    <message>
+      <source>Install package has been lost.</source>
+      <translation type="unfinished">Install package has been lost.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Внутрішня помилка.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Копіювати</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>Копіювати у буфер обміну</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Вставити</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Вставити з буфера обміну</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Скопійовано</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation>Вставлено</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Ця камера потребує встановлення пароля.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>Для цього слід звернутися до системного адміністратора.</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>Встановити паролі</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
+    <message>
+      <source>Start address</source>
+      <translation>Початкова адреса</translation>
+    </message>
+    <message>
+      <source>End address</source>
+      <translation>Кінцева адреса</translation>
+    </message>
+    <message>
+      <source>IP / Hostname / RTSP link / UDP link</source>
+      <translation>IP / ім'я вузла / RTSP / UDP</translation>
+    </message>
+    <message>
+      <source>Examples:</source>
+      <translation>Приклади:</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>Сервер не в мережі</translation>
+    </message>
+    <message>
+      <source>Device search failed</source>
+      <translation>Помилка пошуку пристроїв</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to add %n devices</source>
+      <translation>
+        <numerusform>Не вдалося додати %n пристрій</numerusform>
+        <numerusform>Не вдалося додати %n пристрої</numerusform>
+        <numerusform>Не вдалося додати %n пристрої</numerusform>
+        <numerusform>Не вдалося додати %n пристрої</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Scan</source>
+      <translation>Сканувати</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Пошук</translation>
+    </message>
+    <message>
+      <source>Initializing scan...</source>
+      <translation>Ініціалізація сканування...</translation>
+    </message>
+    <message>
+      <source>Scanning online hosts...</source>
+      <translation>Сканування вузлів в мережі...</translation>
+    </message>
+    <message>
+      <source>Checking host...</source>
+      <translation>Перевірка хоста...</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation>Завершено</translation>
+    </message>
+    <message>
+      <source>Aborted</source>
+      <translation>Перервано</translation>
+    </message>
+    <message>
+      <source>Searching...</source>
+      <translation>Пошук...</translation>
+    </message>
+    <message>
+      <source>No devices found</source>
+      <translation>Пристроїв не знайдено</translation>
+    </message>
+    <message>
+      <source>All devices are already added</source>
+      <translation type="unfinished">All devices are already added</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices are being added. You can close this dialog or start a new search</source>
+      <translation type="unfinished">
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Додати всі пристрої</translation>
+    </message>
+    <message numerus="yes">
+      <source>Add %n Devices</source>
+      <translation>
+        <numerusform>Додати %n пристрій</numerusform>
+        <numerusform>Додати %n пристрої</numerusform>
+        <numerusform>Додати %n пристрої</numerusform>
+        <numerusform>Додати %n пристрої</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Address field cannot be empty</source>
+      <translation type="unfinished">Address field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventPanel::Private</name>
+    <message>
+      <source>Notifications</source>
+      <comment>Notifications tab title</comment>
+      <translation>Сповіщення</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <comment>Motion tab title</comment>
+      <translation>Рух</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <comment>Bookmarks tab title</comment>
+      <translation>Закладки</translation>
+    </message>
+    <message>
+      <source>Events</source>
+      <comment>Events tab title</comment>
+      <translation>Події</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <comment>Analytics tab title</comment>
+      <translation>Об'єкти</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventSearchWidget</name>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation type="unfinished">Any camera issue</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation type="unfinished">Any event</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>Немає подій</translation>
+    </message>
+    <message>
+      <source>No events occured</source>
+      <translation>Не відбулося ніяких подій</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n події</numerusform>
+        <numerusform>%n подій</numerusform>
+        <numerusform>%n подій</numerusform>
+        <numerusform>%n подій</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>unnamed analytics engine</source>
+      <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventTile</name>
+    <message numerus="yes">
+      <source>...and %n more</source>
+      <translation>
+        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і ще %n</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportPasswordWidget</name>
+    <message>
+      <source>Please enter the password.</source>
+      <translation type="unfinished">Please enter the password.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
       <translation>Даний тип даних не експортується.</translation>
@@ -8405,11 +8605,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
     <message>
-      <source>exported</source>
-      <translation>експортовано</translation>
+      <source>Copy archive length settings</source>
+      <translation>Копіювати налаштування довжини архіву</translation>
     </message>
+    <message>
+      <source>Schedule motion type is not supported by some cameras.</source>
+      <translation>Тип детекції руху в розкладі не підтримується деякими камерами.</translation>
+    </message>
+    <message>
+      <source>Recording cannot be enabled for some cameras.</source>
+      <translation>Неможливо включити запис на деяких камерах.</translation>
+    </message>
+    <message>
+      <source>Schedule settings are not compatible with some devices.</source>
+      <translation>Налаштування розкладу несумісні з деякими пристроями.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
       <translation>Експорт</translation>
@@ -8474,9 +8689,41 @@ to %1</source>
       <source>Bookmark Info</source>
       <translation>Інформація про закладку</translation>
     </message>
+    <message>
+      <source>exported</source>
+      <translation>експортовано</translation>
+    </message>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Вибрані параметри вимагають перекодування. Це збільшить навантаження на процесор і може зайняти значний час.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>Формат AVI не рекомендується використовувати для експорту записів з перервами і з аудіодоріжками.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Ми рекомендуємо експортувати відео з цієї камери як &quot;Multi Video&quot; щоб уникнути погіршення якості.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>Експортований файл .EXE буде мати розмір більше 4 ГБ, і його не можна відкрити, двічі клацнувши в Windows. Його можна відтворити лише у %1 клієнта.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>Налаштування недоступні для файлів .NOV та .EXE.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Локальні файли, віджети моніторингу серверів і веб-сторінки експортуватися не будуть.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
+      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+    </message>
   </context>
   <context>
-    <name>nx::client::desktop::FilenamePanel</name>
+    <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
       <translation>Папка</translation>
@@ -8495,21 +8742,95 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::HintButton</name>
+    <name>nx::vms::client::desktop::FisheyeCalibrationWidget</name>
+    <message>
+      <source>Loading preview, please wait...</source>
+      <translation>Завантаження превью, будь ласка, зачекайте...</translation>
+    </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Авто калібрування не вдалося</translation>
+    </message>
+    <message>
+      <source>Image is not round</source>
+      <translation>Зображення не кругле</translation>
+    </message>
+    <message>
+      <source>Image might be too dim</source>
+      <translation>Зображення може бути занадто тьмяне</translation>
+    </message>
+    <message>
+      <source>Invalid input image</source>
+      <translation>Недійсний образ введення</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Внутрішня помилка</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Використовуйте цей параметр для компенсації спотворень, якщо камера не встановлена точно вертикально або горизонтально.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FoundDevicesModel</name>
+    <message>
+      <source>Brand</source>
+      <translation>Виробник</translation>
+    </message>
+    <message>
+      <source>Model</source>
+      <translation>Модель</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation>Адреса</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices total</source>
+      <translation type="unfinished">
+        <numerusform>%n devices total</numerusform>
+        <numerusform>%n devices total</numerusform>
+        <numerusform>%n devices total</numerusform>
+        <numerusform>%n devices total</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
       <translation>Натисніть, щоб дізнатись більше</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <name>nx::vms::client::desktop::ImageControlWidget</name>
+    <message>
+      <source>Auto</source>
+      <translation>Авто</translation>
+    </message>
+    <message>
+      <source>%1 degrees</source>
+      <translation>%1 градусів</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
       <translation>Обрати файл...</translation>
-    </message>
-    <message>
-      <source>Pictures (%1)</source>
-      <translation>Картинки (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8521,7 +8842,18 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <name>nx::vms::client::desktop::LabelSelectionManager</name>
+    <message>
+      <source>Copy</source>
+      <translation>Копіювати</translation>
+    </message>
+    <message>
+      <source>Copy Link Location</source>
+      <translation type="unfinished">Copy Link Location</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
       <translation>клітинки</translation>
@@ -8543,10 +8875,6 @@ to %1</source>
       <translation>Обрати файл...</translation>
     </message>
     <message>
-      <source>Pictures %1</source>
-      <translation>Картинки %1</translation>
-    </message>
-    <message>
       <source>Picture cannot be read</source>
       <translation>Зображення неможливо прочитати</translation>
     </message>
@@ -8560,7 +8888,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
       <translation>клітинки</translation>
@@ -8571,7 +8899,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
       <translation>Загальні</translation>
@@ -8582,7 +8910,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
       <translation>НЕМАЄ ДАНИХ</translation>
@@ -8593,57 +8921,417 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
-      <source>Secondary Stream</source>
-      <translation>Вторинний потік</translation>
+      <source>Server is not specified</source>
+      <translation>Сервер не вказано</translation>
     </message>
     <message>
-      <source>I/O Module ID</source>
-      <translation>Модулі вводу-виводу</translation>
+      <source>Server offline</source>
+      <translation>Сервер не в мережі</translation>
     </message>
     <message>
-      <source>Camera ID</source>
-      <translation>Ідентифікатор камери</translation>
+      <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+      <translation>Поле адреси пристрою має містити URL, IP адресу або посилання RTSP.</translation>
     </message>
     <message>
-      <source>Audio Stream</source>
-      <translation>Аудіопотік</translation>
+      <source>First address in range is greater than the last one.</source>
+      <translation>Початкова адреса діапазону більша кінцевої.</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Основний потік</translation>
+      <source>The specified IP address range has more than 255 addresses.</source>
+      <translation>Обраний діапазон містить більше 255 ІР-адрес.</translation>
     </message>
     <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL недоступний. Відкрийте потік і повторіть спробу.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL-адреса недоступна. Відкрийте відео потік і спробуйте ще раз.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>Модуль вводу-виводу не має аудіопотоку</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Камера не має вторинного потоку</translation>
+      <source>Can&apos;t start searching process</source>
+      <translation>Не&apos;можливо почати процес пошуку</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::RadassActionFactory</name>
+    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
+    <message>
+      <source>Motion</source>
+      <translation>Рух</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+    <message>
+      <source>Bookmark it...</source>
+      <translation>Додати до закладок...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
+    <message>
+      <source>Release notes</source>
+      <translation>Список змін</translation>
+    </message>
+    <message>
+      <source>Checking for updates automatically</source>
+      <translation type="unfinished">Checking for updates automatically</translation>
+    </message>
+    <message>
+      <source>Check for updates</source>
+      <translation type="unfinished">Check for updates</translation>
+    </message>
+    <message>
+      <source>Force check</source>
+      <translation type="unfinished">Force check</translation>
+    </message>
+    <message>
+      <source>Disable Automatically Checking</source>
+      <translation type="unfinished">Disable Automatically Checking</translation>
+    </message>
+    <message>
+      <source>Check Once</source>
+      <translation type="unfinished">Check Once</translation>
+    </message>
+    <message>
+      <source>Check Automatically</source>
+      <translation type="unfinished">Check Automatically</translation>
+    </message>
+    <message>
+      <source>Download in External Browser</source>
+      <translation>Завантажити в зовнішньому браузері</translation>
+    </message>
+    <message>
+      <source>Copy Link to Clipboard</source>
+      <translation>Копіювати посилання у буфер</translation>
+    </message>
+    <message>
+      <source>You have already installed this version.</source>
+      <translation type="unfinished">You have already installed this version.</translation>
+    </message>
+    <message>
+      <source>Unable to check updates on the internet</source>
+      <translation type="unfinished">Unable to check updates on the internet</translation>
+    </message>
+    <message>
+      <source>Build not found</source>
+      <translation type="unfinished">Build not found</translation>
+    </message>
+    <message>
+      <source>Cannot update from the selected file</source>
+      <translation type="unfinished">Cannot update from the selected file</translation>
+    </message>
+    <message>
+      <source>Invalid update information</source>
+      <translation type="unfinished">Invalid update information</translation>
+    </message>
+    <message>
+      <source>Downgrade to earlier versions is not possible</source>
+      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+    </message>
+    <message>
+      <source>Update file is not found</source>
+      <translation type="unfinished">Update file is not found</translation>
+    </message>
+    <message>
+      <source>Upgrade package is broken</source>
+      <translation type="unfinished">Upgrade package is broken</translation>
+    </message>
+    <message>
+      <source>Missing update package for some servers</source>
+      <translation type="unfinished">Missing update package for some servers</translation>
+    </message>
+    <message>
+      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation>Несумісний компонент %1. Для оновлення спочатку відключіть систему від %1.</translation>
+    </message>
+    <message>
+      <source>No update package available</source>
+      <translation type="unfinished">No update package available</translation>
+    </message>
+    <message>
+      <source>Select Update File...</source>
+      <translation>Виберіть файл оновлень...</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Файли оновлень</translation>
+    </message>
+    <message>
+      <source>Some servers are offline and will not be updated. Skip them?</source>
+      <translation>Деякі сервери знаходяться поза мережею і не будуть оновлюватися. Пропустити їх?</translation>
+    </message>
+    <message>
+      <source>Ready to install client updates</source>
+      <translation type="unfinished">Ready to install client updates</translation>
+    </message>
+    <message>
+      <source>Install now</source>
+      <translation>Встановити зараз</translation>
+    </message>
+    <message>
+      <source>Later</source>
+      <translation>Пізніше</translation>
+    </message>
+    <message>
+      <source>Updates downloaded</source>
+      <translation>Оновлення завантажено</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages</source>
+      <translation>Не вдалося завантажити пакети оновлень</translation>
+    </message>
+    <message>
+      <source>Please make sure there is enough free storage space and network connection is stable.</source>
+      <translation>Переконайтеся, що вільного місця для зберігання достатньо, а мережеве з'єднання стабільне.</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact Customer Support.</source>
+      <translation>Якщо проблема залишається невирішеною, зверніться в службу підтримки.</translation>
+    </message>
+    <message>
+      <source>Try again</source>
+      <translation>Спробуйте ще раз</translation>
+    </message>
+    <message>
+      <source>Cancel Update</source>
+      <translation>Скасувати оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some servers</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких серверів</translation>
+    </message>
+    <message>
+      <source>Please make sure they have enough free storage space and stable network connection.</source>
+      <translation>Переконайтеся, що вільного місця для зберігання достатньо, а мережеве з'єднання стабільне.</translation>
+    </message>
+    <message>
+      <source>Update completed</source>
+      <translation>Оновлення завершено</translation>
+    </message>
+    <message>
+      <source>Update completed, but some servers have failed an update</source>
+      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+    </message>
+    <message>
+      <source>Nx Witness Client will be restarted to the updated version.</source>
+      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>ОК</translation>
+    </message>
+    <message>
+      <source>Failed to install updates to servers:</source>
+      <translation type="unfinished">Failed to install updates to servers:</translation>
+    </message>
+    <message>
+      <source>Downloading updates...</source>
+      <translation>Завантаження оновлень...</translation>
+    </message>
+    <message>
+      <source>Pushing updates...</source>
+      <translation type="unfinished">Pushing updates...</translation>
+    </message>
+    <message>
+      <source>Upload</source>
+      <translation type="unfinished">Upload</translation>
+    </message>
+    <message>
+      <source>Upload &amp;&amp; Install</source>
+      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Завантажити</translation>
+    </message>
+    <message>
+      <source>Download &amp;&amp; Install</source>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation type="unfinished">Select Another Build</translation>
+    </message>
+    <message>
+      <source>Browse for Another File...</source>
+      <translation type="unfinished">Browse for Another File...</translation>
+    </message>
+    <message>
+      <source>Update to Specific Build</source>
+      <translation>Оновити до зазначеної збірки</translation>
+    </message>
+    <message>
+      <source>Uploading updates...</source>
+      <translation type="unfinished">Uploading updates...</translation>
+    </message>
+    <message>
+      <source>Downloading client package...</source>
+      <translation type="unfinished">Downloading client package...</translation>
+    </message>
+    <message>
+      <source>Installing updates...</source>
+      <translation>Встановлення оновлень...</translation>
+    </message>
+    <message>
+      <source>Installing client updates...</source>
+      <translation type="unfinished">Installing client updates...</translation>
+    </message>
+    <message>
+      <source>Updating to ...</source>
+      <translation>Оновлення до...</translation>
+    </message>
+    <message>
+      <source>Ready to update to</source>
+      <translation>Готовий оновитись до</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Встановити оновлення</translation>
+    </message>
+    <message>
+      <source>System updated to</source>
+      <translation type="unfinished">System updated to</translation>
+    </message>
+    <message>
+      <source>System update in process</source>
+      <translation>Виконується оновлення системи</translation>
+    </message>
+    <message>
+      <source>Continue in Background</source>
+      <translation>Продовжити у фоновому режимі</translation>
+    </message>
+    <message>
+      <source>Specific Build</source>
+      <translation>Вказати номер збірки</translation>
+    </message>
+    <message>
+      <source>Browse for Update File</source>
+      <translation>Знайти файл оновлення</translation>
+    </message>
+    <message>
+      <source>Update from mediaservers</source>
+      <translation type="unfinished">Update from mediaservers</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Останнє доступне оновлення</translation>
+    </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation type="unfinished">Missing update package for the client</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation type="unfinished">Finish Update</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Відміна</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation type="unfinished">The latest version is already installed</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation type="unfinished">This version is already installed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n розкладка</numerusform>
+        <numerusform>%n розкладок</numerusform>
+        <numerusform>%n розкладок</numerusform>
+        <numerusform>%n розкладок</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have any layouts</source>
+      <translation type="unfinished">You do not have any layouts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationListModel::Private</name>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>Тривога: %1</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>Підтвердити</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
+    <message>
+      <source>No new notifications</source>
+      <translation>Немає нових повідомлень</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
+    <message>
+      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
+      <translation>Деякі користувачі н&apos;е мають доступ до вибраної розкладки. Дія для них не буде працювати.</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout. Action will not work.</source>
+      <translation>Жоден із вибраних користувачів не має доступу до обраної розкладки. Дія не буде працювати.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners. </source>
+      <translation>Місцеві розкладки можуть бути показані лише їх власникам. </translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>Виберіть макет...</translation>
+    </message>
+    <message>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>Виберіть окремий користувач в &quot;Показати&quot; рядок, щоб відобразити його місцеві макети в цьому списку</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners.</source>
+      <translation>Місцеві розкладки можуть бути показані лише їх власникам.</translation>
+    </message>
+    <message>
+      <source>None of selected user roles contain users. Action will not work.</source>
+      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PresentedStateDelegate</name>
+    <message>
+      <source>Added</source>
+      <translation>Додано</translation>
+    </message>
+    <message>
+      <source>Adding</source>
+      <translation>Додавання</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
       <translation>Авто</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низьке</translation>
+      <translation>Низький</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Високе</translation>
+      <translation>Високий</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8651,14 +9339,14 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::RadassActionHandler</name>
+    <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
       <translation>Встановіть розширення &quot;Auto&quot; на розкладці для збільшення продуктивності.</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
@@ -8670,7 +9358,318 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
+    <message>
+      <source>Not recording</source>
+      <translation>Не записується</translation>
+    </message>
+    <message>
+      <source>Recording everything</source>
+      <translation>Записується постійно</translation>
+    </message>
+    <message>
+      <source>Recording motion only</source>
+      <translation>Записується тільки рух</translation>
+    </message>
+    <message>
+      <source>Recording motion and low quality</source>
+      <translation>Записується рух і низька якість</translation>
+    </message>
+    <message>
+      <source>Continuous</source>
+      <translation>Безперервно</translation>
+    </message>
+    <message>
+      <source>Motion only</source>
+      <translation>Тільки рух</translation>
+    </message>
+    <message>
+      <source>Motion + Low-Res</source>
+      <translation type="unfinished">Motion + Low-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScheduleGridWidget</name>
+    <message>
+      <source>All</source>
+      <translation>Усі</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>Налаштування якості визначає тільки ступінь стиснення і не впливає на роздільну здатність. Попередньо налаштовані значення бітрейта: низький, середній, високий і найкращий.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Мбіт / с</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Менше налаштувань</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Більше налаштувань</translation>
+    </message>
+    <message>
+      <source>Dual-Streaming not supported for this camera</source>
+      <translation>Подвійний потік не підтримується для цієї камери</translation>
+    </message>
+    <message>
+      <source>Dual-Streaming and motion detection not supported for this camera</source>
+      <translation>Подвійний потік та детектор руху не підтримуються для цієї камери</translation>
+    </message>
+    <message>
+      <source>Motion detection disabled</source>
+      <translation>Виявлення руху вимкнено</translation>
+    </message>
+    <message>
+      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
+      <translation>Щоб увімкнути або налаштувати його, перейдіть на вкладку &quot;Рух&quot; в розділі Параметри камери</translation>
+    </message>
+    <message>
+      <source>Motion detection disabled or not supported</source>
+      <translation>Виявлення руху вимкнено або не підтримується</translation>
+    </message>
+    <message>
+      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+      <translation>Щоб переконатися, що воно підтримується і включити його, перейдіть на вкладку &quot;Рух&quot; в налаштуваннях камери.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SearchLineEdit</name>
+    <message>
+      <source>Search</source>
+      <translation>Пошук</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Відстежує і реєструє всі дії користувача.</translation>
+    </message>
+    <message>
+      <source>User will be automatically logged out after this period of time.</source>
+      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
+    </message>
+    <message>
+      <source>minutes</source>
+      <translation>хвилина</translation>
+    </message>
+    <message>
+      <source>hours</source>
+      <translation>година</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
+    <message>
+      <source>Skipped</source>
+      <translation>Пропущено</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation>Завантажене</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdatesModel</name>
+    <message>
+      <source>Current Version</source>
+      <translation>Поточна версія</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Статус</translation>
+    </message>
+    <message>
+      <source>Message</source>
+      <translation>Повідомлення</translation>
+    </message>
+    <message>
+      <source>Store Update Files</source>
+      <translation type="unfinished">Store Update Files</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Клієнт</translation>
+    </message>
+    <message>
+      <source>Component</source>
+      <translation type="unfinished">Component</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
+    <message>
+      <source>Motion</source>
+      <translation>Рух</translation>
+    </message>
+    <message>
+      <source>Bookmark it...</source>
+      <translation>Додати до закладок...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation type="unfinished">Select area on the video to filter results</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>У вибраній ділянці</translation>
+    </message>
+    <message>
+      <source>No motion</source>
+      <translation>Немає руху</translation>
+    </message>
+    <message>
+      <source>No motion detected</source>
+      <translation>Жодного руху не виявлено</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n motion events</source>
+      <translation>
+        <numerusform>%n подія руху</numerusform>
+        <numerusform>%n події руху</numerusform>
+        <numerusform>%n події руху</numerusform>
+        <numerusform>%n події руху</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Вибрана камера</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ні</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Перейти до перегляду відео в реальному часі</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
+    <message numerus="yes">
+      <source>Email address is not set for %n users</source>
+      <translation type="unfinished">
+        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>Email address is not set for %n users</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Встановити паролі</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TileInteractionHandler</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і ще %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No available archive</source>
+      <translation type="unfinished">No available archive</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
+    <message>
+      <source>Server</source>
+      <translation>Сервер</translation>
+    </message>
+    <message>
+      <source>Time Zone</source>
+      <translation type="unfinished">Time Zone</translation>
+    </message>
+    <message>
+      <source>Date</source>
+      <translation>Дата</translation>
+    </message>
+    <message>
+      <source>Server OS Time</source>
+      <translation type="unfinished">Server OS Time</translation>
+    </message>
+    <message>
+      <source>VMS Time</source>
+      <translation type="unfinished">VMS Time</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
+    <message>
+      <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
+      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+    </message>
+    <message>
+      <source>Synchronized with the Internet</source>
+      <translation type="unfinished">Synchronized with the Internet</translation>
+    </message>
+    <message>
+      <source>Synchronized with the local time at the selected server</source>
+      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+    </message>
+    <message>
+      <source>Not synchronized. Each server uses its own local time.</source>
+      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+    </message>
+    <message>
+      <source>Equal to the server local time</source>
+      <translation type="unfinished">Equal to the server local time</translation>
+    </message>
+    <message>
+      <source>No Internet connection. Time is not being synchronized.</source>
+      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+    </message>
+    <message>
+      <source>Time Server is offline. Time is not being synchronized.</source>
+      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
       <translation>Довгий</translation>
@@ -8681,7 +9680,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::UploadWorker</name>
+    <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
       <translation>Не вдалося відкрити файл &quot;%1&quot;</translation>
@@ -8691,8 +9690,8 @@ to %1</source>
       <translation>Не вдалося обчислити md5 для файлу &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Could not create upload on the server side</source>
-      <translation>Не вдалося створити завантаження на стороні сервера</translation>
+      <source>Could not create upload on the server side: %1</source>
+      <translation type="unfinished">Could not create upload on the server side: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -8708,32 +9707,78 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WearableWorker</name>
+    <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
+    <message>
+      <source>Motion is being detected only during video uploading.</source>
+      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+    </message>
+    <message>
+      <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
+      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WearableCameraUploadWidget</name>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation>Інший користувач в даний час завантажує архів на цю камеру.</translation>
+    </message>
+    <message>
+      <source>User %1 is currently uploading footage to this camera.</source>
+      <translation>Користувач %1 в даний час завантажує архів на цю камеру.</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <comment>Uploaded and total number of files will be substituted</comment>
+      <translation>(%1 з %2)</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <comment>Filename will be substituted</comment>
+      <translation>Завершення %1...</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <comment>Filename will be substituted</comment>
+      <translation>Завантаження %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
       <translation>Не вдалося відправити запит на сервер.</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <name>nx::vms::client::desktop::WebWidget</name>
     <message>
-      <source>%1 Analytics</source>
-      <translation>Аналітика %1</translation>
+      <source>Failed to load page</source>
+      <translation>Помилка при завантаженні сторінки</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладки</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>Експорт відео</translation>
+    </message>
     <message>
       <source>Stop Export</source>
       <translation>Зупинити експорт</translation>
     </message>
     <message>
-      <source>Export completed</source>
-      <translation>Експорт завершено</translation>
-    </message>
-    <message>
-      <source>Export failed</source>
-      <translation>Експорт не вдався</translation>
+      <source>Minimize</source>
+      <translation>Згорнути</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -8745,92 +9790,20 @@ to %1</source>
       <translation>%1 використовується іншим процесом експорту.</translation>
     </message>
     <message>
+      <source>Export completed</source>
+      <translation>Експорт завершено</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Експорт не вдався</translation>
+    </message>
+    <message>
       <source>Selected period cannot be exported for the current camera.</source>
       <translation>Вибраний період не можна експортувати для поточної камери.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n закладка</numerusform>
-        <numerusform>%n закладки</numerusform>
-        <numerusform>%n закладки</numerusform>
-        <numerusform>%n закладки</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; використовується іншим процесом. Будь ласка, спробуйте інше ім'я.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>Не вдається створити вихідний файл: %1...</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Відбулась невідома помилка.</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Експорт до &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>Неможливо експортувати пристрій %1.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>Неможливо експортувати камеру %1.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>Неможливо експортувати модуль вводу/виводу %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Виконуваний %1 медіа файл (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Виконуваний %1 медіа файл (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>Файл вже використовувався для запису</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Будь ласка, виберіть інше ім'я або зачекайте, доки не закінчиться запис.</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Експорт розкладки</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>EXE-формат не рекомендується</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>Через обмеження Windows EXE-файли більше 4 ГБ не можуть бути відкриті подвійним клацанням миші.</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>Все одно експортувати в EXE?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Не вдалося експортувати мульти-відео</translation>
+      <translation>Деякі закладки можна експортувати лише як макет.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -8841,28 +9814,19 @@ to %1</source>
       <translation>Видаліть всі локальні файли з розкладки та повторіть спробу.</translation>
     </message>
     <message>
-      <source>Save local layout as...</source>
-      <translation>Зберегти розкладку як...</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>експортовано</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 медіафайл (*.nov)</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Зробити доступним тільки для читання.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Експорт</translation>
+      <source>Starting export...</source>
+      <translation type="unfinished">Starting export...</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <name>nx::vms::client::desktop::detail::BaseInputField</name>
+    <message>
+      <source>multiple values</source>
+      <translation>декілька значень</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
       <translation>Події аналітики можуть бути налаштовані на певних камерах.</translation>
@@ -8872,62 +9836,61 @@ to %1</source>
       <translation>Виберіть камери, скориставшись кнопкою вище, щоб переглянути список підтримуваних подій.</translation>
     </message>
     <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Якщо поле пусте, подія завжди буде викликатися.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в описі є збіги з будь-яким з введених ключових слів.</translation>
-    </message>
-    <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в заголовку є збіги з будь-яким з введених ключових слів.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Якщо поле пусте, подія завжди буде викликатися.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
       <translation>Цей поле чутливе до регістру.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
-      <source>Copy</source>
-      <comment>to Clipboard</comment>
-      <translation>Копіювати</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Копіювати у буфер обміну</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <comment>from Clipboard</comment>
-      <translation>Вставити</translation>
-    </message>
-    <message>
-      <source>Paste from Clipboard</source>
-      <translation>Вставити з буфера обміну</translation>
-    </message>
-    <message>
-      <source>Copied</source>
-      <comment>to Clipboard</comment>
-      <translation>Скопійовано</translation>
-    </message>
-    <message>
-      <source>Pasted</source>
-      <comment>from Clipboard</comment>
-      <translation>Вставлено</translation>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в описі є збіги з будь-яким з введених ключових слів.</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
       <translation>Перетягніть розкладку або камеру сюди щоб додати їх в прокрутку</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <message>
+      <source>Any Plugin</source>
+      <translation type="unfinished">Any Plugin</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в заголовку є збіги з будь-яким з введених ключових слів.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Якщо поле пусте, подія завжди буде викликатися.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Цей поле чутливе до регістру.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в описі є збіги з будь-яким з введених ключових слів.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>All Users</source>
+      <translation>Всі користувачі</translation>
+    </message>
     <message>
       <source>Users</source>
       <translation>Користувачі</translation>
@@ -8936,13 +9899,9 @@ to %1</source>
       <source>Custom Users</source>
       <translation>Особливі користувачі</translation>
     </message>
-    <message>
-      <source>All Users</source>
-      <translation>Всі користувачі</translation>
-    </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
       <translation>Переключити за допомогою гарячих клавіш</translation>
@@ -8953,26 +9912,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Зупинити прокрутку</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>Почати прокрутку</translation>
-    </message>
+    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Tour</source>
       <translation>Зупинити маршрут обходу</translation>
     </message>
     <message>
+      <source>Stop Showreel</source>
+      <translation>Зупинити прокрутку</translation>
+    </message>
+    <message>
       <source>Start Tour</source>
       <translation>Почати маршрут обходу</translation>
     </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Почати прокрутку</translation>
+    </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
@@ -8985,7 +9944,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Please fill up information about yourself and reason for license deactivation</source>
       <translation>Будь ласка, заповніть інформацію про себе і причину деактивації ліцензії</translation>
@@ -9019,6 +9978,10 @@ to %1</source>
       <translation>- Виберіть один -</translation>
     </message>
     <message>
+      <source>I am upgrading my machine</source>
+      <translation>Я модернізую свій комп'ютер</translation>
+    </message>
+    <message>
       <source>I accidentally assigned the license to a wrong machine</source>
       <translation>Я випадково призначив ліцензію на неправильний комп’ютер</translation>
     </message>
@@ -9026,20 +9989,17 @@ to %1</source>
       <source>Other Reason</source>
       <translation>Інша причина</translation>
     </message>
-    <message>
-      <source>I am upgrading my machine</source>
-      <translation>Я модернізую свій комп'ютер</translation>
-    </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
-      <source>Go to Live</source>
-      <translation>Перейти до перегляду відео в реальному часі</translation>
+      <source>Layout is full</source>
+      <translation type="unfinished">Layout is full</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message>
+      <source>Failed to change password</source>
+      <translation>Не вдалося змінити пароль</translation>
+    </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
       <translation>
@@ -9103,28 +10063,20 @@ to %1</source>
       <translation>Перемістити</translation>
     </message>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>Розкладка заблокована, і її неможливо змінити.</translation>
+      <source>Virtual Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
     </message>
     <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Все підтримуються (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *. bmp *.tiff)</translation>
-    </message>
-    <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>Відео (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
-    </message>
-    <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Зображення (*.jpg *.png *.gif *.bmp *.tiff)</translation>
-    </message>
-    <message>
-      <source>All files (*.*)</source>
-      <translation>Всі файли (*.*)</translation>
+      <source>Layout is locked and cannot be changed</source>
+      <translation>Розкладка заблокована, і її неможливо змінити</translation>
     </message>
     <message>
       <source>Open File</source>
       <translation>Відкрити файл</translation>
+    </message>
+    <message>
+      <source>All Supported</source>
+      <translation type="unfinished">All Supported</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9141,10 +10093,6 @@ to %1</source>
     <message>
       <source>Preview Search for %1</source>
       <translation>Пошук за фрагментами для %1</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation>Скасувати додавання пристрою?</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
@@ -9192,20 +10140,12 @@ to %1</source>
       <translation>Не вдалося завантажити зображення</translation>
     </message>
     <message>
-      <source>Client</source>
-      <translation>Клієнт</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
+      <source>Components of System have different versions:</source>
+      <translation>Компоненти системи мають різні версії:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
       <translation>Будь ласка, оновіть всі компоненти до версії %1</translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>Компоненти системи мають різні версії:</translation>
     </message>
     <message>
       <source>Update...</source>
@@ -9218,6 +10158,10 @@ to %1</source>
     <message>
       <source>Beta version %1</source>
       <translation>Бета версія %1</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation>Будь ласка, оновіть програму до наступрої версії.</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
@@ -9235,29 +10179,23 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>Не вдалося відкрити веб-сторінку сервера</translation>
     </message>
-    <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Портативні камери не можна переміщати між серверами</translation>
+    <message numerus="yes">
+      <source>Failed to change password on %n cameras of %1</source>
+      <comment>Total number of cameras will be substituted as %1</comment>
+      <translation type="unfinished">
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Failed to change password</source>
-      <translation>Не вдалося змінити пароль</translation>
-    </message>
-    <message>
-      <source>Failed to change password on %1 of %2 cameras</source>
-      <translation>Не вдалося змінити пароль на %1 з %2 камер</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only!</source>
-      <translation>Попередження! Ця збірка призначена для тестування!</translation>
-    </message>
-    <message>
-      <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation>Будь ласка, оновіть програму до наступрої версії.</translation>
+      <source>This build is for testing purposes only.</source>
+      <translation type="unfinished">This build is for testing purposes only.</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
       <translation>Використовуйте клавіші зі стрілками для перемикання розкладок. Для виходу з проктуткі натисніть Esc.</translation>
@@ -9268,22 +10206,25 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
     <message>
-      <source>Switch by %1</source>
-      <translation>Переключити на %1</translation>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>Переключити на</translation>
     </message>
     <message>
       <source>Display for</source>
+      <comment>Time selector will follow</comment>
       <translation>Показати для</translation>
     </message>
     <message>
       <source>Display selected for</source>
+      <comment>Time will follow</comment>
       <translation>Відобразити вибрані для</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
       <translation>Прокрутка</translation>
@@ -9298,7 +10239,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
       <translation>Зберегти розкладку як</translation>

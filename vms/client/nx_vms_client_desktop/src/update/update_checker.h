@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
+#include <nx/vms/api/data/software_version.h>
+
 class QNetworkAccessManager;
 
 struct QnUpdateInfo;
@@ -16,7 +18,10 @@ public:
      * \param url                       Url of the update feed.
      * \param parent                    Parent object.
      */
-    QnUpdateChecker(const QUrl& url, QObject* parent = nullptr);
+    QnUpdateChecker(
+        const QUrl& url, 
+        QObject* parent, 
+        const nx::vms::api::SoftwareVersion& engineVersion);
 
 public slots:
     void checkForUpdates();
@@ -30,6 +35,7 @@ private slots:
 private:
     QNetworkAccessManager* const m_networkAccessManager;
     QUrl m_url;
+    const nx::vms::api::SoftwareVersion m_engineVersion;
 };
 
 #endif // UPDATE_CHECKER_H_

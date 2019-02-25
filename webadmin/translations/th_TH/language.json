@@ -33,22 +33,24 @@
         "error": "ข้อผิดพลาด: ",
         "restartNeeded": "บันทึกการเปลี่ยนแปลงแล้ว รีสตาร์ทเซิร์ฟเวอร์เพื่อใช้การตั้งค่าใหม่หรือไม่?",
         "settingsSaved": "การตั้งค่าที่บันทึกไว้",
-        "confirmHardwareRestart": "รีสตาร์ทระบบการทำงานของเซิร์ฟเวอร์หรือไม่?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "คืนค่าการตั้งค่าเซิร์ฟเวอร์ทั้งหมด จะถูกบันทึกเก็บถาวร แต่จะถูกรีเซ็ตการตั้งค่าเครือข่าย",
         "confirmRestoreSettingsNotNetwork": "ตั้งค่าการกำหนดค่าเซิร์ฟเวอร์ จะมีบันทึกการตั้งค่าการเก็บถาวรและเครือข่าย",
         "unavailable": "ไม่มี",
         "unsafePortConfirm": "ไม่ปลอดภัยที่จะใช้หมายเลขพอร์ตน้อยกว่า 1025 เซิร์ฟเวอร์อาจไม่สามารถเข้าถึงได้ ดำเนินการต่อ?",
-        "confirmDisconnectFromCloud": "ยกเลิกการเชื่อมต่อระบบจาก {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloud": "Disconnect System from {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบออก</span><br><br>ระบบสามารถเข้าถึงได้ผ่านเครือข่ายท้องถิ่นโดยใช้บัญชีผู้ดูแลระบบภายใน",
         "confirmDisconnectFromCloudAction": "ตัดการเชื่อมต่อ",
         "disconnectedFromCloudSuccess": "ระบบถูกตัดการเชื่อมต่อจาก {{CLOUD_NAME}} เรียบร้อยแล้ว",
-        "confirmDisconnectFromSystem": "แยกออกจากระบบเซิร์ฟเวอร์",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "ถอดออก",
-        "disconnectedFromSystemSuccess": "เซิร์ฟเวอร์ถูกแยกออกจากระบบสำเร็จแล้ว",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "เชื่อมต่อระบบเรียบร้อยแล้ว",
         "createLocalOwnerTitle": "สร้างผู้ดูแลระบบภายใน",
         "confirmChangePassword": "เปลี่ยนรหัสผ่านผู้ดูแลระบบ",
-        "confirmChangePasswordTitle": "ระบบเปลี่ยนรหัสผ่าน มันจะมีผลต่อผู้ใช้ 'ผู้ดูแลระบบ' และผ่านรากสำหรับเซิร์ฟเวอร์",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "บันทึกรหัสผ่านใหม่",
         "nx1ControlHint": "แอ็พพลิเคชันไคลเอ็นต์ได้เริ่มต้นแล้ว ใช้แป้นพิมพ์ / เมาส์หรือแอปพลิเคชันมือถือเพื่อควบคุม"
     },
@@ -66,7 +68,7 @@
         "cloudConnectRelayingEnabled": "เปิดใช้งานการถ่ายทอดข้อมูลสำหรับการเชื่อมต่อระบบคลาวด์",
         "cloudConnectUdpHolePunchingEnabled": "เปิดใช้งาน UDP สำหรับการเชื่อมต่อระบบคลาวด์",
         "cloudHost": "โฮสต์ระบบคลาวด์",
-        "cloudSystemID": "ระบบคลาวด์",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "ผู้ขายที่ปิดใช้งาน",
         "ec2AliveUpdateIntervalSec": "ช่วงเวลาการอัพเดตของระบบ (วินาที)",
         "ec2ConnectionKeepAliveTimeoutSec": "การเชื่อมต่อช่วยให้หมดเวลาในการทำงาน (วินาที)",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "ช่วงรายงานสถิติ",
         "statisticsReportUpdateDelay": "รายงานสถิติ - ความล่าช้าในการอัปเดต",
         "synchronizeTimeWithInternet": "ซิงโครไนซ์เวลากับอินเทอร์เน็ต",
-        "systemName": "ชื่อระบบ",
+        "SystemName": "ชื่อระบบ",
         "takeCameraOwnershipWithoutLock": "ถ่ายรูปเป็นเจ้าของกล้องโดยไม่ต้องล็อค",
         "timeSynchronizationEnabled": "เปิดใช้งานการซิงโครไนส์เวลา",
         "primaryTimeServer": "Primary time synchronization server",
@@ -116,14 +118,15 @@
         "updateNotificationsEnabled": "เปิดใช้งานการแจ้งเตือนการปรับปรุง",
         "upnpPortMappingEnabled": "เปิดใช้การแมปพอร์ต UPnP",
         "useTextEmailFormat": "ส่งอีเมลแบบธรรมดา",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "ใช้ฟีดบรรทัดของ Windows ในอีเมล",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info": {
         "tabs": {
@@ -133,21 +136,22 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "ระบบไม่สามารถเข้าถึงได้หรือไม่มีอยู่",
+        "SystemIsUnreacheble": "ระบบไม่สามารถเข้าถึงได้หรือไม่มีอยู่",
         "incorrectCurrentPassword": "รหัสผ่านปัจจุบันไม่ถูกต้อง.",
         "incorrectRemotePassword": "รหัสผ่านหรือรหัสผ่านไม่ถูกต้อง",
         "incompatibleVersion": "ระบบไม่สามารถเข้าถึงได้ไม่มีหรือไม่มีเวอร์ชันที่เข้ากันไม่ได้",
         "wrongUrl": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ที่ระบุได้",
-        "newSystemError": "ไม่สามารถผสานระบบ ไม่ได้กำหนดค่าระบบจากระยะไกล",
-        "safeMode": "ไม่สามารถผสานระบบ ระบบระยะไกลอยู่ในเซฟโหมด",
-        "configError": "ไม่สามารถผสานระบบ บางทีระบบหนึ่งในเซฟโหมด",
-        "cloudError": "ไม่สามารถผสานระบบ ระบบขึ้นอยู่กับระบบคลาวด์ คุณต้องตัดการเชื่อมต่อก่อน",
-        "cloudBothError": "ไม่สามารถผสานระบบ ทั้งสองระบบมีการเชื่อมต่อไปที่ cloud คุณจำเป็นต้องตัดการเชื่อมต่อครั้งแรก",
-        "cloudHostConflict": "ไม่สามารถผสานระบบ เนื่องจากเซิร์ฟเวอร์อยู่กับโฮสต์เมฆแตกต่างกัน",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "คำเตือน! คุณกำลังจะผสานรวมสิทธิ์การใช้งานระบบกับ Starter อนุญาตได้หนึ่งใบต่อระบบดังนั้นใบอนุญาตที่สองจะถูกยกเลิกการใช้งาน รวมหรือไม่?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "การเชื่อมต่อล้มเหลว: ",
         "unknownError": "ข้อผิดพลาดที่ไม่รู้จัก",
-        "mergeFailed": "ผสานล้มเหลว: ",
+        "mergeFailed": "ผสานล้มเหลว",
         "mergeSucceed": "ผสานสำเร็จ",
         "newSystemDisplayName": "ระบบใหม่",
         "incompatibleProtocol": "รุ่นที่เข้ากันไม่ได้",
@@ -156,7 +160,7 @@
     },
     "login": {
         "incorrectPassword": "เข้าสู่ระบบหรือรหัสผ่านไม่ถูกต้อง",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่"
     },
     "navigaion": {
         "cannotGetUser": "ล้มเหลวของเซิร์ฟเวอร์: ไม่สามารถเรียกข้อมูลผู้ใช้ปัจจุบัน"
@@ -173,7 +177,7 @@
         "started": "ปรับปรุงเริ่มต้นเรียบร้อยแล้ว จะใช้เวลาหลายนาที",
         "upToDate": "ปรับปรุงล้มเหลว รุ่นที่ระบุถูกติดตั้งแล้ว",
         "invalidFile": "ปรับปรุงล้มเหลว ไม่ให้แฟ้มเก็บถาวรแบบปรับปรุงที่ถูกต้อง",
-        "incompatibleSystem": "ปรับปรุงล้มเหลว แฟ้มที่มีเฉพาะสำหรับระบบอื่น",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "ปรับปรุงล้มเหลว พื้นที่ไม่เพียงพอให้แยกเก็บ ตรวจสอบพื้นที่เก็บข้อมูล",
         "installationError": "การปรับปรุงล้มเหลว ไม่สามารถเรียกใช้สคริปต์การติดตั้ง",
         "selectFiles": "เลือกไฟล์"
@@ -186,5 +190,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} เว็บอินเทอร์เฟซ"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "หยุด",
+            "help": "help | show commands",
+            "collapse all servers": "ยุบเซิร์ฟเวอร์ทั้งหมด",
+            "collapse server": "collapse server + [server name]",
+            "play": "เล่น",
+            "clear search": "ล้างการค้นหา",
+            "live": "go to live | show me live",
+            "expand all servers": "ขยายเซิร์ฟเวอร์ทั้งหมด",
+            "stop listening": "หยุดฟัง",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "ระบบออฟไลน์",
+        "cameraLinks": {
+            "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
+            "highStream": "สตรีมสูง",
+            "copyDefaultText": "คัดลอก",
+            "unknown": "ม่รู้จัก",
+            "lowStream": "สตรีมต่ำ",
+            "transcoding": "การแปลงรหัส",
+            "copyActiveText": "คัดลอกไปยังคลิปบอร์ด"
+        },
+        "searchCamPlaceholder": "ค้นหา",
+        "cameraStates": {
+            "noFormat": "เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
+            "ieWin10": "โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
+            "iosVideoTooLarge": "iOS ไม่สนับสนุนวิดีโอที่ใหญ่กว่า fullHD (2MP: 1920x1080)",
+            "unauthorized": "จำเป็นต้องระบุตัวตนผู้ใช้",
+            "ubuntuNX": "เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน",
+            "ieNoWebm": "โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
+            "flashOrWebmRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
+            "noArmSupport": "เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
+            "error": "ข้อผิดพลาด",
+            "offline": "ออฟไลน์",
+            "noData": "ไม่มีข้อมูล",
+            "flashRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> สำหรับเล่นวิดีโอ"
+        },
+        "chromeCastWarning": "Chromecast เป็นทรัพยากรที่เข้มข้นและอาจทำให้เกิดปัญหาบนเซิร์ฟเวอร์ของคุณ",
+        "resolution": {
+            "high": "สูง",
+            "auto": "อัตโนมัติ",
+            "low": "ต่ำ"
+        }
     }
 }

@@ -3,7 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include "../command_descriptor.h"
-#include "../transaction_transport.h"
+#include "../outgoing_command_filter.h"
 
 namespace nx::clusterdb::engine::transport {
 
@@ -20,6 +20,7 @@ GenericTransport::GenericTransport(
     std::unique_ptr<AbstractCommandPipeline> commandPipeline)
     :
     m_protocolVersionRange(protocolVersionRange),
+    m_outgoingCommandFilter(outgoingCommandFilter),
     m_systemId(systemId),
     m_localPeer(localPeer),
     m_remotePeer(connectionRequestAttributes.remotePeer),
@@ -54,7 +55,7 @@ GenericTransport::GenericTransport(
 
 GenericTransport::~GenericTransport()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Closing connection to %2")
+    NX_DEBUG(this, lm("systemId %1. Closing connection to %2")
         .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
 }
 
@@ -103,16 +104,28 @@ void GenericTransport::sendTransaction(
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
+            if (peerAlreadyHasCommand(transactionSerializer->header()))
+            {
+                NX_VERBOSE(this,
+                    "Not sending command %1 to %2 since remote peer must have it",
+                    engine::toString(transactionSerializer->header()),
+                    m_commonTransportHeaderOfRemoteTransaction);
+                return;
+            }
+
             if (isHandshakeCommand(transactionSerializer->header().command)
                 || m_canSendCommands)
             {
+                NX_VERBOSE(this, "Sending command %1 to %2",
+                    engine::toString(transactionSerializer->header()),
+                    m_commonTransportHeaderOfRemoteTransaction);
                 m_commandPipeline->sendTransaction(
                     std::move(transportHeader),
                     transactionSerializer);
                 return;
             }
 
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing sending command %1 to %2")
+            NX_DEBUG(this, lm("Postponing sending command %1 to %2")
                 .args(engine::toString(transactionSerializer->header()),
                     m_commonTransportHeaderOfRemoteTransaction));
 
@@ -129,7 +142,7 @@ void GenericTransport::sendTransaction(
 
 void GenericTransport::start()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("Starting outgoing transaction channel to %1")
             .arg(m_commonTransportHeaderOfRemoteTransaction));
 
@@ -179,11 +192,17 @@ void GenericTransport::processCommandData(
 
     if (!commandData)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to deserialized %1 command received from (%2, %3)")
             .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
         m_commandPipeline->closeConnection();
         return;
+    }
+
+    if (m_remotePeer.persistentId.isNull() &&
+        !commandData->header().persistentInfo.dbID.isNull())
+    {
+        m_remotePeer.persistentId = commandData->header().persistentInfo.dbID;
     }
 
     if (isHandshakeCommand(commandData->header().command))
@@ -200,6 +219,12 @@ void GenericTransport::processCommandData(
     m_gotCommandHandler(
         std::move(commandData),
         std::move(transportHeader));
+}
+
+bool GenericTransport::peerAlreadyHasCommand(const CommandHeader& header) const
+{
+    return header.peerID == m_remotePeer.id
+        && header.persistentInfo.dbID == m_remotePeer.persistentId;
 }
 
 bool GenericTransport::isHandshakeCommand(int commandType) const
@@ -224,7 +249,8 @@ void GenericTransport::processHandshakeCommand(
 void GenericTransport::processHandshakeCommand(
     Command<vms::api::SyncRequestData> data)
 {
-    m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
+    m_tranStateToSynchronizeTo =
+        m_outgoingCommandFilter.filter(m_transactionLogReader->getCurrentState());
     m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response
@@ -266,7 +292,7 @@ void GenericTransport::onTransactionsReadFromLog(
 
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("systemId %1. Error reading transaction log (%2). Closing connection to the peer %3")
                 .args(m_systemId, toString(resultCode),
                     m_commonTransportHeaderOfRemoteTransaction));
@@ -274,25 +300,13 @@ void GenericTransport::onTransactionsReadFromLog(
         return;
     }
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("systemId %1. Read %2 transactions from transaction log (result %3). "
            "Posting them to the send queue to %4")
             .args(m_systemId, serializedTransactions.size(), toString(resultCode),
                 m_commonTransportHeaderOfRemoteTransaction));
 
-    // Posting transactions to send
-    for (auto& tranData: serializedTransactions)
-    {
-        CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
-        transportHeader.systemId = m_systemId;
-        transportHeader.vmsTransportHeader.distance = 1;
-        transportHeader.vmsTransportHeader.processedPeers.insert(
-            m_localPeer.id);
-
-        m_commandPipeline->sendTransaction(
-            transportHeader,
-            std::move(tranData.serializer));
-    }
+    sendTransactions(std::exchange(serializedTransactions, {}));
 
     // TODO: #ak If m_remotePeerTranState contained unknown peers, than they are now
     // missing in readedUpTo.
@@ -302,7 +316,7 @@ void GenericTransport::onTransactionsReadFromLog(
     if (resultCode == ResultCode::partialContent ||
         m_tranStateToSynchronizeTo.containsDataMissingIn(m_remotePeerTranState))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("systemId %1. Synchronize to (%2), already synchronized to (%3)")
             .args(m_systemId, stateToString(m_tranStateToSynchronizeTo),
                 stateToString(m_remotePeerTranState)));
@@ -324,7 +338,7 @@ void GenericTransport::onTransactionsReadFromLog(
     }
     else
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. "
+        NX_DEBUG(this, lm("systemId %1. "
             "Done initial synchronization to (%2)")
                 .args(m_systemId, stateToString(m_remotePeerTranState)));
     }
@@ -333,9 +347,26 @@ void GenericTransport::onTransactionsReadFromLog(
     enableOutputChannel();
 }
 
+void GenericTransport::sendTransactions(
+    std::vector<dao::TransactionLogRecord> serializedTransactions)
+{
+    for (auto& tranData: serializedTransactions)
+    {
+        CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
+        transportHeader.systemId = m_systemId;
+        transportHeader.vmsTransportHeader.distance = 1;
+        transportHeader.vmsTransportHeader.processedPeers.insert(
+            m_localPeer.id);
+
+        m_commandPipeline->sendTransaction(
+            transportHeader,
+            std::move(tranData.serializer));
+    }
+}
+
 void GenericTransport::enableOutputChannel()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("systemId %1. Enabled output channel to the peer %2")
             .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
 

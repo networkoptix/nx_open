@@ -26,7 +26,6 @@ public:
         m_emailManager(nullptr),
         m_ec2SyncronizationEngine(
             std::string(),
-            QnUuid::createUuid(),
             m_settings.p2pDb(),
             nx::clusterdb::engine::ProtocolVersionRange(
                 kMinSupportedProtocolVersion,

@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "crear cuenta",
         "errorNoHDD": "Este dispositivo está diseñado para trabajar con disco duro instalado. <br>Por favor apague el dispositivo e instalar un disco duro.",
-        "errorNoNetwork": "Este dispositivo necesita la conexión de red para trabajar. <br>Por favor lo conecte a la local red ot Internet"
+        "errorNoNetwork": "Este dispositivo necesita conexión de red para funcionar.<br>Por favor conéctelo a la red local o internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
@@ -33,22 +33,24 @@
         "error": "Error: ",
         "restartNeeded": "Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
         "settingsSaved": "Configuraciones guardadas",
-        "confirmHardwareRestart": "¿Reiniciar el sistema operativo de servidor?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "¿Restaurar todas las configuraciones del servidor? Se guardará el archivo, pero se restablecerá la configuración de la red.",
         "confirmRestoreSettingsNotNetwork": "¿Restablecer la configuración del servidor? Configuración de red y el archivo se guardará.",
         "unavailable": "No Disponible",
         "unsafePortConfirm": "No es seguro utilizar puerto número 1025 menos. Servidor podría no ser accesible. ¿Continuar de todos modos?",
-        "confirmDisconnectFromCloud": "Desconecte el sistema de {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloud": "Desconectar el sistema de {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
         "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
-        "confirmDisconnectFromSystem": "Separar el servidor del sistema actual",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "Separar",
-        "disconnectedFromSystemSuccess": "Servidor fue separado del sistema con éxito",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "Sistema fue conectado con éxito",
         "createLocalOwnerTitle": "Crear administrador local",
         "confirmChangePassword": "Cambiar contraseña de admin",
-        "confirmChangePasswordTitle": "¿Cambiar contraseña del sistema? Afectará a usuario 'admin' y la contraseña de root para algunos servidores",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Guardar nueva contraseña",
         "nx1ControlHint": "Aplicación de cliente se ha iniciado. Utilizar un teclado/ratón o una aplicación móvil para controlarla."
     },
@@ -66,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Habilitar retransmisión para conexión a la nube",
         "cloudConnectUdpHolePunchingEnabled": "Habilitar la perforación de orificios UDP para conectarse a la nube",
         "cloudHost": "Cloud host",
-        "cloudSystemID": "Id de sistema de Cloud",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Proveedores desahabilitados",
         "ec2AliveUpdateIntervalSec": "Intervalo de actualización activa del sistema (segundos)",
         "ec2ConnectionKeepAliveTimeoutSec": "Mantener viva la conexión (segundos)",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "Intervalo de informe de estadísticas",
         "statisticsReportUpdateDelay": "Informe de estadísticas - retraso de actualización",
         "synchronizeTimeWithInternet": "Sincronice el tiempo con Internet",
-        "systemName": "Nombre del sistema",
+        "SystemName": "Nombre del sistema",
         "takeCameraOwnershipWithoutLock": "Apropiarse de las cámaras sin bloquear",
         "timeSynchronizationEnabled": "Sincronización de tiempo habilitada",
         "primaryTimeServer": "Primary time synchronization server",
@@ -116,14 +118,15 @@
         "updateNotificationsEnabled": "Notificaciones de actualización habilitadas",
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
         "useTextEmailFormat": "Enviar correos electrónicos de texto plano",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "Usa el salto de línea de Windows en los correos",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
     },
     "info": {
         "tabs": {
@@ -133,30 +136,31 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "Sistema es inaccesible o no existe.",
+        "SystemIsUnreacheble": "Sistema es inaccesible o no existe.",
         "incorrectCurrentPassword": "Contraseña actual es incorrecto.",
         "incorrectRemotePassword": "Nombre de usuario o contraseña son incorrectos.",
         "incompatibleVersion": "Sistema es inalcanzable, no existe o tiene versión incompatible.",
         "wrongUrl": "No se puede conectar al servidor especificado.",
-        "newSystemError": "No se puede unir sistemas. Sistema remoto no está configurado.",
-        "safeMode": "No se puede unir sistemas. Sistema remoto está en modo seguro.",
-        "configError": "No se puede unir sistemas. Tal vez uno de los sistemas está en modo seguro.",
-        "cloudError": "No se puede combinar sistemas. Sistema dependiente esté conectado a la nube. Es necesario desconectarlo primero.",
-        "cloudBothError": "No se puede combinar sistemas. Ambos sistemas están conectados a la nube. Necesitas desconectarte uno primero.",
-        "cloudHostConflict": "No se puede combinar sistemas, porque los servidores están construidos con hosts diferentes nube",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Error de conexión: ",
         "unknownError": "Error desconocido",
-        "mergeFailed": "Error en la combinación: ",
+        "mergeFailed": "Error en la combinación",
         "mergeSucceed": "Unión fue exitosa.",
-        "newSystemDisplayName": "Nuevo sistema",
+        "newSystemDisplayName": "Nuevo Sistema",
         "incompatibleProtocol": "versión incompatible",
         "incompatibleCloudHost": "conflicto de nube",
         "incompatibleCloudState": "nube conectada"
     },
     "login": {
         "incorrectPassword": "Nombre de usuario o contraseña es incorrecta",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Demasiados intentos. Inténtalo de nuevo en un minuto."
     },
     "navigaion": {
         "cannotGetUser": "Falla en el servidor: no se puede recuperar datos de usuario actual"
@@ -173,7 +177,7 @@
         "started": "Actualización se inició correctamente. Tardará varios minutos",
         "upToDate": "Error de actualización. Ya está instalada la versión proporcionada.",
         "invalidFile": "Error de actualización. Archivo proporcionado no es un archivo de actualización válido.",
-        "incompatibleSystem": "Error de actualización. Archivo proporcionado está dirigido a otro sistema.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "Error de actualización. No hay suficiente espacio para extraer el archivo, revise almacenamiento disponible.",
         "installationError": "La actualización falló. No puede ejecutar la escritura de instalación.",
         "selectFiles": "Seleccionar archivos"
@@ -186,5 +190,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} interfaz web"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pausa",
+            "help": "help | show commands",
+            "collapse all servers": "colapsar todos los servidores",
+            "collapse server": "collapse server + [server name]",
+            "play": "reproducir",
+            "clear search": "borrar búsqueda",
+            "live": "go to live | show me live",
+            "expand all servers": "expandir todos los servidores",
+            "stop listening": "detener escucha",
+            "expand server": "expand server + [server name]",
+            "view": "vista + [nombre de la cámara]"
+        },
+        "systemOffline": "Sistema está desconectado",
+        "cameraLinks": {
+            "copyToClipboard": "copiar a portapapeles",
+            "highStream": "Corriente de alta",
+            "copyDefaultText": "copiar",
+            "unknown": "Uesconocido",
+            "lowStream": "Corriente de baja",
+            "transcoding": "Transcodificación",
+            "copyActiveText": "copiado al portapapeles"
+        },
+        "searchCamPlaceholder": "Búsqueda",
+        "cameraStates": {
+            "noFormat": "Este navegador no admite reproducción de video desde esta cámara.",
+            "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
+            "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+            "unauthorized": "Autenticación necesaria",
+            "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar.",
+            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+            "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
+            "noArmSupport": "Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
+            "error": "Error",
+            "offline": "Desconectado",
+            "noData": "No hay datos",
+            "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir videos."
+        },
+        "chromeCastWarning": "Chromecast consume muchos recursos y puede causar problemas en tu servidor.",
+        "resolution": {
+            "high": "Elevado",
+            "auto": "Auto",
+            "low": "Bajo"
+        }
     }
 }

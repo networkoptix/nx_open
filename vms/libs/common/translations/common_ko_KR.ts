@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation type="unfinished">MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>시스템 이벤트</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>이미 클라우드 (id %1) 에 바인딩된 시스템</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>서버가 인터넷에 연결되어 있지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>로컬 DB에 클라우드 인증정보를 저장하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>클라우드 소유자를 로컬 DB에 저장하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>클라우드: %1 에 연결할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation>미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>카메라 플러그인 오류입니다. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>카메라 재시작후 카메라 웹페이지를 통해 장치를 초기화 해주세요.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>리샘플링 컨텍스트, 오류 코드를 초기화할 수 없습니다: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>샘플 버러를 할당 할 수업습니다: 에러코드: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>디코더롤 오디오 프레임을 전송할 수 없습니다: 에러코드 %1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>디코더에서 오디오 프레임을 받을 수 없습니다: 에러코드 %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation>무료</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>무료 라이센스</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>시간</translation>
     </message>
@@ -497,6 +532,166 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>브릿지 라이센스</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Invalid Licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Time Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Analog Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Professional Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Edge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Start Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -545,10 +740,6 @@
       <translation>유효하지 않은 방식</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>이 장치는 하나의 (단일) 인증키만 허용합니다</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>이 라이선스 유형은 상위버젼 소프트웨어 필요</translation>
     </message>
@@ -560,6 +751,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>HWID와 일치하는 서버를 찾지 못했습니다</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -570,30 +769,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>%n 카메라 (들)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>%n 카메라(들)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>%n 장치</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n 장치(들)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>카메라</translation>
@@ -626,18 +801,6 @@
       <source>device</source>
       <translation>장치</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n I/O 장치(들)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n I/O 장치(들)</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>IO장치</translation>
@@ -653,6 +816,42 @@
     <message>
       <source>I/O module</source>
       <translation>IO장치</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -680,67 +879,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>하드웨어 ID: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>최하</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>낮은</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>일반</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>높은</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>최고</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>프리셋</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>한정되지 않은</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>최저</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>낮은</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>일반</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>높은</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>최적</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>프리셋</translation>
     </message>
   </context>
   <context>
@@ -787,172 +925,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>명명 되지 않은 시스템</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>확인</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>찾지 못함</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>구현되지 않음</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>지원하지 않는 전송</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>내부 서버 오류</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>유효하지 않은 변수</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>초</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>시간</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>일</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>주</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>년</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>밀리초</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>초</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>시간</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>일</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>년</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>밀리초</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>초</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>분</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>시간</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>일</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>주</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>개월</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>년</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1031,6 +1003,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>전체 시스템에 액세스할 수 있으며 그것을 관리할 수 있습니다. 사용자를 만들 수 있습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>알 수 없는 오류.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1507,6 +1521,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation>전체 화면 종료</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>레이아웃 열기...</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

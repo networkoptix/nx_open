@@ -5,7 +5,6 @@
 namespace nx {
 namespace vms::server {
 
-
 ServerModuleAware::ServerModuleAware(QnMediaServerModule* serverModule):
     m_serverModule(serverModule)
 {
@@ -40,9 +39,9 @@ QnResourcePool* ServerModuleAware::resourcePool() const
     return m_serverModule ? m_serverModule->resourcePool() : nullptr;
 }
 
-QnResourcePropertyDictionary* ServerModuleAware::propertyDictionary() const
+QnResourcePropertyDictionary* ServerModuleAware::resourcePropertyDictionary() const
 {
-    return m_serverModule ? m_serverModule->propertyDictionary() : nullptr;
+    return m_serverModule ? m_serverModule->resourcePropertyDictionary() : nullptr;
 }
 
 QnCameraHistoryPool* ServerModuleAware::cameraHistoryPool() const

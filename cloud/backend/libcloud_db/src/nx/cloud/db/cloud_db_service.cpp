@@ -45,17 +45,6 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
-    auto logSettings = settings.vmsSynchronizationLogging();
-    for (auto& loggerSettings: logSettings.loggers)
-        loggerSettings.logBaseName = "sync_log";
-    logSettings.updateDirectoryIfEmpty(settings.dataDir());
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
-            logSettings,
-            QnLibCloudDbAppInfo::applicationDisplayName(),
-            QString(),
-            {nx::utils::log::Filter(QnLog::EC2_TRAN_LOG)}));
-
     m_settings = &settings;
 
     auto model = ModelFactory::instance().create();

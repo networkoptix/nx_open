@@ -25,8 +25,6 @@ InteractiveSettingsTestDialog::InteractiveSettingsTestDialog(QWidget* parent):
 
     m_settingsWidget->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
 
-    qDebug() << m_settingsWidget->rootObject();
-
     if (!NX_ASSERT(m_settingsWidget->rootObject()))
         return;
 

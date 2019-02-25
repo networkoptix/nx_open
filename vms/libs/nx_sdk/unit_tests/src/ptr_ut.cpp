@@ -1,68 +1,45 @@
 #include <nx/kit/test.h>
 
-#include <map>
-#include <string>
-
-#include <plugins/plugin_api.h>
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/interface.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/ptr.h>
 
 namespace nx {
 namespace sdk {
-namespace common {
 namespace test {
 
 namespace {
 
-class IBase: public nxpl::PluginInterface
+class IBase: public Interface<IBase, IRefCountable>
 {
 public:
-    static const nxpl::NX_GUID& iid()
-    {
-        static const nxpl::NX_GUID kIid =
-            {{0x58,0x41,0x2e,0x63,0x12,0x31,0x40,0xbd,0x11,0xce,0xfd,0x0b,0x2d,0xa5,0x01,0x02}};
-        return kIid;
-    }
+    static auto interfaceId() { return InterfaceId("nx::sdk::test::*::IBase"); }
 };
 
-class IData: public IBase
+class IData: public Interface<IData, IBase>
 {
 public:
-    static const nxpl::NX_GUID& iid()
-    {
-        static const nxpl::NX_GUID kIid =
-            {{0x49,0x32,0x2d,0x6d,0x12,0x81,0x40,0xad,0x81,0xcf,0xed,0x0b,0x1d,0xa6,0x4a,0x06}};
-        return kIid;
-    }
+    static auto interfaceId() { return InterfaceId("nx::sdk::test::*::IData"); }
 
     virtual int number() const = 0;
 };
 
-class Base: public nxpt::CommonRefCounter<IBase>
+class Base: public RefCountable<IBase>
 {
 public:
     static bool s_destructorCalled;
 
-public:
     Base() = default;
 
-    void* queryInterface(const nxpl::NX_GUID& interfaceId) override
+    virtual ~Base() override
     {
-        if (interfaceId == iid())
-            return this;
-        if (interfaceId == nxpl::IID_PluginInterface)
-            return static_cast<PluginInterface*>(this);
-        return nullptr;
+        ASSERT_FALSE(s_destructorCalled);
+        s_destructorCalled = true;
     }
-
-    virtual ~Base() override { s_destructorCalled = true; }
-
-private:
-    int m_number = 42;
 };
 bool Base::s_destructorCalled = false;
 
-class Data: public nxpt::CommonRefCounter<IData>
+class Data: public RefCountable<IData>
 {
 public:
     static bool s_destructorCalled;
@@ -71,24 +48,12 @@ public:
     Data() = default;
     Data(int number): m_number(number) {}
 
-
-    void* queryInterface(const nxpl::NX_GUID& interfaceId) override
-    {
-        if (interfaceId == iid())
-            return this;
-        if (interfaceId == IBase::iid())
-            return static_cast<IBase*>(this);
-        if (interfaceId == nxpl::IID_PluginInterface)
-            return static_cast<PluginInterface*>(this);
-        return nullptr;
-    }
-
     virtual int number() const override { return m_number; }
 
     virtual ~Data() override { s_destructorCalled = true; }
 
 private:
-    int m_number = 42;
+    const int m_number = 42;
 };
 bool Data::s_destructorCalled = false;
 
@@ -102,10 +67,13 @@ void assertEq(
     ASSERT_TRUE(expected == actual); //< operator==()
     ASSERT_FALSE(expected != actual); //< operator!=()
 
+    ASSERT_EQ(expectedRefCount, refCount(actual.get())); //< Test refCount(const IRefCountable*).
+    ASSERT_EQ(expectedRefCount, refCount(actual)); //< Test refCount(const Ptr<>&).
+
     // This is the only correct way to access the ref counter of an arbitrary interface.
     const int increasedRefCount = actual->addRef();
     const int actualRefCount = actual->releaseRef();
-    ASSERT_EQ(increasedRefCount, actualRefCount + 1); //< Just in case.
+    ASSERT_EQ(increasedRefCount, actualRefCount + 1); //< Check test integrity.
     ASSERT_EQ(expectedRefCount, actualRefCount);
 }
 
@@ -118,6 +86,12 @@ TEST(Ptr, null)
     const auto nullPtr1 = Ptr<IData>();
     ASSERT_EQ(nullptr, nullPtr1.get());
 
+    // Standalone operator==() and operator!=() with nullptr_t.
+    ASSERT_TRUE(nullptr == nullPtr1);
+    ASSERT_TRUE(nullPtr1 == nullptr);
+    ASSERT_FALSE(nullptr != nullPtr1);
+    ASSERT_FALSE(nullPtr1 != nullptr);
+
     const auto nullPtr2 = Ptr<IData>(nullptr);
     ASSERT_EQ(nullptr, nullPtr2.get());
 }
@@ -126,13 +100,33 @@ TEST(Ptr, basic)
 {
     Data::s_destructorCalled = false;
     {
-        const auto data = makePtr<Data>(113);
-        ASSERT_EQ(data->number(), 113);
+        const Ptr<Data> data = makePtr<Data>(42);
+        ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
         ASSERT_TRUE(static_cast<bool>(data)); //< operator bool()
         ASSERT_TRUE(data.get() != nullptr); //< get()
+
+        // Standalone operator==() and operator!=() with nullptr_t.
+        ASSERT_FALSE(nullptr == data);
+        ASSERT_FALSE(data == nullptr);
+        ASSERT_TRUE(nullptr != data);
+        ASSERT_TRUE(data != nullptr);
+
         ASSERT_FALSE(Data::s_destructorCalled);
     } //< data destroyed
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
+TEST(Ptr, toPtr)
+{
+    Data::s_destructorCalled = false;
+    {
+        Data* p = new Data(42);
+        const Ptr<Data> data = toPtr(p);
+        ASSERT_EQ(p, data.get());
+        ASSERT_EQ(1, data->refCount());
+        ASSERT_FALSE(Data::s_destructorCalled);
+    } //< data destroyed via ~Ptr().
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
@@ -140,20 +134,20 @@ TEST(Ptr, assign)
 {
     Data::s_destructorCalled = false;
     {
-        auto oldData = makePtr<Data>(113);
-        ASSERT_EQ(oldData->number(), 113);
+        auto oldData = makePtr<Data>(42);
+        ASSERT_EQ(oldData->number(), 42);
 
         ASSERT_EQ(1, oldData->refCount());
         ASSERT_FALSE(Data::s_destructorCalled);
         {
-            Ptr<Data> newData; //< Should be of exactly the same Ptr template instance.
+            Ptr<Data> newData; //< Should be of exactly the same Ptr template instance as oldData.
             ASSERT_EQ(nullptr, newData.get());
 
             newData = oldData; //< operator=(const)
             assertEq(oldData, newData, /*expectedRefCount*/ 2);
 
-            newData = std::move(oldData); //< operator=(&&)
-            assertEq(oldData, newData, /*expectedRefCount*/ 2);
+            auto movedData = std::move(newData); //< operator=(&&)
+            assertEq(oldData, movedData, /*expectedRefCount*/ 2);
         }
         ASSERT_FALSE(Data::s_destructorCalled);
         ASSERT_EQ(1, oldData->refCount());
@@ -179,8 +173,8 @@ TEST(Ptr, dynamicCast)
     Data::s_destructorCalled = false;
     Base::s_destructorCalled = false;
     {
-        const auto data = makePtr<Data>(113);
-        ASSERT_EQ(data->number(), 113);
+        const auto data = makePtr<Data>(42);
+        ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
 
         const auto base = makePtr<Base>();
@@ -197,7 +191,7 @@ TEST(Ptr, dynamicCast)
         ASSERT_EQ(2, data->refCount());
 
         {
-            const Ptr<nxpl::PluginInterface> cast = data.dynamicCast<IBase>(); //< Cast to base.
+            const Ptr<IRefCountable> cast = data.dynamicCast<IBase>(); //< Cast to base.
             ASSERT_TRUE(cast);
             ASSERT_EQ(3, data->refCount());
         }
@@ -234,7 +228,36 @@ TEST(Ptr, releasePtrAndReset)
     ASSERT_EQ(nullptr, data2.get());
 }
 
+TEST(Ptr, queryInterfacePtrNonConst)
+{
+    Data::s_destructorCalled = false;
+    {
+        auto dataPtr = makePtr<Data>(42);
+
+        Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
+        ASSERT_EQ(dataPtr, iDataPtrFromData);
+
+        Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
+        ASSERT_EQ(dataPtr, iDataPtrFromIData);
+    }
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
+TEST(Ptr, queryInterfacePtrConst)
+{
+    Data::s_destructorCalled = false;
+    {
+        const auto dataPtr = makePtr<Data>(42);
+
+        const Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
+        ASSERT_EQ(dataPtr, iDataPtrFromData);
+
+        const Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
+        ASSERT_EQ(dataPtr, iDataPtrFromIData);
+    }
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
 } // namespace test
-} // namespace common
 } // namespace sdk
 } // namespace nx

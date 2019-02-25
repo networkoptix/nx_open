@@ -104,6 +104,8 @@ public:
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
     void setAuthType(AuthType value);
+    void setCredentials(const Credentials& credentials);
+
     void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     void setDisablePrecalculatedAuthorization(bool value);
@@ -147,6 +149,7 @@ private:
     std::optional<SocketAddress> m_proxyEndpoint;
     bool m_isProxySecure = false;
     std::optional<AuthType> m_authType;
+    std::optional<Credentials> m_credentials;
 
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;

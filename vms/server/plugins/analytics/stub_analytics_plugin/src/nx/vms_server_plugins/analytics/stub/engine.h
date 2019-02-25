@@ -47,7 +47,7 @@ protected:
 
 private:
     void initCapabilities();
-    void processPluginEvents();
+    void generatePluginEvents();
 
 private:
     mutable std::mutex m_pluginEventGenerationLoopMutex;

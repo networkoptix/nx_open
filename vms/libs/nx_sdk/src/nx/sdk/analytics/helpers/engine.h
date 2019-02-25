@@ -4,7 +4,7 @@
 #include <map>
 #include <mutex>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/i_string_map.h>
@@ -18,14 +18,14 @@ namespace analytics {
  * Base class for a typical implementation of an Analytics Engine. Hides many technical details of
  * the Analytics Plugin SDK, but may limit plugin capabilities - use only when suitable.
  *
- * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
- * add the following to the derived class cpp:
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the prefix defined by this class, add the
+ * following to the derived class .cpp:
  * <pre><code>
- *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */
-class Engine: public nxpt::CommonRefCounter<IEngine>
+class Engine: public RefCountable<IEngine>
 {
 protected:
     LogUtils logUtils;
@@ -93,12 +93,12 @@ protected:
     template<typename DerivedPlugin>
     DerivedPlugin* pluginCasted()
     {
-        const auto plugin= dynamic_cast<DerivedPlugin*>(m_plugin);
-        assetPluginCasted(plugin);
+        const auto plugin = dynamic_cast<DerivedPlugin*>(m_plugin);
+        assertPluginCasted(plugin);
         return plugin;
     }
 
-    IEngine::IHandler* handler() { return m_handler; }
+    IEngine::IHandler* handler() const { return m_handler; }
 
 public:
     virtual ~Engine() override;
@@ -109,7 +109,7 @@ public:
 // Not intended to be used by a descendant.
 
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
+    virtual void setEngineInfo(const IEngineInfo* engineInfo) override;
     virtual void setSettings(const nx::sdk::IStringMap* settings) override;
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
     virtual const IString* manifest(Error* error) const override;
@@ -124,6 +124,7 @@ private:
 private:
     mutable std::mutex m_mutex;
     IPlugin* const m_plugin;
+    const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
     IEngine::IHandler* m_handler = nullptr;
 };

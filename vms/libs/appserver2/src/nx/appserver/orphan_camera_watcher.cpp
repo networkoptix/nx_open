@@ -13,7 +13,6 @@
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace appserver {
 

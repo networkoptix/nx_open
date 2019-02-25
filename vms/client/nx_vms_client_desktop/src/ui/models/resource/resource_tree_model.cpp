@@ -22,6 +22,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -33,6 +34,7 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
+#include <core/resource/avi/avi_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
@@ -474,9 +476,13 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (layout->isFile())
         {
-            if (isLoggedIn)
-                return m_rootNodes[NodeType::localResources];
-            return rootNode;
+            if (layout->isOnline())
+            {
+                if (isLoggedIn)
+                    return m_rootNodes[NodeType::localResources];
+                return rootNode;
+            }
+            return bastardNode;
         }
 
         if (layout->isShared())
@@ -495,9 +501,13 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (node->resourceFlags().testFlag(Qn::local))
         {
-            if (isLoggedIn)
-                return m_rootNodes[NodeType::localResources];
-            return rootNode;
+            const auto resource = node->resource();
+            if (resource->getStatus() == Qn::Online)
+            {
+                if (isLoggedIn)
+                    return m_rootNodes[NodeType::localResources];
+                return rootNode;
+            }
         }
         return bastardNode;
     }
@@ -1025,6 +1035,26 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
             {
                 for (auto node: m_nodesByResource.value(webPage))
                     node->updateIcon();
+            });
+    }
+
+    if (const auto aviResource = resource.dynamicCast<QnAviResource>())
+    {
+        connect(aviResource, &QnAviResource::statusChanged, this,
+            [this, aviResource]()
+            {
+                for (auto node: m_nodesByResource.value(aviResource))
+                    updateNodeParent(node);
+            });
+    }
+
+    if (const auto fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
+    {
+        connect(fileLayoutResource, &QnFileLayoutResource::statusChanged, this,
+            [this, fileLayoutResource]()
+            {
+                for (auto node: m_nodesByResource.value(fileLayoutResource))
+                    updateNodeParent(node);
             });
     }
 

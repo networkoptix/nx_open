@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Không thể thiết lập Hệ thống</h2>
-    <p class="master-description">Không thể cấu hìnH hệ thống. <br>
+    <p class="master-description">The System cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Thiết lập hệ thống nâng cao</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Thiết lập hệ thống nâng cao</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -138,7 +138,7 @@
     </div>
     <h2>{{Config.cloud.productName}} tài khoản</h2>
     <p class="master-description">
-        Cần có tài khoản để sử dụng hệ thống đám mây {{Config.cloud.productName}}
+        An account is required to use the cloud System {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus> Tạo tài khoản mới </button> &nbsp;&nbsp; <button class="btn btn-default" ng-click="next('cloudLogin', true)"> Sử dụng hiện tại </button>
@@ -275,7 +275,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Kết nối máy chủ với hệ thống hiện có</h2>
+    <h2>Connect the server to the existing System</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -287,7 +287,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="URL hệ thống hiện tại (https://host:port)"
+ placeholder="Existing System URL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -327,25 +327,26 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Hợp nhất các hệ thống ...</h2>
+    <h2>Sáp nhập hệ thống ...</h2>
     <p class="master-description">Quá trình này có thể mất vài phút</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Hợp nhất các hệ thống ...</h2>
-    <p class="master-description">Đang thử kết nối với hệ thống</p>
+    <h2>Sáp nhập hệ thống ...</h2>
+    <p class="master-description">Trying to connect to the System</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Không thể hợp nhất các hệ thống</h2>
+    <h2>Cannot merge Systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()"> Thử lại </button> <button class="btn btn-default" ng-click="skip()"> Thiết lập một hệ thống riêng </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
     </p>
 </div>
 
@@ -411,7 +412,8 @@
         Thiết lập kết nối Internet trên máy chủ để có thể <br> kết nối với người sử dụng ở bất kỳ nơi nào {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()"> Thử lại </button> <button class="btn btn-default" ng-click="skip()"> Thiết lập hệ thống cục bộ </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Cấu hình thiết đặt mạng</a>
@@ -425,7 +427,8 @@
         Kiểm tra kết nối Internet.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()"> Thử lại </button> <button class="btn btn-default" ng-click="skip()"> Thiết lập hệ thống cục bộ </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -436,7 +439,8 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()"> Thử lại </button> <button class="btn btn-default" ng-click="skip()"> Thiết lập hệ thống cục bộ </button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 

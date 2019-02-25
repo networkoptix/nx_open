@@ -3,8 +3,7 @@
 #include "rpi_utils.h"
 
 #include <stdio.h>
-
-#include <nx/utils/app_info.h>
+#include <cstring>
 
 namespace nx {
 namespace usb_cam {
@@ -22,7 +21,7 @@ static int constexpr kMmalMaxBitrate=10000000;
 
 // The v4l2 driver for the integrated camera doesn't report resolutions accurately,
 // so we have to hardcode it here
-static const std::vector<ResolutionData> kMmalResolutionList = 
+static const std::vector<ResolutionData> kMmalResolutionList =
 {
     {1920, 1080, 30},
     {1920, 1080, 25},
@@ -59,7 +58,7 @@ static const std::vector<ResolutionData> kMmalResolutionList =
     {480, 270, 20},
     {480, 270, 15},
     {480, 270, 10},
-    {480, 270, 5} 
+    {480, 270, 5}
 };
 
 static std::string getUniqueId()
@@ -96,7 +95,7 @@ static std::string getUniqueId()
         size_t newLinePosition = keyValuePair.find("\n");
         if (newLinePosition != std::string::npos)
         {
-            serialNumber = 
+            serialNumber =
                 keyValuePair.substr(delimitterPosition, newLinePosition - delimitterPosition);
         }
         else
@@ -140,11 +139,6 @@ bool isMmalCamera(const std::string& deviceName)
     return deviceName.find("mmal") != std::string::npos;
 }
 
-bool isRpi()
-{
-    return nx::utils::AppInfo::isRaspberryPi();
-}
-    
 } // namespace rpi
 } // namespace video
 } // namespace device

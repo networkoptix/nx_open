@@ -1,0 +1,87 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+.card {
+    box-shadow   : none;
+    border-color : $light4;
+    
+    &--header {
+        background-color : $additional_light1;
+        padding          : 1rem;
+        border-bottom    : 1px solid $light3;
+        
+        h3 {
+            margin : 0;
+        }
+    
+        &-logo {
+            float               : left;
+            display             : flex;
+            align-items         : center;
+            height              : rem(48px);
+            max-width           : 160px;
+            background-size     : contain;
+            width               : 100%;
+            background-position : left center;
+            background-repeat   : no-repeat;
+        }
+    }
+    
+    &--body {
+        padding          : 1rem;
+        overflow         : hidden;
+        background-color : $light1;
+    }
+    
+    &--footer {
+        position         : absolute;
+        width            : 100%;
+        bottom           : 0;
+        padding          : .5rem 1rem 1rem;
+        background-color : $light1;
+        box-shadow       : 0px -22px 22px -6px rgb(255, 255, 255);
+        
+        footer {
+            // overwrite standard footer properties
+            position         : relative !important;
+            bottom           : 0;
+            width            : 100%;
+            border           : none;
+            padding          : 0;
+            background-color : $light1;
+            z-index          : 9;
+        }
+    }
+    
+    nx-section:first-of-type {
+        .card--body {
+            border-top: none;
+        }
+    }
+    
+    &.gray {
+        background-color : $light4;
+        border           : none;
+        
+        .card--header {
+            background-color    : $light4;
+            border-bottom-color : $light6;
+        }
+        
+        .card--body {
+            background-color : $light4;
+            border-top       : 1px solid $light6;
+        }
+    
+        .card--footer {
+            background-color : $light4;
+        }
+    }
+    
+    &.fixed-height {
+        height   : rem(300px);
+        overflow : hidden;
+    }
+}
+
+

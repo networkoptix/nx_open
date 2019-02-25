@@ -35,7 +35,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
     {
         result.setError(
             QnJsonRestResult::InvalidParameter,
-            lit("Invalid Json object provided"));
+            lit("Invalid JSON object provided"));
         return nx::network::http::StatusCode::ok;
     }
 

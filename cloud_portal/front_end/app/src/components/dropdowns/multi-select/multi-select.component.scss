@@ -1,0 +1,13 @@
+nx-multi-select {
+    width   : 100%;
+    display : block;
+    
+    label {
+        display : block;
+    }
+    
+    .dropdown-menu--list {
+        max-height : 120px !important;
+        margin     : 0;
+    }
+}

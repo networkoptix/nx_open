@@ -1,14 +1,8 @@
 #include "engine.h"
 
-#include "device_agent.h"
-#include "common.h"
-#include "string_helper.h"
-#include "parser.h"
-
 #include <chrono>
 
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
@@ -17,6 +11,10 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/string.h>
+
+#include "device_agent.h"
+#include "common.h"
+#include "parser.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
@@ -87,19 +85,8 @@ Engine::Engine(Plugin* plugin)
 {
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
 void Engine::setSettings(const IStringMap* /*settings*/)
@@ -238,6 +225,7 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 namespace {
 
 static const std::string kLibName = "dahua_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.dahua",
@@ -250,7 +238,7 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,

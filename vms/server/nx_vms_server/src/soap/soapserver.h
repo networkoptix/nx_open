@@ -31,8 +31,7 @@ public:
     QnSoapServer(unsigned int port = 0, const char* path = "/services" );
     virtual ~QnSoapServer();
 
-    //!Implementation of QnSoapServer::pleaseStop
-    virtual void pleaseStop();
+    virtual void pleaseStop() override;
 
     bool bind();
     bool initialized() const;

@@ -59,10 +59,10 @@ then
     service $COMPANY_NAME-mediaserver stop || true
     service $COMPANY_NAME-root-tool stop || true
 
-    $CFG_HELPER -d sysIdTime
+    $CFG_HELPER sysIdTime -d
 
     if [ "$RET" = "$REMOVE" ]
     then
-        rm -f /opt/$COMPANY_NAME/mediaserver/var/ecs.sqlite
+        rm -f /opt/$COMPANY_NAME/mediaserver/var/*.sqlite*
     fi
 fi

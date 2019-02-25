@@ -15,3 +15,5 @@
 @subpage layout_files
 
 @subpage watermarks
+
+@subpage storage_forecast

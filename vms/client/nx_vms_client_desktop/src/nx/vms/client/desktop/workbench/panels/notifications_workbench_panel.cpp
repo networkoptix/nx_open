@@ -376,6 +376,8 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
 
     // TODO: #vkutin Get rid of proxying.
     m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
+    m_eventPanelContainer->setProperty(Qn::NoHandScrollOver, true);
+    m_eventPanelContainer->setProperty(Qn::BlockMotionSelection, true);
 
     auto eventPanelResizer = new ResizerWidget(item, m_eventPanelContainer);
     auto dragProcessor = new DragProcessor(this);

@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation type="unfinished">MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -91,6 +102,10 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 sisteminin URL i bu sistemlerden farklı. Birleştirme mümkün değil.</translation>
     </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +113,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Sistem Olayı</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Sistem (id %1) e çoktan bağlanmış</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Sunucu internete bağlı değil.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Bulut kimlik bilgileri kaydedilemedi</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Sahiplik bilgileri kaydedilemedi</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Bulut Sunucuya bağlanılamadı: %1</translation>
     </message>
   </context>
   <context>
@@ -211,10 +246,6 @@
       <translation>Birden Fazla Medya Hatası. Daha Fazla Detay İçin Lütfen Kamera Sorun Penceresini Açın.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>Kamera Eklentisi Hatası. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>Lütfen I/O Modülünü Yeniden Başlatmayı Deneyin, Sonrasında Web Sayfasındaki Fabrika Ayarlarına Geri Dönün.</translation>
     </message>
@@ -318,6 +349,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Lütfen firmware güncelleyiniz. Desteklenen minimum versiyon %1'dir. Şu anki versiyon %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation type="unfinished">Plugin error. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation type="unfinished">Plugin is unavailable</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation type="unfinished">Internal server error. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +385,6 @@
       <translation>%1 için kodlayıcı bulunamadı.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>Örnek bağlam yüklenemedi, Hata kodu:%1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Arabellek alınamadı, hata kodu:%1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>Encodera ses gönderilemedi. Hata kodu:%1.</translation>
     </message>
@@ -360,6 +395,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>Decoder dan ses alınamadı, Hata kodu: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation type="unfinished">Could not allocate sample buffers</translation>
     </message>
   </context>
   <context>
@@ -479,10 +518,6 @@
       <translation>Ücretsiz</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>Ücretsiz lisans</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>Zaman</translation>
     </message>
@@ -497,6 +532,190 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>Köprü Lisansları</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation>
+        <numerusform>%n Deneme Lisansı</numerusform>
+        <numerusform>%n Deneme Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation>
+        <numerusform>%n Analog Lisans</numerusform>
+        <numerusform>%n Analog Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation>
+        <numerusform>%n Profesyonel Lisans</numerusform>
+        <numerusform>%n Profesyonel Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation>
+        <numerusform>%n Edge lisansları</numerusform>
+        <numerusform>%n Edge lisansı</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation>
+        <numerusform>%n Vmax lisansı</numerusform>
+        <numerusform>%n Vmax lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation>
+        <numerusform>%n Analog Encoder lisansı</numerusform>
+        <numerusform>%n Analog Encoder lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation>
+        <numerusform>%n Video Wall lisansı</numerusform>
+        <numerusform>%n Video Wall lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation>
+        <numerusform>%n I/O Modül lisansı</numerusform>
+        <numerusform>%n I/O Modül lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation>
+        <numerusform>%n Start lisansı</numerusform>
+        <numerusform>%n Start lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation>
+        <numerusform>%n Bridge Lisansı</numerusform>
+        <numerusform>%n Bridge Lisans</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation>
+        <numerusform>%n Geçersiz lisans</numerusform>
+        <numerusform>%n Geçersiz lisansları</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation type="unfinished">Free Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1Deneme lisansı</numerusform>
+        <numerusform>%n/%1Deneme lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1Deneme lisansı</numerusform>
+        <numerusform>%n/%1Deneme lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Profesyonel Lisansı</numerusform>
+        <numerusform>%n/%1 Profesyonel Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Edge lisansı</numerusform>
+        <numerusform>%n/%1 Edge lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Vmax Lisansı</numerusform>
+        <numerusform>%n/%1 Vmax Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Analog Kodlayıcı Lisansı</numerusform>
+        <numerusform>%n/%1 Analog Kodlayıcı Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Video Duvarı Lisansı</numerusform>
+        <numerusform>%n/%1 Video Duvarı Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 I / O modül Lisansı</numerusform>
+        <numerusform>%n/%1 I / O modül Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Start Lisansı</numerusform>
+        <numerusform>%n/%1 Start Lisanslar</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Free Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Bridge Lisansı</numerusform>
+        <numerusform>%n/%1 Bridge Lisansları</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Geçersiz Lisansı</numerusform>
+        <numerusform>%n/%1 Geçersiz Lisansları</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -549,10 +768,6 @@
       <translation>Geçersiz tür</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>Bu Aygıt İçin Sadece Tek Bir Lisansa İzin Verildi</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>Bu lisans türü daha yüksek yazılım sürümü gerektirir</translation>
     </message>
@@ -564,6 +779,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation type="unfinished">You already have one active starter license.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -574,34 +797,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>%n Kamera(lar)</numerusform>
-        <numerusform>%n Kameralar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kameralar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>%n Aygıtlar</numerusform>
-        <numerusform>%n Aygıtlar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n aygıt</numerusform>
-        <numerusform>%n aygıt</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>Kameralar</translation>
@@ -634,20 +829,6 @@
       <source>device</source>
       <translation>aygıt</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n I/O Modül</numerusform>
-        <numerusform>%n I/O Modül</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n I/O modül</numerusform>
-        <numerusform>%n I/O modül</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>I/O Modülleri</translation>
@@ -663,6 +844,48 @@
     <message>
       <source>I/O module</source>
       <translation>I/O modül</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -690,67 +913,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>Donanım Kimliği: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>En Düşük</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Düşük</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Orta</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Yüksek</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>En İyi</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Standart</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>Tanımlanmamış</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>En Düşük</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Düşük</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Orta</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Yüksek</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>En İyi</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Standart</translation>
     </message>
   </context>
   <context>
@@ -797,180 +959,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>İsimlendirilmemiş Sistem</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>TAMAM</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>Bulunamadı</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>Uygulanamadı</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>Desteklenmeyen Aktarım</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>İç Sunucu Hatası</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>Geçersiz Parametre</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>sn</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>sa</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>g</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>A</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>saniye</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>dk</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>saat</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>gün</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>hafta</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>ay</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>yıl</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milisaniye</numerusform>
-        <numerusform>milisaniye</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>saniye</numerusform>
-        <numerusform>saniye</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>dakika</numerusform>
-        <numerusform>dakika</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>saat</numerusform>
-        <numerusform>saat</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>gün</numerusform>
-        <numerusform>gün</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>hafta</numerusform>
-        <numerusform>hafta</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>ay</numerusform>
-        <numerusform>ay</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>yıl</numerusform>
-        <numerusform>yıl</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1049,6 +1037,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Tüm sisteme erişebilir ve her işlemi gerçekleştirebilir. Ve kullanıcıları yönetebilir.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation type="unfinished">Zip file is corrupted.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation type="unfinished">Could not find target dir.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation type="unfinished">Could not open file for writing.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation type="unfinished">There is no free space on the disk.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Bilinmeyen hata.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation type="unfinished">Extraction was cancelled.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation type="unfinished">Extractor is busy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -1537,6 +1567,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation>Tam Ekrandan Çık</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Ekranı Aç</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation type="unfinished">Plugin Event</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation type="unfinished">Unknown plugin event</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation type="unfinished">Camera time is back to normal</translation>
     </message>
   </context>
   <context>

@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/clusterdb/engine/outgoing_command_filter.h>
 #include <nx/clusterdb/engine/service/service.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -16,6 +17,8 @@ namespace nx::clusterdb::engine::test {
 class Peer
 {
 public:
+    Peer();
+
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
@@ -23,9 +26,14 @@ public:
     nx::utils::Url syncronizationUrl() const;
 
     void connectTo(const Peer& other);
-    void addRandomData();
+    Customer addRandomData();
+    bool hasData(const std::vector<Customer>& data);
+    Customer modifyRandomly(const Customer& data);
+
+    void setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter);
 
 private:
+    const std::string m_nodeId;
     nx::utils::test::ModuleLauncher<CustomerDbNode> m_process;
 };
 
@@ -45,6 +53,7 @@ public:
     int peerCount() const;
 
     bool allPeersAreSynchronized() const;
+    bool peersAreSynchronized(std::vector<int> ids) const;
 
 private:
     std::vector<std::unique_ptr<Peer>> m_peers;

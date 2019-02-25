@@ -9,17 +9,17 @@ void ZipExtractor::extractAsync(
     const QString& outputDir,
     ExtractHandler extractHandler)
 {
-    auto extractor = std::make_shared<QnZipExtractor>(filePath, outputDir);
+    m_extractor = std::make_unique<QnZipExtractor>(filePath, outputDir);
     QObject::connect(
-        extractor.get(),
+        m_extractor.get(),
         &QnZipExtractor::finished,
-        [extractor, extractHandler](int error)
+        [this, extractHandler](int error)
         {
             extractHandler(
                 static_cast<QnZipExtractor::Error>(error),
-                extractor->dir().absolutePath());
+                m_extractor->dir().absolutePath());
         });
-    extractor->start();
+    m_extractor->start();
 }
 
 } // namespace nx::update::detail

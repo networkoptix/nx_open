@@ -19,22 +19,27 @@
 #include <nx/utils/log/log_main.h>
 #include "media_server/media_server_module.h"
 
+using StreamIndex = nx::vms::api::StreamIndex;
+
 namespace {
 
 static constexpr int kMaxGopLen = 100;
 
 static constexpr int kRoundFactor = 4;
 
-static Qn::StreamIndex oppositeStreamIndex(Qn::StreamIndex streamIndex)
+static StreamIndex oppositeStreamIndex(StreamIndex streamIndex)
 {
     switch (streamIndex)
     {
-        case Qn::StreamIndex::primary: return Qn::StreamIndex::secondary;
-        case Qn::StreamIndex::secondary: return Qn::StreamIndex::primary;
-        case Qn::StreamIndex::undefined: break;
+        case StreamIndex::primary:
+            return StreamIndex::secondary;
+        case StreamIndex::secondary:
+            return StreamIndex::primary;
+        default:
+            break;
     }
     NX_ASSERT(false, lm("Unsupported StreamIndex %1").args(streamIndex));
-    return Qn::StreamIndex::undefined; //< Fallback for the failed assertion.
+    return StreamIndex::undefined; //< Fallback for the failed assertion.
 }
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
@@ -130,13 +135,13 @@ QSize updateDstSize(
 
 CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     const nx::api::CameraImageRequest& request,
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     QnAbstractArchiveDelegate* archiveDelegate,
     int preferredChannel,
     bool& isOpened) const
 {
-    if (!NX_ASSERT(streamIndex == Qn::StreamIndex::primary
-        || streamIndex == Qn::StreamIndex::secondary))
+    if (!NX_ASSERT(streamIndex == StreamIndex::primary
+        || streamIndex == StreamIndex::secondary))
     {
         return nullptr;
     }
@@ -258,9 +263,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
     if (!isArchiveVideoPacket)
     {
-        if (resource->getStatus() == Qn::Online
-            || resource->getStatus() == Qn::Recording
-            || request.usecSinceEpoch != DATETIME_NOW)
+        if (resource->isOnline() || request.usecSinceEpoch != DATETIME_NOW)
         {
             gotFrame = decoder.decode(video, &outFrame);
             if (!gotFrame)
@@ -287,7 +290,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     QnVideoCameraPtr camera,
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     qint64 timestampUs,
     int preferredChannel,
     nx::api::ImageRequest::RoundMethod roundMethod) const
@@ -316,7 +319,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
-    Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
+    StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
 {
     NX_VERBOSE(this, "%1()", __func__);
 
@@ -365,9 +368,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
  * @return Sequence from an I-frame to the desired frame. Can be null but not empty.
  */
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
-    Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
+    StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
 {
-    const MediaQuality stream = (streamIndex == Qn::StreamIndex::primary)
+    const MediaQuality stream = (streamIndex == StreamIndex::primary)
         ? MEDIA_Quality_High
         : MEDIA_Quality_Low;
     if (!camera->liveCache(stream))
@@ -493,7 +496,7 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
     return result;
 }
 
-Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
+StreamIndex QnGetImageHelper::determineStreamIndex(
     const nx::api::CameraImageRequest &request) const
 {
     NX_VERBOSE(this, "%1(%2)", __func__, request.streamSelectionMode);
@@ -505,34 +508,34 @@ Qn::StreamIndex QnGetImageHelper::determineStreamIndex(
         {
             #if defined(EDGE_SERVER)
                 // On edge, we always try to use the secondary stream first.
-                return Qn::StreamIndex::secondary;
+                return StreamIndex::secondary;
             #endif
 
             const auto secondaryResolution =
-                request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
+                request.camera->streamInfo(StreamIndex::secondary).getResolution();
             if ((request.size.width() <= 0 && request.size.height() <= 0)
                 || request.size.width() > secondaryResolution.width()
                 || request.size.height() > secondaryResolution.height())
             {
-                return Qn::StreamIndex::primary;
+                return StreamIndex::primary;
             }
 
-            return Qn::StreamIndex::secondary;
+            return StreamIndex::secondary;
         }
-        case StreamSelectionMode::forcedPrimary: return Qn::StreamIndex::primary;
-        case StreamSelectionMode::forcedSecondary: return Qn::StreamIndex::secondary;
+        case StreamSelectionMode::forcedPrimary: return StreamIndex::primary;
+        case StreamSelectionMode::forcedSecondary: return StreamIndex::secondary;
         case StreamSelectionMode::sameAsAnalytics:
-            return ini().analyzeSecondaryStream ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
+            return ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary;
         case StreamSelectionMode::sameAsMotion:
             return request.camera->motionStreamIndex().index;
     }
 
     NX_ASSERT(false);
-    return Qn::StreamIndex::undefined;
+    return StreamIndex::undefined;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
-    Qn::StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const
+    StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const
 {
     NX_VERBOSE(this, "%1(%2, %3 us, roundMethod: %4) BEGIN",
         __func__, streamIndex, request.usecSinceEpoch, request.roundMethod);
@@ -551,7 +554,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
     bool isOpened = false;
 
-    if (streamIndex == Qn::StreamIndex::secondary)
+    if (streamIndex == StreamIndex::secondary)
         archiveDelegate->setQuality(MEDIA_Quality_Low, true, QSize());
 
     QList<QnAbstractImageFilterPtr> filterChain;

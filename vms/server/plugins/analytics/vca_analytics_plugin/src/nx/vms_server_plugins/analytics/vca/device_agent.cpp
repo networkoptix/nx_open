@@ -59,9 +59,9 @@ EventMetadataPacket* createCommonEventMetadataPacket(
 {
     using namespace std::chrono;
 
+    const auto commonEvent = toPtr(createCommonEvent(event, active));
     auto packet = new EventMetadataPacket();
-    const auto commonEvent = createCommonEvent(event, active);
-    packet->addItem(commonEvent);
+    packet->addItem(commonEvent.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUs(-1);
@@ -201,21 +201,6 @@ DeviceAgent::~DeviceAgent()
 {
     stopFetchingMetadata();
     NX_PRINT << "VCA DeviceAgent destroyed.";
-}
-
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<DeviceAgent*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
 void DeviceAgent::treatMessage(int size)
@@ -534,7 +519,7 @@ const IString* DeviceAgent::manifest(Error* /*error*/) const
     return new nx::sdk::String();
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

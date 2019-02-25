@@ -1283,7 +1283,7 @@ void ActionHandler::at_openFileAction_triggered()
 {
     static const QStringList kProprietaryFormats{"nov"};
     static const QStringList kVideoFormats = QnCustomFileDialog::kVideoFilter.second;
-    static const QStringList kPicturesFormats = QnCustomFileDialog::kPicturesFilter.second;
+    static const QStringList kPicturesFormats = QnCustomFileDialog::picturesFilter().second;
     static const QStringList kAllSupportedFormats = kProprietaryFormats
         + kVideoFormats
         + kPicturesFormats;
@@ -1294,7 +1294,7 @@ void ActionHandler::at_openFileAction_triggered()
         QnCustomFileDialog::createFilter({
             {tr("All Supported"), kAllSupportedFormats},
             QnCustomFileDialog::kVideoFilter,
-            QnCustomFileDialog::kPicturesFilter,
+            QnCustomFileDialog::picturesFilter(),
             QnCustomFileDialog::kAllFilesFilter
             }),
         nullptr,
@@ -2377,7 +2377,7 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            propertyDictionary()->saveParamsAsync(resource->getId());
+            resourcePropertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
 }
@@ -2430,8 +2430,10 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (!watcher->hasMismatches())
         return;
 
+    constexpr auto kServerComponent = QnWorkbenchVersionMismatchWatcher::Component::server;
+
     const auto latestVersion = watcher->latestVersion();
-    auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    auto latestMsVersion = watcher->latestVersion(kServerComponent);
 
     // if some component is newer than the newest mediaserver, focus on its version
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
@@ -2439,13 +2441,13 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
 
     QnResourceList mismatched;
 
-    for (const QnAppInfoMismatchData &data : watcher->mismatchData())
+    for (const auto& data: watcher->components())
     {
-        if (data.component == Qn::ServerComponent)
+        if (data.component == kServerComponent)
         {
-            QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            if (resource)
-                mismatched << data.resource;
+            NX_ASSERT(data.server);
+            if (data.server)
+                mismatched << data.server;
         }
     }
 
@@ -2512,9 +2514,9 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
         return;
 
     QString header = tr("Beta version %1").arg(qApp->applicationVersion());
-    QString contents = lit("<html><p style=\"color:#d04437\">%1</p>%2</html>").arg(
-        tr("Warning! This build is for testing purposes only!"),
-        tr("Please upgrade to a next available patch or release version once available."));
+    QString contents = setWarningStyleHtml(tr("This build is for testing purposes only."))
+        + "<br/>"
+        + tr("Please upgrade to a next available patch or release version once available.");
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning, header, contents,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindowWidget());
@@ -2559,7 +2561,7 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
 void ActionHandler::at_queueAppRestartAction_triggered()
 {
 
-    auto tryToRestartClient = []
+    auto tryToRestartClient = [this]
         {
             using namespace applauncher::api;
 

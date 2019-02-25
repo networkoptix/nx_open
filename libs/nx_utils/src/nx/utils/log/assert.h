@@ -12,6 +12,7 @@
 #include "log_message.h"
 
 #include <nx/utils/general_macros.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #if defined(ANDROID) || defined(__ANDROID__)
     #include "backtrace_android.h"
@@ -33,7 +34,11 @@ bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
 void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
 
-bool NX_UTILS_API isAssertHeavyConditionEnabled();
+namespace detail {
+
+static const bool assertHeavyConditionEnabled = ini().assertHeavyCondition;
+
+} // detail
 
 /**
  * @return Always false.
@@ -164,6 +169,6 @@ private:
  */
 #define NX_ASSERT_HEAVY_CONDITION(...) do \
 { \
-    if (::nx::utils::isAssertHeavyConditionEnabled()) \
+    if (::nx::utils::detail::assertHeavyConditionEnabled) \
         NX_ASSERT(__VA_ARGS__); \
 } while (0)

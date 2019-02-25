@@ -3,6 +3,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "../../protocol_type.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -209,6 +211,12 @@ OutgoingConnection::OutgoingConnection(
 OutgoingConnection::~OutgoingConnection()
 {
     --(*m_usageCounter);
+}
+
+bool OutgoingConnection::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::relay;
+    return true;
 }
 
 } // namespace relay

@@ -34,7 +34,6 @@ public:
     const CameraSettingsDialogState& state() const;
 
     // Actions.
-    void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
     void setGlobalPermissions(GlobalPermissions value);
@@ -49,8 +48,8 @@ public:
     void setRecordingShowFps(bool value);
     void setRecordingShowQuality(bool value);
     void toggleCustomBitrateVisible();
-    void setCustomRecordingBitrateMbps(float mbps);
-    void setCustomRecordingBitrateNormalized(float value);
+    void setRecordingBitrateMbps(float mbps);
+    void setRecordingBitrateNormalized(float value);
     void setMinRecordingDaysAutomatic(bool value);
     void setMinRecordingDaysValue(int value);
     void setMaxRecordingDaysAutomatic(bool value);
@@ -65,7 +64,7 @@ public:
     void setMotionRegionList(const QList<QnMotionRegion>& value);
     void setFisheyeSettings(const QnMediaDewarpingParams& value);
     void setIoPortDataList(const QnIOPortDataList& value);
-    void setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value);
+    void setIoModuleVisualStyle(nx::vms::api::IoModuleVisualStyle value);
     void setCameraControlDisabled(bool value);
     void setDualStreamingDisabled(bool value);
     void setUseBitratePerGOP(bool value);
@@ -74,11 +73,11 @@ public:
     void setPreferredPtzPresetType(nx::core::ptz::PresetType value);
     void setForcedPtzPanTiltCapability(bool value);
     void setForcedPtzZoomCapability(bool value);
-    void setRtpTransportType(vms::api::RtpTransportType value);
+    void setRtpTransportType(nx::vms::api::RtpTransportType value);
     void setCustomMediaPortUsed(bool value);
     void setTrustCameraTime(bool value);
     void setCustomMediaPort(int value);
-    void setMotionStreamType(vms::api::MotionStreamType value);
+    void setForcedMotionStreamType(nx::vms::api::StreamIndex value);
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();

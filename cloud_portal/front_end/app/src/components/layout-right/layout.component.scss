@@ -1,0 +1,58 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+.layout {
+    position  : relative;
+    max-width : 1600px;
+    
+    .card-columns {
+        &.toggle-on {
+            width: 100%;
+            columns: 2;
+    
+            @include media-breakpoint-down(md) {
+                columns : 1;
+            }
+        }
+        &.toggle-off {
+            width: 100%;
+            columns: 1;
+        }
+        @include media-breakpoint-up(sm) {
+            width   : 66.66667%; // col-8
+            columns : 1;         // overwrite default Bootstrap value
+            
+            .right-sidemenu {
+                position    : absolute;
+                margin-left : 1rem;
+                width       : calc(33.33333% - 24px); // col-4 (-) 1.5rem margins for row and column
+            }
+        }
+        
+        @include media-breakpoint-up(xl) {
+            width : 58.33333%; // col-7
+            
+            .right-sidemenu {
+                width : calc(25% - 24px); // col-3 (-) 1.5rem margins for row and column
+            }
+        }
+        
+        @include media-breakpoint-up(xxl)    {
+            width   : 83.33333%; // col-10
+            columns : 2;
+            
+            .right-sidemenu {
+                right : 1.5rem;
+                width : calc(16.66667% - 24px); // col-2 (-) 1.5rem margins for row and column
+            }
+
+        }
+    }
+}
+
+.right-sidemenu {
+    width: 100%;
+}

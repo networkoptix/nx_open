@@ -188,7 +188,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
         new QnCustomFileDialog(
             this, tr("Select File..."),
             folder,
-            QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter)
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter())
         )
     );
     dialog->setFileMode(QFileDialog::ExistingFile);

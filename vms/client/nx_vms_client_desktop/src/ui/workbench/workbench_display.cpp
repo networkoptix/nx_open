@@ -288,13 +288,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
 
         for (auto actionId : {
+            action::NotificationsTabAction, //< N
+            action::MotionTabAction, //< M
+            action::BookmarksTabAction, //< B
+            action::EventsTabAction, //< E
+            action::ObjectsTabAction, //< O
             action::JumpToLiveAction, //< L
-            action::ToggleMuteAction, //< M
+            action::ToggleMuteAction, //< U
             action::ToggleSyncAction, //< S
             action::JumpToEndAction,  //< X
             action::JumpToStartAction,//< Z
             action::ToggleInfoAction, //< I
-            action::ToggleSmartSearchAction, //< A
 
             /* "Delete" button */
             action::DeleteVideowallMatrixAction,
@@ -1147,10 +1151,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
-    if (options)
-        widget->setOptions(widget->options() | options);
-
     synchronize(widget, false);
     bringToFront(widget);
 
@@ -1427,9 +1427,6 @@ QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::shadowLayer(ItemLayer itemLaye
 QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const
 {
     NX_ASSERT(widget);
-
-    if (widget->options().testFlag(QnResourceWidget::InvisibleWidgetOption))
-        return InvisibleLayer;
 
     if (widget == m_widgetByRole[Qn::ZoomedRole])
         return ZoomedLayer;
@@ -2068,7 +2065,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
         int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if (checkedButtons != -1)
+        {
+            checkedButtons &= ~Qn::MotionSearchButton; //< Handled by MotionSearchSynchronizer.
             resourceWidget->setCheckedButtons(checkedButtons);
+        }
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if (!widget)

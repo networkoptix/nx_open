@@ -10,11 +10,10 @@
 namespace nx::cloud::db {
 
 MaintenanceManager::MaintenanceManager(
-    const QnUuid& moduleGuid,
     clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
     const nx::sql::InstanceController& dbInstanceController)
     :
-    m_moduleGuid(moduleGuid),
+    m_moduleGuid(syncronizationEngine->peerId()),
     m_syncronizationEngine(syncronizationEngine),
     m_dbInstanceController(dbInstanceController)
 {
@@ -102,8 +101,8 @@ void MaintenanceManager::onTransactionLogRead(
 {
     api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("system %1. Read %2 transactions. Result code %3")
-            .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)));
+    NX_DEBUG(this, "system %1. Read %2 transactions. Result code %3",
+        systemId, serializedTransactions.size(), api::toString(resultCode));
 
     NX_ASSERT(resultCode != api::ResultCode::partialContent);
     if (resultCode != api::ResultCode::ok)

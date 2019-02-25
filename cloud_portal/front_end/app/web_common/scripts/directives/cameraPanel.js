@@ -3,9 +3,9 @@
     'use strict';
 
     function CameraPanel($localStorage, $timeout, $location, $routeParams,
-                         configService, languageService) {
+                         nxConfigService, languageService) {
     
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
         const LANG = languageService.lang;
         
         return {
@@ -14,7 +14,8 @@
                 'activeCamera'   : '=',
                 'camerasProvider': '=',
                 'showCameraPanel': '=',
-                'isEmbeded'      : '<'
+                'isEmbeded'      : '<',
+                'showOnTop'      : '='
             },
             templateUrl: CONFIG.viewsDirCommon + 'components/cameraPanel.html',
             link       : function (scope/*, element, attrs*/) {
@@ -27,7 +28,7 @@
                 };
                 
                 scope.selectCamera = function (activeCamera) {
-                    if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
+                    if (scope.activeCamera && (scope.activeCamera.id === activeCamera.id)) {
                         return;
                     }
                     scope.activeCamera = activeCamera;
@@ -98,6 +99,7 @@
                 };
 
                 scope.showCamera = function (camera) {
+                    scope.showOnTop = false;
                     scope.selectCamera(camera);
                 };
 
@@ -128,7 +130,7 @@
         };
     }
     
-    CameraPanel.$inject = ['$localStorage', '$timeout', '$location', '$routeParams', 'configService', 'languageService'];
+    CameraPanel.$inject = ['$localStorage', '$timeout', '$location', '$routeParams', 'nxConfigService', 'languageService'];
     
     angular
         .module('nxCommon')

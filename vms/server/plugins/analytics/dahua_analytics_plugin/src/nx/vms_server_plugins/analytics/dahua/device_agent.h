@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/utils/url.h>
 
@@ -18,7 +18,7 @@ namespace nx::vms_server_plugins::analytics::dahua {
 
 class DeviceAgent:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(Engine* engine,
@@ -28,8 +28,6 @@ public:
     virtual ~DeviceAgent();
 
     virtual Engine* engine() const override { return m_engine; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;

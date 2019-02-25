@@ -1,279 +1,427 @@
 <div class="container">
     <h1>SANDBOX</h1>
 
-    <div class="row">
-        <div class="col-12">
-            <!--<iframe-->
-                <!--style="border : 1px solid gold; height: 400px; width: 100%;"-->
-                <!--src="https://0.0.0.0:9000/embed/c9899a0f-4ce9-4114-946c-3a4f4df06a49/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras&noheader&nocontrols&auth=dHRzb2xvdkBuZXR3b3Jrb3B0aXguY29tOnF3ZWFzZDEyMzU=">-->
-                <!--Your browser doesn't support iframe.-->
-            <!--</iframe>-->
-            <iframe
-                    style="border : 1px solid gold; height: 400px; width: 100%;"
-                    src="https://cloud-test.hdw.mx/embed/262d629d-144c-4402-bfa9-c490d9f6dbe9/view/ff2f7cd0-4220-bcf6-2dac-a63441454daf?nocameras&noheader&nocontrols&auth=bm9wdGl4YXV0b3FhK293bmVyQGdtYWlsLmNvbTpxd2Vhc2QgMTIz">
-                Your browser doesn't support iframe.
-            </iframe>
-        </div>
-    </div>
 
-    <!--<div class="row">-->
-        <!--<div class="col-12">-->
-            <!--<iframe-->
-                    <!--style="border : 1px solid gold; height: 500px; width: 100%;"-->
-                    <!--src="/embed/766a58d2-a5e6-4765-87d5-95a4d1798995/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras">-->
-                <!--Your browser doesn't support iframe.-->
-            <!--</iframe>-->
-        <!--</div>-->
-    <!--</div>-->
+    <ngb-tabset #tabs>
+        <ngb-tab id="Search">
+            <ng-template ngbTabTitle>
+                <span class="tab-heading">Search</span>
+            </ng-template>
+            <ng-template ngbTabContent>
+                <div class="row p-3">
+                    <nx-search
+                            name="filter"
+                            [(ngModel)]="filter"
+                            expandable>
+                    </nx-search>
 
-    <!--<div class="row">-->
-        <!--<div class="col-12">-->
-            <!--<iframe-->
-                    <!--style="border : 1px solid gold; height: 500px; width: 100%;"-->
-                    <!--src="/embed/766a58d2-a5e6-4765-87d5-95a4d1798995/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras&nocontrols&noheader">-->
-                <!--Your browser doesn't support iframe.-->
-            <!--</iframe>-->
-        <!--</div>-->
-    <!--</div>-->
-
-    <div class="row">
-        <div class="col-12 col-md-4 border-right">
-            <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
-
-                <div class="form-group">
-                    <nx-checkbox
-                            name="show"
-                            compId="show1"
-                            [(ngModel)]="show5"
-                            checked>Remember me
-                    </nx-checkbox>
-
-                    <label for="show1">Remember me</label>
+                    <div class="pt-5">
+                        Search filter: {{filter.query}}
+                    </div>
+                    <div class="pt-3">
+                        Search selects: {{filter.selects | json}}
+                    </div>
+                    <div class="pt-3">
+                        Search multi-selects: {{filter.multiselects | json}}
+                    </div>
+                    <div class="pt-3">
+                        Search tags: {{filter.tags | json}}
+                    </div>
                 </div>
+            </ng-template>
+        </ngb-tab>
 
-                <div class="form-group">
-                    <nx-checkbox
-                            name="show"
-                            compId="show"
-                            [(ngModel)]="show"
-                            [checked]="true"
-                            disabled>
-                    </nx-checkbox>
-
-                    <label for="show" disabled>Remember me (disabled)</label>
-                </div>
-
-                <div class="form-group">
-                    <nx-checkbox
-                            name="fldAgree"
-                            compId="fldAgree" #spyAgree
-                            [(ngModel)]="agree"
-                            required>
-                    </nx-checkbox>
-
-                    <label for="fldAgree">I agree to T&C (required)</label>
-                    <!--component: {{spyAgree | json}}-->
-                    <div class="help-block input-error input-error--required">Required</div>
-                </div>
-
-                <br/>
-
-                <div class="form-group">
-                    <nx-radio
-                            name="blah" compId="blah1"
-                            value="blah1"
-                            [(ngModel)]="blah">
-                    </nx-radio>
-                    <label for="blah1">blah1</label>
-                    <br/>
-                    <nx-radio
-                            name="blah" compId="blah2"
-                            value="blah2"
-                            [(ngModel)]="blah">blah2
-                    </nx-radio>
-                    <label for="blah2">blah2</label>
-                    <br/>
-                    <nx-radio
-                            name="blah" compId="blah3"
-                            value="blah3"
-                            [(ngModel)]="blah">blah3
-                    </nx-radio>
-                    <label for="blah3">blah3</label>
-                </div>
-
-                <div class="form-group">
-                    <nx-radio
-                            name="group2" compId="group1"
-                            value="Tsanko"
-                            [(ngModel)]="group">Tsanko
-                    </nx-radio>
-                    <label for="group1">Tsanko</label>
-                    <br/>
-                    <nx-radio
-                            name="group2" compId="group2"
-                            value="Evgeny"
-                            [(ngModel)]="group">Evgeny
-                    </nx-radio>
-                    <label for="group2">Evgeny</label>
-                </div>
-
-                <div class="form-group">
-                    <nx-radio
-                            name="group2" compId="group3"
-                            value="Tsanko"
-                            [(ngModel)]="group"
-                            disabled>Tsanko
-                    </nx-radio>
-                    <label for="group3" disabled>Tsanko</label>
-                    <br/>
-                    <nx-radio
-                            name="group2" compId="group4"
-                            value="Evgeny"
-                            [(ngModel)]="group"
-                            disabled>Evgeny
-                    </nx-radio>
-                    <label for="group4" disabled>Evgeny</label>
-                </div>
-
-                <br/>
-                <br/>
-
-                <button type="submit" class="btn btn-default">Click me!</button>
-
-            </form>
-
-            <br/>
-            value: {{show5}}
-            <br/>
-            value: {{show}}
-            <br/>
-            <!--value (required): {{agree}}-->
-            <!--<br/>-->
-            <!--value (blah): {{blah}}-->
-            <!--<br/>-->
-            <!--value (group): {{group}}-->
-            <!--<br/>-->
-            <!--submited: {{submitted}}-->
-            <!--<br/>-->
-            form is valid: {{ testForm.valid ? 'true' : 'false' }}
-            <br/>
-
-        </div>
-        <div class="col-12 col-md-4 border-right">
-            <h3>Grid</h3>
-
-            <form #testForm2="ngForm" (ngSubmit)="onSubmit()" name="testForm2" novalidate>
-
+        <ngb-tab id="Multi DD">
+            <ng-template ngbTabTitle>
+                <span class="tab-heading">Multi DD</span>
+            </ng-template>
+            <ng-template ngbTabContent>
                 <div class="row">
-                    <div class="col-6 border-right">
-                        <label for="show2">This is a separate label:</label>
+                    <div class="col-3 p-5">
+                        <nx-multi-select name="ddMultiSelect"
+                                         [items]="items"
+                                         [ngModel]="itemsSelected"
+                                         (ngModelChange)="modelChanged($event)"
+                                         canSelectAll>
+                        </nx-multi-select>
                     </div>
-                    <div>
-                        <nx-checkbox
-                                name="show2"
-                                compId="show2"
-                                [(ngModel)]="show"
-                                [checked]="true">
-                        </nx-checkbox>
+                    <div class="col-3 p-5">
+                        <nx-multi-select name="ddMultiSelect1"
+                                         [items]="items"
+                                         [ngModel]="itemsSelected"
+                                         (ngModelChange)="modelChanged($event)"
+                                         canSelectAll>
+                        </nx-multi-select>
+                    </div>
+                    <div class="col p-5">
+                        Labels:
+                        <br>
+                        {{items | json}}
+                        <br>
+                        <br>
+                        Selected
+                        <br>
+                        {{itemsSelected}}
                     </div>
                 </div>
+            </ng-template>
+        </ngb-tab>
 
+        <ngb-tab id="Masonry Grid">
+            <ng-template ngbTabTitle>
+                <span class="tab-heading">Masonry Grid</span>
+            </ng-template>
+            <ng-template ngbTabContent>
+                <div class="container">
+                    <div class="card-columns">
+                        <div class="card">
+                            <img class="card-img-top img-fluid" src="//placehold.it/800x560" alt="Card image cap">
+                            <div class="card-body">
+                                <h4 class="card-title">Card title that wraps to a new line</h4>
+                                <p class="card-text">This is a longer card with supporting text below as a natural
+                                    lead-in to
+                                    additional content. This content is a little bit longer.</p>
+                            </div>
+                        </div>
+                        <div class="card card-body">
+                            <blockquote class="card-blockquote">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                                    ante.</p>
+
+                                <small class="text-muted">
+                                    Someone famous in <cite title="Source Title">Source Title</cite>
+                                </small>
+                            </blockquote>
+                        </div>
+                        <div class="card">
+                            <img class="card-img-top img-fluid" src="//placehold.it/800x400" alt="Card image cap">
+                            <div class="card-body">
+                                <h4 class="card-title">Card title</h4>
+                                <p class="card-text">This card has supporting text below as a natural lead-in to
+                                    additional
+                                    content.</p>
+                                <p class="card-text">
+                                    <small class="text-muted">Last updated 3 mins ago</small>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card card-body card-inverse card-primary text-xs-center">
+                            <blockquote class="card-blockquote">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat.</p>
+
+                                <small>
+                                    Someone famous in <cite title="Source Title">Source Title</cite>
+                                </small>
+                            </blockquote>
+                        </div>
+                        <div class="card card-body text-xs-center">
+                            <h4 class="card-title">Card title</h4>
+                            <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                                content.</p>
+                            <p class="card-text">
+                                <small class="text-muted">Last updated 3 mins ago</small>
+                            </p>
+                        </div>
+                        <div class="card">
+                            <img class="card-img img-fluid" src="//placehold.it/800x600" alt="Card image">
+                        </div>
+                        <div class="card card-body text-right">
+                            <blockquote class="card-blockquote">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                                    ante.</p>
+                                <small class="text-muted">
+                                    Someone famous in <cite title="Source Title">Source Title</cite>
+                                </small>
+                            </blockquote>
+                        </div>
+                        <div class="card card-body">
+                            <h4 class="card-title">Card title</h4>
+                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
+                                additional
+                                content. This card has even longer content than the first to show that equal height
+                                action.</p>
+                            <p class="card-text">
+                                <small class="text-muted">Last updated 3 mins ago</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="IFrame">
+            <ng-template ngbTabTitle>
+                <span class="tab-heading">IFrame</span>
+            </ng-template>
+            <ng-template ngbTabContent>
                 <div class="row">
-                    <div class="col-6 border-right">
-                        <label for="fldEdit">
-                            <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
-                        </label>
-                    </div>
-                    <div>
-                        <nx-checkbox
-                                name="fldEdit"
-                                compId="fldEdit"
-                                [(ngModel)]="edit">
-                        </nx-checkbox>
+                    <div class="col-12">
+                        <!--<iframe-->
+                        <!--style="border : 1px solid gold; height: 400px; width: 100%;"-->
+                        <!--src="https://0.0.0.0:9000/embed/c9899a0f-4ce9-4114-946c-3a4f4df06a49/view/ad1d1b6c-7013-0049-6fd4-ff15450e4716?nocameras&noheader&nocontrols&auth=dHRzb2xvdkBuZXR3b3Jrb3B0aXguY29tOnF3ZWFzZDEyMzU=">-->
+                        <!--Your browser doesn't support iframe.-->
+                        <!--</iframe>-->
+                        <iframe style="border : 1px solid gold; height: 400px; width: 100%;"
+                                src="https://cloud-test.hdw.mx/embed/813f5aa8-10bd-4fa8-a5f4-e276a39f80df/view/ff2f7cd0-4220-bcf6-2dac-a63441454daf?nocameras&noheader&nocontrols&debug&auth=bm9wdGl4YXV0b3FhK293bmVyQGdtYWlsLmNvbTpxd2Vhc2QgMTIz">
+                            Your browser doesn't support iframe.
+                        </iframe>
                     </div>
                 </div>
+            </ng-template>
+        </ngb-tab>
 
-                <br/>
-                <br/>
+        <ngb-tab id="Other">
+            <ng-template ngbTabTitle>
+                <span class="tab-heading">Other</span>
+            </ng-template>
+            <ng-template ngbTabContent>
+                <div class="row">
+                    <div class="col-12 col-md-4 border-right">
+                        <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
 
-                <button type="submit" class="btn btn-default">Click me!</button>
+                            <div class="form-group">
+                                <nx-checkbox
+                                        name="show"
+                                        componentId="show1"
+                                        [(ngModel)]="show5"
+                                        checked>Remember me
+                                </nx-checkbox>
 
-            </form>
-        </div>
-        <div class="col-12 col-md-4">
-            <h3>Table</h3>
+                                <label for="show1">Remember me</label>
+                            </div>
 
-            <form #testForm3="ngForm" (ngSubmit)="onSubmit()" name="testForm3" novalidate>
+                            <div class="form-group">
+                                <nx-checkbox
+                                        name="show"
+                                        componentId="show"
+                                        [(ngModel)]="show"
+                                        [checked]="true"
+                                        disabled>
+                                </nx-checkbox>
 
-                <table border="1" cellpadding="10">
-                    <tr>
-                        <td>
-                            <label for="show3">This is a separate label:</label>
-                        </td>
-                        <td>
-                            <nx-checkbox
-                                    name="show3"
-                                    compId="show3"
-                                    [(ngModel)]="show"
-                                    [checked]="true">
-                            </nx-checkbox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <nx-checkbox
-                                    name="fldEdit"
-                                    compId="fldEdit3"
-                                    [(ngModel)]="edit">
-                            </nx-checkbox>
+                                <label for="show" disabled>Remember me (disabled)</label>
+                            </div>
 
-                            <label for="fldEdit3">
-                                <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="blah11">blah1</label>
-                        </td>
-                        <td>
-                            <nx-radio
-                                    name="blah" compId="blah11"
-                                    value="blah1"
-                                    [(ngModel)]="blah">
-                            </nx-radio>
-                        </td>
+                            <div class="form-group">
+                                <nx-checkbox
+                                        name="fldAgree"
+                                        componentId="fldAgree" #spyAgree
+                                        [(ngModel)]="agree"
+                                        required>
+                                </nx-checkbox>
+
+                                <label for="fldAgree">I agree to T&C (required)</label>
+                                <!--component: {{spyAgree | json}}-->
+                                <div class="help-block input-error input-error--required">Required</div>
+                            </div>
+
+                            <br/>
+
+                            <div class="form-group">
+                                <nx-radio
+                                        name="blah" componentId="blah1"
+                                        value="blah1"
+                                        [(ngModel)]="blah">
+                                </nx-radio>
+                                <label for="blah1">blah1</label>
+                                <br/>
+                                <nx-radio
+                                        name="blah" componentId="blah2"
+                                        value="blah2"
+                                        [(ngModel)]="blah">blah2
+                                </nx-radio>
+                                <label for="blah2">blah2</label>
+                                <br/>
+                                <nx-radio
+                                        name="blah" componentId="blah3"
+                                        value="blah3"
+                                        [(ngModel)]="blah">blah3
+                                </nx-radio>
+                                <label for="blah3">blah3</label>
+                            </div>
+
+                            <div class="form-group">
+                                <nx-radio
+                                        name="group2" componentId="group1"
+                                        value="Tsanko"
+                                        [(ngModel)]="group">Tsanko
+                                </nx-radio>
+                                <label for="group1">Tsanko</label>
+                                <br/>
+                                <nx-radio
+                                        name="group2" componentId="group2"
+                                        value="Evgeny"
+                                        [(ngModel)]="group">Evgeny
+                                </nx-radio>
+                                <label for="group2">Evgeny</label>
+                            </div>
+
+                            <div class="form-group">
+                                <nx-radio
+                                        name="group2" componentId="group3"
+                                        value="Tsanko"
+                                        [(ngModel)]="group"
+                                        disabled>Tsanko
+                                </nx-radio>
+                                <label for="group3" disabled>Tsanko</label>
+                                <br/>
+                                <nx-radio
+                                        name="group2" componentId="group4"
+                                        value="Evgeny"
+                                        [(ngModel)]="group"
+                                        disabled>Evgeny
+                                </nx-radio>
+                                <label for="group4" disabled>Evgeny</label>
+                            </div>
+
+                            <br/>
+                            <br/>
+
+                            <button type="submit" class="btn btn-default">Click me!</button>
+
+                        </form>
+
+                        <br/>
+                        value: {{show5}}
+                        <br/>
+                        value: {{show}}
+                        <br/>
+                        <!--value (required): {{agree}}-->
+                        <!--<br/>-->
+                        value (blah): {{blah}}
+                        <br/>
+                        value (group): {{group}}
+                        <br/>
+                        <!--submited: {{submitted}}-->
+                        <!--<br/>-->
+                        form is valid: {{ testForm.valid ? 'true' : 'false' }}
+                        <br/>
+
+                    </div>
+                    <div class="col-12 col-md-4 border-right">
+                        <h3>Grid</h3>
+
+                        <form #testForm2="ngForm" (ngSubmit)="onSubmit()" name="testForm2" novalidate>
+
+                            <div class="row">
+                                <div class="col-6 border-right">
+                                    <label for="show2">This is a separate label:</label>
+                                </div>
+                                <div>
+                                    <nx-checkbox
+                                            name="show2"
+                                            componentId="show2"
+                                            [(ngModel)]="show"
+                                            [checked]="true">
+                                    </nx-checkbox>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 border-right">
+                                    <label for="fldEdit">
+                                        <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <nx-checkbox
+                                            name="fldEdit"
+                                            componentId="fldEdit"
+                                            [(ngModel)]="edit">
+                                    </nx-checkbox>
+                                </div>
+                            </div>
+
+                            <br/>
+                            <br/>
+
+                            <button type="submit" class="btn btn-default">Click me!</button>
+
+                        </form>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h3>Table</h3>
+
+                        <form #testForm3="ngForm" (ngSubmit)="onSubmit()" name="testForm3" novalidate>
+
+                            <table border="1" cellpadding="10">
+                                <tr>
+                                    <td>
+                                        <label for="show3">This is a separate label:</label>
+                                    </td>
+                                    <td>
+                                        <nx-checkbox
+                                                name="show3"
+                                                componentId="show3"
+                                                [(ngModel)]="show"
+                                                [checked]="true">
+                                        </nx-checkbox>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <nx-checkbox
+                                                name="fldEdit"
+                                                componentId="fldEdit3"
+                                                [(ngModel)]="edit">
+                                        </nx-checkbox>
+
+                                        <label for="fldEdit3">
+                                            <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="blah11">blah1</label>
+                                    </td>
+                                    <td>
+                                        <nx-radio
+                                                name="blah" componentId="blah11"
+                                                value="blah1"
+                                                [(ngModel)]="blah">
+                                        </nx-radio>
+                                    </td>
 
 
-                        <td>
-                            <label for="blah21">blah2</label>
-                        </td>
-                        <td>
-                            <nx-radio
-                                    name="blah" compId="blah21"
-                                    value="blah2"
-                                    [(ngModel)]="blah">blah2
-                            </nx-radio>
-                        </td>
+                                    <td>
+                                        <label for="blah21">blah2</label>
+                                    </td>
+                                    <td>
+                                        <nx-radio
+                                                name="blah" componentId="blah21"
+                                                value="blah2"
+                                                [(ngModel)]="blah">blah2
+                                        </nx-radio>
+                                    </td>
 
-                        <td>
-                            <label for="blah31">blah3</label>
-                        </td>
-                        <td>
-                            <nx-radio
-                                    name="blah" compId="blah31"
-                                    value="blah3"
-                                    [(ngModel)]="blah">blah3
-                            </nx-radio>
-                        </td>
-                    </tr>
-                </table>
+                                    <td>
+                                        <label for="blah31">blah3</label>
+                                    </td>
+                                    <td>
+                                        <nx-radio
+                                                name="blah" componentId="blah31"
+                                                value="blah3"
+                                                [(ngModel)]="blah">blah3
+                                        </nx-radio>
+                                    </td>
+                                </tr>
+                            </table>
 
-                <br/>
-                <br/>
+                            <br/>
+                            <br/>
 
-            </form>
-        </div>
-    </div>
+                        </form>
+                        <br>
+                        <br>
+                        <div class="d-inline-flex">
+                            <nx-tag class="mr-1" *ngFor="let option of options" [type]="option.type"
+                                    [value]="option.selected">{{ option.name }}</nx-tag>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
 </div>
 

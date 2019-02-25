@@ -177,6 +177,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             .setPath(state.singleCameraProperties.settingsUrlPath)
             .setUserName(d->credentials.login())
             .setPassword(d->credentials.password()).toUrl().toQUrl();
+        NX_ASSERT(targetUrl.isValid());
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
         if (gateway->isSslEnabled())

@@ -5,7 +5,7 @@ const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const common = require('./webpack.common.js');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const ENV = process.env.ENV = process.env.NODE_ENV = 'dev';
 
@@ -21,8 +21,9 @@ module.exports = merge(common, {
                 context: [ '/api/', '/gateway/' ],
                 //target : 'http://cloud-local',
                 target : 'https://cloud-dev2.hdw.mx',
-                //target : 'https://cloud-test.hdw.mx',
-                changeOrigin: true
+                // target : 'https://cloud-test.hdw.mx',
+                changeOrigin: true,
+                //secure: false
 
             },
             // Rewrite English translations to be served from DEV files
@@ -33,13 +34,21 @@ module.exports = merge(common, {
                 changeOrigin: true,
                 secure      : false
             },
+            // Rewrite Russian translations to be served from DEV files
+            {
+                context: '/static/lang_ru_RU/',
+                target: 'https://0.0.0.0:9000',
+                pathRewrite: {'^/static/lang_ru_RU': ''},
+                changeOrigin: true,
+                secure: false
+            },
             {
                 context     : '/static/',
                 target      : 'https://0.0.0.0:9000',
                 pathRewrite : { '^/static': '' },
                 changeOrigin: true,
                 secure      : false
-            }
+            },
         ],
         https             : {
             spdy: {
@@ -92,7 +101,7 @@ module.exports = merge(common, {
                 test: /\.s?css$/,
                 exclude: /src/,
                 use : ExtractTextPlugin.extract({
-                    fallback: "style-loader",
+                    fallback: 'style-loader',
                     use     : [
                         {
                             loader : 'css-loader',

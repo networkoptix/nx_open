@@ -21,7 +21,6 @@
 
 #include <translation/translation_manager.h>
 
-#include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
 
@@ -84,12 +83,12 @@
 #include <recorder/schedule_sync.h>
 #include "media_server_process.h"
 #include <camera/camera_error_processor.h>
+#include <nx/vms/server/server_update_manager.h>
 #include "media_server_resource_searchers.h"
 #include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
-
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -111,7 +110,7 @@ void installTranslations()
 
 class ServerDataProviderFactory:
     public QnDataProviderFactory,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ServerDataProviderFactory(QnMediaServerModule* serverModule):
@@ -185,11 +184,10 @@ QnMediaServerModule::QnMediaServerModule(
     {
         soapServer = store(new QnSoapServer());
         soapServer->bind();
-        soapServer->start();     //starting soap server to accept event notifications from onvif cameras
+        // Starting soap server to accept event notifications from onvif cameras.
+        soapServer->start();
     }
 #endif //ENABLE_ONVIF
-
-    store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
     {
@@ -235,19 +233,22 @@ QnMediaServerModule::QnMediaServerModule(
         new QnStorageManager(
             this,
             m_analyticsEventsStorage.get(),
-            QnServer::StoragePool::Normal
+            QnServer::StoragePool::Normal,
+            "normalStorageManager"
         ));
 
    m_context->backupStorageManager.reset(
         new QnStorageManager(
             this,
             nullptr,
-            QnServer::StoragePool::Backup
+            QnServer::StoragePool::Backup,
+            "backupStorageManager"
+
         ));
 
     const bool isRootToolEnabled = !settings().ignoreRootTool();
     m_rootFileSystem = nx::vms::server::instantiateRootFileSystem(
-        isRootToolEnabled, 
+        isRootToolEnabled,
         qApp->applicationFilePath());
 
     #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
@@ -266,8 +267,11 @@ QnMediaServerModule::QnMediaServerModule(
         nullptr,
         this));
 
-    m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
-    m_pluginManager->loadPlugins(roSettings());
+    m_pluginManager = store(new PluginManager(this));
+
+
+    if (!mutableSettings()->noPlugins())
+        m_pluginManager->loadPlugins(roSettings());
 
     m_eventRuleProcessor = store(new nx::vms::server::event::ExtendedRuleProcessor(this));
     m_eventConnector = store(new nx::vms::server::event::EventConnector(this));
@@ -354,7 +358,7 @@ void QnMediaServerModule::stop()
     resourceDiscoveryManager()->stop();
 
     m_licenseWatcher->stop();
-    m_resourceSearchers->stop();
+    m_resourceSearchers->clear();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -488,7 +492,7 @@ void QnMediaServerModule::registerResourceDataProviders()
     m_resourceDataProviderFactory->registerResourceType<nx::vms::server::resource::Camera>();
 }
 
-nx::CommonUpdateManager* QnMediaServerModule::updateManager() const
+nx::vms::server::ServerUpdateManager* QnMediaServerModule::updateManager() const
 {
     return m_updateManager;
 }
@@ -508,9 +512,9 @@ QnResourcePool* QnMediaServerModule::resourcePool() const
     return commonModule()->resourcePool();
 }
 
-QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+QnResourcePropertyDictionary* QnMediaServerModule::resourcePropertyDictionary() const
 {
-    return commonModule()->propertyDictionary();
+    return commonModule()->resourcePropertyDictionary();
 }
 
 QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const

@@ -16,7 +16,7 @@ namespace nx::network::http {
  * Base class for client of some API. E.g., REST API based on HTTP/json.
  * ApiResultCodeDescriptor MUST define:
  * - ResultCode type.
- * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be 
+ * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be
  * defined too:
  * <pre><code>
  * template<typename Output>
@@ -215,14 +215,14 @@ void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
     Output... output)
 {
     Context context = takeContextOfRequest(requestPtr);
-    
+
     const auto resultCode = getResultCode(error, response, output...);
-    
+
     handler(resultCode, std::move(output)...);
 }
 
 template<typename ApiResultCodeDescriptor>
-typename GenericApiClient<ApiResultCodeDescriptor>::Context 
+typename GenericApiClient<ApiResultCodeDescriptor>::Context
     GenericApiClient<ApiResultCodeDescriptor>::takeContextOfRequest(
         nx::network::aio::BasicPollable* httpClientPtr)
 {

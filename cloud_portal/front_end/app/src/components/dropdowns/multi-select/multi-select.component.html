@@ -1,0 +1,41 @@
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="btn btn-dropdown-toggle dropdown-toggle"
+            (click)="show = !show"
+            type="button" data-toggle="dropdown">
+
+        <span [innerHtml]="numSelected"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <div class="dropdown-menu" [nxArrowNav]="show"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="multiSelect">
+
+        <ul class="dropdown-menu--header" *ngIf="canSelectAll">
+            <li class="dropdown-item-container">
+                <a class="dropdown-item inset" (click)="selectAll(); show = false;"
+                   href translate>All</a>
+            </li>
+            <li role="separator" class="dropdown-divider"></li>
+        </ul>
+
+        <ul class="dropdown-menu--list">
+            <li class="dropdown-item-container" *ngFor="let item of items">
+                <div class="dropdown-item inset">
+                    <nx-checkbox
+                            [componentId]="item.id"
+                            [checked]="item.selected"
+                            (click)="change($event, item)">
+                    </nx-checkbox>
+
+                    <label for="{{item.id}}">{{item.label}}</label>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,56 +1,38 @@
-#ifndef QN_CAMERA_LIST_DIALOG_H
-#define QN_CAMERA_LIST_DIALOG_H
+#pragma once
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QDialog>
-#include <QtGui/QStandardItem>
 
 #include <core/resource/resource_fwd.h>
-
-#include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-class QnCameraListModel;
-class QnWorkbenchContext;
-class QnResourceSearchProxyModel;
+#include <nx/utils/impl_ptr.h>
 
-namespace Ui {
-    class CameraListDialog;
-}
+namespace Ui { class CameraListDialog; }
 
-class QnCameraListDialog: public QnSessionAwareDialog {
+class QnCameraListDialog: public QnSessionAwareDialog
+{
     Q_OBJECT
-
-    typedef QnSessionAwareDialog base_type;
+    using base_type = QnSessionAwareDialog;
 
 public:
-    explicit QnCameraListDialog(QWidget *parent);
-    virtual ~QnCameraListDialog();
+    explicit QnCameraListDialog(QWidget* parent);
+    virtual ~QnCameraListDialog() override;
 
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setServer(const QnMediaServerResourcePtr& server);
     QnMediaServerResourcePtr server() const;
+
 private:
-    Q_SIGNAL void updateWindowTitleQueued();
-    void updateWindowTitleLater();
     void updateWindowTitle();
     void updateCriterion();
 
-    void at_camerasView_customContextMenuRequested(const QPoint &pos);
+    void at_camerasView_customContextMenuRequested(const QPoint& pos);
     void at_exportAction_triggered();
     void at_clipboardAction_triggered();
-    void at_camerasView_doubleClicked(const QModelIndex &index);
+    void at_camerasView_doubleClicked(const QModelIndex& index);
 
 private:
-    Q_DISABLE_COPY(QnCameraListDialog)
-
-    QScopedPointer<Ui::CameraListDialog> ui;
-    QnCameraListModel *m_model;
-    QnResourceSearchProxyModel *m_resourceSearch;
-    QAction *m_selectAllAction;
-    QAction *m_exportAction;
-    QAction *m_clipboardAction;
-    bool m_pendingWindowTitleUpdate;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+    nx::utils::ImplPtr<Ui::CameraListDialog> ui;
 };
-
-#endif // QN_CAMERA_LIST_DIALOG_H

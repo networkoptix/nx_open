@@ -17,7 +17,7 @@ namespace nx::vms::server::resource {
 
 class AnalyticsEngineResource:
     public nx::vms::common::AnalyticsEngineResource,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -47,6 +47,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
 private:
+    // ATTENTION: The field order is essential: EngineHandler must survive IEngine.
     std::unique_ptr<analytics::EngineHandler> m_handler;
     nx::sdk::Ptr<nx::sdk::analytics::IEngine> m_sdkEngine;
 };

@@ -33,22 +33,6 @@ DeviceAgent::~DeviceAgent()
     stopFetchingMetadata();
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<DeviceAgent*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // This plugin doesn't use DeviceAgent setting, it just ignores them.
@@ -89,7 +73,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
-                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+                auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
                     dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
@@ -104,7 +88,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUs(-1);
-                packet->addItem(eventMetadata);
+                packet->addItem(eventMetadata.get());
             }
 
             m_handler->handleMetadata(packet);

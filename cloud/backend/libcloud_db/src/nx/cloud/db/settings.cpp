@@ -17,6 +17,8 @@
 
 namespace {
 
+static constexpr char kCdbGuid[] = "{674bafd7-4eec-4bba-84aa-a1baea7fc6db}";
+
 const QLatin1String kEndpointsToListen("listenOn");
 const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3346");
 
@@ -109,6 +111,9 @@ const int kDefaultTcpBacklogSize = 1024;
 
 const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
+
+const QLatin1String kMaintenanceHtdigestPath("http/maintenanceHtdigestPath");
+const QLatin1String kDefaultMaintenanceHtdigestPath("");
 
 //-------------------------------------------------------------------------------------------------
 // VmsGateway
@@ -237,11 +242,6 @@ nx::utils::log::Settings Settings::logging() const
     return m_logging;
 }
 
-const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
-{
-    return m_vmsSynchronizationLogging;
-}
-
 const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -329,7 +329,6 @@ void Settings::loadSettings()
 
     //log
     m_logging.load(settings(), QLatin1String("log"));
-    m_vmsSynchronizationLogging.load(settings(), QLatin1String("syncroLog"));
 
     //DB
     m_dbConnectionOptions.loadFromSettings(settings());
@@ -391,6 +390,8 @@ void Settings::loadSettings()
             kDefaultMediaServerConnectionIdlePeriod));
 
     m_p2pDb.load(settings());
+    // NOTE: Intentionally not allowing overriding this value.
+    m_p2pDb.nodeId = kCdbGuid;
 
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
@@ -405,6 +406,9 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
+
+    m_http.maintenanceHtdigestPath = settings().value(
+        kMaintenanceHtdigestPath, kDefaultMaintenanceHtdigestPath).toString().toStdString();
 
     //vmsGateway
     m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();

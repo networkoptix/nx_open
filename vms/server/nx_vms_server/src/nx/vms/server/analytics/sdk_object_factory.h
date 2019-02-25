@@ -15,7 +15,7 @@ namespace nx::vms::server::analytics {
 
 class SdkObjectFactory:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -26,9 +26,10 @@ public:
     bool init();
 
 private:
-    bool clearActionDescriptorList();
     bool initPluginResources();
     bool initEngineResources();
+
+    void updateActiveEngines(QSet<QnUuid> activeEngines);
 
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,

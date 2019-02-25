@@ -11,7 +11,7 @@
 
 namespace nx::analytics {
 
-class EventTypeDescriptorManager: public QnCommonModuleAware
+class EventTypeDescriptorManager: public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 
@@ -65,7 +65,6 @@ private:
     EventTypeDescriptorContainer m_eventTypeDescriptorContainer;
     EngineDescriptorContainer m_engineDescriptorContainer;
     GroupDescriptorContainer m_groupDescriptorContainer;
-    DeviceDescriptorContainer m_deviceDescriptorContainer;
 };
 
 } // namespace nx::analytics

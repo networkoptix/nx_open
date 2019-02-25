@@ -32,7 +32,7 @@ QUrl QnCloudUrlHelper::mainUrl() const
 
 QUrl QnCloudUrlHelper::aboutUrl() const
 {
-    return makeUrl(lit("/content/about"), false);
+    return makeUrl(lit("/content/about"), /*auth*/ false);
 }
 
 QUrl QnCloudUrlHelper::accountManagementUrl() const
@@ -42,17 +42,17 @@ QUrl QnCloudUrlHelper::accountManagementUrl() const
 
 QUrl QnCloudUrlHelper::createAccountUrl() const
 {
-    return makeUrl(lit("/register"), false);
+    return makeUrl(lit("/register"), /*auth*/ false);
 }
 
 QUrl QnCloudUrlHelper::restorePasswordUrl() const
 {
-    return makeUrl(lit("/restore_password"), false);
+    return makeUrl(lit("/restore_password"), /*auth*/ false);
 }
 
 QUrl QnCloudUrlHelper::faqUrl() const
 {
-    return makeUrl(lit("/content/faq"), false);
+    return makeUrl(lit("/content/faq"), /*auth*/ false);
 }
 
 QUrl QnCloudUrlHelper::viewSystemUrl() const
@@ -62,6 +62,11 @@ QUrl QnCloudUrlHelper::viewSystemUrl() const
         return mainUrl();
 
     return makeUrl(lit("/systems/%1/view").arg(systemId));
+}
+
+QUrl QnCloudUrlHelper::armPolicyUrl() const
+{
+    return makeUrl(lit("/content/arm"), /*auth*/ false);
 }
 
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const

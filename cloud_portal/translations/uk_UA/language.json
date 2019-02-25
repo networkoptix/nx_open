@@ -1,5 +1,5 @@
 {
-  "language": "ukr_UKR",
+  "language": "uk_UA",
   "language_name": "Українська",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -137,13 +137,21 @@
     "cantOpenClient": "Додаток %VMS_NAME% не виявлено. <a href=\"/download\">Завантажити</a>",
     "lostConnection": "Підключення до {{systemName}} втрачено",
     "thisSystem": "система",
-    "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються"
+    "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "хороший",
+    "fair": "середній",
+    "minLength": "занадто короткий",
     "minLengthMessage": "Пароль повинен містити принаймні 8 символів",
+    "required": "некоректний",
     "requiredMessage": "Використовуйте тільки латинські букви, цифри і символи клавіатури, уникайте початкових та кінцевих пробілів",
+    "weak": "слабкий",
     "weakMessage": "Для надійності паролю використовуйте цифри, букви верхнього та нижнього регістру та спеціальні символи",
     "strongMessage": "Сильний пароль!",
+    "common": "занадто поширений",
     "commonMessage": "Цей пароль входить у список найпопулярніших паролів у світі",
     "missingMessage": "Необхідно вказати пароль"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "successMerge": "Система {{systemName}} була об’єднана з {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "{{email}} був позбавлений повноважень"
   },
   "account": {

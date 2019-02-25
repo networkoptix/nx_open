@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
 #include <QtCore/QHash>
 #include <QtCore/QSharedPointer>
@@ -19,8 +20,6 @@
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/vms/client/desktop/event_search/utils/live_analytics_receiver.h>
-#include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/descriptors.h>
 
 class QnUuid;
 class QnMediaResourceWidget;
@@ -84,15 +83,6 @@ private:
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
 
     QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
-
-    bool requestActionSettings(
-        const QJsonObject& settingsModel,
-        QMap<QString, QString>* values) const;
-
-    void executePluginAction(
-        const QnUuid& engineId,
-        const nx::vms::api::analytics::ActionTypeDescriptor& action,
-        const analytics::storage::DetectedObject& object) const;
 
     void setLiveReceptionActive(bool value);
 

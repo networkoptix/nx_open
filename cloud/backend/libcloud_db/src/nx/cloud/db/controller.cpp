@@ -16,8 +16,6 @@ namespace nx::cloud::db {
 const int kMinSupportedProtocolVersion = 3024;
 const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
-static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
-
 Controller::Controller(
     const conf::Settings& settings,
     Model* model)
@@ -40,7 +38,6 @@ Controller::Controller(
     m_eventManager(settings),
     m_ec2SyncronizationEngine(
         std::string(), //< No application id.
-        kCdbGuid,
         settings.p2pDb(),
         nx::clusterdb::engine::ProtocolVersionRange(
             kMinSupportedProtocolVersion,
@@ -76,7 +73,6 @@ Controller::Controller(
         m_tempPasswordManager,
         &m_vmsP2pCommandBus),
     m_maintenanceManager(
-        kCdbGuid,
         &m_ec2SyncronizationEngine,
         m_dbInstanceController),
     m_cloudModuleUrlProviderDeprecated(
@@ -211,6 +207,11 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
+
+    // Temporary fix allowing maintenance/log/* and maintenance/malloc_info to
+    // be authenticated by htdigest authenticator.
+    m_authRestrictionList->allow({std::nullopt, std::nullopt, "/cdb/maintenance/log/.*"}, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow({std::nullopt, std::nullopt, "/cdb/maintenance/malloc_info"}, nx::network::http::AuthMethod::noAuth);
 
     m_transportSecurityManager =
         std::make_unique<AccessBlocker>(m_settings);

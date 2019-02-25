@@ -20,7 +20,7 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
 
 }
 
-void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
+bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 {
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
@@ -28,20 +28,26 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
         emit itemRemoved(*it);
+    if (m_clientItem)
+    {
+        emit itemRemoved(m_clientItem);
+        m_clientItem.reset();
+    }
+
     m_items.clear();
     m_activeServers.clear();
 
     if (!pool)
     {
         NX_DEBUG(this, "setResourceFeed() got nullptr resource pool");
-        return;
+        return false;
     }
 
     auto systemId = helpers::currentSystemLocalId(commonModule());
     if (systemId.isNull())
     {
         NX_DEBUG(this, "setResourceFeed() got null system id");
-        return;
+        return false;
     }
 
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
@@ -55,6 +61,7 @@ void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
         this, &PeerStateTracker::atResourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
         this, &PeerStateTracker::atResourceRemoved);
+    return true;
 }
 
 UpdateItemPtr PeerStateTracker::findItemById(QnUuid id) const
@@ -122,6 +129,7 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
+    NX_ASSERT(!version.isNull());
     m_targetVersion = version;
 }
 
@@ -160,6 +168,16 @@ bool PeerStateTracker::hasVerificationErrors() const
     return false;
 }
 
+bool PeerStateTracker::hasStatusErrors() const
+{
+    for (auto& item: m_items)
+    {
+        if (item->state == StatusCode::error && !item->statusMessage.isEmpty())
+            return true;
+    }
+    return false;
+}
+
 void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)
@@ -192,7 +210,10 @@ void PeerStateTracker::setVersionInformation(
                     || item->state == StatusCode::latestUpdateInstalled;
 
                 if (installed != item->installed)
+                {
                     item->installed = true;
+                    NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
+                }
                 emit itemChanged(item);
             }
         }
@@ -446,6 +467,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyRestart:
             m_clientItem->statusMessage = "Client is ready to install and restart";
             m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
         case State::installing:
@@ -533,6 +555,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 
     if (version != item->version)
     {
+        NX_INFO(this, "updateServerData() - peer %1 changing version from=%2 to %3", item->id, item->version, version);
         item->version = version;
         changed = true;
     }
@@ -541,6 +564,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     if (installed != item->installed)
     {
         item->installed = true;
+        NX_INFO(this, "updateServerData() - peer %1 changed installed=%2", item->id, item->installed);
         changed = true;
     }
 

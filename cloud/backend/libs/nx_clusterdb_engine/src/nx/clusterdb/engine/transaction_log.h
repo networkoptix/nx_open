@@ -17,12 +17,13 @@
 #include "compatible_ec2_protocol_version.h"
 #include "command.h"
 #include "dao/abstract_transaction_data_object.h"
+#include "outgoing_transaction_dispatcher.h"
 #include "outgoing_transaction_sorter.h"
 #include "result_code.h"
 #include "serialization/transaction_serializer.h"
 #include "serialization/ubjson_serialized_transaction.h"
 #include "transaction_log_cache.h"
-#include "transaction_transport_header.h"
+#include "transport/transaction_transport_header.h"
 
 namespace nx::clusterdb::engine {
 
@@ -110,7 +111,7 @@ public:
                 transaction.get(),
                 transactionHash))
         {
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            NX_DEBUG(this,
                 lm("systemId %1. Command (%2, hash %3) is skipped")
                     .args(systemId, engine::toString(transaction.header()),
                         CommandDescriptor::hash(transaction.get().params)));
@@ -119,19 +120,31 @@ public:
             return nx::sql::DBResult::cancelled;
         }
 
-        const auto resultCode = saveToDb(
+        auto resultCode = saveToDb(
             queryContext,
             systemId,
-            transaction.get(),
             transactionHash,
-            transaction.serialize(Qn::UbjsonFormat, m_supportedProtocolRange.currentVersion()));
+            transaction);
         if (resultCode != nx::sql::DBResult::ok)
             return resultCode;
 
-        return invokeExternalProcessor<CommandDescriptor>(
+        resultCode = invokeExternalProcessor<CommandDescriptor>(
             queryContext,
             systemId,
             transaction);
+        if (resultCode != nx::sql::DBResult::ok)
+            return resultCode;
+
+        // TODO: #ak Get rid of transaction.clone().
+        queryContext->transaction()->addOnSuccessfulCommitHandler(
+            [this, systemId, commandSerializer = transaction.clone()]() mutable
+            {
+                m_outgoingTransactionDispatcher->dispatchTransaction(
+                    systemId,
+                    std::move(commandSerializer));
+            });
+
+        return nx::sql::DBResult::ok;
     }
 
     template<typename CommandDescriptor>
@@ -264,8 +277,8 @@ private:
 
     const QnUuid m_peerId;
     const ProtocolVersionRange m_supportedProtocolRange;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
-    AbstractOutgoingCommandDispatcher* const m_outgoingTransactionDispatcher;
+    nx::sql::AsyncSqlQueryExecutor* m_dbManager = nullptr;
+    AbstractOutgoingCommandDispatcher* m_outgoingTransactionDispatcher = nullptr;
     mutable QnMutex m_mutex;
     DbTransactionContextMap m_dbTransactionContexts;
     std::map<std::string, std::unique_ptr<TransactionLogContext>> m_systemIdToTransactionLog;
@@ -276,7 +289,9 @@ private:
 
     /** Fills transaction state cache. */
     nx::sql::DBResult fillCache();
-    nx::sql::DBResult fetchTransactionState(nx::sql::QueryContext* connection);
+    void fetchTransactionState(nx::sql::QueryContext* queryContext);
+    void restoreTransactionSequence(nx::sql::QueryContext* queryContext);
+
     /**
      * Selects transactions from DB by condition.
      */
@@ -295,9 +310,8 @@ private:
     nx::sql::DBResult saveToDb(
         nx::sql::QueryContext* connection,
         const std::string& systemId,
-        const CommandHeader& transaction,
         const QByteArray& transactionHash,
-        const QByteArray& ubjsonData);
+        const SerializableAbstractCommand& transactionSerializer);
 
     template<typename CommandDescriptor>
     nx::sql::DBResult invokeExternalProcessor(
@@ -339,6 +353,10 @@ private:
         const std::string& systemId);
 
     std::tuple<int, vms::api::Timestamp> generateNewTransactionAttributes(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId);
+
+    nx::sql::DBResult saveActualSequence(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId);
 

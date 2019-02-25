@@ -18,7 +18,7 @@
                    [(ngModel)]="user.email"
                    id="email"
                    name="email"
-                   pattern="{{ configService.config.emailRegex }}" maxlength="255"
+                   pattern="{{ config.emailRegex }}" maxlength="255"
                    required nxFocusMe>
 
             <input type="text" *ngIf="!isNewShare" name="email" id="lockedEmail"

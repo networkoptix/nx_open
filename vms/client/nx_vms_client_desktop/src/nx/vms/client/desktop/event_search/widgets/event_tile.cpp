@@ -1,8 +1,9 @@
 #include "event_tile.h"
 #include "ui_event_tile.h"
 
-#include <QtCore/QUrl>
+#include <QtCore/QScopedPointer>
 #include <QtCore/QTimer>
+#include <QtCore/QUrl>
 #include <QtGui/QPainter>
 #include <QtGui/QDesktopServices>
 
@@ -66,6 +67,9 @@ static constexpr QMargins kMarginsWithoutHeader(8, 4, 8, 8);
 
 static constexpr QMargins kWidePreviewMarginsWithHeader(0, 0, 0, 0);
 static constexpr QMargins kWidePreviewMarginsWithoutHeader(0, 4, 0, 0);
+
+static constexpr QMargins kNarrowPreviewMarginsWithHeader(0, 2, 0, 0);
+static constexpr QMargins kNarrowPreviewMarginsWithoutHeader(0, 0, 0, 0);
 
 // Close button margins are fine-tuned in correspondence with tile layout.
 static constexpr QMargins kCloseButtonMarginsWithHeader(0, 6, 2, 0);
@@ -221,6 +225,7 @@ EventTile::EventTile(QWidget* parent):
 
     ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
     ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+    ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
     ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
@@ -736,6 +741,7 @@ void EventTile::setHeaderEnabled(bool value)
         ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
         ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
         ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+        ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
         d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
     }
     else
@@ -746,6 +752,7 @@ void EventTile::setHeaderEnabled(bool value)
         ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
         ui->mainWidget->layout()->setContentsMargins(kMarginsWithoutHeader);
         ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithoutHeader);
+        ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithoutHeader);
         d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithoutHeader);
     }
 }

@@ -34,6 +34,16 @@ Camera::Camera(QnMediaServerModule* serverModule):
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
 
+    connect(this, &Camera::groupIdChanged,
+        [this]()
+        {
+            NX_CRITICAL(!isInitializationInProgress(), "Initialization should fail");
+
+            const auto status = getStatus();
+            if (!NX_ASSERT(status != Qn::Online && status != Qn::Recording, status))
+                setStatus(Qn::Offline);
+        });
+
     connect(this, &QnResource::initializedChanged,
         [this]()
         {
@@ -135,7 +145,7 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
-        NX_ASSERT(this, "Get advanced parameters from camera with no providers");
+        NX_ASSERT(false, "Get advanced parameters from camera with no providers");
         return {};
     }
 
@@ -187,13 +197,12 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
     QnMutexLocker lock(&m_initMutex);
-    if (!isInitialized())
-        return {};
-
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
-        NX_ASSERT(this, "Set advanced parameters from camera with no providers");
+        // NOTE: It may sometimes occur if we are trying to set some parameters on the never
+        // initialised camera.
+        NX_VERBOSE(this, "Set advanced parameters from camera with no providers: %1", values);
         return {};
     }
 
@@ -207,12 +216,12 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
         }
         else if (m_defaultAdvancedParametersProvider)
         {
-            NX_WARNING(this, lm("Set undeclared advanced parameter: %1").arg(value.id));
+            NX_WARNING(this, "Set undeclared advanced parameter: %1", value.id);
             valuesByProvider[m_defaultAdvancedParametersProvider].push_back(value);
         }
         else
         {
-            NX_WARNING(this, lm("No provider to set parameter: %1").arg(value.id));
+            NX_WARNING(this, "No provider to set parameter: %1", value.id);
         }
     }
 
@@ -223,8 +232,8 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
         const auto& values = providerValues.second;
 
         auto ids = provider->set(values);
-        NX_VERBOSE(this, lm("Set advanced parameters %1 by %2, result %3").args(
-            containerString(values), provider, containerString(ids)));
+        NX_VERBOSE(this, "Set advanced parameters %1 by %2, result %3", containerString(values),
+            provider, containerString(ids));
 
         result += std::move(ids);
     }
@@ -242,7 +251,7 @@ bool Camera::setAdvancedParameter(const QString& id, const QString& value)
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParameters =
-        [&](Qn::StreamIndex streamIndex)
+        [&](nx::vms::api::StreamIndex streamIndex)
         {
             QnMutexLocker lock(&m_initMutex);
             if (!isInitialized())
@@ -256,8 +265,8 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         };
 
     QnAdvancedStreamParams parameters;
-    parameters.primaryStream = getStreamParameters(Qn::StreamIndex::primary);
-    parameters.secondaryStream = getStreamParameters(Qn::StreamIndex::secondary);
+    parameters.primaryStream = getStreamParameters(nx::vms::api::StreamIndex::primary);
+    parameters.secondaryStream = getStreamParameters(nx::vms::api::StreamIndex::secondary);
     return parameters;
 }
 
@@ -404,9 +413,6 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    m_streamCapabilityAdvancedProviders.clear();
-    m_defaultAdvancedParametersProvider = nullptr;
-    m_advancedParametersProvidersByParameterId.clear();
     setCameraCapability(Qn::CameraTimeCapability, true);
 
     if (commonModule()->isNeedToStop())
@@ -426,6 +432,12 @@ void Camera::initializationDone()
     // TODO: Find out is it's ever required, monitoring resource state change should be enough!
     QnMutexLocker lk(&m_initMutex);
     fixInputPortMonitoring();
+}
+
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
+{
+    // Implementation may be overloaded in a driver.
+    return StreamCapabilityMap();
 }
 
 nx::media::CameraTraits Camera::mediaTraits() const
@@ -448,15 +460,19 @@ void Camera::stopInputPortStatesMonitoring()
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
+    m_streamCapabilityAdvancedProviders.clear();
+    m_defaultAdvancedParametersProvider = nullptr;
+    m_advancedParametersProvidersByParameterId.clear();
+
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
     const StreamCapabilityMaps streamCapabilityMaps = {
-        {Qn::StreamIndex::primary, getStreamCapabilityMap(Qn::StreamIndex::primary)},
-        {Qn::StreamIndex::secondary, getStreamCapabilityMap(Qn::StreamIndex::secondary)}
+        {StreamIndex::primary, getStreamCapabilityMap(StreamIndex::primary)},
+        {StreamIndex::secondary, getStreamCapabilityMap(StreamIndex::secondary)}
     };
 
     const auto traits = mediaTraits();
-    for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
+    for (const auto streamType: {StreamIndex::primary, StreamIndex::secondary})
     {
         //auto streamCapabilities = getStreamCapabilityMap(streamType);
         if (!streamCapabilityMaps[streamType].isEmpty())
@@ -495,9 +511,9 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
             advancedParameters.merge(providerParameters);
     }
 
-    NX_VERBOSE(this, lm("Default advanced parameters provider %1, providers by params: %2").args(
+    NX_VERBOSE(this, "Default advanced parameters provider %1, providers by params: %2",
         m_defaultAdvancedParametersProvider,
-        containerString(m_advancedParametersProvidersByParameterId)));
+        containerString(m_advancedParametersProvidersByParameterId));
 
     advancedParameters.packet_mode = resourceData()
         .value<bool>(ResourceDataKey::kNeedToReloadAllAdvancedParametersAfterApply, false);
@@ -506,13 +522,13 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
     return CameraDiagnostics::NoErrorResult();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex)
 {
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
-        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1);
-        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps());
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1, key.codec);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps(), key.codec);
         result.maxFps = getMaxFps();
         return result;
     };

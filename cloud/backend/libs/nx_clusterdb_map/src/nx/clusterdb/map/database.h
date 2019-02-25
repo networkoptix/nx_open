@@ -1,13 +1,13 @@
 #pragma once
 
-#include <nx/clusterdb/engine/synchronization_engine.h>
-#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/uuid.h>
 
 #include "dao/structure_updater.h"
 #include "data_manager.h"
 #include "event_provider.h"
-#include "settings.h"
+
+namespace nx::clusterdb::engine{ class SyncronizationEngine; }
+namespace nx::sql { class AsyncSqlQueryExecutor; }
 
 namespace nx::clusterdb::map {
 
@@ -18,25 +18,20 @@ public:
      * Throws on failure.
      */
     Database(
-        const Settings& settings,
+        nx::clusterdb::engine::SyncronizationEngine* syncEngine,
         nx::sql::AsyncSqlQueryExecutor* dbManager);
-    ~Database();
-
-    void registerHttpApi(
-        const std::string& pathPrefix,
-        nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
     DataManager& dataManager();
     EventProvider& eventProvider();
 
+    std::string systemId() const;
+
 private:
-    //const Settings& m_settings;
-    //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
-    const QnUuid m_moduleId;
-    nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
-    dao::rdb::StructureUpdater m_structureUpdater;
-    DataManager m_dataManager;
+    const QnUuid m_systemId;
+    nx::clusterdb::engine::SyncronizationEngine* m_syncEngine = nullptr;
+    dao::StructureUpdater m_structureUpdater;
     EventProvider m_eventProvider;
+    DataManager m_dataManager;
 };
 
 } // namespace nx::clusterdb::map

@@ -430,4 +430,3 @@ QnWearableUploadManager* QnWearableCameraRestHandler::uploadManager(QnJsonRestRe
         lit("QnWearableUploadManager is not initialized."));
     return nullptr;
 }
-

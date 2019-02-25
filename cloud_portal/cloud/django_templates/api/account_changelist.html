@@ -1,0 +1,13 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_modify %}
+{% load cms_filters %}
+
+{% block object-tools-items %}
+    {% has_permission user 'api.invite_users' as can_invite_user %}
+    {% if can_invite_user %}
+    <li><a href="{% url 'admin:invite' %}" class="addlink">Invite User</a></li>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {{ block.super }}
+{% endblock %}

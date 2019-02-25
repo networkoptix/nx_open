@@ -25,6 +25,8 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/update/update_information.h>
 
+#include <nx/vms/api/analytics/settings_response.h>
+
 namespace rest {
 
 struct RestResultWithDataBase
@@ -79,8 +81,8 @@ struct ServerConnectionBase::Result<QByteArray>
  */
 class ServerConnection:
     public QObject,
-    public QnCommonModuleAware,
-    public Qn::EnableSafeDirectConnection,
+    public /*mixin*/ QnCommonModuleAware,
+    public /*mixin*/ Qn::EnableSafeDirectConnection,
     public ServerConnectionBase
 {
     Q_OBJECT
@@ -413,12 +415,25 @@ public:
         Result<nx::update::Information>::type&& callback,
         QThread* targetThread = nullptr);
 
-    Handle updateActionStop(
-        std::function<void (Handle, bool)>&& callback,
+    /**
+     * Asks mediaserver to run check for updates.
+     * @param changeset - changeset to be checked. It is usually a build number
+     * @param callback
+     */
+    Handle checkForUpdates(const QString& changeset,
+        Result<QnJsonRestResult>::type&& callback,
         QThread* targetThread = nullptr);
 
-    Handle updateActionInstall(
-        std::function<void (Handle, bool)>&& callback,
+    Handle updateActionStop(
+        std::function<void(Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionFinish(bool skipActivePeers,
+        std::function<void(Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle updateActionInstall(const QSet<QnUuid>& participants,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     using UpdateStatusAll = std::vector<nx::update::Status>;
@@ -432,30 +447,30 @@ public:
 
     Handle getEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<QJsonObject>::type&& callback,
+        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
-    
+
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        std::function<void (bool, Handle, const QJsonObject&)>&& callback,
+        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle getDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<QJsonObject>::type&& callback,
+        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle setDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+        Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     /**
-     * Cancel running request by known requestID. If request is canceled, callback isn't called.
+     * Cancel running request by known requestId. If request is canceled, callback isn't called.
      * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
      * If QnServerRestConnection is destroyed all running requests are canceled, no callbacks called.
      *
@@ -522,6 +537,8 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
+    std::pair<QString, QString> getRequestCredentials(
+        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;

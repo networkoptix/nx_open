@@ -63,7 +63,7 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     }
 
     ensureCacheFolder();
-    FileTranscoder* transcoder = new FileTranscoder(commonModule()->metrics());
+    FileTranscoder* transcoder = new FileTranscoder(commonModule());
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
@@ -78,13 +78,19 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     return transcoder->startAsync();
 }
 
-bool ServerNotificationCache::updateTitle(const QString &filename, const QString &title)
+bool ServerNotificationCache::updateTitle(const QString& filename, const QString& title)
 {
     if (!isConnectedToServer())
         return false;
 
-    bool result = FileTranscoder::setTagValue(getFullPath(filename), titleTag, title);
-    if (result) {
+    const bool result = FileTranscoder::setTagValue(
+        commonModule(),
+        getFullPath(filename),
+        titleTag,
+        title);
+
+    if (result)
+    {
         m_model->updateTitle(filename, title);
         if (m_updatingFiles.contains(filename))
             m_updatingFiles[filename] += 1;

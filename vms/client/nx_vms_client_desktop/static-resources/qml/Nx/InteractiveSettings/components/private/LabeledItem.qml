@@ -1,10 +1,12 @@
 import QtQuick 2.0
+import nx.vms.client.desktop 1.0
 
 FocusScope
 {
     id: labeledItem
 
     property string name: ""
+    property string description: ""
 
     property Item contentItem: null
 
@@ -25,6 +27,8 @@ FocusScope
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignRight
         wrapMode: Text.WordWrap
+
+        GlobalToolTip.text: description
     }
 
     onContentItemChanged:
@@ -40,5 +44,7 @@ FocusScope
             function() { return (labeledItem.height - contentItem.height) / 2 })
         contentItem.width = Qt.binding(
             function() { return labeledItem.width - contentItem.x })
+        contentItem.GlobalToolTip.text = Qt.binding(
+            function() { return description })
     }
 }

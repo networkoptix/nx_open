@@ -259,7 +259,6 @@ int QnTranscoder::suggestBitrate(
 
 QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
     AVCodecID codec,
-    QSize resolution,
     Qn::StreamQuality quality)
 {
     QnCodecParams::Value params;
@@ -338,6 +337,8 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
             params.insert("max-q", 63);
             break;
         }
+        default:
+            break;
     }
 
     return params;
@@ -352,7 +353,7 @@ int QnTranscoder::setVideoCodec(
     QnCodecParams::Value params )
 {
     if (params.isEmpty())
-        params = suggestMediaStreamParams(codec, resolution, quality);
+        params = suggestMediaStreamParams(codec, quality);
 
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;

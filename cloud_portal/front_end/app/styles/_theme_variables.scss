@@ -190,3 +190,26 @@ $collapse-second-width : 768px;
 #inset-outline {
     box-shadow : inset 0 0 0 2px transparentize($brand_l2, 0.4) !important;
 }
+
+/* set the overriding variables */
+$grid-breakpoints : (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1440px
+);
+$container-max-widths : (
+        sm: 540px,
+        md: 720px,
+        lg: 960px,
+        xl: 1140px,
+        xxl: 1380px
+);
+
+/* badge component */
+$badge-font-size: rem(12px);
+$badge-border-radius: rem(2px);
+$badge-padding-x : rem(8px);
+$badge-padding-y : rem(3px);

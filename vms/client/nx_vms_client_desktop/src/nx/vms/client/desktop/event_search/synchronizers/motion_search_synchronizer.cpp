@@ -2,6 +2,7 @@
 
 #include <core/resource/media_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 
 #include <nx/utils/log/assert.h>
@@ -30,9 +31,10 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
             widget->setOption(QnResourceWidget::DisplayMotion, active());
 
             connect(widget, &QnResourceWidget::optionsChanged, this,
-                [this, widget]()
+                [this, widget](QnResourceWidget::Options changedOptions)
                 {
-                    setActive(widget->options().testFlag(QnResourceWidget::DisplayMotion));
+                    if (!m_layoutChanging && changedOptions.testFlag(QnResourceWidget::DisplayMotion))
+                        setActive(widget->options().testFlag(QnResourceWidget::DisplayMotion));
                 });
 
             const auto mediaWidget = static_cast<QnMediaResourceWidget*>(widget);
@@ -55,7 +57,7 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
     connect(this, &AbstractSearchSynchronizer::mediaWidgetChanged,
         this, &MotionSearchSynchronizer::updateAreaSelection);
 
-    connect(this, &AbstractSearchSynchronizer::activeChanged, this,
+    const auto updateActiveState =
         [this](bool isActive)
         {
             updateAreaSelection();
@@ -66,6 +68,18 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
                 : ui::action::StopSmartSearchAction;
 
             menu()->trigger(action, display()->widgets());
+        };
+
+    connect(this, &AbstractSearchSynchronizer::activeChanged, this, updateActiveState);
+
+    connect(workbench(), &QnWorkbench::layoutChangeProcessStarted, this,
+        [this]() { m_layoutChanging = true; });
+
+    connect(workbench(), &QnWorkbench::layoutChangeProcessFinished, this,
+        [this, updateActiveState]()
+        {
+            m_layoutChanging = false;
+            updateActiveState(active());
         });
 
     connect(m_motionSearchWidget.data(), &SimpleMotionSearchWidget::filterRegionsChanged, this,

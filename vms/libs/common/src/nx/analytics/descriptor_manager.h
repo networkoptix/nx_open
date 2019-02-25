@@ -12,7 +12,6 @@
 #include <nx/analytics/event_type_descriptor_manager.h>
 #include <nx/analytics/object_type_descriptor_manager.h>
 #include <nx/analytics/action_type_descriptor_manager.h>
-#include <nx/analytics/device_descriptor_manager.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
@@ -21,14 +20,12 @@
 
 namespace nx::analytics {
 
-class DescriptorManager: public QnCommonModuleAware
+class DescriptorManager: public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 
 public:
     DescriptorManager(QnCommonModule* commonModule);
-
-    void clearRuntimeInfo();
 
     void updateFromPluginManifest(
         const nx::vms::api::analytics::PluginManifest& manifest);
@@ -50,8 +47,6 @@ private:
     GroupDescriptorManager m_groupDescriptorManager;
     EventTypeDescriptorManager m_eventTypeDescriptorManager;
     ObjectTypeDescriptorManager m_objectTypeDescriptorManager;
-    ActionTypeDescriptorManager m_actionTypeDescriptorManager;
-    DeviceDescriptorManager m_deviceDescriptorManager;
 };
 
 } // namespace nx::analytics

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>173</height>
+    <width>418</width>
+    <height>180</height>
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -25,14 +25,17 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
       <property name="sizeConstraint">
        <enum>QLayout::SetNoConstraint</enum>
       </property>
       <item>
+       <widget class="QnWordWrappedLabel" name="motionHintLabel" native="true"/>
+      </item>
+      <item>
        <widget class="QCheckBox" name="motionDetectionCheckBox">
         <property name="text">
-         <string>Detect motion in uploaded video</string>
+         <string>Detect motion</string>
         </property>
        </widget>
       </item>
@@ -60,6 +63,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

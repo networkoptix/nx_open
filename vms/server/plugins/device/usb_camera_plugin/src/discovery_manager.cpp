@@ -2,7 +2,6 @@
 
 #include <QCryptographicHash>
 
-#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
 #include "plugin.h"
@@ -67,7 +66,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     std::vector<DeviceDataWithNxId> devices = findCamerasInternal();
 
     int i;
-    for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
+    for (i = 0; i < (int)devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
         strncpy(
             cameras[i].modelName,
@@ -85,7 +84,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
 int DiscoveryManager::checkHostAddress(
     nxcip::CameraInfo* /*cameras*/,
     const char* /*address*/,
-    const char* /*login*/, 
+    const char* /*login*/,
     const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam
@@ -117,7 +116,8 @@ nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::Cam
         return nullptr;
 
     if (!cameraData->camera)
-        cameraData->camera = std::make_shared<Camera>(this, info, m_timeProvider);
+        cameraData->camera = std::make_shared<Camera>(
+            cameraData->deviceData.device.path, info, m_timeProvider);
 
     return new CameraManager(cameraData->camera);
 }
@@ -133,7 +133,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(device.nxId);
     NX_DEBUG(this, "addOrUpdateCamera attempting to add device: %1", device.toString());
-    if(it == m_cameras.end())
+    if (it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
         m_cameras.emplace(device.nxId, CameraAndDeviceDataWithNxId(device));
@@ -149,6 +149,11 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
                 device.toString());
 
             it->second.deviceData = device;
+            if (it->second.camera)
+            {
+                it->second.camera->videoStream().updateUrl(it->second.deviceData.device.path);
+                //TODO it->second.camera->audioStream().updateUrl();
+            }
         }
         else
         {
@@ -157,13 +162,6 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
                 "Device already found");
         }
     }
-}
-
-std::string DiscoveryManager::getFfmpegUrl(const std::string& nxId) const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_cameras.find(nxId);
-    return it != m_cameras.end() ? it->second.deviceData.device.path : std::string();
 }
 
 std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasInternal()

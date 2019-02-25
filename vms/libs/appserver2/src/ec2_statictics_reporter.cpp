@@ -73,7 +73,6 @@ namespace ec2
 
         for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
 
-
         nx::vms::api::CameraDataExList cameras;
         errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
         if (errCode != ErrorCode::ok)

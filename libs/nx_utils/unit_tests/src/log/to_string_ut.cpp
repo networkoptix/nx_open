@@ -1,5 +1,4 @@
 #include <nx/utils/log/to_string.h>
-#include <nx/utils/nx_utils_ini.h>
 
 #include <gtest/gtest.h>
 
@@ -7,6 +6,7 @@
 #include <QtNetwork/QTcpSocket>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace utils {
@@ -61,7 +61,7 @@ TEST(ToString, Qt)
 
     assertToString(QUrl(QLatin1String("http://abc.xyz:8080/path")), "http://abc.xyz:8080/path");
     assertToString(QUrl(QLatin1String("http://xxx-yyy.w/path?param=3")), "http://xxx-yyy.w/path?param=3");
-    if (nx::utils::ini().displayUrlPasswordInLogs)
+    if (nx::utils::log::showPasswords())
         assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login:password@abx-xyz.x");
     else
         assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login@abx-xyz.x");

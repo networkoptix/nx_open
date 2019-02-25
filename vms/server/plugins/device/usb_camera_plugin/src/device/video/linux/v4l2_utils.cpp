@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 #include "device/video/rpi/rpi_utils.h"
 #include "udev_utils.h"
@@ -25,7 +26,7 @@ NX_DEBUG(nx::utils::log::Tag(std::string("nx::usb_cam::v4l2_utils::")+__FUNCTION
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace video {    
+namespace video {
 namespace detail {
 
 namespace {
@@ -49,25 +50,12 @@ struct DeviceInitializer
     int fileDescriptor = -1;
 };
 
-static unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
-{
-    switch(nxCodecID)
-    {
-        case nxcip::AV_CODEC_ID_MPEG2VIDEO: return V4L2_PIX_FMT_MPEG2;
-        case nxcip::AV_CODEC_ID_H263:       return V4L2_PIX_FMT_H263;
-        case nxcip::AV_CODEC_ID_MJPEG:      return V4L2_PIX_FMT_MJPEG;
-        case nxcip::AV_CODEC_ID_MPEG4:      return V4L2_PIX_FMT_MPEG4;
-        case nxcip::AV_CODEC_ID_H264:       return V4L2_PIX_FMT_H264;
-        default:                            return 0;
-    }
-}
-
 std::string getDeviceName(int fileDescriptor)
 {
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
-    
+
     //force a null terminator on the end of the string with c_str()
     return std::string(
         deviceCapability.card,
@@ -121,7 +109,7 @@ float toFrameRate(const v4l2_fract& frameInterval)
 V4L2CompressionTypeDescriptor::V4L2CompressionTypeDescriptor(
     const struct v4l2_fmtdesc& formatEnum)
     :
-    m_descriptor(new struct v4l2_fmtdesc({0}))
+    m_descriptor(new struct v4l2_fmtdesc({}))
 {
     memcpy(m_descriptor, &formatEnum, sizeof(formatEnum));
 }
@@ -201,18 +189,18 @@ std::vector<DeviceData> getDeviceList()
 
         int nameIndex = 0;
         auto it = duplicateCameras.find(name);
-        if(it == duplicateCameras.end())
+        if (it == duplicateCameras.end())
             duplicateCameras.emplace(name, 0);
         else
             nameIndex = ++it->second;
 
         std::string uniqueId;
-        if(rpi::isRpi() && rpi::isMmalCamera(name))
+        if (nx::utils::AppInfo::isRaspberryPi() && rpi::isMmalCamera(name))
             uniqueId = rpi::getMmalUniqueId();
         else
             uniqueId = getDeviceUniqueId(devicePath);
 
-        if(uniqueId.empty())
+        if (uniqueId.empty())
             uniqueId = std::to_string(nameIndex) + "-" + name;
 
         deviceList.push_back(DeviceData(name, devicePath, uniqueId));
@@ -227,7 +215,7 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
     DeviceInitializer initializer(devicePath);
 
     std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> codecDescriptorList;
-    struct v4l2_fmtdesc formatEnum = {0};
+    struct v4l2_fmtdesc formatEnum = {};
     formatEnum.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     while (ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FMT, &formatEnum) == 0)
@@ -263,21 +251,21 @@ std::vector<ResolutionData> getResolutionList(
         };
 
     DeviceInitializer initializer(devicePath);
-    if(initializer.fileDescriptor == -1)
+    if (initializer.fileDescriptor == -1)
     {
         int error = errno;
         NX_V4L2_LOG("failed to open %1, %2:", devicePath, strerror(error));
         return {};
     }
 
-    auto descriptor = 
+    auto descriptor =
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
 
     std::vector<ResolutionData> resolutionList;
 
     __u32 pixelFormat = descriptor->pixelFormat();
 
-    struct v4l2_frmsizeenum frameSizeEnum = {0};
+    struct v4l2_frmsizeenum frameSizeEnum = {};
     frameSizeEnum.index = 0;
     frameSizeEnum.pixel_format = pixelFormat;
 
@@ -287,7 +275,7 @@ std::vector<ResolutionData> getResolutionList(
         int height = 0;
         getResolution(frameSizeEnum, &width, &height);
 
-        struct v4l2_frmivalenum frameRateEnum = {0};
+        struct v4l2_frmivalenum frameRateEnum = {};
         frameRateEnum.pixel_format = pixelFormat;
         frameRateEnum.width = width;
         frameRateEnum.height = height;
@@ -332,8 +320,8 @@ void setBitrate(
         return;
     }
 
-    struct v4l2_ext_controls ecs = {0};
-    struct v4l2_ext_control ec {0};
+    struct v4l2_ext_controls ecs = {};
+    struct v4l2_ext_control ec {};
     ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
     ec.value = bitrate;
     ec.size = 0;
@@ -341,10 +329,10 @@ void setBitrate(
     ecs.count = 1;
     ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
 
-    if(ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs) != 0)
+    if (ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs) != 0)
     {
         int error = errno;
-        NX_V4L2_LOG("ioctl() failed: %1", strerror(error));
+        NX_V4L2_LOG("ioctl() failed: %1, path %2", strerror(error), devicePath);
     }
 }
 
@@ -361,8 +349,8 @@ int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDe
         return 0;
     }
 
-    struct v4l2_ext_controls ecs = {0};
-    struct v4l2_ext_control ec = {0};
+    struct v4l2_ext_controls ecs = {};
+    struct v4l2_ext_control ec = {};
     ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
     ec.size = sizeof(ec.value);
     ecs.controls = &ec;
@@ -373,7 +361,7 @@ int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDe
 
     int error = errno;
 
-    NX_V4L2_LOG("ioctl() failed: %1", strerror(error));
+    NX_V4L2_LOG("ioctl() failed: %1, path %2", strerror(error), devicePath);
 
     if (error == ENOSPC)
     {

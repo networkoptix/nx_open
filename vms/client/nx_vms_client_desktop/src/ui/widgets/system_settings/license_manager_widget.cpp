@@ -490,7 +490,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
-    params.addQueryItem(lit("version"), qnStaticCommon->engineVersion().toString());
+    params.addQueryItem(lit("version"), commonModule()->engineVersion().toString());
     params.addQueryItem(lit("lang"), qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())
@@ -971,7 +971,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
             if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {
-                showFailedToActivateLicenseLater(QnLicenseValidator::errorMessage(errCode));
+                showFailedToActivateLicenseLater(errCode);
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else
@@ -1062,19 +1062,12 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                     showIncompatibleLicenceMessageLater();
                     break;
                 case QnLicenseErrorCode::TooManyLicensesPerDevice:
-                    showMessageLater(
-                        QnMessageBoxIcon::Critical,
-                        tr("Failed to activate license"),
-                        tr("Only one starter license is allowed per System.")
-                            + '\n'
-                            + tr("You already have one active starter license."),
-                        CopyToClipboardButton::Hide);
+                    showFailedToActivateLicenseLater(errCode);
                     break;
                 default:
                     break;
             }
         }
-
 
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
@@ -1139,6 +1132,11 @@ QString QnLicenseManagerWidget::networkErrorExtras()
 QString QnLicenseManagerWidget::getProblemPersistMessage()
 {
     return tr("If the problem persists, please contact Customer Support.");
+}
+
+void QnLicenseManagerWidget::showFailedToActivateLicenseLater(QnLicenseErrorCode errorCode)
+{
+    showFailedToActivateLicenseLater(QnLicenseValidator::errorMessage(errorCode));
 }
 
 void QnLicenseManagerWidget::showAlreadyActivatedLater(

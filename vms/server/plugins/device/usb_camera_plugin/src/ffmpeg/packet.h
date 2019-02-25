@@ -7,16 +7,12 @@ extern "C"{
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-namespace nx {
-namespace usb_cam {
-namespace ffmpeg {
+namespace nx::usb_cam::ffmpeg {
 
 class Packet
 {
 public:
-    Packet(
-        AVCodecID codecId,
-        AVMediaType mediaType);
+    Packet(AVCodecID codecId, AVMediaType mediaType);
     ~Packet();
 
     int size() const;
@@ -25,7 +21,7 @@ public:
     int flags() const;
     int64_t pts() const;
     int64_t dts() const;
-    AVPacket * packet() const;
+    AVPacket* packet() const;
 
     void initialize();
     void unreference();
@@ -39,6 +35,8 @@ public:
 
     bool keyPacket() const;
 
+    int copy(AVPacket& source);
+
 private:
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
     AVMediaType m_mediaType = AVMEDIA_TYPE_UNKNOWN;
@@ -46,6 +44,4 @@ private:
     AVPacket* m_packet = nullptr;
 };
 
-} // namespace ffmpeg
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam::ffmpeg

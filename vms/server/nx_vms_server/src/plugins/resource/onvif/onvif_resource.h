@@ -216,7 +216,7 @@ public:
     virtual void setHostAddress(const QString &ip) override;
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
-    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
+    virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler) override;
 
     virtual QString getDriverName() const override;
 
@@ -230,7 +230,7 @@ public:
     virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
-        unsigned int autoResetTimeoutMS ) override;
+        unsigned int autoResetTimeoutMS) override;
 
     int innerQualityToOnvif(Qn::StreamQuality quality, int minQuality, int maxQuality) const;
     const QString createOnvifEndpointUrl() const
@@ -318,12 +318,12 @@ public:
     CameraDiagnostics::Result getFullUrlInfo();
 
     //!Relay input with token \a relayToken has changed its state to \a active
-    //void notificationReceived( const std::string& relayToken, bool active );
+    //void notificationReceived(const std::string& relayToken, bool active);
 
     /** Notifications with timestamp earlier than \a minNotificationTime are ignored. */
     void handleOneNotification(
         const oasisWsnB2__NotificationMessageHolderType& notification,
-        time_t minNotificationTime = (time_t)-1 );
+        time_t minNotificationTime = (time_t)-1);
 
     void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
@@ -339,12 +339,12 @@ public:
 
     virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
         onvifXsd__VideoEncoderConfiguration& encoder,
-        Qn::StreamIndex streamIndex,
+        StreamIndex streamIndex,
         const QnLiveStreamParams& params);
 
     virtual CameraDiagnostics::Result sendVideoEncoder2ToCameraEx(
         onvifXsd__VideoEncoder2Configuration& encoder,
-        Qn::StreamIndex streamIndex,
+        StreamIndex streamIndex,
         const QnLiveStreamParams& params);
 
     virtual int suggestBitrateKbps(
@@ -367,12 +367,12 @@ public:
 
     void updateVideoEncoder1(
         onvifXsd__VideoEncoderConfiguration& encoder,
-        Qn::StreamIndex streamIndex,
+        StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
 
     void updateVideoEncoder2(
         onvifXsd__VideoEncoder2Configuration& encoder,
-        Qn::StreamIndex streamIndex,
+        StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
 
     SoapTimeouts onvifTimeouts() const;
@@ -386,7 +386,7 @@ protected:
     void setAudioCodec(AUDIO_CODEC c);
 
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
+        StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         DeviceSoapWrapper& deviceSoapWrapper,
@@ -482,7 +482,7 @@ private:
     void fillStreamCapabilityLists(const QList<VideoEncoderCapabilities>& capabilitiesList);
 
     VideoEncoderCapabilities findVideoEncoderCapabilities(
-        SupportedVideoEncoding encoding, Qn::StreamIndex streamIndex);
+        SupportedVideoEncoding encoding, StreamIndex streamIndex);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
@@ -510,7 +510,7 @@ protected:
     virtual QnAudioTransmitterPtr initializeTwoWayAudio();
 
 private slots:
-    void onRenewSubscriptionTimer( quint64 timerID );
+    void onRenewSubscriptionTimer(quint64 timerID);
 
 private:
     // TODO: #Elric #enum
@@ -631,7 +631,7 @@ private:
     std::unique_ptr<std::string> m_profile;
 
     void removePullPointSubscription();
-    void pullMessages( quint64 timerID );
+    void pullMessages(quint64 timerID);
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
     /**
      * Used for cameras that do not support renew request.
@@ -644,21 +644,21 @@ private:
 
     //!Reads relay output list from resource
     bool fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList);
-    bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
-    bool fetchRelayInputInfo( const _onvifDevice__GetCapabilitiesResponse& capabilitiesResponse );
+    bool fetchRelayOutputInfo(const std::string& outputID, RelayOutputInfo* const relayOutputInfo);
+    bool fetchRelayInputInfo(const _onvifDevice__GetCapabilitiesResponse& capabilitiesResponse);
     bool fetchPtzInfo();
-    bool setRelayOutputInfo( const RelayOutputInfo& relayOutputInfo );
+    bool setRelayOutputInfo(const RelayOutputInfo& relayOutputInfo);
     void checkPrimaryResolution(QSize& primaryResolution);
     void setOutputPortStateNonSafe(
         quint64 timerID,
         const QString& outputID,
         bool active,
-        unsigned int autoResetTimeoutMS );
+        unsigned int autoResetTimeoutMS);
     QnAbstractPtzController* createSpecialPtzController() const;
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper& soapWrapper,
-        _onvifDevice__GetCapabilitiesResponse* response );
+        _onvifDevice__GetCapabilitiesResponse* response);
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
     bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,

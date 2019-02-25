@@ -99,7 +99,6 @@ struct LicenseKey
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((LicenseKey), (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseKey, (json), (licenseKey))
 
-
 int QnActivateLicenseRestHandler::executePost(const QString& /*path*/,
     const QnRequestParams& /*params*/, const QByteArray& body, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
@@ -113,7 +112,6 @@ int QnActivateLicenseRestHandler::executePost(const QString& /*path*/,
 
     return activateLicense(licenseKeyStruct.licenseKey, result, owner);
 }
-
 
 // WARNING: Deprecated!
 int QnActivateLicenseRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
@@ -129,12 +127,10 @@ int QnActivateLicenseRestHandler::executeGet(const QString& /*path*/, const QnRe
     return activateLicense(licenseKey, result, owner);
 }
 
-
 int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
     vms::api::DetailedLicenseData reply;
-
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
     {
         result.setError(QnJsonRestResult::InvalidParameter,
@@ -186,9 +182,16 @@ int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     QnLicenseList licenses;
     licenses << license;
     auto licenseManager = connect->getLicenseManager(owner->accessRights());
+
     const ec2::ErrorCode errorCode = licenseManager->addLicensesSync(licenses);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if( errorCode != ec2::ErrorCode::ok)
+    if (errorCode == ec2::ErrorCode::forbidden)
+    {
+        result.setError(QnJsonRestResult::Forbidden,
+            QString("Can't activate license because user has not enough access rights."));
+        return nx::network::http::StatusCode::ok;
+    }
+
+    if (errorCode != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
             QString("Internal server error: %1").arg(ec2::toString(errorCode)));
@@ -216,7 +219,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     params.addQueryItem(kBox, runtimeData.box);
     params.addQueryItem(kBrand, runtimeData.brand);
     // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
-    params.addQueryItem(kVersion, QnAppInfo::engineVersion());
+    params.addQueryItem(kVersion, QnAppInfo::applicationVersion());
 
 #ifdef Q_OS_LINUX
     if(QnAppInfo::isBpi() || QnAppInfo::isNx1())

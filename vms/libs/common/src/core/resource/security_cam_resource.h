@@ -37,7 +37,13 @@ public:
     static const int kDefaultSecondStreamFpsHigh;
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
-    struct MotionStreamIndex { Qn::StreamIndex index; bool isForced; };
+    using StreamIndex = nx::vms::api::StreamIndex;
+
+    struct MotionStreamIndex
+    {
+        StreamIndex index = StreamIndex::undefined;
+        bool isForced = false;
+    };
 public:
     QnSecurityCamResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnSecurityCamResource();
@@ -74,11 +80,22 @@ public:
     /** Returns which stream should be used for motion detection and is it forced. */
     MotionStreamIndex motionStreamIndex() const;
 
-    ////!Get camera settings, which are generally modified by user
-    ///*!
-    //    E.g., recording schedule, motion type, second stream quality, etc...
-    //*/
-    //QnCameraUserAttributes getUserCameraSettings() const;
+    /**
+     * Enable forced motion detection on a selected stream or switch to automatic mode.
+     */
+    void setMotionStreamIndex(MotionStreamIndex value);
+
+    /**
+     * If motion detection in the remote archive is enabled. Actual for the Virtual (Wearable)
+     * cameras and for the edge cameras (with RemoteArchiveCapability).
+     */
+    bool isRemoteArchiveMotionDetectionEnabled() const;
+
+    /**
+     * Enable or disable motion detection in the remote archive. Actual for the Virtual (Wearable)
+     * cameras and for the edge cameras (with RemoteArchiveCapability).
+     */
+    void setRemoteArchiveMotionDetectionEnabled(bool value);
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
@@ -303,8 +320,10 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
-    virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
-    static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
+    virtual int suggestBitrateKbps(
+        const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
+    static float rawSuggestBitrateKbps(
+        Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec);
 
     /**
      * All events emitted by analytics driver bound to the resource can be captured within
@@ -327,14 +346,11 @@ public:
      */
     bool isDefaultAuth() const;
 
-    /**
-     * @return true if remote archive motion analysis is enabled by user.
-     */
-    virtual bool isRemoteArchiveMotionDetectionEnabled() const;
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps,
+        const QString& codec, Qn::ConnectionRole role = Qn::CR_Default) const;
 
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
-
-    static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
+    static Qn::ConnectionRole toConnectionRole(StreamIndex index);
+    static StreamIndex toStreamIndex(Qn::ConnectionRole role);
 
     nx::core::ptz::PresetType preferredPtzPresetType() const;
 

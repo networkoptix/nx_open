@@ -106,7 +106,7 @@ void Connector::registerConnection(
     ConnectionManager::ConnectionContext connectionContext;
     connectionContext.connectionId = nodeContext.connectionId;
     connectionContext.fullPeerName.systemId = nodeContext.systemId;
-    connectionContext.fullPeerName.peerId = 
+    connectionContext.fullPeerName.peerId =
         connection->commonTransportHeaderOfRemoteTransaction().peerId;
     //connectionContext.userAgent = ;
     const auto connectionSequence = ++m_connectionSequence;
@@ -122,7 +122,7 @@ void Connector::registerConnection(
         nodeContext.connectionId,
         [connectionSequence](auto abstractConnection)
         {
-            const auto connection = 
+            const auto connection =
                 dynamic_cast<ConnectionWithSequence*>(abstractConnection);
             if (!connection || connection->data() != connectionSequence)
                 return;

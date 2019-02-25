@@ -27,7 +27,7 @@ QSize updateDstSize(const QnVirtualCameraResource* camera,
     const CLVideoDecoderOutput& outFrame,
     nx::api::ImageRequest::AspectRatio aspectRatio);
 
-class QnGetImageHelper: public nx::vms::server::ServerModuleAware
+class QnGetImageHelper: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnGetImageHelper(QnMediaServerModule* serverModule);
@@ -37,22 +37,24 @@ public:
     QByteArray encodeImage(
         const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format) const;
 
-    Qn::StreamIndex determineStreamIndex(const nx::api::CameraImageRequest& request) const;
+    nx::vms::api::StreamIndex determineStreamIndex(
+        const nx::api::CameraImageRequest& request) const;
 
 private:
     CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,
-        Qn::StreamIndex streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         QnAbstractArchiveDelegate* archiveDelegate,
         int prefferedChannel,
         bool& isOpened) const;
 
     CLVideoDecoderOutputPtr getImageWithCertainQuality(
-        Qn::StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const;
+        nx::vms::api::StreamIndex streamIndex,
+        const nx::api::CameraImageRequest& request) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromCaches(
         QnVideoCameraPtr camera,
-        Qn::StreamIndex streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         qint64 timestampUs,
         int preferredChannel,
         nx::api::ImageRequest::RoundMethod roundMethod) const;
@@ -62,8 +64,12 @@ private:
         std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
-        Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const;
+        nx::vms::api::StreamIndex streamIndex,
+        qint64 timestampUs,
+        QnVideoCameraPtr camera) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
-        Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const;
+        nx::vms::api::StreamIndex streamIndex,
+        qint64 timestampUs,
+        QnVideoCameraPtr camera) const;
 };

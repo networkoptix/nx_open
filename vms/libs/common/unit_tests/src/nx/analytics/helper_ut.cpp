@@ -103,13 +103,6 @@ auto objectTypeDescriptors(const QnResourcePtr& resource)
         resource->getProperty(kObjectTypeDescriptorsProperty).toUtf8());
 }
 
-auto actionTypeDescriptors(const QnResourcePtr& resource)
-{
-    return QJson::deserialized<
-        MapHelper::NestedMap<std::map, QnUuid, QString, ActionTypeDescriptor>>(
-        resource->getProperty(kActionTypeDescriptorsProperty).toUtf8());
-}
-
 const char* kBasicEngineManifest = R"json(
 {
     "eventTypes": [
@@ -350,8 +343,6 @@ protected:
         std::map<QString, GroupDescriptor> groupDescriptors;
         std::map<QString, EventTypeDescriptor> eventTypeDescriptors;
         std::map<QString, ObjectTypeDescriptor> objectTypeDescriptors;
-        MapHelper::NestedMap<std::map, QnUuid, QString, ActionTypeDescriptor>
-            actionTypeDescriptors;
     };
 
     PluginManifest givenManifestForPlugin(const QString& pluginId)
@@ -436,7 +427,6 @@ protected:
         ASSERT_EQ(expected.groupDescriptors, groupDescriptors(m_ownServer));
         ASSERT_EQ(expected.eventTypeDescriptors, eventTypeDescriptors(m_ownServer));
         ASSERT_EQ(expected.objectTypeDescriptors, objectTypeDescriptors(m_ownServer));
-        ASSERT_EQ(expected.actionTypeDescriptors, actionTypeDescriptors(m_ownServer));
     }
 
     void fillExpectedDescriptorsFromEngineInfo(
@@ -469,15 +459,6 @@ protected:
             merge(
                 MapHelper::get(inOutExpectedDescriptors->objectTypeDescriptors, objectType.id),
                 ObjectTypeDescriptor(engineId, objectType));
-        }
-
-        for (const auto& actionType : engineManifest.objectActions)
-        {
-            MapHelper::set(
-                &inOutExpectedDescriptors->actionTypeDescriptors,
-                engineId,
-                actionType.id,
-                ActionTypeDescriptor(engineId, actionType));
         }
 
         for (const auto& deviceAgentInfo: engineInfo.deviceAgentInfos)
@@ -518,14 +499,6 @@ protected:
                 ObjectTypeDescriptor(engineId, objectType));
         }
     }
-
-    void makeSureActionDescriptorsAreCleared()
-    {
-        ASSERT_EQ(
-            (MapHelper::NestedMap<std::map, QnUuid, QString, ActionTypeDescriptor>()),
-            actionTypeDescriptors(m_ownServer));
-    }
-
 
     void givenServerWithEventDescriptors(
         QnMediaServerResourcePtr server,
@@ -568,12 +541,16 @@ protected:
 
     QnVirtualCameraResourcePtr givenDeviceWhichSupportsEventTypes(QSet<QString> eventTypeIds)
     {
+#if 0 //< TODO: #dmishin reimplement this method.
         auto device = makeDevice();
         device->setSupportedAnalyticsEventTypeIds(
             /*engineId*/ QnUuid::createUuid(),
             std::move(eventTypeIds));
 
         return device;
+#else
+        return  QnVirtualCameraResourcePtr();
+#endif
     }
 
 protected:
@@ -612,23 +589,6 @@ TEST_F(HelperTest, updateFromDeviceAgentManifest)
     EngineInfo* engineInfo = givenEngine(pluginId, makeEngineId(pluginId, 0), &manifestSet);
     givenDeviceAgent(makeDeviceId("device"), engineInfo);
     makeSureDescriptorsAreCorrectForManifests({manifestSet});
-}
-
-TEST_F(HelperTest, clearRuntimeInfo)
-{
-    ManifestSet manifestSet = givenPlugin("pluginId");
-
-    const auto pluginId = manifestSet.pluginManifest.id;
-    const auto engineId = makeEngineId(pluginId, 0);
-    EngineInfo* engineInfo = givenEngine(pluginId, engineId, &manifestSet);
-
-    const auto engineId2 = makeEngineId(pluginId, 1);
-    EngineInfo* engineInfo2 = givenEngine(pluginId, engineId2, &manifestSet);
-
-    DescriptorManager descriptorManager(m_commonModule.get());
-    descriptorManager.clearRuntimeInfo();
-
-    makeSureActionDescriptorsAreCleared();
 }
 
 TEST_F(HelperTest, eventTypes)

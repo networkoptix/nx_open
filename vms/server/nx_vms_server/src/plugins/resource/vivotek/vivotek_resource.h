@@ -41,7 +41,7 @@ public:
         Qn::ConnectionRole role) override;
 protected:
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
+        StreamIndex streamIndex) override;
 private:
     bool fetchHevcSupport();
 

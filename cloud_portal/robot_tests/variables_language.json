@@ -15,7 +15,7 @@
     "AUTOTESTS OFFLINE TEXT"               :    "offline",
     "NEW PERMISSIONS SAVED"                :    "New permissions saved",
     "PERMISSIONS WERE REMOVED FROM"        :    "Permissions were removed from %email%",
-    "SYSYEM DELETED FROM ACCOUNT"          :    "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT"          :    "System {{system_name}} is successfully deleted from your account",
 
     "RESET SUCCESS MESSAGE TEXT"           :    "Password successfully saved",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED"   :    "Your account is successfully saved",
@@ -26,6 +26,7 @@
 
     "CANNOT SAVE PASSWORD"                 :    "Cannot save password:",
     "PASSWORD INCORRECT"                   :    "Current password is incorrect.",
+    "TOO MANY ATTEMPTS TEXT"               :    "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD"                       :    "Wrong password",
     "ACCOUNT NOT FOUND TEXT"               :    "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
@@ -47,6 +48,7 @@
     "CANCEL BUTTON TEXT"                   :    "Cancel",
     "SAVE BUTTON TEXT"                     :    "Save",
     "SHARE BUTTON TEXT"                    :    "Share",
+    "DISCONNECT BUTTON TEXT"               :    "Disconnect",
 
     "OWNER TEXT"                           :    "Owner",
     "ADMIN TEXT"                           :    "Administrator",
@@ -60,11 +62,10 @@
     "ABOUT"                                :    "About",
     "KNOWN LIMITATIONS"                    :    "Known limitations",
     "SUPPORT"                              :    "Support",
+    "REMOTE CONNECTIVITY"                  :    "Remote connectivity",
     "TERMS"                                :    "Terms",
     "PRIVACY"                              :    "Privacy",
     "COPYRIGHT"                            :    "Copyright",
-
-    "DOWNLOADS HEADER TEXT"                :    "Download",
 
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT"  :    "Activate your account",
     "RESET PASSWORD EMAIL SUBJECT"         :    "Reset your password",
@@ -90,11 +91,6 @@
     "PAGE NOT FOUND TEXT"                  :    "Page not found",
     "TAKE ME HOME TEXT"                    :    "Take me home",
     "OPEN NX WITNESS BUTTON TEXT"          :    "Open %VMS_NAME%",
-
-    "RELEASES TEXT"                        :    "Releases",
-    "PATCHES TEXT"                         :    "Patches",
-    "BETAS TEXT"                           :    "Betas",
-    "CLIENT ONLY TEXT"                     :    "Client only",
 
     "PASSWORD TOO SHORT BADGE TEXT"        :    "too short",
     "PASSWORD TOO COMMON BADGE TEXT"       :    "too common",

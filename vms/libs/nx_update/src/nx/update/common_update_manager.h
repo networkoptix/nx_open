@@ -17,7 +17,7 @@ namespace update { struct Package; }
 
 class CommonUpdateInstaller;
 
-class CommonUpdateManager: public QObject, public QnCommonModuleAware
+class CommonUpdateManager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -28,9 +28,22 @@ public:
     void cancel();
     void startUpdate(const QByteArray& content);
     void install(const QnAuthSession& authInfo);
+    bool participants(QList<QnUuid>* outParticipants) const;
+    bool setParticipants(const QList<QnUuid>& participants);
+    bool updateLastInstallationRequestTime();
+    void finish();
+    vms::api::SoftwareVersion targetVersion() const;
 
 private:
-    std::atomic<bool> m_downloaderFailed = false;
+    enum class DownloaderFailDetail
+    {
+        noError,
+        internalError,
+        noFreeSpace,
+        downloadFailed
+    };
+
+    std::atomic<DownloaderFailDetail> m_downloaderFailDetail = DownloaderFailDetail::noError;
 
     void onGlobalUpdateSettingChanged();
     void onDownloaderFailed(const QString& fileName);
@@ -44,6 +57,9 @@ private:
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);
     update::Status start();
+    bool deserializedUpdateInformation(update::Information* outUpdateInformation,
+        const QString& caller) const;
+    void setUpdateInformation(const update::Information& updateInformation);
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;

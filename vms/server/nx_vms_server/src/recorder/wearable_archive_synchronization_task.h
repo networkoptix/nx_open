@@ -55,7 +55,7 @@ private:
     void createStreamRecorder(qint64 startTimeMs, qint64 durationMs);
 
 private:
-    QnSecurityCamResourcePtr m_resource;
+    QnSecurityCamResourcePtr m_camera;
     QPointer<QIODevice> m_file;
     qint64 m_startTimeMs = 0;
 

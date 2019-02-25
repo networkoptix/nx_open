@@ -6,6 +6,7 @@
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
@@ -18,51 +19,24 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(IPlugin* plugin): nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
+    nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
 
 Engine::~Engine()
 {
-    m_terminated.store(true);
-    m_pluginEventGenerationLoopCondition.notify_all();
+    {
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_terminated = true;
+        m_pluginEventGenerationLoopCondition.notify_all();
+    }
     if (m_thread)
         m_thread->join();
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* /*deviceInfo*/, Error* /*outError*/)
-{
-    return new DeviceAgent(this);
-}
-
-void Engine::initCapabilities()
-{
-    if (ini().deviceModelDependent)
-        m_capabilities += "|deviceModelDependent";
-
-    const std::string pixelFormatString = ini().needUncompressedVideoFrames;
-    if (!pixelFormatString.empty())
-    {
-        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
-        {
-            NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
-                << ini().iniFile() << ": [" << pixelFormatString << "].";
-        }
-        else
-        {
-            m_needUncompressedVideoFrames = true;
-            m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
-        }
-    }
-
-    // Delete first '|', if any.
-    if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
-        m_capabilities.erase(0, 1);
-}
-
-void Engine::processPluginEvents()
+void Engine::generatePluginEvents()
 {
     while (!m_terminated)
     {
@@ -86,10 +60,45 @@ void Engine::processPluginEvents()
         // Sleep until the next event pack needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether the
         // timeout has occurred) and spurious wake-ups are ignored.
-        static const std::chrono::seconds kEventGenerationPeriod{10};
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-        m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+        {
+            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            if (m_terminated)
+                break;
+            static const std::chrono::seconds kEventGenerationPeriod{7};
+            m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+        }
     }
+}
+
+IDeviceAgent* Engine::obtainDeviceAgent(
+    const IDeviceInfo* deviceInfo, Error* /*outError*/)
+{
+    return new DeviceAgent(this, deviceInfo);
+}
+
+void Engine::initCapabilities()
+{
+    if (ini().deviceDependent)
+        m_capabilities += "|deviceDependent";
+
+    const std::string pixelFormatString = ini().needUncompressedVideoFrames;
+    if (!pixelFormatString.empty())
+    {
+        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
+        {
+            NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
+                << ini().iniFile() << ": [" << pixelFormatString << "].";
+        }
+        else
+        {
+            m_needUncompressedVideoFrames = true;
+            m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
+        }
+    }
+
+    // Delete first '|', if any.
+    if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
+        m_capabilities.erase(0, 1);
 }
 
 std::string Engine::manifest() const
@@ -261,7 +270,7 @@ void Engine::settingsReceived()
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation thread";
         if (!m_thread)
-            m_thread.reset(new std::thread([this]() { processPluginEvents(); }));
+            m_thread.reset(new std::thread([this]() { generatePluginEvents(); }));
     }
     else
     {
@@ -284,16 +293,18 @@ void Engine::executeAction(
         if (!params.empty())
         {
             *outMessageToUser = std::string("Your param values are:\n");
-            for (const auto& entry : params)
+            bool first = true;
+            for (const auto& entry: params)
             {
                 const auto& parameterName = entry.first;
                 const auto& parameterValue = entry.second;
 
-                *outMessageToUser += parameterName + ": [" + parameterValue + "],\n";
+                if (!first)
+                    *outMessageToUser += ",\n";
+                else
+                    first = false;
+                *outMessageToUser += parameterName + ": [" + parameterValue + "]";
             }
-
-            // Remove a trailing comma and a newline character.
-            *outMessageToUser = outMessageToUser->substr(0, outMessageToUser->size() - 2);
         }
         else
         {
@@ -323,6 +334,7 @@ void Engine::executeAction(
 namespace {
 
 static const std::string kLibName = "stub_analytics_plugin";
+
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.stub",
@@ -381,9 +393,7 @@ static const std::string kPluginManifest = R"json(
 
 } // namespace
 
-extern "C" {
-
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kLibName,
@@ -393,5 +403,3 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
             return new nx::vms_server_plugins::analytics::stub::Engine(plugin);
         });
 }
-
-} // extern "C"

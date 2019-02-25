@@ -10,7 +10,7 @@
 
 namespace nx::analytics {
 
-class EngineDescriptorManager: public QnCommonModuleAware
+class EngineDescriptorManager: public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 

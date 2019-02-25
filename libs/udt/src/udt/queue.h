@@ -204,7 +204,7 @@ public:
 
 private:
     void insert_(int64_t ts, std::shared_ptr<CUDT> u);
-    void remove_(CUDT* u);
+    void remove_(CSNode* n);
 
 private:
     // The heap array
@@ -242,6 +242,7 @@ class CRcvUList
 {
 public:
     CRcvUList() = default;
+    ~CRcvUList();
 
     CRcvUList(const CRcvUList&) = delete;
     CRcvUList& operator=(const CRcvUList&) = delete;
@@ -392,11 +393,10 @@ public:
      * Initialize the receiving queue.
      * @param size queue size
      * @param mss maximum packet size
-     * @param hsize hash table size
      * @param c UDP channel to be associated to the queue
      * @param t timer
      */
-    CRcvQueue(int size, int payload, int ipVersion, int hsize, UdpChannel* c, CTimer* t);
+    CRcvQueue(int size, int payload, int ipVersion, UdpChannel* c, CTimer* t);
     ~CRcvQueue();
 
     void start();

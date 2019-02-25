@@ -19,7 +19,7 @@ static std::chrono::milliseconds now()
 
 InputFormat::InputFormat():
     Options()
-{    
+{
 }
 
 InputFormat::~InputFormat()
@@ -29,7 +29,7 @@ InputFormat::~InputFormat()
 
 int InputFormat::initialize(const char * deviceType)
 {
-    m_inputFormat = av_find_input_format(deviceType); 
+    m_inputFormat = av_find_input_format(deviceType);
     if (!m_inputFormat)
     {
         // There is no error code for format not found
@@ -112,7 +112,7 @@ const AVInputFormat * InputFormat::inputFormat() const
     return m_inputFormat;
 }
 
-AVStream * InputFormat::stream(int index) const
+AVStream * InputFormat::stream(uint32_t index) const
 {
     if (index < 0 || index >= m_formatContext->nb_streams)
         return nullptr;
@@ -123,12 +123,12 @@ AVStream * InputFormat::findStream(AVMediaType type, int * streamIndex) const
 {
     for (unsigned int i = 0; i < m_formatContext->nb_streams; ++i)
     {
-        if(!m_formatContext->streams[i] || !m_formatContext->streams[i]->codecpar)
+        if (!m_formatContext->streams[i] || !m_formatContext->streams[i]->codecpar)
             continue;
 
         if (m_formatContext->streams[i]->codecpar->codec_type == type)
         {
-            if(streamIndex)
+            if (streamIndex)
                 *streamIndex = i;
             return m_formatContext->streams[i];
         }

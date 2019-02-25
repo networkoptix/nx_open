@@ -33,22 +33,22 @@ TimeSyncManager::TimeSyncManager(
     m_steadyClock(std::make_shared<SteadyClock>()),
     m_thread(new QThread())
 {
-    moveToThread(m_thread);
+    moveToThread(m_thread.get());
 
-    connect(m_thread, &QThread::started,
+    connect(m_thread.get(), &QThread::started,
         [this]()
         {
             if (!m_timer)
             {
-                m_timer = new QTimer();
-                connect(m_timer, &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
+                m_timer.reset(new QTimer());
+                connect(m_timer.get(), &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
             }
             updateTime();
             auto globalSettings = this->commonModule()->globalSettings();
             m_timer->start(
                 std::chrono::milliseconds(globalSettings->osTimeChangeCheckPeriod()).count());
         });
-    connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
+    connect(m_thread.get(), &QThread::finished, [this]() { m_timer->stop(); });
 
     connect(
         commonModule->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,

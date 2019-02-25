@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "tr_TR",
   "language_name": "Türk",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Gelişmiş Görüntüleyici",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
     },
     "Administrator": {
       "label": "Yönetici",
@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
     "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "Bu hesap geçici olarak kilitlendi. Lütfen bir süre sonra tekrar deneyin.",
     "notFound": "Bulunamadı",
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",
@@ -137,13 +137,21 @@
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
     "thisSystem": "sistem",
-    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez."
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "iyi",
+    "fair": "idare Eder",
+    "minLength": "çok kısa",
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",
+    "required": "yanlış",
     "requiredMessage": "Sadece alfanümerik ve klavye karakterleri kullanın",
+    "weak": "zayıf",
     "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage": "Güçlü parola!",
+    "common": "çok yaygın",
     "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz",
     "missingMessage": "Parola gerekmektedir"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Sil",
     "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
   "account": {
@@ -273,13 +281,13 @@
       "highStream": "Yüksek çözünürlük",
       "lowStream": "Düşük çözünürlük",
       "transcoding": "Dönüştürme",
-      "unknown": "Belirtilmemiş",
-      "copyToClipboard": "panoya yapıştır",
+      "unknown": "Bilinmeyen",
+      "copyToClipboard": "panoya kopyala",
       "copyDefaultText": "kopyala",
       "copyActiveText": "panoya kopyalandı"
     },
     "systemOffline": "Sistem çevrimdışı",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "KAMERA YOK",
     "cameraStates": {
       "offline": "Çevrimdışı",
       "error": "Hata",
@@ -291,7 +299,7 @@
       "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
       "noFormat": "Bu tarayıcı bu kameradan video oynatmayı desteklemiyor.",
       "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
-      "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+      "ieWin10": "Lütfen Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
       "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
     },
     "searchCamPlaceholder": "Arama",
@@ -300,7 +308,7 @@
       "high": "Yüksek",
       "low": "Düşük"
     },
-    "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
+    "chromeCastWarning": "Chromecast kaynak kullanımını arttırabilir ve sunucunuzda sorunlara neden olabilir.",
     "voiceCommands": {
       "play": "oynat",
       "pause": "duraklat",

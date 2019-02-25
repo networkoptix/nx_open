@@ -158,16 +158,11 @@ public:
     CameraDiagnostics::Result enableAudioInput();
 
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
-
-    virtual void setSupportedAnalyticsEventTypeIds(
-        QnUuid engineId, QSet<QString> supportedEvents) override;
 
 private:
     CameraDiagnostics::Result initDevice();

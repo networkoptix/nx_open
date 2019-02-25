@@ -30,6 +30,7 @@
 #include <ui/help/help_topics.h>
 #include <utils/media/sse_helper.h>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
 #include "resource_widget.h"
@@ -86,6 +87,12 @@ public:
     QnResourceDisplayPtr display() const;
 
     QnResourceWidgetRenderer* renderer() const;
+
+    /** Returns default camera rotation angle or 0 if does not exist or invalid. */
+    int defaultRotation() const;
+
+    /** Returns default camera rotation plus fisheye rotation if needed. */
+    int defaultFullRotation() const;
 
     /**
      * @param itemPos Point in item coordinates to map to grid coordinates.
@@ -157,6 +164,8 @@ public:
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
     bool isMotionSearchModeEnabled() const;
+
+    void setPtzMode(bool value);
 
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
@@ -280,7 +289,7 @@ protected:
     virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
-    void ensureTwoWayAudioWidget();
+    void updateTwoWayAudioWidget();
     bool animationAllowed() const;
 
     rest::Handle invokeTrigger(
@@ -291,7 +300,6 @@ protected:
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_screenshotButton_clicked();
-    void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
     void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
@@ -430,7 +438,7 @@ private:
     void handleSelectedAreaChanged();
 
 private:
-    QScopedPointer<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
+    nx::utils::ImplPtr<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
@@ -486,7 +494,6 @@ private:
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
-    QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     QScopedPointer<nx::vms::client::desktop::WatermarkPainter> m_watermarkPainter;
 

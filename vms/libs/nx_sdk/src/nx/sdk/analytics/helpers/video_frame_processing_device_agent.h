@@ -5,7 +5,7 @@
 #include <vector>
 #include <mutex>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
 
 #include <nx/sdk/analytics/i_engine.h>
@@ -24,15 +24,14 @@ namespace analytics {
  * back constructed metadata packets. Hides many technical details of Analytics SDK, but may
  * limit DeviceAgent capabilities - use only when suitable.
  *
- * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
- * add the following to the derived class cpp:
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the prefix defined by this class, add the
+ * following to the derived class .cpp:
  * <pre><code>
- *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
  *     #include <nx/kit/debug.h>
  * </code></pre>
  */
-class VideoFrameProcessingDeviceAgent:
-    public nxpt::CommonRefCounter<IConsumingDeviceAgent>
+class VideoFrameProcessingDeviceAgent: public RefCountable<IConsumingDeviceAgent>
 {
 protected:
     const LogUtils logUtils;
@@ -45,6 +44,7 @@ protected:
      */
     VideoFrameProcessingDeviceAgent(
         IEngine* engine,
+        const IDeviceInfo* deviceInfo,
         bool enableOutput,
         const std::string& printPrefix = "");
 
@@ -134,15 +134,16 @@ public:
 // Not intended to be used by the descendant.
 
 public:
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual Error setHandler(IDeviceAgent::IHandler* handler) override;
     virtual Error pushDataPacket(IDataPacket* dataPacket) override;
     virtual const IString* manifest(Error* error) const override;
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual void setSettings(const IStringMap* settings) override;
+    virtual IStringMap* pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;
+    void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
+    void processMetadataPacket(IMetadataPacket* metadataPacket, int packetIndex /*= -1*/);
 
 private:
     mutable std::mutex m_mutex;

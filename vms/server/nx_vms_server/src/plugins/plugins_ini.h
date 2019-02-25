@@ -35,6 +35,10 @@ struct PluginsIniConfig: public nx::kit::IniConfig
     NX_INI_STRING("", analyticsSettingsOutputPath,
         "Path (absolute or relative to .ini dir) to dir for saving settings that the Server\n"
         "sends to an analytics plugin.");
+
+    NX_INI_FLAG(false, tryAllLibsInPluginDir,
+        "Attempt to load each dynamic library from each plugin directory instead of only the one\n"
+        "with the plugin_name equal to the directory name.");
 };
 
 inline PluginsIniConfig& pluginsIni()

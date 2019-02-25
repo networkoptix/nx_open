@@ -68,8 +68,6 @@ namespace
     static const QByteArray AUTH_KEY("authKey");
 }
 
-static QnMediaServerResourcePtr m_server;
-
 namespace nx {
 namespace vms::server {
 

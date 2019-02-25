@@ -598,8 +598,9 @@
     "QnTwoWayAudioWidget": {
         "palette": {
             "default": {
-            "window": "dark1.setAlpha(128)",
-            "windowText": "light1"
+                "window": "dark1.setAlpha(128)",
+                "midlight": "brand_core.setAlpha(179)",
+                "windowText": "light1"
             }
         },
         "colors": {
@@ -935,6 +936,14 @@
             "eventRules": "#9c6b50",
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
+        }
+    },
+
+    "QnWorkbenchWelcomeScreen": {
+        "palette": {
+            "default": {
+                "window": "dark3"
+            }
         }
     },
 

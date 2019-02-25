@@ -16,7 +16,7 @@ class PluginEvent: public InstantEvent
 public:
     explicit PluginEvent(
         qint64 timeStamp,
-        const AnalyticsEngineResourcePtr& engineResource,
+        const QnUuid& engineResourceId,
         const QString& caption,
         const QString& description,
         nx::vms::api::EventLevel level,

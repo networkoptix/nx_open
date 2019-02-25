@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "nl_NL",
   "language_name": "Nederlands",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -137,13 +137,21 @@
     "cantOpenClient": "%VMS_NAME% applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbinding met {{systemName}} verloren",
     "thisSystem": "het systeem",
-    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund"
+    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "goed",
+    "fair": "redelijk",
+    "minLength": "te kort",
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",
+    "required": "incorrect",
     "requiredMessage": "Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
+    "weak": "zwak",
     "weakMessage": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "strongMessage": "Sterk wachtwoord!",
+    "common": "te algemeen",
     "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
     "missingMessage": "Wachtwoord is vereist"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "successMerge": "Systeem {{systemName}} is samengevoegd met {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
   },
   "account": {

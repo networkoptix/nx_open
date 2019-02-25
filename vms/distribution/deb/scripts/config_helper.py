@@ -30,7 +30,7 @@ if args.key:
         if config.has_section("General") and config.has_option("General", args.key):
             config.remove_option("General", args.key)
             has_changes = True
-    elif args.value:
+    elif not args.value is None:
         if not config.has_section("General"):
             config.add_section("General")
         config.set("General", args.key, args.value)

@@ -9,7 +9,7 @@
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <common/common_module_aware.h>
 
-class QnProxyAudioTransmitter: public QnAbstractAudioTransmitter, public QnCommonModuleAware
+class QnProxyAudioTransmitter: public QnAbstractAudioTransmitter, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

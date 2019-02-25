@@ -533,7 +533,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
                 updateMode();
             };
         snapshotManager()->save(layout, callback);
-        propertyDictionary()->saveParamsAsync(layout->getId());
+        resourcePropertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
     {

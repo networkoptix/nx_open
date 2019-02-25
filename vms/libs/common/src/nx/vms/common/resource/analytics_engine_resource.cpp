@@ -5,6 +5,7 @@
 #include <QtCore/QJsonDocument>
 
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
@@ -22,13 +23,26 @@ const QString AnalyticsEngineResource::kSettingsValuesProperty{"settingsValues"}
 const QString AnalyticsEngineResource::kEngineManifestProperty{"engineManifest"};
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnCommonModule* commonModule):
-    base_type(commonModule)
+    base_type(commonModule),
+    m_cachedManifest([this]() { return fetchManifest(); }, &m_cacheMutex)
 {
+    connect(
+        this,
+        &QnResource::propertyChanged,
+        this,
+        [&](auto& resource, auto& key)
+        {
+            if (key == kEngineManifestProperty)
+            {
+                m_cachedManifest.reset();
+                emit manifestChanged(toSharedPointer(this));
+            }
+        });
 }
 
 EngineManifest AnalyticsEngineResource::manifest() const
 {
-    return QJson::deserialized(getProperty(kEngineManifestProperty).toUtf8(), EngineManifest());
+    return m_cachedManifest.get();
 }
 
 void AnalyticsEngineResource::setManifest(const api::analytics::EngineManifest& manifest)
@@ -46,6 +60,11 @@ void AnalyticsEngineResource::setSettingsValues(const QVariantMap& values)
 {
     setProperty(kSettingsValuesProperty,
         QString::fromUtf8(QJsonDocument(QJsonObject::fromVariantMap(values)).toJson()));
+}
+
+QString AnalyticsEngineResource::idForToStringFromPtr() const
+{
+    return lm("[%1 %2]").args(getName(), getId());
 }
 
 AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
@@ -72,6 +91,34 @@ analytics::ObjectTypeDescriptorMap AnalyticsEngineResource::analyticsObjectTypeD
     return analytics::fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(
         getId(),
         engineManifest.objectTypes);
+}
+
+QList<nx::vms::api::analytics::EngineManifest::ObjectAction>
+    AnalyticsEngineResource::supportedObjectActions() const
+{
+    return manifest().objectActions;
+}
+
+bool AnalyticsEngineResource::isDeviceDependent() const
+{
+    return manifest().capabilities.testFlag(EngineManifest::Capability::deviceDependent);
+}
+
+bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const
+{
+    const auto userEnabledEngines = device->userEnabledAnalyticsEngines();
+    if (userEnabledEngines.contains(getId()))
+        return true;
+
+    if (!isDeviceDependent())
+        return false;
+
+    return device->compatibleAnalyticsEngines().contains(getId());
+}
+
+api::analytics::EngineManifest AnalyticsEngineResource::fetchManifest() const
+{
+    return QJson::deserialized<EngineManifest>(getProperty(kEngineManifestProperty).toUtf8());
 }
 
 } // namespace nx::vms::common

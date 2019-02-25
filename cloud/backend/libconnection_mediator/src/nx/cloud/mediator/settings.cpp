@@ -69,6 +69,9 @@ const QLatin1String kDefaultHttpKeepAliveOptions("");
 const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
 const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 
+const QLatin1String kHttpMaintenanceHtdigestPath("http/maintenanceHtdigestPath");
+const QLatin1String kDefaultHttpMaintenanceHtdigestPath("");
+
 const QString kModuleName = lit("connection_mediator");
 
 //HTTPS
@@ -313,15 +316,7 @@ void Settings::loadSettings()
     m_stun.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
         settings().value(kStunConnectionInactivityTimeout).toString(), kDefaultStunInactivityTimeout);
 
-    readEndpointList(
-        settings().value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
-        &m_http.addrToListenList);
-
-    m_http.keepAliveOptions = network::KeepAliveOptions::fromString(
-        settings().value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
-
-    m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
-        settings().value(kHttpConnectionInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
+    loadHttp();
 
     loadHttps();
 
@@ -458,6 +453,22 @@ void Settings::readEndpointList(
         httpAddrToListenStrList.end(),
         std::back_inserter(*addrToListenList),
         [](const QString& str) { return network::SocketAddress(str); });
+}
+
+void Settings::loadHttp()
+{
+    readEndpointList(
+        settings().value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
+        &m_http.addrToListenList);
+
+    m_http.keepAliveOptions = network::KeepAliveOptions::fromString(
+        settings().value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
+
+    m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        settings().value(kHttpConnectionInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
+
+    m_http.maintenanceHtdigestPath = settings().value(
+        kHttpMaintenanceHtdigestPath, kDefaultHttpMaintenanceHtdigestPath).toString().toStdString();
 }
 
 void Settings::loadHttps()

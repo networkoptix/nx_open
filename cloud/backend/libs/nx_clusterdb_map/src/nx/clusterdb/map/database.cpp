@@ -1,39 +1,27 @@
 #include "database.h"
 
+#include "dao/key_value_dao.h"
+
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
+
 namespace nx::clusterdb::map {
 
-// TODO: This should be passed to m_syncEngine
-// to allow connections with this guid only.
-static constexpr char kKeyValueDbApplicationId[] = "118e2785-d05c-4ab9-b1e0-6d74324dada3";
+namespace {
+
+static constexpr char kSystemId[] = "c484573f-8b0d-4458-b86c-1da31188884b";
+
+} // namespace
 
 Database::Database(
-    const Settings& settings,
+    nx::clusterdb::engine::SyncronizationEngine* syncEngine,
     nx::sql::AsyncSqlQueryExecutor* dbManager)
     :
-    //m_settings(settings),
-    //m_dbManager(dbManager),
-    m_moduleId(QnUuid::createUuid()), //< TODO: moduleId should be persistent.
-    m_syncEngine(
-        kKeyValueDbApplicationId,
-        m_moduleId,
-        settings.dataSyncEngineSettings,
-        nx::clusterdb::engine::ProtocolVersionRange(1, 1),
-        dbManager),
+    m_systemId(kSystemId),
+    m_syncEngine(syncEngine),
     m_structureUpdater(dbManager),
-    m_dataManager(dbManager),
-    m_eventProvider(dbManager)
+    m_dataManager(m_syncEngine, dbManager, kSystemId, &m_eventProvider)
 {
-}
-
-Database::~Database()
-{
-}
-
-void Database::registerHttpApi(
-    const std::string& pathPrefix,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    m_syncEngine.registerHttpApi(pathPrefix, dispatcher);
 }
 
 DataManager& Database::dataManager()
@@ -44,6 +32,11 @@ DataManager& Database::dataManager()
 EventProvider& Database::eventProvider()
 {
     return m_eventProvider;
+}
+
+std::string Database::systemId() const
+{
+    return m_systemId.toSimpleString().toStdString();
 }
 
 } // namespace nx::clusterdb::map

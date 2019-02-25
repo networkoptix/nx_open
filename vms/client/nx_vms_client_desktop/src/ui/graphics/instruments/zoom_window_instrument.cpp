@@ -308,24 +308,6 @@ protected:
         const QStyleOptionGraphicsItem* /*option*/,
         QWidget* /*widget*/) override
     {
-        if (m_zoomWidget && m_zoomWidget->options().testFlag(QnResourceWidget::AnalyticsModeSlave))
-        {
-            const auto originalRegion = qnResourceRuntimeDataManager->layoutItemData(
-                m_zoomWidget->item()->uuid(),
-                Qn::ItemAnalyticsModeSourceRegionRole).value<QRectF>().
-                intersected(QRectF(0, 0, 1, 1));
-
-            // Main frame also must not be painted in this way.
-            if (originalRegion.isEmpty())
-                return;
-
-            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * 0.5);
-            const QRectF fullRect = Geometry::unsubRect(rect(), m_zoomWidget->item()->zoomRect());
-            const QRectF scaled = Geometry::subRect(fullRect, originalRegion);
-            QnNxStyle::paintCosmeticFrame(painter, scaled, m_frameColor, 1, 1);
-
-        }
-
         QnNxStyle::paintCosmeticFrame(painter, rect(), m_frameColor,
             m_frameWidth, m_frameWidth / 2);
     }
@@ -459,38 +441,6 @@ public:
 
         if (!qFuzzyEquals(oldSize, size()))
             updateLayout();
-    }
-
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* w) override
-    {
-        if (m_target && m_target->options().testFlag(QnResourceWidget::InvisibleWidgetOption))
-            return;
-
-        if (m_target && m_target->options().testFlag(QnResourceWidget::AnalyticsModeMaster))
-        {
-            const QRectF masterItemGeometry = m_target->item()->combinedGeometry();
-
-            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * 0.5);
-            QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(rect().toRect()));
-
-            for (auto widget: m_rectByWidget.keys())
-            {
-                if (m_rectByWidget[widget].isEmpty())
-                    continue;
-
-                const QRectF slaveItemGeometry = widget->zoomWidget()->item()->combinedGeometry();
-                const Direction direction = calculateDirection(masterItemGeometry, slaveItemGeometry);
-                QPointF p1 = sourceDirectionPoint(widget->geometry(), direction);
-                QPointF p2 = mapFromScene(
-                    targetDirectionPoint(widget->zoomWidget()->geometry(), direction));
-
-                QPen cosmetic(widget->frameColor());
-                cosmetic.setCosmetic(true);
-                QnScopedPainterPenRollback penRollback(painter, cosmetic);
-                painter->drawLine(p1, p2);
-            }
-
-        }
     }
 
 private:
@@ -829,16 +779,16 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     {
         /* Leave invisible. */
     }
-    else if (options & QnResourceWidget::DisplayDewarped)
+    else if (options.testFlag(QnResourceWidget::DisplayDewarped))
     {
         /* Leave invisible. */
         instant = true;
     }
-    else if (options & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity))
+    else if (options.testFlag(QnResourceWidget::DisplayMotion))
     {
         /* Leave invisible. */
     }
-    else if (options & QnResourceWidget::DisplayCrosshair)
+    else if (options.testFlag(QnResourceWidget::ControlPtz))
     {
         /* PTZ mode - transparent, non-interactive. */
         opacity = 0.3;

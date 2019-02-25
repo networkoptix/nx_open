@@ -1,11 +1,12 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <nx/utils/impl_ptr.h>
 
 class QMenu;
 class QLabel;
@@ -153,7 +154,7 @@ private:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractSearchWidget::Controls)

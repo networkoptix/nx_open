@@ -216,12 +216,7 @@ void ExperimentalTunnelClient::reportTunnelIfReady()
     m_timer.pleaseStopSync();
 
     if (!resetConnectionAttributes())
-    {
-        return reportFailure({
-            SystemError::getLastOSErrorCode(),
-            StatusCode::serviceUnavailable,
-            nullptr });
-    }
+        return reportFailure(OpenTunnelResult(SystemError::getLastOSErrorCode()));
 
     reportSuccess();
 }

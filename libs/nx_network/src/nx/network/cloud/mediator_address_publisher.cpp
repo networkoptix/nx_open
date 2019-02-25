@@ -34,7 +34,7 @@ MediatorAddressPublisher::MediatorAddressPublisher(
 void MediatorAddressPublisher::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    
+
     m_mediatorConnection->bindToAioThread(aioThread);
     if (m_retryTimer)
         m_retryTimer->bindToAioThread(aioThread);

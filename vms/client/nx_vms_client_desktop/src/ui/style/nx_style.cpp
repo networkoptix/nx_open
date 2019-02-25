@@ -55,6 +55,7 @@
 #include <nx/vms/client/desktop/common/utils/object_companion.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/common/utils/popup_shadow.h>
+#include <nx/vms/client/desktop/common/utils/label_selection_manager.h>
 #include <nx/vms/client/desktop/common/widgets/detail/base_input_field.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/scroll_bar_proxy.h>
@@ -575,6 +576,8 @@ namespace
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
+    LabelSelectionManager::init(qApp);
+
     // TODO: Think through how to make it better
     /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates.
      * Menu popups do not cause deactivation but steal focus so we should handle that too. */
@@ -3256,19 +3259,30 @@ QSize QnNxStyle::sizeFromContents(
     if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
         type = CT_PushButton;
 
+    const auto withContentsMargins =
+        [](const QWidget* widget, const QSize& size)
+        {
+            if (!widget)
+                return size;
+
+            const auto m = widget->contentsMargins();
+            return size + QSize(m.left() + m.right(), m.top() + m.bottom());
+        };
+
     switch (type)
     {
         case CT_CheckBox:
-            return QSize(
+            return withContentsMargins(widget, QSize(
                 size.width() + proxy()->pixelMetric(PM_IndicatorWidth, option, widget) +
-                               proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget),
-                qMax(size.height(), proxy()->pixelMetric(PM_IndicatorHeight, option, widget)));
+                    proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget),
+                qMax(size.height(), proxy()->pixelMetric(PM_IndicatorHeight, option, widget))));
 
         case CT_RadioButton:
-            return QSize(
+            return withContentsMargins(widget, QSize(
                 size.width() + proxy()->pixelMetric(PM_ExclusiveIndicatorWidth, option, widget) +
-                               proxy()->pixelMetric(PM_RadioButtonLabelSpacing, option, widget),
-                qMax(size.height(), proxy()->pixelMetric(PM_ExclusiveIndicatorHeight, option, widget)));
+                    proxy()->pixelMetric(PM_RadioButtonLabelSpacing, option, widget),
+                qMax(size.height(), proxy()->pixelMetric(PM_ExclusiveIndicatorHeight, option,
+                    widget))));
 
         case CT_PushButton:
         {
@@ -4080,7 +4094,6 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
-        qobject_cast<QLabel*>(widget) ||
         isNonEditableComboBox(widget))
     {
         if (widget->focusPolicy() != Qt::NoFocus)

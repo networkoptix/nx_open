@@ -29,7 +29,7 @@ void ClientOverHttpUpgrade::beginListening(
     issueUpgradeRequest<
         BeginListeningRequest, std::string, BeginListeningHandler, BeginListeningResponse>(
             nx::network::http::Method::post,
-            kRelayProtocolName,
+            kRelayProtocol,
             std::move(request),
             kServerIncomingConnectionsPath,
             {peerName},
@@ -58,7 +58,7 @@ void ClientOverHttpUpgrade::openConnectionToTheTargetHost(
     issueUpgradeRequest<
         ConnectToPeerRequest, std::string, OpenRelayConnectionHandler>(
             nx::network::http::Method::post,
-            kRelayProtocolName,
+            kRelayProtocol,
             std::move(request),
             kClientSessionConnectionsPath,
             {sessionId},

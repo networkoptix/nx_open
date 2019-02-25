@@ -9,6 +9,8 @@
 
 #include "connection_mediator_url_fetcher.h"
 #include "mediator/api/mediator_api_http_paths.h"
+#include "mediator_endpoint_provider.h"
+#include "mediator_stun_client.h"
 
 namespace nx {
 namespace hpm {
@@ -27,10 +29,9 @@ MediatorConnector::MediatorConnector(const std::string& cloudHost):
 
     auto stunClientSettings = s_stunClientSettings;
     stunClientSettings.reconnectPolicy = network::RetryPolicy::kNoRetries;
-    m_stunClient = std::make_shared<DelayedConnectStunClient>(
-        m_mediatorEndpointProvider.get(),
-        std::make_unique<network::stun::AsyncClientWithHttpTunneling>(
-            stunClientSettings));
+    m_stunClient = std::make_shared<MediatorStunClient>(
+        std::move(stunClientSettings),
+        m_mediatorEndpointProvider.get());
 
     bindToAioThread(getAioThread());
 
@@ -86,7 +87,7 @@ void MediatorConnector::mockupMediatorAddress(
 
         m_mockedUpMediatorAddress = mediatorAddress;
         m_mediatorEndpointProvider->mockupMediatorAddress(mediatorAddress);
-    }   
+    }
 
     establishTcpConnectionToMediatorAsync();
 }
@@ -218,193 +219,6 @@ void MediatorConnector::reconnectToMediator()
                 connectToMediatorAsync();
             }
         });
-}
-
-//-------------------------------------------------------------------------------------------------
-
-DelayedConnectStunClient::DelayedConnectStunClient(
-    MediatorEndpointProvider* endpointProvider,
-    std::unique_ptr<nx::network::stun::AbstractAsyncClient> stunClient)
-    :
-    base_type(std::move(stunClient)),
-    m_endpointProvider(endpointProvider)
-{
-}
-
-void DelayedConnectStunClient::connect(
-    const nx::utils::Url& url,
-    ConnectHandler handler)
-{
-    dispatch(
-        [this, url, handler = std::move(handler)]() mutable
-        {
-            m_urlKnown = true;
-            base_type::connect(url, std::move(handler));
-        });
-}
-
-void DelayedConnectStunClient::sendRequest(
-    nx::network::stun::Message request,
-    RequestHandler handler,
-    void* client)
-{
-    dispatch(
-        [this, request = std::move(request),
-            handler = std::move(handler), client]() mutable
-        {
-            if (m_urlKnown)
-            {
-                base_type::sendRequest(std::move(request), std::move(handler), client);
-                return;
-            }
-
-            NX_ASSERT(m_endpointProvider->getAioThread() == getAioThread());
-
-            m_endpointProvider->fetchMediatorEndpoints(
-                [this](auto... args) { onFetchEndpointCompletion(std::move(args)...); });
-
-            m_postponedRequests.push_back(
-                {std::move(request), std::move(handler), client});
-        });
-}
-
-void DelayedConnectStunClient::onFetchEndpointCompletion(
-    nx::network::http::StatusCode::Value resultCode)
-{
-    if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
-        return failPendingRequests(SystemError::hostUnreachable);
-
-    m_urlKnown = true;
-
-    const auto createStunTunnelUrl =
-        nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
-            .appendPath(api::kStunOverHttpTunnelPath).toUrl();
-
-    base_type::connect(createStunTunnelUrl, [](auto... /*args*/) {});
-
-    sendPendingRequests();
-}
-
-void DelayedConnectStunClient::failPendingRequests(
-    SystemError::ErrorCode resultCode)
-{
-    auto postponedRequests = std::exchange(m_postponedRequests, {});
-    for (auto& requestContext: postponedRequests)
-        requestContext.handler(resultCode, nx::network::stun::Message());
-}
-
-void DelayedConnectStunClient::sendPendingRequests()
-{
-    auto postponedRequests = std::exchange(m_postponedRequests, {});
-    for (auto& requestContext: postponedRequests)
-    {
-        base_type::sendRequest(
-            std::move(requestContext.request),
-            std::move(requestContext.handler),
-            requestContext.client);
-    }
-}
-
-//-------------------------------------------------------------------------------------------------
-
-MediatorEndpointProvider::MediatorEndpointProvider(const std::string& cloudHost):
-    m_cloudHost(cloudHost)
-{
-}
-
-void MediatorEndpointProvider::bindToAioThread(
-    network::aio::AbstractAioThread* aioThread)
-{
-    base_type::bindToAioThread(aioThread);
-
-    if (m_mediatorUrlFetcher)
-        m_mediatorUrlFetcher->bindToAioThread(aioThread);
-}
-
-void MediatorEndpointProvider::mockupCloudModulesXmlUrl(
-    const nx::utils::Url& cloudModulesXmlUrl)
-{
-    m_cloudModulesXmlUrl = cloudModulesXmlUrl;
-}
-
-void MediatorEndpointProvider::mockupMediatorAddress(
-    const MediatorAddress& mediatorAddress)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    m_mediatorAddress = mediatorAddress;
-}
-
-void MediatorEndpointProvider::fetchMediatorEndpoints(
-    FetchMediatorEndpointsCompletionHandler handler)
-{
-    NX_ASSERT(isInSelfAioThread());
-
-    m_fetchMediatorEndpointsHandlers.push_back(std::move(handler));
-    
-    if (m_mediatorUrlFetcher)
-        return; //< Operation has already been started.
-
-    initializeUrlFetcher();
-
-    m_mediatorUrlFetcher->get(
-        [this](
-            nx::network::http::StatusCode::Value resultCode,
-            nx::utils::Url tcpUrl,
-            nx::utils::Url udpUrl)
-        {
-            m_mediatorUrlFetcher.reset();
-
-            if (nx::network::http::StatusCode::isSuccessCode(resultCode))
-            {
-                NX_DEBUG(this, lm("Fetched mediator tcp (%1) and udp (%2) URLs")
-                    .args(tcpUrl, udpUrl));
-
-                QnMutexLocker lock(&m_mutex);
-                m_mediatorAddress = MediatorAddress{
-                    tcpUrl,
-                    nx::network::url::getEndpoint(udpUrl)};
-            }
-            else
-            {
-                NX_DEBUG(this, lm("Cannot fetch mediator address. HTTP %1")
-                    .arg((int)resultCode));
-            }
-
-            for (auto& handler: m_fetchMediatorEndpointsHandlers)
-                nx::utils::swapAndCall(handler, resultCode);
-            m_fetchMediatorEndpointsHandlers.clear();
-        });
-}
-
-std::optional<MediatorAddress> MediatorEndpointProvider::mediatorAddress() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_mediatorAddress;
-}
-
-void MediatorEndpointProvider::stopWhileInAioThread()
-{
-    base_type::stopWhileInAioThread();
-
-    m_mediatorUrlFetcher.reset();
-}
-
-void MediatorEndpointProvider::initializeUrlFetcher()
-{
-    m_mediatorUrlFetcher =
-        std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
-    m_mediatorUrlFetcher->bindToAioThread(getAioThread());
-
-    if (m_cloudModulesXmlUrl)
-    {
-        m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
-    }
-    else
-    {
-        m_mediatorUrlFetcher->setModulesXmlUrl(
-            network::AppInfo::defaultCloudModulesXmlUrl(m_cloudHost.c_str()));
-    }
 }
 
 } // namespace api

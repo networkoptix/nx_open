@@ -10,16 +10,15 @@
 #include "connection_manager.h"
 #include "connector.h"
 #include "dao/rdb/structure_updater.h"
-#include "http/sync_connection_request_handler.h"
 #include "http_server.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
 #include "outgoing_command_filter.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
-#include "transport/http_transport_acceptor.h"
+#include "transport/common_http/acceptor.h"
 #include "transport/p2p_http/acceptor.h"
-#include "transport/p2p_websocket/websocket_transport_acceptor.h"
+#include "transport/p2p_websocket/acceptor.h"
 #include "transport/transport_manager.h"
 
 namespace nx::clusterdb::engine {
@@ -35,7 +34,6 @@ public:
      */
     SyncronizationEngine(
         const std::string& applicationId,
-        const QnUuid& peerId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
@@ -57,6 +55,10 @@ public:
 
     const statistics::Provider& statisticsProvider() const;
 
+    /**
+     * NOTE: Using this filter can lead to hard-to-find problems.
+     * Make sure you fully understand what you are doing.
+     */
     void setOutgoingCommandFilter(
         const OutgoingCommandFilterConfiguration& configuration);
 
@@ -72,7 +74,7 @@ public:
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
 private:
-    QnUuid m_peerId;
+    const QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingCommandDispatcher m_outgoingTransactionDispatcher;
@@ -83,27 +85,12 @@ private:
     transport::TransportManager m_transportManager;
     Connector m_connector;
     transport::CommonHttpAcceptor m_httpTransportAcceptor;
-    transport::p2p::websocket::WebSocketTransportAcceptor m_webSocketAcceptor;
+    transport::p2p::websocket::Acceptor m_webSocketAcceptor;
     transport::p2p::http::Acceptor m_p2pHttpAcceptor;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
     HttpServer m_httpServer;
-
-    template<typename ManagerType>
-    void registerHttpHandler(
-        const std::string& handlerPath,
-        typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-        ManagerType* manager,
-        nx::network::http::server::rest::MessageDispatcher* dispatcher);
-
-    template<typename ManagerType>
-    void registerHttpHandler(
-        nx::network::http::Method::ValueType method,
-        const std::string& handlerPath,
-        typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-        ManagerType* manager,
-        nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
     void onSystemDeleted(const std::string& systemId);
 };

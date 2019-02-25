@@ -38,7 +38,8 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         clearSocketList();
         for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
         {
-            DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(), iface.address);
+            DiscoveryInfo info(
+                nx::network::SocketFactory::createDatagramSocket().release(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
                 m_sockList << info;
             else
@@ -93,7 +94,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             {
                 QnTestCameraResourcePtr resource (new QnTestCameraResource(serverModule()));
                 QString model = QLatin1String(QnTestCameraResource::kModel);
-                QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
+                QnUuid rt = qnResTypePool->getResourceTypeId(manufacturer(), model);
                 if (rt.isNull())
                     continue;
 
@@ -108,9 +109,9 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 processedMac << mac;
 
                 resource->setMAC(nx::utils::MacAddress(mac));
-                resource->setUrl(
-                    QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':') +
-                    QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );
+                resource->setUrl(QLatin1String("tcp://") + remoteEndpoint.address.toString()
+                    + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/')
+                    + QLatin1String(params[j]));
                 resources.insert(mac, resource);
             }
         }
@@ -124,7 +125,8 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     return rez;
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnTestCameraResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -136,9 +138,9 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufature " << resourceType->getManufacturer() << " != " << manufacturer();
         return result;
     }
 
@@ -150,7 +152,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
 
 }
 
-QString QnTestCameraResourceSearcher::manufacture() const
+QString QnTestCameraResourceSearcher::manufacturer() const
 {
     return QLatin1String(QnTestCameraResource::kManufacturer);
 }
@@ -159,7 +161,7 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils
     const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
-        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+        return QList<QnResourcePtr>(); //< searching if only host is present, not specific protocol
 
     return QList<QnResourcePtr>();
 }

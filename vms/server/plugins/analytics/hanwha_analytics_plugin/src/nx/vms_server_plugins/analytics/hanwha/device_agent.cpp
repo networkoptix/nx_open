@@ -34,22 +34,6 @@ DeviceAgent::~DeviceAgent()
     m_engine->deviceAgentIsAboutToBeDestroyed(m_sharedId);
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<DeviceAgent*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     m_handler = handler;
@@ -91,7 +75,7 @@ Error DeviceAgent::startFetchingMetadata(
                 if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channelNumber)
                     return;
 
-                auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+                auto eventMetadata = makePtr<EventMetadata>();
                 NX_PRINT
                     << "Got event: caption ["
                     << hanwhaEvent.caption.toStdString() << "], description ["
@@ -112,7 +96,7 @@ Error DeviceAgent::startFetchingMetadata(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 eventMetadataPacket->setDurationUs(-1);
-                eventMetadataPacket->addItem(eventMetadata);
+                eventMetadataPacket->addItem(eventMetadata.get());
             }
 
             NX_ASSERT(m_handler, "Handler should exist");

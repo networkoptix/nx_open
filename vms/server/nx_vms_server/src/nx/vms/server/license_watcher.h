@@ -15,7 +15,7 @@ struct ServerLicenseInfo;
 /**
  * Periodically check on license server if license was removed or updated.
  */
-class LicenseWatcher: public QObject, public QnCommonModuleAware
+class LicenseWatcher: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT;
     using base_type = QnCommonModuleAware;

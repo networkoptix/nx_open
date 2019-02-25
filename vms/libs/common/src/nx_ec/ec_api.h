@@ -95,7 +95,9 @@ signals :
         const QnUuid& resourceId,
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source);
-    void resourceParamChanged(const nx::vms::api::ResourceParamWithRefData& param);
+    void resourceParamChanged(
+        const nx::vms::api::ResourceParamWithRefData& param,
+        ec2::NotificationSource source);
     void resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
     void resourceRemoved(const QnUuid& resourceId);
     void resourceStatusRemoved(const QnUuid& resourceId);
@@ -401,8 +403,6 @@ protected:
         impl::SimpleHandlerPtr handler) = 0;
     virtual int removeLicense(const QnLicensePtr& license, impl::SimpleHandlerPtr handler) = 0;
 };
-
-
 
 class AbstractStoredFileNotificationManager: public QObject
 {
@@ -1010,7 +1010,8 @@ public:
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractEventRulesManagerPtr getEventRulesManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData& userAccessData) = 0;
+    virtual AbstractUserManagerPtr getUserManager(
+        const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractLayoutManagerPtr getLayoutManager(
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractLayoutTourManagerPtr getLayoutTourManager(
@@ -1021,31 +1022,31 @@ public:
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractUpdatesManagerPtr getUpdatesManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData& userAccessData) = 0;
+    virtual AbstractMiscManagerPtr getMiscManager(
+        const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractWebPageManagerPtr getWebPageManager(
         const Qn::UserAccessData& userAccessData) = 0;
-
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
         const Qn::UserAccessData& userAccessData) = 0;
 
-    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() = 0;
-    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() = 0;
-    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() = 0;
-    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() = 0;
-    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() = 0;
-    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() = 0;
-    virtual AbstractUserNotificationManagerPtr getUserNotificationManager() = 0;
-    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() = 0;
-    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() = 0;
-    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() = 0;
-    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() = 0;
-    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() = 0;
-    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() = 0;
-    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
-    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
-    virtual AbstractAnalyticsNotificationManagerPtr getAnalyticsNotificationManager() = 0;
+    virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;
+    virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;
+    virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() = 0;
+    virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() = 0;
+    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() = 0;
+    virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() = 0;
+    virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() = 0;
+    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() = 0;
+    virtual AbstractMiscNotificationManagerPtr miscNotificationManager() = 0;
+    virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() = 0;
+    virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() = 0;
+    virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() = 0;
+    virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() = 0;
+    virtual AbstractTimeNotificationManagerPtr timeNotificationManager() = 0;
+    virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() = 0;
+    virtual AbstractUserNotificationManagerPtr userNotificationManager() = 0;
 
     virtual QnCommonModule* commonModule() const = 0;
 
@@ -1163,7 +1164,7 @@ protected:
 /*!
     \note All methods are asynchronous if other not specified
 */
-class AbstractECConnectionFactory: public QObject, public QnCommonModuleAware
+class AbstractECConnectionFactory: public QObject, public /*mixin*/ QnCommonModuleAware
 {
 Q_OBJECT
 

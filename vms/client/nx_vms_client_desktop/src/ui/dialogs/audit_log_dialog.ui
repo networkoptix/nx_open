@@ -573,6 +573,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="tabShape">
           <enum>QTabWidget::Triangular</enum>
          </property>
@@ -726,17 +729,19 @@
   <tabstop>checkBoxExport</tabstop>
   <tabstop>checkBoxSystem</tabstop>
   <tabstop>checkBoxBRules</tabstop>
-  <tabstop>selectAllCheckBox</tabstop>
   <tabstop>checkBoxUsers</tabstop>
   <tabstop>checkBoxArchive</tabstop>
   <tabstop>checkBoxCameras</tabstop>
   <tabstop>checkBoxServers</tabstop>
   <tabstop>checkBoxEmail</tabstop>
+  <tabstop>selectAllCheckBox</tabstop>
   <tabstop>mainTabWidget</tabstop>
   <tabstop>gridMaster</tabstop>
+  <tabstop>gridCameras</tabstop>
   <tabstop>detailsTabWidget</tabstop>
   <tabstop>gridDetails</tabstop>
-  <tabstop>gridCameras</tabstop>
+  <tabstop>clearFilterButton</tabstop>
+  <tabstop>refreshButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

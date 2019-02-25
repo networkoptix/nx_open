@@ -4,6 +4,21 @@
 
 namespace nx::clusterdb::engine::test {
 
+std::string toString(ResultCode result)
+{
+    switch (result)
+    {
+        case ResultCode::ok:
+            return "ok";
+        case ResultCode::error:
+            return "error";
+    }
+
+    return "unknown";
+}
+
+//-------------------------------------------------------------------------------------------------
+
 CustomerManager::CustomerManager(
     SyncronizationEngine* syncronizationEngine,
     dao::CustomerDao* customerDao,
@@ -51,6 +66,15 @@ void CustomerManager::saveCustomer(
                 ? ResultCode::ok
                 : ResultCode::error);
         });
+}
+
+ResultCode CustomerManager::saveCustomer(const Customer& customer)
+{
+    std::promise<ResultCode> done;
+    saveCustomer(
+        customer,
+        [&done](ResultCode resultCode) { done.set_value(resultCode); });
+    return done.get_future().get();
 }
 
 void CustomerManager::removeCustomer(

@@ -1,24 +1,17 @@
 #pragma once
 
 #include <string>
-#include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <vector>
-#include <deque>
 #include <thread>
 #include <atomic>
-#include <map>
+#include <vector>
 
 #include "ffmpeg/input_format.h"
-#include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
-#include "ffmpeg/frame.h"
 #include "codec_parameters.h"
-#include "fps_counter.h"
-#include "timestamp_mapper.h"
-#include "stream_consumer_manager.h"
-#include "abstract_stream_consumer.h"
+#include "device/video/resolution_data.h"
+#include "device/abstract_compression_type_descriptor.h"
 
 namespace nxpl { class TimeProvider; }
 
@@ -29,129 +22,49 @@ class Camera;
 class VideoStream
 {
 public:
-    VideoStream(
-        const std::weak_ptr<Camera>& camera,
-        const CodecParameters& codecParams);
+    VideoStream(const std::string& url, nxpl::TimeProvider* timeProvider);
     virtual ~VideoStream();
 
-    /**
-     * Get the url used by ffmpeg to open the video stream.
-     */
-    std::string ffmpegUrl() const;
-
-    /**
-     * The target frames per second the video stream was opened with.
-     */
-    float fps() const;
-
-    /**
-     * The number of frames per second the video stream is actually producing, updated every
-     *    second. Some cameras run at a lower fps than it actually reports.
-     */
-    float actualFps() const;
-
-    /**
-     * The amount of time it takes to produce a video frame at the target frame rate.
-     */
-    std::chrono::milliseconds timePerFrame() const;
-
-    /**
-     * The amount of time it takes to produce a video frame based on actualFps().
-     */
-    std::chrono::milliseconds actualTimePerFrame() const;
-
-    void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-    void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-    void addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
-    void removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
+    int initialize();
+    int nextPacket(std::shared_ptr<ffmpeg::Packet>& result);
+    void uninitializeInput();
 
     void setFps(float fps);
     void setResolution(const nxcip::Resolution& resolution);
     void setBitrate(int bitrate);
-
-    /**
-     *  Return internal io error code, set if readFrame fails with such code.
-     */
-    bool ioError() const;
+    void updateUrl(const std::string& url);
+    bool isVideoCompressed();
+    CodecParameters codecParameters();
+    int getMaxBitrate();
 
     /**
      * Queries hardware for the camera name to determine if the camera is plugged in.
      */
     bool pluggedIn() const;
+    std::vector<device::video::ResolutionData> resolutionList() const;
+    AVCodecParameters* getCodecParameters();
 
 private:
-    enum CameraState
-    {
-        csOff,
-        csInitialized,
-        csModified
-    };
-
-    //std::string m_url;
+    std::string m_url;
     std::weak_ptr<Camera> m_camera;
     CodecParameters m_codecParams;
-    nxpl::TimeProvider * const m_timeProvider;
-    FpsCounter m_fpsCounter;
-
-    std::atomic<CameraState> m_streamState = csOff;
-
+    nxpl::TimeProvider* const m_timeProvider;
+    std::atomic_bool m_needReinitialization = true;
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
-    std::unique_ptr<ffmpeg::Codec> m_decoder;
-    bool m_skipUntilNextKeyPacket = true;
-
-    /**
-     * Some cameras crash the plugin if they are uninitialized while there are still packets and 
-     * frames allocated. These variables are given to allocated packets and frames to keep track of 
-     * the amount of frames and packets still waiting to be consumed. uninitialize() blocks until
-     * both reach 0. All pointers to a packet or frame should be kept for as short as possible, 
-     * assigning nullptr where possible to release decerement the count.
-     */
-    std::shared_ptr<std::atomic_int> m_packetCount;
-
-    /**
-     * See m_packetCount
-     */
-    std::shared_ptr<std::atomic_int> m_frameCount;
-
-    TimestampMapper m_timestamps;
-
+    device::CompressionTypeDescriptorPtr m_compressionTypeDescriptor;
     mutable std::mutex m_mutex;
-    FrameConsumerManager m_frameConsumerManager;
-    PacketConsumerManager m_packetConsumerManager;
-
-    mutable std::mutex m_threadStartMutex;
-    std::thread m_videoThread;
-    std::atomic_bool m_terminated = true;
-    std::atomic_bool m_ioError = false;
-    int m_initCode = 0;
 
 private:
+    int ensureInitialized();
     /**
      * Get the url of the video stream, modified appropriately based on platform.
      */
     std::string ffmpegUrlPlatformDependent() const;
-    bool waitForConsumers();
-    bool noConsumers() const;
-    void tryToStartIfNotStarted();
-    void start();
-    void stop();
-    void run();
-    bool ensureInitialized();
-    int initialize();
-    void uninitialize();
-    int initializeInputFormat();
+    int initializeInput();
     void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
-    int initializeDecoder();
-    std::shared_ptr<ffmpeg::Packet> readFrame();
-    std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
-    int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
-
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
-    void setCameraState(CameraState cameraState);
-
-    bool checkIoError(int ffmpegError);
-    void setLastError(int ffmpegError);
+    CodecParameters getDefaultVideoParameters();
 };
 
 } // namespace nx::usb_cam

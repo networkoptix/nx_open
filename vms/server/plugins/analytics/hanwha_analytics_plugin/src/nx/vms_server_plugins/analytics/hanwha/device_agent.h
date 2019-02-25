@@ -4,7 +4,7 @@
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
 #include "engine.h"
@@ -17,7 +17,7 @@ namespace hanwha {
 
 class DeviceAgent:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
     Q_OBJECT
 
@@ -26,8 +26,6 @@ public:
     virtual ~DeviceAgent();
 
     virtual Engine* engine() const override { return m_engine; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;

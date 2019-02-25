@@ -45,8 +45,8 @@ void IncomingCommandDispatcher::dispatchTransaction(
 
     if (it == m_commandProcessors.end() || it->second->markedForRemoval)
     {
-        NX_VERBOSE(this, lm("Received unsupported transaction %1")
-            .arg(commandData->header().command));
+        NX_VERBOSE(this, "Received unsupported transaction %1",
+            engine::toString(commandData->header()));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -64,13 +64,16 @@ void IncomingCommandDispatcher::dispatchTransaction(
     return it->second->processor->process(
         std::move(transportHeader),
         std::move(commandData),
-        [it, completionHandler = std::move(completionHandler)](
+        [this, it, completionHandler = std::move(completionHandler)](
             ResultCode resultCode)
-        {
-            --it->second->usageCount;
-            it->second->usageCountDecreased.wakeAll();
-            completionHandler(resultCode);
-        });
+            {
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    --it->second->usageCount;
+                    it->second->usageCountDecreased.wakeAll();
+                }
+                completionHandler(resultCode);
+            });
 }
 
 void IncomingCommandDispatcher::removeHandler(int commandCode)

@@ -38,8 +38,9 @@ class QnLayoutResource:
 public:
     QnLayoutResource(QnCommonModule* commonModule = nullptr);
 
-    virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
+    virtual void setStatus(Qn::ResourceStatus newStatus,
+        Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
     QnLayoutResourcePtr clone(QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
 
@@ -118,7 +119,7 @@ public:
     virtual void setLogicalId(int value) override;
 
     /** Check if layout is an exported file. */
-    bool isFile() const;
+    virtual bool isFile() const;
 
     /** Check if layout is shared. */
     bool isShared() const;
@@ -145,8 +146,9 @@ public:
      * No checking because data roles are inaccessible here.
      */
     void usePasswordForRecordings(const QString& password);
+
     /**
-     * Makes layout children to forget its password.
+     * Makes layout children to forget its password AND removes freshly added cameras.
      * Layout password is kept because it in data roles that are inaccessible here
      */
     void forgetPasswordForRecordings();

@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "pl_PL",
   "language_name": "Polski",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -137,13 +137,21 @@
     "cantOpenClient": "Nie wykryto aplikacji %VMS_NAME%. <a href=\"/download\">Pobierz</a>",
     "lostConnection": "Utracono połączenie z {{systemName}}",
     "thisSystem": "system",
-    "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane"
+    "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "dobre",
+    "fair": "średnie",
+    "minLength": "za krótkie",
     "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",
+    "required": "nieprawidłowe",
     "requiredMessage": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
+    "weak": "słabe",
     "weakMessage": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
     "strongMessage": "Bezpieczne hasło!",
+    "common": "zbyt popularne",
     "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
     "missingMessage": "Hasło jest wymagane"
   },
@@ -177,7 +185,7 @@
     "confirmUnshareAction": "Usuń",
     "successDisconnected": "System został pomyślnie odłączony od %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
-    "successMerge": "System {{systemName}} został złączony z {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}"
   },
   "account": {

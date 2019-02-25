@@ -7,7 +7,7 @@ extern "C"
 
 #include <QtCore/QSize>
 
-#include <common/common_globals.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 class CameraMediaStreamInfo
@@ -16,7 +16,7 @@ public:
     static const QLatin1String anyResolution;
     static QString resolutionToString( const QSize& resolution = QSize() );
 
-    Qn::StreamIndex getEncoderIndex() const;
+    nx::vms::api::StreamIndex getEncoderIndex() const;
 
     // We have to keep compatibility with previous version. So, this field stay int
     int encoderIndex;
@@ -37,11 +37,11 @@ public:
     std::map<QString, QString> customStreamParams; // TODO remove outdated field
 
     CameraMediaStreamInfo(
-        Qn::StreamIndex _encoderIndex = Qn::StreamIndex::undefined,
+        nx::vms::api::StreamIndex encoderIndex = nx::vms::api::StreamIndex::undefined,
         const QSize& _resolution = QSize(),
         AVCodecID _codec = AV_CODEC_ID_NONE)
         :
-        encoderIndex((int) _encoderIndex ),
+        encoderIndex((int) encoderIndex ),
         resolution( resolutionToString( _resolution ) ),
         transcodingRequired( false ),
         codec( _codec )
@@ -67,35 +67,29 @@ public:
 class CameraBitrateInfo
 {
 public:
-    Qn::StreamIndex encoderIndex;
+    nx::vms::api::StreamIndex encoderIndex;
     QString timestamp;
 
-    float rawSuggestedBitrate;  //< Megabits per second
-    float suggestedBitrate;     //< Megabits per second
-    float actualBitrate;        //< Megabits per second
+    float rawSuggestedBitrate = -1; //< Megabits per second
+    float suggestedBitrate = -1; //< Megabits per second
+    float actualBitrate = -1; //< Megabits per second
 
-    bool bitratePerGop;
-    float bitrateFactor;
+    bool bitratePerGop = false;
+    float bitrateFactor = -1;
 
-    int fps;
-    float actualFps;
+    int fps = -1;
+    float actualFps = -1;
     float averageGopSize;
     QString resolution;
-    int numberOfChannels;
-    bool isConfigured;
+    int numberOfChannels = -1;
+    bool isConfigured = false;
 
-    CameraBitrateInfo(Qn::StreamIndex index = Qn::StreamIndex::undefined, QString time = QString())
-        : encoderIndex(index)
-        , timestamp(time)
-        , rawSuggestedBitrate(-1)
-        , suggestedBitrate(-1)
-        , actualBitrate(-1)
-        , bitratePerGop(false)
-        , bitrateFactor(-1)
-        , fps(-1)
-        , actualFps(-1)
-        , numberOfChannels(-1)
-        , isConfigured(false)
+    CameraBitrateInfo(
+        nx::vms::api::StreamIndex index = nx::vms::api::StreamIndex::undefined,
+        QString time = QString())
+        :
+        encoderIndex(index),
+        timestamp(time)
     {
     }
 };

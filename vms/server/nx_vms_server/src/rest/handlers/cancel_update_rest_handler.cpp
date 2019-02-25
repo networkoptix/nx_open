@@ -1,6 +1,6 @@
 #include "cancel_update_rest_handler.h"
 #include <media_server/media_server_module.h>
-#include <nx/update/common_update_manager.h>
+#include <nx/vms/server/server_update_manager.h>
 
 QnCancelUpdateRestHandler::QnCancelUpdateRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)

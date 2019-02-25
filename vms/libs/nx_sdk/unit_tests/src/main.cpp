@@ -1,5 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
-
 #include <iostream>
 
 #include <nx/kit/test.h>

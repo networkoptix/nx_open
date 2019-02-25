@@ -652,6 +652,9 @@ ConditionWrapper currentLayoutIsVideowallScreen();
 
 ConditionWrapper canForgetPassword();
 
+/** Whether showreel can be created using the given resources. */
+ConditionWrapper canMakeShowreel();
+
 } // namespace condition
 
 } // namespace action

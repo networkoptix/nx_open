@@ -1,37 +1,37 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success && !loading">
-            Your account is successfully activated
+            Ditt konto har aktiverats
         </h1>
         <h1 class="process-success" ng-if="activate.success && !loading">
-            <a class="btn btn-default" href="/login">Log In</a>
+            <a class="btn btn-default" href="/login">Logga in</a>
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success && !loading">
-            Account is already activated or confirmation code is incorrect
+            Kontot är redan aktiverat eller bekräftelsekoden är felaktig
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Your account is successfully activated
+            Ditt konto har aktiverats
         </h1>
         <h1 class="process-success">
-            <a class="btn btn-default" href="/login">Log In</a>
+            <a class="btn btn-default" href="/login">Logga in</a>
         </h1>
     </div>
 
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in %PRODUCT_NAME%</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <h1>Du har registrerat dig i %PRODUCT_NAME%</h1>
+            <p>Vi har skickat ett mail med aktiveringslänk till {{data.email}}<br>
+            Vänligen aktivera ditt konto genom att besöka den här länken.</p>
         </div>
         <h1 ng-if="!data.email">Aktivera ditt konto</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
-                    <label for="emailReactivate" class="control-label">Email</label>
+                    <label for="emailReactivate" class="control-label">E-post</label>
                 </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"
@@ -43,9 +43,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> E-post krävs </span>
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vänligen ange en giltig e-postadress </span>
                 </div>
             </div>
             <div class="form-group">
@@ -60,7 +60,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            Instruktion för ändring av lösenord skickas till Email <br>{{data.email}}
         </h1>
     </div>
 
@@ -69,7 +69,7 @@
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
-                    <label for="email" class="col-sm-4 control-label">Email</label>
+                    <label for="email" class="col-sm-4 control-label">E-post</label>
                 </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control" validate-email
@@ -80,9 +80,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> E-post krävs </span>
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vänligen ange en giltig e-postadress </span>
                 </div>
             </div>
             <div class="form-group">
@@ -96,15 +96,15 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
-            Password successfully saved
+            Lösenordet har sparats
         </h1>
         <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login" translate>Log In</a>
+            <a class="btn btn-default" href="/login" translate>Logga in</a>
         </div>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"
               novalidate>
-            <h1 translate>Set New Password</h1>
+            <h1 translate>Ange nytt lösenord</h1>
 
             <password-input ng-model="data.newPassword"
                             id="'newPassword'"

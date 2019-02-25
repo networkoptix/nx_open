@@ -11,7 +11,7 @@
 
 namespace nx::analytics {
 
-class ObjectTypeDescriptorManager : public QnCommonModuleAware
+class ObjectTypeDescriptorManager : public /*mixin*/ QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 
@@ -59,7 +59,6 @@ private:
     ObjectTypeDescriptorContainer m_objectTypeDescriptorContainer;
     EngineDescriptorContainer m_engineDescriptorContainer;
     GroupDescriptorContainer m_groupDescriptorContainer;
-    DeviceDescriptorContainer m_deviceDescriptorContainer;
 };
 
 } // namespace nx::analytics

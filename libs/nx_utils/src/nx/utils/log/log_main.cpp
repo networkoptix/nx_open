@@ -4,6 +4,8 @@
 
 #include "logger_collection.h"
 
+#include <nx/utils/nx_utils_ini.h>
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -80,6 +82,11 @@ Level maxLevel()
 bool isToBeLogged(Level level, const Tag& tag)
 {
     return getLogger(tag)->isToBeLogged(level, tag);
+}
+
+bool showPasswords()
+{
+    return nx::utils::ini().showPasswordsInLogs;
 }
 
 } // namespace log

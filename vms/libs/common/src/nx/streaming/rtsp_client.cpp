@@ -38,7 +38,6 @@ const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
 const QByteArray QnRtspClient::kPauseCommand("PAUSE");
 const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
 
-
 RtspTransport rtspTransportFromString(const QString& value)
 {
     auto upperValue = value.toUpper().trimmed();
@@ -140,6 +139,8 @@ void QnRtspIoDevice::shutdown()
 
 void QnRtspIoDevice::setTransport(RtspTransport rtspTransport)
 {
+    if (m_transport == rtspTransport)
+        return;
     m_transport = rtspTransport;
     if (m_transport == RtspTransport::tcp)
     {
@@ -288,17 +289,16 @@ void QnRtspClient::parseSDP(const QByteArray& data)
         if (!media.rtpmap.codecName.isEmpty())
             m_sdpTracks.emplace_back(media, this, m_transport, media.serverPort);
     }
-    if (m_config.backChannelAudioOnly)
+
+    m_sdpTracks.erase(std::remove_if(
+        m_sdpTracks.begin(), m_sdpTracks.end(),
+        [this](const QnRtspClient::SDPTrackInfo& track)
     {
-        m_sdpTracks.erase(std::remove_if(
-            m_sdpTracks.begin(), m_sdpTracks.end(),
-            [](const QnRtspClient::SDPTrackInfo& track)
-            {
-                return !track.sdpMedia.sendOnly
-                    || track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Audio;
-            }),
-            m_sdpTracks.end());
-    }
+        if (m_config.backChannelAudioOnly && track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Audio)
+            return true; //< Remove non audio tracks for back audio channel.
+        return m_config.backChannelAudioOnly != track.sdpMedia.sendOnly;
+    }),
+        m_sdpTracks.end());
 }
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
@@ -460,11 +460,8 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     if (m_contentBase.isEmpty())
         m_contentBase = m_url.toString(); // TODO remove url params?
 
-    if( result )
-    {
-        NX_ALWAYS(this, lit("Sucessfully opened RTSP stream %1")
-                .arg(m_url.toString(QUrl::RemovePassword)));
-    }
+    if (result)
+        NX_DEBUG(this, "Sucessfully opened RTSP stream %1", m_url);
 
     return result;
 }
@@ -659,6 +656,7 @@ bool QnRtspClient::sendSetup()
             transportStr += m_prefferedTransport == RtspTransport::tcp ? "TCP" : "UDP";
             transportStr += m_prefferedTransport == RtspTransport::multicast ? ";multicast;" : ";unicast;";
 
+            track.ioDevice->setTransport(m_prefferedTransport);
             if (m_prefferedTransport == RtspTransport::multicast)
             {
                 track.ioDevice->bindToMulticastAddress(m_sdp.serverAddress,
@@ -689,7 +687,7 @@ bool QnRtspClient::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == RtspTransport::notDefined && m_prefferedTransport == RtspTransport::tcp)
+            if (m_transport == RtspTransport::tcp && m_prefferedTransport == RtspTransport::tcp)
             {
                 m_prefferedTransport = RtspTransport::udp;
                 if (!sendSetup()) //< Try UDP transport.
@@ -1125,7 +1123,7 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
                     NX_WARNING(this, lit("Error reading RTSP response from %1. %2").
                         arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()));
                 }
-                return false;	//error occured or connection closed
+                return false; //< error occurred or connection closed
             }
             m_responseBufferLen += bytesRead;
         }
