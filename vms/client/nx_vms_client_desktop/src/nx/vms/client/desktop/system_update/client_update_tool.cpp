@@ -563,14 +563,14 @@ bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version
     return version != nx::utils::SoftwareVersion(clientVersion);
 }
 
-bool ClientUpdateTool::restartClient()
+bool ClientUpdateTool::restartClient(QString authString)
 {
     /* Try to run applauncher if it is not running. */
     if (!applauncher::api::checkOnline())
         return false;
 
     using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::restartClient(m_updateVersion);
+    Result result = applauncher::api::restartClient(m_updateVersion, authString);
     if (result == Result::ok)
         return true;
 
@@ -579,7 +579,7 @@ bool ClientUpdateTool::restartClient()
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::api::restartClient(m_updateVersion) == Result::ok)
+        if (applauncher::api::restartClient(m_updateVersion, authString) == Result::ok)
             return true;
     }
     return false;
