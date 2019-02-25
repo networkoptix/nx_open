@@ -11,11 +11,14 @@ AbstractButton
     property color normalIconColor: "transparent"
     property color checkedIconColor: normalIconColor
     property color checkedBackgroundColor: ColorTheme.contrast1
+    property int checkedPadding: 0
+    property color backgroundColor: "transparent"
+    property color disabledBackgroundColor: "transparent"
 
     padding: 6
 
-    implicitWidth: Math.max(48, background.implicitWidth, contentItem.implicitWidth)
-    implicitHeight: Math.max(48, background.implicitHeight, contentItem.implicitHeight)
+    implicitWidth: Math.max(48, contentItem.implicitWidth)
+    implicitHeight: Math.max(48, contentItem.implicitHeight)
 
     icon.color: checkable && checked
         ? checkedIconColor
@@ -41,12 +44,26 @@ AbstractButton
 
     background: Item
     {
-        implicitWidth: 36
-        implicitHeight: 36
+        id: background
+
+        width: control.width - control.padding * 2
+        height: control.height - control.padding * 2
+
+        anchors.centerIn: parent
 
         Rectangle
         {
             anchors.fill: parent
+            radius: Math.min(width, height) / 2
+            visible: !control.pressed
+            color: control.enabled ? control.backgroundColor : control.disabledBackgroundColor
+        }
+
+        Rectangle
+        {
+            anchors.centerIn: parent
+            width: parent.width - control.checkedPadding * 2
+            height: parent.height - control.checkedPadding * 2
             radius: Math.min(width, height) / 2
             visible: control.checkable && control.checked
             color: control.checkedBackgroundColor
@@ -55,7 +72,6 @@ AbstractButton
         MaterialEffect
         {
             anchors.fill: parent
-            anchors.margins: control.padding
             rounded: true
             mouseArea: control
             rippleColor: "transparent"

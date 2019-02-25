@@ -1632,6 +1632,7 @@ void QnTimelinePrivate::animateProperties()
     if (zoomJustStopped)
         tryFitInBounds();
 
+    const auto oldWindowSize = windowEnd - windowStart;
     if (!zoomKineticHelper.isStopped())
     {
         qint64 maxSize = (liveTime - startBound) * 16;
@@ -1767,7 +1768,6 @@ void QnTimelinePrivate::animateProperties()
     }
 
     bool windowUpdateRequired = false;
-    const auto oldWindowSize = windowEnd - windowStart;
     if (originalWindowStart != windowStart)
     {
         emit parent->windowStartChanged();
