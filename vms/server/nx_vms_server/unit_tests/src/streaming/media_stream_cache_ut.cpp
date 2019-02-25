@@ -14,75 +14,115 @@ using namespace std::chrono;
 
 namespace {
 
-QnCompressedVideoDataPtr createVideoPacket(milliseconds timestamp, bool isKeyFrame = false)
+struct FrameDescriptor
 {
-    auto packet = std::make_shared<QnWritableCompressedVideoData>();
-    packet->timestamp = timestamp.count() * 1000;
-    if (isKeyFrame)
-        packet->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    return packet;
-}
+    milliseconds timestamp{0};
+    int channelNumber = 0;
+    bool isKeyFrame = false;
+};
 
-void fillCache(
-    MediaStreamCache& cache,
-    milliseconds timestampStart,
-    milliseconds timestampStep,
-    int keyFrameStep,
-    int dataPacketsNumber,
-    std::function<void(MediaStreamCache&)> handler = {})
+// Sequence: K0 p0 p0 K0 p0 p0 K0 p0.
+const std::vector<FrameDescriptor> singleChannelTestData =
 {
-    milliseconds currentTimestamp = timestampStart;
-    for (int i = 0; i < dataPacketsNumber; ++i)
-    {
-        cache.putData(createVideoPacket(currentTimestamp, (i % keyFrameStep == 0)));
-        currentTimestamp += timestampStep;
-    }
-}
+    {milliseconds(10), 0, true}, {milliseconds(20), 0, false}, {milliseconds(30), 0, false},
+    {milliseconds(40), 0, true}, {milliseconds(50), 0, false}, {milliseconds(60), 0, false},
+    {milliseconds(70), 0, true}, {milliseconds(80), 0, false}
+};
 
-void assertSearch(MediaStreamCache& cache,
-    milliseconds searchedTimestamp, milliseconds shouldFindTimestamp, int channel = 0)
+// Sequence: K0 K1 p0 p1 K1 K0 p0 p1 K0 p1 K1.
+const std::vector<FrameDescriptor> multiChannelTestData =
 {
-    quint64 foundTimestamp;
-    auto dataPacket =
-        cache.findByTimestamp(searchedTimestamp.count() * 1000, false, &foundTimestamp, channel);
-    ASSERT_NE(dataPacket, nullptr);
-    EXPECT_EQ(dataPacket->timestamp, shouldFindTimestamp.count() * 1000);
-    EXPECT_EQ(foundTimestamp, shouldFindTimestamp.count() * 1000);
+    {milliseconds(10), 0, true},  // K0
+    {milliseconds(10), 1, true},  // K1
+    {milliseconds(20), 0, false}, // p0
+    {milliseconds(30), 1, false}, // p1
 
-    auto videoPacket = std::dynamic_pointer_cast<QnCompressedVideoData>(dataPacket);
-    ASSERT_NE(videoPacket, nullptr);
-    EXPECT_EQ(videoPacket->channelNumber, channel);
-}
+    {milliseconds(30), 1, true},  // K1
+    {milliseconds(30), 0, true},  // K0
+    {milliseconds(40), 0, false}, // p0
+    {milliseconds(40), 1, false}, // p1
+
+    {milliseconds(50), 0, true},  // K0
+    {milliseconds(60), 1, false}, // p1
+    {milliseconds(70), 1, true}   // K1
+};
 
 } // namespace
 
-// TODO: test channels and keyFrameOnly
-// TODO: add test for two same numbers
-// TODO: add check if we are too far from required value
-TEST(MediaStreamCache, findByTimestamp)
+class MediaStreamCacheTest : public ::testing::Test
 {
-    const std::chrono::milliseconds cacheSize(1000);
-    MediaStreamCache cache(cacheSize.count(), cacheSize.count() * 10);
+public:
+    const milliseconds cacheSize{1000};
 
-    const milliseconds tsStart(10);
-    const milliseconds tsStep(10);
-    const int cachePacketsNumber = 8;
-    const milliseconds tsLast(tsStart + tsStep * (cachePacketsNumber - 1));
+    MediaStreamCache cache;
+    milliseconds tsStart;
+    milliseconds tsLast;
 
-    fillCache(cache, tsStart, tsStep, 3, cachePacketsNumber);
+public:
+    MediaStreamCacheTest() : cache(cacheSize.count(), cacheSize.count() * 10) {}
+
+    void fillCache(const std::vector<FrameDescriptor>& cacheData,
+        std::function<void(MediaStreamCache&)> handler = {})
+    {
+        tsStart = cacheData.begin()->timestamp;
+        tsLast = (--cacheData.end())->timestamp;
+
+        for (const auto frame: cacheData)
+        {
+            cache.putData(createVideoPacket(frame.timestamp, frame.isKeyFrame, frame.channelNumber));
+            if (handler)
+                handler(cache);
+        }
+    }
+
+    void assertSearch(milliseconds searchedTimestamp, milliseconds shouldFindTimestamp,
+        int channel = 0, bool isKeyFrameOnly = false)
+    {
+        quint64 foundTimestamp;
+        auto dataPacket =
+            cache.findByTimestamp(searchedTimestamp.count() * 1000, isKeyFrameOnly, &foundTimestamp, channel);
+        ASSERT_NE(dataPacket, nullptr);
+        EXPECT_EQ(dataPacket->timestamp, shouldFindTimestamp.count() * 1000);
+        EXPECT_EQ(foundTimestamp, shouldFindTimestamp.count() * 1000);
+
+        auto videoPacket = std::dynamic_pointer_cast<QnCompressedVideoData>(dataPacket);
+        ASSERT_NE(videoPacket, nullptr);
+        EXPECT_EQ(videoPacket->channelNumber, channel);
+    }
+
+private:
+    QnCompressedVideoDataPtr createVideoPacket(
+        milliseconds timestamp, bool isKeyFrame = false, int channel = 0)
+    {
+        auto packet = std::make_shared<QnWritableCompressedVideoData>();
+        packet->channelNumber = channel;
+        packet->timestamp = timestamp.count() * 1000;
+        if (isKeyFrame)
+            packet->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+        return packet;
+    }
+};
+
+TEST_F(MediaStreamCacheTest, findByTimestamp)
+{
+    const milliseconds tsInside = (++singleChannelTestData.begin())->timestamp;
+    const milliseconds tsBeforeLast =
+        (singleChannelTestData[singleChannelTestData.size()-2]).timestamp;
+
+    fillCache(singleChannelTestData);
 
     // The first one.
-    assertSearch(cache, tsStart, tsStart, 0);
+    assertSearch(tsStart, tsStart);
     // The one inside.
-    assertSearch(cache, tsStart + tsStep, tsStart + tsStep, 0);
+    assertSearch(tsInside, tsInside);
     // The one inside, no exact match.
-    assertSearch(cache, tsStart + milliseconds(1), tsStart, 0);
+    assertSearch(tsStart + milliseconds(1), tsStart);
     // The last one.
-    assertSearch(cache, tsLast, tsLast, 0);
+    assertSearch(tsLast, tsLast);
     // Before the last one, no exact match.
-    assertSearch(cache, tsLast - milliseconds(1), tsLast - tsStep, 0);
+    assertSearch(tsLast - milliseconds(1), tsBeforeLast);
     // After the last one, close to the last one.
-    assertSearch(cache, tsLast + milliseconds(1), tsLast, 0);
+    assertSearch(tsLast + milliseconds(1), tsLast);
 
     quint64 foundTimestamp;
     // Before the first one.
@@ -92,7 +132,14 @@ TEST(MediaStreamCache, findByTimestamp)
     ASSERT_EQ(cache.findByTimestamp(tsFarFromLast.count() * 1000, false, &foundTimestamp, 0), nullptr);
 }
 
-//TEST(MediaStreamCache, cacheObsolescence)
+// TODO: test channels and keyFrameOnly
+// TODO: add test for two same numbers
+TEST_F(MediaStreamCacheTest, findByTimestamp_multichannel)
+{
+    fillCache(multiChannelTestData);
+}
+
+//TEST(MediaStreamCache, getNextPacket)
 //{
 //    // TODO
 //}
