@@ -20,6 +20,8 @@ ZoomableFlickable
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
     property size fitSize: content.boundedSize(width, height)
 
+    signal showRoiHint()
+
     interactive: !fisheyeMode
 
     function getMoveViewportData(position)
@@ -212,6 +214,22 @@ ZoomableFlickable
             var easing = newContentWidth > contentWidth ? Easing.InOutCubic : Easing.OutCubic
             flickable.animateTo(-newX, -newY, newContentWidth, newContentHeight, easing)
         }
+
+        property bool showRoiHint:
+            motionController.motionSearchMode && !motionController.drawingRoi && falseDragging
+
+        Timer
+        {
+            id: roiHintFilterTimer
+            interval: 200
+            onTriggered:
+            {
+                if (d.showRoiHint)
+                    control.showRoiHint()
+            }
+        }
+
+        onShowRoiHintChanged: roiHintFilterTimer.restart()
     }
 
     onWidthChanged: fitToBounds()

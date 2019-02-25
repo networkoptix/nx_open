@@ -284,6 +284,8 @@ PageBase
 
         onClicked: toggleUi()
 
+        onShowRoiHint: banner.showText(qsTr("Tap and hold to select an area"))
+
         Connections
         {
             target: video.motionController
