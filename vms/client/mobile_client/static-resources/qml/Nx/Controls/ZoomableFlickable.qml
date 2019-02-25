@@ -15,6 +15,11 @@ Item
     property alias contentWidth: flick.contentWidth
     property alias contentHeight: flick.contentHeight
 
+    readonly property bool falseDragging:
+        (Math.abs(flick.contentWidth - width) <= 1 && Math.abs(flick.contentHeight - height) <= 1)
+        && controller.enabled
+        && controller.draggingGesture
+
     default property alias data: contentItem.data
 
     property real minContentWidth: 0

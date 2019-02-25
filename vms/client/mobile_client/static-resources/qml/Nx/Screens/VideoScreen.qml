@@ -284,13 +284,18 @@ PageBase
 
         onClicked: toggleUi()
 
+        onShowRoiHint: banner.showText(qsTr("Tap and hold to select an area"))
+
         Connections
         {
             target: video.motionController
             onDrawingRoiChanged:
             {
-                if (target.drawingRoi)
-                    videoNavigation.motionSearchMode = true
+                if (!target.drawingRoi)
+                    return
+
+                videoNavigation.motionSearchMode = true
+                showUi()
             }
 
             onRequestDrawing: videoNavigation.motionSearchMode = true
