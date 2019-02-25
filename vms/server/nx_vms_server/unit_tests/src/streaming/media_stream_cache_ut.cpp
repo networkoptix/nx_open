@@ -4,11 +4,7 @@
 #include <utils/media/detail/media_stream_cache_detail.h>
 #include <nx/streaming/video_data_packet.h>
 
-// TODO: Is it correct namespaces?
-namespace nx {
-namespace vms {
-namespace server {
-namespace test {
+namespace nx::vms::server::test {
 
 using namespace std::chrono;
 
@@ -100,6 +96,27 @@ public:
         EXPECT_EQ(videoPacket->channelNumber, channel);
     }
 
+    void assertNextPacket(milliseconds startingTimestamp,
+        std::optional<milliseconds> shouldFindTimestamp, int channel)
+    {
+        quint64 foundTimestamp;
+        auto dataPacket = cache.getNextPacket(
+            startingTimestamp.count() * 1000, &foundTimestamp, channel);
+
+        if (!shouldFindTimestamp.has_value())
+        {
+            ASSERT_EQ(dataPacket, nullptr);
+            return;
+        }
+        ASSERT_NE(dataPacket, nullptr);
+        EXPECT_EQ(dataPacket->timestamp, shouldFindTimestamp->count() * 1000);
+        EXPECT_EQ(foundTimestamp, shouldFindTimestamp->count() * 1000);
+
+        auto videoPacket = std::dynamic_pointer_cast<QnCompressedVideoData>(dataPacket);
+        ASSERT_NE(videoPacket, nullptr);
+        EXPECT_EQ(videoPacket->channelNumber, channel);
+    }
+
 private:
     QnCompressedVideoDataPtr createVideoPacket(
         milliseconds timestamp, bool isKeyFrame = false, int channel = 0)
@@ -177,13 +194,25 @@ TEST_F(MediaStreamCacheTest, findByTimestamp_multichannel)
     assertSearch(tsLast, {}, 2, /*isKeyFrameOnly*/ true);
 }
 
-//TEST(MediaStreamCache, getNextPacket)
-//{
-//    // TODO
-//}
+TEST_F(MediaStreamCacheTest, getNextPacket)
+{
+    const auto &testData = multiChannelTestData;
+    fillCache(testData);
 
+    const auto assertChannel =
+        [this](const std::vector<int>& channelIndexes, int channel)
+        {
+            for (size_t i = 1; i < channelIndexes.size(); ++i)
+            {
+                const auto tsStart = testData[channelIndexes[i-1]].timestamp;
+                const auto tsExpectedNext = testData[channelIndexes[i]].timestamp;
+                assertNextPacket(tsStart, tsExpectedNext, channel);
+            }
+            assertNextPacket(testData[channelIndexes.back()].timestamp, {}, channel);
+        };
 
-} // namespace test
-} // namespace server
-} // namespace vms
-} // namespace nx
+    assertChannel({0, 2, 5, 6, 8}, 0);
+    assertChannel({1, 3, 4, 7, 9, 10}, 1);
+}
+
+} // namespace nx::vms::server::test
