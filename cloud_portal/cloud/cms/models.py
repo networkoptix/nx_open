@@ -83,7 +83,7 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'product_name': product.read_global_value("%PRODUCT_NAME%"),
                 'vms_name': product.read_global_value("%VMS_NAME%"),
                 'landing_layout': product.read_global_value("%LAYOUT%"),
-                'landing_layout_full': product.read_global_value("%LANDING_LAYOUT%")
+                'landing_block1': product.read_global_value("%BLOCK1_CONTENT%")
             }
         }
         cache.set(customization_name, data)
