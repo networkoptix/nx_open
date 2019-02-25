@@ -200,7 +200,7 @@ TEST_F(MediaStreamCacheTest, getNextPacket)
     fillCache(testData);
 
     const auto assertChannel =
-        [this](const std::vector<int>& channelIndexes, int channel)
+        [this, testData](const std::vector<int>& channelIndexes, int channel)
         {
             for (size_t i = 1; i < channelIndexes.size(); ++i)
             {
