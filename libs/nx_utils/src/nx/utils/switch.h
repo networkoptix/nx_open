@@ -70,33 +70,5 @@ auto switch_(const Value& value, const Match& match, const Action& action,
     return decltype(action())();
 }
 
-/**
- * Enum-safe switch. If there is no default case and the value does not match any case, issues a
- * compile-time warning and fails a run-time assertion.
- *
- * ATTENTION: Each case should end with `return` rather than `break`, otherwise a run-time
- * assertion will fail but no compile-time diagnostics will be provided.
- *
- * Usage:
- * ```
- * const std::string string = NX_ENUM_SWITCH(value,
- * {
- *     case Enum::value1: return "value1";
- *     case Enum::value2: return "value2";
- * });
- * ```
- */
-#define NX_ENUM_SWITCH(VALUE, BODY) ( \
-    [&]() \
-    { \
-        const auto nx_enum_switch_value_ = (VALUE); \
-        switch (nx_enum_switch_value_) \
-        BODY \
-        NX_CRITICAL(false, lm("Unmatched switch value: %1").arg( \
-            static_cast<int>(nx_enum_switch_value_))); \
-        throw std::exception(); /*< Instead of the required return. */ \
-    }() \
-)
-
 } // namespace utils
 } // namespace nx

@@ -2,8 +2,7 @@
 // 14 dec 2012    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifndef MEDIASTREAMCACHE_H
-#define MEDIASTREAMCACHE_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -122,5 +121,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  //MEDIASTREAMCACHE_H

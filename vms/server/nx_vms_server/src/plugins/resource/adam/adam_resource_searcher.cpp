@@ -9,6 +9,7 @@
 #include <utils/common/sleep.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/url/url_builder.h>
 
 namespace
 {
@@ -35,6 +36,15 @@ namespace
     const quint32 kAdamBroadcastBufferSize = 1024 * 5;
     const quint32 kAdamBroadcastIntervalMs = 10000;
     const quint32 kAdamBroadcastSleepInterval = 500;
+
+    nx::utils::Url createAdamUrl(QString host)
+    {
+        return nx::network::url::Builder()
+            .setScheme(nx::network::http::kUrlSchemeName)
+            .setHost(std::move(host))
+            .setPort(nx::modbus::kDefaultModbusPort)
+            .toUrl();
+    }
 }
 
 QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& command)
@@ -75,7 +85,7 @@ QString QnAdamResourceSearcher::executeAsciiCommand(
     nx::modbus::QnModbusClient& client,
     const QString& commandStr)
 {
-    NX_VERBOSE(this, lm("Sending ASCII command [%1]").args(commandStr));
+    NX_VERBOSE(this, "Sending ASCII command [%1]", commandStr);
     QnAdamAsciiCommand command(commandStr);
     bool status = false;
 
@@ -100,13 +110,17 @@ QString QnAdamResourceSearcher::executeAsciiCommand(
 
     auto endOfStr = response.data.indexOf("\r");
     auto result = QString::fromLatin1(response.data.mid(4, endOfStr)).trimmed();
-    NX_VERBOSE(this, lm("Response for ASCII command [%1]: \"%2\"").args(commandStr, result));
+    NX_VERBOSE(this, "Response for ASCII command [%1]: \"%2\"", commandStr, result);
     return result;
 }
 
-QString QnAdamResourceSearcher::getAdamModuleName(nx::modbus::QnModbusClient& client)
+QString QnAdamResourceSearcher::getAdamModel(nx::modbus::QnModbusClient& client)
 {
-    return executeAsciiCommand(client, "$01M");
+    const auto moduleName = executeAsciiCommand(client, "$01M");
+    if (moduleName.isEmpty())
+        return {};
+
+    return "ADAM-" + moduleName;
 }
 
 QString QnAdamResourceSearcher::getAdamModuleFirmware(nx::modbus::QnModbusClient& client)
@@ -118,30 +132,26 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
     const QAuthenticator &auth,
     bool doMultichannelCheck)
 {
-    NX_VERBOSE(this, lm("CheckHostAddr requested with URL [%1]").args(url));
+    NX_VERBOSE(this, "CheckHostAddr requested with URL [%1]", url);
 
     QList<QnResourcePtr> result;
-    if( !url.scheme().isEmpty() && doMultichannelCheck )
+    if (!url.scheme().isEmpty() && doMultichannelCheck)
         return result;
 
     nx::network::SocketAddress endpoint(url.host(), url.port(nx::modbus::kDefaultModbusPort));
 
     nx::modbus::QnModbusClient modbusClient(endpoint);
 
-    if(!modbusClient.connect())
+    if (!modbusClient.connect())
         return result;
 
-    auto moduleName = getAdamModuleName(modbusClient);
-
-    if(moduleName.isEmpty())
+    const auto model = getAdamModel(modbusClient);
+    if (model.isEmpty())
         return result;
 
     auto firmware = getAdamModuleFirmware(modbusClient);
-
-    if(firmware.isEmpty())
+    if (firmware.isEmpty())
         return result;
-
-    auto model = lit("ADAM-") + moduleName;
 
     QnUuid typeId = qnResTypePool->getResourceTypeId(kAdamResourceType, model);
     if (typeId.isNull())
@@ -155,16 +165,16 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
 
     modbusClient.disconnect();
 
+    resource->setVendor("Advantech");
     nx::utils::Url modbusUrl(url);
-    modbusUrl.setScheme(lit("http"));
+    modbusUrl.setScheme(nx::network::http::kUrlSchemeName);
     modbusUrl.setPort(url.port(nx::modbus::kDefaultModbusPort));
-    resource->setVendor(lit("Advantech"));
     resource->setUrl(modbusUrl.toString());
 
     // Advantech ADAM modules do not have any unique identifier that we can obtain.
     auto uid = generatePhysicalId(modbusUrl.toString());
     resource->setPhysicalId(uid);
-    resource->setMAC( nx::utils::MacAddress(uid));
+    resource->setMAC(nx::utils::MacAddress(uid));
 
     resource->setDefaultAuth(auth);
 
@@ -190,18 +200,18 @@ QnResourceList QnAdamResourceSearcher::findResources()
         nx::network::SocketAddress localAddress(iface.address.toString(), 0);
         if (!socket->bind(localAddress))
         {
-            NX_DEBUG(this, lm("Unable to bind socket to local address %1").args(localAddress));
+            NX_DEBUG(this, "Unable to bind socket to local address %1", localAddress);
             continue;
         }
 
         nx::network::SocketAddress foreignEndpoint(nx::network::BROADCAST_ADDRESS, kAdamAutodiscoveryPort);
         if (!socket->sendTo(kAdamSearchMessage, sizeof(kAdamSearchMessage), foreignEndpoint))
         {
-            NX_DEBUG(this, lm("Unable to send data to %1").args(foreignEndpoint));
+            NX_DEBUG(this, "Unable to send data to %1", foreignEndpoint);
             continue;
         }
 
-        NX_VERBOSE(this, lm("Sent broadcast message from %1").args(localAddress));
+        NX_VERBOSE(this, "Sent broadcast message from %1", localAddress);
         QnSleep::msleep(kAdamBroadcastSleepInterval);
 
         while (socket->hasData())
@@ -220,50 +230,48 @@ QnResourceList QnAdamResourceSearcher::findResources()
 
             auto existingResources = serverModule()->resourcePool()
                 ->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
-
-            if (!existingResources.isEmpty())
+            if (existingResources.isEmpty())
             {
-                for (const auto& existingRes: existingResources)
-                {
-                    auto secRes = existingRes.dynamicCast<QnSecurityCamResource>();
-                    if (!secRes)
-                        continue;
-
-                    NX_VERBOSE(this, lm("Found already existing resource [%1] (model [%2]) with URL [%3]").args(
-                        secRes->getName(), secRes->getModel(), secRes->getUrl()));
-
-                    QnUuid typeId = qnResTypePool->getResourceTypeId(
-                        lit("AdvantechADAM"),
-                        secRes->getModel());
-                    if (typeId.isNull())
-                        continue;
-
-                    QnAdamResourcePtr resource(new QnAdamResource(serverModule()));
-                    resource->setTypeId(typeId);
-                    resource->setName(secRes->getName());
-                    resource->setModel(secRes->getModel());
-                    resource->setFirmware(secRes->getFirmware());
-                    resource->setPhysicalId(secRes->getPhysicalId());
-                    resource->setVendor(secRes->getVendor());
-                    resource->setMAC(nx::utils::MacAddress(secRes->getPhysicalId()));
-                    resource->setUrl(secRes->getUrl());
-                    resource->setAuth(secRes->getAuth());
-
-                    result.push_back(resource);
-
-                }
+                result.append(checkHostAddr(
+                    createAdamUrl(remoteEndpoint.address.toString()), {}, false));
                 continue;
             }
-            else
-            {
-                nx::utils::Url url;
-                url.setScheme(lit("http"));
-                url.setHost(remoteEndpoint.address.toString());
-                url.setPort(nx::modbus::kDefaultModbusPort);
-                auto res = checkHostAddr(url, {}, false);
 
-                result.append(res);
+            for (const auto& existingRes: existingResources)
+            {
+                auto secRes = existingRes.dynamicCast<QnSecurityCamResource>();
+                if (!secRes)
+                    continue;
+
+                NX_VERBOSE(this, "Found already existing resource [%1] (model [%2]) with URL [%3]",
+                    secRes->getName(), secRes->getModel(), secRes->getUrl());
+
+                QnUuid typeId = qnResTypePool->getResourceTypeId(
+                    lit("AdvantechADAM"),
+                    secRes->getModel());
+                if (typeId.isNull())
+                {
+                    // Trying to fix some bug occuring in 3.2.
+                    result.append(checkHostAddr(
+                        createAdamUrl(remoteEndpoint.address.toString()), {}, false));
+                    continue;
+                }
+
+                QnAdamResourcePtr resource(new QnAdamResource(serverModule()));
+                resource->setTypeId(typeId);
+                resource->setName(secRes->getName());
+                resource->setModel(secRes->getModel());
+                resource->setFirmware(secRes->getFirmware());
+                resource->setPhysicalId(secRes->getPhysicalId());
+                resource->setVendor(secRes->getVendor());
+                resource->setMAC(nx::utils::MacAddress(secRes->getPhysicalId()));
+                resource->setUrl(secRes->getUrl());
+                resource->setAuth(secRes->getAuth());
+
+                result.push_back(resource);
+
             }
+            continue;
         }
     }
 
@@ -278,7 +286,7 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
 
     if (resourceType.isNull())
     {
-        NX_DEBUG(this, lm("No resource type for ID %1").args(resourceTypeId));
+        NX_DEBUG(this, "No resource type for ID %1", resourceTypeId);
         return result;
     }
 
@@ -288,8 +296,8 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
     result.reset(new QnAdamResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    NX_DEBUG(this, lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
-        .arg(resourceTypeId.toString()));
+    NX_DEBUG(this, "Create Advantech ADAM-6000 series IO module resource (TypeID %1)",
+        resourceTypeId.toString());
     return result;
 }
 

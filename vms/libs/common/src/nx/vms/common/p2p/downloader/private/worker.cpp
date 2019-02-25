@@ -366,7 +366,7 @@ bool Worker::hasPendingRequestsByType(State type) const
 {
     for (const auto& context: m_contextByHandle)
     {
-        if (!context.cancelled && context.type == type)
+        if (context.type == type)
             return true;
     }
 
@@ -401,7 +401,7 @@ void Worker::requestFileInformationInternal()
             requestSubjectString(m_state), peerName);
 
         const auto handle = m_peerManager->requestFileInfo(peer, m_fileName,
-            [this, self = shared_from_this()](
+            [this](
                 bool success, rest::Handle handle, const FileInformation& fileInfo)
             {
                 handleFileInformationReply(success, handle, fileInfo);
@@ -478,14 +478,10 @@ void Worker::handleFileInformationReply(
 
     auto requestContext = m_contextByHandle.take(handle);
 
-    NX_VERBOSE(m_logTag, "handleFileInformationReply(): Got %3%4 reply from %1: %2",
+    NX_VERBOSE(m_logTag, "handleFileInformationReply(): Got %3 reply from %1: %2",
         m_peerManager->peerString(requestContext.peerId),
         statusString(success),
-        requestSubjectString(m_state),
-        requestContext.cancelled ? " (cancelled)" : "");
-
-    if (requestContext.cancelled)
-        return;
+        requestSubjectString(m_state));
 
     NX_ASSERT(!requestContext.peerId.isNull());
     NX_ASSERT(requestContext.type == State::requestingFileInformation);
@@ -596,7 +592,7 @@ void Worker::requestChecksums()
             m_peerManager->peerString(peer));
 
         const auto handle = m_peerManager->requestChecksums(peer, m_fileName,
-            [this, self = shared_from_this()](
+            [this](
                 bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
             {
                 handleChecksumsReply(success, handle, checksums);
@@ -618,14 +614,10 @@ void Worker::handleChecksumsReply(
 
     auto requestContext = m_contextByHandle.take(handle);
 
-    NX_VERBOSE(m_logTag, "handleChecksumsReply(): Got %1 from %2: %3%4",
+    NX_VERBOSE(m_logTag, "handleChecksumsReply(): Got %1 from %2: %3",
         requestSubjectString(State::requestingChecksums),
         m_peerManager->peerString(requestContext.peerId),
-        statusString(success),
-        requestContext.cancelled ? " (cancelled)" : "");
-
-    if (requestContext.cancelled)
-        return;
+        statusString(success));
 
     NX_ASSERT(!requestContext.peerId.isNull());
     NX_ASSERT(requestContext.type == State::requestingChecksums);
@@ -736,7 +728,7 @@ void Worker::downloadNextChunk()
         m_peerManager->distanceTo(peerId));
 
     auto handleReply =
-        [this, chunkIndex, self = shared_from_this()](
+        [this, chunkIndex](
             bool result,
             rest::Handle handle,
             const QByteArray& data)
@@ -800,14 +792,10 @@ void Worker::handleDownloadChunkReply(
     auto requestContext = m_contextByHandle.take(handle);
 
     NX_VERBOSE(m_logTag,
-        "handleDownloadChunkReply(): handle: %1, chunk: %2, success: %3, cancelled: %4",
+        "handleDownloadChunkReply(): handle: %1, chunk: %2, success: %3",
         handle,
         chunkIndex,
-        success,
-        requestContext.cancelled);
-
-    if (requestContext.cancelled)
-        return;
+        success);
 
     NX_ASSERT(!requestContext.peerId.isNull());
     NX_ASSERT(requestContext.type == State::downloadingChunks);
@@ -862,7 +850,7 @@ void Worker::cancelRequests()
     NX_DEBUG(m_logTag, "Cancelling all requests...");
 
     for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
-        it->cancelled = true;
+        m_peerManager->cancelRequest(QnUuid(), it.key());
 }
 
 void Worker::cancelRequestsByType(State type)
@@ -872,7 +860,7 @@ void Worker::cancelRequestsByType(State type)
     for (auto it = m_contextByHandle.begin(); it != m_contextByHandle.end(); ++it)
     {
         if (it->type == type)
-            it->cancelled = true;
+            m_peerManager->cancelRequest(QnUuid(), it.key());
     }
 }
 

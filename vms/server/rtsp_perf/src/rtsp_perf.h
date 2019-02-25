@@ -18,20 +18,10 @@ public:
         int count = 1;
         int livePercent = 100;
         bool useSsl = false;
-        std::chrono::milliseconds timeout {5000};
+        std::chrono::milliseconds timeout{5000};
+        std::chrono::milliseconds startInterval{0};
 
-        QString toString()
-        {
-            return
-                "\nserver: " + server +
-                "\nuser: " + user +
-                "\npassword: " + password +
-                "\nuse ssl: " + QString::number(useSsl) +
-                "\ncount: " + QString::number(count) +
-                "\nlive percent: " + QString::number(livePercent) + "%"
-                "\ntimeout: " + QString::number(timeout.count()) + "ms"
-                "\n";
-        }
+        QString toString();
     };
 public:
     RtspPerf(const Config& config): m_sessions(config.count), m_config(config) {}
@@ -39,7 +29,7 @@ public:
 
 private:
     bool getCamerasUrls(const QString& server, std::vector<QString>& cameras);
-    void startSessions(const std::vector<QString>& urls);
+    void startSessionsThread(const std::vector<QString>& urls);
 
     struct Session
     {
@@ -52,5 +42,6 @@ private:
 private:
     std::vector<Session> m_sessions;
     std::atomic<int64_t> m_totalFailed = 0;
+    std::chrono::milliseconds m_currentStartInterval;
     Config m_config;
 };
