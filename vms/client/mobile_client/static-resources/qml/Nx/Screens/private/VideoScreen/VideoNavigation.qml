@@ -99,6 +99,25 @@ Item
         }
 
         onLoadingChunksChanged: updateWarningTextTimer.restart()
+        onLoadedChanged: d.updateTimelinePosition()
+
+        Connections
+        {
+            target: videoScreenController.mediaPlayer
+            onPositionChanged: d.updateTimelinePosition()
+        }
+
+        function updateTimelinePosition()
+        {
+            if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+                return
+
+            if (!timeline.moving && !d.liveMode)
+            {
+                timeline.autoReturnToBounds = false
+                timeline.position = videoScreenController.mediaPlayer.position
+            }
+        }
 
         Timer
         {
@@ -370,22 +389,6 @@ Item
                     resumeWhenDragFinished = !videoNavigation.paused
                     videoScreenController.preview()
                     d.resumePosition = -1
-                }
-            }
-
-            Connections
-            {
-                target: videoScreenController.mediaPlayer
-                onPositionChanged:
-                {
-                    if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
-                        return
-
-                    if (!timeline.moving && !d.liveMode)
-                    {
-                        timeline.autoReturnToBounds = false
-                        timeline.position = videoScreenController.mediaPlayer.position
-                    }
                 }
             }
         }
