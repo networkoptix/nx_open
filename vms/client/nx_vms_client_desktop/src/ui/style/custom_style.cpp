@@ -16,6 +16,7 @@
 #include <ui/style/globals.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/utils/log/log_message.h>
 #include <nx/vms/client/desktop/common/utils/object_companion.h>
 #include <nx/vms/client/desktop/common/utils/page_size_adjuster.h>
 
@@ -76,6 +77,23 @@ void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)
 QString setWarningStyleHtml( const QString &source )
 {
     return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);
+}
+
+void setWarningFrame(QWidget* widget, int frameWidth, int roundingRadius)
+{
+    static const auto styleTemplateRaw = lm(R"qss(
+        .QWidget {
+            border-style: solid;
+            border-color: %1;
+            border-width: %2;
+            border-radius: %3;
+        })qss");
+
+    const auto color = qnGlobals->errorTextColor();
+    const auto styleTemplate =
+        styleTemplateRaw.args(color.name(QColor::HexArgb), frameWidth, roundingRadius);
+
+    widget->setStyleSheet(styleTemplate);
 }
 
 void resetButtonStyle(QAbstractButton* button)

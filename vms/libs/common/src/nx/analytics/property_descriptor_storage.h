@@ -28,8 +28,11 @@ public:
 
     Container fetch() const
     {
-        Container container;
         const auto serialized = m_resource->getProperty(m_propertyName);
+        if (serialized.isEmpty())
+            return Container();
+
+        Container container;
         if (!QJson::deserialize(serialized, &container))
         {
             NX_WARNING(this, "Unable to deserialize descriptor container from: %1", serialized);

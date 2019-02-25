@@ -111,7 +111,7 @@
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
-#include <rest/handlers/crash_server_handler.h>
+#include <rest/handlers/debug_handler.h>
 #include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
@@ -2623,7 +2623,16 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(serverModule(), cloudManagerGroup));
 
     reg("favicon.ico", new QnFavIconRestHandler());
-    reg("api/dev-mode-key", new QnCrashServerHandler(), kAdmin);
+
+    /**%apidoc[proprietary] GET /api/debug
+     * Intended for debugging and experimenting.
+     * <br/>ATTENTION: Works only if enabled by mediaserver.ini.
+     * %param[opt]:option crash Intentionally crashes the Server.
+     * %param[opt]:option fullDump If specified together with "crash", creates full crash dump.
+     * %param[opt]:option exit Terminates the Server normally, via "exit(64)".
+     * %permissions Owner.
+     */
+    reg("api/debug", new QnDebugHandler(), kAdmin);
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 

@@ -8,58 +8,74 @@ namespace nx {
 namespace utils {
 namespace test {
 
-static QString voice(const QString& animal)
+static void expectVoice(const QString& animal, const QString& expectedVoice)
 {
-    return switch_(animal,
-        "cat", []{ return "mew"; },
-        "dog", []{ return "wof"; },
-        default_, []{ return "unknown"; }
+    const auto voice = switch_(animal,
+        "cat", [](){ return "mew"; },
+        "dog", [](){ return "wof"; },
+        default_, [](){ return "unknown"; }
     );
+
+    ASSERT_EQ(expectedVoice, voice);
 }
 
 TEST(Switch, StringToString)
 {
-    ASSERT_EQ(voice("cat"), "mew");
-    ASSERT_EQ(voice("dog"), "wof");
-    ASSERT_EQ(voice("parrot"), "unknown");
-    ASSERT_EQ(voice("mouse"), "unknown");
+    expectVoice("cat", "mew");
+    expectVoice("dog", "wof");
+    expectVoice("parrot", "unknown");
+    expectVoice("mouse", "unknown");
 }
 
 enum class Type { a, b };
 
-static Type parseType(const QString& value)
+static void expectParsedType(const QString& value, Type expectedType = Type::a)
 {
-    return switch_(value,
-        "a", []{ return Type::a; },
-        "b", []{ return Type::b; }
+    const auto parsedType = switch_(value,
+        "a", [](){ return Type::a; },
+        "b", [](){ return Type::b; }
     );
+
+    ASSERT_EQ(expectedType, parsedType);
 }
 
 TEST(Switch, StringToEnum)
 {
-    ASSERT_EQ(parseType("a"), Type::a);
-    ASSERT_EQ(parseType("b"), Type::b);
+    expectParsedType("a", Type::a);
+    expectParsedType("b", Type::b);
     if (ini().assertCrash)
     {
-        ASSERT_DEATH(parseType("c"), "Unmatched switch value");
-        ASSERT_DEATH(parseType("d"), "Unmatched switch value");
+        ASSERT_DEATH(expectParsedType("c"), "Unmatched switch value");
+        ASSERT_DEATH(expectParsedType("d"), "Unmatched switch value");
     }
 }
 
-static QString toString(Type value)
+TEST(Switch, Action)
 {
-    return NX_ENUM_SWITCH(value,
-    {
-        case Type::a: return "a";
-        case Type::b: return "b";
-    });
-}
+    int value = 0;
+    const auto execute =
+        [&value](const QString& command)
+        {
+            switch_(command,
+                "increment", [&](){ value++; },
+                "null", [&](){ value = 0; }
+            );
+        };
 
-TEST(EnumSwitch, EnumToString)
-{
-    ASSERT_EQ(toString(Type::a), "a");
-    ASSERT_EQ(toString(Type::b), "b");
-    ASSERT_DEATH(toString(static_cast<Type>(42)), "Unmatched switch value: 42");
+    execute("increment");
+    ASSERT_EQ(1, value);
+
+    execute("increment");
+    ASSERT_EQ(2, value);
+
+    execute("null");
+    ASSERT_EQ(0, value);
+
+    if (ini().assertCrash)
+    {
+        ASSERT_DEATH(execute("wrong"), "Unmatched switch value");
+        ASSERT_DEATH(execute("command"), "Unmatched switch value");
+    }
 }
 
 } // namespace test

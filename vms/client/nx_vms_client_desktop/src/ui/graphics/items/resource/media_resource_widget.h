@@ -66,9 +66,6 @@ class QnMediaResourceWidget: public Customized<QnResourceWidget>
     Q_OBJECT
     typedef Customized<QnResourceWidget> base_type;
 
-    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors
-        WRITE setMotionSensitivityColors);
-
 public:
     QnMediaResourceWidget(
         QnWorkbenchContext* context,
@@ -128,14 +125,6 @@ public:
      */
     const QList<QRegion>& motionSelection() const;
 
-    bool addToMotionSensitivity(const QRect& gridRect, int sensitivity);
-
-    bool setMotionSensitivityFilled(const QPoint& gridPos, int sensitivity);
-
-    void clearMotionSensitivity();
-
-    const QList<QnMotionRegion>& motionSensitivity() const;
-
     nx::vms::api::ImageCorrectionData imageEnhancement() const;
     void setImageEnhancement(const nx::vms::api::ImageCorrectionData& imageEnhancement);
 
@@ -157,9 +146,6 @@ public:
         const QnUuid& id,
         const QString& text,
         const QnHtmlTextItemOptions& options);
-
-    QVector<QColor> motionSensitivityColors() const;
-    void setMotionSensitivityColors(const QVector<QColor>& value);
 
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
@@ -246,15 +232,12 @@ protected:
         int channel,
         const QRectF& rect) override;
 
-    void paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect);
-
     void paintMotionGrid(
         QPainter* painter,
         int channel,
         const QRectF& rect,
         const QnMetaDataV1Ptr& motion);
 
-    void paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect);
     void paintWatermark(QPainter* painter, const QRectF& rect);
 
     void paintFilledRegionPath(
@@ -274,9 +257,6 @@ protected:
 
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
-
-    void ensureMotionLabelPositions() const;
-    void invalidateMotionLabelPositions() const;
 
     QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
@@ -466,16 +446,6 @@ private:
     /** Whether motion selection cached paths are valid. */
     mutable bool m_motionSelectionCacheValid = false;
 
-    /** Position for text labels for all motion sensitivity regions. */
-    /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
-    mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>>
-    m_motionLabelPositions;
-
-    /** Whether motion label positions data is valid. */
-    mutable bool m_motionLabelPositionsValid = false;
-
-    QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
-
     nx::vms::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
 
     QnPtzControllerPtr m_ptzController;
@@ -487,8 +457,6 @@ private:
     bool m_ioCouldBeShown = false;
 
     qint64 m_posUtcMs;
-
-    QVector<QColor> m_motionSensitivityColors;
 
     QnScrollableItemsWidget* m_triggersContainer = nullptr;
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;

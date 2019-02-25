@@ -377,169 +377,182 @@ public: // internal API
 
     void checkTimers(bool forceAck);
 
-    static const int m_iSYNInterval;             // Periodical Rate Control Interval, 10000 microsecond
-    static const int m_iSelfClockInterval;       // ACK interval for self-clocking
+    static constexpr int m_iSYNInterval = 10000;             // Periodical Rate Control Interval, 10000 microsecond
+    static constexpr int m_iSelfClockInterval = 64;       // ACK interval for self-clocking
     static CUDTUnited* s_UDTUnited;               // UDT global management base
 
 public:
-    static const UDTSOCKET INVALID_SOCK;         // invalid socket descriptor
-    static const int ERROR;                      // socket api error returned value
-    static const int m_iVersion;                 // UDT version, for compatibility use
+    static constexpr UDTSOCKET INVALID_SOCK = -1;         // invalid socket descriptor
+    static constexpr int ERROR = -1;                      // socket api error returned value
+    static constexpr int m_iVersion = 4;                 // UDT version, for compatibility use
 
 private: // Identification
-    UDTSOCKET m_SocketId;                        // UDT socket number
-    UDTSockType m_iSockType;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
-    UDTSOCKET m_PeerID;                // peer id, for multiplexer
+    static constexpr int kDefaultRecvWindowSize = 25600;
+
+    // Mimimum recv buffer size is 32 packets
+    static constexpr int kMinRecvBufferSize = 32;
+    //Rcv buffer MUST NOT be bigger than Flight Flag size
+    static constexpr int kDefaultRecvBufferSize =
+        kDefaultRecvWindowSize < 8192
+        ? kDefaultRecvWindowSize
+        : 8192;
+
+    static constexpr int kDefaultSendBufferSize =
+        kDefaultRecvWindowSize < 8192
+        ? kDefaultRecvWindowSize
+        : 8192;
+
+    UDTSOCKET m_SocketId = INVALID_SOCK;                        // UDT socket number
+    UDTSockType m_iSockType = UDT_STREAM;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
+    UDTSOCKET m_PeerID = INVALID_SOCK;                // peer id, for multiplexer
 
 private: // Packet sizes
-    int m_iPktSize;                              // Maximum/regular packet size, in bytes
-    int m_iPayloadSize;                          // Maximum/regular payload size, in bytes
+    int m_iPktSize = 0;                              // Maximum/regular packet size, in bytes
+    int m_iPayloadSize = 0;                          // Maximum/regular payload size, in bytes
 
 private: // Options
-    int m_iMSS;                                  // Maximum Segment Size, in bytes
-    bool m_bSynSending;                          // Sending syncronization mode
-    bool m_bSynRecving;                          // Receiving syncronization mode
-    int m_iFlightFlagSize;                       // Maximum number of packets in flight from the peer side
-    int m_iSndBufSize;                           // Maximum UDT sender buffer size
-    int m_iRcvBufSize;                           // Maximum UDT receiver buffer size
+    int m_iMSS = kDefaultMtuSize;                // Maximum Segment Size, in bytes
+    bool m_bSynSending = true;                          // Sending syncronization mode
+    bool m_bSynRecving = true;                          // Receiving syncronization mode
+    int m_iFlightFlagSize = kDefaultRecvWindowSize;                       // Maximum number of packets in flight from the peer side
+    int m_iSndBufSize = kDefaultSendBufferSize;                           // Maximum UDT sender buffer size
+    int m_iRcvBufSize = kDefaultRecvBufferSize;                           // Maximum UDT receiver buffer size
     struct linger m_Linger;                             // Linger information on close
-    int m_iUDPSndBufSize;                        // UDP sending buffer size
-    int m_iUDPRcvBufSize;                        // UDP receiving buffer size
-    int m_iIPversion;                            // IP version
-    bool m_bRendezvous;                          // Rendezvous connection mode
-    int m_iSndTimeOut;                           // sending timeout in milliseconds
-    int m_iRcvTimeOut;                           // receiving timeout in milliseconds
-    bool m_bReuseAddr;                // reuse an exiting port or not, for UDP multiplexer
-    int64_t m_llMaxBW;                // maximum data transfer rate (threshold)
+    int m_iUDPSndBufSize = 65536;                        // UDP sending buffer size. TODO #ak why it is not calculated somehow?
+    int m_iUDPRcvBufSize = kDefaultRecvBufferSize * kDefaultMtuSize;                        // UDP receiving buffer size
+    int m_iIPversion = AF_INET;                            // IP version
+    bool m_bRendezvous = false;                          // Rendezvous connection mode
+    int m_iSndTimeOut = -1;                           // sending timeout in milliseconds
+    int m_iRcvTimeOut = -1;                           // receiving timeout in milliseconds
+    bool m_bReuseAddr = true;                // reuse an exiting port or not, for UDP multiplexer
+    int64_t m_llMaxBW = -1;                // maximum data transfer rate (threshold)
 
 private: // congestion control
-    CCCVirtualFactory* m_pCCFactory;             // Factory class to create a specific CC instance
-    CCC* m_pCC;                                  // congestion control class
-    CCache<CInfoBlock>* m_pCache;        // network information cache
+    CCCVirtualFactory* m_pCCFactory = nullptr;             // Factory class to create a specific CC instance
+    CCC* m_pCC = nullptr;                                  // congestion control class
+    CCache<CInfoBlock>* m_pCache = nullptr;        // network information cache
 
 private: // Status
-    volatile bool m_bListening;                  // If the UDT entit is listening to connection
-    volatile bool m_bConnecting;            // The short phase when connect() is called but not yet completed
-    volatile bool m_bConnected;                  // Whether the connection is on or off
-    volatile bool m_bClosing;                    // If the UDT entity is closing
-    volatile bool m_bShutdown;                   // If the peer side has shutdown the connection
-    volatile bool m_bBroken;                     // If the connection has been broken
-    volatile bool m_bPeerHealth;                 // If the peer status is normal
-    bool m_bOpened;                              // If the UDT entity has been opened
-    int m_iBrokenCounter;            // a counter (number of GC checks) to let the GC tag this socket as disconnected
+    volatile bool m_bListening = false;                  // If the UDT entit is listening to connection
+    volatile bool m_bConnecting = false;            // The short phase when connect() is called but not yet completed
+    volatile bool m_bConnected = false;                  // Whether the connection is on or off
+    volatile bool m_bClosing = false;                    // If the UDT entity is closing
+    volatile bool m_bShutdown = false;                   // If the peer side has shutdown the connection
+    volatile bool m_bBroken = false;                     // If the connection has been broken
+    volatile bool m_bPeerHealth = true;                 // If the peer status is normal
+    bool m_bOpened = false;                              // If the UDT entity has been opened
+    int m_iBrokenCounter = 0;            // a counter (number of GC checks) to let the GC tag this socket as disconnected
 
-    int m_iEXPCount;                             // Expiration counter
-    int m_iBandwidth;                            // Estimated bandwidth, number of packets per second
-    int m_iRTT;                                  // RTT, in microseconds
-    int m_iRTTVar;                               // RTT variance
-    int m_iDeliveryRate;                // Packet arrival rate at the receiver side
+    int m_iEXPCount = 1;                // Expiration counter
+    int m_iBandwidth = 1;               // Estimated bandwidth, number of packets per second
+    int m_iRTT = 10 * m_iSYNInterval;   // RTT, in microseconds
+    int m_iRTTVar = (10 * m_iSYNInterval) >> 1;                      // RTT variance
+    int m_iDeliveryRate = 16;                // Packet arrival rate at the receiver side
 
-    uint64_t m_ullLingerExpiration;        // Linger expiration time (for GC to close a socket with data in sending buffer)
+    uint64_t m_ullLingerExpiration = 0;     // Linger expiration time (for GC to close a socket with data in sending buffer)
 
-    CHandShake m_ConnReq;            // connection request
-    CHandShake m_ConnRes;            // connection response
-    int64_t m_llLastReqTime;            // last time when a connection request is sent
+    CHandShake m_ConnReq;               // connection request
+    CHandShake m_ConnRes;               // connection response
+    int64_t m_llLastReqTime = 0;            // last time when a connection request is sent
 
 private: // Sending related data
-    CSndBuffer* m_pSndBuffer;                    // Sender buffer
-    CSndLossList* m_pSndLossList;                // Sender loss list
-    CPktTimeWindow* m_pSndTimeWindow;            // Packet sending time window
+    CSndBuffer* m_pSndBuffer = nullptr;                    // Sender buffer
+    CSndLossList* m_pSndLossList = nullptr;                // Sender loss list
+    CPktTimeWindow* m_pSndTimeWindow = nullptr;            // Packet sending time window
 
-    volatile uint64_t m_ullInterval;             // Inter-packet time, in CPU clock cycles
-    uint64_t m_ullTimeDiff;                      // aggregate difference in inter-packet time
+    volatile uint64_t m_ullInterval = 0;             // Inter-packet time, in CPU clock cycles
+    uint64_t m_ullTimeDiff = 0;                      // aggregate difference in inter-packet time
 
-    volatile int m_iFlowWindowSize;              // Flow control window size
-    volatile double m_dCongestionWindow;         // congestion window size
+    volatile int m_iFlowWindowSize = 0;              // Flow control window size
+    volatile double m_dCongestionWindow = 0.0;         // congestion window size
 
-    volatile int32_t m_iSndLastAck;              // Last ACK received
-    volatile int32_t m_iSndLastDataAck;          // The real last ACK that updates the sender buffer and loss list
-    volatile int32_t m_iSndCurrSeqNo;            // The largest sequence number that has been sent
-    int32_t m_iLastDecSeq;                       // Sequence number sent last decrease occurs
-    int32_t m_iSndLastAck2;                      // Last ACK2 sent back
-    uint64_t m_ullSndLastAck2Time;               // The time when last ACK2 was sent back
+    volatile int32_t m_iSndLastAck = 0;              // Last ACK received
+    volatile int32_t m_iSndLastDataAck = 0;          // The real last ACK that updates the sender buffer and loss list
+    volatile int32_t m_iSndCurrSeqNo = 0;            // The largest sequence number that has been sent
+    int32_t m_iLastDecSeq = 0;                       // Sequence number sent last decrease occurs
+    int32_t m_iSndLastAck2 = 0;                      // Last ACK2 sent back
+    uint64_t m_ullSndLastAck2Time = 0;               // The time when last ACK2 was sent back
 
-    int32_t m_iISN;                              // Initial Sequence Number
+    int32_t m_iISN = 0;                              // Initial Sequence Number
 
     void CCUpdate();
 
 private: // Receiving related data
-    CRcvBuffer* m_pRcvBuffer;                    // Receiver buffer
-    CRcvLossList* m_pRcvLossList;                // Receiver loss list
-    CACKWindow* m_pACKWindow;                    // ACK history window
-    CPktTimeWindow* m_pRcvTimeWindow;            // Packet arrival time window
+    CRcvBuffer* m_pRcvBuffer = nullptr;                    // Receiver buffer
+    CRcvLossList* m_pRcvLossList = nullptr;                // Receiver loss list
+    CACKWindow* m_pACKWindow = nullptr;                    // ACK history window
+    CPktTimeWindow* m_pRcvTimeWindow = nullptr;            // Packet arrival time window
 
-    int32_t m_iRcvLastAck;                       // Last sent ACK
-    uint64_t m_ullLastAckTime;                   // Timestamp of last ACK
-    int32_t m_iRcvLastAckAck;                    // Last sent ACK that has been acknowledged
-    int32_t m_iAckSeqNo;                         // Last ACK sequence number
-    int32_t m_iRcvCurrSeqNo;                     // Largest received sequence number
+    int32_t m_iRcvLastAck = 0;                       // Last sent ACK
+    uint64_t m_ullLastAckTime = 0;                   // Timestamp of last ACK
+    int32_t m_iRcvLastAckAck = 0;                    // Last sent ACK that has been acknowledged
+    int32_t m_iAckSeqNo = 0;                         // Last ACK sequence number
+    int32_t m_iRcvCurrSeqNo = 0;                     // Largest received sequence number
 
-    uint64_t m_ullLastWarningTime;               // Last time that a warning message is sent
+    uint64_t m_ullLastWarningTime = 0;               // Last time that a warning message is sent
 
-    int32_t m_iPeerISN;                          // Initial Sequence Number of the peer side
+    int32_t m_iPeerISN = 0;                          // Initial Sequence Number of the peer side
 
 private: // synchronization: mutexes and conditions
     std::mutex m_ConnectionLock;            // used to synchronize connection operation
 
-    pthread_cond_t m_SendBlockCond;              // used to block "send" call
-    pthread_mutex_t m_SendBlockLock;             // lock associated to m_SendBlockCond
+    std::condition_variable m_SendBlockCond;              // used to block "send" call
+    std::mutex m_SendBlockLock;             // lock associated to m_SendBlockCond
 
-    pthread_mutex_t m_AckLock;                   // used to protected sender's loss list when processing ACK
+    std::mutex m_AckLock;                   // used to protected sender's loss list when processing ACK
 
-    pthread_cond_t m_RecvDataCond;               // used to block "recv" when there is no data
-    pthread_mutex_t m_RecvDataLock;              // lock associated to m_RecvDataCond
+    std::condition_variable m_RecvDataCond; // used to block "recv" when there is no data
+    std::mutex m_RecvDataLock;              // lock associated to m_RecvDataCond
 
-    pthread_mutex_t m_SendLock;                  // used to synchronize "send" call
+    std::mutex m_SendLock;                  // used to synchronize "send" call
     std::mutex m_RecvLock;                  // used to synchronize "recv" call
 
-    void initSynch();
-    void destroySynch();
     void releaseSynch();
 
 private: // Trace
-    uint64_t m_StartTime;                        // timestamp when the UDT entity is started
-    int64_t m_llSentTotal;                       // total number of sent data packets, including retransmissions
-    int64_t m_llRecvTotal;                       // total number of received packets
-    int m_iSndLossTotal;                         // total number of lost packets (sender side)
-    int m_iRcvLossTotal;                         // total number of lost packets (receiver side)
-    int m_iRetransTotal;                         // total number of retransmitted packets
-    int m_iSentACKTotal;                         // total number of sent ACK packets
-    int m_iRecvACKTotal;                         // total number of received ACK packets
-    int m_iSentNAKTotal;                         // total number of sent NAK packets
-    int m_iRecvNAKTotal;                         // total number of received NAK packets
-    int64_t m_llSndDurationTotal;        // total real time for sending
+    uint64_t m_StartTime = 0;                       // timestamp when the UDT entity is started
+    int64_t m_llSentTotal = 0;                      // total number of sent data packets, including retransmissions
+    int64_t m_llRecvTotal = 0;                      // total number of received packets
+    int m_iSndLossTotal = 0;                        // total number of lost packets (sender side)
+    int m_iRcvLossTotal = 0;                        // total number of lost packets (receiver side)
+    int m_iRetransTotal = 0;                        // total number of retransmitted packets
+    int m_iSentACKTotal = 0;                        // total number of sent ACK packets
+    int m_iRecvACKTotal = 0;                        // total number of received ACK packets
+    int m_iSentNAKTotal = 0;                        // total number of sent NAK packets
+    int m_iRecvNAKTotal = 0;                        // total number of received NAK packets
+    int64_t m_llSndDurationTotal = 0;               // total real time for sending
 
-    uint64_t m_LastSampleTime;                   // last performance sample time
-    int64_t m_llTraceSent;                       // number of pakctes sent in the last trace interval
-    int64_t m_llTraceRecv;                       // number of pakctes received in the last trace interval
-    int m_iTraceSndLoss;                         // number of lost packets in the last trace interval (sender side)
-    int m_iTraceRcvLoss;                         // number of lost packets in the last trace interval (receiver side)
-    int m_iTraceRetrans;                         // number of retransmitted packets in the last trace interval
-    int m_iSentACK;                              // number of ACKs sent in the last trace interval
-    int m_iRecvACK;                              // number of ACKs received in the last trace interval
-    int m_iSentNAK;                              // number of NAKs sent in the last trace interval
-    int m_iRecvNAK;                              // number of NAKs received in the last trace interval
-    int64_t m_llSndDuration;            // real time for sending
-    int64_t m_llSndDurationCounter;        // timers to record the sending duration
+    uint64_t m_LastSampleTime = 0;                  // last performance sample time
+    int64_t m_llTraceSent = 0;                      // number of pakctes sent in the last trace interval
+    int64_t m_llTraceRecv = 0;                      // number of pakctes received in the last trace interval
+    int m_iTraceSndLoss = 0;                        // number of lost packets in the last trace interval (sender side)
+    int m_iTraceRcvLoss = 0;                        // number of lost packets in the last trace interval (receiver side)
+    int m_iTraceRetrans = 0;                        // number of retransmitted packets in the last trace interval
+    int m_iSentACK = 0;                             // number of ACKs sent in the last trace interval
+    int m_iRecvACK = 0;                             // number of ACKs received in the last trace interval
+    int m_iSentNAK = 0;                             // number of NAKs sent in the last trace interval
+    int m_iRecvNAK = 0;                             // number of NAKs received in the last trace interval
+    int64_t m_llSndDuration = 0;            // real time for sending
+    int64_t m_llSndDurationCounter = 0;        // timers to record the sending duration
 
 private: // Timers
-    uint64_t m_ullCPUFrequency;                  // CPU clock frequency, used for Timer, ticks per microsecond
+    uint64_t m_ullCPUFrequency = 1;                  // CPU clock frequency, used for Timer, ticks per microsecond
 
-    uint64_t m_ullNextACKTime;            // Next ACK time, in CPU clock cycles, same below
-    uint64_t m_ullNextNAKTime;            // Next NAK time
+    uint64_t m_ullNextACKTime = 0;            // Next ACK time, in CPU clock cycles, same below
+    uint64_t m_ullNextNAKTime = 0;            // Next NAK time
 
-    volatile uint64_t m_ullSYNInt;        // SYN interval
-    volatile uint64_t m_ullACKInt;        // ACK interval
-    volatile uint64_t m_ullNAKInt;        // NAK interval
-    volatile uint64_t m_ullLastRspTime;        // time stamp of last response from the peer
+    volatile uint64_t m_ullSYNInt = 0;        // SYN interval
+    volatile uint64_t m_ullACKInt = 0;        // ACK interval
+    volatile uint64_t m_ullNAKInt = 0;        // NAK interval
+    volatile uint64_t m_ullLastRspTime = 0;        // time stamp of last response from the peer
 
-    uint64_t m_ullMinNakInt;            // NAK timeout lower bound; too small value can cause unnecessary retransmission
-    uint64_t m_ullMinExpInt;            // timeout lower bound threshold: too small timeout can cause problem
+    uint64_t m_ullMinNakInt = 0;            // NAK timeout lower bound; too small value can cause unnecessary retransmission
+    uint64_t m_ullMinExpInt = 0;            // timeout lower bound threshold: too small timeout can cause problem
 
-    int m_iPktCount;                // packet counter for ACK
-    int m_iLightACKCount;            // light ACK counter
+    int m_iPktCount = 0;                // packet counter for ACK
+    int m_iLightACKCount = 0;            // light ACK counter
 
-    uint64_t m_ullTargetTime;            // scheduled time of next packet sending
+    uint64_t m_ullTargetTime = 0;            // scheduled time of next packet sending
 
 private: // for UDP multiplexer
     std::shared_ptr<Multiplexer> m_multiplexer;

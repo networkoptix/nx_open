@@ -98,6 +98,7 @@ public:
 
 private:
     QRegularExpression m_filter;
+    bool m_valid = true;
 };
 
 using LevelFilters = std::map<Filter, Level>;

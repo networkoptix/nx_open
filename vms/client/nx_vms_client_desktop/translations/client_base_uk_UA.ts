@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Отримання оновленої інформації з сервера</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Завантаження пакета оновлення</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Встановлення</translation>
     </message>
   </context>
   <context>
@@ -865,7 +865,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Забули пароль</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -877,15 +877,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Налаштування движка Analytics...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Показувати мініатюри</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Сховати мініатюри</translation>
     </message>
     <message>
       <source>Pin Panel</source>
@@ -897,11 +897,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Віртуальна камера...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Нова віртуальна камера...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +925,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Перейдіть на вкладку Сповіщення</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Перейдіть на вкладку Рух</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Перейдіть на вкладку "Закладка"</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Перейдіть на вкладку Події</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Перейдіть на вкладку Об’єкти</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Кадри об'єктів та інформація...</translation>
     </message>
   </context>
   <context>
@@ -991,23 +991,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Будь ласка введіть пароль</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Неприпустимий пароль.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Зашифрований макет</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Файл %1 зашифрований. Введіть пароль:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Повторно введіть пароль для макета %1:</translation>
     </message>
   </context>
   <context>
@@ -1342,7 +1342,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Макет заблокований</translation>
     </message>
   </context>
   <context>
@@ -1614,21 +1614,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
+        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
+        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
+        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Подробиці %n камери(р) із %1</numerusform>
+        <numerusform>Подробиці %n камери(р) із %1</numerusform>
+        <numerusform>Подробиці %n камери(р) із %1</numerusform>
+        <numerusform>Подробиці %n камери(р) із %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1784,15 +1784,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Оновлення встановлено</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n дії</numerusform>
+        <numerusform>%n дії</numerusform>
+        <numerusform>%n дії</numerusform>
+        <numerusform>%n дії</numerusform>
       </translation>
     </message>
   </context>
@@ -2087,7 +2087,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Функція підтвердження примусу буде працювати лише для загальних подій, якщо в загальній URL-адресі події використовуються модифікатори камери</translation>
     </message>
   </context>
   <context>
@@ -2640,6 +2640,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Не вдалося підключити систему до %1</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation>Внутрішня помилка сервера. Будь ласка, повторіть спробу пізніше.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -2803,11 +2807,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Звантажити і Встановити</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Не вдалося ввести режим сумісності для версії %1</translation>
     </message>
   </context>
   <context>
@@ -2959,7 +2963,7 @@ to %1</source>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>Налаштований кодек: %1 не знайдено, h263p буде використано</translation>
     </message>
   </context>
   <context>
@@ -3077,21 +3081,21 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
       </translation>
     </message>
   </context>
@@ -3177,11 +3181,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (з %n камер)</numerusform>
+        <numerusform>%1 (з %n камер)</numerusform>
+        <numerusform>%1 (з %n камер)</numerusform>
+        <numerusform>%1 (з %n камер)</numerusform>
       </translation>
     </message>
   </context>
@@ -3264,11 +3268,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</translation>
     </message>
   </context>
   <context>
@@ -3455,7 +3459,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Будь ласка введіть значення.</translation>
     </message>
   </context>
   <context>
@@ -3876,7 +3880,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Кожну ліцензію можна деактивувати лише кілька разів.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4186,7 +4190,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Збільшити область</translation>
     </message>
   </context>
   <context>
@@ -4341,11 +4345,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Віртуальна камера</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Віртуальна камера %1</translation>
     </message>
   </context>
   <context>
@@ -4574,11 +4578,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>близько %n хв</numerusform>
+        <numerusform>близько %n хв</numerusform>
+        <numerusform>близько %n хв</numerusform>
+        <numerusform>близько %n хв</numerusform>
       </translation>
     </message>
   </context>
@@ -4767,11 +4771,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Бажаний бітрейт</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>немає даних для прогнозу</translation>
     </message>
   </context>
   <context>
@@ -4821,11 +4825,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Локальні файли</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Немає локальних файлів</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4841,7 +4845,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>відкрити все</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4900,10 +4904,6 @@ to %1</source>
     <message>
       <source>Select Cameras...</source>
       <translation>Виберіть Камери...</translation>
-    </message>
-    <message>
-      <source>Select users...</source>
-      <translation>Виберіть користувачів...</translation>
     </message>
   </context>
   <context>
@@ -4966,7 +4966,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Подія Аналітики</translation>
     </message>
   </context>
   <context>
@@ -5799,23 +5799,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Останні 5 хвилин</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Останні 60 хвилин</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Останні 24 години</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Найдовший доступний період</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Прогноз доступний лише для камер з ввімкненим записом.</translation>
     </message>
   </context>
   <context>
@@ -6070,7 +6070,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Аналітика</translation>
     </message>
   </context>
   <context>
@@ -6211,23 +6211,23 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Жоден сервер не має доступу до Інтернету для синхронізації часу</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Система знаходиться в безпечному режимі</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Жоден сервер не має доступу до Інтернету для синхронізації часу</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Жоден сервер не має доступу до Інтернету для синхронізації часу.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Система працює в безпечному режимі.</translation>
     </message>
   </context>
   <context>
@@ -6269,11 +6269,11 @@ to %1</source>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML-файл</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Файл розповсюдження аркуша (CSV)</translation>
     </message>
   </context>
   <context>
@@ -6307,11 +6307,11 @@ to %1</source>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Час VMS синхронізується з Інтернетом і не залежить від місцевого часу на серверах.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Системний час синхронізується з локальним часом на вибраному сервері і не залежить від локального часу на інших серверах.</translation>
     </message>
   </context>
   <context>
@@ -6322,11 +6322,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Натисніть і говоріть</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>Вхідний пристрій не вибрано</translation>
@@ -6338,6 +6334,10 @@ to %1</source>
     <message>
       <source>Network error</source>
       <translation>Помилка мережі</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Натисніть і говоріть</translation>
     </message>
   </context>
   <context>
@@ -6425,7 +6425,7 @@ to %1</source>
     </message>
     <message>
       <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
+      <translation>Оновлення скасоване.</translation>
     </message>
   </context>
   <context>
@@ -6888,19 +6888,19 @@ to %1</source>
     <name>QnWorkbenchContext</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Щоб продовжити, перегляньте та погодьтеся з номером %1</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Для використання програмного забезпечення ви повинні прийняти ліцензійну угоду кінцевого користувача</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Я згоден</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Я не згідний</translation>
     </message>
   </context>
   <context>
@@ -6912,10 +6912,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Сервери з іншої системи будуть відображатися в дереві ресурсів.</translation>
-    </message>
-    <message>
-      <source>Failed to merge Systems</source>
-      <translation>Не вдалося об'єднати Системи</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
@@ -6949,6 +6945,18 @@ to %1</source>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 системи не можуть бути об’єднані</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation>%1 успішно налаштовано.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation>Щоб завершити процес, підключіться до нього з клієнтом і оновіть до версії %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation>Не вдалося об'єднати %1 з нашою системою.</translation>
     </message>
   </context>
   <context>
@@ -7028,7 +7036,7 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -7079,11 +7087,11 @@ to %1</source>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>Зображення PNG</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>Зображення JPEG</translation>
     </message>
   </context>
   <context>
@@ -7351,19 +7359,19 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Не вдалося додати віртуальну камеру</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Відкрити записи віртуальної камери...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший екземпляр віртуальної камери.</numerusform>
       </translation>
     </message>
     <message>
@@ -7624,11 +7632,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Деякі відеофайли як і раніше завантажуються у віртуальну камеру %n:</numerusform>
+        <numerusform>Деякі відеофайли як і раніше завантажуються у віртуальну камеру %n:</numerusform>
+        <numerusform>Деякі відеофайли як і раніше завантажуються у віртуальну камеру %n:</numerusform>
+        <numerusform>Деякі відеофайли як і раніше завантажуються у віртуальну камеру %n:</numerusform>
       </translation>
     </message>
   </context>
@@ -7716,21 +7724,21 @@ to %1</source>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Ця платформа Linux більше не підтримується</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Ця версія ОС більше не підтримується</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Ця версія %1 більше не підтримується</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 більше не підтримується</translation>
     </message>
   </context>
   <context>
@@ -7805,23 +7813,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Пристрої на макеті</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Камери на макеті</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Будь-який пристрій</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Будь-яка камера</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Вибраний пристрій</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7832,11 +7840,11 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Показувати завжди</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Показати лише за допомогою вкладки &quot;Об'єкт&quot; Tab</translation>
     </message>
   </context>
   <context>
@@ -7847,7 +7855,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>видалена камера</translation>
     </message>
   </context>
   <context>
@@ -7862,11 +7870,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n об'єкт</numerusform>
+        <numerusform>%n об'єкти</numerusform>
+        <numerusform>%n об'єкти</numerusform>
+        <numerusform>%n об'єкти</numerusform>
       </translation>
     </message>
     <message>
@@ -7875,11 +7883,11 @@ to %1</source>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Виберіть область</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Виберіть ділянку на відео...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7887,7 +7895,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>неназваний движок аналітики</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7895,11 +7903,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Введіть параметри</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Дія вимагає заповнення деяких параметрів.</translation>
     </message>
   </context>
   <context>
@@ -7913,7 +7921,7 @@ to %1</source>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>видалена камера</translation>
     </message>
   </context>
   <context>
@@ -8124,16 +8132,16 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камери</numerusform>
+        <numerusform>%n камери</numerusform>
+        <numerusform>%n камери</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>У вас немає камер</translation>
     </message>
   </context>
   <context>
@@ -8168,7 +8176,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Аналітика</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -8271,43 +8279,43 @@ to %1</source>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Файл оновлення не знайдено</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Файл оновлення пошкоджено</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Не вдалося завантажити пакети оновлень: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Пакет оновлення пошкоджено: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Оновлення вже встановлено.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Ця версія ще не встановлена.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Недійсний формат версії.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Неправильний пакет оновлення.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
+      <translation>Недостатньо місця на диску для встановлення оновлення клієнта.</translation>
     </message>
     <message>
       <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
+      <translation>Інсталяційний пакет було втрачено.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -8353,7 +8361,7 @@ to %1</source>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Для деяких вибраних камер потрібно встановити пароль.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8437,15 +8445,15 @@ to %1</source>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Усі пристрої вже додані</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>Додано %n пристрій. Ви можете закрити це діалогове вікно або почати новий пошук</numerusform>
+        <numerusform>Додано %n пристрої. Ви можете закрити це діалогове вікно або почати новий пошук</numerusform>
+        <numerusform>Додано %n пристрої. Ви можете закрити це діалогове вікно або почати новий пошук</numerusform>
+        <numerusform>Додано %n пристрої. Ви можете закрити це діалогове вікно або почати новий пошук</numerusform>
       </translation>
     </message>
     <message>
@@ -8463,7 +8471,7 @@ to %1</source>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Поле адреси не повинно бути порожнім</translation>
     </message>
   </context>
   <context>
@@ -8498,39 +8506,39 @@ to %1</source>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Події сервера</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Аналітика подій</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Будь-яка проблема з пристроєм</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Будь-яка проблема з камерою</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Будь-яка подія сервера</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Проблеми з пристроями</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Проблеми з камерою</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Будь-яка подія</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Подія Аналітики</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8551,7 +8559,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>неназваний движок аналітики</translation>
     </message>
   </context>
   <context>
@@ -8570,7 +8578,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Будь ласка, введіть пароль.</translation>
     </message>
   </context>
   <context>
@@ -8719,7 +8727,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Ви збираєтеся експортувати довге відео. Для цього може знадобитися багато місця для зберігання та зайняти значний час.</translation>
     </message>
   </context>
   <context>
@@ -8791,20 +8799,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n новий</numerusform>
+        <numerusform>%n нові</numerusform>
+        <numerusform>%n нові</numerusform>
+        <numerusform>%n нові</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n пристрій</numerusform>
+        <numerusform>%n пристрої</numerusform>
+        <numerusform>%n пристрої</numerusform>
+        <numerusform>%n пристрої</numerusform>
       </translation>
     </message>
   </context>
@@ -8849,7 +8857,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Копіювати посилання</translation>
     </message>
   </context>
   <context>
@@ -8955,7 +8963,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>видалена камера</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8970,27 +8978,27 @@ to %1</source>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Перевіряти наявність оновлень автоматично</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Перевірка оновлень</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Примусова перевірка</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Вимкнути автоматичну перевірку</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Перевірте один раз</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Перевіряти автоматично</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -9002,39 +9010,39 @@ to %1</source>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Ви вже встановили цю версію.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>Не вдається перевірити оновлення в Інтернеті</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Збірка не знайдена</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Неможливо оновитися з цього файлу</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Недійсна інформація для оновлення</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Перехід до попередніх версій неможливий</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Файл оновлення не знайдено</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Пакет оновлення порушено</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Відсутній пакет оновлення для деяких серверів</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -9043,7 +9051,7 @@ to %1</source>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Оновлення відсутні</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -9059,7 +9067,7 @@ to %1</source>
     </message>
     <message>
       <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
+      <translation>Готовий до встановлення оновлень клієнтів</translation>
     </message>
     <message>
       <source>Install now</source>
@@ -9107,11 +9115,11 @@ to %1</source>
     </message>
     <message>
       <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
+      <translation>Оновлення завершено, але деякі сервери не отримали оновлення</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9119,7 +9127,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
+      <translation>Не вдалося встановити оновлення на сервери:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -9127,15 +9135,15 @@ to %1</source>
     </message>
     <message>
       <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
+      <translation>Встановлення оновлень...</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Завантажити</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Звантажити і Встановити</translation>
     </message>
     <message>
       <source>Download</source>
@@ -9143,15 +9151,15 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Звантажити і Встановити</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Обрати інше місце</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Знайти файл оновлення...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -9159,11 +9167,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Завантаження оновлень...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Завантаження пакета оновлення...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -9171,7 +9179,7 @@ to %1</source>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Встановлення оновлення клієнта...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -9187,7 +9195,7 @@ to %1</source>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>Система оновлена до</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -9207,7 +9215,7 @@ to %1</source>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Оновлення від медіасерверів</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -9215,20 +9223,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Відсутній пакет оновлення для клієнта</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Завершити оновлення</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -9236,11 +9244,15 @@ to %1</source>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>Встановлено найновішу версію</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Ця версія вже встановлена</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
     </message>
   </context>
   <context>
@@ -9256,7 +9268,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>У вас немає макетів</translation>
     </message>
   </context>
   <context>
@@ -9305,7 +9317,7 @@ to %1</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Жодна з вибраних ролей не містить користувачів. Дія не спрацює.</translation>
     </message>
   </context>
   <context>
@@ -9385,7 +9397,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Рух + низк. якість</translation>
     </message>
   </context>
   <context>
@@ -9453,7 +9465,7 @@ to %1</source>
     </message>
     <message>
       <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
+      <translation>Користувач автоматично вийде з системи після закінчення цього періоду часу.</translation>
     </message>
     <message>
       <source>minutes</source>
@@ -9472,11 +9484,11 @@ to %1</source>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Встановлено</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Встановлення...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9499,7 +9511,7 @@ to %1</source>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Місце зберігання оновлені файли</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9507,7 +9519,7 @@ to %1</source>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Компонент</translation>
     </message>
   </context>
   <context>
@@ -9525,7 +9537,7 @@ to %1</source>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Виберіть область відео, щоб фільтрувати результати</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9554,11 +9566,11 @@ to %1</source>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Вибраний пристрій</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Вибрані медіа</translation>
     </message>
     <message>
       <source>none</source>
@@ -9577,11 +9589,11 @@ to %1</source>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Користувач %n не налаштував адресу Email</numerusform>
+        <numerusform>Користувачі %n не налаштували адресу Email</numerusform>
+        <numerusform>Користувачі %n не налаштували адресу Email</numerusform>
+        <numerusform>Користувачі %n не налаштували адресу Email</numerusform>
       </translation>
     </message>
     <message>
@@ -9602,16 +9614,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Двічі клацніть, щоб додати камеру до поточного макета, або натисніть Ctrl + клік, щоб відкрити нову вкладку</numerusform>
+        <numerusform>Двічі клацніть, щоб додати камери до поточного макета, або натисніть Ctrl + клік, щоб відкрити нову вкладку</numerusform>
+        <numerusform>Двічі клацніть, щоб додати камери до поточного макета, або натисніть Ctrl + клік, щоб відкрити нову вкладку</numerusform>
+        <numerusform>Двічі клацніть, щоб додати камери до поточного макета, або натисніть Ctrl + клік, щоб відкрити нову вкладку</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Немає доступного архіву</translation>
     </message>
   </context>
   <context>
@@ -9622,7 +9634,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Часовий пояс</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9630,42 +9642,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Час серверу</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Час VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Час, спільний і синхронізований між усіма серверами. Може відрізнятися від часу операційної системи на певному сервері.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Синхронізувати час з Інтернетом</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Синхронізується з місцевим часом на вибраному сервері</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Не синхронізовано. Кожен сервер використовує свій власний локальний час.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Відповідає місцевому часу сервера</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Без підключення до Інтернету. Час не синхронізується.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Сервер часу перебуває поза мережею. Час не синхронізовано.</translation>
     </message>
   </context>
   <context>
@@ -9691,7 +9703,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Не вдалося створити завантаження на стороні сервера: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9710,11 +9722,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Рух виявляється лише під час завантаження відео.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Активація або деактивація цього параметра не змінює існуючого архіву.</translation>
     </message>
   </context>
   <context>
@@ -9815,7 +9827,7 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Початок експорту...</translation>
     </message>
   </context>
   <context>
@@ -9863,7 +9875,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Будь-який плагін</translation>
     </message>
   </context>
   <context>
@@ -9994,7 +10006,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Макет заповнений</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -10064,7 +10076,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Віртуальні камери не можуть переміщатися між серверами</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -10076,7 +10088,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Всі підтримувані</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -10182,16 +10194,16 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Не вдалося змінити пароль на %n з %1 камер</numerusform>
+        <numerusform>Не вдалося змінити пароль на %n з %1 камер</numerusform>
+        <numerusform>Не вдалося змінити пароль на %n з %1 камер</numerusform>
+        <numerusform>Не вдалося змінити пароль на %n з %1 камер</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Ця збірка призначена для тестування.</translation>
     </message>
   </context>
   <context>

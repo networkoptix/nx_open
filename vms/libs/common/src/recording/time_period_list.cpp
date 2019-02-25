@@ -341,6 +341,38 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(
     return aggregateTimePeriodsUnconstrained(periods, detailLevel);
 }
 
+QnTimePeriodList QnTimePeriodList::intersection(
+    const QnTimePeriodList& first, const QnTimePeriodList& second)
+{
+    QnTimePeriodList result;
+    auto firstIt = first.begin();
+    auto secondIt = second.begin();
+    while (true)
+    {
+        if (firstIt == first.end() || secondIt == second.end())
+            return result;
+
+        const auto intersected = firstIt->intersected(*secondIt);
+        if (intersected.isEmpty())
+        {
+            if (firstIt->startTime() < secondIt->startTime())
+                ++firstIt;
+            else
+                ++secondIt;
+        }
+        else
+        {
+            result << intersected;
+            if (firstIt->endTime() < secondIt->endTime())
+                ++firstIt;
+            else
+                ++secondIt;
+        }
+    }
+
+    return result;
+}
+
 void QnTimePeriodList::includeTimePeriod(const QnTimePeriod &period)
 {
     if (period.isEmpty())

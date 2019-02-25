@@ -2549,6 +2549,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 시스템에 연결 하지 못했습니다.</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -4729,10 +4733,6 @@ to %1</source>
       <source>Select Cameras...</source>
       <translation>카메라 선택...</translation>
     </message>
-    <message>
-      <source>Select users...</source>
-      <translation>사용자 선택...</translation>
-    </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
@@ -6129,11 +6129,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>말하기 위해 잡고 계세요.</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>입력장치가 선택되지 않음</translation>
@@ -6145,6 +6141,10 @@ to %1</source>
     <message>
       <source>Network error</source>
       <translation>네트워크 문제</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>말하기 위해 잡고 계세요.</translation>
     </message>
   </context>
   <context>
@@ -6697,10 +6697,6 @@ to %1</source>
       <translation>다른 시스템의 서바가 서버 리소스 트리에 곧 표시 됩니다.</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>시스템을 병합 하지 못했습니다.</translation>
-    </message>
-    <message>
       <source>Failed to update Server</source>
       <translation>서버를 업데이트 하지 못했습니다.</translation>
     </message>
@@ -6732,6 +6728,18 @@ to %1</source>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 시스템은 병합 할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -8868,6 +8876,10 @@ to %1</source>
     <message>
       <source>This version is already installed</source>
       <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
   </context>
   <context>

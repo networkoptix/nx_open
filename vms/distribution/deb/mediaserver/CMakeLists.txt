@@ -29,7 +29,10 @@ set(common_depends
     "libldap-2.4-2"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
-set(arch.depends ", syslinux")
+
+if(NOT "${box}" STREQUAL "tx1")
+    set(arch.depends ", syslinux")
+endif()
 
 if(cloudGroup STREQUAL "prod")
     set(cloud_group_suffix)
