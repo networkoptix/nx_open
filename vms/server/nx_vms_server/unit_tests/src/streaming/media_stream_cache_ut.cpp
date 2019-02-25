@@ -37,14 +37,14 @@ const std::vector<FrameDescriptor> multiChannelTestData =
     {milliseconds(20), 0, false}, // p0
     {milliseconds(30), 1, false}, // p1
 
-    {milliseconds(30), 1, true},  // K1
-    {milliseconds(30), 0, true},  // K0
-    {milliseconds(40), 0, false}, // p0
-    {milliseconds(40), 1, false}, // p1
+    {milliseconds(40), 1, true},  // K1
+    {milliseconds(40), 0, true},  // K0
+    {milliseconds(50), 0, false}, // p0
+    {milliseconds(50), 1, false}, // p1
 
-    {milliseconds(50), 0, true},  // K0
-    {milliseconds(60), 1, false}, // p1
-    {milliseconds(70), 1, true}   // K1
+    {milliseconds(60), 0, true},  // K0
+    {milliseconds(70), 1, false}, // p1
+    {milliseconds(80), 1, true}   // K1
 };
 
 } // namespace
@@ -75,18 +75,28 @@ public:
         }
     }
 
-    void assertSearch(milliseconds searchedTimestamp, milliseconds shouldFindTimestamp,
+    void assertSearch(milliseconds searchedTimestamp, std::optional<milliseconds> shouldFindTimestamp,
         int channel = 0, bool isKeyFrameOnly = false)
     {
         quint64 foundTimestamp;
-        auto dataPacket =
-            cache.findByTimestamp(searchedTimestamp.count() * 1000, isKeyFrameOnly, &foundTimestamp, channel);
+        auto dataPacket = cache.findByTimestamp(
+            searchedTimestamp.count() * 1000, isKeyFrameOnly, &foundTimestamp, channel);
+
+        if (!shouldFindTimestamp.has_value())
+        {
+            ASSERT_EQ(dataPacket, nullptr);
+            return;
+        }
         ASSERT_NE(dataPacket, nullptr);
-        EXPECT_EQ(dataPacket->timestamp, shouldFindTimestamp.count() * 1000);
-        EXPECT_EQ(foundTimestamp, shouldFindTimestamp.count() * 1000);
+        EXPECT_EQ(dataPacket->timestamp, shouldFindTimestamp->count() * 1000);
+        EXPECT_EQ(foundTimestamp, shouldFindTimestamp->count() * 1000);
 
         auto videoPacket = std::dynamic_pointer_cast<QnCompressedVideoData>(dataPacket);
         ASSERT_NE(videoPacket, nullptr);
+        if (isKeyFrameOnly)
+        {
+            EXPECT_TRUE(videoPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey));
+        }
         EXPECT_EQ(videoPacket->channelNumber, channel);
     }
 
@@ -109,6 +119,9 @@ TEST_F(MediaStreamCacheTest, findByTimestamp)
     const milliseconds tsBeforeLast =
         (singleChannelTestData[singleChannelTestData.size()-2]).timestamp;
 
+    // Search in empty cache.
+    assertSearch(tsStart, {});
+
     fillCache(singleChannelTestData);
 
     // The first one.
@@ -124,19 +137,44 @@ TEST_F(MediaStreamCacheTest, findByTimestamp)
     // After the last one, close to the last one.
     assertSearch(tsLast + milliseconds(1), tsLast);
 
-    quint64 foundTimestamp;
     // Before the first one.
-    ASSERT_EQ(cache.findByTimestamp((tsStart.count() - 1) * 1000, false, &foundTimestamp, 0), nullptr);
-//     After the last one, far from the last.
+    assertSearch(tsStart - milliseconds(1), {});
+    // After the last one, far from the last.
     auto tsFarFromLast = tsLast + detail::MediaStreamCache::kMaxTimestampDeviation + milliseconds(1);
-    ASSERT_EQ(cache.findByTimestamp(tsFarFromLast.count() * 1000, false, &foundTimestamp, 0), nullptr);
+    assertSearch(tsFarFromLast, {});
 }
 
-// TODO: test channels and keyFrameOnly
-// TODO: add test for two same numbers
 TEST_F(MediaStreamCacheTest, findByTimestamp_multichannel)
 {
-    fillCache(multiChannelTestData);
+    const auto &testData = multiChannelTestData;
+    fillCache(testData);
+
+    // Exactly key-frame.
+    assertSearch(testData[0].timestamp, testData[0].timestamp, 0, /*isKeyFrameOnly*/ true);
+    assertSearch(testData[1].timestamp, testData[1].timestamp, 1, /*isKeyFrameOnly*/ true);
+
+    // Exactly p-frame.
+    assertSearch(testData[2].timestamp, testData[0].timestamp, 0, /*isKeyFrameOnly*/ true);
+    assertSearch(testData[3].timestamp, testData[1].timestamp, 1, /*isKeyFrameOnly*/ true);
+
+    // Another channel key-frame.
+    assertSearch(testData[8].timestamp, testData[4].timestamp, 1, /*isKeyFrameOnly*/ true);
+    assertSearch(testData[10].timestamp, testData[8].timestamp, 0, /*isKeyFrameOnly*/ true);
+
+    // Another channel p-frame (isKeyFrameOnly = false).
+    assertSearch(testData[7].timestamp, testData[6].timestamp, 0, /*isKeyFrameOnly*/ false);
+    assertSearch(testData[8].timestamp, testData[7].timestamp, 1, /*isKeyFrameOnly*/ false);
+
+    // After the last one.
+    assertSearch(tsLast + milliseconds(1), testData[8].timestamp, 0, /*isKeyFrameOnly*/ true);
+    assertSearch(tsLast + milliseconds(1), testData[10].timestamp, 1, /*isKeyFrameOnly*/ true);
+
+    // No exact match.
+    assertSearch(tsLast - milliseconds(1), testData[8].timestamp, 0, /*isKeyFrameOnly*/ true);
+    assertSearch(tsLast - milliseconds(1), testData[4].timestamp, 1, /*isKeyFrameOnly*/ true);
+
+    // Not found channel.
+    assertSearch(tsLast, {}, 2, /*isKeyFrameOnly*/ true);
 }
 
 //TEST(MediaStreamCache, getNextPacket)
