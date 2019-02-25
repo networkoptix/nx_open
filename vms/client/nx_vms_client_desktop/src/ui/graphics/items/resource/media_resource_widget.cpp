@@ -1553,7 +1553,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     {
         const PainterTransformScaleStripper scaleStripper(painter);
 
-        const auto result = m_renderer->discardFrame(channel);
+        result = m_renderer->discardFrame(channel);
         m_paintedChannels[channel] = true;
 
         painter->drawPixmap(
@@ -1750,7 +1750,7 @@ void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect
     {
         // We have implicit camera rotation due to default rotation and/or dewarping procedure.
         // We should rotate watermark to make it appear in appropriate orientation.
-        const auto& oldTransform = painter->transform();
+        const auto oldTransform = painter->transform();
         const auto transform =
             QTransform().translate(rect.center().x(), rect.center().y()).rotate(-imageRotation);
         painter->setTransform(transform, true);
