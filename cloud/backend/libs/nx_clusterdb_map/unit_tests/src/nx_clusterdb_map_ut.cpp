@@ -496,8 +496,8 @@ private:
     void callbackFired()
     {
         {
-            m_callbackFired = true;
             std::lock_guard<std::mutex> lock(m_mutex);
+            m_callbackFired = true;
         }
         m_wait.notify_all();
     }
