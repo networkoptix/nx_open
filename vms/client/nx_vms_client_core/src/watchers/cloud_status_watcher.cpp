@@ -197,7 +197,6 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
                 case QnCloudStatusWatcher::LoggedOut:
                     d->setRecentCloudSystems(QnCloudSystemList());
                     d->cloudConnection.reset();
-                    resetCredentials(true);
                     break;
                 default:
                     break;
@@ -577,7 +576,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     }
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
-    cloudConnection->setCredentials(credentials.user.toStdString(), 
+    cloudConnection->setCredentials(credentials.user.toStdString(),
         credentials.password.toStdString());
 
     /* Very simple email check. */
@@ -612,6 +611,7 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
         && errorCode == QnCloudStatusWatcher::InvalidPassword)
     {
         NX_ERROR(this, "Detected invalid user password. Forcing logout. Could it be user has changed the password?");
+        q->resetCredentials(true);
         emit q->forcedLogout();
     }
 

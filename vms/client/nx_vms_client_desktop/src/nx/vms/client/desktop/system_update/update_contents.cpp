@@ -258,6 +258,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         record.append(package);
     }
 
+    QSet<QnUuid> serversWithNewerVersion;
+
     // TODO: Should reverse this verification: get all platform configurations and find packages for them.
     // Checking if all servers have update packages.
     for (auto record: activeServers)
@@ -302,12 +304,12 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         // Prohibiting updates to previous version.
         if (serverVersion > targetVersion)
         {
-            NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
+            NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") server"
                 << server->getId()
                 << "ver" << serverVersion.toString()
-                << "is incompatible with this update";
-            contents.invalidVersion.insert(server->getId());
+                << "has a newer version";
+            serversWithNewerVersion.insert(server->getId());
         }
         else if (serverVersion != targetVersion)
         {
@@ -317,6 +319,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         if (package)
         {
             package->targets.push_back(server->getId());
+            contents.serversWithUpdate.insert(server->getId());
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
             if (!hasInternet)
                 manualPackages.insert(package);
@@ -327,6 +330,11 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     for (auto package: manualPackages)
         contents.manualPackages.push_back(*package);
+
+    if (contents.serversWithUpdate.empty())
+        contents.invalidVersion.unite(serversWithNewerVersion);
+    else
+        contents.ignorePeers = serversWithNewerVersion;
 
     contents.alreadyInstalled = alreadyInstalled;
     contents.cloudIsCompatible = checkCloudHost(commonModule, targetVersion, contents.info.cloudHost, allServers);
