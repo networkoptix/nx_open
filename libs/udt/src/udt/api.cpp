@@ -90,8 +90,7 @@ void CUDTSocket::removeEPoll(const int eid)
 ////////////////////////////////////////////////////////////////////////////////
 
 CUDTUnited::CUDTUnited():
-    m_TLSError(),
-    m_MultiplexerLock()
+    m_TLSError()
 {
     // Socket ID MUST start from a random value
     srand((unsigned int)CTimer::getTime());
@@ -109,6 +108,13 @@ CUDTUnited::CUDTUnited():
 
 CUDTUnited::~CUDTUnited()
 {
+    m_Sockets.clear();
+    m_ClosedSockets.clear();
+
+    for (auto& idAndMultiplexer: m_multiplexers)
+        idAndMultiplexer.second->shutdown();
+    m_multiplexers.clear();
+
 #ifndef _WIN32
     pthread_key_delete(m_TLSError);
 #else
