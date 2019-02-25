@@ -1741,6 +1741,9 @@ void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect,
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
 {
+    if (!m_watermarkPainter->watermark().visible())
+        return;
+
     const auto imageRotation = defaultFullRotation();
     if (imageRotation == 0)
     {
