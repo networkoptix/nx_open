@@ -39,12 +39,12 @@ void DiscoveryServer::registerRequestHandlers(
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::post,
         kRegisterNodePath,
-        [this](auto&&... args) { serveRegisterNode(std::move(args)...); });
+        [this](auto&&... args) { serveRegisterNode(std::forward<decltype(args)>(args)...); });
 
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::get,
         kRegisterNodePath,
-        [this](auto&&... args) { serveGetOnlineNodes(std::move(args)...); });
+        [this](auto&&... args) { serveGetOnlineNodes(std::forward<decltype(args)>(args)...); });
 }
 
 void DiscoveryServer::serveRegisterNode(
