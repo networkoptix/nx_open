@@ -53,9 +53,15 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
 
     addItemForClient();
+
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
         atResourceAdded(server);
+
+    // We will not work with incompatible systems for now. We are going to deal with it in 4.1.
+    //const auto incompatible = pool->getIncompatibleServers();
+    //for (const QnMediaServerResourcePtr& server: incompatible)
+    //    atResourceAdded(server);
 
     m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
         this, &PeerStateTracker::atResourceAdded);
@@ -90,6 +96,8 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
 {
     if (!item)
         return QnMediaServerResourcePtr();
+    if (item->incompatible)
+        return resourcePool()->getIncompatibleServerById(item->id);
     return resourcePool()->getResourceById<QnMediaServerResource>(item->id);
 }
 
@@ -189,7 +197,8 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 item->installing = false;
-            item->offline = (status.second.code == StatusCode::offline);
+            // Ignoring 'offline' status from /ec2/updateStatus.
+            //item->offline = (status.second.code == StatusCode::offline);
             emit itemChanged(item);
         }
     }
@@ -372,13 +381,6 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
-    bool fake = server->hasFlags(Qn::fake_server);
-    if (fake)
-    {
-        NX_VERBOSE(this, "atResourceAdded(%1) - server is fake", server->getName());
-        return;
-    }
-
     UpdateItemPtr item;
     {
         QnMutexLocker locker(&m_dataLock);
@@ -536,11 +538,18 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 {
     bool changed = false;
     auto status = server->getStatus();
-    // TODO: Right now 'Incompatible' means we should use legacy update system to deal with them
-    bool incompatible = status == Qn::ResourceStatus::Incompatible;
+
+    bool incompatible = status == Qn::ResourceStatus::Incompatible
+        || server->hasFlags(Qn::fake_server);
     if (incompatible != item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = incompatible;
+        changed = true;
+    }
+
+    if (incompatible != item->incompatible)
+    {
+        item->incompatible = incompatible;
         changed = true;
     }
 
@@ -550,6 +559,13 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     if (version < kNewUpdateSupportVersion && !item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = true;
+        changed = true;
+    }
+
+    bool viewAsOffline = !server->isOnline() || incompatible;
+    if (item->offline != viewAsOffline)
+    {
+        item->offline = viewAsOffline;
         changed = true;
     }
 

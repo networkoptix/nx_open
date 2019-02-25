@@ -75,12 +75,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nytt system</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Det upptäckta systemet %1 är oförenligt med det nuvarande systemet.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -113,26 +113,6 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Systemhändelse</translation>
-    </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>Systemet är redan bunden till molnet (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>Servern är inte ansluten till Internet.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>Misslyckades med att spara molnuppgifter till lokala DB</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>Misslyckades med att spara molnägare till lokal DB</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>Det gick inte att ansluta till molnet: %1</translation>
     </message>
   </context>
   <context>

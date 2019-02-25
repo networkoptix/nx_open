@@ -155,7 +155,8 @@ void InternetOnlyPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle h
         return;
 
     NX_MUTEX_LOCKER lock(&d->mutex);
-    d->requestClients.remove(handle);
+    auto httpClient = d->requestClients.take(handle);
+    httpClient->pleaseStopSync();
 }
 
 bool InternetOnlyPeerManager::hasAccessToTheUrl(const QString& url) const

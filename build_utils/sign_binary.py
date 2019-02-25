@@ -7,6 +7,9 @@ from requests.packages.urllib3.util.retry import Retry
 
 chunk_size = 1024 * 1024
 
+DEFAULT_TIMEOUT = 600
+DEFAULT_RETRIES = 10
+
 
 def bool_to_str(value):
     return 'true' if value else 'false'
@@ -18,8 +21,8 @@ def sign_binary(
     output,
     customization,
     trusted_timestamping,
-    timeout,
-    max_retries
+    timeout=DEFAULT_TIMEOUT,
+    max_retries=DEFAULT_RETRIES
 ):
 
     params = {
@@ -31,27 +34,39 @@ def sign_binary(
         'file': open(file, 'rb')
     }
 
-    retries = Retry(
-        total=max_retries,
-        backoff_factor=0.1)
+    last_status_code = 0
+    for current_try in range(1, max_retries + 1):
+        print('Signing file {}'.format(file))
+        retries = Retry(
+            total=max_retries,
+            backoff_factor=0.1)
+        session = requests.Session()
+        session.mount(url, HTTPAdapter(max_retries=retries))
+        try:
+            r = session.post(url, params=params, files=files, timeout=timeout)
+            if r.status_code == 200:
+                with open(output, 'wb') as fd:
+                    for chunk in r.iter_content(chunk_size=chunk_size):
+                        fd.write(chunk)
+                return 0
+            else:
+                print('ERROR: {}'.format(r.text))
+                last_status_code = r.status_code
 
-    session = requests.Session()
-    session.mount(url, HTTPAdapter(max_retries=retries))
-    try:
-        r = session.post(url, params=params, files=files, timeout=timeout)
-        if r.status_code != 200:
-            print('ERROR: {}'.format(r.text))
-            return r.status_code
+        except requests.exceptions.ReadTimeout as e:
+            print('ERROR: Connection to the signing server has timed out' +
+                  ' ({} seconds, {} retries) while signing {}'.format(timeout, max_retries, file))
+            print(e)
+            last_status_code = 1
+        except requests.exceptions.ConnectionError as e:
+            print('ERROR: Connection to the signing server cannot be established ' +
+                  'while signing {}'.format(file))
+            print(e)
+            last_status_code = 2
+        print('Trying again')
 
-        with open(output, 'wb') as fd:
-            for chunk in r.iter_content(chunk_size=chunk_size):
-                fd.write(chunk)
-
-        return 0
-    except requests.exceptions.ConnectionError as e:
-        print('ERROR: Connection to the signing server cannot be established.')
-        print(e)
-        return 1
+    print('ERROR: Too max retries failed. Status code {}'.format(last_status_code))
+    return last_status_code
 
 
 def main():
@@ -66,8 +81,16 @@ def main():
         '-t', '--trusted-timestamping',
         action='store_true',
         help='Trusted timestamping')
-    parser.add_argument('--retries', help='Max retries count (10)', type=int, default=10)
-    parser.add_argument('--timeout', help='Request timeout in seconds (30)', type=int, default=30)
+    parser.add_argument(
+        '--retries',
+        help='Max retries count ({})'.format(DEFAULT_RETRIES),
+        type=int,
+        default=DEFAULT_RETRIES)
+    parser.add_argument(
+        '--timeout',
+        help='Request timeout in seconds ({})'.format(DEFAULT_TIMEOUT),
+        type=int,
+        default=DEFAULT_TIMEOUT)
     args = parser.parse_args()
 
     return sign_binary(

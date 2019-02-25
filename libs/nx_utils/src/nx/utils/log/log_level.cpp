@@ -132,8 +132,11 @@ bool Tag::operator!=(const Tag& rhs) const
 // Filter
 
 Filter::Filter(const QRegularExpression& source):
-    m_filter(source)
+    m_filter(source),
+    m_valid(m_filter.isValid())
 {
+    if (m_valid)
+        m_filter.optimize();
 }
 
 Filter::Filter(const QString& source):
@@ -148,7 +151,7 @@ Filter::Filter(const Tag& tag):
 
 bool Filter::isValid() const
 {
-    return m_filter.isValid();
+    return m_valid;
 }
 
 bool Filter::accepts(const Tag& tag) const

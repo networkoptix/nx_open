@@ -115,7 +115,7 @@ QPixmap createWatermarkTile(const Watermark& watermark, const QSize& size, const
     painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setPen(kWatermarkColor);
     painter.setFont(font);
-    painter.drawText(0, 0,size.width(),size.height(),Qt::AlignCenter, watermark.text);
+    painter.drawText(0, 0, size.width(), size.height(), Qt::AlignCenter, watermark.text);
     painter.end(); //< or we may crush in painter destructor later.
 
     nx::utils::graphics::DropShadowFilter().filterImage(tile); //< Add shadow.

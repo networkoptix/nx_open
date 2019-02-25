@@ -14,16 +14,18 @@ MediatorStunClient::MediatorStunClient(
     MediatorEndpointProvider* endpointProvider)
     :
     base_type(
-        [settings]()
+        [settings]() mutable
         {
             using namespace nx::network::stun;
 
+            settings.reconnectPolicy = nx::network::RetryPolicy::kNoRetries;
             auto client = std::make_unique<AsyncClientWithHttpTunneling>(settings);
             client->setTunnelValidatorFactory([](auto connection, const auto& /*response*/) {
                 return std::make_unique<ClientConnectionValidator>(std::move(connection)); });
             return client;
         }()),
-    m_endpointProvider(endpointProvider)
+    m_endpointProvider(endpointProvider),
+    m_reconnectTimer(settings.reconnectPolicy)
 {
     bindToAioThread(m_endpointProvider ? m_endpointProvider->getAioThread() : getAioThread());
 
@@ -38,6 +40,7 @@ void MediatorStunClient::bindToAioThread(
 
     if (m_alivenessTester)
         m_alivenessTester->bindToAioThread(aioThread);
+    m_reconnectTimer.bindToAioThread(aioThread);
 }
 
 void MediatorStunClient::connect(
@@ -47,15 +50,10 @@ void MediatorStunClient::connect(
     dispatch(
         [this, url, handler = std::move(handler)]() mutable
         {
-            m_urlKnown = true;
-            base_type::connect(
-                url,
-                [this, handler = std::move(handler)](auto&&... args) mutable
-                {
-                    handleConnectCompletion(
-                        std::move(handler),
-                        std::forward<decltype(args)>(args)...);
-                });
+            m_url = url;
+            m_externallyProvidedUrl = true;
+
+            connectInternal(std::move(handler));
         });
 }
 
@@ -68,19 +66,17 @@ void MediatorStunClient::sendRequest(
         [this, request = std::move(request),
             handler = std::move(handler), client]() mutable
         {
-            if (m_urlKnown)
+            if (m_url)
             {
                 base_type::sendRequest(std::move(request), std::move(handler), client);
                 return;
             }
 
-            NX_ASSERT(m_endpointProvider->getAioThread() == getAioThread());
-
-            m_endpointProvider->fetchMediatorEndpoints(
-                [this](auto... args) { onFetchEndpointCompletion(std::move(args)...); });
-
             m_postponedRequests.push_back(
                 { std::move(request), std::move(handler), client });
+
+            cancelReconnectTimer();
+            connectWithResolving();
         });
 }
 
@@ -108,6 +104,7 @@ void MediatorStunClient::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
+    m_reconnectTimer.pleaseStopSync();
     m_alivenessTester.reset();
 }
 
@@ -115,8 +112,67 @@ void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)
 {
     stopKeepAliveProbing();
 
+    scheduleReconnect();
+
     if (m_onConnectionClosedHandler)
         m_onConnectionClosedHandler(reason);
+}
+
+void MediatorStunClient::connectInternal(ConnectHandler handler)
+{
+    cancelReconnectTimer();
+
+    base_type::connect(
+        *m_url,
+        [this, handler = std::move(handler)](auto&&... args) mutable
+        {
+            handleConnectCompletion(
+                std::move(handler),
+                std::forward<decltype(args)>(args)...);
+        });
+}
+
+void MediatorStunClient::scheduleReconnect()
+{
+    NX_ASSERT(isInSelfAioThread());
+
+    if (m_reconnectTimer.scheduleNextTry([this]() { reconnect(); }))
+    {
+        NX_VERBOSE(this, "Scheduled reconnect attempt");
+    }
+    else
+    {
+        NX_DEBUG(this, "Stopping reconnect attempts");
+    }
+}
+
+void MediatorStunClient::cancelReconnectTimer()
+{
+    m_reconnectTimer.cancelSync();
+}
+
+void MediatorStunClient::reconnect()
+{
+    if (m_endpointProvider && !(m_url && m_externallyProvidedUrl))
+    {
+        NX_VERBOSE(this, "Reconnecting via resolve");
+        m_url = std::nullopt;
+        connectWithResolving();
+    }
+    else
+    {
+        NX_ASSERT(m_url);
+        NX_VERBOSE(this, "Reconnecting directly to %1", *m_url);
+        connectInternal([](auto&&... /*args*/) {});
+    }
+}
+
+void MediatorStunClient::connectWithResolving()
+{
+    NX_ASSERT(m_endpointProvider->getAioThread() == getAioThread());
+
+    m_endpointProvider->fetchMediatorEndpoints(
+        [this](auto... args) { onFetchEndpointCompletion(std::move(args)...); });
 }
 
 void MediatorStunClient::onFetchEndpointCompletion(
@@ -125,13 +181,10 @@ void MediatorStunClient::onFetchEndpointCompletion(
     if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
         return failPendingRequests(SystemError::hostUnreachable);
 
-    m_urlKnown = true;
-
-    const auto createStunTunnelUrl =
-        nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
+    m_url = nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
         .appendPath(api::kStunOverHttpTunnelPath).toUrl();
 
-    connect(createStunTunnelUrl, [](auto... /*args*/) {});
+    connectInternal([](auto&&... /*args*/) {});
 
     sendPendingRequests();
 }
@@ -164,6 +217,9 @@ void MediatorStunClient::handleConnectCompletion(
 
     if (resultCode == SystemError::noError && m_keepAliveOptions)
         startKeepAliveProbing();
+
+    if (resultCode != SystemError::noError)
+        scheduleReconnect();
 
     if (handler)
         nx::utils::swapAndCall(handler, resultCode);

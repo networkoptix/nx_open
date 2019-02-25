@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>Мм/дд</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>Мммм рррр</translation>
     </message>
   </context>
   <context>
@@ -104,7 +104,7 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Неможливо об'єднати системи, оскільки вони мають принаймні один сервер з однаковим ідентифікатором. Видаліть цей сервер і повторіть спробу.</translation>
     </message>
   </context>
   <context>
@@ -113,26 +113,6 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Системна подія</translation>
-    </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>Система, вже прив'язана до хмари (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>Сервер не підключений до Інтернету.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>Неможливо зберегти облікові дані хмари в локальну базу даних</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>Не вдалося зберегти власника хмари в місцевій базі даних</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>Не вдалося підключитися до хмари: %1</translation>
     </message>
   </context>
   <context>
@@ -351,15 +331,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Помилка плагіна. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>Зміст недоступний</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Внутрішня помилка сервера. %1</translation>
     </message>
   </context>
   <context>
@@ -398,7 +378,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Не вдається виділити буфер зразка</translation>
     </message>
   </context>
   <context>
@@ -634,15 +614,15 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Безкоштовні ліцензії</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Безкоштовна ліцензія</numerusform>
+        <numerusform>%n Безкоштовні ліцензії</numerusform>
+        <numerusform>%n Безкоштовні ліцензії</numerusform>
+        <numerusform>%n Безкоштовні ліцензії</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -738,11 +718,11 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Безкоштовна ліцензія</numerusform>
+        <numerusform>%n%1 Безкоштовні ліцензії</numerusform>
+        <numerusform>%n%1 Безкоштовні ліцензії</numerusform>
+        <numerusform>%n%1 Безкоштовні ліцензії</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -837,11 +817,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Дозволено лише одну ліцензію на систему.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Ви вже маєте одну активну ліцензію для початку.</translation>
     </message>
   </context>
   <context>
@@ -903,56 +883,56 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Камера</numerusform>
+        <numerusform>%n Камери</numerusform>
+        <numerusform>%n Камери</numerusform>
+        <numerusform>%n Камери</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камери</numerusform>
+        <numerusform>%n камери</numerusform>
+        <numerusform>%n камери</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n модуль вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n модуль вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n пристрою</numerusform>
+        <numerusform>%n пристроїв</numerusform>
+        <numerusform>%n пристроїв</numerusform>
+        <numerusform>%n пристроїв</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n пристрою</numerusform>
+        <numerusform>%n пристроїв</numerusform>
+        <numerusform>%n пристроїв</numerusform>
+        <numerusform>%n пристроїв</numerusform>
       </translation>
     </message>
   </context>
@@ -1111,19 +1091,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip файл пошкоджений.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Не вдалося знайти цільовий каталог.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Неможливо відкрити файл для запису.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Недостатньо вільного місця на диску.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1131,22 +1111,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Розпакування перервано.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Розпаковувач зайнятий.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Неправильно зашифрований розмір потоку.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Пошкоджений заголовок зашифрованого потоку.</translation>
     </message>
   </context>
   <context>
@@ -1666,19 +1646,19 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>Плагін події</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>Невідомий плагін події</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Не вдалося застосувати час камери, затримка занадто висока, буде використано системний час</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Час камери знову нормалізується</translation>
     </message>
   </context>
   <context>

@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Update-Informationen vom Server abrufen</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Updatepaket herunterladen</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Installiere</translation>
     </message>
   </context>
   <context>
@@ -865,7 +865,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Passwort vergessen</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -877,7 +877,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Einstellungen der Analytics Engine...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -897,11 +897,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuelle Kamera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Neue virtuelle Kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +925,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Zur Registerkarte Benachrichtigungen wechseln</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Zur Registerkarte Bewegung wechseln</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Zur Registerkarte Lesezeichen wechseln</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Zur Registerkarte Ereignisse wechseln</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Zur Registerkarte Objekte wechseln</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Objekte Frames und Info...</translation>
     </message>
   </context>
   <context>
@@ -991,23 +991,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Bitte geben Sie ein gültiges Kennwort ein</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Das Passwort ist ungültig.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Verschlüsseltes Layout</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Die Datei %1 ist verschlüsselt. Bitte geben Sie das Passwort ein:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Bitte geben Sie das Passwort für das Layout %1 erneut ein:</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Layout ist geschützt</translation>
     </message>
   </context>
   <context>
@@ -1586,17 +1586,17 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Details für %n Sitzung von %1</numerusform>
+        <numerusform>Details für %n Sitzungen von %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Details für %n Kamera von %1</numerusform>
+        <numerusform>Details für %n Kameras von %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1752,13 +1752,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Update installiert</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n Aktion</numerusform>
+        <numerusform>%n Aktionen</numerusform>
       </translation>
     </message>
   </context>
@@ -2041,7 +2041,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn in der URL für generische Ereignisse Kameramodifizierer verwendet werden</translation>
     </message>
   </context>
   <context>
@@ -2578,6 +2578,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Fehler beim Verbinden mit %1</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -2741,11 +2745,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Herunterladen &amp;&amp; Installieren</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Der Kompatibilitätsmodus für die Version %1 konnte nicht aufgerufen werden</translation>
     </message>
   </context>
   <context>
@@ -2897,7 +2901,7 @@ to %1</source>
     </message>
     <message>
       <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
+      <translation>Konfigurierter Codec: %1 nicht gefunden, h263p wird verwendet</translation>
     </message>
   </context>
   <context>
@@ -3015,17 +3019,17 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Ereignisprotokoll für den Zeitraum von %1 bis %2 - %n gefundenes Ereignis</numerusform>
+        <numerusform>Ereignisprotokoll für den Zeitraum von %1 bis %2 - %n gefundene Ereignisse</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Ereignisprotokoll für %1 - %n Ereignis gefunden</numerusform>
+        <numerusform>Ereignisprotokoll für %1 - %n Ereignisse gefunden</numerusform>
       </translation>
     </message>
   </context>
@@ -3103,9 +3107,9 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n Kamera)</numerusform>
+        <numerusform>%1 (%n Kameras)</numerusform>
       </translation>
     </message>
   </context>
@@ -3188,11 +3192,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Diese Kamera befindet sich derzeit nicht im ausgewählten Layout. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Diese Kamera befindet sich derzeit nicht in einigen der ausgewählten Layouts. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</translation>
     </message>
   </context>
   <context>
@@ -3379,7 +3383,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Bitte geben Sie einen Wert ein.</translation>
     </message>
   </context>
   <context>
@@ -3782,7 +3786,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Jede Lizenz kann nur ein paar Mal deaktiviert werden.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4086,7 +4090,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Bereichszoom</translation>
     </message>
   </context>
   <context>
@@ -4241,11 +4245,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuelle Kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuelle Kamera %1</translation>
     </message>
   </context>
   <context>
@@ -4470,9 +4474,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>circa %n Minute</numerusform>
+        <numerusform>circa %n Minuten</numerusform>
       </translation>
     </message>
   </context>
@@ -4655,11 +4659,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Aktuelle Bitrate</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>keine Daten für die Prognose</translation>
     </message>
   </context>
   <context>
@@ -4705,11 +4709,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Lokale Dateien</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Keine lokalen Dateien</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4725,7 +4729,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>alle öffnen</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4784,10 +4788,6 @@ to %1</source>
     <message>
       <source>Select Cameras...</source>
       <translation>Kameras auswählen...</translation>
-    </message>
-    <message>
-      <source>Select users...</source>
-      <translation>Benutzer auswählen...</translation>
     </message>
   </context>
   <context>
@@ -4850,7 +4850,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analytik-Engine</translation>
     </message>
   </context>
   <context>
@@ -5669,23 +5669,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Letzte 5 Minuten</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Letzte 60 Minuten</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Letzte 24 Stunden</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Längster verfügbarer Zeitraum</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Vorhersage nur für Kameras mit aktivierter Aufzeichnung verfügbar.</translation>
     </message>
   </context>
   <context>
@@ -6081,23 +6081,23 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Kein Server hat einen Internetzugang für die Zeitsynchronisation</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Das System ist im abgesicherten Modus</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Das System hat keinen Internetzugang für die Zeitsynchronisation</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Kein Onlineserver im System hat einen Internetzugang zur Zeitsynchronisation.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Das System wird im abgesicherten Modus ausgeführt.</translation>
     </message>
   </context>
   <context>
@@ -6139,11 +6139,11 @@ to %1</source>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML-Datei</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Tabellenkalkulationsdatei (CSV)</translation>
     </message>
   </context>
   <context>
@@ -6177,11 +6177,11 @@ to %1</source>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Die VMS-Zeit wird mit dem Internet synchronisiert und ist unabhängig von der lokalen Zeit auf den Servern.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Die VMS-Zeit wird mit der lokalen Zeit auf dem ausgewählten Server synchronisiert und hängt nicht von der lokalen Zeit auf anderen Servern ab.</translation>
     </message>
   </context>
   <context>
@@ -6192,11 +6192,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Halten, um zu Sprechen</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>Eingabegerät wurde nicht ausgewählt.</translation>
@@ -6207,7 +6203,11 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Netzwerkfehler</translation>
+      <translation>Netzwerkfehler.</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Halten, um zu Sprechen</translation>
     </message>
   </context>
   <context>
@@ -6285,7 +6285,7 @@ to %1</source>
     </message>
     <message>
       <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
+      <translation>Das Update wurde abgebrochen.</translation>
     </message>
   </context>
   <context>
@@ -6742,19 +6742,19 @@ to %1</source>
     <name>QnWorkbenchContext</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Bitte überprüfen und stimmen Sie der %1 zu, um fortzufahren</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Um die Software nutzen zu können, müssen Sie der Endbenutzer-Lizenzvereinbarung zustimmen</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Ich stimme zu</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Ich stimme nicht zu</translation>
     </message>
   </context>
   <context>
@@ -6766,10 +6766,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Die Server vom anderen System werden in der Objektleiste erscheinen.</translation>
-    </message>
-    <message>
-      <source>Failed to merge Systems</source>
-      <translation>Fehler beim Zusammenführen der Systeme</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
@@ -6803,6 +6799,18 @@ to %1</source>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 systeme können nicht zusammengeführt werden</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -6876,7 +6884,7 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -6927,11 +6935,11 @@ to %1</source>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG-Bilddatei</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG-Bilddatei</translation>
     </message>
   </context>
   <context>
@@ -7177,17 +7185,17 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Fehler beim Hinzufügen der virtuellen Kamera</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Öffnen der virtuellen Kameraaufnahmen...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Sie können diese Dateien auf eine andere Instanz einer virtuellen Kamera hochladen.</numerusform>
+        <numerusform>Sie können diese Dateien auf eine andere Instanz mehrerer virtueller Kameras hochladen.</numerusform>
       </translation>
     </message>
     <message>
@@ -7414,9 +7422,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Einige Videodateien werden noch auf %n virtuelle Kamera hochgeladen:</numerusform>
+        <numerusform>Einige Videodateien werden noch auf %n virtuelle Kameras hochgeladen:</numerusform>
       </translation>
     </message>
   </context>
@@ -7502,21 +7510,21 @@ to %1</source>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Diese Linuxplattform wird nicht mehr unterstützt</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Diese Betriebssystemversion wird nicht mehr unterstützt</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Diese %1 Version wird nicht mehr unterstützt</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 wird nicht mehr unterstützt</translation>
     </message>
   </context>
   <context>
@@ -7591,23 +7599,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Geräte im Layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kameras im Layout</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Jedes Gerät</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Jede Kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Ausgewähltes Gerät</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7618,11 +7626,11 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Immer anzeigen</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Nur mit &quot;Objecte&quot;-Tab anzeigen</translation>
     </message>
   </context>
   <context>
@@ -7633,7 +7641,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>gelöschte Kamera</translation>
     </message>
   </context>
   <context>
@@ -7648,9 +7656,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n Objekt</numerusform>
+        <numerusform>%n Objekte</numerusform>
       </translation>
     </message>
     <message>
@@ -7659,11 +7667,11 @@ to %1</source>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Bereich auswählen</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Wählen Sie einen Bereich im Video aus...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7671,7 +7679,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>unbenannte Analytik-Engine</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7679,11 +7687,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Parameter eingeben</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Die Aktion erfordert, dass einige Parameter ausgefüllt werden.</translation>
     </message>
   </context>
   <context>
@@ -7697,7 +7705,7 @@ to %1</source>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>gelöschte Kamera</translation>
     </message>
   </context>
   <context>
@@ -7902,14 +7910,14 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kameras</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Du hast keine Kameras</translation>
     </message>
   </context>
   <context>
@@ -8037,43 +8045,43 @@ to %1</source>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Update-Datei wird nicht gefunden</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Updatepaket ist beschädigt</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Updatepaket konnte nicht heruntergeladen werden: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Updatepaket ist beschädigt: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Dieses Update ist bereits installiert.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Diese Version ist nicht installiert.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Ungültiges Versionsformat.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Defektes Updatepaket.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
+      <translation>Nicht genügend Speicherplatz auf der Festplatte, um das Clientupdate zu installieren.</translation>
     </message>
     <message>
       <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
+      <translation>Das Installationspaket ist verloren gegangen.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -8119,7 +8127,7 @@ to %1</source>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Bei einigen ausgewählten Kameras muss ein Passwort eingerichtet werden.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8201,13 +8209,13 @@ to %1</source>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Alle Geräte wurden bereits hinzugefügt</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n Gerät wird hinzugefügt. Sie können diesen Dialog schließen oder eine neue Suche starten</numerusform>
+        <numerusform>%n Geräte werden hinzugefügt. Sie können diesen Dialog schließen oder eine neue Suche starten</numerusform>
       </translation>
     </message>
     <message>
@@ -8223,7 +8231,7 @@ to %1</source>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Das Adressfeld darf nicht leer sein</translation>
     </message>
   </context>
   <context>
@@ -8258,39 +8266,39 @@ to %1</source>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Serverereignisse</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analytik-Ereignisse</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Jedes Geräteproblem</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Jedes Kameraproblem</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Jedes Serverereignis</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Geräteprobleme</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Kameraprobleme</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Jedes Ereignis</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Jedes Analytikereignis</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8309,7 +8317,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>unbenannte Analytik-Engine</translation>
     </message>
   </context>
   <context>
@@ -8326,7 +8334,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Bitte geben Sie das Kennwort ein.</translation>
     </message>
   </context>
   <context>
@@ -8475,7 +8483,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Sie exportieren gerade ein langes Video. Dies kann viel Speicherplatz erfordern und viel Zeit in Anspruch nehmen.</translation>
     </message>
   </context>
   <context>
@@ -8547,16 +8555,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n neu</numerusform>
+        <numerusform>%n neu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n Gerät insgesamt</numerusform>
+        <numerusform>%n Geräte insgesamt</numerusform>
       </translation>
     </message>
   </context>
@@ -8601,7 +8609,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Linkadresse kopieren</translation>
     </message>
   </context>
   <context>
@@ -8707,7 +8715,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>gelöschte Kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8991,6 +8999,10 @@ to %1</source>
     <message>
       <source>This version is already installed</source>
       <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
   </context>
   <context>
@@ -9360,7 +9372,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Zeitzone</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9368,42 +9380,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Server-Betriebssystemzeit</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-Zeit</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Zeit, gemeinsam und synchronisiert zwischen allen Servern. Kann mit der Betriebssystemzeit auf einem bestimmten Server unterschiedlich sein.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Synchronisiert mit dem Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Synchronisiert mit der Ortszeit auf dem ausgewählten Server</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Nicht synchronisiert. Jeder Server verwendet seine eigene lokale Zeit.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Entspricht der Ortszeit des Servers</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Keine Internetverbindung. Die Zeit wird nicht synchronisiert.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Der Zeitserver ist offline. Die Zeit wird nicht synchronisiert.</translation>
     </message>
   </context>
   <context>
@@ -9429,7 +9441,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Upload konnte auf der Serverseite nicht erstellt werden: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9448,11 +9460,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Bewegung wird nur beim Hochladen von Videos erkannt.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Das Aktivieren oder Deaktivieren dieser Einstellung ändert nichts an dem bestehenden Archiv.</translation>
     </message>
   </context>
   <context>
@@ -9551,7 +9563,7 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Export starten...</translation>
     </message>
   </context>
   <context>
@@ -9599,7 +9611,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Jedes Plugin</translation>
     </message>
   </context>
   <context>
@@ -9730,7 +9742,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout ist voll</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9788,7 +9800,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Virtuelle Kameras können nicht zwischen Servern verschoben werden</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9800,7 +9812,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Alle werden unterstützt</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9904,14 +9916,14 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Das Passwort konnte bei %n-Kamera von %1 nicht geändert werden</numerusform>
+        <numerusform>Das Passwort konnte bei %n-Kameras von %1 nicht geändert werden</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Dieser Build dient nur zu Testzwecken.</translation>
     </message>
   </context>
   <context>

@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>Політика підтримки ARM</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>наступного дня</translation>
     </message>
   </context>
   <context>
@@ -665,12 +665,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Порт спеціального мультимедіа</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Довіряйте часовій мітці камери</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Власні пресети камери стануть недоступними.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +705,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Виявлення руху під час імпорту архіву</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Підказка</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1089,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Додати пристрої</translation>
     </message>
     <message>
       <location/>
@@ -1230,7 +1230,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Захист паролем</translation>
     </message>
     <message>
       <location/>
@@ -1767,7 +1767,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Мінімальний розмір сітки</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Admin DN або CN</translation>
     </message>
   </context>
   <context>
@@ -2141,7 +2141,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Перевірити оновлення</translation>
     </message>
     <message>
       <location/>
@@ -2166,7 +2166,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Звантажити і Встановити</translation>
     </message>
     <message>
       <location/>
@@ -2181,7 +2181,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Розширені налаштування системи</translation>
     </message>
     <message>
       <location/>
@@ -2194,12 +2194,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Показати на розкладці</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Виберіть макет</translation>
     </message>
   </context>
   <context>
@@ -2212,12 +2212,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Нова віртуальна камера...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;віртуальна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої системи і доступно будь-якому користувачеві.</translation>
     </message>
   </context>
   <context>
@@ -2286,22 +2286,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Рівень:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ПОМИЛКА</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>ПОПЕРЕДЖЕННЯ</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>ДАНІ</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2450,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Перезавантажте оновлену версію, коли будете готові</translation>
     </message>
   </context>
   <context>
@@ -2845,7 +2845,7 @@
     <message>
       <location/>
       <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
+      <translation>Фільтр ТЕСТ</translation>
     </message>
     <message>
       <location/>
@@ -2855,7 +2855,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Перетягніть будь-яке зображення або відеофайл до вікна програми, щоб відтворити їх</translation>
     </message>
   </context>
   <context>
@@ -2969,7 +2969,7 @@
     <message>
       <location/>
       <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <translation>Обмеження довжини сеансу</translation>
     </message>
     <message>
       <location/>
@@ -3219,7 +3219,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Базовий прогноз даних запису</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3380,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Час VMS</translation>
     </message>
   </context>
   <context>
@@ -3388,17 +3388,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Синхронізувати час з Інтернетом</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Час VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Не синхронізуйте час між серверами</translation>
     </message>
   </context>
   <context>
@@ -3506,7 +3506,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Виявити рух</translation>
     </message>
   </context>
   <context>

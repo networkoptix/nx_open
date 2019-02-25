@@ -37,14 +37,14 @@
                     <div>
                         <h3>אתחל שרת</h3>
                         <p>פעולה זו תחזיר את השרת לברירות המחדל (תנקה את מסד הנתונים ותאפס את ההגדרות).
-                            The server will be detached from the current System. ארכיון הווידאו יישאר שלם.</p>
+                            השרת ינותק מהמערכת הנוכחית. ארכיון הווידאו יישאר שלם.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">שחזר להגדרות ברירת מחדל</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Detach server from the System</h3>
-                        <p>This action will detach server from the System keeping database, local users and configuration.
+                        <h3>נתק את השרת מן המערכת</h3>
+                        <p>פעולה זו תנתק שרת מהמערכת תוך שמירה על מסד הנתונים, משתמשים מקומיים ותצורה.
                             ארכיון הווידאו יישאר שלם. <b>כל משתמשי הענן יימחקו.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>
                     </div>
                     <div>
                         <h3>איתחול</h3>
@@ -60,7 +60,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">שנה סיסמא</button>
+                                        ng-click="changePassword()">שינוי סיסמא</button>
                             </div>
                         </form>
                     </div>
@@ -91,7 +91,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
+                            <p>מערכת זו מקושרת אל {{Config.cloud.productName}}, בעל מערכת: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">התנתק מ {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -99,10 +99,9 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
-                                <a ng-if="!mode.liteClient"
+                            <uib-alert type="warning">מערכת זו מקושרת אל {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></uib-alert>
+                                   target="_blank">מידע נוסף</a></uib-alert>
                             <uib-alert type="error" ng-if="!hasInternetOnServer">חבר את השרת לאינטרנט כדי לבצע התקנה {{Config.cloud.productName}}</uib-alert>
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">מחויב חיבור לאינטרנט בכדי לחבר מערכת אל {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button

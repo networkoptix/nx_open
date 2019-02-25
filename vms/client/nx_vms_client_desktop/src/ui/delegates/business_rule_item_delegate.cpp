@@ -31,6 +31,8 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 
+#include <ui/delegates/select_cameras_delegate_editor_button.h>
+#include <ui/delegates/select_users_delegate_editor_button.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop::ui;
@@ -42,158 +44,6 @@ namespace {
 enum { comboBoxMaxVisibleItems = 100 };
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnSelectResourcesDialogButton ------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
-
-QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
-    base_type(parent),
-    m_dialogDelegate(NULL),
-    m_target(QnResourceSelectionDialog::Filter::cameras)
-{
-    connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
-}
-
-QnSelectResourcesDialogButton::~QnSelectResourcesDialogButton()
-{
-}
-
-QSet<QnUuid> QnSelectResourcesDialogButton::resources() const
-{
-    return m_resources;
-}
-
-void QnSelectResourcesDialogButton::setResources(QSet<QnUuid> resources)
-{
-    m_resources = resources;
-}
-
-QnResourceSelectionDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() const
-{
-    return m_dialogDelegate;
-}
-
-void QnSelectResourcesDialogButton::setDialogDelegate(QnResourceSelectionDialogDelegate* delegate)
-{
-    m_dialogDelegate = delegate;
-}
-
-QnResourceSelectionDialog::Filter  QnSelectResourcesDialogButton::selectionTarget() const
-{
-    return m_target;
-}
-
-void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog::Filter target)
-{
-    m_target = target;
-}
-
-void QnSelectResourcesDialogButton::setSubjectValidationPolicy(QnSubjectValidationPolicy* policy)
-{
-    m_subjectValidation.reset(policy);
-}
-
-void QnSelectResourcesDialogButton::at_clicked()
-{
-    if (m_target == QnResourceSelectionDialog::Filter::users)
-    {
-        // Dialog will be destroyed by delegate editor.
-        auto dialog = new SubjectSelectionDialog(this);
-        auto ids = m_resources;
-
-        // TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
-        dialog->setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
-        dialog->setCheckedSubjects(ids);
-
-        // TODO: #vkutin Hack till #3.2
-        const bool isEmail = dynamic_cast<QnSendEmailActionDelegate*>(m_dialogDelegate) != nullptr;
-        dialog->setAllUsersSelectorEnabled(!isEmail);
-
-        if (m_dialogDelegate)
-        {
-            dialog->setUserValidator(
-                [this](const QnUserResourcePtr& user)
-                {
-                    // TODO: #vkutin #3.2 This adapter is rather sub-optimal.
-                    return m_dialogDelegate->isValid(user->getId());
-                });
-        }
-        else
-        {
-            dialog->setRoleValidator(
-                [this](const QnUuid& roleId)
-                {
-                    return m_subjectValidation
-                        ? m_subjectValidation->roleValidity(roleId)
-                        : QValidator::Acceptable;
-                });
-
-            dialog->setUserValidator(
-                [this](const QnUserResourcePtr& user)
-                {
-                    return m_subjectValidation
-                        ? m_subjectValidation->userValidity(user)
-                        : true;
-                });
-        }
-
-        const auto updateAlert =
-            [this, &dialog]
-            {
-                // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
-                if (m_dialogDelegate)
-                {
-                    dialog->showAlert(m_dialogDelegate->validationMessage(
-                        dialog->checkedSubjects()));
-                }
-                else
-                {
-                    dialog->showAlert(m_subjectValidation
-                        ? m_subjectValidation->calculateAlert(dialog->allUsers(),
-                            dialog->checkedSubjects())
-                        : QString());
-                }
-            };
-
-        connect(dialog, &SubjectSelectionDialog::changed, this, updateAlert);
-        updateAlert();
-
-        if (dialog->exec() != QDialog::Accepted)
-            return;
-
-        if (dialog->allUsers())
-            m_resources = QSet<QnUuid>({ QnBusinessRuleViewModel::kAllUsersId });
-        else
-            m_resources = dialog->checkedSubjects();
-    }
-    else
-    {
-        auto dialog = new QnResourceSelectionDialog(m_target, this);
-        dialog->setSelectedResources(m_resources);
-        dialog->setDelegate(m_dialogDelegate);
-
-        if (dialog->exec() != QDialog::Accepted)
-            return;
-
-        m_resources = dialog->selectedResources();
-    }
-
-    emit commit();
-}
-
-void QnSelectResourcesDialogButton::initStyleOption(QStyleOptionButton *option) const
-{
-    base_type::initStyleOption(option);
-}
-
-void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event)
-{
-    base_type::paintEvent(event);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnBusinessRuleItemDelegate ---------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -248,7 +98,8 @@ int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& 
     return -1;
 }
 
-void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option,
+    const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
 
@@ -271,7 +122,10 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option, c
     }
 }
 
-void QnBusinessRuleItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void QnBusinessRuleItemDelegate::paint(
+    QPainter* painter,
+    const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
 {
     if (!option.state.testFlag(QStyle::State_Selected))
     {
@@ -282,117 +136,23 @@ void QnBusinessRuleItemDelegate::paint(QPainter* painter, const QStyleOptionView
     base_type::paint(painter, option, index);
 }
 
-QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget* QnBusinessRuleItemDelegate::createEditor(
+    QWidget* parent,
+    const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
 {
     switch (Column(index.column()))
     {
         case Column::source:
-        {
-            QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-            // TODO: #GDM #Business server selection dialog?
-            connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
-
-            vms::api::EventType eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
-            if (eventType == EventType::cameraMotionEvent)
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
-            else if (eventType == EventType::cameraInputEvent)
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
-            else if (eventType == EventType::analyticsSdkEvent)
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAnalyticsPolicy>(btn));
-
-            return btn;
-        }
+            return createSourceEditor(parent, index);
         case Column::target:
-        {
-            vms::api::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
-            auto model = index.data(Qn::RuleModelRole).value<QnBusinessRuleViewModelPtr>();
-
-            QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-            connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
-
-            if (actionType == ActionType::cameraRecordingAction)
-            {
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
-            }
-            else if (actionType == ActionType::bookmarkAction)
-            {
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
-            }
-            else if (actionType == ActionType::cameraOutputAction)
-            {
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
-            }
-            else if (actionType == ActionType::executePtzPresetAction)
-            {
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(btn));
-            }
-            else if (actionType == ActionType::sendMailAction)
-            {
-                btn->setDialogDelegate(new QnSendEmailActionDelegate(btn));
-                btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
-            }
-            else if (actionType == ActionType::showPopupAction)
-            {
-                btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
-                if (model->actionParams().needConfirmation)
-                {
-                    btn->setSubjectValidationPolicy(new QnRequiredPermissionSubjectPolicy(
-                        GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
-                }
-                else
-                {
-                    btn->setSubjectValidationPolicy(new QnDefaultSubjectValidationPolicy());
-                }
-            }
-            else if (actionType == ActionType::playSoundAction ||
-                actionType == ActionType::playSoundOnceAction ||
-                actionType == ActionType::sayTextAction)
-            {
-                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(btn));
-            }
-            return btn;
-        }
+            return createTargetEditor(parent, index);
         case Column::event:
-        {
-            using EventSubType = QnBusinessTypesComparator::EventSubType;
-            auto comboBox = new QComboBox(parent);
-            auto addItem = [this, comboBox](vms::api::EventType eventType)
-                {
-                    comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
-                };
-
-            comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::user))
-                addItem(eventType);
-            comboBox->insertSeparator(comboBox->count());
-            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::failure))
-                addItem(eventType);
-            comboBox->insertSeparator(comboBox->count());
-            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::success))
-                addItem(eventType);
-            return comboBox;
-        }
+            return createEventEditor(parent, index);
         case Column::action:
-        {
-            auto eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
-            auto eventParams = index.data(Qn::EventParametersRole).value<nx::vms::event::EventParameters>();
-            bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, commonModule());
-            QComboBox* comboBox = new QComboBox(parent);
-            comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (vms::api::ActionType actionType : m_lexComparator->lexSortedActions())
-            {
-                if (isInstantOnly && !vms::event::canBeInstant(actionType))
-                    continue;
-                comboBox->addItem(m_businessStringsHelper->actionName(actionType), actionType);
-            }
-            return comboBox;
-        }
+            return createActionEditor(parent, index);
         case Column::aggregation:
-        {
-            nx::vms::client::desktop::AggregationWidget* widget = new nx::vms::client::desktop::AggregationWidget(parent);
-            widget->setShort(true);
-            return widget;
-        }
+            return createAggregationEditor(parent, index);
         default:
             break;
     }
@@ -401,46 +161,51 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 }
 
 
-void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void QnBusinessRuleItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
     switch (Column(index.column()))
     {
         case Column::source:
         {
-            if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
+            if (QnSelectResourcesDialogButton* button =
+                dynamic_cast<QnSelectResourcesDialogButton*>(editor))
             {
-                btn->setResources(index.data(Qn::EventResourcesRole).value<QSet<QnUuid>>());
-                btn->setText(index.data(Qn::ShortTextRole).toString());
+                button->setResources(index.data(Qn::EventResourcesRole).value<QnUuidSet>());
+                button->setText(index.data(Qn::ShortTextRole).toString());
                 return;
             }
             break;
         }
         case Column::target:
         {
-            if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
+            if (QnSelectResourcesDialogButton* button =
+                dynamic_cast<QnSelectResourcesDialogButton*>(editor))
             {
-                btn->setResources(index.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>());
-                btn->setText(index.data(Qn::ShortTextRole).toString());
+                button->setResources(index.data(Qn::ActionResourcesRole).value<QnUuidSet>());
+                button->setText(index.data(Qn::ShortTextRole).toString());
                 return;
             }
             break;
         }
         case Column::event:
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
+            if (QComboBox* comboBox = dynamic_cast<QComboBox*>(editor))
             {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<vms::api::EventType>()));
+                comboBox->setCurrentIndex(comboBox->findData(
+                    index.data(Qn::EventTypeRole).value<vms::api::EventType>()));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case Column::action:
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
+            if (QComboBox* comboBox = dynamic_cast<QComboBox*>(editor))
             {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<vms::api::ActionType>()));
+                comboBox->setCurrentIndex(comboBox->findData(
+                    index.data(Qn::ActionTypeRole).value<vms::api::ActionType>()));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case Column::aggregation:
-            if (nx::vms::client::desktop::AggregationWidget* widget = dynamic_cast<nx::vms::client::desktop::AggregationWidget *>(editor))
+            if (nx::vms::client::desktop::AggregationWidget* widget =
+                dynamic_cast<nx::vms::client::desktop::AggregationWidget*>(editor))
             {
                 widget->setValue(index.data(Qt::EditRole).toInt());
                 connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
@@ -453,29 +218,34 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
     base_type::setEditorData(editor, index);
 }
 
-void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void QnBusinessRuleItemDelegate::setModelData(
+    QWidget* editor,
+    QAbstractItemModel* model,
+    const QModelIndex& index) const
 {
     switch (Column(index.column()))
     {
         case Column::source:
         case Column::target:
         {
-            if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
+            if (QnSelectResourcesDialogButton* btn =
+                dynamic_cast<QnSelectResourcesDialogButton*>(editor))
             {
-                model->setData(index, qVariantFromValue(btn->resources()));
+                model->setData(index, qVariantFromValue(btn->getResources()));
                 return;
             }
             break;
         }
         case Column::event:
         case Column::action:
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
+            if (QComboBox* comboBox = dynamic_cast<QComboBox*>(editor))
             {
                 model->setData(index, comboBox->itemData(comboBox->currentIndex()));
             }
             return;
         case Column::aggregation:
-            if (nx::vms::client::desktop::AggregationWidget* widget = dynamic_cast<nx::vms::client::desktop::AggregationWidget *>(editor))
+            if (nx::vms::client::desktop::AggregationWidget* widget =
+                dynamic_cast<nx::vms::client::desktop::AggregationWidget*>(editor))
             {
                 model->setData(index, widget->value());
             }
@@ -486,22 +256,172 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     base_type::setModelData(editor, model, index);
 }
 
-bool QnBusinessRuleItemDelegate::eventFilter(QObject *object, QEvent *event)
+bool QnBusinessRuleItemDelegate::eventFilter(QObject* object, QEvent* event)
 {
-    QComboBox *editor = qobject_cast<QComboBox*>(object);
+    QComboBox* editor = qobject_cast<QComboBox*>(object);
     if (editor && event->type() == QEvent::FocusOut)
         return false;
     return base_type::eventFilter(object, event);
 }
 
-void QnBusinessRuleItemDelegate::at_editor_commit()
+QWidget* QnBusinessRuleItemDelegate::createSourceEditor(QWidget* parent,
+    const QModelIndex& index) const
 {
-    if (QWidget* w = dynamic_cast<QWidget*> (sender()))
-        emit commitData(w);
+    QnSelectCamerasDialogButton* button = new QnSelectCamerasDialogButton(parent);
+    // TODO: #GDM #Business server selection dialog?
+    connect(button, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+
+    vms::api::EventType eventType =
+        index.data(Qn::EventTypeRole).value<vms::api::EventType>();
+
+    if (eventType == EventType::cameraMotionEvent)
+        button->setResourcePolicy<QnCameraMotionPolicy>();
+    else if (eventType == EventType::cameraInputEvent)
+        button->setResourcePolicy<QnCameraInputPolicy>();
+    else if (eventType == EventType::analyticsSdkEvent)
+        button->setResourcePolicy<QnCameraAnalyticsPolicy>();
+
+    return button;
 }
 
-void QnBusinessRuleItemDelegate::updateEditorGeometry(QWidget* editor,
-    const QStyleOptionViewItem& option, const QModelIndex& index) const
+QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
+    const QModelIndex& index) const
+{
+    const auto actionType = index.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
+    const auto model = index.data(Qn::RuleModelRole).value<QnBusinessRuleViewModelPtr>();
+
+    QnSelectResourcesDialogButton* editorButton = nullptr;
+
+    if (actionType == ActionType::cameraRecordingAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnCameraRecordingPolicy>();
+        editorButton = camerasButton;
+    }
+    else if (actionType == ActionType::bookmarkAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnBookmarkActionPolicy>();
+        editorButton = camerasButton;
+    }
+    else if (actionType == ActionType::cameraOutputAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnCameraOutputPolicy>();
+        editorButton = camerasButton;
+    }
+    else if (actionType == ActionType::executePtzPresetAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnExecPtzPresetPolicy>();
+        editorButton = camerasButton;
+    }
+    else if (actionType == ActionType::sendMailAction)
+    {
+        auto usersButton = new QnSelectUsersDialogButton(parent);
+        usersButton->setDialogDelegate(new QnSendEmailActionDelegate(usersButton));
+        editorButton = usersButton;
+    }
+    else if (actionType == ActionType::showPopupAction)
+    {
+        auto usersButton = new QnSelectUsersDialogButton(parent);
+        if (model->actionParams().needConfirmation)
+        {
+            usersButton->setSubjectValidationPolicy(new QnRequiredPermissionSubjectPolicy(
+                GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
+        }
+        else
+        {
+            usersButton->setSubjectValidationPolicy(new QnDefaultSubjectValidationPolicy());
+        }
+        editorButton = usersButton;
+    }
+    else if (actionType == ActionType::playSoundAction ||
+        actionType == ActionType::playSoundOnceAction ||
+        actionType == ActionType::sayTextAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnCameraAudioTransmitPolicy>();
+        editorButton = camerasButton;
+    }
+    else if (actionType == ActionType::fullscreenCameraAction)
+    {
+        auto camerasButton = new QnSelectCamerasDialogButton(parent);
+        camerasButton->setResourcePolicy<QnFullscreenCameraPolicy>();
+        editorButton = camerasButton;
+    }
+
+    if (editorButton)
+        connect(editorButton, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+
+    // TODO: #vbreus Create proper editor for exitFullscreenAction
+    return editorButton;
+}
+
+QWidget* QnBusinessRuleItemDelegate::createEventEditor(QWidget* parent,
+    const QModelIndex& index) const
+{
+    using EventSubType = QnBusinessTypesComparator::EventSubType;
+    auto comboBox = new QComboBox(parent);
+
+    auto addItem =
+        [this, comboBox](vms::api::EventType eventType)
+        {
+            comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
+        };
+
+    comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
+    for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::user))
+        addItem(eventType);
+    comboBox->insertSeparator(comboBox->count());
+    for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::failure))
+        addItem(eventType);
+    comboBox->insertSeparator(comboBox->count());
+    for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::success))
+        addItem(eventType);
+
+    return comboBox;
+}
+
+QWidget* QnBusinessRuleItemDelegate::createActionEditor(QWidget* parent,
+    const QModelIndex& index) const
+{
+    auto eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
+    auto eventParams = index.data(Qn::EventParametersRole).value<nx::vms::event::EventParameters>();
+    bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, commonModule());
+
+    QComboBox* comboBox = new QComboBox(parent);
+    comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
+    for (vms::api::ActionType actionType: m_lexComparator->lexSortedActions())
+    {
+        if (isInstantOnly && !vms::event::canBeInstant(actionType))
+            continue;
+        comboBox->addItem(m_businessStringsHelper->actionName(actionType), actionType);
+    }
+
+    return comboBox;
+}
+
+QWidget* QnBusinessRuleItemDelegate::createAggregationEditor(QWidget* parent,
+    const QModelIndex& index) const
+{
+    nx::vms::client::desktop::AggregationWidget* aggregationWidget =
+        new nx::vms::client::desktop::AggregationWidget(parent);
+    aggregationWidget->setShort(true);
+
+    return aggregationWidget;
+}
+
+void QnBusinessRuleItemDelegate::at_editor_commit()
+{
+    if (QWidget* widget = dynamic_cast<QWidget*>(sender()))
+        emit commitData(widget);
+}
+
+void QnBusinessRuleItemDelegate::updateEditorGeometry(
+    QWidget* editor,
+    const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
 {
     switch (Column(index.column()))
     {
