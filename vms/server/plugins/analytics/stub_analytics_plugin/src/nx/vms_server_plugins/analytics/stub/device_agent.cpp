@@ -342,9 +342,9 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
         m_objectId = UuidHelper::randomUuid();
         m_currentObjectIndex = sequentialNumber;
         m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
-	++m_currentObjectTypeIndex;
-	if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
-	    m_currentObjectTypeIndex = 0;
+        ++m_currentObjectTypeIndex;
+        if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
+            m_currentObjectTypeIndex = 0;
     }
 
     objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
