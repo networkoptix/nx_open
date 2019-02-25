@@ -176,6 +176,18 @@
       </item>
       <item>
        <widget class="nx::vms::client::desktop::InfoBanner" name="statusLabel">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
         <property name="text">
          <string notr="true">&lt;Status text&gt;</string>
         </property>
@@ -199,6 +211,22 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>8</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QStackedWidget" name="detailsWidget">
@@ -305,6 +333,7 @@
    <class>nx::vms::client::desktop::TableView</class>
    <extends>QTableView</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/table_view.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::InfoBanner</class>
