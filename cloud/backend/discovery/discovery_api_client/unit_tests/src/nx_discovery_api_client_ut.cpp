@@ -267,13 +267,16 @@ private:
     void waitForCallback()
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_wait.wait(lock, [this]() { return m_callbackFired.load(); });
+        m_wait.wait(lock, [this]() { return m_callbackFired; });
         m_callbackFired = false;
     }
 
     void callbackFired()
     {
-        m_callbackFired = true;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_callbackFired = true;
+        }
         m_wait.notify_all();
     }
 
@@ -283,7 +286,7 @@ private:
 
     std::mutex m_mutex;
     std::condition_variable m_wait;
-    std::atomic_bool m_callbackFired = false;
+    bool m_callbackFired = false;
 
     std::vector<Node> m_onlineNodes;
 
