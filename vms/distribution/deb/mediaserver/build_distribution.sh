@@ -67,7 +67,7 @@ copyLibs()
             [[ "$BOX" == "tx1" && "$LIB_BASENAME" == libtegra_video.* ]]
         then
             echo "  Copying $LIB_BASENAME"
-            cp -P "$LIB" "$STAGE_LIB/"
+            cp -L "$LIB" "$STAGE_LIB/"
         fi
     done
 
