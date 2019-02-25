@@ -9,9 +9,6 @@
 
 namespace nx::cloud::discovery::test {
 
-using namespace nx::network::http;
-using namespace std::chrono;
-
 namespace {
 
 static constexpr char kClusterId[] = "clusterId";
@@ -32,20 +29,20 @@ bool DiscoveryServer::bindAndListen()
 nx::utils::Url DiscoveryServer::url() const
 {
     return nx::network::url::Builder().
-        setScheme(kUrlSchemeName)
+        setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_httpServer.serverAddress());
 }
 
 void DiscoveryServer::registerRequestHandlers(
-    server::rest::MessageDispatcher* messageDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
     messageDispatcher->registerRequestProcessorFunc(
-        Method::post,
+        nx::network::http::Method::post,
         kRegisterNodePath,
         [this](auto&&... args) { serveRegisterNode(std::move(args)...); });
 
     messageDispatcher->registerRequestProcessorFunc(
-        Method::get,
+        nx::network::http::Method::get,
         kRegisterNodePath,
         [this](auto&&... args) { serveGetOnlineNodes(std::move(args)...); });
 }
@@ -55,18 +52,20 @@ void DiscoveryServer::serveRegisterNode(
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     if (!requestContainsThisClusterId(requestContext))
-        return completionHandler(StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
 
     bool ok = false;
     NodeInfo nodeInfo = QJson::deserialized(requestContext.request.messageBody, NodeInfo(), &ok);
     if (!ok)
-        return completionHandler(StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
 
     Node node = updateNode(nodeInfo, requestContext.connection->clientEndpoint());
 
-    RequestResult result(StatusCode::created);
+    nx::network::http::RequestResult result(nx::network::http::StatusCode::created);
     result.dataSource =
-        std::make_unique<BufferSource>("application/json", QJson::serialized(node));
+        std::make_unique<nx::network::http::BufferSource>(
+            "application/json",
+            QJson::serialized(node));
 
     completionHandler(std::move(result));
 }
@@ -76,13 +75,15 @@ void DiscoveryServer::serveGetOnlineNodes(
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     if (!requestContainsThisClusterId(requestContext))
-        return completionHandler(StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
 
     auto onlineNodes = getOnlineNodes();
 
-    RequestResult result(StatusCode::ok);
+    nx::network::http::RequestResult result(nx::network::http::StatusCode::ok);
     result.dataSource =
-        std::make_unique<BufferSource>("application/json", QJson::serialized(onlineNodes));
+        std::make_unique<nx::network::http::BufferSource>(
+            "application/json",
+            QJson::serialized(onlineNodes));
 
     completionHandler(std::move(result));
 }
@@ -107,7 +108,7 @@ Node DiscoveryServer::updateNode(
         node.host = nodeEndpoint.toStdString();
 
     node.infoJson = nodeInfo.infoJson;
-    node.expirationTime = system_clock::now() + seconds(3);
+    node.expirationTime = std::chrono::system_clock::now() + std::chrono::seconds(3);
 
     return node;
 }
@@ -118,7 +119,7 @@ std::vector<Node> DiscoveryServer::getOnlineNodes()
     std::vector<Node> onlineNodes;
     for (auto it = m_onlineNodes.begin(); it != m_onlineNodes.end();)
     {
-        if (it->second.expirationTime <= system_clock::now())
+        if (it->second.expirationTime <= std::chrono::system_clock::now())
         {
             it = m_onlineNodes.erase(it);
         }
