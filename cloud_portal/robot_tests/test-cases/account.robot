@@ -233,3 +233,30 @@ Language changed in account is new default
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    //h1[text()='Account']
     Check Language
+
+Language change in account page affects emails
+    [tags]    C41575
+    ${russian subject}    Set Variable    Восстановление пароля
+    Go To    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']
+    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']/..
+    Click Button    ${ACCOUNT SAVE}
+    Sleep    5
+    Close Browser
+
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL NOPERM}
+    Click Button    ${RESET PASSWORD BUTTON}
+    Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120    status=UNSEEN
+    Check Email Subject    ${email}    ${russian subject}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    Delete All Emails
+    Close Mailbox
+    Check Language
