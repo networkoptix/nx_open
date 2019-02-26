@@ -327,14 +327,14 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
         m_eventTypeId = kObjectInTheAreaEventType;
         caption = "Object in the Area (caption)";
         description = "Object in the Area (description)";
-        isActive = 1;
+        isActive = true;
     }
     else
     {
         m_eventTypeId = kLineCrossingEventType;
         caption = "Line Crossing (caption)";
         description = "Line Crossing (description)";
-        isActive = 0;
+        isActive = false;
     }
 
     auto eventMetadata = makePtr<EventMetadata>();
@@ -351,7 +351,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
 
     NX_OUTPUT << "Firing event: "
         << "type: " << m_eventTypeId
-        << ", isActive: " << ((isActive) ? "true" : "false");
+        << ", isActive: " << (isActive ? "true" : "false");
 
     return eventMetadataPacket;
 }
