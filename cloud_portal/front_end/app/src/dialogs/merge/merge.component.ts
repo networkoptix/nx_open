@@ -28,7 +28,6 @@ export class MergeModalContent {
     tooManySystems: boolean;
     user: any;
     wrongPassword: boolean;
-    // Todo: open branch
 
     @ViewChild('mergeForm') mergeForm: HTMLFormElement;
 
