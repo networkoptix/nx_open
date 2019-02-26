@@ -355,11 +355,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
         const auto currentIndex = ui->comboBoxTransport->currentIndex();
         if (index >= 0)
-        {
             ui->comboBoxTransport->removeItem(index);
-            if (index == currentIndex)
-                ui->comboBoxTransport->setCurrentIndex(0);
-        }
     }
 
     if (state.expert.rtpTransportType.hasValue())
