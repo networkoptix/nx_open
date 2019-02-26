@@ -23,6 +23,7 @@
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "common_socket_impl.h"
 #include "address_resolver.h"
 
 #ifdef _WIN32
@@ -1297,12 +1298,12 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
  * @return fd (>=0) on success, <0 on error (-2 if timed out)
  */
 static int acceptWithTimeout(
-    int m_fd,
+    int fd,
     int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
     bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
-        return ::accept(m_fd, NULL, NULL);
+        return ::accept(fd, NULL, NULL);
 
     int result = 0;
     if (timeoutMillis == 0)
@@ -1311,7 +1312,7 @@ static int acceptWithTimeout(
 #ifdef _WIN32
     struct pollfd fds[1];
     memset(fds, 0, sizeof(fds));
-    fds[0].fd = m_fd;
+    fds[0].fd = fd;
     fds[0].events |= POLLIN;
     result = poll(fds, sizeof(fds) / sizeof(*fds), timeoutMillis);
     if (result < 0)
@@ -1325,16 +1326,16 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         int errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
             return -1;
         ::SetLastError(errorCode);
         return -1;
     }
-    return ::accept(m_fd, NULL, NULL);
+    return ::accept(fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset(&sockPollfd, 0, sizeof(sockPollfd));
-    sockPollfd.fd = m_fd;
+    sockPollfd.fd = fd;
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
@@ -1349,7 +1350,7 @@ static int acceptWithTimeout(
     }
     if (sockPollfd.revents & POLLIN)
     {
-        auto fd = ::accept(m_fd, NULL, NULL);
+        auto fd = ::accept(fd, NULL, NULL);
         return fd;
     }
     if ((sockPollfd.revents & POLLHUP)
@@ -1365,7 +1366,7 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         socklen_t errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
             return -1;
         errno = errorCode;
         return -1;

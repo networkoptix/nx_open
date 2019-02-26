@@ -85,7 +85,7 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
 {
     NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
 
-    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::m_impl.get());
+    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::impl());
 }
 
 template<typename InterfaceToImplement>

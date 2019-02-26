@@ -18,7 +18,7 @@ BasicPollable::BasicPollable(
     aio::AIOService* aioService,
     aio::AbstractAioThread* aioThread)
     :
-    m_pollable(-1, std::make_unique<CommonSocketImpl>()),
+    m_pollable(-1),
     m_aioService(aioService)
 {
     if (!aioThread)
