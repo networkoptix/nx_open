@@ -25,8 +25,8 @@ static constexpr auto kTunnelTypeRestoreSpeed = 1;
 ClientFactory::ClientFactory():
     base_type([this](auto&&... args) { return defaultFactoryFunction(std::move(args)...); })
 {
-    registerClientType<ConnectionUpgradeTunnelClient>();
     registerClientType<GetPostTunnelClient>();
+    registerClientType<ConnectionUpgradeTunnelClient>();
     registerClientType<SslTunnelClient>();
 }
 
