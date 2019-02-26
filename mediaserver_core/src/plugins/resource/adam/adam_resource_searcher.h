@@ -43,8 +43,8 @@ public:
 
 private:
     QString generatePhysicalId(const QString& url) const;
-    QByteArray executeAsciiCommand(nx::modbus::QnModbusClient& client, const QString& command);
-    QString getAdamModuleName(nx::modbus::QnModbusClient& client);
+    QString executeAsciiCommand(nx::modbus::QnModbusClient& client, const QString& command);
+    QString getAdamModel(nx::modbus::QnModbusClient& client);
     QString getAdamModuleFirmware(nx::modbus::QnModbusClient& client);
 
 private:
