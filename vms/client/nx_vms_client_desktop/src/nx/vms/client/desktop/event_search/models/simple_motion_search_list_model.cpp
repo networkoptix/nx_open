@@ -277,11 +277,14 @@ void SimpleMotionSearchListModel::requestFetch()
 
 void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 {
-    if (!NX_ASSERT(!m_fetchInProgress))
+    if (!NX_ASSERT(!m_fetchInProgress) || isFilterDegenerate())
         return;
 
-    if ((m_data.empty() && canFetchMore()) || isFilterDegenerate())
+    if (m_data.empty())
+    {
+        clear(); //< Will emit dataNeeded signal.
         return;
+    }
 
     QnScopedValueRollback<bool> progressRollback(&m_fetchInProgress, true);
 
@@ -290,7 +293,9 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     if (!m_data.empty())
         startTimeMs = std::clamp(startTimeMs, m_data.back().startTimeMs, m_data.front().startTimeMs);
 
-    NX_VERBOSE(this, "Updating, from %1", utils::timestampToDebugString(startTimeMs));
+    NX_VERBOSE(this, "Updating, from %1, old item count = %2",
+        utils::timestampToDebugString(startTimeMs),
+        m_data.size());
 
     NX_ASSERT(!fetchedTimeWindow().isNull());
 
@@ -312,12 +317,12 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     const auto sourceEnd = std::lower_bound(periods.cbegin(), periods.cend(),
         periodToUpdate.endTime(), ascendingLowerBoundPredicate);
 
-    if ((sourceEnd - sourceBegin) > maximumCount())
+    const int updateSize = sourceEnd - sourceBegin;
+    if ((updateSize - rowCount()) > maximumCount())
     {
-        NX_WARNING(this, "Unexpected update, resetting.");
+        NX_WARNING(this, "Unexpected update, count = %1, resetting.", updateSize);
         progressRollback.rollback();
-        clear();
-        requestFetch();
+        clear(); //< Will emit dataNeeded signal.
         return;
     }
 
