@@ -9,6 +9,7 @@
 #include "abstract_pollset.h"
 #include "aio_event_handler.h"
 #include "pollable.h"
+#include "../common_socket_impl.h"
 #include "../detail/socket_sequence.h"
 
 namespace nx::network::aio::detail {
@@ -207,13 +208,13 @@ public:
 
     /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
-    
+
     /**
      * @return true, if at least one task has been processed.
      */
     bool processPeriodicTasks(const qint64 curClock);
     void processPostedCalls();
-    
+
     /**
      * Moves elements to remove to a temporary container and returns it.
      * Elements may contain functor which may contain aio objects (sockets) which will be removed
@@ -221,7 +222,7 @@ public:
      */
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         SocketSequenceType socketSequence);
-    
+
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);
