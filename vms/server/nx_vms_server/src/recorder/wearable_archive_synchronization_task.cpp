@@ -124,7 +124,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs,
     delegate->setStartTimeUs(startTimeMs * 1000);
     delegate->setUseAbsolutePos(false);
 
-    QnAviResourcePtr resource(new QnAviResource(temporaryFilePath));
+    QnAviResourcePtr resource(new QnAviResource(temporaryFilePath, serverModule()->commonModule()));
     delegate->open(resource, nullptr);
     delegate->findStreams();
 
