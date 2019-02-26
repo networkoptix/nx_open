@@ -284,7 +284,14 @@ PageBase
 
         onClicked: toggleUi()
 
-        onShowRoiHint: banner.showText(qsTr("Tap and hold to select an area"))
+        readonly property string roiHintText: qsTr("Tap and hold to select an area")
+        onHideRoiHint:
+        {
+            if (banner.text == roiHintText)
+                banner.hide()
+        }
+
+        onShowRoiHint: banner.showText(roiHintText)
 
         Connections
         {

@@ -21,6 +21,7 @@ ZoomableFlickable
     property size fitSize: content.boundedSize(width, height)
 
     signal showRoiHint()
+    signal hideRoiHint()
 
     interactive: !fisheyeMode
 
@@ -317,6 +318,12 @@ ZoomableFlickable
             {
                 target: control
                 onMovementEnded: motionSearchController.updateDefaultRoi()
+            }
+
+            onDrawingRoiChanged:
+            {
+                if (drawingRoi)
+                    control.hideRoiHint()
             }
         }
     }
