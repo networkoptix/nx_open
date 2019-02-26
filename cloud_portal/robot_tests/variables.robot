@@ -217,12 +217,6 @@ ${PATCHES TAB}                        //span[@class='tab-heading' and text()='Pa
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='Betas']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
-#Known Limitations
-${REMOTE CONNECTIVITY TILE LINK}      //h2[contains(text(),"${REMOTE CONNECTIVITY}")]/..//a[contains(@href,"${SUPPORT URL}")]
-${SUPPORT TILE LINK}                  //h2[contains(text(),"${SUPPORT}")]/..//a[@href="${SUPPORT URL}"]
-#About
-${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
-
 #Footer
 ${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT} ${PRODUCT_NAME}")]
 ${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITATIONS}")]
