@@ -100,8 +100,6 @@ window.L = {};
                     appState.supportLink = response.supportLink;
                     appState.productName = response.productName;
                     appState.vmsName = response.vmsName;
-                    appState.landingLayout = response.landingLayout;
-                    appState.landingBlock1 = response.landingBlock1;
                     
                     angular.extend(CONFIG, appState);
                     
