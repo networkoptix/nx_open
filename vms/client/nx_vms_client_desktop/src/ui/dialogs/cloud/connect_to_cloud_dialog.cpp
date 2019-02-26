@@ -8,6 +8,7 @@
 #include <api/server_rest_connection.h>
 #include <cloud/cloud_connection.h>
 #include <cloud/cloud_result_info.h>
+#include <client/client_runtime_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -365,7 +366,11 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         {
             if (guard && parentGuard && (!success || (reply.error != QnRestResult::NoError)))
             {
-                showFailure(reply.errorString);
+                QString errorMessage = tr("Internal server error. Please try again later.");
+                if (qnRuntime->isDevMode())
+                    errorMessage += '\n' + reply.errorString;
+
+                showFailure(errorMessage);
                 return;
             }
 

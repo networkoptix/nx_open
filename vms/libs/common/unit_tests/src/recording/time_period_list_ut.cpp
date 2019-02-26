@@ -379,6 +379,45 @@ TEST( QnTimePeriodsListTest, overwriteTailOfBigList )
     ASSERT_EQ(makeTimePeriods(10, 5, 5, kBigListLength + 1), sourceList);
 }
 
+TEST( QnTimePeriodsListTest, intersection )
+{
+    //                                1 1 1 1 1 1 1 1 1 1 2 2 ...
+    //            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 ...
+    //  1st:      |-------------|     |-------------|     |---
+    //  2nd:            |-----------|        |-----------|
+    //  expected:       |-------|            |-------|
+    //
+    EXPECT_EQ(makeTimePeriods(/*start*/ 3, /*length*/ 4, /*gap*/ 6, /*count*/ 5),
+        QnTimePeriodList::intersection(
+            makeTimePeriods(/*start*/ 0, /*length*/ 7, /*gap*/ 3, /*count*/ 5),
+            makeTimePeriods(/*start*/ 3, /*length*/ 7, /*gap*/ 3, /*count*/ 5)));
+
+    //  1st:      -- -- -- -- -- -- -- -- -- --
+    //  2nd:       -- -- -- -- --
+    //  expected:  -  -  -  -  -
+    //
+    EXPECT_EQ(makeTimePeriods(/*start*/ 13, /*length*/ 4, /*gap*/ 6, /*count*/ 5),
+        QnTimePeriodList::intersection(
+            makeTimePeriods(/*start*/ 0, /*length*/ 7, /*gap*/ 3, /*count*/ 10),
+            makeTimePeriods(/*start*/ 13, /*length*/ 7, /*gap*/ 3, /*count*/ 5)));
+
+    QnTimePeriodList expected;
+    expected << QnTimePeriod(0, 5) << QnTimePeriod(10, 5) << QnTimePeriod(40, 5);
+
+    QnTimePeriodList limiter;
+    limiter << QnTimePeriod(0, 20) << QnTimePeriod(40, 10);
+
+    //                                                    1
+    //                1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 0
+    //            0 5 0 5 0 5 0 5 0 5 0 5 0 5 0 5 0 5 0 5 0
+    //  1st:      |-| |-| |-| |-| |-| |-| |-| |-| |-| |-|
+    //  limiter:  |-------|       |---|
+    //  expected: |-| |-|         |-|
+    //
+    EXPECT_EQ(expected, QnTimePeriodList::intersection(
+        makeTimePeriods(/*start*/ 0, /*length*/ 5, /*gap*/ 5, /*count*/ 10), limiter));
+}
+
 TEST( QnTimePeriodsListTest, includingPeriods )
 {
     QnTimePeriodList sourceList;

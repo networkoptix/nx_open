@@ -2699,6 +2699,10 @@ to %1</translation>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Failed to connect System to %1</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -5014,10 +5018,6 @@ to %1</translation>
       <source>Select Cameras...</source>
       <translation>Select Cameras...</translation>
     </message>
-    <message>
-      <source>Select users...</source>
-      <translation>Select users...</translation>
-    </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
@@ -6449,11 +6449,7 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Hold to Speak</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>Input device is not selected</translation>
@@ -6465,6 +6461,10 @@ to %1</translation>
     <message>
       <source>Network error</source>
       <translation>Network error</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Hold to Speak</translation>
     </message>
   </context>
   <context>
@@ -7057,10 +7057,6 @@ to %1</translation>
       <translation>Servers from the other System will appear in the resource tree.</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>Failed to merge Systems</translation>
-    </message>
-    <message>
       <source>Failed to update Server</source>
       <translation>Failed to update Server</translation>
     </message>
@@ -7092,6 +7088,18 @@ to %1</translation>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 Systems cannot be merged</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -9488,6 +9496,10 @@ to %1</translation>
     <message>
       <source>This version is already installed</source>
       <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
   </context>
   <context>

@@ -2583,6 +2583,10 @@ a %1</translation>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Falha ao conectar o sistema a %1</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -4790,10 +4794,6 @@ a %1</translation>
       <source>Select Cameras...</source>
       <translation>Seleccionar Câmaras...</translation>
     </message>
-    <message>
-      <source>Select users...</source>
-      <translation>Seleccionar Utilizadores...</translation>
-    </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
@@ -6197,11 +6197,7 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Premir para falar</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>O dispositivo de entrada não está seleccionado</translation>
@@ -6213,6 +6209,10 @@ a %1</translation>
     <message>
       <source>Network error</source>
       <translation>Erro de rede</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Premir para falar</translation>
     </message>
   </context>
   <context>
@@ -6773,10 +6773,6 @@ a %1</translation>
       <translation>Servidores do outro sistema aparecerão na árvore de recursos.</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>Falha ao mesclar Sistemas</translation>
-    </message>
-    <message>
       <source>Failed to update Server</source>
       <translation>Falha ao atualizar o servidor</translation>
     </message>
@@ -6808,6 +6804,18 @@ a %1</translation>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>Não pode ser feito o &quot;merge&quot; dos Sistemas %1</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -8996,6 +9004,10 @@ a %1</translation>
     <message>
       <source>This version is already installed</source>
       <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
   </context>
   <context>

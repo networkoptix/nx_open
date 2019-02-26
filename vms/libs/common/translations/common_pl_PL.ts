@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>MM/dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -104,7 +104,7 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Nie można połączyć systemów, ponieważ mają co najmniej jeden serwer o tym samym identyfikatorze. Usuń ten serwer i spróbuj ponownie.</translation>
     </message>
   </context>
   <context>
@@ -113,26 +113,6 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Zdarzenie systemowe</translation>
-    </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>System jest już powiązany z chmurą (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>Serwer nie ma połączenia z Internetem.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>Nie udało się zapisać danych logowania do chmury w lokalnej bazie danych</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>Nie udało się zapisać danych o właścicielu chmury w lokalnej bazie danych</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>Nie można połączyć się z chmurą: %1</translation>
     </message>
   </context>
   <context>
@@ -351,15 +331,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Błąd wtyczki. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>Wtyczka jest niedostępna</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Wewnętrzny błąd serwera. %1</translation>
     </message>
   </context>
   <context>
@@ -398,7 +378,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Nie można przydzielić buforów próbki</translation>
     </message>
   </context>
   <context>
@@ -634,15 +614,15 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Licencje bezpłatne</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n bezpłatna licencja</numerusform>
+        <numerusform>%n bezpłatne licencje</numerusform>
+        <numerusform>%n bezpłatnych licencji</numerusform>
+        <numerusform>%n bezpłatnych licencji</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -738,11 +718,11 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 bezpłatna licencja</numerusform>
+        <numerusform>%n/%1 bezpłatne licencje</numerusform>
+        <numerusform>%n/%1 bezpłatnych licencji</numerusform>
+        <numerusform>%n/%1 bezpłatnych licencji</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -837,11 +817,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Dozwolona jest tylko jedna licencja startowa na system.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Masz już jedną aktywną licencję startową.</translation>
     </message>
   </context>
   <context>
@@ -903,56 +883,56 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenia</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n urządzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenia</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n urządzeń</numerusform>
       </translation>
     </message>
   </context>
@@ -1111,19 +1091,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Plik zip jest uszkodzony.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Nie można znaleźć katalogu docelowego.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Nie można otworzyć pliku do zapisu.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Na dysku nie ma wolnej przestrzeni.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1131,22 +1111,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Anulowano wypakowywanie.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Program wypakowujący jest zajęty.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Zły rozmiar strumienia szyfrowanego.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Uszkodzony nagłówek strumienia szyfrowanego.</translation>
     </message>
   </context>
   <context>
@@ -1666,19 +1646,19 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>Zdarzenie wtyczki</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>Nieznane zdarzenie wtyczki</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Nie można wymusić użycia czasu kamery z powodu opóźnień, zostanie wykorzystany czas systemowy</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Czas kamery powrócił do normy</translation>
     </message>
   </context>
   <context>

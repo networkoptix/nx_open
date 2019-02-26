@@ -60,11 +60,12 @@ QnStaticCommonModule::QnStaticCommonModule(
 
 QnStaticCommonModule::~QnStaticCommonModule()
 {
-    clear();
-
+    instance<QnLongRunnablePool>()->stopAll();
     nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
         std::move(m_private->endpointVerificatorFactoryBak));
     nx::network::SocketGlobals::deinit();
+
+    clear();
 
     delete m_private;
     m_private = nullptr;

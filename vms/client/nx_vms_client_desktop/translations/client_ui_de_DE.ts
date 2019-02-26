@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>ARM-Supportrichtlinie</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>am nächsten Tag</translation>
     </message>
   </context>
   <context>
@@ -665,12 +665,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Benutzerdefinierter Medienport</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Kamerazeitstempel vertrauen</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Native Kamerapresets sind nicht verfügbar.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +705,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Bewegung während des Archivimports erkennen</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Tipp</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1089,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Geräte hinzufügen</translation>
     </message>
     <message>
       <location/>
@@ -1230,7 +1230,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Mit Passwort schützen</translation>
     </message>
     <message>
       <location/>
@@ -1588,7 +1588,7 @@
         }
     ]
 }</source>
-      <translation type="unfinished">{
+      <translation>{
     &quot;items&quot;: [
         {
             &quot;type&quot;: &quot;TextField&quot;,
@@ -1767,7 +1767,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Minimale Rastergröße</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Admin-DN oder CN</translation>
     </message>
   </context>
   <context>
@@ -2141,7 +2141,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Auf Update prüfen</translation>
     </message>
     <message>
       <location/>
@@ -2166,7 +2166,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Herunterladen &amp;&amp; Installieren</translation>
     </message>
     <message>
       <location/>
@@ -2181,7 +2181,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Erweiterte Systemeinstellungen</translation>
     </message>
     <message>
       <location/>
@@ -2194,12 +2194,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Zeige alle Layouts</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Layouts auswählen</translation>
     </message>
   </context>
   <context>
@@ -2212,12 +2212,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Neue virtuelle Kamera...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtuelle Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>
   <context>
@@ -2286,22 +2286,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>FEHLER</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>WARNUNG</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFO</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2450,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Neustart auf die aktualisierte Version, wenn Sie bereit sind</translation>
     </message>
   </context>
   <context>
@@ -2845,7 +2845,7 @@
     <message>
       <location/>
       <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
+      <translation>Filter TEST</translation>
     </message>
     <message>
       <location/>
@@ -2855,7 +2855,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Ziehen Sie ein Bild oder eine Videodatei in das Anwendungsfenster, um sie abzuspielen</translation>
     </message>
   </context>
   <context>
@@ -2969,7 +2969,7 @@
     <message>
       <location/>
       <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <translation>Sitzungslänge begrenzen</translation>
     </message>
     <message>
       <location/>
@@ -3219,7 +3219,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Basisprognose auf der Grundlage von Daten, die während der Zeit aufgezeichnet wurden</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3380,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-Zeit</translation>
     </message>
   </context>
   <context>
@@ -3388,17 +3388,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Zeitsynchronisation mit dem Internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-Zeit</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Synchronisieren Sie keine Zeit zwischen Servern</translation>
     </message>
   </context>
   <context>
@@ -3506,7 +3506,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Bewegung erkennen</translation>
     </message>
   </context>
   <context>
