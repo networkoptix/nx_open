@@ -1349,10 +1349,8 @@ static int acceptWithTimeout(
         return -1;
     }
     if (sockPollfd.revents & POLLIN)
-    {
-        auto fd = ::accept(fd, NULL, NULL);
-        return fd;
-    }
+        return ::accept(fd, NULL, NULL);
+
     if ((sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
