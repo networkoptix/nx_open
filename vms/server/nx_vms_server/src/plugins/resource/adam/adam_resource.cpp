@@ -196,7 +196,7 @@ bool QnAdamResource::setOutputPortState(
             [this, outputId, newState](quint64  timerId)
             {
                 QnMutexLocker lock(&m_mutex);
-                if (!NX_ASSERT(m_autoResetTimers.count(timerId)))
+                if (!m_autoResetTimers.count(timerId))
                     return;
 
                 NX_VERBOSE(this, "Setting port [%1] back to state [%2]", outputId, !newState);
