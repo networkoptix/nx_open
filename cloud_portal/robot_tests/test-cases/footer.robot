@@ -17,11 +17,11 @@ Restart
 *** Test Cases ***
 About page is correctly displayed
     [tags]    C41541    Threaded
-    Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
+    Wait Until Elements Are Visible    ${FOOTER ABOUT LINK}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
     Click Link    ${FOOTER ABOUT LINK}
     Location Should Be    ${ENV}${ABOUT URL}
-    Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
+    Wait Until Elements Are Visible    ${FOOTER ABOUT LINK}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
 
 Support leads to the proper support site
