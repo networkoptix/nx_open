@@ -54,7 +54,7 @@ private:
 
 private:
     std::unique_ptr<QnAbstractIOManager> m_ioManager;
-    std::map<quint64, PortTimerEntry> m_autoResetTimers;
+    std::unordered_map<quint64, PortTimerEntry> m_autoResetTimers;
     std::map<QString, Qn::IOPortType> m_portTypes;
     mutable QnMutex m_mutex;
 
