@@ -139,5 +139,16 @@ bool hasCredentials(const QnUuid& localSystemId)
     return !credentialsHash.value(localSystemId).isEmpty();
 }
 
+void saveCloudCredentials(const common::Credentials& credentials)
+{
+    settings()->cloudCredentials = credentials;
+}
+
+void forgetSavedCloudCredentials(bool keepUser)
+{
+    settings()->cloudCredentials = {keepUser ? settings()->cloudCredentials().user : QString(),
+        QString()};
+}
+
 } // namespace helpers
 } // namespace nx::vms::client::core

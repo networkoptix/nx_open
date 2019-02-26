@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
+#include <helpers/system_helpers.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -377,7 +378,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             if (stayLoggedIn)
             {
                 const nx::vms::common::Credentials credentials(cloudLogin, cloudPassword);
-                nx::vms::client::core::settings()->cloudCredentials = credentials;
+                nx::vms::client::core::helpers::saveCloudCredentials(credentials);
                 qnCloudStatusWatcher->setCredentials(credentials);
             }
 
