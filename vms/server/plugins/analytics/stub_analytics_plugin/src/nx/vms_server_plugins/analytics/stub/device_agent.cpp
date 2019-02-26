@@ -4,7 +4,6 @@
 #include <chrono>
 #include <ctime>
 #include <cmath>
-#include <vector>
 
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
@@ -27,9 +26,9 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
-    m_objectId(nx::sdk::UuidHelper::randomUuid())
+    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
+    generateObjectIds();
 }
 
 DeviceAgent::~DeviceAgent()
@@ -119,7 +118,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
 
     NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUsec = videoFrame->timestampUs();
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
     return true;
 }
 
@@ -134,7 +133,7 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
     NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
 
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUsec = videoFrame->timestampUs();
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
 
     return checkFrame(videoFrame);
 }
@@ -162,7 +161,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
         logMessage = "Objects generation disabled by .ini";
     }
 
-    m_lastVideoFrameTimestampUsec = 0;
+    m_lastVideoFrameTimestampUs = 0;
 
     NX_OUTPUT << __func__ << "() END -> true: " << logMessage;
     return true;
@@ -274,12 +273,55 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
+static IObjectMetadata* makeObjectMetadata(
+    std::string objectTypeId,
+    Uuid objectId,
+    double dt,
+    int64_t lastVideoFrameTimestampUs,
+    bool generatePreviewAttributes,
+    int objectIndex)
+{
+    auto objectMetadata = new ObjectMetadata();
+    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
+    objectMetadata->setTypeId(objectTypeId);
+    objectMetadata->setId(objectId);
+    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt,
+        (float) dt + 0.05 * objectIndex, 0.25F, 0.25F));
+    if (generatePreviewAttributes)
+    {
+        // Make a box smaller than the one in setBoundingBox() to make the change visible.
+        objectMetadata->setAttributes({
+            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
+                std::to_string(lastVideoFrameTimestampUs)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
+                std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"}
+        });
+    }
+    return objectMetadata;
+}
+
+void DeviceAgent::generateObjectIds()
+{
+    int objectsCount = ini().objectsCount;
+    if (objectsCount < 1)
+    {
+        NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
+        objectsCount = 1;
+    }
+    m_objectIds.resize(objectsCount);
+    for (auto& objectId: m_objectIds)
+        objectId = UuidHelper::randomUuid();
+}
+
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
     std::string caption;
     std::string description;
     bool isActive;
-    
+
     if (m_eventTypeId == kLineCrossingEventType)
     {
         m_eventTypeId = kObjectInTheAreaEventType;
@@ -316,13 +358,11 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
 
 IMetadataPacket* DeviceAgent::cookSomeObjects()
 {
-    if (m_lastVideoFrameTimestampUsec == 0)
+    if (m_lastVideoFrameTimestampUs == 0)
         return nullptr;
 
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
-
-    auto objectMetadata = makePtr<ObjectMetadata>();
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -339,19 +379,16 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
 
     if (m_currentObjectIndex != sequentialNumber)
     {
-        m_objectId = UuidHelper::randomUuid();
+        generateObjectIds();
         m_currentObjectIndex = sequentialNumber;
         m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
         ++m_currentObjectTypeIndex;
+
         if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
             m_currentObjectTypeIndex = 0;
     }
 
-    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    objectMetadata->setTypeId(m_objectTypeId);
-    objectMetadata->setId(m_objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt, (float) dt, 0.25F, 0.25F));
-
+    bool generatePreviewAttributes = false;
     if (dt < 0.5)
     {
         m_previewAttributesGenerated = false;
@@ -359,23 +396,25 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
     else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewAttributes)
     {
         m_previewAttributesGenerated = true;
-
-        // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        objectMetadata->setAttributes({
-            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
-                std::to_string(m_lastVideoFrameTimestampUsec)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y", std::to_string(dt)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"}
-        });
+        generatePreviewAttributes = true;
     }
 
     auto objectMetadataPacket = new ObjectMetadataPacket();
 
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
+    for (int i = 0; i < (int) m_objectIds.size(); ++i)
+    {
+        auto objectMetadata = toPtr(makeObjectMetadata(
+            m_objectTypeId,
+            m_objectIds[i],
+            dt,
+            m_lastVideoFrameTimestampUs,
+            generatePreviewAttributes,
+            i));
+        objectMetadataPacket->addItem(objectMetadata.get());
+    }
+
+    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
     objectMetadataPacket->setDurationUs(0);
-    objectMetadataPacket->addItem(objectMetadata.get());
     return objectMetadataPacket;
 }
 
