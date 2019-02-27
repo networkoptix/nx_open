@@ -235,7 +235,7 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::resetIoDevice()
 {
-    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite));
+    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
     if (!m_ioDevice)
     {
         NX_WARNING(this, lm("%1 DB file open failed").args(m_dbFileName));
