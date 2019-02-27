@@ -2,6 +2,25 @@
 
 #include <nx/fusion/model_functions.h>
 
+namespace nx::vms::api {
+
+StreamIndex oppositeStreamIndex(StreamIndex streamIndex)
+{
+    switch (streamIndex)
+    {
+        case StreamIndex::primary:
+            return StreamIndex::secondary;
+        case StreamIndex::secondary:
+            return StreamIndex::primary;
+        default:
+            break;
+    }
+    NX_ASSERT(false, lm("Unsupported StreamIndex %1").args(streamIndex));
+    return StreamIndex::undefined; //< Fallback for the failed assertion.
+}
+
+} // namespace nx::vms::api
+
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionType,
     (nx::vms::api::MT_Default, "MT_Default")
     (nx::vms::api::MT_HardwareGrid, "MT_HardwareGrid")

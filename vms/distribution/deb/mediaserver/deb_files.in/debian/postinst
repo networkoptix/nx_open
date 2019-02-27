@@ -187,6 +187,9 @@ if [ $(which systemctl) ]; then
     # Systemd requires explicit enabling of the service to start it on boot.
     systemctl enable $COMPANY_NAME-root-tool || exit $?
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
+else
+    update-rc.d $COMPANY_NAME-root-tool defaults || exit $?
+    update-rc.d $COMPANY_NAME-mediaserver defaults || exit $?
 fi
 
 if service $COMPANY_NAME-root-tool start && service $COMPANY_NAME-mediaserver start; then

@@ -29,20 +29,6 @@ std::optional<std::string> calculateUpperBound(const std::string& str)
     return std::nullopt;
 }
 
-std::optional<std::string> calculateLowerBound(const std::string& str)
-{
-    if (!str.empty())
-    {
-        std::string upperBound = str;
-        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
-        {
-            if (--(*rit) != 0)
-                return upperBound;
-        }
-    }
-    return std::nullopt;
-}
-
 std::string randomBinaryString()
 {
     std::string s;
@@ -503,13 +489,16 @@ private:
     void waitForCallback()
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_wait.wait(lock, [this]() { return m_callbackFired.load(); });
+        m_wait.wait(lock, [this]() { return m_callbackFired; });
         m_callbackFired = false;
     }
 
     void callbackFired()
     {
-        m_callbackFired = true;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_callbackFired = true;
+        }
         m_wait.notify_all();
     }
 
@@ -606,11 +595,11 @@ private:
         db().dataManager().lowerBound(
             lowerBoundKey,
             [this](map::ResultCode result, std::string key)
-        {
-            m_result = result;
-            m_fetchedLowerBound = std::move(key);
-            callbackFired();
-        });
+            {
+                m_result = result;
+                m_fetchedLowerBound = std::move(key);
+                callbackFired();
+            });
 
         waitForCallback();
     }
@@ -716,7 +705,7 @@ private:
 
     std::mutex m_mutex;
     std::condition_variable m_wait;
-    std::atomic_bool m_callbackFired = false;
+    bool m_callbackFired = false;
 
     nx::utils::SubscriptionId m_eventSubscriptionId = nx::utils::kInvalidSubscriptionId;
     std::atomic_bool m_eventTriggered = false;

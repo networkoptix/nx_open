@@ -100,7 +100,7 @@ private:
 
     std::unique_ptr<ModuleConnector> m_moduleConnector;
     std::unique_ptr<UdpMulticastFinder> m_multicastFinder;
-    DeprecatedMulticastFinder* m_legacyMulticastFinder;
+    std::unique_ptr<DeprecatedMulticastFinder> m_legacyMulticastFinder;
 };
 
 } // namespace discovery

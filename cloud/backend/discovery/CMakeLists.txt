@@ -1,0 +1,1 @@
+add_subdirectory(discovery_api_client)

@@ -110,7 +110,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
     switch (role)
     {
         case Qt::DisplayRole:
-            return title(eventParams.eventType);
+            return title(eventParams);
 
         case Qt::DecorationRole:
             return QVariant::fromValue(pixmap(eventParams));
@@ -138,7 +138,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         {
             const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
             if (resource)
-                return QVariant::fromValue(QnResourceList({ resource }));
+                return QVariant::fromValue(QnResourceList({resource}));
 
             if (role == Qn::DisplayedResourceListRole)
                 return {}; //< TODO: #vkutin Replace with <deleted camera> or <deleted server>.
@@ -359,9 +359,11 @@ rest::Handle EventSearchListModel::Private::getEvents(
     return server->restConnection()->getEvents(request, internalCallback, thread());
 }
 
-QString EventSearchListModel::Private::title(EventType eventType) const
+QString EventSearchListModel::Private::title(const vms::event::EventParameters& parameters) const
 {
-    return m_helper->eventName(eventType);
+    return parameters.eventType == EventType::analyticsSdkEvent
+        ? m_helper->getAnalyticsSdkEventName(parameters)
+        : m_helper->eventName(parameters.eventType);
 }
 
 QString EventSearchListModel::Private::description(

@@ -4,10 +4,9 @@
 
 namespace nx::vms::client::desktop {
 
-CameraExtraStatus getCameraExtraStatus(QnResourcePtr resource)
+CameraExtraStatus getCameraExtraStatus(const QnVirtualCameraResourcePtr& camera)
 {
     CameraExtraStatus result;
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
         return result;
 

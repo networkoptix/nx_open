@@ -21,6 +21,7 @@ enum Value
     safeMode,
     dependentSystemBoundToCloud,
     bothSystemBoundToCloud,
+    cloudSystemsHaveDifferentOwners,
     unconfiguredSystem,
     notLocalOwner,
     differentCloudHost,

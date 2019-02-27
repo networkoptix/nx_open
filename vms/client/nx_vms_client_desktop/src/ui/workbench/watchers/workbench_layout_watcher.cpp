@@ -40,12 +40,9 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
 
         if (!resource && !data.resource.uniqueId.isEmpty())
         {
-            if (QDir::isAbsolutePath(data.resource.uniqueId))
-            {
-                /* Try to load local resource. */
-                resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
-                resourcePool()->addResource(resource);
-            }
+            /* Try to load local resource. */
+            resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
+            resourcePool()->addResource(resource);
         }
 
         if (resource)

@@ -40,7 +40,7 @@ private:
     virtual StatusCode::Value validateOpenTunnelRequest(
         const RequestContext& requestContext) override;
 
-    virtual network::http::RequestResult processOpenTunnelRequest(
+    virtual RequestResult processOpenTunnelRequest(
         const RequestContext& requestContext,
         ApplicationData... requestData) override;
 };
@@ -120,10 +120,9 @@ StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData...>::validateOpe
 }
 
 template<typename ...ApplicationData>
-network::http::RequestResult
-    ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
-        const RequestContext& /*requestContext*/,
-        ApplicationData... requestData)
+RequestResult ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
+    const RequestContext& /*requestContext*/,
+    ApplicationData... requestData)
 {
     RequestResult requestResult(StatusCode::switchingProtocols);
     requestResult.connectionEvents.onResponseHasBeenSent =

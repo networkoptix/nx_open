@@ -129,6 +129,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         &m_mutex),
     m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); }, &m_mutex)
 {
+    NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
 
     connect(
@@ -170,7 +171,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             else if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
                 || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
                 || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
-                || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities)
+                || key == ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify)
             {
                 emit ptzConfigurationChanged(toSharedPointer(this));
             }
@@ -1485,16 +1486,18 @@ void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::Pres
     setProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
-bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilities() const
+Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesUserIsAllowedToModify() const
 {
-    return QnLexical::deserialized(getProperty(ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities), false);
+    return QnLexical::deserialized(
+        getProperty(ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify),
+        Ptz::Capabilities(Ptz::NoPtzCapabilities));
 }
 
-void QnSecurityCamResource::setIsUserAllowedToModifyPtzCapabilities(bool allowed)
+void QnSecurityCamResource::setPtzCapabilitesUserIsAllowedToModify(Ptz::Capabilities capabilities)
 {
     setProperty(
-        ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities,
-        QnLexical::serialized(allowed));
+        ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify,
+        QnLexical::serialized(capabilities));
 }
 
 Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesAddedByUser() const

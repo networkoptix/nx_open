@@ -29,30 +29,41 @@ class AIOService;
  *     using base_type = nx::network::aio::BasicPollable;
  *
  * public:
+ *     SampleClassWithAsyncOperations(std::unique_ptr<HttpConnection> httpConnection):
+ *         m_httpConnection(std::move(httpConnection))
+ *     {
+ *         // Making sure this, m_httpConnection and m_timer are bound to the same AIO thread.
+ *         bindToAioThread(m_httpConnection->getAioThread());
+ *     }
+ *
  *     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
  *     {
  *         base_type::bindToAioThread(aioThread);
  *
- *         if (m_connection)
- *             m_connection->bindToAioThread(aioThread);
+ *         if (m_httpConnection)
+ *             m_httpConnection->bindToAioThread(aioThread);
+ *         m_timer.bindToAioThread(aioThread);
  *     }
  *
  *     void doSomethingAsync(CompletionHandler handler)
  *     {
- *         m_connection = ...; //< Creating connection.
- *         m_connection->bindToAioThread(getAioThread());
- *         m_connection->any_async_call(... handler);
+ *         m_httpConnection->any_async_call(... handler);
  *     }
  *
  * protected:
  *     virtual void stopWhileInAioThread() override
  *     {
  *         base_type::stopWhileInAioThread();
- *         m_connection->pleaseStopSync(); // or m_connection.reset();
+ *
+ *         m_httpConnection.reset();
+ *         m_timer.pleaseStopSync();
  *     }
  *
  * private:
- *     std::unique_ptr<AbstractStreamSocket> m_connection;
+ *     // HttpConnection and aio::Timer inherit aio::BasicPollable.
+ *
+ *     std::unique_ptr<HttpConnection> m_httpConnection;
+ *     aio::Timer m_timer;
  * };
  * </code></pre>
  *

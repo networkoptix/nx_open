@@ -114,26 +114,6 @@
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>系統事件</translation>
     </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>系統已綁定到雲 (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>伺服器未連接到 Internet。</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>無法將雲帳密保存到本地資料庫</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>無法將雲持有人保存到本地資料庫</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>無法連線到雲: %1</translation>
-    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

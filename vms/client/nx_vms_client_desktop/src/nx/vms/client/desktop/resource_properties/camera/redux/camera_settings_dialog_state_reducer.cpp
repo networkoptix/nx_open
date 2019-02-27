@@ -391,11 +391,14 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (state.canForcePtzCapabilities() && (state.expert.forcedPtzPanTiltCapability.valueOr(true)
-        || state.expert.forcedPtzZoomCapability.valueOr(true)))
+    if (state.canForcePanTiltCapabilities() &&
+        state.expert.forcedPtzPanTiltCapability.valueOr(true))
     {
         return false;
     }
+
+    if (state.canForcePanTiltCapabilities() && state.expert.forcedPtzZoomCapability.valueOr(true))
+        return false;
 
     if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
         && state.expert.forcedMotionStreamType() != vms::api::StreamIndex::undefined)
@@ -431,6 +434,18 @@ std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state
 
     return state.recordingAlert;
 }
+
+bool canForceZoomCapability(const Camera& camera)
+{
+    return camera->ptzCapabilitiesUserIsAllowedToModify()
+        .testFlag(Ptz::Capability::ContinuousZoomCapability);
+};
+
+bool canForcePanTiltCapabilities(const Camera& camera)
+{
+    return camera->ptzCapabilitiesUserIsAllowedToModify() &
+        Ptz::Capability::ContinuousPanTiltCapabilities;
+};
 
 } // namespace
 
@@ -540,8 +555,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription.canSwitchPtzPresetTypes = combinedValue(cameras,
         [](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); });
 
-    state.devicesDescription.canForcePtzCapabilities = combinedValue(cameras,
-        [](const Camera& camera) { return camera->isUserAllowedToModifyPtzCapabilities(); });
+    state.devicesDescription.canForcePanTiltCapabilities =
+        combinedValue(cameras, canForcePanTiltCapabilities);
+
+    state.devicesDescription.canForceZoomCapability =
+        combinedValue(cameras, canForceZoomCapability);
 
     state.devicesDescription.supportsMotionStreamOverride = combinedValue(cameras,
         [](const Camera& camera)
@@ -734,24 +752,20 @@ State CameraSettingsDialogStateReducer::loadCameras(
             [](const Camera& camera) { return camera->userPreferredPtzPresetType(); });
     }
 
-    if (state.canForcePtzCapabilities())
+    if (state.canForcePanTiltCapabilities())
     {
-        const auto editableCameras = cameras.filtered(
-            [](const Camera& camera) { return camera->isUserAllowedToModifyPtzCapabilities(); });
+        fetchFromCameras<bool>(
+            state.expert.forcedPtzPanTiltCapability,
+            cameras,
+            canForcePanTiltCapabilities);
+    }
 
-        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, editableCameras,
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousPanTiltCapabilities);
-            });
-
-        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, editableCameras,
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousZoomCapability);
-            });
+    if (state.canForceZoomCapability())
+    {
+        fetchFromCameras<bool>(
+            state.expert.forcedPtzZoomCapability,
+            cameras,
+            canForceZoomCapability);
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
@@ -1221,7 +1235,7 @@ State CameraSettingsDialogStateReducer::setPreferredPtzPresetType(
 
 State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State state, bool value)
 {
-    if (!state.canForcePtzCapabilities())
+    if (state.devicesDescription.canForcePanTiltCapabilities != CombinedValue::All)
         return state;
 
     state.expert.forcedPtzPanTiltCapability.setUser(value);
@@ -1232,7 +1246,7 @@ State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State stat
 
 State CameraSettingsDialogStateReducer::setForcedPtzZoomCapability(State state, bool value)
 {
-    if (state.devicesDescription.canForcePtzCapabilities != CombinedValue::All)
+    if (state.devicesDescription.canForceZoomCapability != CombinedValue::All)
         return state;
 
     state.expert.forcedPtzZoomCapability.setUser(value);

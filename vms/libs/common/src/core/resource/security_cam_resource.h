@@ -360,9 +360,9 @@ public:
     nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
     void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
 
-    bool isUserAllowedToModifyPtzCapabilities() const;
+    Ptz::Capabilities ptzCapabilitiesUserIsAllowedToModify() const;
 
-    void setIsUserAllowedToModifyPtzCapabilities(bool allowed);
+    void setPtzCapabilitesUserIsAllowedToModify(Ptz::Capabilities);
 
     Ptz::Capabilities ptzCapabilitiesAddedByUser() const;
 

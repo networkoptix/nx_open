@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>MM/dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -104,7 +104,7 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>לא ניתן למזג את 'מערכות' משום שיש להם לפחות שרת אחד עם אותו מזהה. הסר את השרת ונסה שוב.</translation>
     </message>
   </context>
   <context>
@@ -113,26 +113,6 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>אירוע מערכת</translation>
-    </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>המערכת כבר קשורה לענן (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>השרת אינו מחובר לאינטרנט.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>נכשלה שמירת אישורי ענן ל- DB המקומי</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>שמירת הענן בעלים ל- DB המקומי נכשלה</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>לא ניתן להתחבר לענן: %1</translation>
     </message>
   </context>
   <context>
@@ -351,15 +331,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>שגיאה בתוסף. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>התוסף אינו זמין</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>שגיאת שרת פנימית. %1</translation>
     </message>
   </context>
   <context>
@@ -398,7 +378,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>לא היתה אפשרות להקצות מאגרי דגימה</translation>
     </message>
   </context>
   <context>
@@ -634,15 +614,15 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>רישיונות חינם</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n רישיונות חינם</numerusform>
+        <numerusform>%n רישיונות חינם</numerusform>
+        <numerusform>%n רישיונות חינם</numerusform>
+        <numerusform>%n רישיונות חינם</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -738,11 +718,11 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -837,11 +817,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>רק רשיון סטרטר אחד מותר לכל מערכת.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>כבר יש לך רישיון סטרטר פעיל אחד.</translation>
     </message>
   </context>
   <context>
@@ -903,56 +883,56 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
       </translation>
     </message>
   </context>
@@ -1111,19 +1091,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>קובץ ה-zip פגום.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>לא ניתן לאתר את היעד.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>לא ניתן לפתוח קובץ לכתיבה.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>אין מקום פנוי בדיסק.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1131,22 +1111,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>החילוץ בוטל.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>המחלץ אינו פנוי.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>גודל זרם שגוי.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>כותרת זרם מוצפן פגומה.</translation>
     </message>
   </context>
   <context>
@@ -1666,19 +1646,19 @@
     </message>
     <message>
       <source>Plugin Event</source>
-      <translation type="unfinished">Plugin Event</translation>
+      <translation>אירוע תוסף</translation>
     </message>
     <message>
       <source>Unknown plugin event</source>
-      <translation type="unfinished">Unknown plugin event</translation>
+      <translation>אירוע תוסף לא ידוע</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>נכשל השימוש בשעת המצלמה, הפרש זמן גדול מדי, יעשה שימוש בזמן המערכת</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>זמן המצלמה חוזר למצב רגיל</translation>
     </message>
   </context>
   <context>
