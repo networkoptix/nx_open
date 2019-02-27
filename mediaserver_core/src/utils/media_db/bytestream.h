@@ -52,9 +52,8 @@ public:
     {
         ensureFreeSize(sizeof(quint64));
 
-        quint64* dst64 = (quint64*)m_dst;
+        memcpy(m_dst, &value, sizeof(quint64));
         m_dst += sizeof(quint64);
-        *dst64 = qToLittleEndian(value);
     }
 
     void writeRawData(const char* src, int len)
