@@ -265,14 +265,15 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
         return QnResourcePtr(new QnAviBlurayResource(path));
 
     if (FileTypeSupport::isMovieFileExt(path))
-        return QnResourcePtr(new QnAviResource(path));
+        return QnResourcePtr(new QnAviResource(path, qnClientCoreModule->commonModule()));
 
     if (FileTypeSupport::isImageFileExt(path))
     {
-        QnResourcePtr rez = QnResourcePtr(new QnAviResource(path));
-        rez->addFlags(Qn::still_image);
-        rez->removeFlags(Qn::video | Qn::audio);
-        return rez;
+        QnResourcePtr res =
+            QnResourcePtr(new QnAviResource(path, qnClientCoreModule->commonModule()));
+        res->addFlags(Qn::still_image);
+        res->removeFlags(Qn::video | Qn::audio);
+        return res;
     }
 
     if (FileTypeSupport::isValidLayoutFile(path))

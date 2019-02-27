@@ -14,13 +14,13 @@ public:
     explicit QnSelectUsersDialogButton(QWidget* parent = nullptr);
     virtual ~QnSelectUsersDialogButton() override;
 
-    QnResourceSelectionDialogDelegate* dialogDelegate() const;
+    QnResourceSelectionDialogDelegate* getDialogDelegate() const;
     void setDialogDelegate(QnResourceSelectionDialogDelegate* delegate);
 
     void setSubjectValidationPolicy(QnSubjectValidationPolicy* policy); //< Takes ownership.
 
-private slots:
-    void at_clicked();
+protected:
+    virtual void handleButtonClicked() override;
 
 private:
     QnResourceSelectionDialogDelegate* m_dialogDelegate;

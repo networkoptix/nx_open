@@ -107,7 +107,7 @@ void TimeSynchronizationServersDelegate::paintName(
     initStyleOption(&option, index);
 
     QStyle* style = option.widget->style();
-    const int kOffset = -8;
+    const int kOffset = -2;
     // Obtain sub-element rectangles
     QRect textRect = style->subElementRect(
         QStyle::SE_ItemViewItemText,
@@ -120,7 +120,8 @@ void TimeSynchronizationServersDelegate::paintName(
         option.widget);
     iconRect.translate(kOffset, 0);
 
-    const bool selected = isRowSelected(index);
+    const bool selected = isRowSelected(index)
+        && index.model()->rowCount() > 1;
 
     // Paint background
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);

@@ -338,7 +338,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     if (QnFile::baseName(fileName).indexOf(lit("_")) == -1)
     {
-        QnAviResourcePtr res(new QnAviResource(fileName));
+        QnAviResourcePtr res(new QnAviResource(fileName, serverModule()->commonModule()));
         QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
         avi->setStorage(storage);
         avi->setFastStreamFind(true);
