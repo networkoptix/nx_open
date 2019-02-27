@@ -18,6 +18,7 @@
 #include <streaming/mjpeg_stream_reader.h>
 #include <network/multicodec_rtp_reader.h>
 
+#include <utils/media/utils.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/frame_type_extractor.h>
 
@@ -78,7 +79,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     Qn::directConnect(
         res.data(), &QnResource::propertyChanged,
         this,
-        [this](const QnResourcePtr& resource, const QString& propertyName)
+        [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
         {
             if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
@@ -223,7 +224,6 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
             if( ret != nxcip::NX_NO_ERROR )
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("stream"));
-            m_videoResolution = resolution;
         }
         else
         {
@@ -250,7 +250,6 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
                     return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
-            m_videoResolution = resolution;
             float selectedFps = 0;
             if( cameraEncoder.setFps( params.fps, &selectedFps ) != nxcip::NX_NO_ERROR )
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
@@ -463,8 +462,15 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
                     if (videoData)
                     {
-                        videoData->width = m_videoResolution.width;
-                        videoData->height = m_videoResolution.height;
+                        if (videoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
+                        {
+                            QSize streamResolution = nx::media::getFrameSize(
+                                std::dynamic_pointer_cast<QnCompressedVideoData>(rez));
+                            if (streamResolution.isValid())
+                                m_videoResolution = streamResolution;
+                        }
+                        videoData->width = m_videoResolution.width();
+                        videoData->height = m_videoResolution.height();
                     }
                     if( videoData && !videoData->metadata.isEmpty() )
                     {

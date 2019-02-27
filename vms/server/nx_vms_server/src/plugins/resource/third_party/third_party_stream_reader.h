@@ -66,7 +66,7 @@ private:
     // TODO: Migrate to nx::sdk::Ptr.
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
-    nxcip::Resolution m_videoResolution;
+    QSize m_videoResolution;
     QnConstMediaContextPtr m_audioContext;
     std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
