@@ -176,7 +176,7 @@ private:
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
-    bool processRemoteChanges(bool force = false);
+    bool processRemoteChanges();
     /** Part of processRemoteChanges FSM processor. */
     void processRemoteInitialState();
     void processRemoteUpdateInformation();

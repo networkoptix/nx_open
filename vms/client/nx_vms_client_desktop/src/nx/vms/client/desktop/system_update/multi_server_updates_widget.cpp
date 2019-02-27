@@ -1701,19 +1701,17 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
     setTargetState(WidgetUpdateState::initial);
 }
 
-bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
+bool MultiServerUpdatesWidget::processRemoteChanges()
 {
     // We gather here updated server status from updateTool
     // and change WidgetUpdateState state accordingly.
 
     // TODO: It could be moved to UpdateTool
     ServerUpdateTool::RemoteStatus remoteStatus;
-    if (!m_serverUpdateTool->getServersStatusChanges(remoteStatus) && !force)
-        return false;
+    if (m_serverUpdateTool->getServersStatusChanges(remoteStatus))
+        m_stateTracker->setUpdateStatus(remoteStatus);
 
     m_clientUpdateTool->checkInternalState();
-
-    m_stateTracker->setUpdateStatus(remoteStatus);
 
     if (m_widgetState == WidgetUpdateState::initial)
         processRemoteInitialState();
