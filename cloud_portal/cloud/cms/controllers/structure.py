@@ -27,6 +27,8 @@ def find_or_add_product(name, customization, product_type_name='cloud_portal'):
         product = Product(name=name)
         product.product_type = product_type
         product.save()
+        product.customizations = [customization]
+        product.save()
     return product
 
 
