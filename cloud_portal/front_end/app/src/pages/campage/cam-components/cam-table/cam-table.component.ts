@@ -5,7 +5,6 @@ import {
 import { NxPagerService }         from '../../../../services/pager.service';
 import { NxConfigService }        from '../../../../services/nx-config';
 import { TranslateService }       from '@ngx-translate/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { NxUriService }           from '../../../../services/uri.service';
 
 @Component({
@@ -28,12 +27,11 @@ export class CamTableComponent implements OnChanges, OnInit {
   private selectedHeader;
   private sortOrderASC: boolean;
   private results;
-  private cameraHeaders;
+  private readonly cameraHeaders;
   private showParameters;
   private showHeaders;
   private paramsShown;
   private lang;
-  private sortables;
   private params: any;
 
   pager: any = {};
@@ -80,13 +78,6 @@ export class CamTableComponent implements OnChanges, OnInit {
           this.lang.campage.isMdSupported,
           this.lang.campage.isIoSupported
       ];
-
-      this.sortables = [
-          this.lang.campage.vendor,
-          this.lang.campage.model,
-          this.lang.campage.hardwareType,
-          this.lang.campage.maxResolution
-      ];
   }
 
     byKey(a, b) {
@@ -127,15 +118,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         };
     }
 
-    isSortable(header) {
-        return this.sortables.indexOf(header) > -1;
-    }
-
     toggleHeaderSort(param) {
-        if (!this.isSortable(param)) {
-            return;
-        }
-
         let filter;
         for (const [key, value] of Object.entries(this.lang.campage)) {
             if (value === param) {
@@ -221,7 +204,7 @@ export class CamTableComponent implements OnChanges, OnInit {
     ngOnInit() {
         // this.showParameters = this.allowedParameters;
         this.results = this._elements.length;
-        this.csvFilename = this.getCurrentDate();
+        this.csvFilename = CamTableComponent.getCurrentDate();
         this.csvCameraData = this.getCsvData();
 
         this.uri
@@ -280,7 +263,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
     }
 
-  yesNo (bVal) {
+  static yesNo (bVal) {
       if (bVal === undefined || bVal === null) {
           return 'Unknown';
       }
@@ -295,16 +278,16 @@ export class CamTableComponent implements OnChanges, OnInit {
                     'Max Resolution': camera.maxResolution,
                     'Max FPS': camera.maxFps,
                     'Codecamera': camera.primaryCodecamera,
-                    '2-Way Audio': this.yesNo(camera.isTwAudioSupported),
-                    'Advancameraed PTZ': this.yesNo(camera.isAptzSupported),
-                    'Fisheye': this.yesNo(camera.isFisheye),
-                    'Motion': this.yesNo(camera.isMdSupported),
-                    'I/O': this.yesNo(camera.isIoSupported)
+                    '2-Way Audio': CamTableComponent.yesNo(camera.isTwAudioSupported),
+                    'Advancameraed PTZ': CamTableComponent.yesNo(camera.isAptzSupported),
+                    'Fisheye': CamTableComponent.yesNo(camera.isFisheye),
+                    'Motion': CamTableComponent.yesNo(camera.isMdSupported),
+                    'I/O': CamTableComponent.yesNo(camera.isIoSupported)
                })
         );
   }
 
-  getCurrentDate() {
+  static getCurrentDate() {
       return Date.now();
   }
 
