@@ -4,9 +4,7 @@
 
 #include <nx/utils/nx_utils_ini.h>
 
-namespace nx {
-namespace utils {
-namespace test {
+namespace nx::utils::test {
 
 static void expectVoice(const QString& animal, const QString& expectedVoice)
 {
@@ -78,6 +76,4 @@ TEST(Switch, Action)
     }
 }
 
-} // namespace test
-} // namespace utils
-} // namesapce nx
+} // namespace nx::utils::test

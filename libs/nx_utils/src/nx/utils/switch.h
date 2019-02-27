@@ -2,8 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 struct Default {} default_;
 
@@ -30,27 +29,33 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *  std::string line;
  *  switch (count)
  *  {
- *      case 0: line = "none";
- *      case 1: line = "single";
- *      default: line = "many";
+ *      case 0:
+ *          line = "none";
+ *          break;
+ *      case 1:
+ *          line = "single";
+ *          break;
+ *      default:
+ *          line = "many";
+ *          break;
  *  }
  * ```
  * Advantage here: keeps `line` const.
  *
  * # Usage example 2:
  * ```
- *  nx::utils::switch_(input.read(),
+ *  nx::utils::switch_(data.command(),
  *      "help", [](){ printHelp(); },
- *      "save", [&](){ save(value.toInt()); },
+ *      "save", [&](){ save(data.argument()); },
  *  );
  * ```
  * Equivalent of:
  * ```
- *  const auto inputValue = input.read();
+ *  const auto inputValue = data.command();
  *  if (inputValue == "help")
  *      printHelp();
  *  else if (inputValue == "save")
- *      save(value.toInt());
+ *      save(data.argument());
  *  else
  *      NX_ASSERT(false, "Unmatched switch value");
  * ```
@@ -70,5 +75,4 @@ auto switch_(const Value& value, const Match& match, const Action& action,
     return decltype(action())();
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

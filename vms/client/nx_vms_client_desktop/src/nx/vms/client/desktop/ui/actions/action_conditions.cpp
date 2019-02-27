@@ -34,6 +34,7 @@
 #include <camera/resource_display.h>
 
 #include <network/cloud_url_validator.h>
+#include <network/system_helpers.h>
 
 #include <core/storage/file_storage/layout_storage_resource.h>
 
@@ -1635,6 +1636,9 @@ ActionVisibility MergeToCurrentSystemCondition::check(const QnResourceList& reso
         return InvisibleAction;
 
     if (server->getModuleInformation().ecDbReadOnly)
+        return InvisibleAction;
+
+    if (helpers::serverBelongsToCurrentSystem(server))
         return InvisibleAction;
 
     return EnabledAction;
