@@ -2,7 +2,7 @@
     
     'use strict';
     
-    function CameraViewInformer($rootScope, nxConfigService, languageService) {
+    function CameraViewInformer($rootScope, $timeout, nxConfigService, languageService) {
         
         const CONFIG = nxConfigService.getConfig();
         const LANG = languageService.lang;
@@ -18,6 +18,13 @@
                 scope.placeholderTitle = LANG.common.cameraStates.error;
                 scope.message = (!scope.flags.errorDescription) ? LANG.common.cameraStates[scope.alertType] : scope.flags.errorDescription;
             }
+            
+            // Visualise after informer resize
+            // ... when error happen - it expands to
+            // 100% ignoring timeline height and info shifts -- TT
+            $timeout(function () {
+                scope.displayInfo = true;
+            }, 500);
         }
         
         function linkFunction(scope) {
@@ -26,6 +33,7 @@
                 scope.placeholderTitle = '';
                 scope.message = '';
                 scope.iconClass = '';
+                scope.displayInfo = false;
                 scope.condition = false;
                 scope.alertType = null;
                 
@@ -45,16 +53,17 @@
                 }
                 
                 //if status is online dont show any message
-                if (!scope.alertType &&
-                    typeof(scope.flags.status) !== 'undefined' &&
+                if (scope.flags.status === 'Offline' ||
+                    !scope.alertType && typeof(scope.flags.status) !== 'undefined' &&
                     !(scope.flags.status === 'Online' || scope.flags.status === 'Recording')) {
+                    
                     scope.alertType = 'status';
                 }
                 //if non flag break
                 if (!scope.alertType) {
                     return;
                 }
-                
+    
                 scope.condition = true;
                 
                 updateTpl(scope);
@@ -71,16 +80,16 @@
         return {
             restrict: 'E',
             scope: {
-                flags: '=',
-                preloader: '=',
-                preview: '='
+                flags: '<',
+                preloader: '<',
+                preview: '<'
             },
             templateUrl: CONFIG.viewsDirCommon + 'components/placeholder.html',
             link: linkFunction
         };
     }
     
-    CameraViewInformer.$inject = ['$rootScope', 'nxConfigService', 'languageService'];
+    CameraViewInformer.$inject = ['$rootScope', '$timeout', 'nxConfigService', 'languageService'];
     
     angular
         .module('nxCommon')

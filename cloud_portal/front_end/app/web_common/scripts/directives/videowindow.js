@@ -42,7 +42,8 @@ import * as Hls from 'hls.js';
                         player: '=',
                         activeFormat: '=',
                         rotation: '=',
-                        playerHandler: '='
+                        playerHandler: '=',
+                        status: '<'
                     },
                     templateUrl: CONFIG.viewsDirCommon + 'components/videowindow.html',// ???
                     
@@ -88,7 +89,8 @@ import * as Hls from 'hls.js';
                                 ieWin10: false,
                                 ubuntuNX: false,
                                 errorCode: '',
-                                errorDescription: ''
+                                errorDescription: '',
+                                status: scope.status
                             };
                             
                             if (scope.debugMode && scope.activeFormat !== 'Auto') {
