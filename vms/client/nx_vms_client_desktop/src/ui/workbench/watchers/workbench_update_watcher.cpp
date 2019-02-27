@@ -220,7 +220,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
         mainWindowWidget());
 
     QString cssStyle = NxUi::generateCssStyle();
-    QString htmlBody= extras.join(lit("<br>"));
+    QString htmlBody= extras.join("<br>");
     QString html = QString::fromLatin1(R"(
         <html>
         <head>
@@ -236,12 +236,12 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
     // QWebView has weird sizeHint. We should manually adjust its size to make it look good.
     view->setFixedWidth(360);
     view->setFixedHeight(380);
-    view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Policy::Maximum);
+    view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
     // Setting up a policy for link redirection. We should not open release notes right here.
     auto page = view->page();
-    page->setLinkDelegationPolicy(QWebPage::QWebPage::DelegateAllLinks);
+    page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     connect(page, &QWebPage::linkClicked, this,
-        [](const QUrl & url)
+        [](const QUrl& url)
         {
             QDesktopServices::openUrl(url);
         });

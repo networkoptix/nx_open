@@ -1,7 +1,7 @@
+#pragma once
+
 #include <QtCore/QString>
 #include <QtGui/QPalette>
-
-#pragma once
 
 class QWebView;
 class QGraphicsWebView;
