@@ -223,6 +223,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
             if( ret != nxcip::NX_NO_ERROR )
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("stream"));
+            m_videoResolution = resolution;
         }
         else
         {
@@ -249,6 +250,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
                     return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
+            m_videoResolution = resolution;
             float selectedFps = 0;
             if( cameraEncoder.setFps( params.fps, &selectedFps ) != nxcip::NX_NO_ERROR )
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
@@ -419,11 +421,6 @@ void ThirdPartyStreamReader::afterRun()
     closeStream();
 }
 
-void ThirdPartyStreamReader::onStreamResolutionChanged( int /*channelNumber*/, const QSize& picSize )
-{
-    m_videoResolution = picSize;
-}
-
 QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
@@ -464,6 +461,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
+                    if (videoData)
+                    {
+                        videoData->width = m_videoResolution.width;
+                        videoData->height = m_videoResolution.height;
+                    }
                     if( videoData && !videoData->metadata.isEmpty() )
                     {
                         m_savedMediaPacket = rez;

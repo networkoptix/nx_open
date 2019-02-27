@@ -53,9 +53,6 @@ protected:
     virtual void beforeRun() override;
     virtual void afterRun() override;
 
-    //!Overrides QnLiveStreamProvider::onStreamResolutionChanged()
-    virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
-
 private:
     //virtual bool needMetaData() const override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
@@ -69,7 +66,7 @@ private:
     // TODO: Migrate to nx::sdk::Ptr.
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
-    QSize m_videoResolution;
+    nxcip::Resolution m_videoResolution;
     QnConstMediaContextPtr m_audioContext;
     std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
