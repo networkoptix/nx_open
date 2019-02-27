@@ -359,11 +359,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
             readyPromise.set_value();
         };
 
-    serverModule()->storageDbPool()->addTask(
-        [this, completionHandler = std::move(completionHandler), &result]() mutable
-        {
-            startVacuum(std::move(completionHandler), &result);
-        });
+    startVacuum(std::move(completionHandler), &result);
 
     readyFuture.wait();
     return result;
