@@ -833,9 +833,12 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             return;
         }
 
-        // TODO: We should get a list of the servers to be updated and filter away the servers
-        // with the same version.
         auto targets = m_stateTracker->getAllPeers();
+
+        // Remove the servers which should not be updated. These are the servers with more recent
+        // version. So we should not track update progress for them.
+        targets.subtract(m_updateInfo.ignorePeers);
+
         auto offlineServers = m_stateTracker->getOfflineServers();
         targets.subtract(offlineServers);
         if (!offlineServers.empty())
@@ -881,6 +884,9 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
             targets.subtract(incompatible);
         }
+
+        if (!m_clientUpdateTool->shouldInstallThis(m_updateInfo))
+            targets.remove(m_stateTracker->getClientPeerId());
 
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
 
