@@ -26,13 +26,7 @@ class QnResourceSelectionDialog: public QnSessionAwareButtonBoxDialog
 
     using base_type = QnSessionAwareButtonBoxDialog;
 public:
-    enum class Filter
-    {
-        cameras,
-        users
-    };
-
-    explicit QnResourceSelectionDialog(Filter filter, QWidget* parent);
+    explicit QnResourceSelectionDialog(QWidget* parent);
     ~QnResourceSelectionDialog();
 
     QSet<QnUuid> selectedResources() const;
@@ -59,7 +53,6 @@ private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
     QnResourceTreeModel* m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
-    Filter m_filter;
 
     bool m_updating;
 };

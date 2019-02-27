@@ -52,7 +52,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged,
         this, updateWatermarkState);
     // Need to sync checkbox to button, loadDataToUi() will do the rest.
-    updateWatermarkState(ui->displayWatermarkCheckBox->checkState() ? Qt::Checked : Qt::Unchecked);
+    updateWatermarkState(ui->displayWatermarkCheckBox->checkState());
 
     connect(ui->auditTrailCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);

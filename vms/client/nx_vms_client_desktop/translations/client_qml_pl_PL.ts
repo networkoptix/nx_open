@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Analityka w kamerze będzie działać tylko wtedy, gdy kamera jest na podglądzie. Należy włączyć nagrywanie, aby analityka działała cały czas.</translation>
     </message>
   </context>
   <context>

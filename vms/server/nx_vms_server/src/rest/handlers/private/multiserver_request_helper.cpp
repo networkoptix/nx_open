@@ -8,19 +8,16 @@ QSet<QnMediaServerResourcePtr> participantServers(
     const IfParticipantPredicate& ifPartcipantPredicate,
     QnCommonModule* commonModule)
 {
-    const auto systemName = commonModule->globalSettings()->systemName();
-    const auto localSystemId = commonModule->globalSettings()->localSystemId();
     auto servers = QSet<QnMediaServerResourcePtr>::fromList(
         commonModule->resourcePool()->getAllServers(Qn::Online));
 
     for (const auto& moduleInformation: commonModule->moduleDiscoveryManager()->getAll())
     {
-        if (moduleInformation.systemName != systemName
-            || moduleInformation.localSystemId != localSystemId)
-        {
+        if (moduleInformation.localSystemId != commonModule->globalSettings()->localSystemId())
             continue;
-        }
 
+        // Looking for servers, which belong to our system but have another version of the
+        // protocol, so they are 'Incompatible' in the resources pool.
         const auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
             moduleInformation.id);
 

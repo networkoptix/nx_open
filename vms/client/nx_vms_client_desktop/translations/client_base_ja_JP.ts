@@ -2549,6 +2549,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続できませんでした</translation>
     </message>
+    <message>
+      <source>Internal server error. Please try again later.</source>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectToCurrentSystemTool</name>
@@ -4729,10 +4733,6 @@ to %1</source>
       <source>Select Cameras...</source>
       <translation>カメラ選択...</translation>
     </message>
-    <message>
-      <source>Select users...</source>
-      <translation>ユーザー選択...</translation>
-    </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
@@ -6129,11 +6129,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>押して話す</translation>
-    </message>
+    <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
       <translation>入力デバイスが選択されていません.</translation>
@@ -6145,6 +6141,10 @@ to %1</source>
     <message>
       <source>Network error</source>
       <translation>ネットワークエラー.</translation>
+    </message>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>押して話す</translation>
     </message>
   </context>
   <context>
@@ -6697,10 +6697,6 @@ to %1</source>
       <translation>他のシステムのサーバーはリソース ツリーに表示されます</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>システム統合に失敗しました</translation>
-    </message>
-    <message>
       <source>Failed to update Server</source>
       <translation>サーバーを更新できませんでした</translation>
     </message>
@@ -6732,6 +6728,18 @@ to %1</source>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 システムを統合することはできません</translation>
+    </message>
+    <message>
+      <source>%1 has been successfully configured.</source>
+      <translation type="unfinished">%1 has been successfully configured.</translation>
+    </message>
+    <message>
+      <source>To complete the process, please connect to it with Client and update to version %1.</source>
+      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our system.</source>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
@@ -8868,6 +8876,10 @@ to %1</source>
     <message>
       <source>This version is already installed</source>
       <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
   </context>
   <context>

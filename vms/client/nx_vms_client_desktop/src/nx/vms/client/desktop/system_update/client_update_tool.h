@@ -127,7 +127,7 @@ public:
      * Works only in state State::complete.
      * @return true if command was successful.
      */
-    bool restartClient();
+    bool restartClient(QString authString = "");
 
     /**
      * Check if client should be restarted to this version.

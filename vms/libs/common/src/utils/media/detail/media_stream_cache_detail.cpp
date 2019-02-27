@@ -55,8 +55,8 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
     NX_CRITICAL(mediaPacket);
 
     const bool isKeyFrame = mediaPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
-    NX_VERBOSE(this, "Got frame [%1], isKeyFrame [%2], channel [%3]",
-        data->timestamp, isKeyFrame, mediaPacket->channelNumber);
+    NX_VERBOSE(this, "Got frame [%1], channel [%2], isKeyFrame [%3]",
+        data->timestamp, mediaPacket->channelNumber, isKeyFrame);
 
     if (m_packetsByTimestamp.empty() && !isKeyFrame)
         return; // Cache data MUST start with key frame.
@@ -221,17 +221,11 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimesta
     QnMutexLocker lk(&m_mutex);
 
     m_inactivityTimer.restart();
-
-    const auto it = std::lower_bound(
-        m_packetsByTimestamp.cbegin(), m_packetsByTimestamp.cend(), desiredTimestamp,
-        [](const MediaStreamCache::MediaPacketContext& one, quint64 two) -> bool
+    const auto result = std::find_if(m_packetsByTimestamp.crbegin(), m_packetsByTimestamp.crend(),
+        [channelNumber, findKeyFrameOnly, desiredTimestamp](const auto& value)
         {
-            return one.timestamp < two;
-        });
-
-    const auto result = std::find_if(std::make_reverse_iterator(it), m_packetsByTimestamp.crend(),
-        [channelNumber, findKeyFrameOnly](const auto& value)
-        {
+            if (value.timestamp > desiredTimestamp)
+                return false;
             if (value.channelNumber != channelNumber)
                 return false;
             if (!findKeyFrameOnly)
@@ -243,6 +237,10 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(quint64 desiredTimesta
 
     if (result == m_packetsByTimestamp.crend())
         return {};
+    using namespace std::chrono;
+    if (desiredTimestamp - result->timestamp > duration_cast<microseconds>(kMaxTimestampDeviation).count())
+        return {};
+
     *foundTimestamp = result->timestamp;
     return result->packet;
 }

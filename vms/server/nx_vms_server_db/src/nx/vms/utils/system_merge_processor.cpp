@@ -311,7 +311,7 @@ QnJsonRestResult SystemMergeProcessor::checkIfCloudSystemsMergeIsPossible(
         {
             NX_DEBUG(this, lm("Cannot merge two cloud systems with different owners: %1 vs %2")
                 .args(m_commonModule->globalSettings()->cloudAccountName(), remoteSystemCloudOwner));
-            setMergeError(&result, MergeStatus::bothSystemBoundToCloud);
+            setMergeError(&result, MergeStatus::cloudSystemsHaveDifferentOwners);
             return result;
         }
         else

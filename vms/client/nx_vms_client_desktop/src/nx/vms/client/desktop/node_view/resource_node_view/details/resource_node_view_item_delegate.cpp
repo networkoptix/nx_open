@@ -190,8 +190,8 @@ void ResourceNodeViewItemDelegate::paintRecordingIndicator(
     if (extraStatus == CameraExtraStatus())
         return;
 
-    const auto nodeHasChildren = [](const QModelIndex& index)
-        { return index.model()->rowCount(index) > 0; };
+    const auto nodeHasChildren =
+        [](const QModelIndex& index){ return index.model()->rowCount(index) > 0; };
 
     QRect indicatorRect(iconRect);
 

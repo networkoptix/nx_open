@@ -270,8 +270,8 @@ void Manager::initializeMulticastFinders(bool clientMode)
             return false;
         };
 
-    m_legacyMulticastFinder = new DeprecatedMulticastFinder(this, options);
-    connect(m_legacyMulticastFinder, &DeprecatedMulticastFinder::responseReceived,
+    m_legacyMulticastFinder = std::make_unique<DeprecatedMulticastFinder>(this, options);
+    connect(m_legacyMulticastFinder.get(), &DeprecatedMulticastFinder::responseReceived,
         [this](const nx::vms::api::ModuleInformation& module,
             const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip)
         {

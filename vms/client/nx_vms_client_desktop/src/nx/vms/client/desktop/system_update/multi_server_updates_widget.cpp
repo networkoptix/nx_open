@@ -85,6 +85,10 @@ const quint32 kProcessTerminateTimeoutMs = 15000;
 /* N-dash 5 times: */
 const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
 
+constexpr int kVersionSelectionBlockHeight = 20;
+constexpr int kVersionInformationBlockMinHeight = 48;
+constexpr int kPreloaderHeight = 32;
+
 // Adds resource list to message box
 void injectResourceList(QnMessageBox& messageBox, const QnResourceList& resources)
 {
@@ -124,6 +128,15 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui(new Ui::MultiServerUpdatesWidget)
 {
     ui->setupUi(this);
+
+    ui->titleStackedWidget->setFixedHeight(kVersionSelectionBlockHeight);
+    ui->versionStackedWidget->setMinimumHeight(kVersionInformationBlockMinHeight);
+    ui->updateStackedWidget->setFixedHeight(style::Metrics::kButtonHeight);
+
+    ui->checkingProgress->setFixedHeight(kPreloaderHeight);
+
+    autoResizePagesToContents(ui->versionStackedWidget,
+        QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 
     m_showDebugData = ini().massSystemUpdateDebugInfo;
     m_autoCheckUpdate = qnGlobalSettings->isUpdateNotificationsEnabled();
@@ -233,8 +246,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
-    ui->releaseDescriptionLabel->setOpenExternalLinks(true);
-
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
         [this]()
         {
@@ -273,7 +284,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     setWarningStyle(ui->longUpdateWarning);
 
-    ui->infoStackedWidget->setCurrentWidget(ui->errorPage);
     ui->errorLabel->setText(QString());
     setWarningStyle(ui->errorLabel);
 
@@ -286,8 +296,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->browseUpdate->setVisible(false);
 
     ui->releaseNotesLabel->setText(QString("<a href='notes'>%1</a>").arg(tr("Release notes")));
+
+    setWarningFrame(ui->releaseDescriptionLabel);
+    ui->releaseDescriptionLabel->setOpenExternalLinks(true);
     ui->releaseDescriptionLabel->setText(QString());
-    ui->releaseDescriptionLabel->setVisible(false);
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -821,9 +833,12 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             return;
         }
 
-        // TODO: We should get a list of the servers to be updated and filter away the servers
-        // with the same version.
         auto targets = m_stateTracker->getAllPeers();
+
+        // Remove the servers which should not be updated. These are the servers with more recent
+        // version. So we should not track update progress for them.
+        targets.subtract(m_updateInfo.ignorePeers);
+
         auto offlineServers = m_stateTracker->getOfflineServers();
         targets.subtract(offlineServers);
         if (!offlineServers.empty())
@@ -869,6 +884,9 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
             targets.subtract(incompatible);
         }
+
+        if (!m_clientUpdateTool->shouldInstallThis(m_updateInfo))
+            targets.remove(m_stateTracker->getClientPeerId());
 
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
 
@@ -1268,6 +1286,9 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         if (!m_peersIssued.contains(id))
             continue;
 
+        if (item->incompatible)
+            continue;
+
         if (item->installed)
         {
             if (m_peersActive.contains(id))
@@ -1488,6 +1509,9 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     {
         StatusCode state = item->state;
         auto id = item->id;
+
+        if (item->incompatible)
+            continue;
         //if (!m_peersIssued.contains(id))
         //    continue;
         if (item->installed)
@@ -1649,8 +1673,9 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
 
     if (clientUpdated && !clientInstallerRequired)
     {
+        QString authString = m_serverUpdateTool->getServerAuthString();
         NX_INFO(this) << "completeInstallation() - restarting the client";
-        if (!m_clientUpdateTool->restartClient())
+        if (!m_clientUpdateTool->restartClient(authString))
         {
             NX_ERROR(this) << "completeInstallation(" << clientUpdated << ") - failed to run restart command";
             unholdConnection = true;
@@ -1823,7 +1848,8 @@ void MultiServerUpdatesWidget::closePanelNotifications()
 
 void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
 {
-    auto setHighlightMode = [](QLabel* label, VersionReport::HighlightMode mode)
+    const auto setHighlightMode =
+        [](QLabel* label, VersionReport::HighlightMode mode)
         {
             if (mode == VersionReport::HighlightMode::bright)
             {
@@ -1849,10 +1875,17 @@ void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
     setHighlightMode(ui->errorLabel, report.statusHighlight);
 }
 
+bool MultiServerUpdatesWidget::isChecking() const
+{
+    return m_updateCheck.valid()
+        || m_serverUpdateCheck.valid()
+        || m_widgetState == WidgetUpdateState::initial;
+}
+
 void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 {
-    bool isChecking = m_updateCheck.valid() || m_serverUpdateCheck.valid() || m_widgetState == WidgetUpdateState::initial;
-    bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
+    const bool isChecking = this->isChecking();
+    const bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
     bool hasLatestVersion = false;
     if (m_updateInfo.isEmpty() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
         hasLatestVersion = true;
@@ -1882,73 +1915,55 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     else
         ui->cancelProgressAction->setText(tr("Cancel"));
 
-    ui->manualDownloadButton->setVisible(!isChecking);
-    ui->updateStackedWidget->setVisible(!isChecking);
     ui->selectUpdateTypeButton->setEnabled(!isChecking);
-    ui->errorLabel->setVisible(true);
 
     if (isChecking)
     {
         ui->versionStackedWidget->setCurrentWidget(ui->checkingPage);
-        ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
+        ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
         ui->updateCheckMode->setVisible(false);
-        ui->releaseDescriptionLabel->setText("");
-        ui->releaseDescriptionLabel->hide();
+        ui->releaseDescriptionLabel->setText(QString());
+        ui->errorLabel->setText(QString());
         hasLatestVersion = false;
     }
     else
     {
-        ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
-        ui->releaseNotesLabel->setVisible(!m_updateInfo.info.releaseNotesUrl.isEmpty());
-
+        ui->downloadButton->setVisible(m_haveValidUpdate);
         if (hasLatestVersion)
         {
-            ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
             if (m_updateInfo.sourceType == UpdateSourceType::internet)
                 ui->latestVersionBannerLabel->setText(tr("The latest version is already installed"));
             else
                 ui->latestVersionBannerLabel->setText(tr("This version is already installed"));
-            ui->errorLabel->setVisible(false);
-            ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
-            ui->downloadButton->setVisible(false);
-            ui->releaseDescriptionLabel->setText("");
-            ui->releaseDescriptionLabel->hide();
+
+            ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
+            ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
         }
-        else if (m_haveValidUpdate)
+        else
         {
-            if (m_updateSourceMode == UpdateSourceType::file)
+            if (m_haveValidUpdate)
             {
-                ui->downloadButton->setText(tr("Upload"));
-                ui->downloadAndInstall->setText(tr("Upload && Install"));
-            }
-            else // LatestVersion or SpecificBuild)
-            {
-                ui->downloadButton->setText(tr("Download"));
-                ui->downloadAndInstall->setText(tr("Download && Install"));
+                if (m_updateSourceMode == UpdateSourceType::file)
+                {
+                    ui->downloadButton->setText(tr("Upload"));
+                    ui->downloadAndInstall->setText(tr("Upload && Install"));
+                }
+                else // LatestVersion or SpecificBuild)
+                {
+                    ui->downloadButton->setText(tr("Download"));
+                    ui->downloadAndInstall->setText(tr("Download && Install"));
+                }
+
+                ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
+                ui->releaseDescriptionLabel->setVisible(!m_updateInfo.info.description.isEmpty());
             }
 
-            ui->downloadButton->setVisible(true);
-
-            if (!m_updateInfo.info.releaseNotesUrl.isEmpty())
-            {
-                ui->infoStackedWidget->setCurrentWidget(ui->releaseNotesPage);
-            }
-            else
-            {
-                ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
-            }
-
-            ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
-            ui->releaseDescriptionLabel->setVisible(!m_updateInfo.info.description.isEmpty());
+            ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
+            ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
         }
 
         if (!m_haveValidUpdate)
-        {
-            ui->infoStackedWidget->setCurrentWidget(ui->errorPage);
-            ui->downloadButton->setVisible(false);
-            ui->releaseDescriptionLabel->setText("");
-            ui->releaseDescriptionLabel->hide();
-        }
+            ui->releaseDescriptionLabel->setText(QString());
 
         bool browseUpdateVisible = false;
         if (/*!m_haveValidUpdate && */m_widgetState != WidgetUpdateState::readyInstall)
@@ -1977,7 +1992,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    bool showButton = !hasLatestVersion
+    const bool showButton = !isChecking && !hasLatestVersion
         && m_updateSourceMode != UpdateSourceType::file
         && (m_widgetState == WidgetUpdateState::ready
             || m_widgetState != WidgetUpdateState::initial)
@@ -1985,6 +2000,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             || m_updateInfo.error == nx::update::InformationError::httpError
             // If one wants to download a file in another place.
             || m_updateInfo.error == nx::update::InformationError::noError);
+
     ui->manualDownloadButton->setVisible(showButton);
 
     syncVersionReport(m_updateReport);
@@ -2107,19 +2123,14 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     }
 
     // Should we show progress for this UI state.
-    bool hasProgress = stateHasProgress(m_widgetState);
-    if (hasProgress)
-    {
+    if (isChecking())
+        ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
+    else if (stateHasProgress(m_widgetState))
         syncProgress();
-    }
     else if (m_widgetState == WidgetUpdateState::complete)
-    {
-        ui->updateStackedWidget->setCurrentWidget(ui->updateCompletionPage);
-    }
+        ui->updateStackedWidget->setCurrentWidget(ui->emptyPage);
     else
-    {
         ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
-    }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
     QString icon = m_showStorageSettings
@@ -2157,6 +2168,25 @@ void MultiServerUpdatesWidget::loadDataToUi()
 
     syncDebugInfoToUi();
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StatusMessageColumn, !m_showDebugData);
+
+    syncVersionInfoVisibility();
+
+    if (auto layout = ui->versionStackedWidget->currentWidget()->layout(); NX_ASSERT(layout))
+        layout->activate();
+
+    ui->controlsVerticalLayout->activate();
+}
+
+void MultiServerUpdatesWidget::syncVersionInfoVisibility()
+{
+    const bool hasError = !ui->errorLabel->text().isEmpty();
+    ui->errorLabel->setVisible(hasError);
+
+    const bool hasReleaseDescription = !ui->releaseDescriptionLabel->text().isEmpty();
+    ui->releaseDescriptionHolder->setVisible(hasReleaseDescription && !hasError);
+
+    const bool hasReleaseNotes = !m_updateInfo.info.releaseNotesUrl.isEmpty();
+    ui->releaseNotesLabel->setVisible(hasReleaseNotes && !hasError);
 }
 
 void MultiServerUpdatesWidget::syncDebugInfoToUi()

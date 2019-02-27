@@ -255,6 +255,9 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
     if (left->component != right->component)
         return left->component == UpdateItem::Component::client;
 
+    if (left->incompatible != right->incompatible)
+        return !left->incompatible;
+
     if (!left || !right)
         return left < right;
 

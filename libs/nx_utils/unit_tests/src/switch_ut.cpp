@@ -4,9 +4,7 @@
 
 #include <nx/utils/nx_utils_ini.h>
 
-namespace nx {
-namespace utils {
-namespace test {
+namespace nx::utils::test {
 
 static void expectVoice(const QString& animal, const QString& expectedVoice)
 {
@@ -78,24 +76,4 @@ TEST(Switch, Action)
     }
 }
 
-static void expectToString(Type value, const QString& expectedString = {})
-{
-    const auto string = NX_ENUM_SWITCH(value,
-    {
-        case Type::a: return "a";
-        case Type::b: return "b";
-    });
-
-    ASSERT_EQ(expectedString, string);
-}
-
-TEST(EnumSwitch, EnumToString)
-{
-    expectToString(Type::a, "a");
-    expectToString(Type::b, "b");
-    ASSERT_DEATH(expectToString(static_cast<Type>(42)), "Unmatched switch value: 42");
-}
-
-} // namespace test
-} // namespace utils
-} // namesapce nx
+} // namespace nx::utils::test

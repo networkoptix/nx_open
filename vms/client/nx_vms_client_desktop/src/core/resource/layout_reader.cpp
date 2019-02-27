@@ -141,7 +141,8 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
         QnStorageResourcePtr storage(
             new QnLayoutFileStorageResource(qnClientCoreModule->commonModule(), layoutUrl));
 
-        QnAviResourcePtr aviResource(new QnAviResource(item.resource.uniqueId));
+        QnAviResourcePtr aviResource(
+            new QnAviResource(item.resource.uniqueId, qnClientCoreModule->commonModule()));
         aviResource->addFlags(Qn::exported_media);
         if (layoutWithCameras)
             aviResource->addFlags(Qn::utc | Qn::sync | Qn::periods | Qn::motion);

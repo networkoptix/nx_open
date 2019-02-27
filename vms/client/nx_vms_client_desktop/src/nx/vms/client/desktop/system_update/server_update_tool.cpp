@@ -885,6 +885,15 @@ std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpda
     return promise->get_future();
 }
 
+QString ServerUpdateTool::getServerAuthString() const
+{
+    const auto& connectionInfo = commonModule()->ec2Connection()->connectionInfo();
+    nx::utils::Url serverUrl = connectionInfo.ecUrl;
+    if (serverUrl.scheme().isEmpty())
+        serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));
+
+    return QnStartupParameters::createAuthenticationString(serverUrl, connectionInfo.version);
+}
 
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {

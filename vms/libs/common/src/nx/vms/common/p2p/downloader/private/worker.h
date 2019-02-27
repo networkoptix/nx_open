@@ -26,7 +26,7 @@ namespace downloader {
 class Storage;
 class AbstractPeerManager;
 
-class Worker: public QnLongRunnable, public ::std::enable_shared_from_this<Worker>
+class Worker: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -141,7 +141,6 @@ private:
     {
         QnUuid peerId;
         State type = State::failed;
-        bool cancelled = false;
 
         RequestContext(const QnUuid& peerId, State type):
             peerId(peerId),
