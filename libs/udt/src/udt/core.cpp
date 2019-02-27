@@ -1583,12 +1583,12 @@ void CUDT::CCUpdate()
 void CUDT::releaseSynch()
 {
     {
-        std::lock_guard<std::mutex> sendguard(m_SendLock);
+        std::unique_lock<std::mutex> lock(m_SendBlockLock);
+        m_SendBlockCond.notify_all();
     }
 
     {
-        std::unique_lock<std::mutex> lock(m_SendBlockLock);
-        m_SendBlockCond.notify_all();
+        std::lock_guard<std::mutex> sendguard(m_SendLock);
     }
 
     {
