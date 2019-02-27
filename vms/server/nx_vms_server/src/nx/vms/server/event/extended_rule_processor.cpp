@@ -342,8 +342,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     {
         auto url = lit("dbfile://notifications/") + params.url;
 
-        QnAviResourcePtr resource(new QnAviResource(url));
-        resource->setCommonModule(serverModule()->commonModule());
+        QnAviResourcePtr resource(new QnAviResource(url, serverModule()->commonModule()));
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
             serverModule()->dataProviderFactory()->createDataProvider(resource));

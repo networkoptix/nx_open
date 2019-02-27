@@ -8,7 +8,7 @@
 
 
 QnAviDvdResource::QnAviDvdResource(const QString& file):
-    QnAviResource(file)
+    QnAviResource(file, nullptr)
 {
 }
 

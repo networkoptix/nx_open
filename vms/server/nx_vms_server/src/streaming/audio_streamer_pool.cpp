@@ -171,8 +171,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
     if (type == nx::vms::api::ActionType::playSoundAction)
     {
         const auto filePath = lit("dbfile://notifications/") + params.url;
-        QnAviResourcePtr resource(new QnAviResource(filePath));
-        resource->setCommonModule(serverModule()->commonModule());
+        QnAviResourcePtr resource(new QnAviResource(filePath, serverModule()->commonModule()));
         resource->setStatus(Qn::Online);
         provider.reset(serverModule()->dataProviderFactory()->createDataProvider(resource));
     }

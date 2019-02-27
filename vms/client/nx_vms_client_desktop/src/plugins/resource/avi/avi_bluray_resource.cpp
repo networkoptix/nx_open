@@ -7,7 +7,7 @@
 #include "avi_bluray_archive_delegate.h"
 
 QnAviBlurayResource::QnAviBlurayResource(const QString& file):
-    QnAviResource(file)
+    QnAviResource(file, nullptr)
 {
 }
 

@@ -30,9 +30,10 @@ QnAspectRatio getAspectRatioFromImage(const QString& fileName)
 
 } // namespace
 
-QnAviResource::QnAviResource(const QString& file)
+QnAviResource::QnAviResource(const QString& file, QnCommonModule* commonModule)
 {
     //setUrl(QDir::cleanPath(file));
+    setCommonModule(commonModule);
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
