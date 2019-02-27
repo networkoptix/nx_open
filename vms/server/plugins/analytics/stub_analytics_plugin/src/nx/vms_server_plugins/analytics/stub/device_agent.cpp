@@ -287,19 +287,48 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setId(objectId);
     objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt,
         (float) dt + 0.05 * objectIndex, 0.25F, 0.25F));
+
     if (generatePreviewAttributes)
     {
         // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        objectMetadata->setAttributes({
+        objectMetadata->addAttributes({
             {IAttribute::Type::number, "nx.sys.preview.timestampUs",
                 std::to_string(lastVideoFrameTimestampUs)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
                 std::to_string(dt)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"}
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
         });
     }
+
+    const std::map<std::string, std::vector<Attribute>> kObjectAttributes = {
+        {kCarObjectType, {
+            {IAttribute::Type::string, "Brand", "Tesla"},
+            {IAttribute::Type::string, "Model", "X"},
+            {IAttribute::Type::string, "Color", "Pink"},
+        }},
+        {kHumanFaceObjectType, {
+            {IAttribute::Type::string, "Sex", "Female"},
+            {IAttribute::Type::string, "Hair color", "Red"},
+            {IAttribute::Type::string, "Age", "29"},
+            {IAttribute::Type::string, "Name", "Triss"},
+
+        }},
+        {kTruckObjectType, {
+            {IAttribute::Type::string, "Length", "12 m"},
+        }},
+        {kPedestrianObjectType, {
+            {IAttribute::Type::string, "Direction", "Towards the camera"},
+            {IAttribute::Type::string, "Clothes color", "White"},
+        }},
+        {kBicycleObjectType, {
+            {IAttribute::Type::string, "Type", "Mountain bike"},
+        }},
+    };
+
+    objectMetadata->addAttributes(kObjectAttributes.at(objectTypeId));
+
     return objectMetadata;
 }
 
