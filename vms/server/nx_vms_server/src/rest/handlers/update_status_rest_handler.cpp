@@ -33,6 +33,7 @@ int QnUpdateStatusRestHandler::executeGet(
             serverModule(), path, &reply, &context);
     }
 
-    QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
+    QnFusionRestHandlerDetail::serializeJsonRestReply(reply, params, result, contentType,
+        QnRestResult());
     return nx::network::http::StatusCode::ok;
 }

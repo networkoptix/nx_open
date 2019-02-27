@@ -56,6 +56,8 @@ struct RestResultWithData: public RestResultWithDataBase
 
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
+using UpdateStatusAllData = RestResultWithData<std::vector<nx::update::Status>>;
+using UpdateInformationData = RestResultWithData<nx::update::Information>;
 
 struct ServerConnectionBase
 {
@@ -412,7 +414,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getUpdateInfo(
-        Result<nx::update::Information>::type&& callback,
+        Result<UpdateInformationData>::type&& callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -421,7 +423,7 @@ public:
      * @param callback
      */
     Handle checkForUpdates(const QString& changeset,
-        Result<QnJsonRestResult>::type&& callback,
+        Result<UpdateInformationData>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionStop(
@@ -436,9 +438,8 @@ public:
         std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
-    using UpdateStatusAll = std::vector<nx::update::Status>;
     Handle getUpdateStatus(
-        Result<UpdateStatusAll>::type callback,
+        Result<UpdateStatusAllData>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getModuleInformation(

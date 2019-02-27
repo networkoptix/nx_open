@@ -122,7 +122,7 @@ update::Status CommonUpdateManager::status()
 
 void CommonUpdateManager::cancel()
 {
-    startUpdate("{}");
+    startUpdate("");
 }
 
 void CommonUpdateManager::finish()
@@ -130,7 +130,7 @@ void CommonUpdateManager::finish()
     commonModule()->globalSettings()->setInstalledUpdateInformation(
         commonModule()->globalSettings()->targetUpdateInformation());
     commonModule()->globalSettings()->synchronizeNowSync();
-    startUpdate("{}");
+    startUpdate("");
 }
 
 void CommonUpdateManager::onGlobalUpdateSettingChanged()
