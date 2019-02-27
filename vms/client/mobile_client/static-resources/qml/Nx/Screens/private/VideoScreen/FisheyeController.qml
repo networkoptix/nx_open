@@ -134,12 +134,12 @@ Object
             {
                 delayedClickTimer.stop()
                 doubleClickFilterTimer.restart()
-                var distance = Qt.vector2d(
-                    mouseAreaHandler.lastClickPosition.x - mouse.x,
-                    mouseAreaHandler.lastClickPosition.y - mouse.y).length()
 
-                if (distance > mouseArea.drag.threshold)
+                if (!Utils.nearPositions(mouseAreaHandler.lastClickPosition,
+                    Qt.point(mouse.x, mouse.y), mouseArea.drag.threshold))
+                {
                     return
+                }
 
                 const kPowerThreshold = 0.8
                 if (interactor.scalePower > kPowerThreshold)

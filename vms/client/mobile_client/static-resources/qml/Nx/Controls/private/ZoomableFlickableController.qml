@@ -195,8 +195,8 @@ Object
 
                 if (clickFilterTimer.running
                     && !doubleClickFilterTimer.running
-                    && mouseAreaHandler.downPos.x == mouse.x
-                    && mouseAreaHandler.downPos.y == mouse.y)
+                    && Utils.nearPositions(mouseAreaHandler.downPos,
+                        Qt.point(mouse.x, mouse.y), mouseArea.drag.threshold))
                 {
 
                     delayedClickTimer.restart()
