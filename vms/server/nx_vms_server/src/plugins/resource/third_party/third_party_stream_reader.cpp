@@ -18,6 +18,7 @@
 #include <streaming/mjpeg_stream_reader.h>
 #include <network/multicodec_rtp_reader.h>
 
+#include <utils/media/utils.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/frame_type_extractor.h>
 
@@ -78,7 +79,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     Qn::directConnect(
         res.data(), &QnResource::propertyChanged,
         this,
-        [this](const QnResourcePtr& resource, const QString& propertyName)
+        [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
         {
             if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
@@ -419,11 +420,6 @@ void ThirdPartyStreamReader::afterRun()
     closeStream();
 }
 
-void ThirdPartyStreamReader::onStreamResolutionChanged( int /*channelNumber*/, const QSize& picSize )
-{
-    m_videoResolution = picSize;
-}
-
 QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
@@ -464,6 +460,18 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
+                    if (videoData)
+                    {
+                        if (videoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
+                        {
+                            QSize streamResolution = nx::media::getFrameSize(
+                                std::dynamic_pointer_cast<QnCompressedVideoData>(rez));
+                            if (streamResolution.isValid())
+                                m_videoResolution = streamResolution;
+                        }
+                        videoData->width = m_videoResolution.width();
+                        videoData->height = m_videoResolution.height();
+                    }
                     if( videoData && !videoData->metadata.isEmpty() )
                     {
                         m_savedMediaPacket = rez;
