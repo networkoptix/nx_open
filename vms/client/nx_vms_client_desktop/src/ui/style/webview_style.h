@@ -1,3 +1,6 @@
+#include <QtCore/QString>
+#include <QtGui/QPalette>
+
 #pragma once
 
 class QWebView;
@@ -15,5 +18,8 @@ enum class WebViewStyle
 QPalette createWebViewPalette(WebViewStyle style = WebViewStyle::common);
 void setupWebViewStyle(QWebView* webView, WebViewStyle style = WebViewStyle::common);
 void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style = WebViewStyle::common);
+
+/** Generates a CSS according to our customization style. */
+QString generateCssStyle();
 
 } // namespace NxUi

@@ -6,11 +6,13 @@
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QGraphicsWebView>
 
+#include <ui/style/nx_style.h>
+
 namespace NxUi {
 
 namespace {
 
-static const QString kStyleName = lit("fusion");
+static const QString kStyleName = "fusion";
 
 } // namespace
 
@@ -51,6 +53,38 @@ void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style)
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
     //webView->setAutoFillBackground(true);
+}
+
+QString generateCssStyle()
+{
+    QString styleBase = QString::fromLatin1(R"(
+    * {
+        color: %1;
+        font-family: 'Roboto-Regular', 'Roboto';
+        font-weight: 400;
+        font-size: 13px;
+        line-height: 16px;
+    }
+
+    body {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    a {
+        color: %2;
+        font-size: 13px;
+    }
+
+    a:hover {
+        color: %3;
+    })");
+
+    auto palette = qApp->palette();
+    auto windowText = palette.color(QPalette::WindowText).name();
+    auto brand = qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(2).color().name();;
+    auto highlight = palette.color(QPalette::Highlight).name();
+    return styleBase.arg(windowText, brand, highlight);
 }
 
 } // namespace NxUi
