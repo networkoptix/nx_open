@@ -5,7 +5,7 @@ import re
 #default english and default customization
 def get_variables(lang="en_US", cust="default"):
     #open up the customization file we want and create a dictionary called customization_json
-    with codecs.open("customizations/default_customization.json", 'r', encoding='utf-8-sig') as customization_variables:
+    with codecs.open("customizations/"+cust+".json", 'r', encoding='utf-8-sig') as customization_variables:
         customization_json = json.load(customization_variables)
         #open up the translation file we want and create a dictionary called translation_variables
         with codecs.open("translations/variables_language_" + lang + ".json", 'r', encoding='utf-8-sig') as translation_variables:
