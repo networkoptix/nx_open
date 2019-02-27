@@ -50,6 +50,8 @@ public:
     {
         m_tcpSocket = std::make_unique<TCPSocket>(AF_INET);
         m_aioThread.start();
+
+        m_tcpSocket->bindToAioThread(&m_aioThread);
     }
 
     ~AIOThread()

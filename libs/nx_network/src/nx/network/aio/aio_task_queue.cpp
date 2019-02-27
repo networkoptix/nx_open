@@ -434,6 +434,8 @@ void AioTaskQueue::processPostedCalls()
     while (!m_postedCalls.empty())
     {
         auto postHandler = std::move(m_postedCalls.begin()->postHandler);
+        NX_ASSERT(!m_postedCalls.front().socket ||
+            m_postedCalls.front().socket->isInSelfAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
         postHandler();
     }
