@@ -190,8 +190,8 @@ public:
 
     bool haveActiveUpdate() const;
 
-    // Get servers with updated protocol.
-    QSet<QnUuid> getServersWithChangedProtocol() const;
+    /** Get authentication string for current connection to mediaserver. */
+    QString getServerAuthString() const;
 
     std::shared_ptr<ServerUpdatesModel> getModel();
     std::shared_ptr<PeerStateTracker> getStateTracker();

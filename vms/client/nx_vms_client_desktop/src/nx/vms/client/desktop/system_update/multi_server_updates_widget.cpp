@@ -1673,8 +1673,9 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
 
     if (clientUpdated && !clientInstallerRequired)
     {
+        QString authString = m_serverUpdateTool->getServerAuthString();
         NX_INFO(this) << "completeInstallation() - restarting the client";
-        if (!m_clientUpdateTool->restartClient())
+        if (!m_clientUpdateTool->restartClient(authString))
         {
             NX_ERROR(this) << "completeInstallation(" << clientUpdated << ") - failed to run restart command";
             unholdConnection = true;

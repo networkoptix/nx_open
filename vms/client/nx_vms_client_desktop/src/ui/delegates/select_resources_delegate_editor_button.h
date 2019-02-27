@@ -12,7 +12,10 @@ public:
     virtual ~QnSelectResourcesDialogButton() override;
 
     QnUuidSet getResources() const;
-    void setResources(QnUuidSet resources);
+    void setResources(const QnUuidSet& resources);
+
+protected:
+    virtual void handleButtonClicked() = 0;
 
 signals:
     void commit();

@@ -17,9 +17,10 @@ class QnAviResource:
     public nx::utils::Encryptable
 {
     Q_OBJECT
-        using base_type = QnAbstractArchiveResource;
+    using base_type = QnAbstractArchiveResource;
+
 public:
-    QnAviResource(const QString& file);
+    QnAviResource(const QString& file, QnCommonModule* commonModule);
     ~QnAviResource();
 
     static QnAbstractStreamDataProvider* createDataProvider(
