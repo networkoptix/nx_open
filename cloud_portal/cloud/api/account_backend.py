@@ -19,6 +19,11 @@ logger = logging.getLogger(__name__)
 IP_MAX_LENGTH = 255
 
 
+def get_ip(request):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    return ip if len(ip) <= IP_MAX_LENGTH else ip[:IP_MAX_LENGTH]
+
+
 class AccountBackend(ModelBackend):
     @staticmethod
     def is_email_in_portal(email):
@@ -135,12 +140,6 @@ class AccountManager(db.models.Manager):
         return user
 
 
-
-
-# Truncate IPs greater than IP_MAX_LENGTH
-def get_ip(request):
-    ip = request.META.get('HTTP_X_FORWARDED_FOR')
-    return ip if len(ip) <= IP_MAX_LENGTH else ip[:IP_MAX_LENGTH]
 
 
 @receiver(user_logged_in)
