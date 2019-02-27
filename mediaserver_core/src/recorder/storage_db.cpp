@@ -65,9 +65,9 @@ QnStorageDb::QnStorageDb(
     using namespace nx::media_db;
     m_vacuumTimer.addTimer(
         [this](nx::utils::TimerId)
-    {
-        startVacuum([this](bool success) { onVacuumFinished(success); });
-    },
+        {
+            startVacuum([this](bool success) { onVacuumFinished(success); });
+        },
         m_vacuumInterval);
 }
 
@@ -75,9 +75,9 @@ void QnStorageDb::onVacuumFinished(bool /*success*/)
 {
     m_vacuumTimer.addTimer(
         [this](nx::utils::TimerId)
-    {
-        startVacuum([this](bool success) { onVacuumFinished(success); });
-    },
+        {
+            startVacuum([this](bool success) { onVacuumFinished(success); });
+        },
         m_vacuumInterval);
 }
 
@@ -87,15 +87,15 @@ void QnStorageDb::startVacuum(
 {
     serverModule()->storageDbPool()->addTask(
         [this, completionHandler = std::move(completionHandler), data]()
-    {
-        m_dbWriter.reset(new nx::media_db::MediaDbWriter);
-        const bool vacuumResult =
-            measureTime([this, data]() { return vacuum(data); }, "Vacuum:");
+        {
+            m_dbWriter.reset(new nx::media_db::MediaDbWriter);
+            const bool vacuumResult =
+                measureTime([this, data]() { return vacuum(data); }, "Vacuum:");
 
-        m_dbWriter->setDevice(m_ioDevice.get());
-        m_dbWriter->start();
-        completionHandler(vacuumResult);
-    });
+            m_dbWriter->setDevice(m_ioDevice.get());
+            m_dbWriter->start();
+            completionHandler(vacuumResult);
+        });
 }
 
 QnStorageDb::~QnStorageDb()
@@ -235,7 +235,7 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::resetIoDevice()
 {
-    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite));
+    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
     if (!m_ioDevice)
     {
         NX_WARNING(this, lm("%1 DB file open failed").args(m_dbFileName));
@@ -360,11 +360,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
         readyPromise.set_value();
     };
 
-    serverModule()->storageDbPool()->addTask(
-        [this, completionHandler = std::move(completionHandler), &result]() mutable
-    {
-        startVacuum(std::move(completionHandler), &result);
-    });
+    startVacuum(std::move(completionHandler), &result);
 
     readyFuture.wait();
     return result;

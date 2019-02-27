@@ -114,6 +114,7 @@ namespace nx_ms_conf
 
     static const QString ALLOW_REMOVABLE_STORAGES("allowRemovableStorages");
     static const QString VACUUM_INTERVAL("vacuumIntervalSec");
+    static const int DEFAULT_VACUUM_INTERVAL(3600 * 24);
 }
 
 /**

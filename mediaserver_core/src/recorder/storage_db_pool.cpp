@@ -50,13 +50,19 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             closeDirPath(dbPath) +
             QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
+        auto vacuumIntervalSec =
+            serverModule()->roSettings()->value(nx_ms_conf::VACUUM_INTERVAL).toInt();
+        if (vacuumIntervalSec == 0)
+            vacuumIntervalSec = nx_ms_conf::DEFAULT_VACUUM_INTERVAL;
+
+        NX_INFO(this, lm("StorageDB vacuum interval is %1 seconds").args(vacuumIntervalSec));
+
         sdb = QnStorageDbPtr(
             new QnStorageDb(
                 serverModule(),
                 storage,
                 getStorageIndex(storage),
-                std::chrono::seconds(
-                    serverModule()->roSettings()->value(nx_ms_conf::VACUUM_INTERVAL).toInt())));
+                std::chrono::seconds(vacuumIntervalSec)));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }
