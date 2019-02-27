@@ -49,7 +49,7 @@ Rectangle
         anchors.centerIn: parent
 
         readonly property real textSpace:
-            fontMetrics.boundingRect(text).width + leftPadding + rightPadding + 1
+            fontMetrics.advanceWidth(text) + leftPadding + rightPadding
 
         FontMetrics
         {
