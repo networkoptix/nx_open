@@ -10,7 +10,6 @@
 #include <client/client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/guarded_callback.h>
-#include "update/media_server_update_tool.h"
 #include "ui/workbench/handlers/workbench_connect_handler.h"
 
 using namespace std::chrono_literals;

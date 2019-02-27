@@ -3,16 +3,19 @@
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 #include <utils/merge_systems_common.h>
-#include <update/updates_common.h>
+#include <nx/utils/software_version.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 class QnMediaServerUpdateTool;
 class QnMergeSystemsTool;
 
-class QnConnectToCurrentSystemTool: public Connective<QObject>, public QnSessionAwareDelegate
+namespace nx::vms::client::desktop {
+
+class ConnectToCurrentSystemTool: public Connective<QObject>, public QnSessionAwareDelegate
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
+    using MergeSystemsStatusValue = ::utils::MergeSystemsStatus::Value;
 
 public:
     enum ErrorCode
@@ -23,17 +26,16 @@ public:
         Canceled
     };
 
-    QnConnectToCurrentSystemTool(QObject* parent = nullptr);
-    virtual ~QnConnectToCurrentSystemTool() override;
+    ConnectToCurrentSystemTool(QObject* parent = nullptr);
+    virtual ~ConnectToCurrentSystemTool() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
     void start(const QnUuid& targetId, const QString& adminPassword);
 
-    utils::MergeSystemsStatus::Value mergeError() const;
+    MergeSystemsStatusValue mergeError() const;
     QString mergeErrorMessage() const;
-    QnUpdateResult updateResult() const;
     QnUuid getTargetId() const;
     QnUuid getOriginalId() const;
     bool wasServerIncompatible() const;
@@ -64,8 +66,8 @@ private:
     bool m_wasIncompatible = false;
 
     QPointer<QnMergeSystemsTool> m_mergeTool;
-    //QPointer<QnMediaServerUpdateTool> m_updateTool;
-    utils::MergeSystemsStatus::Value m_mergeError = utils::MergeSystemsStatus::ok;
+    MergeSystemsStatusValue m_mergeError = MergeSystemsStatusValue::ok;
     QString m_mergeErrorMessage;
-    QnUpdateResult m_updateResult;
 };
+
+} // namespace nx::vms::client::desktop

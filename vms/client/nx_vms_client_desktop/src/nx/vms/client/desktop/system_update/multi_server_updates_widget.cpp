@@ -25,12 +25,10 @@
 #include <client/client_app_info.h>
 
 #include <ui/common/palette.h>
-#include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
-#include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
@@ -41,7 +39,6 @@
 #include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <update/low_free_space_warning.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>

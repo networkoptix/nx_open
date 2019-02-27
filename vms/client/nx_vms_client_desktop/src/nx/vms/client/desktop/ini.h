@@ -35,7 +35,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
-    NX_INI_FLAG(1, massSystemUpdatePrototype, "Enable experimental system update.");
     NX_INI_FLAG(0, massSystemUpdateDebugInfo,
         "Show additional debug information for experimental update system.");
     NX_INI_FLAG(0, massSystemUpdateClearDownloads,
