@@ -66,8 +66,9 @@ Item
             // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
             // Since it's value depends on MotionRoi state, we have to use executeLater to
             // break direct dependencies and avoid binding loop.
+            var value = singleSelectionMarker.expandingFinished
             var updateExpandingFlag =
-                function() { item.expandingFinished = singleSelectionMarker.expandingFinished; }
+                function() { item.expandingFinished = value }
 
             Utils.executeLater(updateExpandingFlag, this)
         }

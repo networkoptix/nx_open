@@ -106,7 +106,7 @@ Object
         Timer
         {
             id: clickFilterTimer
-            interval: 400
+            interval: 200
         }
 
         Timer
