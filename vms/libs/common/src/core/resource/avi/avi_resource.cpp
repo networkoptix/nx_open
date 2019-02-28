@@ -206,6 +206,11 @@ QnAspectRatio QnAviResource::customAspectRatio() const
         : base_type::customAspectRatio();
 }
 
+bool QnAviResource::isEmbedded() const
+{
+    return m_storage.dynamicCast<QnLayoutFileStorageResource>();
+}
+
 bool QnAviResource::isEncrypted() const
 {
     const auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();

@@ -23,9 +23,6 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
-
-#include <update/updates_common.h>
-#include <update/update_info.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 
 #include <utils/color_space/image_correction.h>
@@ -94,8 +91,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaType<ui::action::IDType>();
     qRegisterMetaType<ui::action::Parameters>();
-    qRegisterMetaType<QnUpdateInfo>();
-    qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
     qRegisterMetaType<Qn::ThumbnailStatus>();
@@ -130,10 +125,6 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
-    qRegisterMetaType<QnPeerUpdateStage>();
-    qRegisterMetaType<QnFullUpdateStage>();
-    qRegisterMetaType<QnUpdateResult>();
-    qRegisterMetaType<QnCheckForUpdateResult>();
     qRegisterMetaType<UploadState>();
     qRegisterMetaType<WearableState>();
     qRegisterMetaType<WearableUpload>();

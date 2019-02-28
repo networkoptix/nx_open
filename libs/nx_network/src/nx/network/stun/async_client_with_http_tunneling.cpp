@@ -76,7 +76,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
     ReconnectHandler handler,
     void* client)
 {
-    post(
+    dispatch(
         [this, client, handler = std::move(handler)]() mutable
         {
             m_reconnectHandlers.emplace(client, std::move(handler));
@@ -86,7 +86,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
 void AsyncClientWithHttpTunneling::setOnConnectionClosedHandler(
     OnConnectionClosedHandler handler)
 {
-    post(
+    dispatch(
         [this, handler = std::move(handler)]() mutable
         {
             m_connectionClosedHandler.swap(handler);

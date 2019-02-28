@@ -1,6 +1,7 @@
 #include "aio_task_queue.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
@@ -12,7 +13,7 @@ AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
 {
 }
 
-qint64 AioTaskQueue::getSystemTimerVal() const
+qint64 AioTaskQueue::getMonotonicTime() const
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         nx::utils::monotonicTime().time_since_epoch()).count();
@@ -87,7 +88,7 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     if (handlingData->timeout > std::chrono::milliseconds::zero())
                     {
                         // Updating existing task.
-                        const auto newClock = getSystemTimerVal() + task.timeout.count();
+                        const auto newClock = getMonotonicTime() + task.timeout.count();
                         if (handlingData->nextTimeoutClock == 0)
                         {
                             handlingData->updatedPeriodicTaskClock = newClock;
@@ -112,7 +113,7 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     else
                     {
                         addPeriodicTask(
-                            getSystemTimerVal() + task.timeout.count(),
+                            getMonotonicTime() + task.timeout.count(),
                             handlingData,
                             task.socket,
                             task.eventType);
@@ -206,7 +207,7 @@ void AioTaskQueue::addSocketToPollset(
         // Adding periodic task associated with socket.
         handlingData->timeout = timeout;
         addPeriodicTask(
-            getSystemTimerVal() + timeout.count(),
+            getMonotonicTime() + timeout.count(),
             handlingData,
             socket,
             eventType);
@@ -326,19 +327,20 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
 
         QnMutexLocker lk(&m_socketEventProcessingMutex);
         ++handlingData->beingProcessed;
-        //TODO #ak possibly some atomic fence is required here
+        auto beingProcessedScopedGuard =
+            nx::utils::makeScopeGuard([&handlingData]() { --handlingData->beingProcessed; });
+
         if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //socket has been removed from watch
-        {
-            --handlingData->beingProcessed;
             continue;
-        }
+
         //eventTriggered is allowed to call stopMonitoring which can remove socket from pollset
         handlingData->eventHandler->eventTriggered(socket, sockEventType);
-        //updating socket's periodic task (it's garanteed that there is periodic task for socket)
+
+        //updating socket's periodic task (it's garanteed that there is a periodic task for socket)
         if (handlingData->timeout > std::chrono::milliseconds::zero())
             handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout.count();
-        --handlingData->beingProcessed;
-        //NOTE element, this iterator points to, could be removed in eventTriggered call,
+
+        //NOTE: element, this iterator points to, could be removed in eventTriggered call,
         //but it is still safe to increment this iterator
     }
 }
@@ -364,14 +366,13 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
         // There is no need to lock mutex since data is removed in this thread only.
         auto handlingData = periodicTaskData.data; // TODO: #ak do we really need to copy shared_ptr here?
         handlingData->nextTimeoutClock = 0;
+
         ++handlingData->beingProcessed;
-        //TODO #ak atomic fence is required here (to avoid reordering)
-        //TODO #ak add some auto pointer for handlingData->beingProcessed
+        auto beingProcessedScopedGuard =
+            nx::utils::makeScopeGuard([&handlingData]() { --handlingData->beingProcessed; });
+
         if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //task has been removed from watch
-        {
-            --handlingData->beingProcessed;
             continue;
-        }
 
         if (handlingData->updatedPeriodicTaskClock > 0)
         {
@@ -385,7 +386,6 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
                     periodicTaskData.socket,
                     periodicTaskData.eventType);
                 handlingData->updatedPeriodicTaskClock = 0;
-                --handlingData->beingProcessed;
                 continue;
             }
 
@@ -396,7 +396,6 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
         {
             //cancelling periodic task
             handlingData->updatedPeriodicTaskClock = 0;
-            --handlingData->beingProcessed;
             continue;
         }
 
@@ -416,7 +415,6 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
         }
         //else
         //    periodicTaskData.periodicEventHandler->onTimeout( periodicTaskData.taskID );  //for periodic tasks not bound to socket
-        --handlingData->beingProcessed;
     }
 
     return tasksProcessedCount > 0;
@@ -427,6 +425,8 @@ void AioTaskQueue::processPostedCalls()
     while (!m_postedCalls.empty())
     {
         auto postHandler = std::move(m_postedCalls.begin()->postHandler);
+        NX_ASSERT(!m_postedCalls.front().socket ||
+            m_postedCalls.front().socket->isInSelfAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
         postHandler();
     }
@@ -483,6 +483,11 @@ std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
 {
     std::vector<SocketAddRemoveTask> elementsToRemove;
 
+    // TODO: #ak This method has O(m_pollSetModificationQueue.size())
+    // which can be quite large in Cloud, for example.
+    // Should optimize it here.
+    // Probably, it can become O(C) after some refactoring.
+
     //detecting range of elements to remove
     const auto tasksToRemoveRangeStart = nx::utils::move_if(
         m_pollSetModificationQueue.begin(),
@@ -520,7 +525,7 @@ std::size_t AioTaskQueue::postedCallCount() const
 qint64 AioTaskQueue::nextPeriodicEventClock() const
 {
     QnMutexLocker lock(&m_socketEventProcessingMutex);
-    
+
     return m_periodicTasksByClock.empty()
         ? 0
         : m_periodicTasksByClock.cbegin()->first;
@@ -528,14 +533,26 @@ qint64 AioTaskQueue::nextPeriodicEventClock() const
 
 void AioTaskQueue::waitCurrentEventProcessingCompletion()
 {
-    m_socketEventProcessingMutex.lock();
-    m_socketEventProcessingMutex.unlock();
+    QnMutexLocker lock(&m_socketEventProcessingMutex);
 }
 
 std::size_t AioTaskQueue::periodicTasksCount() const
 {
     QnMutexLocker lock(&m_socketEventProcessingMutex);
     return m_periodicTasksByClock.size();
+}
+
+void AioTaskQueue::clear()
+{
+    QnMutexLocker lock(&mutex);
+
+    auto postedCalls = std::exchange(m_postedCalls, {});
+    auto pollSetModificationQueue = std::exchange(m_pollSetModificationQueue, {});
+    auto periodicTasksByClock = std::exchange(m_periodicTasksByClock, {});
+
+    lock.unlock();
+
+    // Freeing everything without mutex locked.
 }
 
 } // namespace nx::network::aio::detail

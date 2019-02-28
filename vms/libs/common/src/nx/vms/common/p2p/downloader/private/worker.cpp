@@ -4,6 +4,7 @@
 
 #include <QtCore/QTimer>
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/random.h>
@@ -727,14 +728,14 @@ void Worker::downloadNextChunk()
         m_peerInfoById[peerId].rank,
         m_peerManager->distanceTo(peerId));
 
-    auto handleReply =
+    auto handleReply = nx::utils::guarded(this,
         [this, chunkIndex](
             bool result,
             rest::Handle handle,
             const QByteArray& data)
         {
             handleDownloadChunkReply(result, handle, chunkIndex, data);
-        };
+        });
 
     if (m_subsequentChunksToDownload == 0)
     {

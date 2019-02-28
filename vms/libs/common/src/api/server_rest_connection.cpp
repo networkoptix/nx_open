@@ -798,14 +798,14 @@ Handle ServerConnection::updateActionStart(
 }
 
 Handle ServerConnection::getUpdateInfo(
-    Result<nx::update::Information>::type&& callback, QThread* targetThread)
+    Result<UpdateInformationData>::type&& callback, QThread* targetThread)
 {
     QnRequestParamList params;
     return executeGet("/ec2/updateInformation", params, callback, targetThread);
 }
 
 Handle ServerConnection::checkForUpdates(const QString& changeset,
-    Result<QnJsonRestResult>::type&& callback,
+    Result<UpdateInformationData>::type&& callback,
     QThread* targetThread)
 {
     QnRequestParamList params {{"version", changeset}};
@@ -877,7 +877,7 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
 }
 
 Handle ServerConnection::getUpdateStatus(
-    Result<UpdateStatusAll>::type callback, QThread* targetThread)
+    Result<UpdateStatusAllData>::type callback, QThread* targetThread)
 {
     QnRequestParamList params;
     return executeGet("/ec2/updateStatus", params, callback, targetThread);

@@ -1,9 +1,10 @@
 #include "workbench_update_watcher.h"
 
 #include <QtCore/QTimer>
+#include <QtGui/QDesktopServices>
+#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
-#include <QtGui/QDesktopServices>
 
 #include <api/global_settings.h>
 
@@ -21,6 +22,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
+#include <ui/style/webview_style.h>
 
 #include <utils/common/html.h>
 
@@ -199,7 +201,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
 
     const auto current = commonModule()->engineVersion();
     const bool majorVersionChange = ((targetVersion.major() > current.major())
-        || (targetVersion.minor() > current.minor()));
+        || (targetVersion.minor() > current.minor())) && !description.isEmpty();
 
     const auto text = tr("%1 version available").arg(targetVersion.toString());
     const auto releaseNotesLink = makeHref(tr("Release Notes"), releaseNotesUrl);
@@ -212,12 +214,38 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
     extras.push_back(releaseNotesLink);
 
     QnMessageBox messageBox(QnMessageBoxIcon::Information,
-        text,
-        makeHtml(extras.join(lit("<br>"))),
+        text, "",
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,
         mainWindowWidget());
 
+    QString cssStyle = NxUi::generateCssStyle();
+    QString htmlBody= extras.join("<br>");
+    QString html = QString::fromLatin1(R"(
+        <html>
+        <head>
+            <style media="screen" type="text/css">%1</style>
+        </head>
+        <body>%2</body>
+        </html>
+        )").arg(cssStyle, htmlBody);
+
+    auto view = new QWebView(&messageBox);
+    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+    view->setHtml(html);
+    // QWebView has weird sizeHint. We should manually adjust its size to make it look good.
+    view->setFixedWidth(360);
+    view->setFixedHeight(380);
+    view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+    // Setting up a policy for link redirection. We should not open release notes right here.
+    auto page = view->page();
+    page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    connect(page, &QWebPage::linkClicked, this,
+        [](const QUrl& url)
+        {
+            QDesktopServices::openUrl(url);
+        });
+    messageBox.addCustomWidget(view, QnMessageBox::Layout::AfterMainLabel);
     messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));
 

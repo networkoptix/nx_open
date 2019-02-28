@@ -73,6 +73,8 @@ ConnectionBase::ConnectionBase(
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_httpClient->setSendTimeout(keepAliveTimeout);
     m_httpClient->setResponseReadTimeout(keepAliveTimeout);
+
+    bindToAioThread(m_timer.getAioThread());
 }
 
 ConnectionBase::ConnectionBase(
@@ -92,7 +94,8 @@ ConnectionBase::ConnectionBase(
     m_connectionLockGuard(std::move(connectionLockGuard))
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_timer.bindToAioThread(m_p2pTransport->getAioThread());
+
+    bindToAioThread(m_p2pTransport->getAioThread());
 
     const auto& queryItems = requestUrlQuery.queryItems();
     std::transform(
@@ -131,25 +134,7 @@ void ConnectionBase::stopWhileInAioThread()
 
 ConnectionBase::~ConnectionBase()
 {
-    if (m_timer.isInSelfAioThread())
-    {
-        stopWhileInAioThread();
-    }
-    else
-    {
-        std::promise<void> waitToStop;
-        m_timer.pleaseStop(
-            [&]()
-            {
-                if (m_p2pTransport)
-                    m_p2pTransport->pleaseStopSync();
-                if (m_httpClient)
-                    m_httpClient->pleaseStopSync();
-                waitToStop.set_value();
-            }
-        );
-        waitToStop.get_future().wait();
-    }
+    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 nx::utils::Url ConnectionBase::remoteAddr() const

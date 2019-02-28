@@ -1589,8 +1589,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         paintMotionGrid(painter, channel, rect,
             d->motionMetadataProvider->metadata(timestamp, channel));
 
-        /* Motion selection. */
-        if (!m_motionSelection[channel].isEmpty())
+        // Motion search region.
+        const bool isActiveWidget = navigator()->currentMediaWidget() == this;
+        if (isActiveWidget && !m_motionSelection[channel].isEmpty())
         {
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);

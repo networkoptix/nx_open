@@ -33,6 +33,11 @@ int FileInformation::calculateDownloadedBytes() const
     return done * chunkSize;
 }
 
+QString FileInformation::key() const
+{
+    return QFileInfo(name).fileName();
+}
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, PeerSelectionPolicy)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

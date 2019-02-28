@@ -13,7 +13,6 @@ distribution_output_dir = '${distribution_output_dir}'
 # Source directories
 bin_source_dir = '${bin_source_dir}'
 vox_source_dir = '${VoxSourceDir}'
-vcrt14_source_dir = '${VC14RedistPath}/bin'
 client_qml_source_dir = '${client_qml_dir}'
 client_help_source_dir = '${ClientHelpSourceDir}'
 client_fonts_source_dir = '${ClientFontsDir}'

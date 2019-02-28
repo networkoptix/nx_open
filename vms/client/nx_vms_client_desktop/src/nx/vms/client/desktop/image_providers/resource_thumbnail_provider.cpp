@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <QtCore/QCache>
+#include <QtCore/QString>
 #include <QtGui/QPainter>
 
 #include <api/server_rest_connection.h>
@@ -13,12 +15,46 @@
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
+static uint qHash(const QSize& key, uint seed = 0)
+{
+    return qHash(qMakePair(key.width(), key.height()), seed);
+}
+
 namespace nx::vms::client::desktop {
+
+namespace {
+
+using PlaceholderKey = QPair<QString, QSize>;
+static constexpr int kPlaceholderCacheLimit = 16 * 1024 * 1024;
+
+static constexpr QSize kDefaultPlaceholderSize(400, 300);
+static constexpr qreal kPlaceholderRatio = 0.5; //< Placeholder size fraction occupied by the icon.
+
+QSize placeholderSize(const QSize& requestedSize)
+{
+    if (requestedSize.height() <= 0)
+    {
+        if (requestedSize.width() <= 0)
+            return kDefaultPlaceholderSize;
+
+        return QSize(requestedSize.width(), kDefaultPlaceholderSize.height()
+            * requestedSize.width() / kDefaultPlaceholderSize.width());
+    }
+
+    if (requestedSize.width() > 0)
+        return requestedSize;
+
+    return QSize(kDefaultPlaceholderSize.width() * requestedSize.height()
+        / kDefaultPlaceholderSize.height(), requestedSize.height());
+}
+
+} // namespace
 
 using namespace std::chrono;
 
@@ -89,24 +125,13 @@ struct ResourceThumbnailProvider::Private
             {
                 baseProvider.reset(new FfmpegImageProvider(value.resource,
                     microseconds(request.usecSinceEpoch), request.size));
-
                 break;
             }
 
             case ProviderType::image:
             {
-                const auto pixmap = qnSkin->pixmap(placeholderIconPath, true);
-
-                QPixmap destination(pixmap.size());
-                destination.fill(colorTheme()->color("dark4"));
-
-                QPainter painter(&destination);
-                painter.setRenderHints(QPainter::SmoothPixmapTransform);
-                painter.setOpacity(0.7);
-                painter.drawPixmap(0, 0, pixmap);
-                painter.end();
-
-                baseProvider.reset(new BasicImageProvider(destination.toImage()));
+                baseProvider.reset(new BasicImageProvider(ensurePlaceholder(placeholderIconPath,
+                    placeholderSize(request.size))));
                 break;
             }
 
@@ -138,10 +163,49 @@ struct ResourceThumbnailProvider::Private
         }
     }
 
+    static QImage ensurePlaceholder(const QString& path, const QSize& size)
+    {
+        if (auto imagePtr = placeholders[{path, size}])
+            return *imagePtr;
+
+        const QImage image = createPlaceholder(path, size);
+        placeholders.insert({path, size}, new QImage(image), image.width() * image.height());
+        return image;
+    }
+
+    static QImage createPlaceholder(const QString& path, const QSize& size)
+    {
+        const auto pixmap = qnSkin->pixmap(path, true);
+        const auto pixelRatio = pixmap.devicePixelRatio();
+
+        QPixmap destination(size * pixelRatio);
+        destination.setDevicePixelRatio(pixmap.devicePixelRatio());
+        destination.fill(colorTheme()->color("dark6"));
+
+        using nx::vms::client::core::Geometry;
+        const auto rect = Geometry::aligned(
+            Geometry::scaled(pixmap.size() / pixelRatio, size * kPlaceholderRatio).toSize(),
+            QRect({}, size),
+            Qt::AlignCenter);
+
+        QPainter painter(&destination);
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+        painter.setOpacity(0.7);
+        painter.drawPixmap(rect, pixmap);
+        painter.end();
+
+        return destination.toImage();
+    }
+
     QScopedPointer<ImageProvider> baseProvider;
     nx::api::ResourceImageRequest request;
     nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode;
+
+    static QCache<PlaceholderKey, QImage> placeholders;
 };
+
+QCache<PlaceholderKey, QImage> ResourceThumbnailProvider::Private::placeholders(
+    kPlaceholderCacheLimit);
 
 ResourceThumbnailProvider::ResourceThumbnailProvider(
     const nx::api::ResourceImageRequest& request,
