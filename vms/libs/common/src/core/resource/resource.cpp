@@ -643,6 +643,7 @@ bool QnResource::init()
         if (m_initInProgress)
             return false; /* Skip request if init is already running. */
         m_initInProgress = true;
+        m_interuptInitialization = false;
     }
 
     NX_DEBUG(this, "Initiatialize...");
@@ -654,6 +655,12 @@ bool QnResource::init()
     {
         QnMutexLocker lock(&m_initMutex);
         m_initInProgress = false;
+        if (m_interuptInitialization)
+        {
+            NX_VERBOSE(this, "Initilization is interrupted");
+            return init();
+        }
+
         m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
         {
             QnMutexLocker lk(&m_mutex);
@@ -692,9 +699,19 @@ void QnResource::reinitAsync()
     if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
 
-    setStatus(Qn::Offline);
-    QnMutexLocker lock(&m_initAsyncMutex);
-    m_lastInitTime = getUsecTimer();
+    NX_DEBUG(this, "Reinitialization is requested");
+    {
+        QnMutexLocker lock(&m_initAsyncMutex);
+        if (m_initInProgress)
+        {
+            m_interuptInitialization = true;
+            return;
+        }
+
+        m_lastInitTime = getUsecTimer();
+        setStatus(Qn::Offline);
+    }
+
     if (const auto pool = resourcePool())
         pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }
