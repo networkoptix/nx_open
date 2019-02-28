@@ -184,20 +184,13 @@ Item
     {
         if (drawingRoi)
         {
-            // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
-            // Since it's value depends on MotionRoi state, we have to use executeLater to
-            // break direct dependencies and avoid binding loop.
-            Utils.executeLater(
-                function()
-                {
-                    d.customFirstPoint = d.customInitialPoint
-                    d.customSecondPoint = d.customInitialPoint
-                    d.selectionRoi.show()
-                    if (d.customRoi)
-                        d.customRoi.hide()
+            d.customFirstPoint = d.customInitialPoint
+            d.customSecondPoint = d.customInitialPoint
+            d.selectionRoi.show()
+            if (d.customRoi)
+                d.customRoi.hide()
 
-                    makeShortVibration()
-                }, this)
+            makeShortVibration()
         }
         else
         {
