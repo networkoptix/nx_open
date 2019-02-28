@@ -79,7 +79,7 @@ bool IsapiPtzController::absoluteMove(
         return false;
 
     static const utils::log::Message request(R"xml(
-    <PTZData version=“2.0” xmlns=“http://www.isapi.org/ver20/XMLSchema”>
+    <PTZData version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
         <AbsoluteHigh>
             <elevation>%1</elevation>
             <azimuth>%2</azimuth>
