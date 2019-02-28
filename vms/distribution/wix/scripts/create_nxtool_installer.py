@@ -19,10 +19,13 @@ wix_extensions = [
     'WixBalExtension']
 
 nxtool_components = [
+    'shared_qt_platform_libraries',
+    'shared_icu_libraries',
+    'shared_ucrt_libraries',
+    'shared_vcrt_libraries',
     'NxTool/NxToolDlg',
     'NxTool/NxTool',
     'NxTool/NxToolQml',
-    'NxTool/NxToolVcrt14',
     'NxTool/Product',
     'MyExitDialog',
     'UpgradeDlg',
@@ -47,7 +50,6 @@ class Config():
         self.output_file = os.path.join(
             args.output, config['servertool_distribution_name']) + '.exe'
         self.qml_directory = args.qml_dir
-        self.vcredist_directory = os.path.join(config['vcredist_directory'], 'bin')
         self.sources_directory = args.sources_dir
         self.arch = config['arch']
         self.tmp_folder = os.path.join(self.sources_directory, engine_tmp_folder)
@@ -144,19 +146,11 @@ def create_nxtool_installer(config):
         component_group_name='QmlComponentGroup',
         directory_ref='NxToolDstQmlDir',
         source_dir_var='var.NxToolQmlDir')
-    harvest_dir(
-        wix_directory=config.wix_directory,
-        source_dir=config.vcredist_directory,
-        target_file=os.path.join(config.sources_directory, 'NxTool/NxToolVcrt14.wxs'),
-        component_group_name='Vcrt14ComponentGroup',
-        directory_ref='NxToolDstRootDir',
-        source_dir_var='var.Vcrt14SrcDir')
 
     msi_filename = 'nxtool.msi'
     msi_file = os.path.join(config.tmp_folder, msi_filename)
 
     candle_msi_variables = {
-        'Vcrt14SrcDir': config.vcredist_directory,
         'NxToolQmlDir': config.qml_directory
     }
     build_msi(

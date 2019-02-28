@@ -64,42 +64,12 @@ def generate_vox():
         'var.VoxSourceDir')
 
 
-def generate_vcrt_14_client():
-    harvest_dir(
-        '${VC14RedistPath}/bin',
-        'ClientVcrt14.wxs',
-        'ClientVcrt14ComponentGroup',
-        'InstallDirRoot',
-        'var.Vcrt14SrcDir')
-
-
-def generate_vcrt_14_mediaserver():
-    harvest_dir(
-        '${VC14RedistPath}/bin',
-        'ServerVcrt14.wxs',
-        'ServerVcrt14ComponentGroup',
-        'InstallDirRoot',
-        'var.Vcrt14SrcDir')
-
-
-def generate_vcrt_14_traytool():
-    harvest_dir(
-        '${VC14RedistPath}/bin',
-        'TraytoolVcrt14.wxs',
-        'TraytoolVcrt14ComponentGroup',
-        'TrayToolRootDir',
-        'var.Vcrt14SrcDir')
-
-
 def main():
     generate_client_backround()
     generate_fonts()
     generate_help()
     generate_client_qml()
     generate_vox()
-    generate_vcrt_14_client()
-    generate_vcrt_14_mediaserver()
-    generate_vcrt_14_traytool()
 
 
 if __name__ == '__main__':
