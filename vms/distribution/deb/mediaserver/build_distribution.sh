@@ -32,24 +32,11 @@ stripIfNeeded() # dir
     fi
 }
 
-# [in] Path_to_binary library_full_path_filter
-getLibraryDependencies()
-{
-    local binaryPath=$1
-    local libraryDirFilter=$2
-
-    echo "`ldd $binaryPath | grep $libraryDirFilter | cut -d '=' -f 1 | sed 's/[ \t]*//g'`"
-}
-
 # [in] STAGE_LIB
 copyLibs()
 {
     echo ""
     echo "Copying libs"
-
-    LIBS_DIR="$BUILD_DIR/lib"
-
-    LIBS=(`getLibraryDependencies $BUILD_DIR/bin/mediaserver $BUILD_DIR`)
 
     mkdir -p "$STAGE_LIB"
     local LIB
@@ -68,8 +55,6 @@ copyLibs()
 
     for LIB in "$BUILD_DIR/lib"/*.so*
     do
-        LIB="$LIBS_DIR/$LIB"
-
         LIB_BASENAME=$(basename "$LIB")
 
         SKIP_LIBRARY=0
