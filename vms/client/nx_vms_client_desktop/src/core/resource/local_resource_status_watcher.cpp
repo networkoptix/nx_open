@@ -9,6 +9,8 @@
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/file_layout_resource.h>
 
+namespace {
+
 Qn::ResourceStatus getAviResourceStatus(QnAviResourcePtr aviResource)
 {
     const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(
@@ -20,6 +22,26 @@ Qn::ResourceStatus getFileLayoutResourceStatus(QnFileLayoutResourcePtr layoutRes
 {
     return QFileInfo::exists(layoutResource->getUrl()) ? Qn::Online : Qn::Offline;
 }
+
+void setResourceStatus(const QnResourcePtr resource, Qn::ResourceStatus status)
+{
+    if (resource->getStatus() == status)
+        return;
+
+    resource->setStatus(status);
+    if (const auto layout = resource.dynamicCast<QnFileLayoutResource>())
+    {
+        const auto resources = layout->layoutResources();
+        for (const auto& item: resources)
+        {
+            if (item.dynamicCast<QnAviResource>())
+                item->setStatus(status);
+        }
+    }
+}
+
+
+} // namespace
 
 QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= nullptr*/):
     QObject(parent)
@@ -40,6 +62,9 @@ void QnLocalResourceStatusWatcher::onResourceAdded(const QnResourcePtr& resource
 {
     if (auto aviResource = resource.dynamicCast<QnAviResource>())
     {
+        if (aviResource->isEmbedded()) //< Do not watch embedded videos, they are governed by layouts.
+            return;
+
         auto statusEvaluator =
             [aviResource]() { return getAviResourceStatus(aviResource); };
 
@@ -74,7 +99,7 @@ void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
         }
         if (auto resource = resourcePool->getResourceById(it->resourceId))
         {
-            resource->setStatus(it->statusFuture.get());
+            setResourceStatus(resource, it->statusFuture.get());
             it->statusFuture = std::async(std::launch::async, it->statusEvaluator);
             ++it;
         }
