@@ -62,7 +62,7 @@ int QnDebugHandler::executeGet(
         };
 
     ini().reload();
-    if (!ini().enableApiServerControl)
+    if (!ini().enableApiDebug)
         return result(StatusCode::forbidden, "Ignoring - not enabled via mediaserver.ini");
 
     const auto action = actionFromParams(params);
