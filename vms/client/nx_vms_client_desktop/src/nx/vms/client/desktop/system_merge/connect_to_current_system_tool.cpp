@@ -47,25 +47,27 @@ QnFakeMediaServerResourcePtr incompatibleServerForOriginalId(
 
 } // namespace
 
-QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject* parent):
+namespace nx::vms::client::desktop {
+
+ConnectToCurrentSystemTool::ConnectToCurrentSystemTool(QObject* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent)
 {
 }
 
-QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
+ConnectToCurrentSystemTool::~ConnectToCurrentSystemTool() {}
 
-bool QnConnectToCurrentSystemTool::tryClose(bool /*force*/)
+bool ConnectToCurrentSystemTool::tryClose(bool /*force*/)
 {
     cancel();
     return true;
 }
 
-void QnConnectToCurrentSystemTool::forcedUpdate()
+void ConnectToCurrentSystemTool::forcedUpdate()
 {
 }
 
-void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& password)
+void ConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& password)
 {
     NX_ASSERT(!targetId.isNull());
     if (targetId.isNull())
@@ -91,47 +93,42 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     mergeServer();
 }
 
-utils::MergeSystemsStatus::Value QnConnectToCurrentSystemTool::mergeError() const
+::utils::MergeSystemsStatus::Value ConnectToCurrentSystemTool::mergeError() const
 {
     return m_mergeError;
 }
 
-QString QnConnectToCurrentSystemTool::mergeErrorMessage() const
+QString ConnectToCurrentSystemTool::mergeErrorMessage() const
 {
     return m_mergeErrorMessage;
 }
 
-QnUpdateResult QnConnectToCurrentSystemTool::updateResult() const
-{
-    return m_updateResult;
-}
-
-QnUuid QnConnectToCurrentSystemTool::getTargetId() const
+QnUuid ConnectToCurrentSystemTool::getTargetId() const
 {
     return m_targetId;
 }
 
-QnUuid QnConnectToCurrentSystemTool::getOriginalId() const
+QnUuid ConnectToCurrentSystemTool::getOriginalId() const
 {
     return m_originalTargetId;
 }
 
-bool QnConnectToCurrentSystemTool::wasServerIncompatible() const
+bool ConnectToCurrentSystemTool::wasServerIncompatible() const
 {
     return m_wasIncompatible;
 }
 
-nx::utils::SoftwareVersion QnConnectToCurrentSystemTool::getServerVersion() const
+nx::utils::SoftwareVersion ConnectToCurrentSystemTool::getServerVersion() const
 {
     return m_serverVersion;
 }
 
-QString QnConnectToCurrentSystemTool::getServerName() const
+QString ConnectToCurrentSystemTool::getServerName() const
 {
     return m_serverName;
 }
 
-void QnConnectToCurrentSystemTool::cancel()
+void ConnectToCurrentSystemTool::cancel()
 {
     if (m_mergeTool)
         m_mergeTool->deleteLater();
@@ -147,7 +144,7 @@ void QnConnectToCurrentSystemTool::cancel()
         finish(Canceled);
 }
 
-void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode)
+void ConnectToCurrentSystemTool::finish(ErrorCode errorCode)
 {
     using nx::utils::log::Level;
 
@@ -157,11 +154,11 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode)
     emit finished(errorCode);
 }
 
-void QnConnectToCurrentSystemTool::mergeServer()
+void ConnectToCurrentSystemTool::mergeServer()
 {
     NX_ASSERT(!m_mergeTool);
 
-    m_mergeError = utils::MergeSystemsStatus::ok;
+    m_mergeError = MergeSystemsStatusValue::ok;
     m_mergeErrorMessage.clear();
 
     const auto server = incompatibleServerForOriginalId(m_originalTargetId, resourcePool());
@@ -175,7 +172,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
             return;
         }
 
-        m_mergeError = utils::MergeSystemsStatus::unknownError;
+        m_mergeError = MergeSystemsStatusValue::unknownError;
         finish(MergeFailed);
         return;
     }
@@ -199,15 +196,15 @@ void QnConnectToCurrentSystemTool::mergeServer()
 
     connect(m_mergeTool, &QnMergeSystemsTool::mergeFinished, this,
         [this](
-            utils::MergeSystemsStatus::Value mergeStatus,
+            MergeSystemsStatusValue mergeStatus,
             const nx::vms::api::ModuleInformation& moduleInformation)
         {
-            if (mergeStatus != utils::MergeSystemsStatus::ok)
+            if (mergeStatus != MergeSystemsStatusValue::ok)
             {
                 delete m_mergeTool;
                 m_mergeError = mergeStatus;
                 m_mergeErrorMessage =
-                    utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
+                    ::utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
 
                 NX_ERROR(this, lm("Server configuration failed: %1.").arg(m_mergeErrorMessage));
 
@@ -223,7 +220,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     m_mergeTool->configureIncompatibleServer(ecServer, server->getApiUrl(), auth);
 }
 
-void QnConnectToCurrentSystemTool::waitServer()
+void ConnectToCurrentSystemTool::waitServer()
 {
     NX_ASSERT(m_mergeTool);
 
@@ -262,7 +259,7 @@ void QnConnectToCurrentSystemTool::waitServer()
     emit progressChanged(kUpdateProgress);
 }
 
-void QnConnectToCurrentSystemTool::updateServer()
+void ConnectToCurrentSystemTool::updateServer()
 {
     // This will be disabled until new update system is used for the merge.
     // dkargin: I would like to keep this code for some time.
@@ -325,3 +322,5 @@ void QnConnectToCurrentSystemTool::updateServer()
     m_updateTool->startUpdate(targetVersion);
 #endif
 }
+
+} // namespace nx::vms::client::desktop

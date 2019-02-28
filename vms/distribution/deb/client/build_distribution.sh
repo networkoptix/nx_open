@@ -79,19 +79,38 @@ copyLibs()
     echo "Copying libs"
 
     mkdir -p "$STAGE_LIB"
+
     local LIB
     local LIB_BASENAME
+    local BLACKLIST_ITEM
+    local SKIP_LIBRARY
+
+    local -r LIB_BLACKLIST=(
+        'libQt5*'
+        'libEnginio.so*'
+        'libqgsttools_p.*'
+        'libtegra_video.*'
+        'libmediaserver*'
+        'libcloud*'
+    )
+
     for LIB in "$BUILD_DIR/lib"/*.so*
     do
         LIB_BASENAME=$(basename "$LIB")
-        if [[ "$LIB_BASENAME" != libQt5* \
-            && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" != libqgsttools_p.* \
-            && "$LIB_BASENAME" != libmediaserver* ]]
-        then
-            echo "  Copying $LIB_BASENAME"
-            cp -P "$LIB" "$STAGE_LIB/"
-        fi
+
+        SKIP_LIBRARY=0
+
+        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"; do
+            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]; then
+                SKIP_LIBRARY=1
+                break
+            fi
+        done
+
+        (( $SKIP_LIBRARY == 1 )) && continue
+
+        echo "  Copying $LIB_BASENAME"
+        cp -P "$LIB" "$STAGE_LIB/"
     done
 
     # TODO: #mshevchenko: Why .debug files are not deleted for mediaserver .deb?
