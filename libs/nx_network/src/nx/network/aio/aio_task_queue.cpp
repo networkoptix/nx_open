@@ -13,10 +13,7 @@ namespace network {
 namespace aio {
 namespace detail {
 
-AioTaskQueue::AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSetToUse):
-    newReadMonitorTaskCount(0),
-    newWriteMonitorTaskCount(0),
-    processingPostedCalls(0)
+AioTaskQueue::AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSetToUse)
 {
     if (pollSetToUse)
         pollSet = std::move(pollSetToUse);
@@ -24,7 +21,7 @@ AioTaskQueue::AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSetToUse):
         pollSet = PollSetFactory::instance()->create();
 }
 
-qint64 AioTaskQueue::getSystemTimerVal() const
+qint64 AioTaskQueue::getMonotonicTime() const
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         nx::utils::monotonicTime().time_since_epoch()).count();
@@ -100,21 +97,21 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     if (handlingData->data->timeout > 0)
                     {
                         //updating existing task
-                        const auto newClock = getSystemTimerVal() + task.timeout;
+                        const auto newClock = getMonotonicTime() + task.timeout;
                         if (handlingData->data->nextTimeoutClock == 0)
                         {
                             handlingData->data->updatedPeriodicTaskClock = newClock;
                         }
                         else
                         {
-                            //replacing timer record in periodicTasksByClock
-                            for (auto it = periodicTasksByClock.lower_bound(handlingData->data->nextTimeoutClock);
-                                    it != periodicTasksByClock.end() && it->first == handlingData->data->nextTimeoutClock;
+                            //replacing timer record in m_periodicTasksByClock
+                            for (auto it = m_periodicTasksByClock.lower_bound(handlingData->data->nextTimeoutClock);
+                                    it != m_periodicTasksByClock.end() && it->first == handlingData->data->nextTimeoutClock;
                                     ++it)
                             {
                                 if (it->second.socket == task.socket)
                                 {
-                                    periodicTasksByClock.erase(it);
+                                    m_periodicTasksByClock.erase(it);
                                     addPeriodicTaskNonSafe(
                                         newClock, handlingData->data, task.socket, task.eventType);
                                     break;
@@ -125,7 +122,7 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                     else
                     {
                         addPeriodicTask(
-                            getSystemTimerVal() + task.timeout,
+                            getMonotonicTime() + task.timeout,
                             handlingData->data,
                             task.socket,
                             task.eventType);
@@ -218,7 +215,7 @@ void AioTaskQueue::addSocketToPollset(
         // Adding periodic task associated with socket.
         handlingData->data->timeout = timeout;
         addPeriodicTask(
-            getSystemTimerVal() + timeout,
+            getMonotonicTime() + timeout,
             handlingData.get()->data,
             socket,
             eventType);
@@ -334,7 +331,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
             static_cast<AioEventHandlingDataHolder*>(
                 socket->impl()->monitoredEvents[handlerToInvokeType].userData)->data;
 
-        QnMutexLocker lk(&socketEventProcessingMutex);
+        QnMutexLocker lk(&m_socketEventProcessingMutex);
         ++handlingData->beingProcessed;
         auto beingProcessedScopedGuard =
             nx::utils::makeScopeGuard([&handlingData]() { --handlingData->beingProcessed; });
@@ -360,16 +357,16 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
 
     for (;; )
     {
-        QnMutexLocker lk(&socketEventProcessingMutex);
+        QnMutexLocker lk(&m_socketEventProcessingMutex);
 
         PeriodicTaskData periodicTaskData;
         {
             //taking task from queue
-            auto it = periodicTasksByClock.begin();
-            if (it == periodicTasksByClock.end() || it->first > curClock)
+            auto it = m_periodicTasksByClock.begin();
+            if (it == m_periodicTasksByClock.end() || it->first > curClock)
                 break;
             periodicTaskData = it->second;
-            periodicTasksByClock.erase(it);
+            m_periodicTasksByClock.erase(it);
         }
 
         //no need to lock mutex, since data is removed in this thread only
@@ -447,7 +444,7 @@ void AioTaskQueue::addPeriodicTask(
     Pollable* _socket,
     aio::EventType eventType)
 {
-    QnMutexLocker lk(&socketEventProcessingMutex);
+    QnMutexLocker lk(&m_socketEventProcessingMutex);
     addPeriodicTaskNonSafe(taskClock, handlingData, _socket, eventType);
 }
 
@@ -458,7 +455,7 @@ void AioTaskQueue::addPeriodicTaskNonSafe(
     aio::EventType eventType)
 {
     handlingData->nextTimeoutClock = taskClock;
-    periodicTasksByClock.insert(std::make_pair(
+    m_periodicTasksByClock.insert(std::make_pair(
         taskClock,
         PeriodicTaskData(handlingData, _socket, eventType)));
 }
@@ -513,6 +510,20 @@ std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
 std::size_t AioTaskQueue::postedCallCount() const
 {
     return m_postedCalls.size();
+}
+
+qint64 AioTaskQueue::nextPeriodicEventClock() const
+{
+    QnMutexLocker lock(&m_socketEventProcessingMutex);
+
+    return m_periodicTasksByClock.empty()
+        ? 0
+        : m_periodicTasksByClock.cbegin()->first;
+}
+
+void AioTaskQueue::waitForCurrentEventProcessingToFinish()
+{
+    QnMutexLocker lock(&m_socketEventProcessingMutex);
 }
 
 } // namespace detail

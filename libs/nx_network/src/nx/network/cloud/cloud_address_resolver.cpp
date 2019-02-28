@@ -1,10 +1,5 @@
 #include "cloud_address_resolver.h"
 
-#include <nx/network/socket_global.h>
-
-#include "cloud_connect_controller.h"
-#include "mediator_connector.h"
-
 namespace nx {
 namespace network {
 

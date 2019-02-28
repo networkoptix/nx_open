@@ -143,7 +143,7 @@ void AIOThread::cancelPostedCalls(Pollable* const sock)
     lock.unlock();
 
     //waiting for posted calls processing to finish
-    while (m_taskQueue->processingPostedCalls == 1)
+    while (m_processingPostedCalls == 1)
         msleep(0);    //yield. TODO #ak Better replace it with conditional_variable
                         //TODO #ak must wait for target call only, not for any call!
 
@@ -184,25 +184,20 @@ void AIOThread::run()
     {
         //setting processingPostedCalls flag before processPollSetModificationQueue
         //  to be able to atomically add "cancel posted call" task and check for tasks to complete
-        m_taskQueue->processingPostedCalls = 1;
+        m_processingPostedCalls = 1;
 
         m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
 
         //making calls posted with post and dispatch
         m_taskQueue->processPostedCalls();
 
-        m_taskQueue->processingPostedCalls = 0;
+        m_processingPostedCalls = 0;
 
         //processing tasks that have been added from within processPostedCalls() call
         m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
 
-        qint64 curClock = m_taskQueue->getSystemTimerVal();
-        //taking clock of the next periodic task
-        qint64 nextPeriodicEventClock = 0;
-        {
-            QnMutexLocker lock(&m_taskQueue->socketEventProcessingMutex);
-            nextPeriodicEventClock = m_taskQueue->periodicTasksByClock.empty() ? 0 : m_taskQueue->periodicTasksByClock.cbegin()->first;
-        }
+        qint64 curClock = m_taskQueue->getMonotonicTime();
+        const auto nextPeriodicEventClock = m_taskQueue->nextPeriodicEventClock();
 
         //calculating delay to the next periodic task
         const int millisToTheNextPeriodicEvent = nextPeriodicEventClock == 0
@@ -225,7 +220,7 @@ void AIOThread::run()
             std::this_thread::sleep_for(kErrorResetTimeout);
             continue;
         }
-        curClock = m_taskQueue->getSystemTimerVal();
+        curClock = m_taskQueue->getMonotonicTime();
         if (triggeredSocketCount == 0)
         {
             if (nextPeriodicEventClock == 0 ||      //no periodic event
@@ -355,10 +350,7 @@ void AIOThread::stopMonitoringInternal(
 
     // Waiting for event handler completion (if it running).
     while (handlingData->beingProcessed.load() > 0)
-    {
-        m_taskQueue->socketEventProcessingMutex.lock();
-        m_taskQueue->socketEventProcessingMutex.unlock();
-    }
+        m_taskQueue->waitForCurrentEventProcessingToFinish();
 
     // Waiting for socket to be removed from pollset.
     while (taskCompletedCondition.load(std::memory_order_relaxed) == 0)
