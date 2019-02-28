@@ -111,7 +111,7 @@ export class MergeModalContent {
                 this.state = 'select';
                 this.user = user;
                 this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
-                this.multipleSystems = this.systems.length > 1;
+                this.multipleSystems = this.systems.length > 0;
                 this.outOfDate = this.multipleSystems && !this.system.canMerge;
                 this.showMergeForm = this.multipleSystems && !this.outOfDate;
                 this.makeSelectorList(this.systems);
