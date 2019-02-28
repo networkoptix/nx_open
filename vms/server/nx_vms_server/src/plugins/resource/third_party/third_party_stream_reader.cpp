@@ -83,7 +83,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
         {
             if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
-                // Reinitialize camera driver. hasDualStreaming may be changed.
+                NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
                 m_resource->setStatus(Qn::Offline);
                 m_isMediaUrlValid.clear();
             }
@@ -149,8 +149,11 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     camManager2->releaseRef();
 }
 
-CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
+CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
+    bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
+    NX_VERBOSE(this, "Openning stream with params [%1]...", liveStreamParams);
+
     QnLiveStreamParams params = liveStreamParams;
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
