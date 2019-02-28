@@ -79,15 +79,18 @@ public:
      * NOTE: MUST be called with mutex locked.
      */
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
+
     /**
      * If called in this aio thread, then calls functor immediately,
      *   otherwise queues functor in same way as aio::AIOThread::post does.
      */
     void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
+
     /**
      * Returns number of sockets handled by this object.
      */
     size_t socketsHandled() const;
+
     bool isSocketBeingMonitored(Pollable* sock) const;
 
 protected:
@@ -95,6 +98,7 @@ protected:
 
 private:
     std::unique_ptr<detail::AioTaskQueue> m_taskQueue;
+    std::atomic<int> m_processingPostedCalls;
 
     bool getSocketTimeout(
         Pollable* const sock,

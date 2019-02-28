@@ -95,8 +95,13 @@ class NX_NETWORK_API SocketGlobalsHolder:
     public Singleton<SocketGlobalsHolder>
 {
 public:
+    /**
+     * Invokes SocketGlobalsHolder::initialize(false).
+     */
     SocketGlobalsHolder(int initializationFlags = 0);
 
+    void initialize(bool initializePeerId = true);
+    void uninitialize();
     void reinitialize(bool initializePeerId = true);
 
 private:
