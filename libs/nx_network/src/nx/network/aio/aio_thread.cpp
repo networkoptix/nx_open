@@ -239,6 +239,10 @@ void AIOThread::run()
             continue;
     }
 
+    // Making sure every completion handler is removed within AIO thread.
+    // Since it can own some socket.
+    m_taskQueue->clear();
+
     NX_DEBUG(this, "AIO thread stopped");
 }
 

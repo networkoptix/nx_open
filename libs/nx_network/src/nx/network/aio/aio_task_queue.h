@@ -258,6 +258,8 @@ public:
 
     void waitForCurrentEventProcessingToFinish();
 
+    void clear();
+
 private:
     // TODO #ak: use cyclic array here to minimize allocations
     /**

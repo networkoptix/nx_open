@@ -526,6 +526,19 @@ void AioTaskQueue::waitForCurrentEventProcessingToFinish()
     QnMutexLocker lock(&m_socketEventProcessingMutex);
 }
 
+void AioTaskQueue::clear()
+{
+    QnMutexLocker lock(&mutex);
+
+    auto postedCalls = std::exchange(m_postedCalls, {});
+    auto pollSetModificationQueue = std::exchange(m_pollSetModificationQueue, {});
+    auto periodicTasksByClock = std::exchange(m_periodicTasksByClock, {});
+
+    lock.unlock();
+
+    // Freeing everything without mutex locked.
+}
+
 } // namespace detail
 } // namespace aio
 } // namespace network
