@@ -77,6 +77,10 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
             syncState();
         });
+
+    m_updateStateTimer.start(10000);
+    connect(&m_updateStateTimer, &QTimer::timeout,
+        this, &WorkbenchUpdateWatcher::atUpdateCurrentState);
 }
 
 WorkbenchUpdateWatcher::~WorkbenchUpdateWatcher() {}
@@ -143,6 +147,7 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
 
 void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
 {
+    NX_INFO(this, "atCheckerUpdateAvailable(%1)", contents.getVersion().toString());
     if (!qnGlobalSettings->isUpdateNotificationsEnabled())
         return;
 
