@@ -514,6 +514,8 @@ void ServerUpdateTool::startUpload(
 {
     NX_ASSERT(server);
     auto serverId = server->getId();
+    if (filesToUpload.isEmpty())
+        NX_ERROR(this, "no packages to upload to %1, what is going on!?", serverId);
     for (const auto& path: filesToUpload)
     {
         auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
@@ -553,6 +555,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     if (recipients.empty())
     {
         // TODO: Do something meaningfull here
+        NX_WARNING(this, "startUpload(%1) - no recipients for update", contents.info.version);
         return false;
     }
 
@@ -563,8 +566,15 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_completedUploads.clear();
     m_uploadStateById.clear();
 
-    for (const auto& server: recipients)
-        startUpload(server, contents.filesToUpload, contents.storageDir);
+    if (contents.filesToUpload.isEmpty())
+    {
+        NX_WARNING(this, "startUpload(%1) - nothing to upload", contents.info.version);
+    }
+    else
+    {
+        for (const auto& server: recipients)
+            startUpload(server, contents.filesToUpload, contents.storageDir);
+    }
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);
