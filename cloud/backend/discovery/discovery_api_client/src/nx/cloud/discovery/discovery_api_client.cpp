@@ -290,9 +290,13 @@ void DiscoveryClient::startRegisterNodeRequest()
 
             updateRequestSentTime(m_registerNodeRequest->request());
 
+            // dt will be invalid the first time registration is done.
+            QDateTime dt = toDateTime(m_thisNode.expirationTime);
+            QString expirationTime = dt.isValid() ? dt.toString() : "now";
+
             NX_VERBOSE(this, lm(kRequestMessageTemplate)
                     .arg(m_requestSent.toString())
-                    .arg(toDateTime(m_thisNode.expirationTime).toString()));
+                    .arg(expirationTime));
         });
 }
 
