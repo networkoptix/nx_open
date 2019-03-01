@@ -65,7 +65,7 @@ void DiscoveryServer::serveRegisterNode(
     result.dataSource =
         std::make_unique<nx::network::http::BufferSource>(
             "application/json",
-            QJson::serialized(node));
+            NodeSerialization::serialized(node));
 
     completionHandler(std::move(result));
 }
@@ -83,7 +83,7 @@ void DiscoveryServer::serveGetOnlineNodes(
     result.dataSource =
         std::make_unique<nx::network::http::BufferSource>(
             "application/json",
-            QJson::serialized(onlineNodes));
+            NodeSerialization::serialized(onlineNodes));
 
     completionHandler(std::move(result));
 }

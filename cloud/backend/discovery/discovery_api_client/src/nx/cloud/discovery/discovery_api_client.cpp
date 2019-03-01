@@ -245,7 +245,8 @@ void DiscoveryClient::setupOnlineNodesRequest()
             if (!error)
             {
                 bool ok = false;
-                auto onlineNodes = QJson::deserialized(messageBody, std::vector<Node>(), &ok);
+                auto onlineNodes =
+                    NodeSerialization::deserialized(messageBody, std::vector<Node>(), &ok);
                 if (ok)
                     updateOnlineNodes(onlineNodes);
                 else
