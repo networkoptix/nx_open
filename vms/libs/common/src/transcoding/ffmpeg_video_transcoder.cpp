@@ -242,6 +242,11 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
 
     decodedFrame = processFilterChain(decodedFrame);
+    if (!decodedFrame)
+    {
+        NX_ERROR(this, "Failed to process filter chain for video frame");
+        return 0;
+    }
 
     static AVRational r = {1, 1000000};
     decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);

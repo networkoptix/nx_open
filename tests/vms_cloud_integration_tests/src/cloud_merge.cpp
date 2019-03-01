@@ -90,6 +90,13 @@ protected:
         }
     }
 
+    void givenSystemProducedByAMerge()
+    {
+        givenTwoCloudSystemsWithTheSameOwner();
+        whenMergeSystems();
+        thenMergeFullyCompleted();
+    }
+
     nx::cloud::db::AccountWithPassword registerCloudUser()
     {
         return m_cdb.addActivatedAccount2();
@@ -377,6 +384,11 @@ protected:
         ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
     }
 
+    void assertCloudOwnerIsAbleToLogin()
+    {
+        assertUserIsAbleToLogin(0, m_cloudAccounts.front());
+    }
+
     void assertUserIsAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_TRUE(testUserLogin(peerIndex, cloudUser));
@@ -399,12 +411,47 @@ protected:
         return mediaServerClient->ec2GetUsers(&users) == ::ec2::ErrorCode::ok;
     }
 
+    void generateTemporaryCloudCredentials()
+    {
+        nx::cloud::db::api::TemporaryCredentialsParams params;
+        params.type = "short";
+        nx::cloud::db::api::TemporaryCredentials temporaryCredentials;
+
+        ASSERT_EQ(
+            nx::cloud::db::api::ResultCode::ok,
+            m_cdb.createTemporaryCredentials(
+                owner().email, owner().password,
+                params,
+                &temporaryCredentials));
+
+        m_temporaryCredentials.push_back(std::move(temporaryCredentials));
+    }
+
+    void assertOwnerTemporaryCredentialsAreAcceptedByEveryServer()
+    {
+        auto client = m_systemMergeFixture.peer(0).mediaServerClient();
+        client->setUserCredentials(nx::network::http::Credentials(
+            m_temporaryCredentials.front().login.c_str(),
+            nx::network::http::PasswordAuthToken(m_temporaryCredentials.front().password.c_str())));
+
+        // TODO: Check every server.
+
+        nx::vms::api::UserDataList users;
+        ASSERT_EQ(::ec2::ErrorCode::ok, client->ec2GetUsers(&users));
+    }
+
+    const nx::cloud::db::AccountWithPassword& owner() const
+    {
+        return m_cloudAccounts.front();
+    }
+
 private:
     nx::cloud::db::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
     nx::network::http::TestHttpServer m_httpProxy;
+    std::vector<nx::cloud::db::api::TemporaryCredentials> m_temporaryCredentials;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 
@@ -543,6 +590,15 @@ TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_clou
     shareSystem(olderSystemIndex, someCloudUser);
     waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
     assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
+}
+
+TEST_F(CloudMerge, DISABLED_resulting_system_can_be_accessed_via_temporary_cloud_credentials)
+{
+    givenSystemProducedByAMerge();
+    assertCloudOwnerIsAbleToLogin();
+
+    generateTemporaryCloudCredentials();
+    assertOwnerTemporaryCredentialsAreAcceptedByEveryServer();
 }
 
 } // namespace test
