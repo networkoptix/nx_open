@@ -889,7 +889,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
         if (m_updateSourceMode == UpdateSourceType::file)
         {
-            setTargetState(WidgetUpdateState::pushing, {});
+            setTargetState(WidgetUpdateState::pushing, targets);
             m_serverUpdateTool->startUpload(m_updateInfo);
         }
         else
