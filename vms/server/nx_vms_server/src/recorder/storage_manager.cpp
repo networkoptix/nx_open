@@ -2568,7 +2568,7 @@ void QnStorageManager::startAuxTimerTasks()
         kCheckStorageSpace,
         kCheckStorageSpace);
 
-    static const std::chrono::seconds kRemoveEmptyDirsInterval(20);
+    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
