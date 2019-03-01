@@ -65,12 +65,7 @@ protected:
     {
         ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(2));
 
-        for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
-        {
-            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[0]));
-            m_systemCloudCredentials.push_back(
-                m_systemMergeFixture.peer(i).getCloudCredentials());
-        }
+        bindAllSystemsToCloud(m_cloudAccounts[0]);
     }
 
     void givenTwoCloudSystemsWithDifferentOwners()
@@ -82,12 +77,7 @@ protected:
         while (m_cloudAccounts.size() < numberOfSystemsToCreate)
             m_cloudAccounts.push_back(m_cdb.addActivatedAccount2());
 
-        for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
-        {
-            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[i]));
-            m_systemCloudCredentials.push_back(
-                m_systemMergeFixture.peer(i).getCloudCredentials());
-        }
+        bindAllSystemsToCloud(m_cloudAccounts);
     }
 
     void givenSystemProducedByAMerge()
@@ -475,6 +465,41 @@ private:
         m_systemMergeFixture.addSetting(
             "-cloudIntegration/delayBeforeSettingMasterFlag",
             "100ms");
+    }
+
+    void bindAllSystemsToCloud(const nx::cloud::db::AccountWithPassword& account)
+    {
+        std::vector<nx::cloud::db::AccountWithPassword> accounts(
+            m_systemMergeFixture.peerCount(),
+            account);
+
+        bindAllSystemsToCloud(accounts);
+    }
+
+    void bindAllSystemsToCloud(
+        const std::vector<nx::cloud::db::AccountWithPassword>& accounts)
+    {
+        m_systemCloudCredentials.resize(m_systemMergeFixture.peerCount());
+
+        auto bindPeer = [this, &accounts](int index)
+        {
+            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(index), accounts[index]));
+            m_systemCloudCredentials[index] =
+                m_systemMergeFixture.peer(index).getCloudCredentials();
+        };
+
+        // NOTE: Randomizing "bind to cloud" order since there is a class of bugs related to this.
+
+        if (::testing::UnitTest::GetInstance()->random_seed() & 1)
+        {
+            for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
+                bindPeer(i);
+        }
+        else
+        {
+            for (int i = m_systemMergeFixture.peerCount() - 1; i >= 0; --i)
+                bindPeer(i);
+        }
     }
 
     bool connectToCloud(
