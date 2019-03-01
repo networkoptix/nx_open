@@ -85,6 +85,12 @@ private:
         const QString& getKey,
         ConfigureSystemData* data);
 
+    bool fetchUserParams(
+        const nx::utils::Url& remoteUrl,
+        const QString& getKey,
+        const nx::vms::api::UserDataList& users,
+        ConfigureSystemData* data);
+
     QnJsonRestResult executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,

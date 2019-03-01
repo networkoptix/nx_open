@@ -8,6 +8,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 
 #include <api/global_settings.h>
@@ -185,6 +186,7 @@ QnJsonRestResult SystemMergeProcessor::checkWhetherMergeIsPossible(
     }
 
     MediaServerClient remoteMediaServerClient(remoteServerUrl);
+    remoteMediaServerClient.setRequestTimeout(kRequestTimeout);
     remoteMediaServerClient.setAuthenticationKey(data.getKey);
 
     result = checkIfSystemsHaveServerWithSameId(&remoteMediaServerClient);
@@ -642,14 +644,21 @@ bool SystemMergeProcessor::fetchRemoteData(
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
 
+    nx::vms::api::UserDataList cloudUsers;
+    std::copy_if(
+        users.begin(), users.end(),
+        std::back_inserter(cloudUsers),
+        [](const auto& user) { return user.isCloud; });
+
+    if (!fetchUserParams(remoteUrl, getKey, cloudUsers, data))
+        return false;
+
     for (const auto& userData: users)
     {
         QnUserResourcePtr user = ec2::fromApiToResource(userData);
         if (user->isCloud() || user->isBuiltInAdmin())
         {
             data->foreignUsers.push_back(userData);
-
-            // TODO: #ak Have to request user params from the remote server.
 
             for (const auto& param: user->params())
                 data->additionParams.push_back(param);
@@ -666,6 +675,56 @@ bool SystemMergeProcessor::fetchRemoteData(
 
     data->sysIdTime = pingReply.sysIdTime;
     data->tranLogTime = pingReply.tranLogTime;
+
+    return true;
+}
+
+bool SystemMergeProcessor::fetchUserParams(
+    const nx::utils::Url& remoteUrl,
+    const QString& getKey,
+    const nx::vms::api::UserDataList& users,
+    ConfigureSystemData* data)
+{
+    MediaServerClient mediaServerClient(remoteUrl);
+    mediaServerClient.setRequestTimeout(kRequestTimeout);
+    mediaServerClient.setAuthenticationKey(getKey);
+
+    std::vector<std::tuple<QnUuid, ec2::ErrorCode, nx::vms::api::ResourceParamDataList>>
+        getUsersParamsResults;
+    int expectedResponseCount = users.size();
+    std::promise<void> done;
+
+    for (const auto& user: users)
+    {
+        mediaServerClient.ec2GetResourceParams(
+            user.id,
+            [this, &getUsersParamsResults, &expectedResponseCount, &done, userId = user.id](
+                ec2::ErrorCode resultCode,
+                nx::vms::api::ResourceParamDataList params)
+            {
+                getUsersParamsResults.push_back(std::make_tuple(userId, resultCode, std::move(params)));
+                if (--expectedResponseCount == 0)
+                    done.set_value();
+            });
+    }
+
+    done.get_future().wait();
+
+    for (const auto& [userId, resultCode, params]: getUsersParamsResults)
+    {
+        if (resultCode != ec2::ErrorCode::ok)
+        {
+            NX_DEBUG(this, "Failed to fetch user %1 params from %2. %3",
+                userId, remoteUrl, resultCode);
+            return false;
+        }
+
+        for (const auto& param: params)
+            data->additionParams.push_back({userId, param.name, param.value});
+
+        NX_VERBOSE(this, "Fetched %1 params of user %2 from %3",
+            params.size(), userId, remoteUrl);
+    }
 
     return true;
 }
