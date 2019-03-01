@@ -7,6 +7,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
@@ -682,7 +683,7 @@ bool SystemMergeProcessor::fetchUsers(
         {
             data->foreignUsers.push_back(userData);
 
-            for (const auto& param : user->params())
+            for (const auto& param: user->params())
                 data->additionParams.push_back(param);
         }
     }
@@ -702,24 +703,23 @@ bool SystemMergeProcessor::fetchUserParams(
 
     std::vector<std::tuple<QnUuid, ec2::ErrorCode, nx::vms::api::ResourceParamDataList>>
         getUsersParamsResults;
-    int expectedResponseCount = users.size();
-    std::promise<void> done;
+
+    nx::utils::Counter expectedResponseCount(users.size());
 
     for (const auto& user: users)
     {
         mediaServerClient.ec2GetResourceParams(
             user.id,
-            [this, &getUsersParamsResults, &expectedResponseCount, &done, userId = user.id](
+            [this, &getUsersParamsResults, &expectedResponseCount, userId = user.id](
                 ec2::ErrorCode resultCode,
                 nx::vms::api::ResourceParamDataList params)
             {
                 getUsersParamsResults.push_back(std::make_tuple(userId, resultCode, std::move(params)));
-                if (--expectedResponseCount == 0)
-                    done.set_value();
+                expectedResponseCount.decrement();
             });
     }
 
-    done.get_future().wait();
+    expectedResponseCount.wait();
 
     for (const auto& [userId, resultCode, params]: getUsersParamsResults)
     {
