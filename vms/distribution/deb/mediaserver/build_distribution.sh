@@ -50,7 +50,7 @@ copyLibs()
         'libqgsttools_p.*'
         'libtegra_video.*'
         'libnx_vms_client*'
-        'libcloud*'
+        'libcloud_db.*'
     )
 
     for LIB in "$BUILD_DIR/lib"/*.so*
