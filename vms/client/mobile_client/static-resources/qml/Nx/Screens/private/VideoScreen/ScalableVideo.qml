@@ -292,6 +292,7 @@ ZoomableFlickable
         {
             id: motionSearchController
 
+            dragThreshold: control.mouseArea.drag.threshold
             parent: content.videoOutput
             anchors.fill: parent
             viewport: control

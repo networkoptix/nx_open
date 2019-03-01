@@ -305,7 +305,9 @@ PageBase
                 showUi()
             }
 
-            onRequestDrawing: videoNavigation.motionSearchMode = true
+            onRequestUnallowedDrawing:
+                banner.showText(qsTr("Enable motion search first to select an area"))
+
             onEmptyRoiCleared:
                 banner.showText(qsTr("Invalid custom area. Please draw a correct one."))
         }

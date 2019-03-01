@@ -2,11 +2,12 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Core.Items 1.0
 import nx.client.core 1.0
-import "utils.js" as Utils
+
 Item
 {
     id: controller
 
+    property int dragThreshold: 10
     property bool allowDrawing: true
     property int cameraRotation: 0
     property Item viewport: null
@@ -19,14 +20,8 @@ Item
     readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
 
-    signal requestDrawing()
+    signal requestUnallowedDrawing()
     signal emptyRoiCleared()
-
-    onAllowDrawingChanged:
-    {
-        if (allowDrawing && d.customInitialPoint && d.selectionRoi)
-            Utils.executeLater(function() { d.selectionRoi.start() }, this)
-    }
 
     function clearCustomRoi()
     {
@@ -57,14 +52,11 @@ Item
             rect ? d.toRelative(Qt.vector2d(rect.right, rect.bottom)) : undefined)
     }
 
-    function handleLongPressed()
-    {
-        if (!controller.allowDrawing)
-            controller.requestDrawing()
-    }
-
     function handlePositionChanged(pos)
     {
+        if (!Utils.nearPositions(pos, pressAndHoldTimer.initialPos, controller.dragThreshold))
+            pressAndHoldTimer.stop()
+
         var relativePos = d.toRelative(pos)
         if (drawingRoi)
         {
@@ -83,10 +75,17 @@ Item
         if (pressFilterTimer.running)
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
+        if (!controller.allowDrawing)
+        {
+            pressAndHoldTimer.restart()
+            pressAndHoldTimer.initialPos = pos
+            return
+        }
+
+        pressAndHoldTimer.stop()
         pressFilterTimer.restart()
         var relativePos = d.toRelative(pos)
         d.customInitialPoint = relativePos
-        pressAndHoldTimer.restart()
 
         d.selectionRoi = d.customRoi == firstRoi
             ? secondRoi
@@ -95,8 +94,7 @@ Item
         d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.singlePoint = true
-        if (allowDrawing)
-            d.selectionRoi.start()
+        d.selectionRoi.start()
     }
 
     function handleReleased()
@@ -157,8 +155,14 @@ Item
     {
         id: pressAndHoldTimer
 
+        property point initialPos
+
         interval: 600
-        onTriggered: controller.handleLongPressed()
+        onTriggered:
+        {
+            if (!motionSearchMode)
+                controller.requestUnallowedDrawing()
+        }
     }
 
     Timer
