@@ -34,6 +34,8 @@
 #include <nx/update/update_information.h>
 #include <nx/update/update_check.h>
 
+#include "server_update_tool.h"
+
 using namespace nx::vms::client::desktop::ui;
 using UpdateContents = nx::update::UpdateContents;
 
@@ -43,25 +45,32 @@ namespace {
     constexpr int kMinutesPerHour = 60;
     constexpr int kSecsPerMinute = 60;
     constexpr int kTooLateDayOfWeek = Qt::Thursday;
+    const auto kWaitForUpdateCheck = std::chrono::milliseconds(1);
 } // anonymous namespace
 
-struct QnWorkbenchUpdateWatcher::Private
+namespace nx::vms::client::desktop {
+
+struct WorkbenchUpdateWatcher::Private
 {
     UpdateContents updateContents;
     std::future<UpdateContents> m_updateCheck;
+    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
 };
 
-QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject* parent):
+WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_timer(new QTimer(this)),
+    m_checkUpdateTimer(this),
+    m_updateStateTimer(this),
     m_notifiedVersion(),
     m_private(new Private())
 {
-    m_timer->setInterval(kUpdatePeriodMSec);
+    m_private->m_serverUpdateTool.reset(new ServerUpdateTool(this));
+
+    m_checkUpdateTimer.setInterval(kUpdatePeriodMSec);
 
     m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
-    connect(m_timer, &QTimer::timeout, this, &QnWorkbenchUpdateWatcher::atStartCheckUpdate);
+    connect(&m_checkUpdateTimer, &QTimer::timeout, this, &WorkbenchUpdateWatcher::atStartCheckUpdate);
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
         [this]()
         {
@@ -70,57 +79,69 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject* parent):
         });
 }
 
-QnWorkbenchUpdateWatcher::~QnWorkbenchUpdateWatcher() {}
+WorkbenchUpdateWatcher::~WorkbenchUpdateWatcher() {}
 
-void QnWorkbenchUpdateWatcher::syncState()
+void WorkbenchUpdateWatcher::syncState()
 {
-    if (m_userLoggedIn && m_autoChecksEnabled && !m_timer->isActive())
+    if (m_userLoggedIn && m_autoChecksEnabled && !m_checkUpdateTimer.isActive())
     {
         NX_VERBOSE(this, "syncState() - starting automatic checks for updates");
-        m_timer->start();
+        m_checkUpdateTimer.start();
         atStartCheckUpdate();
     }
 
-    if ((!m_userLoggedIn || !m_autoChecksEnabled) && m_timer->isActive())
+    if ((!m_userLoggedIn || !m_autoChecksEnabled) && m_checkUpdateTimer.isActive())
     {
         NX_VERBOSE(this, "syncState() - stopping automatic checks for updates");
-        m_timer->stop();
+        m_checkUpdateTimer.stop();
     }
 }
 
-void QnWorkbenchUpdateWatcher::start()
+void WorkbenchUpdateWatcher::atUpdateCurrentState()
+{
+    NX_ASSERT(m_private);
+    if (m_private->m_updateCheck.valid()
+        && m_private->m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
+    {
+        atCheckerUpdateAvailable(m_private->m_updateCheck.get());
+    }
+}
+
+std::shared_ptr<ServerUpdateTool> WorkbenchUpdateWatcher::getServerUpdateTool()
+{
+    NX_ASSERT(m_private);
+    return m_private->m_serverUpdateTool;
+}
+
+std::future<UpdateContents> WorkbenchUpdateWatcher::takeUpdateCheck()
+{
+    NX_ASSERT(m_private);
+    return std::move(m_private->m_updateCheck);
+}
+
+void WorkbenchUpdateWatcher::start()
 {
     m_userLoggedIn = true;
     syncState();
 }
 
-void QnWorkbenchUpdateWatcher::stop()
+void WorkbenchUpdateWatcher::stop()
 {
     m_userLoggedIn = false;
     syncState();
 }
 
-void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
+void WorkbenchUpdateWatcher::atStartCheckUpdate()
 {
     // This signal will be removed when update check is complete.
     if (m_private->m_updateCheck.valid())
         return;
     QString updateUrl = qnSettings->updateFeedUrl();
     NX_ASSERT(!updateUrl.isEmpty());
-
-    auto callback = nx::utils::guarded(this,
-        [this](const UpdateContents& contents)
-        {
-            atCheckerUpdateAvailable(contents);
-        });
-
-    m_private->m_updateCheck = nx::update::checkLatestUpdate(
-        updateUrl,
-        commonModule()->engineVersion(),
-        std::move(callback));
+    m_private->m_updateCheck = m_private->m_serverUpdateTool->checkLatestUpdate(updateUrl);
 }
 
-void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
+void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
 {
     if (!qnGlobalSettings->isUpdateNotificationsEnabled())
         return;
@@ -133,7 +154,7 @@ void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& co
         return;
 
     // We are not interested in updates right now.
-    if (!m_timer->isActive())
+    if (!m_checkUpdateTimer.isActive())
         return;
 
     // We have no access rights.
@@ -192,7 +213,7 @@ void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& co
     showUpdateNotification(targetVersion, contents.info.releaseNotesUrl, contents.info.description);
 }
 
-void QnWorkbenchUpdateWatcher::showUpdateNotification(
+void WorkbenchUpdateWatcher::showUpdateNotification(
     const nx::utils::SoftwareVersion& targetVersion,
     const nx::utils::Url& releaseNotesUrl,
     const QString& description)
@@ -261,7 +282,9 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(
         action(action::SystemUpdateAction)->trigger();
 }
 
-const UpdateContents& QnWorkbenchUpdateWatcher::getUpdateContents() const
+const UpdateContents& WorkbenchUpdateWatcher::getUpdateContents() const
 {
     return m_private->updateContents;
 }
+
+} // namespace nx::vms::client::desktop

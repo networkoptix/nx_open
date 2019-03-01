@@ -36,7 +36,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
 
@@ -49,6 +48,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/applauncher_utils.h>
 
+#include "workbench_update_watcher.h"
 #include "peer_state_tracker.h"
 #include "server_update_tool.h"
 #include "server_updates_model.h"
@@ -72,7 +72,7 @@ static constexpr int kSectionMinHeight = 30;
 constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
-const auto kWaitForUpdateCheck = std::chrono::milliseconds(10);
+const auto kWaitForUpdateCheck = std::chrono::milliseconds(1);
 
 const int kLinkCopiedMessageTimeoutMs = 2000;
 
@@ -138,8 +138,11 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_showDebugData = ini().massSystemUpdateDebugInfo;
     m_autoCheckUpdate = qnGlobalSettings->isUpdateNotificationsEnabled();
 
-    m_serverUpdateTool.reset(new ServerUpdateTool(this));
+    auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
+    m_serverUpdateTool = watcher->getServerUpdateTool();
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
+
+    m_updateCheck = watcher->takeUpdateCheck();
 
     m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
@@ -744,11 +747,11 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     if (m_widgetState != WidgetUpdateState::initial && m_widgetState != WidgetUpdateState::ready)
         return;
 
-    if (initial)
+    if (initial && !m_updateCheck.valid())
     {
-        // QnWorkbenchUpdateWatcher checks for updates periodically. We could reuse its update
+        // WorkbenchUpdateWatcher checks for updates periodically. We could reuse its update
         // info, if there is any.
-        auto watcher = context()->instance<QnWorkbenchUpdateWatcher>();
+        auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
         auto contents = watcher->getUpdateContents();
         auto installedVersions = m_clientUpdateTool->getInstalledVersions();
         if (!contents.isEmpty()
@@ -757,6 +760,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
             // Widget FSM uses future<UpdateContents> while it spins around 'initial'->'ready'.
             // So the easiest way to advance it towards 'ready' state is by providing another
             // future to await.
+            NX_INFO(this, "checkForInternetUpdates(%1) - picking update information from "
+                "WorkbenchUpdateWatcher", initial);
             std::promise<nx::update::UpdateContents> promise;
             m_updateCheck = promise.get_future();
             promise.set_value(contents);
@@ -1143,11 +1148,11 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
+        m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
     }
 
     if (!m_serverUpdateCheck.valid())
-        m_serverUpdateCheck = m_serverUpdateTool->checkRemoteUpdateInfo();
+        m_serverUpdateCheck = m_serverUpdateTool->checkMediaserverUpdateInfo();
 
     if (!m_serverStatusCheck.valid())
         m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
