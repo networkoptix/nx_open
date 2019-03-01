@@ -18,17 +18,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 QDateTime toDateTime(const Node::time_point& timePoint)
 {
-    if (timePoint == Node::time_point())
-        return {};
-
-    using namespace std::chrono;
-
-    auto chronoMsec = duration_cast<milliseconds>(timePoint.time_since_epoch()).count();
-
     QDateTime dt;
-    dt.setMSecsSinceEpoch(
-        duration_cast<milliseconds>(timePoint.time_since_epoch()).count());
-    auto qtMsec = dt.toMSecsSinceEpoch();
+    dt.setMSecsSinceEpoch(std::chrono::duration_cast<std::chrono::milliseconds>(
+        timePoint.time_since_epoch()).count());
     return dt;
 }
 
@@ -43,23 +35,14 @@ static constexpr char kHost[] = "host";
 static constexpr char kExpirationTime[] = "expirationTime";
 static constexpr char kInfoJson[] = "infoJson";
 
-QDateTime toDateTime(QByteArray expirationTime)
-{
-    if (expirationTime.endsWith(" GMT"))
-        expirationTime.truncate(expirationTime.size() - 4);
-    QDateTime dt = QDateTime::fromString(expirationTime, "ddd, dd MMM yyyy hh:mm:ss");
-    dt.setTimeSpec(Qt::UTC);
-    return dt;
-}
-
 QString toString(const Node::time_point& expirationTime)
 {
-    using namespace std::chrono;
-    QDateTime dt;
-    dt.setTimeSpec(Qt::UTC);
-    dt.setMSecsSinceEpoch(
-        time_point_cast<milliseconds>(expirationTime).time_since_epoch().count());
-    return nx::network::http::formatDateTime(dt);
+    return nx::network::http::formatDateTime(toDateTime(expirationTime));
+}
+
+Node::time_point toTimePoint(const QDateTime& dt)
+{
+    return Node::time_point() + std::chrono::milliseconds(dt.toMSecsSinceEpoch());
 }
 
 QJsonObject serialize(const Node& node)
@@ -93,10 +76,10 @@ Node deserialize(const QVariantMap& map, const Node& defaultValue, bool* ok = nu
     it = map.find(kExpirationTime);
     if (it == map.end())
         return defaultValue;
-    QDateTime dt = toDateTime(it->toByteArray());
+    QDateTime dt = nx::network::http::parseDate(it->toByteArray());
     if (!dt.isValid())
         return defaultValue;
-    node.expirationTime = Node::time_point() + std::chrono::milliseconds(dt.toMSecsSinceEpoch());
+    node.expirationTime = toTimePoint(dt);
 
     it = map.find(kInfoJson);
     if (it != map.end())
