@@ -35,6 +35,15 @@ class CloudUserOfflineLogin:
     using base_type = MediaServerCloudIntegrationTest;
 
 protected:
+    void givenCloudSystem()
+    {
+        ASSERT_TRUE(startMediaServer());
+
+        connectSystemToCloud();
+
+        waitUserCloudAuthInfoToBeSynchronized();
+    }
+
     void givenUserInvitedFromDesktopClient()
     {
         m_invitedUserEc2Data = inviteRandomCloudUser();
@@ -71,6 +80,11 @@ protected:
         cdb()->stop();
 
         whenMediaServerRestarted();
+    }
+
+    void whenSystemGoesOffline()
+    {
+        cdb()->stop();
     }
 
     void whenMediaServerRestarted()
@@ -146,6 +160,11 @@ protected:
         }
     }
 
+    void thenCloudOwnerCanLogin()
+    {
+        ASSERT_EQ(ec2::ErrorCode::ok, checkIfOwnerCanLogin());
+    }
+
     void thenUserCanStillLogin()
     {
         waitUntilUserLoginFuncPasses([this]() { return checkIfOwnerCanLogin(); });
@@ -185,10 +204,7 @@ private:
 
     virtual void SetUp() override
     {
-        base_type::SetUp();
-
-        connectSystemToCloud();
-        waitUserCloudAuthInfoToBeSynchronized();
+        ASSERT_TRUE(startCloudDB());
     }
 
     void waitUserCloudAuthInfoToBeSynchronized()
@@ -285,14 +301,28 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+TEST_P(CloudUserOfflineLogin, DISABLED_offline_login_works_just_after_binding_system_to_the_cloud)
+{
+    mediaServer().addSetting("delayBeforeSettingMasterFlag", "1h");
+
+    ASSERT_TRUE(startMediaServer());
+    connectSystemToCloud();
+
+    whenSystemGoesOffline();
+    thenCloudOwnerCanLogin();
+}
+
 TEST_P(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
 {
+    givenCloudSystem();
     whenVmsLostConnectionToTheCloud();
     thenUserCanStillLogin();
 }
 
 TEST_P(CloudUserOfflineLogin, multiple_users_can_login)
 {
+    givenCloudSystem();
+
     whenAddedMultipleCloudUsers();
     whenVmsLostConnectionToTheCloud();
 
@@ -305,6 +335,8 @@ TEST_P(CloudUserOfflineLogin, multiple_users_can_login)
 
 TEST_P(CloudUserOfflineLogin, user_can_login_after_password_change)
 {
+    givenCloudSystem();
+
     whenCloudUserPasswordHasBeenChanged();
     whenVmsLostConnectionToTheCloud();
 
@@ -315,6 +347,7 @@ TEST_P(
     CloudUserOfflineLogin,
     invited_user_can_login_after_registering_by_following_invite_link)
 {
+    givenCloudSystem();
     givenUserInvitedFromDesktopClient();
 
     whenUserCompletesRegistrationInCloud();
@@ -327,6 +360,7 @@ TEST_P(
     CloudUserOfflineLogin,
     invited_user_can_login_after_missing_invite_email_and_completing_registration_in_cloud)
 {
+    givenCloudSystem();
     givenUserInvitedFromDesktopClient();
 
     whenUserRegistersInCloudSkippingInviteEmail();
@@ -340,6 +374,7 @@ TEST_P(
     CloudUserOfflineLogin,
     invited_and_registered_but_not_activated_user_cannot_login_to_the_system)
 {
+    givenCloudSystem();
     givenUserInvitedFromDesktopClient();
 
     whenUserRegistersInCloudSkippingInviteEmail();
@@ -371,8 +406,11 @@ public:
 
 TEST_P(CloudUserOfflineLoginAfterAuthInfoUpdate, user_is_able_to_login_after_auth_info_update)
 {
+    givenCloudSystem();
+
     waitForUserCloudAuthInfoToBeUpdated();
     whenVmsLostConnectionToTheCloud();
+
     thenUserCanStillLogin();
 }
 
