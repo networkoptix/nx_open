@@ -640,6 +640,28 @@ bool SystemMergeProcessor::fetchRemoteData(
     const QString& getKey,
     ConfigureSystemData* data)
 {
+    if (!fetchUsers(remoteUrl, getKey, data))
+        return false;
+
+    QnJsonRestResult pingRestResult;
+    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
+        return false;
+
+    QnPingReply pingReply;
+    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
+        return false;
+
+    data->sysIdTime = pingReply.sysIdTime;
+    data->tranLogTime = pingReply.tranLogTime;
+
+    return true;
+}
+
+bool SystemMergeProcessor::fetchUsers(
+    const nx::utils::Url& remoteUrl,
+    const QString& getKey,
+    ConfigureSystemData* data)
+{
     nx::vms::api::UserDataList users;
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
@@ -660,21 +682,10 @@ bool SystemMergeProcessor::fetchRemoteData(
         {
             data->foreignUsers.push_back(userData);
 
-            for (const auto& param: user->params())
+            for (const auto& param : user->params())
                 data->additionParams.push_back(param);
         }
     }
-
-    QnJsonRestResult pingRestResult;
-    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
-        return false;
-
-    QnPingReply pingReply;
-    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
-        return false;
-
-    data->sysIdTime = pingReply.sysIdTime;
-    data->tranLogTime = pingReply.tranLogTime;
 
     return true;
 }

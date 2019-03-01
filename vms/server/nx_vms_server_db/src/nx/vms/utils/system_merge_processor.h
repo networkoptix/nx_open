@@ -85,6 +85,11 @@ private:
         const QString& getKey,
         ConfigureSystemData* data);
 
+    bool fetchUsers(
+        const nx::utils::Url& remoteUrl,
+        const QString& getKey,
+        ConfigureSystemData* data);
+
     bool fetchUserParams(
         const nx::utils::Url& remoteUrl,
         const QString& getKey,
