@@ -536,25 +536,13 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     const QString& getKey,
     const QString& postKey)
 {
-    /* Read admin user from the remote server */
+    ConfigureSystemData remoteSystemData;
+    remoteSystemData.localSystemId = systemId;
+    remoteSystemData.wholeSystem = true;
+    remoteSystemData.systemName = systemName;
+
     QnJsonRestResult result;
-
-    nx::vms::api::UserDataList users;
-    if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
-    {
-        setMergeError(&result, MergeStatus::configurationFailed);
-        return result;
-    }
-
-    QnJsonRestResult pingRestResult;
-    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
-    {
-        setMergeError(&result, MergeStatus::configurationFailed);
-        return result;
-    }
-
-    QnPingReply pingReply;
-    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
+    if (!fetchRemoteData(remoteUrl, getKey, &remoteSystemData))
     {
         setMergeError(&result, MergeStatus::configurationFailed);
         return result;
@@ -589,25 +577,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     // 2. Updating local data.
-    ConfigureSystemData data;
-    data.localSystemId = systemId;
-    data.wholeSystem = true;
-    data.sysIdTime = pingReply.sysIdTime;
-    data.tranLogTime = pingReply.tranLogTime;
-    data.systemName = systemName;
 
-    for (const auto& userData: users)
-    {
-        QnUserResourcePtr user = ec2::fromApiToResource(userData);
-        if (user->isCloud() || user->isBuiltInAdmin())
-        {
-            data.foreignUsers.push_back(userData);
-            for (const auto& param : user->params())
-                data.additionParams.push_back(param);
-        }
-    }
-
-    if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, data))
+    if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, remoteSystemData))
     {
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to change system name"));
         setMergeError(&result, MergeStatus::configurationFailed);
@@ -648,7 +619,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
-    ec2::ErrorCode errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        systemId, remoteSystemData.sysIdTime, remoteSystemData.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -659,6 +631,43 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     return result;
+}
+
+bool SystemMergeProcessor::fetchRemoteData(
+    const nx::utils::Url& remoteUrl,
+    const QString& getKey,
+    ConfigureSystemData* data)
+{
+    nx::vms::api::UserDataList users;
+    if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
+        return false;
+
+    for (const auto& userData: users)
+    {
+        QnUserResourcePtr user = ec2::fromApiToResource(userData);
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            data->foreignUsers.push_back(userData);
+
+            // TODO: #ak Have to request user params from the remote server.
+
+            for (const auto& param: user->params())
+                data->additionParams.push_back(param);
+        }
+    }
+
+    QnJsonRestResult pingRestResult;
+    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
+        return false;
+
+    QnPingReply pingReply;
+    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
+        return false;
+
+    data->sysIdTime = pingReply.sysIdTime;
+    data->tranLogTime = pingReply.tranLogTime;
+
+    return true;
 }
 
 bool SystemMergeProcessor::isResponseOK(const nx::network::http::HttpClient& client)

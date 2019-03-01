@@ -80,6 +80,11 @@ private:
         const QString& getKey,
         const QString& postKey);
 
+    bool fetchRemoteData(
+        const nx::utils::Url& remoteUrl,
+        const QString& getKey,
+        ConfigureSystemData* data);
+
     QnJsonRestResult executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,
