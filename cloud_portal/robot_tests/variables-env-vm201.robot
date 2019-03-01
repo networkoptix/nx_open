@@ -38,7 +38,7 @@ ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
 ${AUTO TESTS}                         Auto Tests
-${AUTO_TESTS SYSTEM ID}                     ac728a5d-0979-4306-86b9-94ff74343767
+${AUTO_TESTS SYSTEM ID}                     8a7f3d2a-83cd-46e8-8e38-908707f90885
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']

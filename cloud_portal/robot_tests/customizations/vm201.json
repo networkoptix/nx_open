@@ -1,9 +1,9 @@
 {
     "PRODUCT_NAME"             :    "VMS Demo Cloud",
     "VMS_NAME"                 :    "VMS Demonstration",
-    "PRIVACY POLICY URL"       :    "https://vm201.la.hdw.mx/content/privacy",
+    "PRIVACY POLICY URL"       :    "/content/privacy",
     "SUPPORT URL"              :    "https://vm201.la.hdw.mx/content/support",
-    "WEBSITE URL"              :    "https://networkoptix.com",
+    "WEBSITE URL"              :    "http://networkoptix.com",
     "ABOUT URL"                :    "/content/about",
     "KNOWN LIMITATIONS URL"    :    "/content/faq",
     "TERMS URL"                :    "/content/eula",
