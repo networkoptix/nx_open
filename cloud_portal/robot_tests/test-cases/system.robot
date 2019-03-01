@@ -67,6 +67,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Element Is Visible    ${DISCONNECT MODAL WARNING}
+    Click Element    ${DISCONNECT MODAL WARNING}
     Click Button    ${DISCONNECT MODAL CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 

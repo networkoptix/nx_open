@@ -42,7 +42,7 @@ Privacy leads to the proper page
     [tags]    C41546    Threaded
     Wait Until Element Is Visible    ${FOOTER PRIVACY LINK}
     Click Link    ${FOOTER PRIVACY LINK}
-    Location Should Be    ${PRIVACY POLICY URL}
+    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
 
 Copyright leads to the proper site
     [tags]    C41547    Threaded

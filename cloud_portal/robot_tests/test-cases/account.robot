@@ -232,7 +232,6 @@ Language changed in account is new default
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    //h1[text()='Account']
-    Check Language
 
 Language change in account page affects emails
     [tags]    C41575
