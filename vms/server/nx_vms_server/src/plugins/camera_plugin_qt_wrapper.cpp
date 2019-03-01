@@ -6,6 +6,8 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/helpers/ptr.h>
 
+#include <nx/utils/log/log.h>
+
 namespace nxcip_qt
 {
     CameraDiscoveryManager::CameraDiscoveryManager( nxcip::CameraDiscoveryManager* const intf )
@@ -49,15 +51,19 @@ namespace nxcip_qt
         int result = 0;
         if (discoveryManager2.get())
         {
+            NX_VERBOSE(this, "Using %1 to find cameras (2)", discoveryManager2);
             result = discoveryManager2->findCameras2(cameras->data(), localInterfaceIPAddrUtf8.data());
         }
         else
         {
+            NX_VERBOSE(this, "Using %1 to find cameras", m_intf);
             result = m_intf->findCameras(cameraInfo1.data(), localInterfaceIPAddrUtf8.data());
             for (int i = 0; i < result; ++i)
                 (*cameras)[i] = cameraInfo1[i];
         }
         cameras->resize(result > 0 ? result : 0);
+
+        NX_VERBOSE(this, "Find cameras result: %1", result);
         return result;
     }
 
