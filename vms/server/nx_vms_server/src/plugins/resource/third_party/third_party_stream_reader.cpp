@@ -86,6 +86,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
                 NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
                 m_resource->setStatus(Qn::Offline);
                 m_isMediaUrlValid.clear();
+                m_resource->initAsync(true);
             }
         });
     m_isMediaUrlValid.test_and_set();
@@ -152,7 +153,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
 CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
     bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
-    NX_VERBOSE(this, "Openning stream with params [%1]...", liveStreamParams);
+    NX_VERBOSE(this, "Openning stream with params %1...", liveStreamParams);
 
     QnLiveStreamParams params = liveStreamParams;
     if( isStreamOpened() )

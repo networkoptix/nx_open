@@ -718,36 +718,54 @@ void QnResource::reinitAsync()
 
 void QnResource::initAsync(bool optional)
 {
+    NX_VERBOSE(this, "Async init requested (optional: %1)", optional);
+
     qint64 t = getUsecTimer();
 
     QnMutexLocker lock(&m_initAsyncMutex);
 
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
+    {
+        NX_VERBOSE(this, "Not running init task: init was recently (%1us < %2us)",
+            t - m_lastInitTime, MIN_INIT_INTERVAL);
         return;
+    }
 
     if (commonModule()->isNeedToStop())
+    {
+        NX_VERBOSE(this, "Not running init task: server is stopping");
         return;
+    }
 
     if (hasFlags(Qn::foreigner))
-        return; // removed to other server
+    {
+        NX_VERBOSE(this, "Not running init task: removed to other server");
+        return;
+    }
 
     auto resourcePool = this->resourcePool();
     if (!resourcePool)
+    {
+        NX_DEBUG(this, "Not running init task: resource pool is unavailable");
         return;
+    }
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    if (optional)
-    {
-        if (resourcePool->threadPool()->tryStart(task))
-            m_lastInitTime = t;
-        else
-            delete task;
-    }
-    else
+    if (!optional)
     {
         m_lastInitTime = t;
         resourcePool->threadPool()->start(task);
+        return;
     }
+
+    if (!resourcePool->threadPool()->tryStart(task))
+    {
+        delete task;
+        NX_DEBUG(this, "Init task was not started");
+        return;
+    }
+
+    m_lastInitTime = t;
 }
 
 CameraDiagnostics::Result QnResource::prevInitializationResult() const
