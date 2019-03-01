@@ -11,22 +11,12 @@
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
-#include <plugins/resource/avi/avi_dvd_resource.h>
-#include <plugins/resource/avi/avi_bluray_resource.h>
-#include <plugins/resource/avi/avi_dvd_archive_delegate.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/workaround/mac_utils.h>
 
 namespace {
-
-bool isFileSupported(const QString& filePath)
-{
-    return QnAviDvdResource::isAcceptedUrl(filePath)
-        || QnAviBlurayResource::isAcceptedUrl(filePath)
-        || FileTypeSupport::isFileSupported(filePath);
-}
 
 QString fixSeparators(const QString& filePath)
 {
@@ -41,41 +31,20 @@ QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
     for (QString path: files)
     {
         path = fixSeparators(path);
-        if (QnAviDvdResource::isAcceptedUrl(path))
+        QFileInfo fileInfo(path);
+        if (fileInfo.isDir())
         {
-            if (path.indexOf(QLatin1Char('?')) == -1)
+            QDirIterator it(path, QDirIterator::Subdirectories);
+            while (it.hasNext())
             {
-                /* Open all titles on a DVD. */
-                QStringList titles = QnAVIDvdArchiveDelegate::getTitleList(path);
-                for (const QString &title: titles)
-                    acceptedFiles.append(path + QLatin1String("?title=") + title);
-            }
-            else
-            {
-                acceptedFiles.append(path);
+                QString nextFilename = it.next();
+                if (it.fileInfo().isFile() && FileTypeSupport::isFileSupported(nextFilename))
+                    acceptedFiles.append(nextFilename);
             }
         }
-        else if (QnAviBlurayResource::isAcceptedUrl(path))
+        else if (fileInfo.isFile() && FileTypeSupport::isFileSupported(path))
         {
             acceptedFiles.append(path);
-        }
-        else
-        {
-            QFileInfo fileInfo(path);
-            if (fileInfo.isDir())
-            {
-                QDirIterator it(path, QDirIterator::Subdirectories);
-                while (it.hasNext())
-                {
-                    QString nextFilename = it.next();
-                    if (it.fileInfo().isFile() && FileTypeSupport::isFileSupported(nextFilename))
-                        acceptedFiles.append(nextFilename);
-                }
-            }
-            else if (fileInfo.isFile() && FileTypeSupport::isFileSupported(path))
-            {
-                acceptedFiles.append(path);
-            }
         }
     }
 
@@ -135,7 +104,7 @@ QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>&
         if (!QFile::exists(filePath))
             continue;
 
-        if (!isFileSupported(filePath))
+        if (!FileTypeSupport::isFileSupported(filePath))
             continue;
 
         #if defined(Q_OS_MAC)

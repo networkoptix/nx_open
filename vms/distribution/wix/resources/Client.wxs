@@ -121,6 +121,8 @@
             <ComponentGroupRef Id="shared_qt_libraries"/>
             <ComponentGroupRef Id="shared_qt_platforms"/>
             <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="shared_ucrt_libraries"/>
+            <ComponentGroupRef Id="shared_vcrt_libraries"/>
             <ComponentGroupRef Id="client_nx_libraries"/>
             <ComponentGroupRef Id="client_misc_libraries"/>
             <ComponentGroupRef Id="client_qt_libraries"/>
@@ -142,7 +144,6 @@
             <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
-            <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
             <ComponentGroupRef Id="info_files"/>
         </Feature>
     </Fragment>
