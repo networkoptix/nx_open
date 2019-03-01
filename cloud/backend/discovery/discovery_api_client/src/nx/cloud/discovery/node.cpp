@@ -23,10 +23,12 @@ QDateTime toDateTime(const Node::time_point& timePoint)
 
     using namespace std::chrono;
 
+    auto chronoMsec = duration_cast<milliseconds>(timePoint.time_since_epoch()).count();
+
     QDateTime dt;
-    dt.setTimeSpec(Qt::UTC);
     dt.setMSecsSinceEpoch(
         duration_cast<milliseconds>(timePoint.time_since_epoch()).count());
+    auto qtMsec = dt.toMSecsSinceEpoch();
     return dt;
 }
 
@@ -62,12 +64,11 @@ QString toString(const Node::time_point& expirationTime)
 
 QJsonObject serialize(const Node& node)
 {
-    QJsonObject object;
-    object.insert(kNodeId, node.nodeId.c_str());
-    object.insert(kHost, node.host.c_str());
-    object.insert(kExpirationTime, toString(node.expirationTime));
-    object.insert(kInfoJson, node.infoJson.c_str());
-    return object;
+    return QJsonObject({
+        {kNodeId, node.nodeId.c_str()},
+        {kHost, node.host.c_str()},
+        {kExpirationTime, toString(node.expirationTime)},
+        {kInfoJson, node.infoJson.c_str()} });
 }
 
 Node deserialize(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr)

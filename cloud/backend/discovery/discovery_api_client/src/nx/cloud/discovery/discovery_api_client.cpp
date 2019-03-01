@@ -384,7 +384,9 @@ void DiscoveryClient::updateRequestSentTime(const nx::network::http::Request& re
     auto it = request.headers.find("Date");
     if (it == request.headers.end())
     {
-        NX_WARNING(this, lm("http request does not contain 'Date' http header, using current time"));
+        NX_WARNING(
+            this,
+            lm("http request does not contain 'Date' http header, using current time."));
         m_requestSent = QDateTime::currentDateTimeUtc();
         return;
     }
@@ -393,8 +395,9 @@ void DiscoveryClient::updateRequestSentTime(const nx::network::http::Request& re
     if (m_requestSent.isValid())
         return;
 
-    NX_ERROR(this,
-        lm("Error parsing date from http request. Format given by request is: %1. Using current time")
+    NX_ERROR(
+        this,
+        lm("Error parsing date from http request. Format given by request is: %1. Using current time.")
             .arg(it->second));
     m_requestSent = QDateTime::currentDateTimeUtc();
 }
