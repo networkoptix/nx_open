@@ -830,7 +830,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula =  acceptedEula < newEula;
 
-        if (showEula && !context()->showEulaMessage(m_updateInfo.eulaPath))
+        if (showEula && !context()->showEulaFromString(m_updateInfo.info.eula))
         {
             return;
         }
@@ -1680,7 +1680,6 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         if (!m_clientUpdateTool->restartClient(authString))
         {
             NX_ERROR(this) << "completeInstallation(" << clientUpdated << ") - failed to run restart command";
-            unholdConnection = true;
             QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
         }
         else
