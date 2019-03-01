@@ -57,8 +57,8 @@
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
-namespace
-{
+namespace {
+
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
@@ -94,7 +94,104 @@ struct TasksQueueInfo {
 
 const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
-} // namespace <anonymous>
+namespace empty_dirs {
+
+namespace detail {
+
+using FileInfo = QnAbstractStorageResource::FileInfo;
+using FileInfoList = QnAbstractStorageResource::FileInfoList;
+
+static std::pair<FileInfoList, FileInfoList> filesDirsFromList(const FileInfoList& fileInfoList)
+{
+    FileInfoList files;
+    FileInfoList dirs;
+    for (const auto& fileInfo : fileInfoList)
+    {
+        if (fileInfo.isDir())
+            dirs.push_back(fileInfo);
+        else
+            files.push_back(fileInfo);
+    }
+    return std::make_pair(files, dirs);
+}
+
+struct FileInfoEx
+{
+    bool visited = false;
+    FileInfoList nodes;
+    const int depth;
+    FileInfoEx(const FileInfoList& fileInfoList, int depth):
+        nodes(fileInfoList),
+        depth(depth)
+    {}
+};
+
+static const int kMaxDepth = 10;
+
+} // namespace detail
+
+static void remove(const QnStorageResourcePtr &storage)
+{
+    using namespace detail;
+
+    std::stack<FileInfoEx> fileInfoStack;
+    fileInfoStack.push(FileInfoEx({FileInfo(storage->getUrl(), /*size*/0, /*isDir*/true)}, 1));
+
+    while (!fileInfoStack.empty())
+    {
+        auto& currentFileInfo = fileInfoStack.top();
+        if (currentFileInfo.depth > kMaxDepth)
+        {
+            NX_WARNING(
+                typeid(QnStorageManager),
+                "Unexpectd file system tree depth detected while removing empty directories. " \
+                "Bailing out");
+            return;
+        }
+
+        if (currentFileInfo.visited)
+        {
+            for (const auto& node: currentFileInfo.nodes)
+            {
+                const auto dirContents = storage->getFileList(node.absoluteFilePath());
+                if (dirContents.isEmpty())
+                    storage->removeDir(node.absoluteFilePath());
+            }
+
+            fileInfoStack.pop();
+            continue;
+        }
+
+        currentFileInfo.visited = true;
+        for (auto it = currentFileInfo.nodes.begin(); it != currentFileInfo.nodes.end(); )
+        {
+            const auto dirContents = storage->getFileList(it->absoluteFilePath());
+            const auto [files, dirs] = filesDirsFromList(dirContents);
+
+            if (dirContents.isEmpty())
+            {
+                storage->removeDir(it->absoluteFilePath());
+                it = currentFileInfo.nodes.erase(it);
+                continue;
+            }
+
+            if (!dirs.isEmpty())
+                fileInfoStack.push(FileInfoEx(dirs, currentFileInfo.depth + 1));
+
+            if (!files.isEmpty())
+            {
+                it = currentFileInfo.nodes.erase(it);
+                continue;
+            }
+
+            ++it;
+        }
+    }
+}
+
+} // namespace empty_dirs
+
+} // namespace
 
 class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -1608,58 +1705,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     return result;
 }
 
-void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
-{
-    const std::function<bool(const QnAbstractStorageResource::FileInfoList&, size_t)> removeEmptyDir =
-        [&](const QnAbstractStorageResource::FileInfoList& fl, size_t depthLimit)
-        {
-            for (const auto& entry: fl)
-            {
-                if (serverModule()->commonModule()->isNeedToStop())
-                    return false;
-
-                if (entry.isDir())
-                {
-                    if (depthLimit == 0)
-                    {
-                        NX_ERROR(this, lm("Directory depth is above the limit, corrupted file system? %1")
-                            .arg(entry.absoluteFilePath()));
-
-                        return false;
-                    }
-
-                    const auto dirFileList = storage->getFileList(entry.absoluteFilePath());
-                    if (!dirFileList.isEmpty() && !removeEmptyDir(dirFileList, depthLimit - 1))
-                        return false;
-
-                    // Ignore error here, trying to clean as much as we can.
-                    storage->removeDir(entry.absoluteFilePath());
-                }
-                else
-                {
-                    // We've met file. Solid reason to stop.
-                    return false;
-                }
-            }
-
-            return true;
-        };
-
-    auto qualityFileList = storage->getFileList(storage->getUrl());
-    for (const auto &qualityEntry : qualityFileList)
-    {
-        if (qualityEntry.isDir()) //< Quality.
-        {
-            auto cameraFileList = storage->getFileList(qualityEntry.absoluteFilePath());
-            for (const auto &cameraEntry : cameraFileList) //< For every year folder.
-            {
-                static const size_t kDepthLimit = 10; //< Little more depth, than required.
-                removeEmptyDir(storage->getFileList(cameraEntry.absoluteFilePath()), kDepthLimit);
-            }
-        }
-    }
-}
-
 void QnStorageManager::updateCameraHistory() const
 {
     auto archivedListNew = getCamerasWithArchive(serverModule());
@@ -2523,15 +2568,15 @@ void QnStorageManager::startAuxTimerTasks()
         kCheckStorageSpace,
         kCheckStorageSpace);
 
-    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
+    static const std::chrono::seconds kRemoveEmptyDirsInterval(20);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
-            for (const auto& storage : getUsedWritableStorages())
+            for (const auto& storage: getUsedWritableStorages())
             {
                 if (storage->hasFlags(Qn::storage_fastscan))
                     continue;
-                removeEmptyDirs(storage);
+                empty_dirs::remove(storage);
             }
         },
         kRemoveEmptyDirsInterval,
