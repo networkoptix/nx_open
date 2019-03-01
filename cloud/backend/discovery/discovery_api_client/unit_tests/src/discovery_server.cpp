@@ -51,6 +51,9 @@ void DiscoveryServer::serveRegisterNode(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
+    // Simulate a 10 msec round trip travel time from client to server and back
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     if (!requestContainsThisClusterId(requestContext))
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
@@ -74,6 +77,9 @@ void DiscoveryServer::serveGetOnlineNodes(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
+    // Simulate 10 msec round trip travel time from client to server and back
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     if (!requestContainsThisClusterId(requestContext))
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
@@ -128,7 +134,6 @@ std::vector<Node> DiscoveryServer::getOnlineNodes()
             onlineNodes.emplace_back(it->second);
             ++it;
         }
-
     }
     return onlineNodes;
 }

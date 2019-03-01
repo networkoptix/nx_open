@@ -50,9 +50,11 @@ protected:
 
         context->client = std::make_unique<discovery::DiscoveryClient>(
             m_server->url(),
+            NodeInfo{
+                context->nodeId,
+                context->infoJson},
             context->clusterId,
-            context->nodeId,
-            context->infoJson);
+            std::chrono::milliseconds(10));
 
         m_clients.emplace_back(std::move(context));
     }
