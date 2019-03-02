@@ -45,7 +45,7 @@ Node::time_point toTimePoint(const QDateTime& dt)
     return Node::time_point() + std::chrono::milliseconds(dt.toMSecsSinceEpoch());
 }
 
-QJsonObject serialize(const Node& node)
+QJsonObject toJsonObject(const Node& node)
 {
     return QJsonObject({
         {kNodeId, node.nodeId.c_str()},
@@ -54,7 +54,7 @@ QJsonObject serialize(const Node& node)
         {kInfoJson, node.infoJson.c_str()} });
 }
 
-Node deserialize(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr)
+Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr)
 {
     if (ok)
         *ok = false;
@@ -62,16 +62,14 @@ Node deserialize(const QVariantMap& map, const Node& defaultValue, bool* ok = nu
     Node node;
 
     auto it = map.find(kNodeId);
-    if (it != map.end())
-        node.nodeId = it->toString().toStdString();
-    if (node.nodeId.empty())
+    if (it == map.end())
         return defaultValue;
+    node.nodeId = it->toString().toStdString();
 
     it = map.find(kHost);
-    if (it != map.end())
-        node.host = it->toString().toStdString();
-    if (node.host.empty())
+    if (it == map.end())
         return defaultValue;
+    node.host = it->toString().toStdString();
 
     it = map.find(kExpirationTime);
     if (it == map.end())
@@ -82,10 +80,9 @@ Node deserialize(const QVariantMap& map, const Node& defaultValue, bool* ok = nu
     node.expirationTime = toTimePoint(dt);
 
     it = map.find(kInfoJson);
-    if (it != map.end())
-        node.infoJson = it->toString().toStdString();
-    if (node.infoJson.empty())
+    if (it == map.end())
         return defaultValue;
+    node.infoJson = it->toString().toStdString();
 
     if (ok)
         *ok = true;
@@ -105,38 +102,40 @@ Node deserialized(const QByteArray& json, const Node& defaultValue, bool* ok)
     if (parseError.error != QJsonParseError::NoError || !document.isObject())
         return defaultValue;
 
-    return deserialize(document.toVariant().value<QVariantMap>(), defaultValue, ok);
+    return toNode(document.toVariant().value<QVariantMap>(), defaultValue, ok);
 }
 
 QByteArray serialized(const Node& node)
 {
-    return QJsonDocument(serialize(node)).toJson(QJsonDocument::Compact);
+    return QJsonDocument(toJsonObject(node)).toJson(QJsonDocument::Compact);
 }
 
 std::vector<Node> deserialized(
     const QByteArray& json,
     const std::vector<Node>& defaultValue,
-    bool * ok)
+    bool* ok)
 {
     if (ok)
         *ok = false;
-
-    std::vector<Node> nodes;
 
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
     if (parseError.error != QJsonParseError::NoError || !document.isArray())
         return defaultValue;
 
-    QJsonArray jsonArray = document.toVariant().value<QJsonArray>();
+    std::vector<Node> nodes;
 
+    QJsonArray jsonArray = document.toVariant().value<QJsonArray>();
     for (auto it = jsonArray.begin(); it != jsonArray.end(); ++it)
     {
         if (!it->isObject())
             return {};
 
-        nodes.emplace_back(deserialize(it->toObject().toVariantMap(), Node(), ok));
-        if (ok && !(*ok))
+        // Use local bool instead of ok because ok could be null, but we want to return early
+        // if one json node is malformed.
+        bool success = false;
+        nodes.emplace_back(toNode(it->toObject().toVariantMap(), Node(), &success));
+        if (!success)
             return {};
     }
 
@@ -150,7 +149,7 @@ QByteArray serialized(const std::vector<Node>& nodes)
 {
     QJsonArray jsonArray;
     for (const auto& node : nodes)
-        jsonArray.append(serialize(node));
+        jsonArray.append(toJsonObject(node));
     return QJsonDocument(jsonArray).toJson(QJsonDocument::Compact);
 }
 
