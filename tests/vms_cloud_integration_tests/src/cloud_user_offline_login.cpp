@@ -301,7 +301,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_P(CloudUserOfflineLogin, DISABLED_offline_login_works_just_after_binding_system_to_the_cloud)
+TEST_P(CloudUserOfflineLogin, offline_login_works_just_after_binding_system_to_the_cloud)
 {
     mediaServer().addSetting("delayBeforeSettingMasterFlag", "1h");
 
