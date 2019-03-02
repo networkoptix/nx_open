@@ -617,7 +617,7 @@ TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_clou
     assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
 }
 
-TEST_F(CloudMerge, DISABLED_resulting_system_can_be_accessed_via_temporary_cloud_credentials)
+TEST_F(CloudMerge, resulting_system_can_be_accessed_via_temporary_cloud_credentials)
 {
     givenSystemProducedByAMerge();
     assertCloudOwnerIsAbleToLogin();
