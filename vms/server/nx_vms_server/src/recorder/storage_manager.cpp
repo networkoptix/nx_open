@@ -1173,7 +1173,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         if (m_rebuildCancelled)
             return; // cancel rebuild
 
-        auto getFileDataFunc= [&storage](const QString& filePath)
+        auto getFileDataFunc =
+            [&storage](const QString& filePath)
             {
                 auto file = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::ReadOnly));
                 if (!file)
@@ -1181,9 +1182,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
                 return file->readAll();
             };
 
-        nx::caminfo::ServerReaderHandler readerHandler(
-            moduleGUID(),
-            resourcePool());
+        nx::caminfo::ServerReaderHandler readerHandler(moduleGUID(), resourcePool());
         nx::caminfo::Reader(&readerHandler, fi, getFileDataFunc)(&archiveCameraList);
 
         QString cameraUniqueId = fi.fileName();
