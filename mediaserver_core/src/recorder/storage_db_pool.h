@@ -10,6 +10,7 @@
 #include <common/common_module_aware.h>
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/long_runnable.h>
 
 class QnCommonModule;
 
