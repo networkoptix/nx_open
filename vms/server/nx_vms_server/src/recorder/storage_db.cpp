@@ -18,19 +18,6 @@
 
 namespace {
 
-inline void AV_WB64(char** dst, quint64 data)
-{
-    quint64* dst64 = (quint64*)(*dst);
-    *dst64 = qToLittleEndian(data);
-    *dst += sizeof(data);
-}
-
-inline void AV_WRITE_BUFFER(char** dst, const char* src, qint64 size)
-{
-    memcpy(*dst, src, size);
-    *dst += size;
-}
-
 template<typename F>
 auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
 {
