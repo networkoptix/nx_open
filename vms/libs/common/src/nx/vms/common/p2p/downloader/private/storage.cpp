@@ -50,6 +50,7 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     QObject(parent),
     m_downloadsDirectory(downloadsDirectory)
 {
+    QDir().mkpath(metadataDirectoryPath());
     /* Cleanup expired files every 5 mins. */
     const auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
@@ -713,6 +714,11 @@ FileMetadata Storage::loadMetadata(const QString& fileName)
     return fileInfo;
 }
 
+QString Storage::metadataDirectoryPath() const
+{
+    return m_downloadsDirectory.absoluteFilePath(kMetadataSuffix);
+}
+
 FileMetadata Storage::fileMetadata(const QString& fileName) const
 {
     return m_fileInformationByName.value(fileName);
@@ -780,10 +786,11 @@ ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
 
 QString Storage::metadataFileName(const QString& fileName)
 {
+    NX_ASSERT(!fileName.isEmpty());
     if (fileName.isEmpty())
         return QString();
 
-    return fileName + kMetadataSuffix;
+    return QDir(metadataDirectoryPath()).absoluteFilePath(QFileInfo(fileName).fileName() + kMetadataSuffix);
 }
 
 qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunkSize)
@@ -800,6 +807,7 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
         : fileSize - chunkSize * (chunkCount - 1);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields \
+    (chunkChecksums)(fullFilePath))
 
 } // nx::vms::common::p2p::downloader
