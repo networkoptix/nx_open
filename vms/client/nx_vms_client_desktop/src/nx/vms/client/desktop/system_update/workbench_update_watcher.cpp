@@ -261,7 +261,10 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
     view->setHtml(html);
     // QWebView has weird sizeHint. We should manually adjust its size to make it look good.
     view->setFixedWidth(360);
-    view->setFixedHeight(380);
+    if (description.isEmpty())
+        view->setFixedHeight(20);
+    else
+        view->setFixedHeight(320);
     view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
     // Setting up a policy for link redirection. We should not open release notes right here.
     auto page = view->page();
