@@ -2,25 +2,30 @@
 @import '../../../styles/theme_variables';
 
 nx-radio {
-    &[disabled] {
+    label.disabled {
+        color: $dark9 !important;
+        opacity: 0.3 !important;
+    }
+
+    .disabled {
         .nx-radio {
-            opacity : .3;
+            opacity : .3 !important;
 
             .check {
-                cursor : default;
+                cursor : default !important;
             }
 
-            input:hover ~ .check {
-                svg path.circle {
-                    fill : $dark9 !important;
-                }
+            svg path.circle {
+                fill : $dark9 !important;
             }
+        }
+        .check {
+            cursor: default !important;
         }
     }
 
     .nx-radio {
         display : flex;
-        float   : left;
         margin  : 0;
 
         input[type="radio"] {

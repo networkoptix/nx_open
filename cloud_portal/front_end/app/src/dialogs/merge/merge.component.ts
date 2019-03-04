@@ -113,10 +113,10 @@ export class MergeModalContent {
                 this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
                 this.multipleSystems = this.systems.length > 0;
                 this.outOfDate = this.multipleSystems && !this.system.canMerge;
-                this.showMergeForm = this.multipleSystems && !this.outOfDate;
                 this.makeSelectorList(this.systems);
                 this.targetSystem = {... this.systemsSelect[0]};
                 this.systemMergeable = this.checkMergeAbility(this.targetSystem);
+                this.showMergeForm = this.multipleSystems && !this.outOfDate;
             });
 
         this.merging = this.process.init(() => {

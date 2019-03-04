@@ -1,4 +1,4 @@
-<label class="nx-radio">
+<label class="nx-radio" for="{{compId}}" (click)="changeState($event)" [ngClass]="{'disabled': disabled}">
     <input type="radio"
            [name]="name"
            id="{{compId}}"
@@ -6,8 +6,7 @@
            [attr.disabled]="disabled ? '' : null">
 
     <span class="check"
-          [ngClass]="state"
-          (click)="changeState($event)">
+          [ngClass]="state">
 
         <svg viewBox="0 0 20 16">
             <path class="circle"
@@ -15,4 +14,5 @@
             <circle cx="8" cy="8" r="4"></circle>
         </svg>
     </span>
+    {{ label }}
 </label>
