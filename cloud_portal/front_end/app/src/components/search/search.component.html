@@ -21,11 +21,11 @@
             </div>
         </div>
 
-        <div class="col-12 p-0" [hidden]="!showAdvancedOptions">
-            <div class="row mt-3 m-0"
+        <div class="row col-12 m-0 p-0" [hidden]="!showAdvancedOptions">
+            <div class="row col-xxl-6 mt-3 m-0 p-0"
                  *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
-                <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let select of localFilter.selects">
+                <div class="drop col-12 col-lg-4 mt-3 mt-lg-0 pl-0 pr-0 pr-lg-3" *ngFor="let select of localFilter.selects">
                     <label>{{ select.label }}</label>
                     <nx-select [name]="select.label"
                                [items]="select.items"
@@ -36,7 +36,7 @@
                     </nx-select>
                 </div>
 
-                <div class="col-md-4 col-lg-4 pl-0 pr-0 pr-md-1" *ngFor="let multiselect of localFilter.multiselects">
+                <div class="drop col-12 col-lg-4 mt-3 mt-lg-0 pl-0 pr-0 pr-lg-3" *ngFor="let multiselect of localFilter.multiselects">
                     <label>{{ multiselect.label }}</label>
                     <nx-multi-select [name]="multiselect.label"
                                      [items]="multiselect.items"
@@ -47,7 +47,7 @@
                 </div>
             </div>
 
-            <div class="row mb-2 m-0"
+            <div class="col-xxl-6 mb-2 m-0 p-0"
                  [ngClass]="{'mt-2' : skinny, 'mt-3 mb-2': !skinny}"
                  [hidden]="!showAdvancedOptions && localFilter.tags && localFilter.tags.length">
 

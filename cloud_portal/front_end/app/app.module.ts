@@ -19,13 +19,14 @@ import {
     localStorageModule, locationProxyModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
-import { AppComponent }      from './app.component';
-import { ComponentsModule }  from './src/components/components.module';
-import { DialogsModule }     from './src/dialogs/dialogs.module';
-import { PagesModule }       from './src/pages/pages.module';
-import { DirectivesModule }  from './src/directives/directives.module';
-import { NxConfigService }   from './src/services/nx-config';
-import { ServiceModule }     from './src/services/services.module';
+import { AppComponent }     from './app.component';
+import { ComponentsModule } from './src/components/components.module';
+import { DialogsModule }    from './src/dialogs/dialogs.module';
+import { PagesModule }      from './src/pages/pages.module';
+import { DirectivesModule } from './src/directives/directives.module';
+import { NxConfigService }  from './src/services/nx-config';
+import { ServiceModule }    from './src/services/services.module';
+import { LayoutModule }     from '@angular/cdk/layout';
 
 
 
@@ -68,6 +69,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     imports        : [
         CommonModule,
         BrowserModule,
+        LayoutModule,
         BrowserAnimationsModule,
         HttpClientModule,
         OrderModule,

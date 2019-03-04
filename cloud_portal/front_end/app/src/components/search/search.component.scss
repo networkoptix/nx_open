@@ -1,6 +1,9 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 @import '../../styles/_mixins';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
 
 .nx-search {
     .btn-text {
@@ -82,6 +85,17 @@
         width       : rem(36px);
         height      : rem(36px);
         padding     : 0;
+    }
+    
+    .drop {
+        &:last-of-type {
+            @include media-breakpoint-up(lg) {
+                padding-right : 0 !important;
+            }
+            @include media-breakpoint-up(xxl) {
+                padding-right : 1rem !important;
+            }
+        }
     }
     
     .pagination {

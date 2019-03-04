@@ -25,6 +25,17 @@
       -webkit-border-radius: initial;
       border-radius: initial;
   }
+  
+  .csv {
+    float : right;
+    margin-top : 24px;
+  
+    @include media-breakpoint-down(md) {
+      width         : 100%;
+      margin-top    : 0;
+      margin-bottom : 1rem;
+    }
+  }
 
   .table-wrapper {
     overflow-x:auto;
@@ -39,41 +50,47 @@
     white-space   : nowrap;
     margin-bottom : 0;
     
-    th {
-      padding          : .5rem .75rem;
+    thead {
       background-color : $additional_light1;
-      border-bottom    : 1px solid $light3;
-      color            : $dark9;
-      font-family      : $font-family-medium;
-      font-weight      : 500 !important;
-      font-size        : $line-height-ssm;
-      text-transform   : none;
-      overflow-wrap    : break-word;
       
-      &.selectable {
-        cursor : pointer;
-      }
+      th {
+        padding          : .5rem .25rem .5rem .75rem;
+        border-bottom    : 1px solid $light3;
+        color            : $dark9;
+        font-family      : $font-family-medium;
+        font-weight      : 500 !important;
+        font-size        : $line-height-ssm;
+        text-transform   : none;
+        overflow-wrap    : break-word;
+        cursor           : pointer;
+    
+        &.table-title {
+          font-family : $font-family-regular;
+          line-height : rem(24px);
       
-      &.table-title {
-        font-family : $font-family-regular;
-        line-height : rem(24px);
-        
-        .text-placeholder {
-          font-size : 1.25rem;
-          color     : $light16;
+          .text-placeholder {
+            font-size : 1.25rem;
+            color     : $light16;
+          }
         }
-      }
+    
+        .caption {
+          position : relative;
       
-      .sort-dir {
-        right : auto;
+          .sort-dir {
+            //top: 0;
+            right    : auto;
+            position : relative;
         
-        &:after {
-          content: ' ';
-        }
+            &:after {
+              content : ' ';
+            }
         
-        &.asc {
-          &:after {
-            content : '+';
+            &.asc {
+              &:after {
+                content : '+';
+              }
+            }
           }
         }
       }
@@ -99,7 +116,7 @@
         }
         
         td {
-          padding      : .25rem .75rem;
+          padding      : .5rem .25rem .5rem .75rem;
           font-family  : $font-family-regular;
           font-size    : $font-size-base;
           color        : $dark9;

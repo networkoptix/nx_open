@@ -4,13 +4,14 @@ import {
     DoCheck,
     KeyValueDiffers,
     ViewEncapsulation
-}                                  from '@angular/core';
-import { CamerasService }          from '../../services/cameras.service';
-import { CampageSearchService }    from './campage-search.service';
-import { NxModalMessageComponent } from '../../dialogs/message/message.component';
-import { NxConfigService }         from '../../services/nx-config';
-import { TranslateService }        from '@ngx-translate/core';
-import { NxUriService }            from '../../services/uri.service';
+}                                              from '@angular/core';
+import { CamerasService }                      from '../../services/cameras.service';
+import { CampageSearchService }                from './campage-search.service';
+import { NxModalMessageComponent }             from '../../dialogs/message/message.component';
+import { NxConfigService }                     from '../../services/nx-config';
+import { TranslateService }                    from '@ngx-translate/core';
+import { NxUriService }                        from '../../services/uri.service';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 @Component({
     selector     : 'campage',
@@ -47,11 +48,17 @@ export class NxCampageComponent implements OnInit, DoCheck {
     hardwareDiffer: any;
     toggleCamview: boolean;
     params: any;
+    mobileDetailMode: boolean;
 
     hwtypes: any;
 
   private setupDefaults() {
-      this.allowedParameters = ['count', 'vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported', 'isPtzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
+      this.allowedParameters = [
+          'count', 'vendor', 'model', 'hardwareType',
+          'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported',
+          'isTwAudioSupported', 'isPtzSupported', 'isAptzSupported',
+          'isFisheye', 'isMdSupported', 'isIoSupported'
+      ];
 
       this.data = undefined;
       this.company = undefined;
@@ -99,7 +106,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
                 private differs: KeyValueDiffers,
-                private uri: NxUriService) {
+                private uri: NxUriService,
+                private breakpointObserver: BreakpointObserver) {
 
         this.setupDefaults();
         this.differ = this.differs.find({}).create();
@@ -119,6 +127,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
             });
 
         this.activate();
+
+        this.breakpointObserver
+            .observe(['(max-width: 991px)'])
+            .subscribe((state: BreakpointState) => {
+                this.mobileDetailMode = (state.matches && this.activeCamera);
+            });
     }
 
     addFilterResolutions() {
@@ -163,15 +177,15 @@ export class NxCampageComponent implements OnInit, DoCheck {
         ];
     }
 
-    toggleAllowedParameters(param, label1, label2) {
-        const paramLookup = this.filterModel.tags.find(x => x.id === param);
-        const paramLabel = this.allowedParameters.findIndex(x => x === label1 || x === label2);
-        if (paramLookup.value) {
-            this.allowedParameters[paramLabel] = label2;
-        } else {
-            this.allowedParameters[paramLabel] = label1;
-        }
-    }
+    // toggleAllowedParameters(param, label1, label2) {
+    //     const paramLookup = this.filterModel.tags.find(x => x.id === param);
+    //     const paramLabel = this.allowedParameters.findIndex(x => x === label1 || x === label2);
+    //     if (paramLookup.value) {
+    //         this.allowedParameters[paramLabel] = label2;
+    //     } else {
+    //         this.allowedParameters[paramLabel] = label1;
+    //     }
+    // }
 
     ngDoCheck() {
         const filterChanges = this.differ.diff(this.filterModel);
@@ -186,13 +200,13 @@ export class NxCampageComponent implements OnInit, DoCheck {
         }
 
         const tagChanges = this.tagDiffer.diff(this.filterModel.tags.map(tag => tag.value));
-        if (tagChanges) {
-            this.toggleAllowedParameters('isAptzSupported', 'isPtzSupported', 'isAptzSupported');
-            this.toggleAllowedParameters('isTwAudioSupported', 'isAudioSupported', 'isTwAudioSupported');
+        // if (tagChanges) {
+            // this.toggleAllowedParameters('isAptzSupported', 'isPtzSupported', 'isAptzSupported');
+            // this.toggleAllowedParameters('isTwAudioSupported', 'isAudioSupported', 'isTwAudioSupported');
 
             // make sure cam-table gets the new params
-            this.allowedParameters = [...this.allowedParameters];
-        }
+        //     this.allowedParameters = [...this.allowedParameters];
+        // }
 
         if (this.filterModel.selects.find(x => x.id === 'resolution') !== undefined) {
             resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => {
@@ -258,7 +272,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
        const camerasWithAliases = [];
 
        data.forEach(camera => {
-           camera.isH265 = camera.primaryCodec === 'H.265';
+           camera.isH265 = (camera.primaryCodec === 'H.265');
 
            if (camera.hardwareType === 'Camera' && camera.isMultiSensor) {
                camera.hardwareType = 'Multi-Sensor Camera';
@@ -382,6 +396,10 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.activeCamera = {...selectedCamera};
       this.showAll = false;
 
+      if (this.breakpointObserver.isMatched('(max-width: 991px)')) {
+          this.mobileDetailMode = true;
+      }
+
       if (typeof this.activeCamera.firmwares === 'string') {
           const firmwares = JSON.parse(this.activeCamera.firmwares);
           let firmwaresArray = [];
@@ -422,5 +440,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.uri.updateURI('/campage', [{ key: 'camera', value: undefined }]);
       this.activeCamera = undefined;
       this.toggleCamview = false;
+      this.mobileDetailMode = false;
   }
 }

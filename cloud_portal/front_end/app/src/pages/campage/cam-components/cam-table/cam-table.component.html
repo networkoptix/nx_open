@@ -1,63 +1,43 @@
 <div class="nx-table-wrapper">
-    <div class="nx-table-header">
-        <div class="col-md-12 d-flex align-items-center p-0">
-
-            <div class="flex-grow-1">
-                <div class="results m-0">
-                    {{results}}
-                    <span *ngIf="results != 1" translate>results</span>
-                    <span *ngIf="results == 1" translate>result</span>
-                </div>
-            </div>
-
-            <div class="col-md-3 text-right p-0">
-                <nx-csv-button [data]="csvCameraData"
-                               filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
-                               [options]="csvOptions">
-                </nx-csv-button>
-            </div>
-        </div>
-    </div>
-
     <div class="table-wrapper">
         <table class="table table-hover nx-table">
             <thead>
-            <tr>
-                <th *ngFor="let header of showHeaders"
-                    class="align-bottom position-relative selectable"
-                    (click)="toggleHeaderSort(header)">
+                <tr>
+                    <th *ngFor="let header of showHeaders"
+                        class="align-bottom"
+                        (click)="toggleHeaderSort(header)">
 
-                    <div class="d-flex">
-                        <div class="float-left">{{header}}</div>
-                        <div class="sort-dir nav-arrow position-relative float-left"
-                             *ngIf="header == selectedHeader"
-                             [ngClass]="{'up': !sortOrderASC}">
+                        <div class="caption d-flex">
+                            <div class="" [innerHTML]="header"></div>
+                            <div class="sort-dir nav-arrow"
+                                 [style.visibility]="(header == selectedHeader) ? 'visible' : 'hidden'"
+                                 [ngClass]="{'up': !sortOrderASC}">
 
-                            <span></span>
-                            <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
                         </div>
-                    </div>
-                </th>
-            </tr>
+                    </th>
+                </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let element of pagedItems | keyvalue: byKey; let i = index"
-                [ngClass]="{'selected': i == selectedRow}"
-                (click)="setClickedRow(i, element);">
-                <td *ngFor="let p of showParameters" class="text-left">
-                        <span *ngIf="isString(element.value[p]); else icon">
-                            {{ element.value[p] }}
-                        </span>
-                    <ng-template #icon>
-                        <nx-bool-icon [value]="element.value[p]"></nx-bool-icon>
-                    </ng-template>
-                </td>
-            </tr>
+                <tr *ngFor="let item of pagedItems | keyvalue: byKey; let i = index"
+                    [ngClass]="{'selected': i == selectedRow}"
+                    (click)="setClickedRow(i, item);">
+                    <td *ngFor="let p of showParametersFor(item)" class="text-left">
+                        <div *ngIf="isString(item.value[p]); else icon">
+                            {{ item.value[p] }}
+                        </div>
+                        <ng-template #icon>
+                            <nx-bool-icon [param]="p" [value]="item.value[p]"></nx-bool-icon>
+                        </ng-template>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
 
-    <div class="row vertical-align ml-0">
+    <div class="vertical-align ml-0 clearfix">
         <nav aria-label="Cameras table navigation" class="pagination-nav pt-3 pb-3">
             <ngb-pagination
                     [collectionSize]="pager.totalItems"
@@ -66,5 +46,12 @@
                     [page]="pager.currentPage"
                     (pageChange)="setPage($event)"></ngb-pagination>
         </nav>
+
+        <div class="csv">
+            <nx-csv-button [data]="csvCameraData"
+                           filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}"
+                           [options]="csvOptions">
+            </nx-csv-button>
+        </div>
     </div>
 </div>

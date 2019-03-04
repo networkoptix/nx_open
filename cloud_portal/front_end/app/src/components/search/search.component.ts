@@ -44,8 +44,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
         this.config = configService.getConfig();
         this.uriPath = '/' + this._route.snapshot.url[0].path;
-
-
     }
 
     ngOnInit() {
@@ -102,7 +100,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                                 this.localFilter.tags.find((tag) => {
                                     if (tag.id === tagName) {
                                         tag.value = true;
-                                        this.showAdvancedOptions = true;
                                     }
                                 });
                             });
@@ -116,7 +113,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                             if (select.id === key) {
                                 const selectedItem = select.items.find((item) => item.name === this.params[key]);
                                 select.selected = selectedItem;
-                                this.showAdvancedOptions = true;
                             }
                         });
                 }
@@ -127,8 +123,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                         .find((select) => {
                             if (select.id === key) {
                                 select.selected = isArray(this.params[key]) ? this.params[key] : this.params[key].split(',');
-
-                                this.showAdvancedOptions = true;
                             }
                         });
                 }

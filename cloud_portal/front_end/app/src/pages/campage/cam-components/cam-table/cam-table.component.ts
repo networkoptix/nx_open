@@ -28,7 +28,6 @@ export class CamTableComponent implements OnChanges, OnInit {
   private sortOrderASC: boolean;
   private results;
   private readonly cameraHeaders;
-  private showParameters;
   private showHeaders;
   private paramsShown;
   private lang;
@@ -73,7 +72,7 @@ export class CamTableComponent implements OnChanges, OnInit {
           this.lang.campage.maxFps,
           this.lang.campage.primaryCodecamera,
           this.lang.campage.isAudioSupported,
-          this.lang.campage.isAptzSupportedShort,
+          this.lang.campage.isPtzSupported,
           this.lang.campage.isFisheye,
           this.lang.campage.isMdSupported,
           this.lang.campage.isIoSupported
@@ -151,16 +150,6 @@ export class CamTableComponent implements OnChanges, OnInit {
         });
     }
 
-    toggleHeaderCaption(param, label1, label2) {
-        const paramLookup = this.allowedParameters.find(x => x === param);
-        const paramLabel = this.cameraHeaders.findIndex(x => x === label1 || x === label2);
-        if (paramLookup) {
-            this.cameraHeaders[paramLabel] = label2;
-        } else {
-            this.cameraHeaders[paramLabel] = label1;
-        }
-    }
-
     filterAllowedParams() {
         // filter 'service' params
         const serviceParams = ['count'];
@@ -171,38 +160,52 @@ export class CamTableComponent implements OnChanges, OnInit {
         });
     }
 
+    showParametersFor(item) {
+         const showParameters = [...this.allowedParameters];
+        // adjust PTZ and Audio params
+        let idxToBeRemoved;
+        let param;
+
+        param = (item.value.isAptzSupported) ? 'isPtzSupported' : 'isAptzSupported';
+        idxToBeRemoved = showParameters.indexOf(param);
+        showParameters.splice(idxToBeRemoved, 1);
+
+        param = (item.value.isTwAudioSupported) ? 'isAudioSupported' : 'isTwAudioSupported';
+        idxToBeRemoved = showParameters.indexOf(param);
+        showParameters.splice(idxToBeRemoved, 1);
+
+        return showParameters;
+    }
+
+    sortElements() {
+        // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
+        const sortBy = (this.CONFIG.campage.sortSupportedDevices) ? 'count' : 'sortKey';
+        this.toggleSort(sortBy);
+    }
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes.elements) {
-            // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
-            const sortBy = (this.CONFIG.campage.sortSupportedDevices) ? 'count' : 'sortKey';
             this.sortOrderASC = !this.CONFIG.campage.sortSupportedDevices;
             this._elements = changes.elements.currentValue;
-            this.toggleSort(sortBy);
-
             this.results = this._elements.length;
+
+            this.sortElements();
         }
 
         if (changes.activeCamera) {
             if (!changes.activeCamera.currentValue) {
                 this.selectedRow = undefined;
             }
-
-            this.showParameters = (changes.activeCamera.currentValue) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
-            this.showHeaders = (changes.activeCamera.currentValue) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
         }
 
         if (changes.allowedParameters) {
             this.filterAllowedParams();
-            this.toggleHeaderCaption('isTwAudioSupported', this.lang.campage.isAudioSupported, this.lang.campage.isTwAudioSupported);
-            this.toggleHeaderCaption('isAptzSupported', this.lang.campage.isPtzSupported, this.lang.campage.isAptzSupportedShort);
-
-            this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
-            this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
         }
     }
 
     ngOnInit() {
-        // this.showParameters = this.allowedParameters;
+        this.showHeaders = this.cameraHeaders;
+
         this.results = this._elements.length;
         this.csvFilename = CamTableComponent.getCurrentDate();
         this.csvCameraData = this.getCsvData();

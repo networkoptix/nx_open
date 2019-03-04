@@ -23,6 +23,11 @@ export class CamViewComponent implements OnInit {
   //     }
   // }
 
+    sendFeedback() {
+        this.onFeedbackClick.emit(this.activeCamera);
+        return false;
+    }
+
   closeView() {
       this.activeCamera = undefined;
       this.onCloseView.emit(this.activeCamera);
