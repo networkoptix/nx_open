@@ -30,6 +30,9 @@ IsapiPtzController::IsapiPtzController(const QnResourcePtr& resource, QAuthentic
     if (const auto capabilities = m_client.get(url("capabilities")))
         loadCapabilities(*capabilities);
 
+    if (m_capabilities & Ptz::AbsolutePtrzCapabilities)
+        m_capabilities |= Ptz::DevicePositioningPtzCapability;
+
     NX_DEBUG(this, "Initilizad channel %1, capabilities: %2",
         *m_channel, QnLexical::serialized(m_capabilities));
 

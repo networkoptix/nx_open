@@ -32,8 +32,12 @@ QnPresetPtzController::~QnPresetPtzController()
 
 bool QnPresetPtzController::extends(Ptz::Capabilities capabilities, bool preferSystemPresets)
 {
-    return (capabilities & Ptz::AbsolutePtzCapabilities)
-        && (preferSystemPresets || !capabilities.testFlag(Ptz::PresetsPtzCapability));
+    if ((capabilities & Ptz::PresetsPtzCapability) && !preferSystemPresets)
+        return false;
+
+    // Check if emulation is possible.
+    return (capabilities & Ptz::AbsolutePtrzCapabilities)
+        && (capabilities & Ptz::PositioningPtzCapabilities);
 }
 
 Ptz::Capabilities QnPresetPtzController::getCapabilities(
