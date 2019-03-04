@@ -3833,9 +3833,13 @@ void MediaServerProcess::connectSignals()
         [this]() { this->serverModule()->updateManager()->connectToSignals(); });
 
     using namespace nx::vms::common::p2p::downloader;
-    connect(
-        this, &MediaServerProcess::started,
-        [this]() {this->serverModule()->findInstance<Downloader>()->startDownloads(); });
+    connect(this, &MediaServerProcess::started,
+        [this]()
+        {
+            Downloader* downloader = this->serverModule()->findInstance<Downloader>();
+            downloader->startDownloads();
+            downloader->findExistingDownloads();
+        });
 
     connect(commonModule()->resourceDiscoveryManager(),
         &QnResourceDiscoveryManager::CameraIPConflict, this,

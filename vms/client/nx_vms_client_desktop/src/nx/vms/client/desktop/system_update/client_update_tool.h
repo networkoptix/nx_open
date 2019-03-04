@@ -179,6 +179,7 @@ protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
     void atRemoteUpdateInformation(const nx::update::Information& updateInformation);
+    void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
     void atExtractFilesFinished(int code);

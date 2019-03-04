@@ -57,6 +57,9 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     connect(m_downloader.get(), &Downloader::fileInformationChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
+    connect(m_downloader.get(), &Downloader::downloadFinished,
+        this, &ClientUpdateTool::atDownloadFinished);
+
     connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
         this, &ClientUpdateTool::atChunkDownloadFailed);
 
@@ -271,8 +274,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
     }
     else
     {
-        NX_INFO(this)
-            << "downloadUpdate(" << contents.info.version << ") this is an internet update";;
+        NX_INFO(this, "downloadUpdate(%1) this is an internet update", contents.info.version);
 
         FileInformation info;
         info.md5 = QByteArray::fromHex(m_clientPackage.md5.toLatin1());
@@ -285,60 +287,17 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             setError("There is no valid client package to download");
             return;
         }
-        auto code = m_downloader->addFile(info);
-        m_downloader->startDownloads();
-        using Code = vms::common::p2p::downloader::ResultCode;
-        QString file =  m_downloader->filePath(m_clientPackage.file);
 
-        m_updateFile = file;
+        setState(State::downloading);
 
-        switch (code)
+        const auto code = m_downloader->addFile(info);
+        if (code != common::p2p::downloader::ResultCode::ok)
         {
-            case Code::ok:
-                NX_VERBOSE(this) << "requestStartUpdate() - downloading client package"
-                    << info.name << " from url=" << m_clientPackage.url;
-                setState(State::downloading);
-                break;
-            case Code::fileAlreadyDownloaded:
-                NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
-                    << file;
-                setState(State::readyInstall);
-                break;
-            case Code::fileAlreadyExists:
-            {
-                auto fileInfo = m_downloader->fileInformation(m_clientPackage.file);
-                if (fileInfo.status == FileInformation::Status::downloaded)
-                {
-                    NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
-                        << file;
-                    setState(State::readyInstall);
-                }
-                else if (fileInfo.status == FileInformation::Status::downloading)
-                {
-                    NX_VERBOSE(this)
-                        << "requestStartUpdate() - file"
-                        << info.name << "exists but not fully downloaded"
-                        << "from url="<< m_clientPackage.url;
-                    setState(State::downloading);
-                }
-                else
-                {
-                    NX_VERBOSE(this)
-                        << "requestStartUpdate() - file" << info.name << "exists and something wrong with it"
-                        << "from url=" << m_clientPackage.url;
-                    setState(State::downloading);
-                }
-                break;
-            }
-            default:
-            // Some sort of an error here.
-            {
-                QString error = vms::common::p2p::downloader::toString(code);
-                NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
-                    << info.name << error;
-                setError(error);
-                break;
-            }
+            const QString error = common::p2p::downloader::toString(code);
+            NX_ERROR(this, "requestStartUpdate() - failed to add client package %1 %2",
+                info.name, error);
+            setError(error);
+            return;
         }
     }
 }
@@ -362,9 +321,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
-            NX_VERBOSE(this) << "atDownloaderStatusChanged(" << fileInformation.name
-                << ") - finally downloaded file to" << m_downloader->filePath(fileInformation.name);
-            setState(State::readyInstall);
+            atDownloadFinished(fileInformation.name);
             break;
         case FileInformation::Status::corrupted:
             setError(tr("Update package is corrupted"));
@@ -377,6 +334,16 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             // Nothing to do here
             break;
     }
+}
+
+void ClientUpdateTool::atDownloadFinished(const QString& fileName)
+{
+    if (fileName != m_clientPackage.file)
+        return;
+
+    NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
+        fileName, m_downloader->filePath(fileName));
+    setState(State::readyInstall);
 }
 
 void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
