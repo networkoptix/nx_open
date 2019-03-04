@@ -42,7 +42,7 @@ public:
     QByteArray remotePeersMessage; //< last received peers message
     QVector<PeerDistanceRecord> remotePeers;
     vms::api::TranState remoteSubscription; //< remote -> local subscription
-    bool remoteAddImplicitData = false; //< remote -> local subscription. Add implicit data to subscription (subscribeAll).
+    bool remoteSubscribeAll = false; //< remote -> local subscription. Add implicit data to subscription (subscribeAll).
     bool recvDataInProgress = false;
     bool isRemoteStarted = false; //< remote peer has open logical connection to us
     PeerNumberInfo shortPeerInfo;
