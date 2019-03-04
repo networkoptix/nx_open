@@ -175,7 +175,7 @@ processCoreDumpIfNeeded()
     # Check whether exactly one core file exists with a time in a name.
     if [ $(expr match "$OLD_CORE_TIME" "[0-9]*\$") != 0 ]
     then
-        if [ ! $(expr $TIME - $OLD_CORE_TIME) -gt $(expr 24 \* 60 \* 60) ]
+        if [ $(expr $TIME - $OLD_CORE_TIME) -gt $(expr 24 \* 60 \* 60) ]
         then
             echo "Old core is more than a day older"
             return 1
