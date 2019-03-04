@@ -8,7 +8,7 @@ ShaderEffect
     property alias sourceItem: shaderSource.sourceItem
 
     readonly property size sourceSize: sourceItem
-        ? Qt.size(sourceItem.width, sourceItem.height)
+        ? Qt.size(sourceItem.implicitWidth, sourceItem.implicitHeight)
         : Qt.size(0.0, 0.0)
 
     /* Equidistant projection is the most common among lenses, but it requires 32-bit float
