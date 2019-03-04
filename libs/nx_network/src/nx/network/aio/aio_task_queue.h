@@ -260,6 +260,8 @@ public:
 
     void clear();
 
+    bool empty() const;
+
 private:
     // TODO #ak: use cyclic array here to minimize allocations
     /**
