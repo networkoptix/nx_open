@@ -83,6 +83,7 @@ Connection::~Connection()
 {
     if (m_direction == Direction::incoming)
         commonModule()->metrics()->tcpConnections().p2p()--;
+    stop();
 }
 
 void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)
