@@ -478,9 +478,8 @@ struct ModifyResourceAccess
         const Param& param)
     {
         NX_VERBOSE(this,
-            lm("Got modify resource request. Is system access: %1, Data type: %2," \
-                " Data contents: %3").args(hasSystemAccess(accessData), typeid(param).name(),
-                    QJson::serialized(param)));
+            "Got modify resource request. Is system access: %1, Data type: %2, Data contents: %3",
+            hasSystemAccess(accessData), typeid(param), QJson::serialized(param));
 
         if (hasSystemAccess(accessData))
             return true;
