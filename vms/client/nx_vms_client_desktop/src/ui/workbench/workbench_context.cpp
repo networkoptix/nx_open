@@ -315,7 +315,7 @@ bool QnWorkbenchContext::showEulaFromString(QString eulaText) const
 
     eulaText = eulaText.replace(
         lit("<head>"),
-        lit("<head>%1").arg(eulaHtmlStyle)
+        lit("<head><style>%1</style>").arg(eulaHtmlStyle)
     );
 
     QnMessageBox eulaDialog(workbench()->context()->mainWindow());
