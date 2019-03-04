@@ -49,7 +49,7 @@ private:
     const std::chrono::milliseconds m_keepAliveProbePeriod;
     nx::Buffer m_readBuffer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
-    network::aio::Timer m_timer;
+    network::aio::Timer m_keepAliveProbeTimer;
     bool m_firstKeepAliveSent = false;
 
     void monitoringConnectionForClosure();
