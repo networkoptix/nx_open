@@ -103,18 +103,16 @@ const nx::network::http::Response* DiscoveryClient::RequestContext::response() c
 // DiscoveryClient
 
 DiscoveryClient::DiscoveryClient(
-    const nx::utils::Url& discoveryServiceUrl,
-    const NodeInfo& nodeInfo,
+    const Settings& discoverySettings,
     const std::string& clusterId,
-    const std::chrono::milliseconds& delayPadding)
+    const NodeInfo& nodeInfo)
     :
-    m_discoveryServiceUrl(discoveryServiceUrl),
-    m_thisNodeInfo(nodeInfo),
-    m_delayPadding(delayPadding)
+    m_settings(discoverySettings),
+    m_thisNodeInfo(nodeInfo)
 {
-    NX_ASSERT(m_delayPadding >= std::chrono::milliseconds::zero());
+    NX_ASSERT(m_settings.roundTripPadding >= std::chrono::milliseconds::zero());
 
-    setupDiscoveryServiceUrl(clusterId);
+    setupDiscoveryUrl(clusterId);
     setupRegisterNodeRequest();
     setupOnlineNodesRequest();
 
@@ -180,11 +178,16 @@ void DiscoveryClient::stopWhileInAioThread()
     m_onlineNodesRequest->pleaseStopSync();
 }
 
-void DiscoveryClient::setupDiscoveryServiceUrl(const std::string& clusterId)
+void DiscoveryClient::setupDiscoveryUrl(const std::string& clusterId)
 {
     QString nodeRegistryPath(kRegisterNodePath);
     nodeRegistryPath.replace(kClusterIdTemplate, clusterId.c_str());
-    m_discoveryServiceUrl.setPath(nodeRegistryPath);
+    m_settings.discoveryServiceUrl.setPath(nodeRegistryPath);
+}
+
+const nx::utils::Url& DiscoveryClient::discoveryUrl() const
+{
+    return m_settings.discoveryServiceUrl;
 }
 
 void DiscoveryClient::setupRegisterNodeRequest()
@@ -197,7 +200,7 @@ void DiscoveryClient::setupRegisterNodeRequest()
             if (error)
             {
                 NX_ERROR(this, lm("Failed to connect to discovery server at: %1")
-                    .arg(m_discoveryServiceUrl).toQString());
+                    .arg(discoveryUrl()).toQString());
             }
 
             if (auto response = m_registerNodeRequest->response())
@@ -285,7 +288,7 @@ void DiscoveryClient::startRegisterNodeRequest()
         {
             QnMutexLocker lock(&m_mutex);
             m_registerNodeRequest->doPost(
-                m_discoveryServiceUrl,
+                discoveryUrl(),
                 QJson::serialized(m_thisNodeInfo));
 
             updateRequestSentTime(m_registerNodeRequest->request());
@@ -306,7 +309,7 @@ void DiscoveryClient::startOnlineNodesRequest()
         requestDelay(),
         [this]()
         {
-            m_onlineNodesRequest->doGet(m_discoveryServiceUrl);
+            m_onlineNodesRequest->doGet(discoveryUrl());
         });
 }
 
@@ -463,8 +466,8 @@ std::chrono::milliseconds DiscoveryClient::requestDelay() const
     if (m_requestDelay == milliseconds::zero())
         return m_requestDelay;
 
-    // requestDelay() is called later in time than when it was updated, in particular by
-    // startOnlineNodesRequest(), which does not influence the delay calculations.
+    // requestDelay() is called later in time than when m_requestDelay was updated,
+    // in particular by startOnlineNodesRequest(), which does not influence the delay calculations.
     // Subsequent calls happen later and later in time.
     // Account for this by subtracting the amount of time that passed between
     // the time m_requestDelay was calculated and now.
@@ -474,7 +477,7 @@ std::chrono::milliseconds DiscoveryClient::requestDelay() const
     if (delay <= milliseconds::zero())
         return milliseconds::zero();
 
-    return delay > m_delayPadding ? delay - m_delayPadding : delay;
+    return delay > m_settings.roundTripPadding ? delay - m_settings.roundTripPadding : delay;
 }
 
 } // namespace nx::cloud::discovery

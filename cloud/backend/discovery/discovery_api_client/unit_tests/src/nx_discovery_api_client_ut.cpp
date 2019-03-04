@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <nx/utils/random.h>
+#include <nx/cloud/discovery/settings.h>
 #include <nx/cloud/discovery/discovery_api_client.h>
 
 #include "discovery_server.h"
@@ -48,13 +49,13 @@ protected:
 
         context->clusterId = kClusterId;
 
+        nx::cloud::discovery::Settings settings;
+        settings.discoveryServiceUrl = m_server->url();
+
         context->client = std::make_unique<discovery::DiscoveryClient>(
-            m_server->url(),
-            NodeInfo{
-                context->nodeId,
-                context->infoJson},
+            settings,
             context->clusterId,
-            std::chrono::milliseconds(10));
+            NodeInfo{context->nodeId, context->infoJson});
 
         m_clients.emplace_back(std::move(context));
     }

@@ -13,6 +13,7 @@
 #include <nx/network/aio/timer.h>
 
 #include "node.h"
+#include "settings.h"
 
 namespace nx::cloud::discovery {
 
@@ -32,10 +33,9 @@ class NX_DISCOVERY_CLIENT_API DiscoveryClient:
 
 public:
     DiscoveryClient(
-        const nx::utils::Url& discoveryServiceUrl,
-        const NodeInfo& nodeInfo,
+        const Settings& discoverySettings,
         const std::string& clusterId,
-        const std::chrono::milliseconds& delay);
+        const NodeInfo& nodeInfo);
     ~DiscoveryClient();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -64,7 +64,9 @@ public:
 private:
     virtual void stopWhileInAioThread() override;
 
-    void setupDiscoveryServiceUrl(const std::string& clusterId);
+    void setupDiscoveryUrl(const std::string& clusterId);
+    const nx::utils::Url& discoveryUrl() const;
+
     void setupRegisterNodeRequest();
     void setupOnlineNodesRequest();
 
@@ -114,9 +116,8 @@ private:
     };
 
 private:
-    nx::utils::Url m_discoveryServiceUrl;
+    Settings m_settings;
     NodeInfo m_thisNodeInfo;
-    std::chrono::milliseconds m_delayPadding;
 
     NodeDiscoveredHandler m_nodeDiscoveredHandler;
     NodeLostHandler m_nodeLostHandler;
