@@ -91,7 +91,7 @@ copyLibs()
         'libqgsttools_p.*'
         'libtegra_video.*'
         'libmediaserver*'
-        'libcloud*'
+        'libcloud_db.*'
     )
 
     for LIB in "$BUILD_DIR/lib"/*.so*
