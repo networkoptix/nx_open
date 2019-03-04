@@ -567,7 +567,7 @@ void Storage::findDownloads(bool waitForFinished)
     m_findDownloadsWatcher.setFuture(QtConcurrent::run(
         [this]()
         {
-            findDownloadsRecursively(m_downloadsDirectory);
+            findDownloadsImpl();
             cleanupExpiredFiles();
         }));
 
@@ -578,29 +578,22 @@ void Storage::findDownloads(bool waitForFinished)
     }
 }
 
-void Storage::findDownloadsRecursively(const QDir& dir)
+void Storage::findDownloadsImpl()
 {
-    for (const auto& entry: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    for (const auto& entry: QDir(metadataDirectoryPath()).entryInfoList(QDir::Files))
     {
         auto fileName = entry.absoluteFilePath();
-        if (entry.isDir())
+        if (!fileName.endsWith(kMetadataSuffix))
+            continue;
+
+        fileName.truncate(fileName.size() - kMetadataSuffix.size());
         {
-            findDownloadsRecursively(QDir(fileName));
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (m_fileInformationByName.contains(FileInformation::keyFromFileName(fileName)))
+                continue;
         }
-        else if (fileName.endsWith(kMetadataSuffix))
-        {
-            fileName.truncate(fileName.size() - kMetadataSuffix.size());
-            if (entry.isFile())
-            {
-                const auto& name = m_downloadsDirectory.relativeFilePath(fileName);
-                {
-                    NX_MUTEX_LOCKER lock(&m_mutex);
-                    if (m_fileInformationByName.contains(FileInformation::keyFromFileName(name)))
-                        continue;
-                }
-                loadDownload(fileName);
-            }
-        }
+
+        loadDownload(fileName);
     }
 }
 

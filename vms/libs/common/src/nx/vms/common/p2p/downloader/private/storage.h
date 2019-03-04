@@ -84,7 +84,7 @@ private:
     FileMetadata fileMetadata(const QString& fileName) const;
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
-    void findDownloadsRecursively(const QDir& dir);
+    void findDownloadsImpl();
     QString metadataDirectoryPath() const;
     QString metadataFileName(const QString& fileName);
 
