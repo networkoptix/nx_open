@@ -41,11 +41,6 @@ static FileMetadata prepareInitialFileMetadata(const FileInformation& fileInform
     return info;
 }
 
-static QString keyFromFileName(const QString& fileName)
-{
-    return QFileInfo(fileName).fileName();
-}
-
 } // namespace
 
 
@@ -74,7 +69,7 @@ QDir Storage::downloadsDirectory() const
 QString Storage::filePath(const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
-    const auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    const auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.cend())
         return QString();
 
@@ -95,7 +90,7 @@ QStringList Storage::files() const
 FileInformation Storage::fileInformation(const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_fileInformationByName.value(keyFromFileName(fileName));
+    return m_fileInformationByName.value(FileInformation::keyFromFileName(fileName));
 }
 
 ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
@@ -234,7 +229,7 @@ ResultCode Storage::updateFileInformation(const QString& fileName, qint64 size,
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -294,7 +289,7 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
 
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -333,7 +328,7 @@ ResultCode Storage::readFileChunk(const QString& fileName, int chunkIndex, QByte
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -362,7 +357,7 @@ ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, cons
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -426,7 +421,7 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
 
 ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
 {
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -475,7 +470,7 @@ QVector<QByteArray> Storage::getChunkChecksums(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto& fileInfo = fileMetadata(keyFromFileName(fileName));
+    const auto& fileInfo = fileMetadata(FileInformation::keyFromFileName(fileName));
     if (!fileInfo.isValid())
         return QVector<QByteArray>();
 
@@ -487,7 +482,7 @@ ResultCode Storage::setChunkChecksums(
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -599,7 +594,7 @@ void Storage::findDownloadsRecursively(const QDir& dir)
                 const auto& name = m_downloadsDirectory.relativeFilePath(fileName);
                 {
                     NX_MUTEX_LOCKER lock(&m_mutex);
-                    if (m_fileInformationByName.contains(keyFromFileName(name)))
+                    if (m_fileInformationByName.contains(FileInformation::keyFromFileName(name)))
                         continue;
                 }
                 loadDownload(fileName);

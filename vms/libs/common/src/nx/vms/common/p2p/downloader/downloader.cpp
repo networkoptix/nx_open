@@ -48,7 +48,8 @@ void Downloader::Private::startDownload(const QString& fileName)
     if (!downloadsStarted)
         return;
 
-    if (workers.contains(fileName))
+    const auto keyFileName = FileInformation::keyFromFileName(fileName);
+    if (workers.contains(keyFileName))
         return;
 
     const auto status = storage->fileInformation(fileName).status;
@@ -59,10 +60,10 @@ void Downloader::Private::startDownload(const QString& fileName)
         const auto fi = storage->fileInformation(fileName);
         auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
         auto worker = std::make_shared<Worker>(
-            fileName,
+            storage->filePath(fileName),
             storage.data(),
             peerManager);
-        workers[fileName] = worker;
+        workers[keyFileName] = worker;
 
         connect(worker.get(), &Worker::finished, this, &Downloader::Private::atWorkerFinished);
         connect(worker.get(), &Worker::failed, this, &Downloader::Private::atWorkerFinished);
@@ -77,7 +78,7 @@ void Downloader::Private::atWorkerFinished(const QString& fileName)
     Worker::State state;
     {
         NX_MUTEX_LOCKER lock(&mutex);
-        const auto worker = workers.take(fileName);
+        const auto worker = workers.take(FileInformation::keyFromFileName(fileName));
         if (!worker)
             return;
 
@@ -191,7 +192,7 @@ ResultCode Downloader::deleteFile(const QString& fileName, bool deleteData)
 {
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
-        auto worker = d->workers.take(fileName);
+        auto worker = d->workers.take(FileInformation::keyFromFileName(fileName));
         if (worker)
             worker->stop();
     }
