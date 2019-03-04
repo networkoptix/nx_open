@@ -6,7 +6,7 @@ class QnSettings;
 
 namespace nx::cloud::discovery {
 
-class Settings
+class NX_DISCOVERY_CLIENT_API Settings
 {
 public:
     /**

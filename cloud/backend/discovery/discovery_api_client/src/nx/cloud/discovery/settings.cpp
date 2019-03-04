@@ -15,8 +15,8 @@ static const QLatin1String kDefaultDiscoveryServiceUrl("https://discovery.nxvms.
 } // namespace
 
 Settings::Settings():
-    roundTripPadding(kDefaultRoundTripPadding),
-    discoveryServiceUrl(kDefaultDiscoveryServiceUrl)
+    discoveryServiceUrl(kDefaultDiscoveryServiceUrl),
+    roundTripPadding(kDefaultRoundTripPadding)
 {
 }
 
