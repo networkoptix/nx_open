@@ -170,7 +170,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(co
     return m_offlineUpdateCheckResult.get_future();
 }
 
-std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
+std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdateInfo()
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
@@ -188,7 +188,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo(
                     {
                         NX_DEBUG(
                             this,
-                            lm("checkRemoteUpdateInfo: An error in response to the /ec2/updateInformation request: %1")
+                            lm("checkMediaserverUpdateInfo: An error in response to the /ec2/updateInformation request: %1")
                                 .args(response.errorString));
                     }
                     else
@@ -208,7 +208,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo(
     }
     else
     {
-        NX_WARNING(this) << "requestRemoteUpdateInfo() - have no connection to the server";
+        NX_WARNING(this) << "checkMediaserverUpdateInfo() - have no connection to the server";
         std::promise<UpdateContents> emptyPromise;
         auto result = emptyPromise.get_future();
         emptyPromise.set_value(UpdateContents());
@@ -884,21 +884,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     return;
 
                 tool->m_activeRequests.remove(handle);
-
-                if (success)
+                if (success && response.error == QnRestResult::NoError)
                 {
-                    if (response.error != QnRestResult::NoError)
-                    {
-                        NX_DEBUG(
-                            this,
-                            lm("requestRemoteUpdateStateAsync: An error in response to the /ec2/updateInformation request: %1")
-                                .args(response.errorString));
-                    }
-                    else
-                    {
-                        tool->m_updateManifest = response.data;
-                        tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
-                    }
+                    tool->m_updateManifest = response.data;
+                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
                 }
             }, thread());
         m_activeRequests.insert(handle);
@@ -1107,13 +1096,13 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
                 contents.sourceType = nx::update::UpdateSourceType::internet;
             else
                 contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
-            contents.source = lit("%1 for build=%2").arg(updateUrl, changeset);
+            contents.source = lit("%1 by serverUpdateTool for build=%2").arg(updateUrl, changeset);
 
             if (contents.error == nx::update::InformationError::networkError && connection)
             {
                 NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
                 auto promise = std::make_shared<std::promise<bool>>();
-                contents.source = lit("%1 for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
+                contents.source = lit("%1 by serverUpdateTool for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
                 contents.info = {};
                 auto proxyCheck = promise->get_future();
                 connection->checkForUpdates(changeset,
@@ -1133,6 +1122,7 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
                             }
                             else
                             {
+                                contents.error = nx::update::InformationError::noError;
                                 contents.info = response.data;
                             }
                         }

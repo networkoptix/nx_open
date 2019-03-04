@@ -163,7 +163,6 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
     // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
-    bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::Package clientPackage;
     nx::update::findPackage(*commonModule(), updateInformation, &clientPackage, &errorMessage);
