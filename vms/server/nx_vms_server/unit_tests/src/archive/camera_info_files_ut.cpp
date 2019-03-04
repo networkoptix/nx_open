@@ -295,10 +295,10 @@ QString kFilePath("/some/" + kCameraId);
 
 struct ExpectedInResult
 {
-    const QString line;
-    const bool shouldBeParsed;
-    const QString key;
-    const QString value;
+    QString line;
+    bool shouldBeParsed;
+    QString key;
+    QString value;
 
     ExpectedInResult(const QString& line, bool shouldBeParsed, const QString& key = "", const QString& value= ""):
         line(line),
