@@ -31,6 +31,8 @@
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <finders/systems_finder.h>
+#include <utils/common/delayed.h>
+#include <nx/utils/guarded_callback.h>
 
 using namespace nx::vms::utils;
 
@@ -50,7 +52,8 @@ QnContext::QnContext(QObject* parent) :
         SystemUri::ReferralSource::MobileClient,
         SystemUri::ReferralContext::WelcomePage,
         this)),
-    m_localPrefix(lit("qrc:///"))
+    m_localPrefix(lit("qrc:///")),
+    m_customMargins()
 {
     const auto screen = qApp->primaryScreen();
     screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::InvertedPortraitOrientation
@@ -97,8 +100,16 @@ QnContext::QnContext(QObject* parent) :
             }
         });
 
-    connect(qApp->screens().first(), &QScreen::orientationChanged,
-        this, &QnContext::customMarginsChanged);
+    auto updateMarginsCallback =
+        [this]()
+        {
+            // We have to update margins after all screen-change animations are finished.
+            static constexpr int kUpdateDelayMs = 300;
+            const auto callback = [this]() { updateCustomMargins(); };
+            executeDelayedParented(nx::utils::guarded(this, callback), kUpdateDelayMs, this);
+        };
+
+    connect(qApp->screens().first(), &QScreen::geometryChanged, this, updateMarginsCallback);
 }
 
 QnContext::~QnContext() {}
@@ -341,6 +352,11 @@ void QnContext::setLocalPrefix(const QString& prefix)
 
 void QnContext::updateCustomMargins()
 {
+    const auto newMargins = getCustomMargins();
+    if (m_customMargins == newMargins)
+        return;
+
+    m_customMargins = newMargins;
     emit customMarginsChanged();
 }
 
@@ -351,20 +367,20 @@ void QnContext::makeShortVibration()
 
 int QnContext::leftCustomMargin() const
 {
-    return getCustomMargins().left();
+    return m_customMargins.left();
 }
 
 int QnContext::rightCustomMargin() const
 {
-    return getCustomMargins().right();
+    return m_customMargins.right();
 }
 
 int QnContext::topCustomMargin() const
 {
-    return getCustomMargins().top();
+    return m_customMargins.top();
 }
 
 int QnContext::bottomCustomMargin() const
 {
-    return getCustomMargins().bottom();
+    return m_customMargins.bottom();
 }
