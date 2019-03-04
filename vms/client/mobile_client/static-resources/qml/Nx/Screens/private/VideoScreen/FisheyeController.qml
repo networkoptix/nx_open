@@ -141,6 +141,7 @@ Object
                     return
                 }
 
+                interactor.enableAnimation = true
                 const kPowerThreshold = 0.8
                 if (interactor.scalePower > kPowerThreshold)
                 {
@@ -151,6 +152,7 @@ Object
                     interactor.centerAtPixel(mouse.x, mouse.y)
                     interactor.scalePower = 1.0
                 }
+                interactor.enableAnimation = false
             }
 
             onReleased:
