@@ -204,7 +204,7 @@ Page
 
         onConnectionFailed:
         {
-            if (!resourcesScreen.activePage)
+            if (stackView.currentItem !== resourcesScreen)
                 return
 
             var systemName = title ? title : getLastUsedSystemName()
