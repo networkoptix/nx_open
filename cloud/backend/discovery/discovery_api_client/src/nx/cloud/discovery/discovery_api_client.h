@@ -70,10 +70,10 @@ private:
     void setupRegisterNodeRequest();
     void setupOnlineNodesRequest();
 
-    void startRegisterNodeRequest();
-    void startOnlineNodesRequest();
+    void startRegisterNodeRequest(const std::chrono::milliseconds& delay);
+    void startOnlineNodesRequest(const std::chrono::milliseconds& delay);
 
-    void updateOnlineNodes(std::vector<Node>& discoveredNodes);
+    void updateOnlineNodes(std::vector<Node> discoveredNodes);
 
     void emitNodeDiscovered(const Node& node);
     void emitNodeLost(const std::string& nodeId);
@@ -82,8 +82,7 @@ private:
     std::optional<QDateTime> getServerResponseTime(
         const nx::network::http::Response* response) const;
 
-    void updateRequestDelay(const nx::network::http::Response* response);
-    std::chrono::milliseconds requestDelay() const;
+    std::optional<std::chrono::milliseconds> calculateRegistrationDelay(const nx::network::http::Response* response);
 
 private:
     using ResponseReceivedHandler =
@@ -107,6 +106,8 @@ private:
         void doPost(const nx::utils::Url& url, const nx::network::http::BufferType& messagBody);
 
         bool failed() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
+
         const nx::network::http::Request& request() const;
         const nx::network::http::Response* response() const;
 
@@ -129,9 +130,6 @@ private:
     Node m_thisNode;
 
     mutable QnMutex m_mutex;
-
-    std::chrono::milliseconds m_requestDelay{0};
-    std::chrono::system_clock::time_point m_timeRequestDelayWasCalculated;
 
     QDateTime m_requestSent;
 };
