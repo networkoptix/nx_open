@@ -10,7 +10,8 @@ class NX_DISCOVERY_CLIENT_API Settings
 {
 public:
     /**
-     * The base url for the discovery service. The default value is https://discovery.nxvms.com
+     * The base url that the discovery client uses to connect to the discovery service.
+     * The default value is https://discovery.nxvms.com
      */
     nx::utils::Url discoveryServiceUrl;
 
