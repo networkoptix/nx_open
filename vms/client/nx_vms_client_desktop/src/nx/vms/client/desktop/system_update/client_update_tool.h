@@ -178,7 +178,8 @@ signals:
 protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
-    void atRemoteUpdateInformation(const nx::update::Information& updateInformation);
+    void atRemoteUpdateInformation(nx::update::InformationError error,
+        const nx::update::Information& updateInformation);
     void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);

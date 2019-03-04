@@ -85,8 +85,11 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 ClientUpdateTool::~ClientUpdateTool()
 {
     m_downloader->disconnect(this);
-    m_serverConnection.reset();
+    // Forcing downloader to be destroyed before peerManager and serverConnection.
+    m_downloader.reset();
+    // And peer manager should die before serverConnection.
     m_peerManager.reset();
+    m_serverConnection.reset();
 }
 
 void ClientUpdateTool::setState(State newState)
@@ -126,21 +129,23 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     if (m_serverConnection)
     {
         // Requesting remote update info.
-        m_serverConnection->getUpdateInfo(
+        m_serverConnection->getInstalledUpdateInfo(
             [this, tool=QPointer<ClientUpdateTool>(this)](
                 bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
             {
+                nx::update::InformationError error = nx::update::InformationError::noError;
                 if (!success || response.error != QnRestResult::NoError)
                 {
                     NX_DEBUG(
                         this,
                         lm("requestRemoteUpdateInfo: Error in response for /updateInformation request: %1")
                             .args(response.errorString));
-                    return;
+                    if (!QnLexical::deserialize(response.errorString, &error))
+                        error = nx::update::InformationError::httpError;
                 }
 
                 if (tool)
-                    tool->atRemoteUpdateInformation(response.data);
+                    tool->atRemoteUpdateInformation(error, response.data);
             }, thread());
     }
     else
@@ -159,7 +164,9 @@ void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
     m_peerManager->setServerUrl(serverUrl, serverId);
 }
 
-void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& updateInformation)
+void ClientUpdateTool::atRemoteUpdateInformation(
+    nx::update::InformationError error,
+    const nx::update::Information& updateInformation)
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
@@ -170,26 +177,24 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
     nx::update::Package clientPackage;
     nx::update::findPackage(*commonModule(), updateInformation, &clientPackage, &errorMessage);
 
-    if (getState() == State::initial)
-    {
-        UpdateContents contents;
-        contents.sourceType = nx::update::UpdateSourceType::mediaservers;
-        contents.source = "mediaserver";
-        contents.info = updateInformation;
-        contents.clientPackage = clientPackage;
-        m_remoteUpdateContents = contents;
+    UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
+    contents.source = "mediaserver";
+    contents.info = updateInformation;
+    contents.clientPackage = clientPackage;
+    contents.error = error;
+    m_remoteUpdateContents = contents;
 
-        if (clientPackage.isValid())
-        {
-            setState(State::readyDownload);
-        }
-        else if (updateInformation.isValid())
-        {
-            NX_WARNING(this) << "atRemoteUpdateInformation have valid update info but no client package";
-            setError("Missing client package inside UpdateInfo");
-        }
-        m_remoteUpdateInfoRequest.set_value(contents);
+    if (clientPackage.isValid())
+    {
+        setState(State::readyDownload);
     }
+    else if (updateInformation.isValid())
+    {
+        NX_WARNING(this) << "atRemoteUpdateInformation have valid update info but no client package";
+        setError("Missing client package inside UpdateInfo");
+    }
+    m_remoteUpdateInfoRequest.set_value(contents);
 }
 
 nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
@@ -441,6 +446,8 @@ bool ClientUpdateTool::installUpdateAsync()
         return false;
 
     NX_ASSERT(!m_updateFile.isEmpty());
+
+    setState(installing);
 
     m_applauncherTask = std::async(std::launch::async,
         [tool = QPointer(this)](

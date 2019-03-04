@@ -339,7 +339,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         m_clientUpdateTool->setServerUrl(serverUrl, serverId);
         m_serverUpdateTool->setServerUrl(serverUrl, serverId);
-        m_clientUpdateTool->requestRemoteUpdateInfo();
+        //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.
     checkForInternetUpdates(/*initial=*/true);
@@ -2222,7 +2222,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
             QString("checkServerUpdate=%1").arg(m_serverUpdateCheck.valid()),
             QString("<a href=\"%1\">/ec2/updateStatus</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
             QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
-            QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
+            QString("<a href=\"%1\">/ec2/updateInformation?version=installed</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
