@@ -406,8 +406,6 @@ window.L = {};
             }])
         .run(['nxLanguageService', 'languageService', function (nxLanguageService, languageService) {
             // make sure both language services are synchronized
-            // had problem downgrading A6 'nxLanguageService' service to AJS provider so
-            // it's set as regular service and running after 'config' phase --TT
-            nxLanguageService.translate.use(languageService.lang.language);
+            nxLanguageService.setLang(languageService.lang.language);
         }]);
 })();
