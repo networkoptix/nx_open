@@ -49,11 +49,8 @@ protected:
 
         context->clusterId = kClusterId;
 
-        nx::cloud::discovery::Settings settings;
-        settings.discoveryServiceUrl = m_server->url();
-
         context->client = std::make_unique<discovery::DiscoveryClient>(
-            settings,
+            settings(),
             context->clusterId,
             NodeInfo{context->nodeId, context->infoJson});
 
@@ -281,6 +278,16 @@ private:
             m_callbackFired = true;
         }
         m_wait.notify_all();
+    }
+
+    discovery::Settings settings()
+    {
+        discovery::Settings settings;
+        settings.discoveryServiceUrl = m_server->url();
+        settings.roundTripPadding = std::chrono::milliseconds(2);
+        settings.registrationErrorDelay = std::chrono::milliseconds(50);
+        settings.onlineNodesRequestDelay = std::chrono::milliseconds(10);
+        return settings;
     }
 
 private:

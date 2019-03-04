@@ -6,9 +6,8 @@ class QnSettings;
 
 namespace nx::cloud::discovery {
 
-class NX_DISCOVERY_CLIENT_API Settings
+struct NX_DISCOVERY_CLIENT_API Settings
 {
-public:
     /**
      * The base url that the discovery client uses to connect to the discovery service.
      * The default value is https://discovery.nxvms.com
@@ -23,7 +22,18 @@ public:
      */
     std::chrono::milliseconds roundTripPadding;
 
-public:
+    /**
+     * The amount of time to wait before resending a registration request in the event of an error.
+     * The default value is 1 minute.
+     */
+    std::chrono::milliseconds registrationErrorDelay;
+
+    /**
+     * The frequency with which requests for online nodes are made.
+     * the default value is 30 seconds.
+     */
+    std::chrono::milliseconds onlineNodesRequestDelay;
+
     Settings();
 
     void load(const QnSettings& settings);
