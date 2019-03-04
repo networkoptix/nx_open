@@ -243,7 +243,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         if (shouldRestartTo(m_updateVersion))
         {
             NX_INFO(this)
-                << "downloadUpdate(" << contents.info.version
+                << "setUpdateTarget(" << contents.info.version
                 << ") client already has this version installed"
                 << m_clientPackage.file;
             setState(State::readyRestart);
@@ -251,7 +251,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         else
         {
             NX_INFO(this)
-                << "downloadUpdate(" << contents.info.version
+                << "setUpdateTarget(" << contents.info.version
                 << ") client is already at this version"
                 << m_clientPackage.file;
             setState(State::complete);
@@ -261,13 +261,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
     {
         // Expecting that file is stored at:
         NX_INFO(this)
-            << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
+            << "setUpdateTarget(" << contents.info.version << ") this is offline update from the file"
             << m_clientPackage.localFile;
         QString path = contents.storageDir.filePath(m_clientPackage.localFile);
         if (!QFileInfo::exists(path))
         {
             NX_ERROR(this)
-                << "downloadUpdate(" << contents.info.version << ") the file"
+                << "setUpdateTarget(" << contents.info.version << ") the file"
                 << path << "does not exist!";
             setError(QString("File %1 does not exist").arg(path));
         }
@@ -279,7 +279,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
     }
     else
     {
-        NX_INFO(this, "downloadUpdate(%1) this is an internet update", contents.info.version);
+        NX_INFO(this, "setUpdateTarget(%1) this is an internet update", contents.info.version);
 
         FileInformation info;
         info.md5 = QByteArray::fromHex(m_clientPackage.md5.toLatin1());
@@ -296,10 +296,12 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         setState(State::downloading);
 
         const auto code = m_downloader->addFile(info);
+        m_updateFile = m_downloader->filePath(m_clientPackage.file);
+
         if (code != common::p2p::downloader::ResultCode::ok)
         {
             const QString error = common::p2p::downloader::toString(code);
-            NX_ERROR(this, "requestStartUpdate() - failed to add client package %1 %2",
+            NX_ERROR(this, "setUpdateTarget() - failed to add client package %1 %2",
                 info.name, error);
             setError(error);
             return;
@@ -445,6 +447,8 @@ bool ClientUpdateTool::installUpdateAsync()
     if (m_state != readyInstall)
         return false;
 
+    NX_INFO(this, "installUpdateAsync() from file %1", m_updateFile);
+
     NX_ASSERT(!m_updateFile.isEmpty());
 
     setState(installing);
@@ -570,6 +574,7 @@ bool ClientUpdateTool::restartClient(QString authString)
 
 void ClientUpdateTool::resetState()
 {
+    NX_DEBUG(this, "resetState() from state %1", toString(m_state));
     switch (m_state)
     {
         case State::downloading:

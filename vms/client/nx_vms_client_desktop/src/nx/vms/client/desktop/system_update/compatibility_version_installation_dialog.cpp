@@ -134,8 +134,6 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         {
             finalProgress = 20;
             setMessage(tr("Downloading update package"));
-            auto contents = m_private->clientUpdateTool->getRemoteUpdateInfo();
-            m_private->clientUpdateTool->setUpdateTarget(contents);
             break;
         }
         case ClientUpdateTool::State::downloading:
