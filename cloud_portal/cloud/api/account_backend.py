@@ -152,7 +152,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     ip = get_ip(request)
-    logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
+    logger.info('User logged out: {}, IP: {}'.format(user.email, ip))
     models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
 
 
