@@ -113,8 +113,6 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        serverModule()->analyticsManager()->registerMetadataSink(
-            getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
 
@@ -148,6 +146,9 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     {
         m_videoDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId());
+
+        serverModule()->analyticsManager()->registerMetadataSink(
+            getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
 
