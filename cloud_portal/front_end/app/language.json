@@ -37,8 +37,9 @@
     "pageNotFound": "Page not found"
   },
   "systemStatuses": {
-    "notActivated": "not activated",
     "activated": "activated",
+    "merging": "merging",
+    "notActivated": "not activated",
     "online": "online",
     "offline": "offline",
     "unavailable": "unavailable"
@@ -139,7 +140,8 @@
     "thisSystem": "the system",
     "oldSafariNotSupported": "Versions of Safari older than 10 are not supported",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "good",

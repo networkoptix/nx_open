@@ -23,6 +23,13 @@ import * as angular from 'angular';
                         .systems()
                         .then(result => {
                             this.systems = this.sortSystems(result.data);
+                            const currentUserEmail = account.getEmail();
+                            this.systems.forEach((system) => {
+                                system.isMine = system.ownerAccountEmail === currentUserEmail;
+                                system.canMerge = system.isMine && (system.capabilities && system.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
+                                    || CONFIG.allowDebugMode
+                                    || CONFIG.allowBetaMode);
+                            });
                         });
                 };
 

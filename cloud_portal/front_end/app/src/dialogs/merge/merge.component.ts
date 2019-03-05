@@ -83,7 +83,7 @@ export class MergeModalContent {
 
         if (system.stateOfHealth === 'offline') {
             status = ' (offline)';
-        } else if (system.stateOfHealth === 'online' && system.canMerge) {
+        } else if (system.stateOfHealth === 'online' && !system.canMerge) {
             status = ' (incompatable)';
         }
 

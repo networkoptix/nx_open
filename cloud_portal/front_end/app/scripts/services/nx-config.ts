@@ -60,6 +60,9 @@
                         offline: {
                             style: 'badge-default'
                         },
+                        merging: {
+                            style: 'badge-default'
+                        },
                         unavailable: {
                             style: 'badge-default'
                         },
