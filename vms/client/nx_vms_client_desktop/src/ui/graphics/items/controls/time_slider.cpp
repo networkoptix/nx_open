@@ -623,7 +623,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     m_iniUseScreenshotCursor(nx::vms::client::desktop::ini().enableTimelineScreenshotCursor),
     m_updatingValue(false),
     m_kineticZoomHandler(new KineticZoomHandler(this)),
-    m_kineticScrollHandler(new KineticScrollHandler(this))
+    m_kineticScrollHandler(new KineticScrollHandler(this)),
+    m_isLive(false)
 {
     setAutoHideToolTip(false);
 
@@ -716,6 +717,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     connect(this, &AbstractGraphicsSlider::rangeChanged,
         this,
         [this](qint64 min, qint64 max) { emit timeRangeChanged(milliseconds(min), milliseconds(max)); });
+
+    connect(this, &QnTimeSlider::selectionPressed, this, &QnTimeSlider::updateLive);
+    connect(this, &QnTimeSlider::selectionReleased, this, &QnTimeSlider::updateLive);
 }
 
 bool QnTimeSlider::isWindowBeingDragged() const
@@ -1892,12 +1896,18 @@ void QnTimeSlider::setLiveSupported(bool value)
         return;
 
     m_liveSupported = value;
+    updateLive();
     updateToolTipVisibilityInternal(false);
 }
 
 bool QnTimeSlider::isLive() const
 {
-    return m_liveSupported && !m_selecting && value() == maximum();
+    return m_isLive;
+}
+
+void QnTimeSlider::updateLive()
+{
+    m_isLive = m_liveSupported && !m_selecting && value() == maximum();
 }
 
 qreal QnTimeSlider::msecsPerPixel() const
@@ -3115,11 +3125,11 @@ void QnTimeSlider::sliderChange(SliderChange change)
                 setSelection(m_selectionStart, m_selectionEnd);
             else
                 setSelectionValid(false);
-
             break;
         }
 
         case SliderValueChange:
+            updateLive();
             updateToolTipVisibilityInternal(true);
             updateToolTipText();
             break;
@@ -3576,8 +3586,8 @@ void QnTimeSlider::finishDragProcess(DragInfo* info)
 
     if (m_selecting)
     {
-        emit selectionReleased();
         m_selecting = false;
+        emit selectionReleased();
     }
 
     setSliderDown(false);
