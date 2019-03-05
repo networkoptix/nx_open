@@ -127,12 +127,6 @@ void HttpServerConnection::authenticate(
             if (!strongThis)
                 return;
 
-            if (!socket())  //< Connection has been removed while request authentication was in progress.
-            {
-                closeConnection(SystemError::noError);
-                return;
-            }
-
             strongThis->post(
                 [this,
                     authenticationResult = std::move(authenticationResult),
@@ -155,6 +149,13 @@ void HttpServerConnection::onAuthenticationDone(
     nx::network::http::server::AuthenticationResult authenticationResult,
     std::unique_ptr<RequestContext> requestContext)
 {
+    if (!socket())
+    {
+        // Connection has been removed while request authentication was in progress.
+        closeConnection(SystemError::noError);
+        return;
+    }
+
     if (!authenticationResult.isSucceeded)
     {
         sendUnauthorizedResponse(
