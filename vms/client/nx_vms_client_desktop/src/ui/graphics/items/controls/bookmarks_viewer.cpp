@@ -628,7 +628,7 @@ private:
     QElapsedTimer m_forceUpdateTimer;
 };
 
-enum { kInvalidTimstamp = -1 };
+enum { kInvalidTimestamp = -1 };
 
 QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , const GetPosOnTimelineFunc &getPosFunc
@@ -645,7 +645,7 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_hoverProcessor(nullptr)
     , m_colors()
 
-    , m_targetLocation(kInvalidTimstamp)
+    , m_targetLocation(kInvalidTimestamp)
 
     , m_bookmarks()
     , m_readonly(false)
@@ -755,7 +755,7 @@ void QnBookmarksViewer::Impl::setTargetLocation(qint64 location)
 
 void QnBookmarksViewer::Impl::updateOnWindowChange()
 {
-    if (m_targetLocation == kInvalidTimstamp)
+    if (m_targetLocation == kInvalidTimestamp)
         return;
 
     const auto params = m_getPos(m_targetLocation);
@@ -775,10 +775,10 @@ void QnBookmarksViewer::Impl::resetBookmarks()
 {
     m_updateDelayedTimer.reset();
 
-    if (m_targetLocation == kInvalidTimstamp)
+    if (m_targetLocation == kInvalidTimestamp)
         return;
 
-    m_targetLocation = kInvalidTimstamp;
+    m_targetLocation = kInvalidTimestamp;
     updateBookmarks(QnCameraBookmarkList());
 }
 
