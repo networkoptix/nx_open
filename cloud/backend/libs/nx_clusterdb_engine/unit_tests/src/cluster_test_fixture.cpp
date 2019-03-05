@@ -107,7 +107,7 @@ Customer Peer::modifyRandomly(const Customer& data)
 
 void Peer::setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter)
 {
-    process().moduleInstance()->syncronizationEngine().setOutgoingCommandFilter(filter);
+    process().moduleInstance()->synchronizationEngine().setOutgoingCommandFilter(filter);
 }
 
 //-------------------------------------------------------------------------------------------------

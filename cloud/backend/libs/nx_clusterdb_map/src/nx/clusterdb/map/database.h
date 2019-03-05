@@ -6,7 +6,7 @@
 #include "data_manager.h"
 #include "event_provider.h"
 
-namespace nx::clusterdb::engine{ class SyncronizationEngine; }
+namespace nx::clusterdb::engine{ class SynchronizationEngine; }
 namespace nx::sql { class AsyncSqlQueryExecutor; }
 
 namespace nx::clusterdb::map {
@@ -18,7 +18,7 @@ public:
      * Throws on failure.
      */
     Database(
-        nx::clusterdb::engine::SyncronizationEngine* syncEngine,
+        nx::clusterdb::engine::SynchronizationEngine* syncEngine,
         nx::sql::AsyncSqlQueryExecutor* dbManager);
 
     DataManager& dataManager();
@@ -28,7 +28,7 @@ public:
 
 private:
     const QnUuid m_systemId;
-    nx::clusterdb::engine::SyncronizationEngine* m_syncEngine = nullptr;
+    nx::clusterdb::engine::SynchronizationEngine* m_syncEngine = nullptr;
     dao::StructureUpdater m_structureUpdater;
     EventProvider m_eventProvider;
     DataManager m_dataManager;

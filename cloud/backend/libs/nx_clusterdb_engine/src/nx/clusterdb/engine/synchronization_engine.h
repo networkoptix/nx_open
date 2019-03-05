@@ -25,19 +25,19 @@ namespace nx::clusterdb::engine {
 
 class SynchronizationSettings;
 
-class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
+class NX_DATA_SYNC_ENGINE_API SynchronizationEngine
 {
 public:
     /**
      * @param supportedProtocolRange Only nodes with compatible protocol
      *     can connect to each other.
      */
-    SyncronizationEngine(
+    SynchronizationEngine(
         const std::string& applicationId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
-    ~SyncronizationEngine();
+    ~SynchronizationEngine();
 
     OutgoingCommandDispatcher& outgoingTransactionDispatcher();
     const OutgoingCommandDispatcher& outgoingTransactionDispatcher() const;

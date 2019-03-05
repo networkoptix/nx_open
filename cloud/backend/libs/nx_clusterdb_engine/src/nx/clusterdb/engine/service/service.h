@@ -16,7 +16,7 @@ class Controller;
 class Model;
 class View;
 class Settings;
-class SyncronizationEngine;
+class SynchronizationEngine;
 
 class NX_DATA_SYNC_ENGINE_API Service:
     public nx::utils::Service
@@ -35,7 +35,7 @@ public:
         const std::string& systemId,
         const nx::utils::Url& url);
 
-    SyncronizationEngine& syncronizationEngine();
+    SynchronizationEngine& synchronizationEngine();
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;

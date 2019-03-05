@@ -15,7 +15,7 @@ View::View(
         nullptr, //< TODO: Authentication.
         &m_httpMessageDispatcher))
 {
-    controller->syncronizationEngine().registerHttpApi(
+    controller->synchronizationEngine().registerHttpApi(
         kBaseSynchronizationPath,
         &m_httpMessageDispatcher);
 }

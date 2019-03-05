@@ -30,7 +30,7 @@ void Service::connectToNode(
     const std::string& systemId,
     const nx::utils::Url& url)
 {
-    m_controller->syncronizationEngine().connector().addNodeUrl(systemId, url);
+    m_controller->synchronizationEngine().connector().addNodeUrl(systemId, url);
 }
 
 nx::sql::AsyncSqlQueryExecutor& Service::sqlQueryExecutor()
@@ -76,9 +76,9 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     return result;
 }
 
-SyncronizationEngine& Service::syncronizationEngine()
+SynchronizationEngine& Service::synchronizationEngine()
 {
-    return m_controller->syncronizationEngine();
+    return m_controller->synchronizationEngine();
 }
 
 } // namespace nx::clusterdb::engine

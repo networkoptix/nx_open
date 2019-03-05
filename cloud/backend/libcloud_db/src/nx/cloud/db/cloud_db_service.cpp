@@ -58,7 +58,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     statistics::Provider statisticsProvider(
         view.httpServer(),
-        controller.ec2SyncronizationEngine().statisticsProvider());
+        controller.ec2SynchronizationEngine().statisticsProvider());
     view.registerStatisticsApiHandlers(&statisticsProvider);
 
     // Process privilege reduction.

@@ -30,7 +30,7 @@ void CustomerDbNode::setup()
     m_customerDao = std::make_unique<dao::CustomerDao>(&sqlQueryExecutor());
 
     m_customerManager = std::make_unique<CustomerManager>(
-        &syncronizationEngine(),
+        &synchronizationEngine(),
         m_customerDao.get(),
         kSystemId);
 }

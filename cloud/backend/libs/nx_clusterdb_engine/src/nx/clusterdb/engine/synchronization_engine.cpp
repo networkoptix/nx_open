@@ -5,7 +5,7 @@
 
 namespace nx::clusterdb::engine {
 
-SyncronizationEngine::SyncronizationEngine(
+SynchronizationEngine::SynchronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& supportedProtocolRange,
@@ -66,93 +66,93 @@ SyncronizationEngine::SyncronizationEngine(
 {
 }
 
-SyncronizationEngine::~SyncronizationEngine()
+SynchronizationEngine::~SynchronizationEngine()
 {
     m_startedAsyncCallsCounter.wait();
 }
 
 OutgoingCommandDispatcher&
-    SyncronizationEngine::outgoingTransactionDispatcher()
+    SynchronizationEngine::outgoingTransactionDispatcher()
 {
     return m_outgoingTransactionDispatcher;
 }
 
 const OutgoingCommandDispatcher&
-    SyncronizationEngine::outgoingTransactionDispatcher() const
+    SynchronizationEngine::outgoingTransactionDispatcher() const
 {
     return m_outgoingTransactionDispatcher;
 }
 
-CommandLog& SyncronizationEngine::transactionLog()
+CommandLog& SynchronizationEngine::transactionLog()
 {
     return m_commandLog;
 }
 
-const CommandLog& SyncronizationEngine::transactionLog() const
+const CommandLog& SynchronizationEngine::transactionLog() const
 {
     return m_commandLog;
 }
 
 IncomingCommandDispatcher&
-    SyncronizationEngine::incomingCommandDispatcher()
+    SynchronizationEngine::incomingCommandDispatcher()
 {
     return m_incomingTransactionDispatcher;
 }
 
 const IncomingCommandDispatcher&
-    SyncronizationEngine::incomingCommandDispatcher() const
+    SynchronizationEngine::incomingCommandDispatcher() const
 {
     return m_incomingTransactionDispatcher;
 }
 
-ConnectionManager& SyncronizationEngine::connectionManager()
+ConnectionManager& SynchronizationEngine::connectionManager()
 {
     return m_connectionManager;
 }
 
-const ConnectionManager& SyncronizationEngine::connectionManager() const
+const ConnectionManager& SynchronizationEngine::connectionManager() const
 {
     return m_connectionManager;
 }
 
-Connector& SyncronizationEngine::connector()
+Connector& SynchronizationEngine::connector()
 {
     return m_connector;
 }
 
-const statistics::Provider& SyncronizationEngine::statisticsProvider() const
+const statistics::Provider& SynchronizationEngine::statisticsProvider() const
 {
     return m_statisticsProvider;
 }
 
-void SyncronizationEngine::setOutgoingCommandFilter(
+void SynchronizationEngine::setOutgoingCommandFilter(
     const OutgoingCommandFilterConfiguration& configuration)
 {
     m_outgoingCommandFilter.configure(configuration);
 }
 
-void SyncronizationEngine::subscribeToSystemDeletedNotification(
+void SynchronizationEngine::subscribeToSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {
     using namespace std::placeholders;
 
     subscription.subscribe(
-        std::bind(&SyncronizationEngine::onSystemDeleted, this, _1),
+        std::bind(&SynchronizationEngine::onSystemDeleted, this, _1),
         &m_systemDeletedSubscriptionId);
 }
 
-void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
+void SynchronizationEngine::unsubscribeFromSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {
     subscription.removeSubscription(m_systemDeletedSubscriptionId);
 }
 
-QnUuid SyncronizationEngine::peerId() const
+QnUuid SynchronizationEngine::peerId() const
 {
     return m_peerId;
 }
 
-void SyncronizationEngine::registerHttpApi(
+void SynchronizationEngine::registerHttpApi(
     const std::string& pathPrefix,
     nx::network::http::server::rest::MessageDispatcher* dispatcher)
 {
@@ -163,7 +163,7 @@ void SyncronizationEngine::registerHttpApi(
     m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
 }
 
-void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
+void SynchronizationEngine::onSystemDeleted(const std::string& systemId)
 {
     // New connections will not be authorized since system is deleted,
     // but existing ones have to be closed.

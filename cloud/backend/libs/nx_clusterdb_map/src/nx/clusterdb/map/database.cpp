@@ -14,7 +14,7 @@ static constexpr char kSystemId[] = "c484573f-8b0d-4458-b86c-1da31188884b";
 } // namespace
 
 Database::Database(
-    nx::clusterdb::engine::SyncronizationEngine* syncEngine,
+    nx::clusterdb::engine::SynchronizationEngine* syncEngine,
     nx::sql::AsyncSqlQueryExecutor* dbManager)
     :
     m_systemId(kSystemId),

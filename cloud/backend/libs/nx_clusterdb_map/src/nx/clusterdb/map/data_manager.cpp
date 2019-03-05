@@ -45,12 +45,12 @@ std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
 } // namespace
 
 DataManager::DataManager(
-    nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
+    nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor,
     const std::string& systemId,
     EventProvider* eventProvider)
     :
-    m_syncEngine(syncronizationEngine),
+    m_syncEngine(synchronizationEngine),
     m_queryExecutor(queryExecutor),
     m_systemId(systemId),
     m_eventProvider(eventProvider)

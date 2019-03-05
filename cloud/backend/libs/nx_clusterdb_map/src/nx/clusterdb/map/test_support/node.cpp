@@ -20,7 +20,7 @@ map::Database& Node::database()
 
 void Node::setup()
 {
-    m_database = std::make_unique<Database>(&syncronizationEngine(), &sqlQueryExecutor());
+    m_database = std::make_unique<Database>(&synchronizationEngine(), &sqlQueryExecutor());
 }
 
 void Node::teardown()

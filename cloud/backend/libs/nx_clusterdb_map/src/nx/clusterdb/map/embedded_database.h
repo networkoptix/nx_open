@@ -21,7 +21,7 @@ public:
     Database& database();
 
 private:
-    nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
+    nx::clusterdb::engine::SynchronizationEngine m_syncEngine;
     Database m_database;
 };
 

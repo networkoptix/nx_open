@@ -33,7 +33,7 @@ protected:
     void andPeerIdIsPresent()
     {
         ASSERT_EQ(
-            peer(0).process().moduleInstance()->syncronizationEngine()
+            peer(0).process().moduleInstance()->synchronizationEngine()
                 .peerId().toSimpleString().toStdString(),
             std::get<1>(m_prevInfoResponse).id);
     }

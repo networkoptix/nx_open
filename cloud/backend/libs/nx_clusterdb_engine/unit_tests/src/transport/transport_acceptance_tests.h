@@ -89,7 +89,7 @@ protected:
 
     void andConnectionIsKnownOnNode()
     {
-        ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->syncronizationEngine()
+        ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->synchronizationEngine()
             .connectionManager().isSystemConnected(m_systemId));
     }
 
