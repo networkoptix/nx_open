@@ -188,7 +188,8 @@
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
     "successMerge":"System merge completed",
-    "permissionsRemoved": "Permissions were removed from {{email}}"
+    "permissionsRemoved": "Permissions were removed from {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Your account is successfully saved",
