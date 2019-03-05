@@ -97,7 +97,7 @@ public:
     QObject* opaqueObject();
 
     virtual utils::Url remoteAddr() const override;
-    void stop();
+    void pleaseStopSync();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
 
@@ -170,7 +170,7 @@ private:
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
     QByteArray m_connectionGuid;
-    size_t m_classId = 0;
+    size_t m_startedClassId = 0;
 };
 
 QString toString(ConnectionBase::State value);
