@@ -119,7 +119,7 @@ struct FileInfoEx
 {
     bool visited = false;
     FileInfoList nodes;
-    const int depth;
+    const int depth = 0;
     FileInfoEx(const FileInfoList& fileInfoList, int depth):
         nodes(fileInfoList),
         depth(depth)
