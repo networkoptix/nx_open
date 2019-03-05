@@ -110,7 +110,7 @@ ListView
             onDraggingChanged: handleCancelled()
         }
 
-        onPressed:
+        onPressedEvent:
         {
             filteringPressing = false
             buttonLongPressed = false

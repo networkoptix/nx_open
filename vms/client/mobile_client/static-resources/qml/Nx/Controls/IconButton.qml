@@ -3,7 +3,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Controls.impl 2.4
 import Nx 1.0
 
-AbstractButton
+Control
 {
     id: control
 
@@ -14,6 +14,17 @@ AbstractButton
     property int checkedPadding: 0
     property color backgroundColor: "transparent"
     property color disabledBackgroundColor: "transparent"
+    property alias icon: iconLabel.icon
+    property bool checkable: false
+    property bool checked: false
+
+    readonly property alias pressed: d.pressed
+
+    signal pressedEvent()
+    signal released()
+    signal pressAndHold()
+    signal canceled()
+    signal clicked()
 
     padding: 6
 
@@ -24,32 +35,65 @@ AbstractButton
         ? checkedIconColor
         : normalIconColor
 
-    onPressAndHold: { d.pressedAndHeld = true }
-    onCanceled: { d.pressedAndHeld = false }
-    onReleased:
-    {
-        if (!d.pressedAndHeld)
-            return
-
-        d.pressedAndHeld = false
-        clicked()
-    }
-
     contentItem: IconLabel
     {
+        id: iconLabel
+
         anchors.centerIn: parent
-        icon: control.icon
         opacity: control.enabled ? 1.0 : 0.3
     }
 
-    background: Item
+    background: MouseArea
     {
         id: background
 
+        anchors.centerIn: parent
         width: control.width - control.padding * 2
         height: control.height - control.padding * 2
 
-        anchors.centerIn: parent
+        function mouseOutsideButton(mouse)
+        {
+            var x = mouse.x
+            var y = mouse.y
+            return mouse.x < 0 || mouse.y < 0
+                || mouse.x >= control.width || mouse.y >= control.height
+        }
+
+        onPressed:
+        {
+            d.pressed = true
+            control.pressedEvent()
+        }
+
+        onPositionChanged: d.pressed = !mouseOutsideButton(mouse)
+
+        onReleased:
+        {
+            d.pressedAndHeld = false
+            d.pressed = false
+            if (mouseOutsideButton(mouse))
+            {
+                control.canceled()
+            }
+            else
+            {
+                control.released()
+                control.clicked()
+            }
+        }
+
+        onPressAndHold:
+        {
+            control.pressAndHold()
+            d.pressedAndHeld = true
+        }
+
+        onCanceled:
+        {
+            d.pressedAndHeld = false
+            d.pressed = false
+            control.canceled()
+        }
 
         Rectangle
         {
@@ -73,7 +117,7 @@ AbstractButton
         {
             anchors.fill: parent
             rounded: true
-            mouseArea: control
+            mouseArea: background
             rippleColor: "transparent"
             alwaysCompleteHighlightAnimation: control.alwaysCompleteHighlightAnimation
         }
@@ -84,5 +128,6 @@ AbstractButton
         id: d
 
         property bool pressedAndHeld: false
+        property bool pressed: false
     }
 }
