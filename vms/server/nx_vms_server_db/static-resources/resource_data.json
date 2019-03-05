@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.263",
+    "version": "1.0.1.264",
     "data": [
         {
             "keys": [
@@ -977,6 +977,8 @@
                 "3r global inc.|xpm16",
                 "3r global inc.|ipm32r32p",
                 "dw-enhd16|encoder1",
+                "DW-ENHD16|DW-Encoder1",
+                "DW-ENHD16|DW-Encoder2",
                 "dw-enhd16|encoder2",
                 "onvif|ud1b-16",
                 "dahua|ipc-hum8431-e1",
