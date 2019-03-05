@@ -312,7 +312,7 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node> onlineNodes)
         std::inserter(onlineNodeSet, onlineNodeSet.end()));
 
     std::vector<Node> discoveredNodes;
-    std::vector<std::string> lostNodes;
+    std::vector<Node> lostNodes;
 
     // Nodes that are not present in onlineNodeSet and not m_onlineNodes are newly online.
     for (const auto& node : onlineNodeSet)
@@ -325,7 +325,7 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node> onlineNodes)
     for (const auto& node : m_onlineNodes)
     {
         if (onlineNodeSet.find(node) == onlineNodeSet.end())
-            lostNodes.emplace_back(node.nodeId);
+            lostNodes.emplace_back(node);
     }
 
     // Update m_onlineNodes before emitting events, as events might access onlineNodes()
@@ -337,8 +337,8 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node> onlineNodes)
     for (const auto& node : discoveredNodes)
         emitNodeDiscovered(node);
 
-    for (const auto& nodeId : lostNodes)
-        emitNodeLost(nodeId);
+    for (const auto& node : lostNodes)
+        emitNodeLost(node);
 }
 
 void DiscoveryClient::emitNodeDiscovered(const Node& node)
@@ -347,10 +347,10 @@ void DiscoveryClient::emitNodeDiscovered(const Node& node)
         m_nodeDiscoveredHandler(node);
 }
 
-void DiscoveryClient::emitNodeLost(const std::string& nodeId)
+void DiscoveryClient::emitNodeLost(const Node& node)
 {
     if (m_nodeLostHandler)
-        m_nodeLostHandler(nodeId);
+        m_nodeLostHandler(node);
 }
 
 std::optional<QDateTime> DiscoveryClient::getServerResponseTime(

@@ -84,10 +84,10 @@ protected:
     void givenSubscriptionToNodeLostEvent()
     {
         clientContext(/*clientIndex*/ 0)->client->setOnNodeLost(
-            [this](const std::string& nodeId)
+            [this](const Node& node)
             {
                 m_nodeLostWasTriggered = true;
-                m_lostNodeId = nodeId;
+                m_lostNodeId = node.nodeId;
                 callbackFired();
             });
     }

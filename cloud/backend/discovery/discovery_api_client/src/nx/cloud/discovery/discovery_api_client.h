@@ -19,7 +19,7 @@ namespace nx::cloud::discovery {
 
 using NodeDiscoveredHandler = nx::utils::MoveOnlyFunc<void(Node)>;
 
-using NodeLostHandler = nx::utils::MoveOnlyFunc<void(std::string /*nodeId*/)>;
+using NodeLostHandler = nx::utils::MoveOnlyFunc<void(Node)>;
 
 /**
   * Updating node registration based on expiration timer is handled by this class.
@@ -76,7 +76,7 @@ private:
     void updateOnlineNodes(std::vector<Node> discoveredNodes);
 
     void emitNodeDiscovered(const Node& node);
-    void emitNodeLost(const std::string& nodeId);
+    void emitNodeLost(const Node& nodeId);
 
     void updateRequestSentTime(const nx::network::http::Request& request);
     std::optional<QDateTime> getServerResponseTime(
