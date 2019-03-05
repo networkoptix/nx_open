@@ -26,6 +26,20 @@ Control
     signal canceled()
     signal clicked()
 
+    function toggle()
+    {
+        if (checkable)
+            checked = !checked
+    }
+
+    onClicked: toggle()
+
+    onCheckableChanged:
+    {
+        if (!checkable)
+            checked = false
+    }
+
     padding: 6
 
     implicitWidth: Math.max(48, contentItem.implicitWidth)
