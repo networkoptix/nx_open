@@ -247,6 +247,7 @@ should display same user data as user provided during registration (stress to cy
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     Delete All Emails
     Close Mailbox
 
@@ -287,6 +288,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     Delete All Emails
     Close Mailbox
 
