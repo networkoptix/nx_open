@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.12",
+    "version": "1.0.1.14",
     "data": [
         {
             "keys": [
@@ -743,7 +743,7 @@
                 "ds-7608ni-i2/8p|sorting center recorder",
                 "dh-nvr4432-16p-4k|private",
                 "d-hktvi5mp908|embedded net dvr",
-                "onvif_encoder|dw-enhd16",
+                "onvif_encoder|dw-enhd16*",
                 "uniview|nvr301-08l-p8",
                 "ali-hvr3008h|embedded net dvr",
                 "ali-qvr3008h|embedded net dvr",
@@ -794,7 +794,35 @@
                 "dahua|dh-xvr4116hs-s2",
                 "rvi-hdr16lb-ta|rvi dvr",
                 "dhi-nvr4208-8p-4k|private",
-                "ds-7104hqhi-f1/n|embedded net dvr"
+                "ds-7104hqhi-f1/n|embedded net dvr",
+                "*|ds-6701hfi",
+                "uniview|nvr301-08-p8",
+                "ltn8708k-p8|home 8ch embedded",
+                "ds-8616n-st|network video recorder",
+                "ds-7204hqhi-f1/n|embedded net dvr",
+                "axis|axis p7224",
+                "dahua|dhi-nvr4104hs-p-4ks2",
+                "dh-nvr5832-16p-4k|private",
+                "dh-nvr7464|private",
+                "dahua|dh-xvr4116hs-s2",
+                "rvi-hdr16lb-ta|rvi dvr",
+                "dhi-nvr4208-8p-4k|private",
+                "ds-7104hqhi-f1/n|embedded net dvr",
+                "ds-9804hdt-f1|embedded net dvr",
+                "dahua|dh-xvr5232an-x",
+                "axis|axisq7424rmkii",
+                "ds-7732ni-i4|network video recorder",
+                "dahua|x24a5l",
+                "dhi-ivss7024dr-8t|private",
+                "rvi-hdr16lb-m_v.2|rvi",
+                "hangzhou hikvision digital technology co., ltd|ds-7708ni*",
+                "dahua|ipc-hum8231-e1",
+                "uniview|nvr302-08s-p8",
+                "uniview|nvr201-04u",
+                "dahua|dhi-nvr4216-4ks2",
+                "DW-ENHD16|DW-ENHD16-*",
+                "DW|DW-ENHD16*",
+                "DW-ENHD16|DW-ENCODWER"
             ],
             "analogEncoder": true
         },
@@ -3018,7 +3046,9 @@
             "vivotek|ma9321-ehtv",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
-            "dahua|IPC-HDBW4231F-E2-M"
+            "dahua|IPC-HDBW4231F-E2-M",
+            "avigilon|32c-h4a-4mh-360",
+            "dahua|psd81602-a360"
             ],
             "canShareLicenseGroup": true
         },
@@ -3339,6 +3369,34 @@
                         "device":  [0.033333, 0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
                         "logical": [1, 1.43, 2, 2.86, 4.14, 5.57, 8, 10.57, 12, 13.57, 15, 15.7, 17.1, 18.57],
                         "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+		{
+            "_comment1": "Mapped for 2.600.Dahua 00.0.R, build: 2017-06-01",
+            "keys": [
+                "Dahua|PDN6CT230*"
+            ],
+            "forceONVIF": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  1,-1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [25, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.25, 0.5, 0.75, 0.775, 0.8125, 0.825, 0.875, 0.9, 0.925, 0.95, 0.975, 0.987, 1],
+                        "logical": [1, 7, 13.3, 16.6, 17.6, 18, 18.3, 19, 19.3, 20, 20.6, 21.6, 22.3, 23.6],
+                        "logicalMultiplier": 31,
                         "space": "35MmEquiv"
                     }
                 }

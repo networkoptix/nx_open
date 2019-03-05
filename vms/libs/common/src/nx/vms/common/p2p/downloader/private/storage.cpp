@@ -41,11 +41,6 @@ static FileMetadata prepareInitialFileMetadata(const FileInformation& fileInform
     return info;
 }
 
-static QString keyFromFileName(const QString& fileName)
-{
-    return QFileInfo(fileName).fileName();
-}
-
 } // namespace
 
 
@@ -55,6 +50,7 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     QObject(parent),
     m_downloadsDirectory(downloadsDirectory)
 {
+    QDir().mkpath(metadataDirectoryPath());
     /* Cleanup expired files every 5 mins. */
     const auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
@@ -74,7 +70,7 @@ QDir Storage::downloadsDirectory() const
 QString Storage::filePath(const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
-    const auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    const auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.cend())
         return QString();
 
@@ -95,7 +91,7 @@ QStringList Storage::files() const
 FileInformation Storage::fileInformation(const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_fileInformationByName.value(keyFromFileName(fileName));
+    return m_fileInformationByName.value(FileInformation::keyFromFileName(fileName));
 }
 
 ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
@@ -234,7 +230,7 @@ ResultCode Storage::updateFileInformation(const QString& fileName, qint64 size,
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -294,7 +290,7 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
 
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -333,7 +329,7 @@ ResultCode Storage::readFileChunk(const QString& fileName, int chunkIndex, QByte
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -362,7 +358,7 @@ ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, cons
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -426,7 +422,7 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
 
 ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
 {
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -475,7 +471,7 @@ QVector<QByteArray> Storage::getChunkChecksums(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto& fileInfo = fileMetadata(keyFromFileName(fileName));
+    const auto& fileInfo = fileMetadata(FileInformation::keyFromFileName(fileName));
     if (!fileInfo.isValid())
         return QVector<QByteArray>();
 
@@ -487,7 +483,7 @@ ResultCode Storage::setChunkChecksums(
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_fileInformationByName.find(keyFromFileName(fileName));
+    auto it = m_fileInformationByName.find(FileInformation::keyFromFileName(fileName));
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
@@ -571,7 +567,7 @@ void Storage::findDownloads(bool waitForFinished)
     m_findDownloadsWatcher.setFuture(QtConcurrent::run(
         [this]()
         {
-            findDownloadsRecursively(m_downloadsDirectory);
+            findDownloadsImpl();
             cleanupExpiredFiles();
         }));
 
@@ -582,29 +578,22 @@ void Storage::findDownloads(bool waitForFinished)
     }
 }
 
-void Storage::findDownloadsRecursively(const QDir& dir)
+void Storage::findDownloadsImpl()
 {
-    for (const auto& entry: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    for (const auto& entry: QDir(metadataDirectoryPath()).entryInfoList(QDir::Files))
     {
         auto fileName = entry.absoluteFilePath();
-        if (entry.isDir())
+        if (!fileName.endsWith(kMetadataSuffix))
+            continue;
+
+        fileName.truncate(fileName.size() - kMetadataSuffix.size());
         {
-            findDownloadsRecursively(QDir(fileName));
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (m_fileInformationByName.contains(FileInformation::keyFromFileName(fileName)))
+                continue;
         }
-        else if (fileName.endsWith(kMetadataSuffix))
-        {
-            fileName.truncate(fileName.size() - kMetadataSuffix.size());
-            if (entry.isFile())
-            {
-                const auto& name = m_downloadsDirectory.relativeFilePath(fileName);
-                {
-                    NX_MUTEX_LOCKER lock(&m_mutex);
-                    if (m_fileInformationByName.contains(keyFromFileName(name)))
-                        continue;
-                }
-                loadDownload(fileName);
-            }
-        }
+
+        loadDownload(fileName);
     }
 }
 
@@ -718,6 +707,11 @@ FileMetadata Storage::loadMetadata(const QString& fileName)
     return fileInfo;
 }
 
+QString Storage::metadataDirectoryPath() const
+{
+    return m_downloadsDirectory.absoluteFilePath(kMetadataSuffix);
+}
+
 FileMetadata Storage::fileMetadata(const QString& fileName) const
 {
     return m_fileInformationByName.value(fileName);
@@ -785,10 +779,11 @@ ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
 
 QString Storage::metadataFileName(const QString& fileName)
 {
+    NX_ASSERT(!fileName.isEmpty());
     if (fileName.isEmpty())
         return QString();
 
-    return fileName + kMetadataSuffix;
+    return QDir(metadataDirectoryPath()).absoluteFilePath(QFileInfo(fileName).fileName() + kMetadataSuffix);
 }
 
 qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunkSize)
@@ -805,6 +800,7 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
         : fileSize - chunkSize * (chunkCount - 1);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields \
+    (chunkChecksums)(fullFilePath))
 
 } // nx::vms::common::p2p::downloader

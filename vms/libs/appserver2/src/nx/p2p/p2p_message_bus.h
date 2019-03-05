@@ -184,7 +184,7 @@ protected:
         }
         else if (connection->remotePeer().isCloudServer())
         {
-            if (!descriptor->isPersistent || context->sendDataInProgress)
+            if (!descriptor->isPersistent || context->sendDataInProgress || !context->updateSequence(tran))
                 return;
         }
 

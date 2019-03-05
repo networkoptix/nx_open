@@ -18,19 +18,6 @@
 
 namespace {
 
-inline void AV_WB64(char** dst, quint64 data)
-{
-    quint64* dst64 = (quint64*)(*dst);
-    *dst64 = qToLittleEndian(data);
-    *dst += sizeof(data);
-}
-
-inline void AV_WRITE_BUFFER(char** dst, const char* src, qint64 size)
-{
-    memcpy(*dst, src, size);
-    *dst += size;
-}
-
 template<typename F>
 auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
 {
@@ -38,12 +25,13 @@ auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
     nx::utils::ElapsedTimer timer;
     timer.restart();
 
-    auto onExit = nx::utils::makeScopeGuard([&message, &timer]()
-    {
-        NX_DEBUG(
-            typeid(QnStorageDb),
-            lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
-    });
+    auto onExit = nx::utils::makeScopeGuard(
+        [&message, &timer]()
+        {
+            NX_DEBUG(
+                typeid(QnStorageDb),
+                lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
+        });
 
     return f();
 }
