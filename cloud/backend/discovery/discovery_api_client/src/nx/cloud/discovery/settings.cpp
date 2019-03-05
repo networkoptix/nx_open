@@ -35,14 +35,19 @@ void Settings::load(const QnSettings& settings)
     discoveryServiceUrl =
         settings.value(kDiscoveryServiceUrl, kDefaultDiscoveryServiceUrl).toString();
 
-    roundTripPadding = std::chrono::milliseconds(
-        settings.value(kRoundTripPadding, kDefaultRoundTripPadding.count()).toInt());
+    // On Linux, count() returns a long, which is unsupported by QVariant constructors
+    // int is supported though.
+    roundTripPadding = std::chrono::milliseconds(settings.value(
+        kRoundTripPadding,
+        (int)kDefaultRoundTripPadding.count()).toInt());
 
-    registrationErrorDelay = std::chrono::milliseconds(
-        settings.value(kRegistrationErrorDelay, kDefaultRegistrationErrorDelay.count()).toInt());
+    registrationErrorDelay = std::chrono::milliseconds(settings.value(
+        kRegistrationErrorDelay,
+        (int)kDefaultRegistrationErrorDelay.count()).toInt());
 
-    onlineNodesRequestDelay = std::chrono::milliseconds(
-        settings.value(kOnlineNodesRequestDelay, kDefaultOnlineNodesRequestDelay.count()).toInt());
+    onlineNodesRequestDelay = std::chrono::milliseconds(settings.value(
+        kOnlineNodesRequestDelay,
+        (int)kDefaultOnlineNodesRequestDelay.count()).toInt());
 }
 
 } // namespace nx::cloud::discovery

@@ -24,13 +24,14 @@ struct NX_DISCOVERY_CLIENT_API Settings
 
     /**
      * The amount of time to wait before resending a registration request in the event of an error.
-     * The default value is 1 minute.
+     * The default value is 1 minute, or 60,000 milliseconds.
      */
     std::chrono::milliseconds registrationErrorDelay;
 
     /**
-     * The frequency with which requests for online nodes are made.
-     * the default value is 30 seconds.
+     * The amount of time to wait before sending a request for online nodes after receiving
+     * a response from the previous request.
+     * the default value is 30 seconds, or 30,000 milliseconds.
      */
     std::chrono::milliseconds onlineNodesRequestDelay;
 
