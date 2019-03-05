@@ -51,6 +51,14 @@ copyLibs()
         'libtegra_video.*'
         'libnx_vms_client*'
         'libcloud_db.*'
+        'libnx_cassandra*'
+        'libconnection_mediator*'
+        'libnx_clusterdb_engine*'
+        'libnx_clusterdb_map*'
+        'libnx_discovery_api_client*'
+        'libnx_relaying*'
+        'libtraffic_relay*'
+        'libvms_gateway_core*'
     )
 
     for LIB in "$BUILD_DIR/lib"/*.so*
