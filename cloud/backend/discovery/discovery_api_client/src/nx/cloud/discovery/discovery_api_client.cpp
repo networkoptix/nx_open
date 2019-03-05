@@ -97,7 +97,7 @@ DiscoveryClient::DiscoveryClient(
 {
     NX_ASSERT(m_settings.roundTripPadding >= std::chrono::milliseconds::zero());
 
-    setupDiscoveryUrl(clusterId);
+    setupDiscoveryServiceUrl(clusterId);
     setupRegisterNodeRequest();
     setupOnlineNodesRequest();
 
@@ -163,17 +163,18 @@ void DiscoveryClient::stopWhileInAioThread()
     m_onlineNodesRequest->pleaseStopSync();
 }
 
-void DiscoveryClient::setupDiscoveryUrl(const std::string& clusterId)
+void DiscoveryClient::setupDiscoveryServiceUrl(const std::string& clusterId)
 {
-    m_settings.discoveryServiceUrl.setPath(
+    m_discoveryServiceUrl = m_settings.discoveryServiceUrl;
+    m_discoveryServiceUrl.setPath(
         nx::network::http::rest::substituteParameters(
             kRegisterNodePath,
             {clusterId}).c_str());
 }
 
-const nx::utils::Url& DiscoveryClient::discoveryUrl() const
+const nx::utils::Url& DiscoveryClient::discoveryServiceUrl() const
 {
-    return m_settings.discoveryServiceUrl;
+    return m_discoveryServiceUrl;
 }
 
 void DiscoveryClient::setupRegisterNodeRequest()
@@ -184,7 +185,7 @@ void DiscoveryClient::setupRegisterNodeRequest()
             if (m_registerNodeRequest->failed())
             {
                 NX_WARNING(this, lm("Failed to connect to discovery server at: %1, error: %2")
-                    .arg(discoveryUrl())
+                    .arg(discoveryServiceUrl())
                     .arg(SystemError::toString(m_registerNodeRequest->lastSysErrorCode())));
                 startRegisterNodeRequest(m_settings.registrationErrorDelay);
                 return;
@@ -277,7 +278,7 @@ void DiscoveryClient::startRegisterNodeRequest(const std::chrono::milliseconds& 
         {
             QnMutexLocker lock(&m_mutex);
             m_registerNodeRequest->doPost(
-                discoveryUrl(),
+                discoveryServiceUrl(),
                 QJson::serialized(m_thisNodeInfo));
 
             updateRequestSentTime(m_registerNodeRequest->request());
@@ -298,7 +299,7 @@ void DiscoveryClient::startOnlineNodesRequest(const std::chrono::milliseconds& d
         delay,
         [this]()
         {
-            m_onlineNodesRequest->doGet(discoveryUrl());
+            m_onlineNodesRequest->doGet(discoveryServiceUrl());
         });
 }
 

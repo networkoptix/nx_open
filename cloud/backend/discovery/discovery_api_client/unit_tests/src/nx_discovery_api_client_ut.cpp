@@ -44,13 +44,14 @@ protected:
         std::string nodeId = std::string("node") + std::to_string((int)m_clients.size());
 
         auto context = std::make_unique<ClientContext>();
+        context->settings = settings();
         context->nodeId = nodeId;
         context->infoJson = generateInfoJson(nodeId);
 
         context->clusterId = kClusterId;
 
         context->client = std::make_unique<discovery::DiscoveryClient>(
-            settings(),
+            context->settings,
             context->clusterId,
             NodeInfo{context->nodeId, context->infoJson});
 
@@ -221,6 +222,7 @@ protected:
 private:
     struct ClientContext
     {
+        discovery::Settings settings;
         std::string clusterId;
         std::string nodeId;
         std::string infoJson;

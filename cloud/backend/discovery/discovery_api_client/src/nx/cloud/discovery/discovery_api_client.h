@@ -64,8 +64,8 @@ public:
 private:
     virtual void stopWhileInAioThread() override;
 
-    void setupDiscoveryUrl(const std::string& clusterId);
-    const nx::utils::Url& discoveryUrl() const;
+    void setupDiscoveryServiceUrl(const std::string& clusterId);
+    const nx::utils::Url& discoveryServiceUrl() const;
 
     void setupRegisterNodeRequest();
     void setupOnlineNodesRequest();
@@ -117,8 +117,9 @@ private:
     };
 
 private:
-    Settings m_settings;
+    const Settings& m_settings;
     NodeInfo m_thisNodeInfo;
+    nx::utils::Url m_discoveryServiceUrl;
 
     NodeDiscoveredHandler m_nodeDiscoveredHandler;
     NodeLostHandler m_nodeLostHandler;
