@@ -5,12 +5,10 @@ namespace network {
 namespace server {
 
 SimpleMessageServerConnection::SimpleMessageServerConnection(
-    StreamConnectionHolder<SimpleMessageServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> _socket,
     nx::Buffer request,
     nx::Buffer response)
     :
-    m_socketServer(socketServer),
     m_socket(std::move(_socket)),
     m_request(std::move(request)),
     m_response(std::move(response)),
@@ -25,7 +23,7 @@ void SimpleMessageServerConnection::startReadingConnection(
     using namespace std::placeholders;
 
     if (!m_socket->setNonBlockingMode(true))
-        return m_socketServer->closeConnection(SystemError::getLastOSErrorCode(), this);
+        return triggerConnectionClosedEvent(SystemError::getLastOSErrorCode());
 
     if (m_request.isEmpty())
     {
@@ -39,6 +37,12 @@ void SimpleMessageServerConnection::startReadingConnection(
             &m_readBuffer, m_request.size(),
             std::bind(&SimpleMessageServerConnection::onDataRead, this, _1, _2));
     }
+}
+
+void SimpleMessageServerConnection::registerCloseHandler(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    m_connectionClosedHandlers.push_back(std::move(handler));
 }
 
 void SimpleMessageServerConnection::setKeepConnection(bool val)
@@ -72,7 +76,7 @@ void SimpleMessageServerConnection::onDataRead(
     {
         NX_VERBOSE(this, lm("Failure while reading connection from %1. %2")
             .args(m_socket->getForeignAddress(), SystemError::toString(errorCode)));
-        m_socketServer->closeConnection(errorCode, this);
+        triggerConnectionClosedEvent(errorCode);
         return;
     }
 
@@ -80,7 +84,7 @@ void SimpleMessageServerConnection::onDataRead(
     {
         NX_VERBOSE(this, lm("Received unexpected message %1 from %2 while expecting %3")
             .args(m_readBuffer, m_socket->getForeignAddress(), m_request));
-        m_socketServer->closeConnection(SystemError::invalidData, this);
+        triggerConnectionClosedEvent(SystemError::invalidData);
         return;
     }
 
@@ -128,13 +132,21 @@ void SimpleMessageServerConnection::onDataSent(
 
     if (!m_keepConnection)
     {
-        m_socketServer->closeConnection(errorCode, this);
+        triggerConnectionClosedEvent(errorCode);
     }
     else
     {
         if (!m_sendQueue.empty())
             sendNextMessage();
     }
+}
+
+void SimpleMessageServerConnection::triggerConnectionClosedEvent(
+    SystemError::ErrorCode reason)
+{
+    auto handlers = std::exchange(m_connectionClosedHandlers, {});
+    for (auto& handler: handlers)
+        handler(reason);
 }
 
 } // namespace server

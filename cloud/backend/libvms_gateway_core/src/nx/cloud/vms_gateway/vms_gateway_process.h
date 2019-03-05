@@ -13,8 +13,9 @@
 #include <nx/cloud/relaying/relay_engine.h>
 #include <nx/network/aio/async_channel_bridge.h>
 
-#include "settings.h"
+#include "http/channel_bridge_to_server_connection_adaptor.h"
 #include "run_time_options.h"
+#include "settings.h"
 
 namespace nx {
 namespace cloud {
@@ -47,7 +48,7 @@ protected:
 
 private:
     using HttpConnectTunnelPool =
-        network::server::StreamServerConnectionHolder<network::aio::AsyncChannelBridge>;
+        network::server::StreamServerConnectionHolder<BridgeToServerConnectionAdaptor>;
 
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<network::SocketAddress> m_httpEndpoints;

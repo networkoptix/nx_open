@@ -27,12 +27,16 @@ public:
     virtual void sendMessage(
         nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler = nullptr) = 0;
+
     virtual nx::network::TransportProtocol transportProtocol() const = 0;
     virtual SocketAddress getSourceAddress() const = 0;
+
     /**
      * NOTE: AbstractServerConnection::sendMessage does nothing after handler has been invoked.
      */
-    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void addOnConnectionCloseHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+
     virtual AbstractCommunicatingSocket* socket() = 0;
     virtual void close() = 0;
     virtual void setInactivityTimeout(std::optional<std::chrono::milliseconds> value) = 0;

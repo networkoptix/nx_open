@@ -15,18 +15,13 @@ namespace network {
 namespace http {
 
 HttpServerConnection::HttpServerConnection(
-    nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
     nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher)
     :
-    base_type(
-        [socketServer](auto... args) { socketServer->closeConnection(args...); },
-        std::move(sock)),
+    base_type(std::move(sock)),
     m_authenticationManager(authenticationManager),
-    m_httpMessageDispatcher(httpMessageDispatcher),
-    m_isPersistent(false),
-    m_persistentConnectionEnabled(true)
+    m_httpMessageDispatcher(httpMessageDispatcher)
 {
 }
 
@@ -279,6 +274,13 @@ void HttpServerConnection::processResponse(
             requestDescriptor = std::move(requestDescriptor),
             responseMessageContext = std::move(responseMessageContext)]() mutable
         {
+            if (!socket())
+            {
+                // Connection is closed.
+                closeConnection(SystemError::noError);
+                return;
+            }
+
             prepareAndSendResponse(
                 std::move(requestDescriptor),
                 std::move(responseMessageContext));

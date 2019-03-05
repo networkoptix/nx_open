@@ -36,11 +36,11 @@ SocketAddress UDPMessageResponseSender::getSourceAddress() const
 }
 
 void UDPMessageResponseSender::addOnConnectionCloseHandler(
-    nx::utils::MoveOnlyFunc<void()> /*handler*/)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
 {
     // This class emulates "server connection" on top of UDP for convenience.
     // So, connection-related logic like this one is not appropriate.
-    // Adding assert to make sure noone waits forever for this object to report "connection closed".
+    // Adding assert to make sure no one waits forever for this object to report "connection closed".
     NX_ASSERT(false);
 }
 

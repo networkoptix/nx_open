@@ -46,12 +46,10 @@ template<
 public:
     using MessageType = Message;
 
-    template<typename OnConnectionClosedHandler>
     BaseStreamProtocolConnection(
-        OnConnectionClosedHandler handler,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(std::move(handler), std::move(streamSocket)),
+        base_type(std::move(streamSocket)),
         m_creationTimestamp(std::chrono::steady_clock::now())
     {
         static constexpr size_t kDefaultSendBufferSize = 4 * 1024;
@@ -449,10 +447,10 @@ public:
     StreamProtocolConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(
-            [this](auto... args) { closeConnection(args...); },
-            std::move(streamSocket))
+        base_type(std::move(streamSocket))
     {
+        // TODO: #ak Refactor out following call.
+        registerCloseHandler([this](auto... args) { closeConnection(args...); });
     }
 
     /**
@@ -478,6 +476,7 @@ public:
         m_messageEndHandler = std::forward<T>(handler);
     }
 
+    // TODO: #ak Duplicates base_type::registerCloseHandler. Remove it.
     void setOnConnectionClosed(
         OnConnectionClosedHandler handler)
     {
@@ -509,9 +508,7 @@ private:
     std::function<void()> m_messageEndHandler;
     OnConnectionClosedHandler m_onConnectionClosed;
 
-    void closeConnection(
-        SystemError::ErrorCode closeReason,
-        self_type* /*connection*/)
+    void closeConnection(SystemError::ErrorCode closeReason)
     {
         if (m_onConnectionClosed)
             nx::utils::swapAndCall(m_onConnectionClosed, closeReason);

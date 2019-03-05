@@ -35,7 +35,6 @@ public:
         MessageSerializer>;
 
     ServerConnection(
-        nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
         const MessageDispatcher& dispatcher);
     ~ServerConnection();
@@ -43,9 +42,13 @@ public:
     virtual void sendMessage(
         nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;
+
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
-    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
+
+    virtual void addOnConnectionCloseHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
     virtual void setInactivityTimeout(std::optional<std::chrono::milliseconds> value) override;

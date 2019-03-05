@@ -172,9 +172,7 @@ class NX_NETWORK_API RandomlyFailingHttpConnection:
 public:
     using BaseType = nx::network::http::BaseConnection<RandomlyFailingHttpConnection>;
 
-    RandomlyFailingHttpConnection(
-        nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
-        std::unique_ptr<AbstractStreamSocket> sock);
+    RandomlyFailingHttpConnection(std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~RandomlyFailingHttpConnection();
 
     void setResponseBuffer(const QByteArray& buf);

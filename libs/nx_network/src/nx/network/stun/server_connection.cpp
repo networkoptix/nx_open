@@ -7,13 +7,10 @@ namespace network {
 namespace stun {
 
 ServerConnection::ServerConnection(
-    nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
-    base_type(
-        [socketServer](auto... args) { socketServer->closeConnection(args...); },
-        std::move(sock)),
+    base_type(std::move(sock)),
     m_peerAddress(base_type::getForeignAddress()),
     m_dispatcher(dispatcher)
 {
@@ -48,7 +45,7 @@ SocketAddress ServerConnection::getSourceAddress() const
 }
 
 void ServerConnection::addOnConnectionCloseHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     registerCloseHandler(std::move(handler));
 }
@@ -70,7 +67,7 @@ void ServerConnection::setInactivityTimeout(
     base_type::setInactivityTimeout(value);
 }
 
-void ServerConnection::setDestructHandler(std::function< void() > handler)
+void ServerConnection::setDestructHandler(std::function<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
     NX_ASSERT(!(handler && m_destructHandler),

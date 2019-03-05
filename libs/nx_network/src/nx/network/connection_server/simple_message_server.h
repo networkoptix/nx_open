@@ -14,13 +14,15 @@ class NX_NETWORK_API SimpleMessageServerConnection:
 {
 public:
     SimpleMessageServerConnection(
-        StreamConnectionHolder<SimpleMessageServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> _socket,
         nx::Buffer request,
         nx::Buffer response);
 
     void startReadingConnection(
         std::optional<std::chrono::milliseconds> /*inactivityTimeout*/);
+
+    void registerCloseHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     void setKeepConnection(bool val);
 
@@ -31,7 +33,6 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    network::server::StreamConnectionHolder<SimpleMessageServerConnection>* m_socketServer;
     std::unique_ptr<AbstractStreamSocket> m_socket;
     nx::Buffer m_request;
     nx::Buffer m_response;
@@ -39,6 +40,7 @@ private:
     const std::chrono::steady_clock::time_point m_creationTimestamp;
     bool m_keepConnection = false;
     std::queue<nx::Buffer> m_sendQueue;
+    std::vector<nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>> m_connectionClosedHandlers;
 
     void onDataRead(
         SystemError::ErrorCode errorCode,
@@ -51,6 +53,8 @@ private:
     void onDataSent(
         SystemError::ErrorCode errorCode,
         size_t bytesSent);
+
+    void triggerConnectionClosedEvent(SystemError::ErrorCode reason);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -92,7 +96,6 @@ protected:
         std::unique_ptr<AbstractStreamSocket> _socket) override
     {
         auto connection = std::make_shared<SimpleMessageServerConnection>(
-            this,
             std::move(_socket),
             m_request,
             m_response);

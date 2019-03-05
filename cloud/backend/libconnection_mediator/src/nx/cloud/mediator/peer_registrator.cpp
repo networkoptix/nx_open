@@ -294,7 +294,8 @@ void PeerRegistrator::clientBind(
     }
 
     connection->addOnConnectionCloseHandler(
-        [this, peerId, connection, guard = m_asyncOperationGuard.sharedGuard()]()
+        [this, peerId, connection, guard = m_asyncOperationGuard.sharedGuard()](
+            SystemError::ErrorCode /*closeReason*/)
         {
             // TODO: #ak Logic here seems to duplicate ListeningPeerPool.
             // The only difference is here we have client connection, there - server connection.
@@ -365,7 +366,7 @@ void PeerRegistrator::reportClientBind(
 std::vector<network::stun::Message> PeerRegistrator::prepareClientBindIndications()
 {
     QnMutexLocker lk(&m_mutex);
- 
+
     std::vector<network::stun::Message> clientBindIndications;
     for (const auto& client: m_boundClients)
         clientBindIndications.push_back(makeIndication(client.first, client.second));
