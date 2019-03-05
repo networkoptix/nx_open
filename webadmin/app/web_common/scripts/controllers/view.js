@@ -370,7 +370,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
-                screenfull.request($('.fullscreen-area').get(0));
+                screenfull.request(document.getElementById('fullscreen-area'));
             }
         };
 
@@ -517,7 +517,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $header.click(function() {
             //350ms delay is to give the navbar enough time to collapse
             $timeout(updateHeights,350);
-        }); 
+        });
 
         $window.resize(updateHeights);
         window.addEventListener("orientationchange",$timeout(updateHeights,200));

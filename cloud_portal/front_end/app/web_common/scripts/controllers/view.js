@@ -435,7 +435,7 @@
                 $scope.fullScreen = function () {
                     $scope.showSettings = false;
                     if (screenfull.enabled) {
-                        screenfull.request($('.fullscreen-area').get(0));
+                        screenfull.request(document.getElementById('fullscreen-area'));
                     }
                 };
                 
