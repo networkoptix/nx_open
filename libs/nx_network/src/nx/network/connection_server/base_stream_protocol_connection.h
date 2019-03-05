@@ -450,7 +450,7 @@ public:
         base_type(std::move(streamSocket))
     {
         // TODO: #ak Refactor out following call.
-        registerCloseHandler([this](auto... args) { closeConnection(args...); });
+        this->registerCloseHandler([this](auto... args) { closeConnection(args...); });
     }
 
     /**
