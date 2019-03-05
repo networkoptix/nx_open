@@ -609,10 +609,15 @@ QRectF Geometry::movedInto(const QRectF& rect, const QRectF& target)
     return rect.translated(dx, dy);
 }
 
+QPointF Geometry::subPoint(const QRectF& rect, const QPointF& relativePoint)
+{
+    return rect.topLeft() + cwiseMul(relativePoint, rect.size());
+}
+
 QRectF Geometry::subRect(const QRectF& rect, const QRectF& relativeSubRect)
 {
     return QRectF(
-        rect.topLeft() + cwiseMul(relativeSubRect.topLeft(), rect.size()),
+        subPoint(rect, relativeSubRect.topLeft()),
         cwiseMul(relativeSubRect.size(), rect.size()));
 }
 
