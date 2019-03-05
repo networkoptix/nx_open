@@ -10,7 +10,7 @@
 
 namespace nx::cloud::discovery::test {
 
-class DiscoveryServer
+class NX_DISCOVERY_CLIENT_API DiscoveryServer
 {
 
 public:

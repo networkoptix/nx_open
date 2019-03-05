@@ -5,8 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/cloud/discovery/settings.h>
 #include <nx/cloud/discovery/discovery_api_client.h>
-
-#include "discovery_server.h"
+#include <nx/cloud/discovery/test_support/discovery_server.h>
 
 namespace nx::cloud::discovery::test {
 
