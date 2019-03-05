@@ -29,6 +29,8 @@ void SynchronizationSettings::load(const QnSettings& settings)
     maxConcurrentConnectionsFromSystem = settings.value(
         kMaxConcurrentConnectionsFromSystem,
         kMaxConcurrentConnectionsFromSystemDefault).toInt();
+
+    discovery.load(settings);
 }
 
 } // namespace nx::clusterdb::engine

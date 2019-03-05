@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <nx/cloud/discovery/settings.h>
+
 class QnSettings;
 
 namespace nx::clusterdb::engine {
@@ -12,6 +14,7 @@ public:
     /** If empty, it is assigned to auto-generated guid. */
     std::string nodeId;
     unsigned int maxConcurrentConnectionsFromSystem;
+    nx::cloud::discovery::Settings discovery;
 
     SynchronizationSettings();
 
