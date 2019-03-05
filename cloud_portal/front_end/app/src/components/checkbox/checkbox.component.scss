@@ -31,6 +31,15 @@ nx-checkbox {
         & + label + div.input-error {
             display : block;
         }
+    
+        .nx-checkbox {
+            input ~ .tick {
+                svg polygon.box,
+                svg polyline.box {
+                    stroke : $error;
+                }
+            }
+        }
     }
 
     .nx-checkbox {

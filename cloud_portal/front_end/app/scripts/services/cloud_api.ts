@@ -213,9 +213,9 @@ import * as angular from 'angular';
                     password: password
                 });
             },
-            sendMessage: function(type, productId, message) {
+            sendMessage: function(type, productId, message, userName?, userEmail?, contact?) {
                 return $http.post(apiBase + '/feedback', {
-                    message, productId, type
+                    message, productId, type, userName, userEmail, contact
                 });
 
             },

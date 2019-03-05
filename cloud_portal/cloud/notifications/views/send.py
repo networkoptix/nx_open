@@ -54,7 +54,7 @@ def update_or_create_notification(data, customizations=[]):
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def send_event(request):
     try:
@@ -73,6 +73,14 @@ def send_event(request):
             validation_error = True
             error_data['message'] = ['This field is required.']
 
+        if 'userEmail' not in request.data:
+            validation_error = True
+            error_data['userEmail'] = ['This field is required.']
+
+        if 'userName' not in request.data:
+            validation_error = True
+            error_data['userName'] = ['This field is required.']
+
         if validation_error:
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
@@ -86,9 +94,9 @@ def send_event(request):
         else:
             request.data['product'] = request.data['productId']
 
-        user = request.user
-        request.data['sender_email'] = user.email
-        request.data['sender_name'] = user.get_full_name()
+        request.data['sender_email'] = request.data['userEmail']
+        request.data['sender_name'] = request.data['userName']
+        request.data['sender_to_be_contacted'] = request.data['contact']
 
         notifications_api.notify(request.data['type'], product_id, request.data)
 
