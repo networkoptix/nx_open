@@ -1064,7 +1064,11 @@ void QnRtspConnectionProcessor::createDataProvider()
         camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
+        {
+            NX_VERBOSE(this,
+                "Trying to initialise resource if it was not initialised on some unknown reason");
             cameraRes->initAsync(true);
+        }
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
     {

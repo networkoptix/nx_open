@@ -234,7 +234,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (needToStop())
             return false;
 
-        NX_VERBOSE(this, "%1 processing %2 resources", Q_FUNC_INFO, resources.size());
+        NX_VERBOSE(this, "%1 processing %2 resources", __func__, resources.size());
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes)
@@ -245,7 +245,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-        NX_VERBOSE(this, "%1 Processing resource %2", Q_FUNC_INFO, netResourceString(newNetRes));
+        NX_VERBOSE(this, "%1 Processing resource [%2]", __func__, netResourceString(newNetRes));
 
         QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
@@ -265,7 +265,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         {
             if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
             {
-                NX_VERBOSE(this, "Can't take foreign resource %1 now", netResourceString(newNetRes));
+                NX_VERBOSE(this, "Can't take foreign resource [%1] now", netResourceString(newNetRes));
                 it = resources.erase(it); //< do not touch foreign resource
                 continue;
             }
@@ -287,10 +287,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnUuid newTypeId = newNetRes->getTypeId();
             bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
 
-            NX_VERBOSE(this, "%1 Found existing cam res %2 for new resource %3",
-                    Q_FUNC_INFO,
-                    netResourceString(rpNetRes),
-                    netResourceString(newNetRes));
+            NX_VERBOSE(this, "%1 Found existing cam res [%2] for new resource [%3]",
+                __func__, netResourceString(rpNetRes), netResourceString(newNetRes));
 
             newNetRes->setPhysicalId(rpNetRes->getUniqueId());
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
@@ -309,16 +307,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     if (updateTypeId)
                         newNetRes->setTypeId(newTypeId);
 
-                    NX_VERBOSE(this,
-                        "Add foreign resource %1 to search list",
+                    NX_VERBOSE(this, "Add foreign resource [%1] to search list",
                         netResourceString(rpNetRes));
 
                     extraResources << newNetRes;
                 }
                 else
                 {
-                    NX_VERBOSE(this,
-                        "Merge existing resource with searched resource %1",
+                    NX_VERBOSE(this, "Merge existing resource with searched resource [%1]",
                         netResourceString(rpNetRes));
 
                     nx::vms::api::CameraData apiCamera;
@@ -557,7 +553,10 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkResourcePtr& rpNetRes)
 {
     if (!rpNetRes->isInitialized() && !rpNetRes->hasFlags(Qn::foreigner))
+    {
+        NX_VERBOSE(this, "Trying to init not initialized resource [%1]", rpNetRes);
         rpNetRes->initAsync(false); //< wait for initialization
+    }
 }
 
 bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(

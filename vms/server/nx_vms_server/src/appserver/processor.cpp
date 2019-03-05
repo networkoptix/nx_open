@@ -245,6 +245,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     QnResourcePtr rpRes = resourcePool()->getResourceById(apiCameraData.id);
     if (rpRes)
     {
+        // TODO: Should be changed to reinitAsync() call?
         NX_VERBOSE(this, "Reiniting resource [%1]", rpRes);
         rpRes->setStatus(Qn::Offline);
         rpRes->initAsync(true);

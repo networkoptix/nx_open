@@ -269,6 +269,9 @@ namespace nxcip_qt
     //!See nxcip::BaseCameraManager::setCredentials
     void BaseCameraManager::setCredentials( const QString& username, const QString& password )
     {
+        NX_VERBOSE(this, "Setting credentials to %1:%2", username,
+            nx::utils::log::showPasswords() ? password : QString("******"));
+
         QnMutexLocker lk( &m_mutex );
         const QByteArray& usernameUtf8 = username.toUtf8();
         const QByteArray& passwordUtf8 = password.toUtf8();
