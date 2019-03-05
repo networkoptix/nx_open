@@ -16,6 +16,7 @@ Button
     property color hoveredColor: ColorTheme.lighter(backgroundColor, 1)
     property color pressedColor:
         isAccentButton ? ColorTheme.darker(hoveredColor, 1) : backgroundColor
+    property color outlineColor: ColorTheme.darker(backgroundColor, 2)
 
     property string iconUrl
     property string hoveredIconUrl
@@ -68,7 +69,10 @@ Button
         hovered: control.hovered
         pressed: control.pressed
         flat: control.flat
-        backgroundColor: control.isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.button
+        backgroundColor: control.backgroundColor
+        hoveredColor: control.hoveredColor
+        pressedColor: control.pressedColor
+        outlineColor: control.outlineColor
 
         FocusFrame
         {
