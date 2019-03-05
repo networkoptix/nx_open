@@ -338,8 +338,10 @@ TEST_P(CloudUserOfflineLogin, user_can_login_after_password_change)
     givenCloudSystem();
 
     whenCloudUserPasswordHasBeenChanged();
-    whenVmsLostConnectionToTheCloud();
+    // Waiting for new cloud user password to be accepted by VMS.
+    thenUserCanStillLogin();
 
+    whenVmsLostConnectionToTheCloud();
     thenUserCanStillLogin();
 }
 
