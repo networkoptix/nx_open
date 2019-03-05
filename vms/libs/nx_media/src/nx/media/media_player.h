@@ -184,6 +184,11 @@ public:
      */
     void setPosition(qint64 value);
 
+    /**
+     * Sets position without imeddiate adjusting to the nearest available one.
+     */
+    Q_INVOKABLE void setDirectPosition(qint64 value);
+
     int maxTextureSize() const;
     void setMaxTextureSize(int value);
 
@@ -283,6 +288,7 @@ protected: //< for tests
 
 private:
     bool checkReadyToPlay();
+    void setPositionInternal(qint64 value, bool allowDirectJumpToNearestPosition);
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;

@@ -953,6 +953,16 @@ qint64 Player::position() const
 
 void Player::setPosition(qint64 value)
 {
+    setPositionInternal(value, true);
+}
+
+void Player::setDirectPosition(qint64 value)
+{
+    setPositionInternal(value, false);
+}
+
+void Player::setPositionInternal(qint64 value, bool allowDirectJumpToNearestPosition)
+{
     if (value > QDateTime::currentMSecsSinceEpoch())
         value = -1;
 
@@ -963,10 +973,10 @@ void Player::setPosition(qint64 value)
 
     if (d->archiveReader)
     {
-
         const qint64 valueUsec = msecToUsec(value);
         qint64 actualPositionUsec = valueUsec;
-        const bool allowCorrection = playbackState() != State::Previewing;
+        const bool allowCorrection = allowDirectJumpToNearestPosition
+            && playbackState() != State::Previewing;
         d->archiveReader->jumpTo(valueUsec, valueUsec, allowCorrection, &actualPositionUsec);
 
         const qint64 actualJumpPositionMsec = usecToMsec(actualPositionUsec);
