@@ -178,12 +178,6 @@ copyStartupScripts()
     install -m 644 "init/networkoptix-root-tool.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-root-tool.conf"
 
-    install -m 755 -d "$STAGE/etc/init.d"
-    install -m 755 "init.d/networkoptix-mediaserver" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
-    install -m 755 "init.d/networkoptix-root-tool" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-root-tool"
-
     install -m 755 -d "$STAGE/etc/systemd/system"
     install -m 644 "systemd/networkoptix-mediaserver.service" \
         "$STAGE/etc/systemd/system/$CUSTOMIZATION-mediaserver.service"
