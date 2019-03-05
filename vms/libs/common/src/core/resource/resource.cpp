@@ -657,7 +657,7 @@ bool QnResource::init()
         m_initInProgress = false;
         if (m_interuptInitialization)
         {
-            NX_VERBOSE(this, "Initilization is interrupted");
+            NX_VERBOSE(this, "Initialization is interrupted");
             return init();
         }
 
