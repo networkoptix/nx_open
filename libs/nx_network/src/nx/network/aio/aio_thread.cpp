@@ -27,6 +27,8 @@ AIOThread::~AIOThread()
 {
     pleaseStop();
     wait();
+
+    NX_ASSERT(m_taskQueue->empty());
 }
 
 void AIOThread::pleaseStop()

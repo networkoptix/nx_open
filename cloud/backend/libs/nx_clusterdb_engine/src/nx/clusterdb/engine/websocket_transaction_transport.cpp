@@ -64,6 +64,11 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     startReading();
 }
 
+WebsocketCommandTransport::~WebsocketCommandTransport()
+{
+    nx::p2p::ConnectionBase::pleaseStopSync();
+}
+
 void WebsocketCommandTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractConnection::bindToAioThread(aioThread);

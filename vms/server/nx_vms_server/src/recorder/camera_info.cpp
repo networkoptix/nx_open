@@ -318,39 +318,126 @@ bool Reader::parseData()
     QTextStream fileDataStream(&m_fileData);
     while (!fileDataStream.atEnd())
     {
-        ParseResult result = parseLine(fileDataStream.readLine());
-        switch (result.code())
-        {
-        case ParseResult::ParseCode::NoData: break;
-        case ParseResult::ParseCode::RegexpFailed:
-            m_lastError = {
-                lit("Camera info file %1 parse failed")
-                    .arg(infoFilePath()),
-                utils::log::Level::error
-            };
-            return false;
-        case ParseResult::ParseCode::Ok:
-            addProperty(result);
-            break;
-        }
+        const auto result = parseLine(fileDataStream.readLine());
+        if (result)
+            addProperty(*result);
     }
 
     return true;
 }
 
-Reader::ParseResult Reader::parseLine(const QString& line) const
+static int findMatchedDelimeter(const QString& src, char startBrace, char endBrace, bool include)
+{
+    int braceCount = 1;
+
+    for (int i = 1; i < src.size(); ++i)
+    {
+        if (src[i] == startBrace && include)
+            ++braceCount;
+        else if (src[i] == endBrace)
+            --braceCount;
+
+        if (braceCount == 0)
+        {
+            if (include)
+            {
+                if (i == src.size() - 1)
+                    return -1;
+                return i + 1;
+            }
+
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+static bool readInnerData(const QString& src, char startBrace, char endBrace, QString* dst, bool include)
+{
+    const int endPos = findMatchedDelimeter(src, startBrace, endBrace, include);
+    if (endPos == -1)
+        return false;
+
+    *dst = src.mid(0, endPos);
+    return true;
+}
+
+static bool readValue(const QString& src, QString* dst)
+{
+    if (src[0] == '{')
+        return readInnerData(src, '{', '}', dst, true);
+    if (src[0] == '[')
+        return readInnerData(src, '[', ']', dst, true);
+
+    return readInnerData(src, '"', '"', dst, false);
+}
+
+boost::optional<Reader::ParseResult> Reader::parseLine(const QString& line) const
 {
     if (line.isEmpty())
-        return ParseResult::ParseCode::NoData;
+        return boost::none;
 
-    thread_local QRegExp keyValueRegExp("^\"(.*)\"=\"(.*)\"$");
+    enum
+    {
+        waitingForKey,
+        readingKey,
+        waitingForValue,
+        readingValue,
+        eqSign,
+        done,
+        failed
+    } state = waitingForKey;
 
-    int reIndex = keyValueRegExp.indexIn(line);
-    if (reIndex == -1 || keyValueRegExp.captureCount() != 2)
-        return ParseResult::ParseCode::RegexpFailed;
+    QString key;
+    QString value;
+    int quoteCount = 0;
+    bool finished = false;
 
-    auto captureList = keyValueRegExp.capturedTexts();
-    return ParseResult(ParseResult::ParseCode::Ok, captureList[1], captureList[2]);
+    for (int i = 0; i < line.size(); ++i)
+    {
+        switch (state)
+        {
+            case waitingForKey:
+                if (line[i] == '"')
+                    state = readingKey;
+                break;
+            case readingKey:
+                if (line[i] == '"')
+                    state = eqSign;
+                else
+                    key.push_back(line[i]);
+                break;
+            case eqSign:
+                if (line[i] != '=')
+                    state = failed;
+                else
+                    state = waitingForValue;
+                break;
+            case waitingForValue:
+                if (line[i] != '"')
+                    state = failed;
+                else
+                    state = readingValue;
+                break;
+            case readingValue:
+                if (readValue(line.mid(i), &value))
+                    state = done;
+                else
+                    state = failed;
+                break;
+            case done:
+            case failed:
+                finished = true;
+                break;
+        }
+
+        if (finished)
+            break;
+    }
+
+    using ParseResult = Reader::ParseResult;
+    return state == done ? boost::optional<ParseResult>(ParseResult(key, value)) : boost::none;
 }
 
 void Reader::addProperty(const ParseResult& result)
