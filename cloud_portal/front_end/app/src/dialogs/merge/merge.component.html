@@ -54,41 +54,15 @@
             <p *ngIf="systemMergeable == undefined || systemMergeable == ''"
                class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
             <div *ngIf="targetSystem.id">
-                <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Took System name and settings from</div>
+                <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Take System name and settings from</div>
                 <div>
                     <div class="radio-group">
-                        <label class="option">
-                            <input type="radio"
-                                   name="firstSystem" id="firstSystem"
-                                   [(ngModel)]="masterId"
-                                   [value]="system.id"
-                                   [checked]="system.id == masterId"
-                                   [disabled]="systemMergeable != ''">
-                            <span class="optionmark">
-                                <svg viewBox="0 0 20 16">
-                                    <path class="circle" d="M8,2c3.3,0,6,2.7,6,6s-2.7,6-6,6s-6-2.7-6-6S4.7,2,8,2 M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1L8,1z"></path>
-                                    <circle cx="8" cy="8" r="4"></circle>
-                                </svg>
-                            </span>
-                            <span [innerHtml]="system.info.name"></span>
-                        </label>
+                        <nx-radio name="firstSystem" [value]="system.id" [label]="system.info.name"
+                                compId="firstSystem" [(ngModel)]="masterId" [disabled]="systemMergeable != ''"></nx-radio>
                     </div>
                     <div class="radio-group">
-                        <label class="option">
-                            <input type="radio"
-                                   name="secondSystem" id="secondSystem"
-                                   [(ngModel)]="masterId"
-                                   [value]="targetSystem.id"
-                                   [checked]="targetSystem.id == masterId"
-                                   [disabled]="systemMergeable != ''">
-                            <span class="optionmark">
-                                <svg viewBox="0 0 20 16">
-                                    <path class="circle" d="M8,2c3.3,0,6,2.7,6,6s-2.7,6-6,6s-6-2.7-6-6S4.7,2,8,2 M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1L8,1z"></path>
-                                    <circle cx="8" cy="8" r="4"></circle>
-                                </svg>
-                            </span>
-                            <span *ngIf="targetSystem.info" [innerHtml]="targetSystem.info.name"></span>
-                        </label>
+                        <nx-radio name="secondSystem" [value]="targetSystem.id" [label]="targetSystem.info && targetSystem.info.name"
+                                compId="secondSystem" [(ngModel)]="masterId" [disabled]="systemMergeable != ''"></nx-radio>
                     </div>
                 </div>
             </div>

@@ -87,8 +87,12 @@ def rename(request, system_id):
 @handle_exceptions
 def merge(request):
     require_params(request, ('master_system_id', 'slave_system_id', 'password'))
-    data = cloud_api.System.merge(request.session['login'], request.data['password'],
-                                  request.data['master_system_id'], request.data['slave_system_id'])
+    try:
+        data = cloud_api.System.merge(request.session['login'], request.data['password'],
+                                      request.data['master_system_id'], request.data['slave_system_id'])
+    except APINotAuthorisedException:
+        raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
+                                  error_data={'password': ['Not recognized']})
     return api_success(data)
 
 
