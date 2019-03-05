@@ -891,6 +891,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             targets.remove(m_stateTracker->getClientPeerId());
 
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
+        m_stateTracker->markStatusUnknown(targets);
 
         if (m_updateSourceMode == UpdateSourceType::file)
         {
@@ -1293,6 +1294,9 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         if (!m_peersIssued.contains(id))
             continue;
 
+        if (item->statusUnknown)
+            continue;
+
         if (item->incompatible)
             continue;
 
@@ -1675,7 +1679,6 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
 {
     auto updatedProtocol = m_stateTracker->getServersWithChangedProtocol();
     bool clientInstallerRequired = false;
-    bool unholdConnection = !clientUpdated || clientInstallerRequired || !updatedProtocol.empty();
     m_serverUpdateTool->requestFinishUpdate(true);
 
     if (clientUpdated && !clientInstallerRequired)
