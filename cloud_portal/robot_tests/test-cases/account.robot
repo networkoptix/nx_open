@@ -241,7 +241,7 @@ Language change in account page affects emails
     Validate Log In
     Verify In Account Page
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']/..
     Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']/..
     Click Button    ${ACCOUNT SAVE}
     Sleep    5

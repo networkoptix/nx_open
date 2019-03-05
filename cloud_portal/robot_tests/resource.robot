@@ -167,8 +167,6 @@ Restore password
 
 Share To
     [arguments]    ${email}    ${permissions}
-    ${log}    get_browser_log
-    log    ${log}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
