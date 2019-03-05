@@ -97,8 +97,8 @@
                 <label for="password" translate>Password</label>
                 <input class="form-control"
                        [(ngModel)]="password" #mergePassword="ngModel"
-                       id="password" autocomplete="new-password"
-                       name="password" type="password"
+                       id="mergePassword" autocomplete="new-password"
+                       name="mergePassword" type="password"
                        required nxFocusMe>
                 <div *ngIf="mergePassword.invalid && mergePassword.touched && !wrongPassword">
                     <label class="input-error" translate>Password is required</label>
