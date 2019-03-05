@@ -247,6 +247,8 @@ should display same user data as user provided during registration (stress to cy
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
+    Delete All Emails
+    Close Mailbox
 
 should display same user data as showed in user account (stress to cyrillic)
     [tags]    email    C41573    C41842    Threaded
@@ -285,6 +287,8 @@ should display same user data as showed in user account (stress to cyrillic)
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
+    Delete All Emails
+    Close Mailbox
 
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    Threaded

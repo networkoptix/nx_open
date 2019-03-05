@@ -114,7 +114,7 @@ Validate Register Email Received
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Should Not Be Equal    ${email}    ${EMPTY}
-    Delete Email    ${email}
+    Delete All Emails
     Close Mailbox
 
 Get Email Link
@@ -166,13 +166,13 @@ Restore password
     Close Browser
 
 Share To
-    [arguments]    ${random email}    ${permissions}
+    [arguments]    ${email}    ${permissions}
     ${log}    get_browser_log
     log    ${log}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
-    Input Text    ${SHARE EMAIL}    ${random email}
+    Input Text    ${SHARE EMAIL}    ${email}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']

@@ -262,6 +262,8 @@ Share with registered user - sends him notification
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
     Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Remove User Permissions    ${EMAIL NOPERM}
+    Delete All Emails
+    Close Mailbox
 
 Share with unregistered user - brings them to registration page with code with correct email locked
     [tags]    email    C41889
@@ -276,6 +278,8 @@ Share with unregistered user - brings them to registration page with code with c
     Go To    ${link}
     Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
     Validate Log In
+    Delete All Emails
+    Close Mailbox
 
 Sharing system with a user who is already in the list updates their permissions
     [tags]    C41892
@@ -287,6 +291,8 @@ Sharing system with a user who is already in the list updates their permissions
     Share To    ${random email}    ${VIEWER TEXT}
     Check User Permissions    ${random email}    ${VIEWER TEXT}
     Remove User Permissions    ${random email}
+    Delete All Emails
+    Close Mailbox
 
 Check share email for registered user
     [tags]    C47297
@@ -314,6 +320,8 @@ Check share email for registered user
     Delete Email    ${email}
     Close Mailbox
     Remove User Permissions    ${EMAIL NOPERM}
+    Delete All Emails
+    Close Mailbox
 
 User with client custom settings has access to system
     [tags]    Threaded
@@ -328,3 +336,5 @@ User can be invited with client custom permissions
     Check User Permissions    ${random email}    Client Custom
     Sleep    2
     Remove User Permissions    ${random email}
+    Delete All Emails
+    Close Mailbox

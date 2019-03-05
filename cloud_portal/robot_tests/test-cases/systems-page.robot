@@ -88,6 +88,8 @@ should show system name in header with no dropdown if user has only one system
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Remove User Permissions    ${EMAIL NOPERM}
+    Delete All Emails
+    Close Mailbox
 
 should show the system page instead of all systems when user only has one
     [tags]    C41878
@@ -106,6 +108,8 @@ should show the system page instead of all systems when user only has one
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Remove User Permissions    ${EMAIL NOPERM}
+    Delete All Emails
+    Close Mailbox
 
 should open system page (users list) when clicked on system
     [tags]    C41893    Threaded
@@ -189,6 +193,8 @@ Search should only be visible with 9 or more systems
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEMS SEARCH INPUT}
+    Delete All Emails
+    Close Mailbox
 
 should update owner name in systems list, if it's changed
     Go To    ${url}/account
