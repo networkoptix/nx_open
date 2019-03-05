@@ -84,12 +84,6 @@ public:
         m_readBuffer.reserve(kReadBufferCapacity);
     }
 
-    ~BaseServerConnection()
-    {
-        if (isInSelfAioThread())
-            stopWhileInAioThread();
-    }
-
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
