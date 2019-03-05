@@ -45,7 +45,7 @@ public:
     DataManager(
         nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine,
         nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-        const std::string& systemId,
+        const std::string& clusterId,
         EventProvider* eventProvider);
     ~DataManager();
 
@@ -181,7 +181,7 @@ private:
      */
     void insertOrUpdateReceivedRecord(
         nx::sql::QueryContext* queryContext,
-        const std::string& systemId,
+        const std::string& clusterId,
         nx::clusterdb::engine::Command<KeyValuePair> command);
 
     /**
@@ -189,13 +189,13 @@ private:
      */
     void removeReceivedRecord(
         nx::sql::QueryContext* queryContext,
-        const std::string& systemId,
+        const std::string& clusterId,
         nx::clusterdb::engine::Command<Key> command);
 
 private:
     nx::clusterdb::engine::SynchronizationEngine* m_syncEngine = nullptr;
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
-    std::string m_systemId;
+    std::string m_clusterId;
     EventProvider * m_eventProvider;
 
     dao::KeyValueDao m_keyValueDao;

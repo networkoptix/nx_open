@@ -24,10 +24,10 @@ public:
     DataManager& dataManager();
     EventProvider& eventProvider();
 
-    std::string systemId() const;
+    std::string clusterId() const;
 
 private:
-    const QnUuid m_systemId;
+    const QnUuid m_clusterId;
     nx::clusterdb::engine::SynchronizationEngine* m_syncEngine = nullptr;
     dao::StructureUpdater m_structureUpdater;
     EventProvider m_eventProvider;

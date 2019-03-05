@@ -47,12 +47,12 @@ std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
 DataManager::DataManager(
     nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-    const std::string& systemId,
+    const std::string& clusterId,
     EventProvider* eventProvider)
     :
     m_syncEngine(synchronizationEngine),
     m_queryExecutor(queryExecutor),
-    m_systemId(systemId),
+    m_clusterId(clusterId),
     m_eventProvider(eventProvider)
 {
     m_syncEngine->incomingCommandDispatcher()
@@ -90,7 +90,7 @@ void DataManager::insertOrUpdate(
         return completionHandler(ResultCode::logicError);
 
     m_syncEngine->transactionLog().startDbTransaction(
-        m_systemId,
+        m_clusterId,
         [this, key, value](nx::sql::QueryContext* queryContext)
         {
             insertToOrUpdateDb(queryContext, key, value);
@@ -111,7 +111,7 @@ void DataManager::remove(
         return completionHandler(ResultCode::logicError);
 
     m_syncEngine->transactionLog().startDbTransaction(
-        m_systemId,
+        m_clusterId,
         [this, key](nx::sql::QueryContext* queryContext)
         {
             removeFromDb(queryContext, key);
@@ -277,7 +277,7 @@ void DataManager::insertToOrUpdateDb(
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveKeyValuePair>(
-            queryContext, m_systemId, KeyValuePair{key, value});
+            queryContext, m_clusterId, KeyValuePair{key, value});
 }
 
 std::optional<std::string> DataManager::getFromDb(
@@ -327,12 +327,12 @@ void DataManager::removeFromDb(
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
-            queryContext, m_systemId, Key{key});
+            queryContext, m_clusterId, Key{key});
 }
 
 void DataManager::insertOrUpdateReceivedRecord(
     nx::sql::QueryContext* queryContext,
-    const std::string& /*systemId*/,
+    const std::string& /*clusterId*/,
     clusterdb::engine::Command<KeyValuePair> command)
 {
     m_keyValueDao.insertOrUpdate(queryContext, command.params.key, command.params.value);
@@ -341,7 +341,7 @@ void DataManager::insertOrUpdateReceivedRecord(
 
 void DataManager::removeReceivedRecord(
     nx::sql::QueryContext* queryContext,
-    const std::string& /*systemId*/,
+    const std::string& /*clusterId*/,
     clusterdb::engine::Command<Key> command)
 {
     m_keyValueDao.remove(queryContext, command.params.key);
