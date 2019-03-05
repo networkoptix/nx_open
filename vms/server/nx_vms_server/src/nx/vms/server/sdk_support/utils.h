@@ -9,10 +9,12 @@
 
 #include <media_server/media_server_module.h>
 
-#include <nx/utils/log/log_level.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/member_detector.h>
 
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+
+#include <nx/fusion/model_functions.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -20,6 +22,7 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/analytics/debug_helpers.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
@@ -28,6 +31,7 @@
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/settings.h>
+#include <plugins/plugins_ini.h>
 
 class QnMediaServerModule;
 
@@ -48,8 +52,47 @@ NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace detail
 
-template<typename ManifestType, typename SdkObjectPtr>
-std::optional<ManifestType> manifest(
+template<typename Manifest>
+std::optional<Manifest> loadManifestFromFile(const QString& filename)
+{
+    using nx::utils::log::Level;
+    static const nx::utils::log::Tag kLogTag(
+        QString("nx::vms::server::sdk_support::loadManifestFromFile"));
+
+    auto logger =
+        [&](Level level, const QString& message)
+        {
+            NX_UTILS_LOG(level, kLogTag) << lm("Loading manifest from file: %1: [%2]")
+                .args(message, filename);
+        };
+
+    if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
+        return std::nullopt;
+
+    const QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(
+        pluginsIni().analyticsManifestSubstitutePath));
+
+    const QString fileData = analytics::debug_helpers::loadStringFromFile(
+        dir.absoluteFilePath(filename), logger);
+
+    if (fileData.isEmpty())
+    {
+        logger(Level::info, "Unable to read file");
+        return std::nullopt;
+    }
+
+    bool success = false;
+    const Manifest deserializedManifest =
+        QJson::deserialized(fileData.toUtf8(), Manifest(), &success);
+
+    if (success)
+        return deserializedManifest;
+
+    return std::nullopt;
+}
+
+template<typename Manifest, typename SdkObjectPtr>
+std::optional<Manifest> manifestFromSdkObject(
     const SdkObjectPtr& sdkObject,
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
@@ -83,7 +126,7 @@ std::optional<ManifestType> manifest(
         return std::nullopt;
 
     bool success = false;
-    auto deserializedManifest = QJson::deserialized(rawString, ManifestType(), &success);
+    auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
     if (!success)
     {
         log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
@@ -92,6 +135,41 @@ std::optional<ManifestType> manifest(
 
     log(rawString, nx::sdk::Error::noError);
     return deserializedManifest;
+}
+
+template<typename Manifest, typename SdkObjectPtr>
+std::optional<Manifest> manifest(
+    const SdkObjectPtr& sdkObject,
+    const QString& substitutionFilename,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr)
+{
+    const std::optional<Manifest> sdkObjectManifest =
+        manifestFromSdkObject<Manifest>(sdkObject, std::move(logger));
+
+    if (pluginsIni().analyticsManifestSubstitutePath[0])
+    {
+        const std::optional<Manifest> manifestSubstitution =
+            loadManifestFromFile<Manifest>(substitutionFilename);
+
+        if (manifestSubstitution)
+            return manifestSubstitution;
+    }
+
+    return sdkObjectManifest;
+}
+
+template<typename Manifest, typename SdkObjectPtr>
+std::optional<Manifest> manifest(
+    const SdkObjectPtr& sdkObject,
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr)
+{
+    const auto substitutionFilename = analytics::debug_helpers::nameOfFileToDumpOrLoadData(
+        device, engine, plugin, "_manifest.json");
+
+    return manifest<Manifest>(sdkObject, substitutionFilename, std::move(logger));
 }
 
 template<typename ResourceType>

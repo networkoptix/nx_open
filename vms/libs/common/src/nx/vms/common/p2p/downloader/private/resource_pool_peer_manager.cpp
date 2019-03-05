@@ -168,7 +168,7 @@ bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
         return true;
 
     const auto& server = getServer(peerId);
-    if (!NX_ASSERT(server))
+    if (!server)
         return false;
 
     return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);

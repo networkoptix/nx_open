@@ -29,12 +29,18 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "is not empty and the file is present in the filesystem. Otherwise the settings from the\n"
         "database are used.");
 
+    NX_INI_STRING("", analyticsManifestSubstitutePath,
+        "Path (absolute or relative to .ini dir) to dir with manifests that will be used instead\n"
+        "of real manifests from Plugins, Engines and DeviceAgents. The filename pattern is the\n"
+        "same as of manifests generated in analyticsManifestOutputPath.");
+
     NX_INI_STRING("", analyticsManifestOutputPath,
-        "Path (absolute or relative to .ini dir) to dir for saving analytics plugin manifests.");
+        "Path (absolute or relative to .ini dir) to existing dir for saving analytics plugin\n"
+        "manifests.");
 
     NX_INI_STRING("", analyticsSettingsOutputPath,
-        "Path (absolute or relative to .ini dir) to dir for saving settings that the Server\n"
-        "sends to an analytics plugin.");
+        "Path (absolute or relative to .ini dir) to existing dir for saving settings that the\n"
+        "Server sends to an analytics plugin.");
 
     NX_INI_FLAG(false, tryAllLibsInPluginDir,
         "Attempt to load each dynamic library from each plugin directory instead of only the one\n"

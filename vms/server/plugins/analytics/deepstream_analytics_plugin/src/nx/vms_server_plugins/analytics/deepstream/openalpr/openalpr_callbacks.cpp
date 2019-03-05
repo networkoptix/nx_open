@@ -147,7 +147,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 nx::sdk::UuidHelper::toStdString(info.uuid));
         }
 
-        detectedObject->setAttributes(
+        detectedObject->addAttributes(
             std::vector<nx::sdk::analytics::Attribute>(
                 attributes.begin(),
                 attributes.end()));

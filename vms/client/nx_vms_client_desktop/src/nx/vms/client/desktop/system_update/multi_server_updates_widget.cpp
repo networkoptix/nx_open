@@ -339,7 +339,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         m_clientUpdateTool->setServerUrl(serverUrl, serverId);
         m_serverUpdateTool->setServerUrl(serverUrl, serverId);
-        m_clientUpdateTool->requestRemoteUpdateInfo();
+        //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.
     checkForInternetUpdates(/*initial=*/true);
@@ -830,7 +830,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula =  acceptedEula < newEula;
 
-        if (showEula && !context()->showEulaMessage(m_updateInfo.eulaPath))
+        if (showEula && !context()->showEulaFromString(m_updateInfo.info.eula))
         {
             return;
         }
@@ -945,6 +945,11 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_stateTracker->getPeersInstalling();
         m_serverUpdateTool->requestFinishUpdate(true);
         m_clientUpdateTool->resetState();
+        if (m_holdConnection)
+        {
+            qnClientMessageProcessor->setHoldConnection(false);
+            m_holdConnection = false;
+        }
         setTargetState(WidgetUpdateState::initial, {});
     }
     else if (m_widgetState == WidgetUpdateState::complete)
@@ -1680,7 +1685,6 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         if (!m_clientUpdateTool->restartClient(authString))
         {
             NX_ERROR(this) << "completeInstallation(" << clientUpdated << ") - failed to run restart command";
-            unholdConnection = true;
             QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
         }
         else
@@ -1691,8 +1695,11 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         }
     }
 
-    if (unholdConnection)
+    if (m_holdConnection)
+    {
         qnClientMessageProcessor->setHoldConnection(false);
+        m_holdConnection = false;
+    }
 
     if (!updatedProtocol.empty())
     {
@@ -1808,6 +1815,11 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
                     m_stateTracker->setPeersInstalling(targets, true);
                     QSet<QnUuid> servers = targets;
                     servers.remove(m_stateTracker->getClientPeerId());
+                    if (!servers.empty() && !m_holdConnection)
+                    {
+                        m_holdConnection = true;
+                        qnClientMessageProcessor->setHoldConnection(true);
+                    }
                     m_serverUpdateTool->requestInstallAction(servers);
                 }
 
@@ -2210,7 +2222,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
             QString("checkServerUpdate=%1").arg(m_serverUpdateCheck.valid()),
             QString("<a href=\"%1\">/ec2/updateStatus</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
             QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
-            QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
+            QString("<a href=\"%1\">/ec2/updateInformation?version=installed</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());

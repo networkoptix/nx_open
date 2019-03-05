@@ -29,7 +29,7 @@ public:
     void setConfidence(float confidence);
     void setId(const Uuid& value);
     void setSubtype(const std::string& value);
-    void setAttributes(const std::vector<Attribute>& value);
+    void addAttributes(const std::vector<Attribute>& value);
     void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
 

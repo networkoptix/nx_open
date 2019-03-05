@@ -110,6 +110,23 @@ QString buildFilename(const QString& libName, const QString& postfix)
     return libName + postfix;
 }
 
+nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFileInternal(
+    const QString& settingsFilename)
+{
+    if (settingsFilename.isEmpty())
+        return nullptr;
+
+    if (!NX_ASSERT(pluginsIni().analyticsEngineSettingsPath[0]))
+        return nullptr;
+
+    const QDir dir(debugFilesDirectoryPath(pluginsIni().analyticsEngineSettingsPath));
+    return loadSettingsFromFile(
+        "Engine settings",
+        dir.absoluteFilePath(settingsFilename));
+}
+
+} // namespace
+
 QString debugFilesDirectoryPath(const QString& path)
 {
     if (QDir::isAbsolutePath(path))
@@ -128,23 +145,6 @@ QString debugFilesDirectoryPath(const QString& path)
     return directory.absolutePath();
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFileInternal(
-    const QString& settingsFilename)
-{
-    if (settingsFilename.isEmpty())
-        return nullptr;
-
-    if (!NX_ASSERT(pluginsIni().analyticsEngineSettingsPath[0]))
-        return nullptr;
-
-    const QDir dir(debugFilesDirectoryPath(pluginsIni().analyticsEngineSettingsPath));
-    return loadSettingsFromFile(
-        "Engine settings",
-        dir.absoluteFilePath(settingsFilename));
-}
-
-} // namespace
-
 nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename)
@@ -158,25 +158,13 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
             return nullptr;
         };
 
-    if (filename.isEmpty())
-        return log(Level::error, lit("File name is empty"));
-
-    if (!QFileInfo::exists(filename))
-        return log(Level::info, lit("File does not exist"));
-
-    log(Level::info, lit("Loading from file"));
-
-    QFile f(filename);
-    if (!f.open(QFile::ReadOnly))
-        return log(Level::error, lit("Unable to open file"));
-
-    const QString& settingsJson = f.readAll();
+    const QString settingsJson = loadStringFromFile(filename, log);
     if (settingsJson.isEmpty())
-        return log(Level::error, lit("Unable to read from file"));
+        return log(Level::error, "Unable to read from file");
 
     auto settings = sdk_support::toIStringMap(settingsJson);
     if (!settings)
-        return log(Level::error, lit("Invalid JSON in file"));
+        return log(Level::error, "Invalid JSON in file");
 
     return settings;
 }
@@ -227,7 +215,7 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     return settings;
 }
 
-QString nameOfFileToDumpDataTo(
+QString nameOfFileToDumpOrLoadData(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
@@ -244,7 +232,7 @@ QString nameOfFileToDumpDataTo(
     return QString();
 }
 
-QString nameOfFileToDumpDataTo(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix)
+QString nameOfFileToDumpOrLoadData(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix)
 {
     if (!NX_ASSERT(plugin))
         return QString();
@@ -283,6 +271,35 @@ void dumpStringToFile(
         if (f.write("\n") < 0)
             return log(Level::error, "Unable to write trailing `\n` to file");
     }
+}
+
+QString loadStringFromFile(
+    const QString& filename,
+    std::function<void(nx::utils::log::Level, const QString& message)> logger)
+{
+    using nx::utils::log::Level;
+    if (filename.isEmpty())
+    {
+        logger(Level::error, "File name is empty");
+        return QString();
+    }
+
+    if (!QFileInfo::exists(filename))
+    {
+        logger(Level::info, "File does not exist");
+        return QString();
+    }
+
+    logger(Level::info, "Loading from file");
+
+    QFile f(filename);
+    if (!f.open(QFile::ReadOnly))
+    {
+        logger(Level::error, "Unable to open file");
+        return QString();
+    }
+
+    return f.readAll();
 }
 
 } // namespace nx::vms::server::analytics::debug_helpers
