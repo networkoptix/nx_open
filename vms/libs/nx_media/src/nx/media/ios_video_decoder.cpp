@@ -320,7 +320,7 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     static const QSize kFullHdResolution(1920, 1080);
     static const QSize kDci4kResolution(4096, 2160);
 
-    const auto& deviceInfo = iosDeviceInformation();
+    const auto& deviceInfo = IosDeviceInformation::currentInformation();
     switch (codec)
     {
         case AV_CODEC_ID_H264:
