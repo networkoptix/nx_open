@@ -233,6 +233,7 @@ private:
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;
     nx::utils::SoftwareVersion m_targetVersion;
+    bool m_holdConnection = false;
 
     WidgetUpdateState m_widgetState = WidgetUpdateState::initial;
 

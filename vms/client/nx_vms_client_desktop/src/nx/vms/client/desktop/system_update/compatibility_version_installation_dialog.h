@@ -49,7 +49,7 @@ public:
     virtual int exec() override;
 
 protected:
-    int installUpdate();
+    int startUpdate();
     void processUpdateContents(const nx::update::UpdateContents& contents);
     void setMessage(const QString& message);
 

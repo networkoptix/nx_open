@@ -1068,7 +1068,7 @@ QString ServerUpdateTool::getUpdateInformationUrl() const
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
+    return getServerUrl(commonModule(), "/ec2/updateInfomation?version=installed");
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(

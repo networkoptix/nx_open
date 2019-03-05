@@ -241,6 +241,11 @@ static InformationError parseHeader(
         NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
     }
 
+    if (!QJson::deserialize(topLevelObject, "eula", &result->eula))
+    {
+        NX_WARNING(typeid(Information)) << "no eula data at" << baseUpdateUrl;
+    }
+
     QString description;
     // Legacy updates: e take update's description from the root updates.json and
     // override it by description in updates.json.
