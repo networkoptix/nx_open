@@ -49,6 +49,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/common/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/ini.h>
 
@@ -318,19 +319,11 @@ bool QnWorkbenchContext::showEulaFromString(QString eulaText) const
         lit("<head><style>%1</style>").arg(eulaHtmlStyle)
     );
 
-    QnMessageBox eulaDialog(workbench()->context()->mainWindow());
-    eulaDialog.setIcon(QnMessageBoxIcon::Warning);
-    eulaDialog.setText(eulaHeader);
+    EulaDialog eulaDialog(workbench()->context()->mainWindow());
+    eulaDialog.setTitle(eulaHeader);
+    eulaDialog.setEulaHtml(eulaText);
 
-    auto view = new QWebView(&eulaDialog);
-    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
-    view->setHtml(eulaText);
-    view->setFixedSize(740, 560);
-    view->show();
-    eulaDialog.addCustomWidget(view);
-    eulaDialog.addButton(tr("I Agree"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-    eulaDialog.addButton(tr("I Do Not Agree"), QDialogButtonBox::RejectRole);
-    return eulaDialog.exec() == QDialogButtonBox::AcceptRole;
+    return eulaDialog.exec() == QDialog::Accepted;
 }
 
 bool QnWorkbenchContext::showEulaFromFile(QString eulaPath) const
