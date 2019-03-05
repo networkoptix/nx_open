@@ -73,7 +73,7 @@ protected:
         m_serverConnection = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             std::make_unique<nx::network::ssl::ServerSideStreamSocket>(
                 std::move(m_prevAcceptedConnection)));
-        m_serverConnection->setOnConnectionClosed(
+        m_serverConnection->registerCloseHandler(
             [this](auto... args) { onConnectionClosed(args...); });
         m_serverConnection->setMessageHandler(
             std::bind(&ProxyUsingRelaying::saveMessageReceived, this, _1));

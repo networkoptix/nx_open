@@ -449,8 +449,6 @@ public:
         :
         base_type(std::move(streamSocket))
     {
-        // TODO: #ak Refactor out following call.
-        this->registerCloseHandler([this](auto... args) { closeConnection(args...); });
     }
 
     /**
@@ -476,13 +474,6 @@ public:
         m_messageEndHandler = std::forward<T>(handler);
     }
 
-    // TODO: #ak Duplicates base_type::registerCloseHandler. Remove it.
-    void setOnConnectionClosed(
-        OnConnectionClosedHandler handler)
-    {
-        m_onConnectionClosed = std::move(handler);
-    }
-
 protected:
     virtual void processMessage(Message msg) override
     {
@@ -506,13 +497,6 @@ private:
     std::function<void(Message)> m_messageHandler;
     std::function<void(nx::Buffer)> m_messageBodyHandler;
     std::function<void()> m_messageEndHandler;
-    OnConnectionClosedHandler m_onConnectionClosed;
-
-    void closeConnection(SystemError::ErrorCode closeReason)
-    {
-        if (m_onConnectionClosed)
-            nx::utils::swapAndCall(m_onConnectionClosed, closeReason);
-    }
 };
 
 } // namespace nx::network::server

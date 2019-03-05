@@ -132,7 +132,7 @@ void ReverseConnection::onConnectDone(
 
         m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             std::move(streamSocket));
-        m_httpPipeline->setOnConnectionClosed(
+        m_httpPipeline->registerCloseHandler(
             [this](auto&&... args) { onConnectionClosed(std::move(args)...); });
         m_httpPipeline->setMessageHandler(
             [this](auto&&... args) { dispatchRelayNotificationReceived(std::move(args)...); });
