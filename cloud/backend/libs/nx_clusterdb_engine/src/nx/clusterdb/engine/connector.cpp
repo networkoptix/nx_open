@@ -40,6 +40,21 @@ void Connector::addNodeUrl(
         });
 }
 
+void Connector::removeNodeUrl(
+    const::std::string& systemId,
+    const nx::utils::Url& url)
+{
+    post([this, systemId, url]()
+    {
+        auto it = m_nodes.find(url);
+        if (it != m_nodes.end() && it->second.systemId == systemId)
+        {
+            m_connectionManager->removeConnection(it->second.connectionId);
+            m_nodes.erase(it);
+        }
+    });
+}
+
 void Connector::stopWhileInAioThread()
 {
     m_nodes.clear();

@@ -32,6 +32,10 @@ public:
         const std::string& systemId,
         const nx::utils::Url& url);
 
+    void removeNodeUrl(
+        const::std::string& systemId,
+        const nx::utils::Url& url);
+
 protected:
     virtual void stopWhileInAioThread() override;
 
