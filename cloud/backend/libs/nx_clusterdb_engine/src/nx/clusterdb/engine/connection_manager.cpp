@@ -246,6 +246,15 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     return true;
 }
 
+void ConnectionManager::removeConnection(const std::string& connectionId)
+{
+    NX_VERBOSE(this,
+        lm("Removing connection %1").args(connectionId));
+
+    QnMutexLocker lock(&m_mutex);
+    removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
+}
+
 bool ConnectionManager::modifyConnectionByIdSafe(
     const std::string& connectionId,
     std::function<void(transport::AbstractConnection* connection)> func)
@@ -365,15 +374,6 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
     m_systemStatusChangedSubscription.notify(
         systemId, { false /*offline*/, 0 });
-}
-
-void ConnectionManager::removeConnection(const std::string& connectionId)
-{
-    NX_VERBOSE(this,
-        lm("Removing connection %1").args(connectionId));
-
-    QnMutexLocker lock(&m_mutex);
-    removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
 }
 
 void ConnectionManager::onGotTransaction(
