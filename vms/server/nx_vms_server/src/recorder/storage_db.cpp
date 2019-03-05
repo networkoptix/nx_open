@@ -25,12 +25,13 @@ auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
     nx::utils::ElapsedTimer timer;
     timer.restart();
 
-    auto onExit = nx::utils::makeScopeGuard([&message, &timer]()
-    {
-        NX_DEBUG(
-            typeid(QnStorageDb),
-            lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
-    });
+    auto onExit = nx::utils::makeScopeGuard(
+        [&message, &timer]()
+        {
+            NX_DEBUG(
+                typeid(QnStorageDb),
+                lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
+        });
 
     return f();
 }
