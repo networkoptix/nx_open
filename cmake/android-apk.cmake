@@ -20,9 +20,9 @@ endfunction()
 
 function(add_android_apk target)
     set(options)
-    set(oneValueArgs TARGET FILE_NAME PACKAGE_SOURCE QML_ROOT_PATH VERSION
+    set(oneValueArgs TARGET FILE_NAME QML_ROOT_PATH VERSION
         KEYSTORE_FILE KEYSTORE_ALIAS KEYSTORE_PASSWORD KEYSTORE_KEY_PASSWORD)
-    set(multiValueArgs QML_IMPORT_PATHS EXTRA_LIBS)
+    set(multiValueArgs PACKAGE_SOURCES QML_IMPORT_PATHS EXTRA_LIBS)
 
     cmake_parse_arguments(APK "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -51,6 +51,8 @@ function(add_android_apk target)
         set(stdcpp_path  "    \"stdcpp-path\": \"${stdcpp_path}\",\n")
     endif()
 
+    set(PACKAGE_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/${target}_apk_template)
+
     set(settings
         "{\n"
         "    \"description\": \"This file is generated and should not be modified by hand.\",\n"
@@ -63,7 +65,7 @@ function(add_android_apk target)
         "    \"toolchain-version\": \"4.9\",\n"
         "    \"ndk-host\": \"${CMAKE_ANDROID_NDK_TOOLCHAIN_HOST_TAG}\",\n"
         "    \"target-architecture\": \"${CMAKE_ANDROID_ARCH_ABI}\",\n"
-        "    \"android-package-source-directory\": \"${APK_PACKAGE_SOURCE}\",\n"
+        "    \"android-package-source-directory\": \"${PACKAGE_SOURCE}\",\n"
         "    \"android-extra-libs\": \"${extra_libs}\",\n"
         ${stdcpp_path}
         "    \"qml-root-path\": \"${APK_QML_ROOT_PATH}\",\n"
@@ -104,6 +106,8 @@ function(add_android_apk target)
     add_custom_command(
         OUTPUT ${APK_FILE_NAME}
         DEPENDS ${APK_TARGET}
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_PACKAGE_SOURCES} ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${APK_TARGET}>"
             "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
@@ -112,6 +116,8 @@ function(add_android_apk target)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${apk_dir}/build/outputs/apk/${APK_TARGET}_apk-${apk_suffix}.apk"
             ${APK_FILE_NAME}
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE}
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${apk_dir}
     )
 
     set(target_args)
