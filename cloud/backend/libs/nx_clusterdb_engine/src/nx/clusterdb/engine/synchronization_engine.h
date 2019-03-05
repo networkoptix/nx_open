@@ -16,6 +16,7 @@
 #include "outgoing_command_filter.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
+#include "discovery_manager.h"
 #include "transport/common_http/acceptor.h"
 #include "transport/p2p_http/acceptor.h"
 #include "transport/p2p_websocket/acceptor.h"
@@ -73,6 +74,8 @@ public:
         const std::string& pathPrefix,
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
+    DiscoveryManager& discoveryManager();
+
 private:
     const QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
@@ -91,6 +94,7 @@ private:
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
     HttpServer m_httpServer;
+    DiscoveryManager m_discoveryManager;
 
     void onSystemDeleted(const std::string& systemId);
 };

@@ -62,7 +62,8 @@ SynchronizationEngine::SynchronizationEngine(
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
     m_systemDeletedSubscriptionId(nx::utils::kInvalidSubscriptionId),
-    m_httpServer(m_peerId)
+    m_httpServer(m_peerId),
+    m_discoveryManager(settings.discovery, this)
 {
 }
 
@@ -161,6 +162,11 @@ void SynchronizationEngine::registerHttpApi(
     m_httpTransportAcceptor.registerHandlers(pathPrefix, dispatcher);
     m_webSocketAcceptor.registerHandlers(pathPrefix, dispatcher);
     m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
+}
+
+DiscoveryManager& SynchronizationEngine::discoveryManager()
+{
+    return m_discoveryManager;
 }
 
 void SynchronizationEngine::onSystemDeleted(const std::string& systemId)
