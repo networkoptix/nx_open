@@ -459,6 +459,10 @@ bool VmsCloudConnectionProcessor::insertCloudOwner(
     cloudOwnerParams.front().resourceId = userData.id;
     cloudOwnerParams.front().name = nx::cloud::db::api::kVmsUserAuthInfoAttributeName;
     cloudOwnerParams.front().value = QJson::serialized(cloudOwnerOfflineAuthInfo);
+
+    NX_VERBOSE(this, "Saving offline login info. System %1, user %2, info %3",
+        data.cloudSystemID, data.cloudAccountName, cloudOwnerParams.front().value);
+
     resultCode = m_commonModule->ec2Connection()
         ->getResourceManager(Qn::kSystemAccess)->saveSync(std::move(cloudOwnerParams));
     if (resultCode != ec2::ErrorCode::ok)

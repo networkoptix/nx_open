@@ -45,7 +45,8 @@ public:
     virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+    virtual CameraDiagnostics::Result openStreamInternal(
+        bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 

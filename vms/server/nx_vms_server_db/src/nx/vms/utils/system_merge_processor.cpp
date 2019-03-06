@@ -731,7 +731,11 @@ bool SystemMergeProcessor::fetchUserParams(
         }
 
         for (const auto& param: params)
+        {
+            NX_VERBOSE(this, "Fetching for resaving. user %1, name %2, value %3",
+                userId, param.name, param.value);
             data->additionParams.push_back({userId, param.name, param.value});
+        }
 
         NX_VERBOSE(this, "Fetched %1 params of user %2 from %3",
             params.size(), userId, remoteUrl);
