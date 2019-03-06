@@ -32,7 +32,6 @@ public:
         nx::p2p::P2pTransportPtr p2pTransport,
         vms::api::PeerDataEx localPeerData,
         vms::api::PeerDataEx remotePeerData);
-    virtual ~WebsocketCommandTransport();
 
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;

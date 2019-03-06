@@ -63,11 +63,6 @@ Connection::Connection(
     startReading();
 }
 
-Connection::~Connection()
-{
-    pleaseStopSync();
-}
-
 void Connection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractConnection::bindToAioThread(aioThread);
