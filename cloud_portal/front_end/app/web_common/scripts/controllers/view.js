@@ -438,10 +438,16 @@
                 };
                 
                 $scope.enableFullScreen = screenfull.enabled;
+                var fullElement = $('.fullscreen-area').get(0);
+    
+                angular.element(fullElement).on('dblclick', function (event) {
+                    screenfull.toggle(fullElement);
+                });
+                
                 $scope.fullScreen = function () {
                     $scope.showSettings = false;
                     if (screenfull.enabled) {
-                        screenfull.request($('.fullscreen-area').get(0));
+                        screenfull.request(fullElement);
                     }
                 };
                 
