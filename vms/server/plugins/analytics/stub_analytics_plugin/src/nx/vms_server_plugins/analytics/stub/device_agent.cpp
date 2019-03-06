@@ -274,8 +274,8 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 // private
 
 static IObjectMetadata* makeObjectMetadata(
-    const std::string &objectTypeId,
-    const Uuid &objectId,
+    const std::string& objectTypeId,
+    const Uuid& objectId,
     double offset,
     int64_t lastVideoFrameTimestampUs,
     bool generatePreviewAttributes,
@@ -334,13 +334,13 @@ static IObjectMetadata* makeObjectMetadata(
 
 void DeviceAgent::generateObjectIds()
 {
-    int objectsCount = ini().objectsCount;
-    if (objectsCount < 1)
+    int objectCount = ini().objectCount;
+    if (objectCount < 1)
     {
         NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
-        objectsCount = 1;
+        objectCount = 1;
     }
-    m_objectIds.resize(objectsCount);
+    m_objectIds.resize(objectCount);
     for (auto& objectId: m_objectIds)
         objectId = UuidHelper::randomUuid();
 }
