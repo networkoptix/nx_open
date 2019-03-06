@@ -13,6 +13,12 @@ ServerAlivenessTester::ServerAlivenessTester(
 {
 }
 
+ServerAlivenessTester::~ServerAlivenessTester()
+{
+    if (isInSelfAioThread())
+        cancelProbe();
+}
+
 void ServerAlivenessTester::probe(ProbeResultHandler handler)
 {
     nx::network::stun::Message probe(
