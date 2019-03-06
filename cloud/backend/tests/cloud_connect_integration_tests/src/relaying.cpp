@@ -96,13 +96,15 @@ protected:
 
 private:
     std::optional<bool> m_useHttpConnectToListenOnRelayBak;
+    int m_connectMethodMaskBak = 0;
 
     virtual void SetUp() override
     {
         base_type::SetUp();
 
         // Disabling every method except relaying.
-        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
+        m_connectMethodMaskBak =
+            ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
 
         m_useHttpConnectToListenOnRelayBak =
             SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay;
@@ -110,6 +112,11 @@ private:
             GetParam().useHttpConnect;
 
         startServer();
+    }
+
+    virtual void TearDown() override
+    {
+        ConnectorFactory::setEnabledCloudConnectMask(m_connectMethodMaskBak);
     }
 };
 
