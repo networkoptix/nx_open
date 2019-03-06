@@ -38,13 +38,15 @@
         "confirmRestoreSettingsNotNetwork": "האם לאפס את תצורת שרת? ארכיון והגדרות הרשת יישמרו.",
         "unavailable": "לא זמין",
         "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
-        "confirmDisconnectFromCloud": "נתק את המערכת מ {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloud": "נתק את המערכת מ- {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
         "confirmDisconnectFromCloudAction": "התנתק",
         "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
+        "disconnectedFromCloudError": "לא ניתן לנתק את המערכת",
         "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",
         "confirmDisconnectFromSystemAction": "ניתוק",
         "disconnectedFromSystemSuccess": "השרת נותק מהמערכת בהצלחה",
+        "disconnectedFromSystemError": "לא ניתן לנתק את השרת",
         "connectedSuccess": "מערכת חובר בהצלחה",
         "createLocalOwnerTitle": "צור מנהל המקומי",
         "confirmChangePassword": "שנה סיסמת מנהל מערכת",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "מרווח דוח סטטיסטיקה",
         "statisticsReportUpdateDelay": "דו\"ח סטטיסטי - עיכוב עדכון",
         "synchronizeTimeWithInternet": "סנכרן זמן עם אינטרנט",
-        "systemName": "שם מערכת",
+        "SystemName": "שם מערכת",
         "takeCameraOwnershipWithoutLock": "לקיחת בעלות על מצלמות ללא נעילה",
         "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
         "primaryTimeServer": "Primary time synchronization server",
@@ -123,7 +125,8 @@
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "כמות מקסימלית של חיבורי WEBM עבור השרת. Chrome פותח 2 חיבורים בו-זמנית, ולאחר מכן סוגר את הראשון. לכן, מומלץ להגדיר ערך> = 2 לפרמטר זה."
     },
     "info": {
         "tabs": {
@@ -133,7 +136,7 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
+        "SystemIsUnreacheble": "אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
         "incorrectCurrentPassword": "סיסמה נוכחית שגויה.",
         "incorrectRemotePassword": "שם או הסיסמה שגויים.",
         "incompatibleVersion": "לא ניתן להגיע למערכת, היא אנה קיימת או בעלת גירסה לא תואמת.",
@@ -145,9 +148,10 @@
         "cloudBothError": "אין אפשרות למזג מערכות. שתי מערכות מחוברות לענן. יש לנתק אחת קודם.",
         "cloudHostConflict": "אין אפשרות למזג מערכות, מאחר והשרתים נבנו עם שרתי ענן שונים",
         "licenceError": "אזהרה! אתה עומד למזג מערכות עם רישיונות Starter. רשיון Starter אחד בלבד מותר לכל מערכת, הרישיון השני יכובה. האם למזג בכל מקרה?",
+        "duplicateServersError": "לא ניתן למזג את 'מערכות' משום שיש להם לפחות שרת אחד עם אותו מזהה. הסר את השרת ונסה שוב.",
         "connectionFailed": "החיבור נכשל: ",
         "unknownError": "שגיאה לא מוכרת",
-        "mergeFailed": "המיזוג נכשל: ",
+        "mergeFailed": "המיזוג נכשל",
         "mergeSucceed": "המיזוג להצליח.",
         "newSystemDisplayName": "מערכת חדשה",
         "incompatibleProtocol": "גירסה לא תואמת",

@@ -42,7 +42,7 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>システムからサーバーを切離す</h3>
-                        <p>これにより、データベース、ローカルユーザー、および構成を保持しているサーバーがシステムから切り離されます
+                        <p>このアクションは、データベース、ローカルユーザー、および設定を保持しているシステムからサーバーを切り離します
                             ビデオのアーカイブはそのまま残ります <b>クラウドユーザーは削除されます </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
                     </div>
@@ -123,15 +123,15 @@
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> トラフィック暗号化
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> トラフィック暗号化
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
                                     ビデオトラフィック暗号化
                                 </label>
                             </div>

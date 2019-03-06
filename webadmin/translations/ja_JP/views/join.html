@@ -48,14 +48,14 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">(このシステム) 現在のパスワード</label>
+            <label for="currentSystemPassword" class="control-label">現在のパスワード（このシステム用） </label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="パスワード" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>現在のシステム<b>{{systems.systemName}}</b>に <b>{{systems.joinSystemName}}</b> が結合</p>
+            <p>現在のシステム<b>{{systems.systemName}}</b>に <b>{{systems.joinSystemName}}</b> が統合されます</p>
             <p>
                 新システムのパスワードおよび名前は次のシステムより引継ぎ:<br/>
                 <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>

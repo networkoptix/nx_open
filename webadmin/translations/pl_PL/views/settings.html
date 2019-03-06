@@ -41,7 +41,7 @@
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Przywróć ustawienia fabryczne</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Odłącz serwer z systemu</h3>
+                        <h3>Odłącz serwer od systemu</h3>
                         <p>Ta czynność spowoduje odłączenie serwera od systemu przechowującego bazę danych, lokalnych użytkowników i konfigurację.
                             Archiwum wideo pozostanie nienaruszone. Wszyscy użytkownicy chmury zostaną usunięci.</p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Odłącz od systemu</button></p>
@@ -118,15 +118,15 @@
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Wymuszaj szyfrowanie transmisji
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Wymuszaj szyfrowanie transmisji
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
                                     Wymuszaj szyfrowanie transmisji wideo
                                 </label>
                             </div>

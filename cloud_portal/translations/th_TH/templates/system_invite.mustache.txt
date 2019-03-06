@@ -1,7 +1,7 @@
 ยินดีต้อนรับสู่ %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) กำลังเชิญคุณเข้าร่วม %PRODUCT_NAME% และแชร์ระบบของเขากับคุณ {{message.system_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %PRODUCT_NAME% and shared the system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}

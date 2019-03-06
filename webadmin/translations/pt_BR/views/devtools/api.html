@@ -25,7 +25,7 @@
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
-                                        <span class="label label-danger" ng-if="function.proprietary">proprietário</span>
+                                        <span class="label label-danger" ng-if="function.proprietary"> proprietário </span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}"
                                               ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
@@ -48,13 +48,13 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">proprietário</span>
+                                            <span class="label label-danger" ng-if="function.proprietary"> proprietário </span>
                                             <a ng-click="setActiveFunction(group,function,$event)"
                                                ng-href="#/developers/api{{function.url}}">
                                                 <b ng-if="function.caption"
-                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
-                                                <span ng-if="function.method">{{function.method}}:</span>
-                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"> </b>
+                                                <span ng-if="function.method">{{function.method}}: </span>
+                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" > </b>
                                             </a>
                                             <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
@@ -83,7 +83,7 @@
                                             <b>{{param.name}}</b> ({{param.type}})
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">
-                                                Values:
+                                                Valores:
                                                 <ul>
                                                     <li ng-repeat="value in param.values">
                                                         <b>{{value.name}}</b>

@@ -82,7 +82,7 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Об'єднання систем</h3>
+                            <h3>Об'єднати системи</h3>
                             <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Об'єднати системи</button></p>
                         </form>
                     </div>
@@ -118,15 +118,15 @@
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Включити шифрування трафіку
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Включити шифрування трафіку
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
                                     Включити шифрування відео трафіку
                                 </label>
                             </div>

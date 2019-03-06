@@ -42,9 +42,11 @@
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle Cloudnutzer werden gelöscht.</span><br><br>Das System wird über das lokale Netzwerk mit dem lokalen Administratoraccount erreichbar sein.",
         "confirmDisconnectFromCloudAction": "Trennen",
         "disconnectedFromCloudSuccess": "System wurde von {{CLOUD_NAME}} erfolgreich getrennt",
+        "disconnectedFromCloudError": "Die Verbindung zum System kann nicht getrennt werden",
         "confirmDisconnectFromSystem": "Server aus dem aktuellen System trennen",
         "confirmDisconnectFromSystemAction": "Trennen",
         "disconnectedFromSystemSuccess": "Server wurde erfolgreich vom System getrennt",
+        "disconnectedFromSystemError": "Die Verbindung zum System kann nicht getrennt werden",
         "connectedSuccess": "Das System wurde erfolgreich verbunden",
         "createLocalOwnerTitle": "Lokalen Administrator erstellen",
         "confirmChangePassword": "Admin-Passwort ändern",
@@ -66,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Aktivieren Sie die Weiterleitung für die Cloudverbindung",
         "cloudConnectUdpHolePunchingEnabled": "Aktivieren Sie die UDP-Lochung für die Cloudverbindung",
         "cloudHost": "Cloud-host",
-        "cloudSystemID": "Cloud-System-id",
+        "cloudSystemID": "Cloudsystem-ID",
         "disabledVendors": "Deaktivierte Treiber",
         "ec2AliveUpdateIntervalSec": "Aktualisierungsintervall des Systems (Sekunden)",
         "ec2ConnectionKeepAliveTimeoutSec": "Verbindungstimeout (Sekunden)",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "Statistikberichtsintervall",
         "statisticsReportUpdateDelay": "Statistikbericht - Updateverzögerung",
         "synchronizeTimeWithInternet": "Synchronisieren Sie die Zeit mit dem Internet",
-        "systemName": "Systemname",
+        "SystemName": "Systemname",
         "takeCameraOwnershipWithoutLock": "Besitz von Kameras übernehmen",
         "timeSynchronizationEnabled": "Synchronisierung aktiviert",
         "primaryTimeServer": "Primärer Zeitsynchronisationsserver",
@@ -123,7 +125,8 @@
         "trafficEncryptionForced": "Trafficverschlüsselung erzwingen",
         "videoTrafficEncryptionForced": "Videotrafficverschlüsselung erzwingen",
         "updateStatus": "Update-Status",
-        "watermarkSettings": "Wasserzeicheneinstellungen"
+        "watermarkSettings": "Wasserzeicheneinstellungen",
+        "maxWebMTranscoders": "Maximale Anzahl von WEBM-Verbindungen für den Server. Chrome öffnet 2 Verbindungen auf einmal und schließt dann die erste. Es wird daher empfohlen, den Wert >=2 auf diesen Parameter zu setzen."
     },
     "info": {
         "tabs": {
@@ -133,7 +136,7 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "System ist nicht erreichbar oder existiert nicht.",
+        "SystemIsUnreacheble": "System ist nicht erreichbar oder existiert nicht.",
         "incorrectCurrentPassword": "Das Passwort ist falsch.",
         "incorrectRemotePassword": "Login oder Passwort falsch.",
         "incompatibleVersion": "System ist nicht erreichbar/nicht vorhanden oder es handelt sich um eine inkompatible Version.",
@@ -145,9 +148,10 @@
         "cloudBothError": "Systeme können nicht zusammengeführt werden. Beide Systeme sind mit der Cloud verbunden. Sie müssen erst eines davon trennen.",
         "cloudHostConflict": "Systeme können nicht zusammengeführt werden, da die Server mit verschiedenen Cloud-Hosts erstellt wurden",
         "licenceError": "Warnung! Sie haben vor Systeme mit Starter-Lizenzen zusammenzuführen. Nur eine Starter-Lizenz pro System ist erlaubt, weshalb die zweite Lizenz deaktiviert wird. Trotzdem zusammenführen?",
+        "duplicateServersError": "Systeme können nicht zusammengeführt werden, da sie mindestens einen Server mit derselben ID haben. Bitte entfernen Sie diesen Server und versuchen Sie es erneut.",
         "connectionFailed": "Verbindung fehlgeschlagen: ",
         "unknownError": "Unbekannter Fehler",
-        "mergeFailed": "Fehler beim Zusammenführen: ",
+        "mergeFailed": "Fehler beim Zusammenführen",
         "mergeSucceed": "Zusammenführung erfolgreich abgeschlossen.",
         "newSystemDisplayName": "Neues System",
         "incompatibleProtocol": "inkompatible Version",

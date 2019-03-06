@@ -38,14 +38,14 @@
                     <div>
                         <h3>Réinitialiser serveur</h3>
                         <p>Cette action remet ce serveur aux valeurs par défaut (efface la base de données et réinitialise la configuration).
-                            Le serveur sera détaché du système actuel. Les archives vidéo resteront intactes.</p>
+                            The server will be detached from the current System. Les archives vidéo resteront intactes.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurer les paramètres par défaut</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Détacher le serveur du système</h3>
-                        <p>Cette action détachera le serveur de la base de données de maintien du système, des utilisateurs locaux et de la configuration.
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
                             Les archives vidéo resteront intactes. <b>Usagers de nuages seront supprimés.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Redémarrer</h3>
@@ -93,7 +93,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Ce système est lié à {{Config.cloud.productName}}, Propriétaire du système: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Déconnecté de {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -101,10 +101,10 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">Ce système n'est pas lié au{{Config.cloud.productName}}
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">En savoir plus</a></uib-alert>
+                                   target="_blank">Learn more</a></uib-alert>
                             <uib-alert type="error" ng-if="!hasInternetOnServer">Connecter le serveur sur Internet pour exécuter l'installation {{Config.cloud.productName}}</uib-alert>
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connexion Internet requise pour connecter le système à {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
@@ -122,15 +122,15 @@
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Forcer le cryptage du trafic
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Forcer le cryptage du trafic
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
                                     Forcer le cryptage du trafic vidéo
                                 </label>
                             </div>

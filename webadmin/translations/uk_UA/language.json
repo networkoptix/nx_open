@@ -42,9 +42,11 @@
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Всі хмарні користувачі будуть видалені.</span><br><br>Система буде доступна через локальну мережу з обліковим записом локального адміністратора.",
         "confirmDisconnectFromCloudAction": "Відключити",
         "disconnectedFromCloudSuccess": "Система була відключена від {{CLOUD_NAME}} успішно",
+        "disconnectedFromCloudError": "Не вдається відключити систему",
         "confirmDisconnectFromSystem": "Від'єднати сервер від поточної системи",
         "confirmDisconnectFromSystemAction": "Від’єднати",
         "disconnectedFromSystemSuccess": "Сервер успішно від’єднано від системи",
+        "disconnectedFromSystemError": "Не вдається відключити сервер",
         "connectedSuccess": "Система успішно підключена",
         "createLocalOwnerTitle": "Створити місцевого адміністратора",
         "confirmChangePassword": "Змінити пароль адміністратора",
@@ -106,7 +108,7 @@
         "statisticsReportTimeCycle": "Інтервал статистичного звіту",
         "statisticsReportUpdateDelay": "Звіт про статистику - період оновлення",
         "synchronizeTimeWithInternet": "Синхронізувати час з Інтернетом",
-        "systemName": "Назва системи",
+        "SystemName": "Назва системи",
         "takeCameraOwnershipWithoutLock": "Взяти управління камерою на себе, не закриваючи доступ іншим",
         "timeSynchronizationEnabled": "Синхронізація часу включена",
         "primaryTimeServer": "Основний сервер синхронізації часу",
@@ -123,7 +125,8 @@
         "trafficEncryptionForced": "Забезпечити шифрування передачі",
         "videoTrafficEncryptionForced": "Забезпечити шифрування передачі відеосигналу",
         "updateStatus": "Оновити статус",
-        "watermarkSettings": "Налаштування водяного знака"
+        "watermarkSettings": "Налаштування водяного знака",
+        "maxWebMTranscoders": "Максимальна кількість WEBM-з'єднань для сервера. Chrome одночасно відкриває 2 з'єднання, потім закриває перше. Отже, рекомендується встановити значення> = 2 для цього параметра."
     },
     "info": {
         "tabs": {
@@ -133,7 +136,7 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "Система недоступна або не існує.",
+        "SystemIsUnreacheble": "Система недоступна або не існує.",
         "incorrectCurrentPassword": "Невірний пароль.",
         "incorrectRemotePassword": "Логін або пароль неправильні.",
         "incompatibleVersion": "Система недоступна, не існує або має несумісну версію.",
@@ -145,9 +148,10 @@
         "cloudBothError": "Не вдається об'єднати системи. Обидві системи підключені до хмари. Вам спочатку потрібно від'єднати одну з них.",
         "cloudHostConflict": "Не вдалося об'єднати системи, оскільки сервери побудовані з різними хостами для хмарної системи",
         "licenceError": "Увага! Будуть об'єднані системи з ліцензіями Starter. В системі дозволяється використовувати тільки одну Starter ліцензію, тому друга ліцензія буде деактивована. Об'єднати?",
+        "duplicateServersError": "Неможливо об'єднати системи, оскільки вони мають принаймні один сервер з однаковим ідентифікатором. Видаліть цей сервер і повторіть спробу.",
         "connectionFailed": "Помилка підключення: ",
         "unknownError": "Невідома помилка",
-        "mergeFailed": "Не вдалося виконати злиття: ",
+        "mergeFailed": "Не вдалося виконати злиття",
         "mergeSucceed": "Злиття пройшло успішно.",
         "newSystemDisplayName": "Нова система",
         "incompatibleProtocol": "несумісна версія",

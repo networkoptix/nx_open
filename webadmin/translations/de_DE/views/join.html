@@ -55,9 +55,7 @@
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>Das derzeitige System
-<b>{{systems.systemName}}</b> soll mit System 
-<b>{{systems.joinSystemName}}</b> zusammengeführt werden</p>
+            <p>Das derzeitige System <b>{{systems.systemName}}</b> soll mit System <b>{{systems.joinSystemName}}</b> zusammengeführt werden</p>
             <p>
                 Das neue System soll das Passwort und den Namen von diesem System haben:<br/>
 <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}}(aktuell)</label><br/>

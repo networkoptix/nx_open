@@ -9,7 +9,7 @@
 
     <uib-alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></uib-alert>
 
-    <uib-alert type="info" ng-if="connecting">A ligar o Sistema a... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
+    <uib-alert type="info" ng-if="connecting">Connecting System to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
         Isto pode durar cerca de um minuto.</uib-alert>
 
     <form name="cloudForm" disable-autocomplete>

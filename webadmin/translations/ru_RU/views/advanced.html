@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Дополнительные настройки сервера</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -125,8 +128,9 @@
                     <option value="error">Ошибки: Записывать ошибки.</option>
                     <option value="warning">Предупреждение: Записывать ошибки и предупреждения.</option>
                     <option value="info">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
-                    <option value="debug">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="debug2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
@@ -135,7 +139,7 @@
         </div>
     </form>
 
-    <h1>Дополнительные настройки системы</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
         <b>Предупреждение!</b> Любые изменения на этой странице могут привести к неправильной работе сервера.
     </div>
@@ -183,7 +187,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Предупреждение!</b> Некоторые изменения требуют перезапуска <b>всех</b> серверов в системе.<br><br>
+        <b>Предупреждение!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
         </div>
