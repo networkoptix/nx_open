@@ -35,35 +35,35 @@ namespace
 
     enum
     {
-        kBorderRadius = 2
-        , kBookmarkFrameWidth = 250
+        kBorderRadius = 2,
+        kBookmarkFrameWidth = 250,
 
-        , kBaseMargin = 10
-        , kBaseHorizontalMargins = kBaseMargin
-        , kBaseTopMargin = 12
-        , kBaseBottomMargin = kBaseMargin
+        kBaseMargin = 10,
+        kBaseHorizontalMargins = kBaseMargin,
+        kBaseTopMargin = 12,
+        kBaseBottomMargin = kBaseMargin,
 
-        , kItemsHorMargin = 4
-        , kItemsTopMargin = 0
-        , kItemsBottomMargin = 10
+        kItemsHorMargin = 4,
+        kItemsTopMargin = 0,
+        kItemsBottomMargin = 10,
 
-        , kTotalHorMargin = kBaseHorizontalMargins + kItemsHorMargin
+        kTotalHorMargin = kBaseHorizontalMargins + kItemsHorMargin
     };
 
     enum
     {
-        kTagClickedActionEventId = QEvent::User + 1
-        , kBookmarkEditActionEventId
-        , kBookmarkRemoveActionEventId
-        , kBookmarkPlayActionEventId
-        , kBookmarkExportActionEventId
+        kTagClickedActionEventId = QEvent::User + 1,
+        kBookmarkEditActionEventId,
+        kBookmarkRemoveActionEventId,
+        kBookmarkPlayActionEventId,
+        kBookmarkExportActionEventId
     };
 
     enum LabelParamIds
     {
-        kNameLabelIndex
-        , kDescriptionLabelIndex
-        , kTagsIndex
+        kNameLabelIndex,
+        kDescriptionLabelIndex,
+        kTagsIndex
     };
 
     struct LabelParams
@@ -72,38 +72,38 @@ namespace
         int fontSize;
         int topMargin;
 
-        LabelParams(bool initBold
-            , int initFontSize
-            , int initTopPadding);
+        LabelParams(bool initBold,
+            int initFontSize,
+            int initTopPadding);
     };
 
-    LabelParams::LabelParams(bool initBold
-        , int initFontSize
-        , int initTopMargin)
-        : bold(initBold)
-        , fontSize(initFontSize)
-        , topMargin(initTopMargin)
+    LabelParams::LabelParams(bool initBold,
+        int initFontSize,
+        int initTopMargin)
+        : bold(initBold),
+        fontSize(initFontSize),
+        topMargin(initTopMargin)
     {}
 
     /// Array of parameters for label. Indexed by LabelParamIds enum
     const LabelParams kLabelParams[] =
     {
-        LabelParams(true, 16, 0)        /// For name label
-        , LabelParams(false, 12, 4)     /// For description label
-        , LabelParams(true, 12, 15)     /// For tags label
+        LabelParams(true, 16, 0),        /// For name label
+        LabelParams(false, 12, 4),     /// For description label
+        LabelParams(true, 12, 15)     /// For tags label
     };
 
-    int placeLabel(QnProxyLabel *label
-        , const QColor &textColor
-        , QGraphicsLinearLayout *layout
-        , int insertionIndex
-        , LabelParamIds labelParamsId)
+    int placeLabel(QnProxyLabel* label,
+        const QColor& textColor,
+        QGraphicsLinearLayout* layout,
+        int insertionIndex,
+        LabelParamIds labelParamsId)
     {
         label->setIndent(0);
         label->setMargin(0);
         layout->insertItem(insertionIndex, label);
 
-        const LabelParams &params = kLabelParams[labelParamsId];
+        const LabelParams& params = kLabelParams[labelParamsId];
         if (insertionIndex > 0 && params.topMargin)
             layout->setItemSpacing(insertionIndex - 1, params.topMargin);
 
@@ -136,12 +136,12 @@ namespace
         return (insertionIndex + 1);
     }
 
-    int createLabel(int insertionIndex
-        , const QString &text
-        , const QColor &textColor
-        , QGraphicsItem *parent
-        , QGraphicsLinearLayout *layout
-        , LabelParamIds labelParamsId)
+    int createLabel(int insertionIndex,
+        const QString& text,
+        const QColor& textColor,
+        QGraphicsItem* parent,
+        QGraphicsLinearLayout* layout,
+        LabelParamIds labelParamsId)
     {
         const QString trimmedText = text.trimmed();
 
@@ -155,15 +155,15 @@ namespace
         return placeLabel(label, textColor, layout, insertionIndex, labelParamsId);
     }
 
-    void insertButtonsSeparator(const QColor &color
-        , int index
-        , QGraphicsItem *item
-        , QGraphicsLinearLayout *layout)
+    void insertButtonsSeparator(const QColor& color,
+        int index,
+        QGraphicsItem* item,
+        QGraphicsLinearLayout* layout)
     {
         enum
         {
-            kButtonSeparatorWidth = 1
-            , kSeparatorSpacingBefore = 15
+            kButtonSeparatorWidth = 1,
+            kSeparatorSpacingBefore = 15
         };
 
         const auto separator = new QnSeparator(kButtonSeparatorWidth, color, item);
@@ -172,10 +172,10 @@ namespace
         layout->insertItem(index, separator);
     }
 
-    void insertBookmarksSeparator(int index
-        , const QnBookmarkColors &colors
-        , QGraphicsItem *parent
-        , QGraphicsLinearLayout *layout)
+    void insertBookmarksSeparator(int index,
+        const QnBookmarkColors& colors,
+        QGraphicsItem* parent,
+        QGraphicsLinearLayout* layout)
     {
         SeparatorAreas areas(1, SeparatorAreaProperties(2, colors.bookmarksSeparatorTop));
         areas.append(SeparatorAreaProperties(1, colors.bookmarksSeparatorBottom));
@@ -186,10 +186,10 @@ namespace
 
     ///
 
-    void insertMoreItemsMessage(const QString &moreItemsText
-        , const QnBookmarkColors &colors
-        , QGraphicsLinearLayout *layout
-        , QGraphicsItem *parent)
+    void insertMoreItemsMessage(const QString& moreItemsText,
+        const QnBookmarkColors& colors,
+        QGraphicsLinearLayout* layout,
+        QGraphicsItem* parent)
     {
         insertBookmarksSeparator(kTopPositionIndex, colors, parent, layout);
 
@@ -217,10 +217,8 @@ namespace
 
     ///
 
-    typedef std::function<void (const QString &tag
-        , int eventId)> EmitTagEventFunc;
-    typedef std::function<void (const QnCameraBookmark &bookmark
-        , int eventId)> EmitBookmarkEventFunc;
+    typedef std::function<void (const QString& tag, int eventId)> EmitTagEventFunc;
+    typedef std::function<void (const QnCameraBookmark& bookmark, int eventId)> EmitBookmarkEventFunc;
 
     /// TODO: #ynikitenkov Move to separate file (for signals etc)
     class BookmarkToolTipFrame : public QnToolTipWidget
@@ -228,52 +226,49 @@ namespace
         Q_DECLARE_TR_FUNCTIONS(BookmarkToolTipFrame)
 
     public:
-        BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks,
+        BookmarkToolTipFrame(const QnCameraBookmarkList& bookmarks,
             bool showMoreTooltip,
             bool allowExport,
-            const QnBookmarkColors &colors,
-            const EmitTagEventFunc &emitTagEvent,
-            const EmitBookmarkEventFunc &emitBookmarkEvent,
-            QnBookmarksViewer *viewer);
+            const QnBookmarkColors& colors,
+            const EmitTagEventFunc& emitTagEvent,
+            const EmitBookmarkEventFunc& emitBookmarkEvent,
+            QnBookmarksViewer* viewer);
 
         virtual ~BookmarkToolTipFrame();
 
-        void setPosition(const QnBookmarksViewer::PosAndBoundsPair &params);
+        void setPosition(const QnBookmarksViewer::PosAndBoundsPair& params);
 
     private:
         void updatePosition();
 
     private:
-        int createTagsControl(int insertionIndex
-            , const QnCameraBookmarkTags &tags
-            , const QColor &commonTextColor
-            , QGraphicsLinearLayout *layout);
+        int createTagsControl(int insertionIndex,
+            const QnCameraBookmarkTags& tags,
+            const QColor& commonTextColor,
+            QGraphicsLinearLayout* layout);
 
-        QGraphicsLinearLayout *createButtonsLayout(const QnCameraBookmark &bookmark);
+        QGraphicsLinearLayout* createButtonsLayout(const QnCameraBookmark& bookmark);
 
-        QGraphicsLinearLayout *createBookmarksLayout(const QnCameraBookmark &bookmark
-            , const QnBookmarkColors &colors);
-
-        QGraphicsLinearLayout *createLeftCountLayout(int bookmarksLeft
-            , const QnBookmarkColors &colors);
+        QGraphicsLinearLayout* createBookmarksLayout(const QnCameraBookmark& bookmark,
+            const QnBookmarkColors& colors);
 
     private:
         const EmitTagEventFunc m_emitTagEvent;
         const EmitBookmarkEventFunc m_emitBookmarkEvent;
         const bool m_allowExport;
-        QnBookmarksViewer * const m_viewer;
-        QGraphicsLinearLayout *m_mainLayout;
+        QnBookmarksViewer* const m_viewer;
+        QGraphicsLinearLayout* m_mainLayout;
         QnBookmarksViewer::PosAndBoundsPair m_posOnTimeline;
     };
 
     BookmarkToolTipFrame::BookmarkToolTipFrame(
-        const QnCameraBookmarkList &bookmarks,
+        const QnCameraBookmarkList& bookmarks,
         bool showMoreTooltip,
         bool allowExport,
-        const QnBookmarkColors &colors,
-        const EmitTagEventFunc &emitTagEvent,
-        const EmitBookmarkEventFunc &emitBookmarkEvent,
-        QnBookmarksViewer *viewer)
+        const QnBookmarkColors& colors,
+        const EmitTagEventFunc& emitTagEvent,
+        const EmitBookmarkEventFunc& emitBookmarkEvent,
+        QnBookmarksViewer* viewer)
         :
         QnToolTipWidget(viewer),
         m_emitTagEvent(emitTagEvent),
@@ -296,7 +291,7 @@ namespace
         m_mainLayout->setSpacing(0);
 
         bool addSeparator = false;
-        for (const auto &bookmark: bookmarks)
+        for (const auto& bookmark: bookmarks)
         {
             if (addSeparator)
                 insertBookmarksSeparator(kTopPositionIndex, colors, this, m_mainLayout);
@@ -312,10 +307,11 @@ namespace
             insertMoreItemsMessage(kMoreItemsCaption, colors, m_mainLayout, this);
         }
 
-        connect(this, &BookmarkToolTipFrame::geometryChanged, this, [this]()
-        {
-            updatePosition();
-        });
+        connect(this, &BookmarkToolTipFrame::geometryChanged, this,
+            [this]()
+            {
+                updatePosition();
+            });
 
         auto mouseEater = new QnMultiEventEater(Qn::AcceptEvent, this);
         mouseEater->addEventType(QEvent::GraphicsSceneMousePress);
@@ -332,11 +328,11 @@ namespace
     {
     }
 
-    QGraphicsLinearLayout *createVertLayout(int horMargin
-        , int topMargin
-        , int bottomMargin)
+    QGraphicsLinearLayout* createVertLayout(int horMargin,
+        int topMargin,
+        int bottomMargin)
     {
-        QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+        QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
 
         layout->setSpacing(0);
         layout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -345,15 +341,15 @@ namespace
         return layout;
     }
 
-    int BookmarkToolTipFrame::createTagsControl(int insertionIndex
-        , const QnCameraBookmarkTags &tags
-        , const QColor &commonTextColor
-        , QGraphicsLinearLayout *layout)
+    int BookmarkToolTipFrame::createTagsControl(int insertionIndex,
+        const QnCameraBookmarkTags& tags,
+        const QColor& commonTextColor,
+        QGraphicsLinearLayout* layout)
     {
         enum { kMaxTags = 16 };
 
         QnCameraBookmarkTags validTags;
-        for (const QString &tag: tags)
+        for (const QString& tag: tags)
         {
             if (tag.isEmpty())
                 continue;
@@ -367,11 +363,11 @@ namespace
 
         const auto tagsControl = new QnBookmarkTagsControl(validTags, this);
 
-        QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked
-            , this, [this](const QString &tag)
-        {
-            m_emitTagEvent(tag, kTagClickedActionEventId);
-        });
+        QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked, this,
+            [this](const QString& tag)
+            {
+                m_emitTagEvent(tag, kTagClickedActionEventId);
+            });
 
         return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, kTagsIndex);
     }
@@ -432,26 +428,29 @@ namespace
         return buttonsLayout;
     }
 
-    QGraphicsLinearLayout *BookmarkToolTipFrame::createBookmarksLayout(const QnCameraBookmark &bookmark
-        , const QnBookmarkColors &colors)
+    QGraphicsLinearLayout* BookmarkToolTipFrame::createBookmarksLayout(
+        const QnCameraBookmark& bookmark,
+        const QnBookmarkColors& colors)
     {
-        const auto layout = createVertLayout(kBaseHorizontalMargins, kBaseTopMargin, kBaseBottomMargin);
-        const auto bookmarkItemsLayout = createVertLayout(kItemsHorMargin
-            , kItemsTopMargin, kItemsBottomMargin);
+        const auto layout = createVertLayout(kBaseHorizontalMargins, kBaseTopMargin,
+            kBaseBottomMargin);
+        const auto bookmarkItemsLayout = createVertLayout(kItemsHorMargin, kItemsTopMargin,
+            kItemsBottomMargin);
 
         enum
         {
-            kMaxHeaderLength = 64
-            , kMaxBodyLength = 96
+            kMaxHeaderLength = 64,
+            kMaxBodyLength = 96
         };
 
         enum { kFirstPosition = 0 };
-        int position = createLabel(kFirstPosition, nx::utils::elideString(bookmark.name, kMaxHeaderLength)
-            , colors.text, this, bookmarkItemsLayout, kNameLabelIndex);
+        int position = createLabel(kFirstPosition,
+            nx::utils::elideString(bookmark.name, kMaxHeaderLength),
+            colors.text, this, bookmarkItemsLayout, kNameLabelIndex);
 
-        position = createLabel(position, nx::utils::elideString(bookmark.description, kMaxBodyLength)
-            , colors.text, this, bookmarkItemsLayout, kDescriptionLabelIndex);
-
+        position = createLabel(position,
+            nx::utils::elideString(bookmark.description, kMaxBodyLength),
+            colors.text, this, bookmarkItemsLayout, kDescriptionLabelIndex);
 
         position = createTagsControl(position, bookmark.tags, colors.text, bookmarkItemsLayout);
 
@@ -463,7 +462,7 @@ namespace
         return layout;
     }
 
-    void BookmarkToolTipFrame::setPosition(const QnBookmarksViewer::PosAndBoundsPair &params)
+    void BookmarkToolTipFrame::setPosition(const QnBookmarksViewer::PosAndBoundsPair& params)
     {
         m_posOnTimeline = params;
         updatePosition();
@@ -506,26 +505,24 @@ namespace
     class TagActionEvent : public QEvent
     {
     public:
-        TagActionEvent(int eventId
-            , const QString &tag);
+        TagActionEvent(int eventId, const QString& tag);
 
         virtual ~TagActionEvent();
 
-        const QString &tag() const;
+        const QString& tag() const;
 
     private:
         const QString m_tag;
     };
 
-    TagActionEvent::TagActionEvent(int eventId
-        , const QString &tag)
-        : QEvent(static_cast<QEvent::Type>(eventId))
-        , m_tag(tag)
+    TagActionEvent::TagActionEvent(int eventId, const QString& tag)
+        : QEvent(static_cast<QEvent::Type>(eventId)),
+        m_tag(tag)
     {}
 
     TagActionEvent::~TagActionEvent() {}
 
-    const QString &TagActionEvent::tag() const
+    const QString& TagActionEvent::tag() const
     {
         return m_tag;
     }
@@ -535,27 +532,25 @@ namespace
     class BookmarkActionEvent : public QEvent
     {
     public:
-        BookmarkActionEvent(int eventId
-            , const QnCameraBookmark &bookmark);
+        BookmarkActionEvent(int eventId, const QnCameraBookmark& bookmark);
 
         virtual ~BookmarkActionEvent();
 
-        const QnCameraBookmark &bookmark() const;
+        const QnCameraBookmark& bookmark() const;
 
     private:
         const QnCameraBookmark m_bookmark;
     };
 
-    BookmarkActionEvent::BookmarkActionEvent(int eventId
-        , const QnCameraBookmark &bookmark)
-        : QEvent(static_cast<QEvent::Type>(eventId))
-        , m_bookmark(bookmark)
+    BookmarkActionEvent::BookmarkActionEvent(int eventId, const QnCameraBookmark& bookmark)
+        : QEvent(static_cast<QEvent::Type>(eventId)),
+        m_bookmark(bookmark)
     {
     }
 
     BookmarkActionEvent::~BookmarkActionEvent() {}
 
-    const QnCameraBookmark &BookmarkActionEvent::bookmark() const
+    const QnCameraBookmark& BookmarkActionEvent::bookmark() const
     {
         return m_bookmark;
     }
@@ -566,9 +561,9 @@ namespace
 class QnBookmarksViewer::Impl : public QObject
 {
 public:
-    Impl(const GetBookmarksFunc &getBookmarksFunc
-        , const GetPosOnTimelineFunc &getPosFunc
-        , QnBookmarksViewer *owner);
+    Impl(const GetBookmarksFunc& getBookmarksFunc,
+        const GetPosOnTimelineFunc& getPosFunc,
+        QnBookmarksViewer* owner);
 
     virtual ~Impl();
 
@@ -588,24 +583,24 @@ public:
 
     bool isHovered() const;
 
-    void setHoverProcessor(HoverFocusProcessor *processor);
+    void setHoverProcessor(HoverFocusProcessor* processor);
 
     ///
 
-    void setColors(const QnBookmarkColors &colors);
+    void setColors(const QnBookmarkColors& colors);
 
-    const QnBookmarkColors &colors() const;
+    const QnBookmarkColors& colors() const;
 
     void resetBookmarks();
 
     QnCameraBookmarkList getBookmarks() const;
 
 private:
-    void updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params);
+    void updatePosition(const QnBookmarksViewer::PosAndBoundsPair& params);
 
     void updateBookmarks(QnCameraBookmarkList bookmarks);
 
-    bool event(QEvent *event) override;
+    bool event(QEvent* event) override;
 
     void updateLocationInternal(qint64 location);
 
@@ -615,8 +610,8 @@ private:
 
     QPointer<BookmarkToolTipFrame> m_tooltip;
 
-    QnBookmarksViewer * const m_owner;
-    HoverFocusProcessor *m_hoverProcessor;
+    QnBookmarksViewer* const m_owner;
+    HoverFocusProcessor* m_hoverProcessor;
     QnBookmarkColors m_colors;
 
     qint64 m_targetLocation;
@@ -632,28 +627,28 @@ private:
 
 enum { kInvalidTimestamp = -1 };
 
-QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
-    , const GetPosOnTimelineFunc &getPosFunc
-    , QnBookmarksViewer *owner)
+QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc& getBookmarksFunc,
+    const GetPosOnTimelineFunc& getPosFunc,
+    QnBookmarksViewer* owner)
 
-    : QObject(owner)
+    : QObject(owner),
 
-    , m_getBookmarks(getBookmarksFunc)
-    , m_getPos(getPosFunc)
+    m_getBookmarks(getBookmarksFunc),
+    m_getPos(getPosFunc),
 
-    , m_tooltip()
+    m_tooltip(),
 
-    , m_owner(owner)
-    , m_hoverProcessor(nullptr)
-    , m_colors()
+    m_owner(owner),
+    m_hoverProcessor(nullptr),
+    m_colors(),
 
-    , m_targetLocation(kInvalidTimestamp)
+    m_targetLocation(kInvalidTimestamp),
 
-    , m_bookmarks()
-    , m_readonly(false)
+    m_bookmarks(),
+    m_readonly(false),
 
-    , m_updateDelayedTimer()
-    , m_forceUpdateTimer()
+    m_updateDelayedTimer(),
+    m_forceUpdateTimer()
 {
 }
 
@@ -661,7 +656,7 @@ QnBookmarksViewer::Impl::~Impl()
 {
 }
 
-void QnBookmarksViewer::Impl::setColors(const QnBookmarkColors &colors)
+void QnBookmarksViewer::Impl::setColors(const QnBookmarkColors& colors)
 {
     if (m_colors == colors)
         return;
@@ -669,7 +664,7 @@ void QnBookmarksViewer::Impl::setColors(const QnBookmarkColors &colors)
     m_colors = colors;
 }
 
-const QnBookmarkColors &QnBookmarksViewer::Impl::colors() const
+const QnBookmarkColors& QnBookmarksViewer::Impl::colors() const
 {
     return m_colors;
 }
@@ -679,7 +674,7 @@ bool QnBookmarksViewer::Impl::isHovered() const
     return (m_hoverProcessor ? m_hoverProcessor->isHovered() : false);
 }
 
-void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor *processor)
+void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor* processor)
 {
     if (m_hoverProcessor == processor)
         return;
@@ -691,10 +686,11 @@ void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor *processor)
     if (m_tooltip)
         m_hoverProcessor->addTargetItem(m_tooltip.data());
 
-    QObject::connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, [this]()
-    {
-        resetBookmarks();
-    });
+    QObject::connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        [this]()
+        {
+            resetBookmarks();
+        });
 }
 
 bool QnBookmarksViewer::Impl::readOnly() const
@@ -795,7 +791,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 
     const int bookmarksCount = std::min<int>(m_bookmarks.size(), kMaxBookmarksCount);
     const int bookmarksLeft = m_bookmarks.size() - bookmarksCount;
-    const auto &trimmedBookmarks = (bookmarksLeft
+    const auto& trimmedBookmarks = (bookmarksLeft
         ? m_bookmarks.mid(0, kMaxBookmarksCount) : m_bookmarks);
 
 
@@ -824,12 +820,12 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
     {
         // TODO: #ynikitenkov Replace emitBookmarkEventFunc,
         // emitTagEventFunc with Qt::QueuedConnection later
-        const auto emitBookmarkEventFunc= [this](const QnCameraBookmark &bookmark, int eventId)
+        const auto emitBookmarkEventFunc= [this](const QnCameraBookmark& bookmark, int eventId)
         {
             qApp->postEvent(this, new BookmarkActionEvent(eventId, bookmark));
         };
 
-        const auto emitTagEventFunc = [this](const QString &tag, int eventId)
+        const auto emitTagEventFunc = [this](const QString& tag, int eventId)
         {
             qApp->postEvent(this, new TagActionEvent(eventId, tag));
         };
@@ -840,21 +836,21 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 
     if (m_tooltip)
     {
-        HoverFocusProcessor *processor = new HoverFocusProcessor(m_tooltip.data());
+        HoverFocusProcessor* processor = new HoverFocusProcessor(m_tooltip.data());
         processor->addTargetItem(m_tooltip.data());
-        connect(processor, &HoverFocusProcessor::hoverEntered, this
-            , [this]()
-        {
-            m_updateDelayedTimer.reset();
-            m_forceUpdateTimer.invalidate();
-        });
+        connect(processor, &HoverFocusProcessor::hoverEntered, this,
+            [this]()
+            {
+                m_updateDelayedTimer.reset();
+                m_forceUpdateTimer.invalidate();
+            });
 
         if (m_hoverProcessor)
             m_hoverProcessor->addTargetItem(m_tooltip.data());
     }
 }
 
-bool QnBookmarksViewer::Impl::event(QEvent *event)
+bool QnBookmarksViewer::Impl::event(QEvent* event)
 {
     const int eventType = event->type();
     switch(eventType)
@@ -870,8 +866,8 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
         case kBookmarkPlayActionEventId:
         case kBookmarkExportActionEventId:
         {
-            const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
-            const auto &bookmark = bookmarkActionEvent->bookmark();
+            const auto bookmarkActionEvent = static_cast<BookmarkActionEvent*>(event);
+            const auto& bookmark = bookmarkActionEvent->bookmark();
 
             if (eventType == kBookmarkEditActionEventId)
                 emit m_owner->editBookmarkClicked(bookmark);
@@ -891,7 +887,7 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
     return true;
 }
 
-void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params)
+void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoundsPair& params)
 {
     if (m_tooltip)
         m_tooltip->setPosition(params);
@@ -904,11 +900,11 @@ QnCameraBookmarkList QnBookmarksViewer::Impl::getBookmarks() const
 
 ///
 
-QnBookmarksViewer::QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
-    , const GetPosOnTimelineFunc &getPosFunc
-    , QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
-    , m_impl(new Impl(getBookmarksFunc, getPosFunc, this))
+QnBookmarksViewer::QnBookmarksViewer(const GetBookmarksFunc& getBookmarksFunc,
+    const GetPosOnTimelineFunc& getPosFunc,
+    QGraphicsItem* parent)
+    : QGraphicsWidget(parent),
+    m_impl(new Impl(getBookmarksFunc, getPosFunc, this))
 {
     setGeometry({});
 }
@@ -932,7 +928,7 @@ void QnBookmarksViewer::setAllowExport(bool allowExport)
     m_impl->setAllowExport(allowExport);
 }
 
-int QnBookmarksViewer::helpTopicAt(const QPointF &pos) const
+int QnBookmarksViewer::helpTopicAt(const QPointF& pos) const
 {
     Q_UNUSED(pos);
     return Qn::Bookmarks_Usage_Help;
@@ -958,7 +954,7 @@ void QnBookmarksViewer::resetBookmarks()
     m_impl->resetBookmarks();
 }
 
-void QnBookmarksViewer::setHoverProcessor(HoverFocusProcessor *processor)
+void QnBookmarksViewer::setHoverProcessor(HoverFocusProcessor* processor)
 {
     m_impl->setHoverProcessor(processor);
 }
@@ -968,12 +964,12 @@ bool QnBookmarksViewer::isHovered() const
     return m_impl->isHovered();
 }
 
-const QnBookmarkColors &QnBookmarksViewer::colors() const
+const QnBookmarkColors& QnBookmarksViewer::colors() const
 {
     return m_impl->colors();
 }
 
-void QnBookmarksViewer::setColors(const QnBookmarkColors &colors)
+void QnBookmarksViewer::setColors(const QnBookmarkColors& colors)
 {
     m_impl->setColors(colors);
 }
