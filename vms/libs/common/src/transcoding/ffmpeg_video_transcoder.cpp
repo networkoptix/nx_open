@@ -279,11 +279,11 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
 
     QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
-    auto itr = m_frameNumToPts.lower_bound(m_outPacket->pts);
+    auto itr = m_frameNumToPts.find(m_outPacket->pts);
     if (itr != m_frameNumToPts.end())
     {
         resultVideoData->timestamp = itr->second;
-        m_frameNumToPts.erase(m_frameNumToPts.begin(), ++itr);
+        m_frameNumToPts.erase(itr);
     }
 
     if (m_outPacket->flags & AV_PKT_FLAG_KEY)
