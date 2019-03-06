@@ -142,7 +142,7 @@ ${YOUR PERMISSIONS}                   //ng-include[@src="$root.C.viewsDir + 'com
 
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
-${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable']
+${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable || currentlyMerging']
 ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
@@ -224,6 +224,7 @@ ${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
 ${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]
 ${FOOTER PRIVACY LINK}               //footer//a[contains(text(),"${PRIVACY}")]
 ${FOOTER COPYRIGHT LINK}             //footer//a[contains(text(),"${COPYRIGHT SYMBOL}") and contains(text(),"${YEAR}") and contains(text(),"${COMPANY}")]
+${FOOTER SUPPORTED DEVICES LINK}     //footer//a[contains(text(),"${SUPPORTED DEVICES}"]
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
