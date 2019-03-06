@@ -71,9 +71,11 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
     return connectors;
 }
 
-void ConnectorFactory::setEnabledCloudConnectMask(int cloudConnectTypeMask)
+int ConnectorFactory::setEnabledCloudConnectMask(int cloudConnectTypeMask)
 {
+    const auto bak = s_cloudConnectTypeMask;
     s_cloudConnectTypeMask = cloudConnectTypeMask;
+    return bak;
 }
 
 int ConnectorFactory::getEnabledCloudConnectMask()

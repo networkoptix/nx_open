@@ -43,10 +43,11 @@ public:
 
     /**
      * Enable/disable cloud connectors. Debug only!
-     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::ConnectType enum.
      * By default, everything is enabled.
+     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::ConnectType enum.
+     * @return The initial value.
      */
-    static void setEnabledCloudConnectMask(int cloudConnectTypeMask);
+    static int setEnabledCloudConnectMask(int cloudConnectTypeMask);
     static int getEnabledCloudConnectMask();
 
 private:

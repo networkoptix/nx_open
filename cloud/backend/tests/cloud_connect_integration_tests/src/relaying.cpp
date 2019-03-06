@@ -132,13 +132,13 @@ TEST_P(Relaying, server_socket_registers_itself_on_relay)
 
 TEST_P(Relaying, connection_can_be_established)
 {
-    this->assertConnectionCanBeEstablished();
+    this->assertCloudConnectionCanBeEstablished();
 }
 
 TEST_P(Relaying, connecting_using_full_server_name)
 {
     this->setRemotePeerName(this->cloudSystemCredentials().hostName().toStdString());
-    this->assertConnectionCanBeEstablished();
+    this->assertCloudConnectionCanBeEstablished();
 }
 
 TEST_P(Relaying, exchanging_fixed_data)
