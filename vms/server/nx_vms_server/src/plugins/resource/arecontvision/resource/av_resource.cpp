@@ -55,6 +55,9 @@ bool QnPlAreconVisionResource::isDualSensor() const
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 {
+    if (commonModule()->isNeedToStop())
+        return CL_HTTP_SERVICEUNAVAILABLE;
+
     QString req;
     QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
@@ -81,6 +84,9 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 
 CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 {
+    if (commonModule()->isNeedToStop())
+        return CL_HTTP_SERVICEUNAVAILABLE;
+
     QString req;
     QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
     QUrl devUrl(getUrl());
@@ -434,6 +440,9 @@ QString QnPlAreconVisionResource::generateRequestString(
 // ===============================================================================================================================
 bool QnPlAreconVisionResource::getApiParameter(const QString& id, QString& value)
 {
+    if (commonModule()->isNeedToStop())
+        return false;
+
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -461,6 +470,9 @@ bool QnPlAreconVisionResource::getApiParameter(const QString& id, QString& value
 
 bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString& value)
 {
+    if (commonModule()->isNeedToStop())
+        return false;
+
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
