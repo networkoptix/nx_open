@@ -274,9 +274,9 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 // private
 
 static IObjectMetadata* makeObjectMetadata(
-    std::string objectTypeId,
-    Uuid objectId,
-    double dt,
+    const std::string &objectTypeId,
+    const Uuid &objectId,
+    double offset,
     int64_t lastVideoFrameTimestampUs,
     bool generatePreviewAttributes,
     int objectIndex)
@@ -285,8 +285,8 @@ static IObjectMetadata* makeObjectMetadata(
     objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     objectMetadata->setTypeId(objectTypeId);
     objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt,
-        (float) dt + 0.05 * objectIndex, 0.25F, 0.25F));
+    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) offset,
+        (float) offset + 0.05 * objectIndex, 0.25F, 0.25F));
 
     if (generatePreviewAttributes)
     {
@@ -294,9 +294,9 @@ static IObjectMetadata* makeObjectMetadata(
         objectMetadata->addAttributes({
             {IAttribute::Type::number, "nx.sys.preview.timestampUs",
                 std::to_string(lastVideoFrameTimestampUs)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(offset)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
-                std::to_string(dt)},
+                std::to_string(offset)},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
             {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
         });
