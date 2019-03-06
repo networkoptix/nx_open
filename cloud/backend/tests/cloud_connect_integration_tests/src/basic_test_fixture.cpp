@@ -261,7 +261,7 @@ void BasicTestFixture::startCloudModulesXmlProvider()
 
 void BasicTestFixture::setRelayCount(int count)
 {
-    m_relayCount = 0;
+    m_relayCount = count;
 }
 
 void BasicTestFixture::startRelays()
