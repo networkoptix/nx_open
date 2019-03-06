@@ -114,7 +114,6 @@ Item
             videoScreenController.setPosition(position, savePosition)
         }
 
-
         function updateTimelinePosition()
         {
             if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
