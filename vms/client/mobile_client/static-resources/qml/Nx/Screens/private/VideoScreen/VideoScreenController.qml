@@ -248,7 +248,6 @@ Object
     function setPosition(position, savePosition)
     {
         mediaPlayer.position = position
-
         if (savePosition)
             d.savePosition()
     }
