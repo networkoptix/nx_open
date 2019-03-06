@@ -94,8 +94,7 @@ copyLibs()
         'libcloud_db.*'
         'libnx_cassandra*'
         'libconnection_mediator*'
-        'libnx_clusterdb_engine*'
-        'libnx_clusterdb_map*'
+        'libnx_clusterdb*'
         'libnx_discovery_api_client*'
         'libtraffic_relay*'
     )
