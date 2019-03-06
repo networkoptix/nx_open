@@ -96,10 +96,10 @@ ListView
         onButtonLongPressedChanged:
         {
             if (active)
-                control.longPressedChanged(index, buttonLongPressed, button.pressed)
+                control.longPressedChanged(index, buttonLongPressed, button.down)
         }
 
-        onPressedChanged: pressedSignalOrderTimer.restart()
+        onDownChanged: pressedSignalOrderTimer.restart()
         onEnabledChanged: control.enabledChanged(index, enabled)
 
         Connections
@@ -110,7 +110,7 @@ ListView
             onDraggingChanged: handleCancelled()
         }
 
-        onPressedEvent:
+        onPressed:
         {
             filteringPressing = false
             buttonLongPressed = false
@@ -150,7 +150,7 @@ ListView
             onTriggered:
             {
                 if (button.active)
-                    control.buttonDownChanged(index, button.pressed)
+                    control.buttonDownChanged(index, button.down)
             }
         }
 

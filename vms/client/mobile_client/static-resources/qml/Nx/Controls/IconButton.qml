@@ -18,9 +18,9 @@ Control
     property bool checkable: false
     property bool checked: false
 
-    readonly property alias pressed: d.pressed
+    readonly property alias down: d.down
 
-    signal pressedEvent()
+    signal pressed()
     signal released()
     signal pressAndHold()
     signal canceled()
@@ -75,16 +75,16 @@ Control
 
         onPressed:
         {
-            d.pressed = true
-            control.pressedEvent()
+            d.down = true
+            control.pressed()
         }
 
-        onPositionChanged: d.pressed = !mouseOutsideButton(mouse)
+        onPositionChanged: d.down = !mouseOutsideButton(mouse)
 
         onReleased:
         {
             d.pressedAndHeld = false
-            d.pressed = false
+            d.down = false
             if (mouseOutsideButton(mouse))
             {
                 control.canceled()
@@ -113,7 +113,7 @@ Control
         {
             anchors.fill: parent
             radius: Math.min(width, height) / 2
-            visible: !control.pressed
+            visible: !control.down
             color: control.enabled ? control.backgroundColor : control.disabledBackgroundColor
         }
 
@@ -142,6 +142,6 @@ Control
         id: d
 
         property bool pressedAndHeld: false
-        property bool pressed: false
+        property bool down: false
     }
 }

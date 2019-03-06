@@ -645,11 +645,11 @@ Item
             {
                 interval: 100
                 repeat: true
-                running: zoomInButton.pressed || zoomOutButton.pressed
+                running: zoomInButton.down || zoomOutButton.down
                 triggeredOnStart: true
                 onTriggered:
                 {
-                    if (zoomInButton.pressed)
+                    if (zoomInButton.down)
                         timeline.zoomIn()
                     else
                         timeline.zoomOut()
