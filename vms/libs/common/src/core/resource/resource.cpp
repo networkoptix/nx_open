@@ -633,6 +633,7 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 bool QnResource::init()
 {
     auto commonModule = this->commonModule();
+    auto parentId = getParentId();
     {
         QnMutexLocker lock(&m_initMutex);
         if (!commonModule || commonModule->isNeedToStop())
@@ -651,7 +652,7 @@ bool QnResource::init()
     NX_INFO(this, "Initialization result: %1",
         initResult.toString(commonModule->resourcePool()));
 
-    bool changed = false;
+    bool isInitialized = false;
     {
         QnMutexLocker lock(&m_initMutex);
         m_initInProgress = false;
@@ -661,22 +662,24 @@ bool QnResource::init()
             return init();
         }
 
-        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
         {
             QnMutexLocker lk(&m_mutex);
             m_prevInitializationResult = initResult;
+
+            if (parentId != m_parentId)
+                return false; //< Initialization has been interrupted by changing parentId.
+            isInitialized = m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
         }
 
         m_initializationAttemptCount.fetchAndAddOrdered(1);
 
-        changed = m_initialized;
-        if (m_initialized)
+        if (isInitialized)
             initializationDone();
         else if (isOnline())
             setStatus(Qn::Offline);
     }
 
-    if (changed)
+    if (isInitialized)
         emit initializedChanged(toSharedPointer(this));
 
     return true;
