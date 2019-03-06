@@ -238,6 +238,7 @@ private:
     QnWaitCondition m_waitCondition;
     QSet<QString> m_beingProcessedStoragesUrls;
     Qn::RebuildState m_lastTaskProcessed = Qn::RebuildState_None;
+    int m_cataloguesProcessed = 0;
 
     void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
@@ -253,14 +254,7 @@ private:
 
         m_beingProcessedStoragesUrls.insert(storageUrl);
         if (!hasTasksToProcess())
-        {
-            m_owner->setRebuildInfo(
-                QnStorageScanData(
-                    partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan,
-                    storage->getUrl(),
-                    0.0,
-                    0.0));
-        }
+            resetRebuildInfo();
 
         const auto storageIndex = m_owner->storageDbPool()->getStorageIndex(storage);
         NX_CRITICAL(storageIndex != -1);
@@ -270,6 +264,12 @@ private:
             addPartialScanTasks(storage, cataloguesToScan);
         else
             addFullScanTasks(storage, cataloguesToScan);
+    }
+
+    void resetRebuildInfo()
+    {
+        m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
+        m_cataloguesProcessed = 0;
     }
 
     virtual void run() override
@@ -287,6 +287,7 @@ private:
             case Qn::RebuildState_None:
                 if (m_partialScanTasks.isEmpty())
                 {
+                    resetRebuildInfo();
                     m_lastTaskProcessed = Qn::RebuildState_None;
                     if (!m_fullScanTasks.isEmpty())
                         processFullTasks(&lock);
@@ -298,6 +299,7 @@ private:
             case Qn::RebuildState_FullScan:
                 if (m_fullScanTasks.isEmpty())
                 {
+                    resetRebuildInfo();
                     m_lastTaskProcessed = Qn::RebuildState_None;
                     if (!m_partialScanTasks.isEmpty())
                         processPartialTasks(&lock);
@@ -312,17 +314,38 @@ private:
 
     void processFullTasks(nx::utils::MutexLocker* lock)
     {
+        nx::caminfo::ArchiveCameraDataList archiveCameras;
         while (!needToStop() && !m_fullScanTasks.isEmpty())
         {
             const auto scanTask = m_fullScanTasks.front();
             m_fullScanTasks.pop_front();
 
-            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalogue);
+            lock->unlock();
+            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalogue, &archiveCameras);
+            lock->relock();
         }
+
+        lock->unlock();
+        if (!needToStop())
+            processArchiveCameras(archiveCameras);
+    }
+
+    void processArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
+    {
+        // #TODO #akulikov Implement this.
     }
 
     void processPartialTasks(nx::utils::MutexLocker* lock)
     {
+        while (!needToStop() && !m_partialScanTasks.isEmpty())
+        {
+            const auto scanTask = m_partialScanTasks.front();
+            m_partialScanTasks.pop_front();
+
+            lock->unlock();
+            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalogue);
+            lock->relock();
+        }
     }
 
     bool hasTasksToProcess()
