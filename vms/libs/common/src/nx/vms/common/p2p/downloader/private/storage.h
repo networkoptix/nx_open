@@ -84,10 +84,11 @@ private:
     FileMetadata fileMetadata(const QString& fileName) const;
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
-    void findDownloadsRecursively(const QDir& dir);
+    void findDownloadsImpl();
+    QString metadataDirectoryPath() const;
+    QString metadataFileName(const QString& fileName);
 
     static ResultCode reserveSpace(const QString& fileName, const qint64 size);
-    static QString metadataFileName(const QString& fileName);
     static qint64 calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 calculateChunkSize);
 
 private:

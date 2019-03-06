@@ -111,6 +111,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 {
     NX_VERBOSE(this, lm("Processing read task. Read buffer size %1")
         .args(task->buffer->capacity() - task->buffer->size()));
+    NX_ASSERT(isInSelfAioThread());
 
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesRead = 0;
@@ -138,6 +139,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 {
     NX_VERBOSE(this, lm("Processing write task (%1 bytes)").args(task->buffer.size()));
+    NX_ASSERT(isInSelfAioThread());
 
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
@@ -306,6 +308,8 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
     SystemError::ErrorCode resultCode,
     std::size_t /*bytesTransferred*/)
 {
+    NX_ASSERT(isInSelfAioThread());
+
     auto completedIoRange =
         std::make_pair(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
     if (resultCode != SystemError::noError)

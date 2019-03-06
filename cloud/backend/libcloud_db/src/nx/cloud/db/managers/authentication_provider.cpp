@@ -304,11 +304,11 @@ void AuthenticationProvider::addUserAuthRecord(
     const api::AccountData& account,
     const std::string& nonce)
 {
-    NX_DEBUG(this,
-        lm("Updating authentication information of user %1 (vms user id %2) of system %3")
-        .arg(account.email).arg(vmsUserId).arg(systemId));
-
     auto authRecord = generateAuthRecord(account, nonce);
+
+    NX_DEBUG(this,
+        "Updating authentication information of user %1 (vms user id %2), system %3, nonce %4",
+        account.email, vmsUserId, systemId, nonce);
 
     api::AuthInfo userAuthRecords;
     userAuthRecords.records.push_back(std::move(authRecord));

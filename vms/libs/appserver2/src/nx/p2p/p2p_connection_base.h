@@ -97,7 +97,7 @@ public:
     QObject* opaqueObject();
 
     virtual utils::Url remoteAddr() const override;
-    void stopWhileInAioThread();
+    void pleaseStopSync();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
 
@@ -118,6 +118,7 @@ protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
     virtual void setState(State state);
+    void stopWhileInAioThread();
   private:
     void cancelConnecting(State state, const QString& reason);
 
@@ -172,6 +173,7 @@ private:
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
     QByteArray m_connectionGuid;
+    size_t m_startedClassId = 0;
 };
 
 QString toString(ConnectionBase::State value);

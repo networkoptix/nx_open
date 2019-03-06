@@ -215,7 +215,7 @@ private:
 
     nx::update::UpdateSourceType m_updateSourceMode = nx::update::UpdateSourceType::internet;
 
-    std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
+    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::shared_ptr<PeerStateTracker> m_stateTracker;
@@ -233,6 +233,7 @@ private:
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;
     nx::utils::SoftwareVersion m_targetVersion;
+    bool m_holdConnection = false;
 
     WidgetUpdateState m_widgetState = WidgetUpdateState::initial;
 

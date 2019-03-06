@@ -11,9 +11,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
 
-#include <nx/cloud/relaying/listening_peer_pool.h>
-#include <nx/cloud/relaying/listening_peer_connector.h>
-
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -28,8 +25,7 @@ class NX_VMS_GATEWAY_API TargetPeerConnector:
     using base_type = nx::network::aio::AbstractAsyncConnector;
 
 public:
-    TargetPeerConnector(
-        relaying::AbstractListeningPeerPool* listeningPeerPool);
+    TargetPeerConnector();
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -42,7 +38,6 @@ public:
     void setTargetConnectionSendTimeout(std::optional<std::chrono::milliseconds> value);
 
 private:
-    relaying::AbstractListeningPeerPool* m_listeningPeerPool;
     network::SocketAddress m_targetEndpoint;
     boost::optional<std::chrono::milliseconds> m_timeout;
     ConnectHandler m_completionHandler;
@@ -50,14 +45,8 @@ private:
     nx::network::aio::Timer m_timer;
     std::optional<std::chrono::milliseconds> m_targetConnectionRecvTimeout;
     std::optional<std::chrono::milliseconds> m_targetConnectionSendTimeout;
-    std::unique_ptr<relaying::ListeningPeerConnector> m_relayConnector;
 
     virtual void stopWhileInAioThread() override;
-
-    void takeConnectionFromListeningPeerPool();
-    void processTakeConnectionResult(
-        SystemError::ErrorCode resultCode,
-        std::unique_ptr<network::AbstractStreamSocket> connection);
 
     void initiateDirectConnection();
     void processDirectConnectionResult(SystemError::ErrorCode systemErrorCode);

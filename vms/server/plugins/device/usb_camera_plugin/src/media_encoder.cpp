@@ -138,7 +138,7 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
         actualFps = 30;
 
     *selectedFps = actualFps;
-     m_streamReader->setFps(actualFps);
+    m_streamReader->setFps(actualFps);
     return nxcip::NX_NO_ERROR;
 }
 
