@@ -172,6 +172,207 @@ private:
     QString                     m_cameraUniqueId;
 };
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// New storage reindexer
+
+class StorageReindexer: public QnLongRunnable
+{
+public:
+    StorageReindexer(QnStorageManager* owner, const QString& threadName):
+        m_owner(owner)
+    {
+        setObjectName(threadName);
+    }
+
+    virtual ~StorageReindexer() override
+    {
+        stop();
+    }
+
+    void addStorageToScan(const QnStorageResourcePtr& storage, bool partialScan)
+    {
+        QnMutexLocker lock(&m_mutex);
+        addStorageToScanUnsafe(storage, partialScan);
+        m_waitCondition.wakeOne();
+    }
+
+    void addStoragesToScan(const QVector<QnStorageResourcePtr>& storages, bool partialScan)
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (auto storage : storages)
+            addStorageToScanUnsafe(storage, partialScan);
+        m_waitCondition.wakeOne();
+    }
+
+private:
+    struct ScanTask
+    {
+        DeviceFileCatalogPtr catalogue;
+        QnStorageResourcePtr storage;
+
+        ScanTask(const DeviceFileCatalogPtr& catalogue, const QnStorageResourcePtr& storage):
+            catalogue(catalogue),
+            storage(storage)
+        {}
+    };
+
+    struct PartialScanTask: ScanTask
+    {
+        DeviceFileCatalog::ScanFilter scanFilter;
+
+        PartialScanTask(
+            const DeviceFileCatalogPtr& catalogue,
+            const QnStorageResourcePtr& storage,
+            const DeviceFileCatalog::ScanFilter& scanFilter)
+            :
+            ScanTask(catalogue, storage),
+            scanFilter(scanFilter)
+        {}
+    };
+
+    QnStorageManager* m_owner;
+    QQueue<ScanTask> m_fullScanTasks;
+    QQueue<PartialScanTask> m_partialScanTasks;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCondition;
+    QSet<QString> m_beingProcessedStoragesUrls;
+    Qn::RebuildState m_lastTaskProcessed = Qn::RebuildState_None;
+
+    void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
+    {
+        const auto storageUrl = storage->getUrl();
+        if (m_beingProcessedStoragesUrls.contains(storageUrl))
+        {
+            NX_DEBUG(
+                this,
+                lm("A storage %1 is already being scanned. Skipping a new scan request.")
+                    .args(storageUrl));
+            return;
+        }
+
+        m_beingProcessedStoragesUrls.insert(storageUrl);
+        if (!hasTasksToProcess())
+        {
+            m_owner->setRebuildInfo(
+                QnStorageScanData(
+                    partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan,
+                    storage->getUrl(),
+                    0.0,
+                    0.0));
+        }
+
+        const auto storageIndex = m_owner->storageDbPool()->getStorageIndex(storage);
+        NX_CRITICAL(storageIndex != -1);
+        const auto cataloguesToScan = m_owner->cataloguesToScan(storageIndex);
+
+        if (partialScan)
+            addPartialScanTasks(storage, cataloguesToScan);
+        else
+            addFullScanTasks(storage, cataloguesToScan);
+    }
+
+    virtual void run() override
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        while (!needToStop() && !hasTasksToProcess())
+            m_waitCondition.wait(&m_mutex);
+
+        if (needToStop())
+            return;
+
+        switch (m_lastTaskProcessed)
+        {
+            case Qn::RebuildState_PartialScan:
+            case Qn::RebuildState_None:
+                if (m_partialScanTasks.isEmpty())
+                {
+                    m_lastTaskProcessed = Qn::RebuildState_None;
+                    if (!m_fullScanTasks.isEmpty())
+                        processFullTasks(&lock);
+
+                    break;
+                }
+
+                processPartialTasks(&lock);
+            case Qn::RebuildState_FullScan:
+                if (m_fullScanTasks.isEmpty())
+                {
+                    m_lastTaskProcessed = Qn::RebuildState_None;
+                    if (!m_partialScanTasks.isEmpty())
+                        processPartialTasks(&lock);
+
+                    break;
+                }
+
+                processFullTasks(&lock);
+                break;
+        }
+    }
+
+    void processFullTasks(nx::utils::MutexLocker* lock)
+    {
+        while (!needToStop() && !m_fullScanTasks.isEmpty())
+        {
+            const auto scanTask = m_fullScanTasks.front();
+            m_fullScanTasks.pop_front();
+
+            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalogue);
+        }
+    }
+
+    void processPartialTasks(nx::utils::MutexLocker* lock)
+    {
+    }
+
+    bool hasTasksToProcess()
+    {
+        return !m_fullScanTasks.isEmpty() || !m_partialScanTasks.isEmpty();
+    }
+
+    void addPartialScanTasks(
+        const QnStorageResourcePtr& storage,
+        const QMap<DeviceFileCatalogPtr, qint64>& cataloguesToScan)
+    {
+        for (auto catalogueIt = cataloguesToScan.cbegin();
+            catalogueIt != cataloguesToScan.cend();
+            ++catalogueIt)
+        {
+            DeviceFileCatalog::ScanFilter scanFilter;
+            scanFilter.scanPeriod.startTimeMs = catalogueIt.value();
+            qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
+            qint64 scanPeriodDuration = qMax(1ll, endScanTime - scanFilter.scanPeriod.startTimeMs);
+            NX_VERBOSE(
+                this,
+                "[Scan]: Partial scan period duration for storage %1, catalog %2 = %3 ms (%4 hrs)",
+                nx::utils::url::hidePassword(storage->getUrl()),
+                catalogueIt.key()->cameraUniqueId(),
+                scanPeriodDuration,
+                scanPeriodDuration / (1000 * 60 * 60));
+            scanFilter.scanPeriod.durationMs = scanPeriodDuration;
+
+            PartialScanTask scanTask(catalogueIt.key(), storage, scanFilter);
+            m_partialScanTasks.push_back(scanTask);
+        }
+    }
+
+    void addFullScanTasks(
+        const QnStorageResourcePtr& storage,
+        const QMap<DeviceFileCatalogPtr, qint64>& cataloguesToScan)
+    {
+        for (auto catalogueIt = cataloguesToScan.cbegin();
+            catalogueIt != cataloguesToScan.cend();
+            ++catalogueIt)
+        {
+            ScanTask scanTask(catalogueIt.key(), storage);
+            m_fullScanTasks.push_back(scanTask);
+        }
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 class ScanMediaFilesTask: public QnLongRunnable
 {
 private:
@@ -568,6 +769,20 @@ QnStorageManager::QnStorageManager(
     m_removeEmtyDirTimer.invalidate();
 
     startAuxTimerTasks();
+}
+
+QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::cataloguesToScan(int storageIndex)
+{
+    QMap<DeviceFileCatalogPtr, qint64> result;
+    NX_MUTEX_LOCKER lock(&m_mutexCatalog);
+
+    for (const DeviceFileCatalogPtr& catalog : m_devFileCatalog[QnServer::LowQualityCatalog])
+        result.insert(catalog, catalog->lastChunkStartTime(storageIndex));
+
+    for (const DeviceFileCatalogPtr& catalog : m_devFileCatalog[QnServer::HiQualityCatalog])
+        result.insert(catalog, catalog->lastChunkStartTime(storageIndex));
+
+    return result;
 }
 
 int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const

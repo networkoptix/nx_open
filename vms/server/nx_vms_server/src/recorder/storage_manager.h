@@ -290,6 +290,7 @@ private:
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
+    QMap<DeviceFileCatalogPtr, qint64> cataloguesToScan(int storageIndex);
 
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
@@ -321,6 +322,7 @@ private:
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;
     friend class AuxiliaryTask;
+    friend class StorageReindexer;
 
     ScanMediaFilesTask* m_rebuildArchiveThread;
 
