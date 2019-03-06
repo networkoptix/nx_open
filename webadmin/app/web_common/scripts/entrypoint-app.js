@@ -5,6 +5,9 @@ import 'angular-ui-bootstrap';
 import 'angular-clipboard';
 import 'jquery-mousewheel';
 
+// Polyfill
+require('es6-promise/auto');
+
 //Vendor scripts
 require('./vendor/client-detection.js');
 require('./vendor/date.js');

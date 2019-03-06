@@ -2,6 +2,9 @@ import 'ngstorage';
 import 'bootstrap-sass';
 import 'angular-ui-bootstrap';
 
+// Polyfill
+require('es6-promise/auto');
+
 //Vendor scripts
 require('./vendor/client-detection.js');
 
