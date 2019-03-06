@@ -2899,14 +2899,27 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
 
-    int hoveredBookmarkIndex = -1;
-    if (m_hoverMousePos.has_value())
-    {
-        const auto hoverValueMs = timeFromPosition(*m_hoverMousePos, false);
-        hoveredBookmarkIndex = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
-            hoverValueMs, milliseconds(qint64(m_msecsPerPixel)),
-            QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
-    }
+    const auto isBookmarkHovered =
+        [this](const QnTimelineBookmarkItem& timelineBookmark) -> bool
+        {
+            for (const auto& displayedBookmark: m_bookmarksViewer->getDisplayedBookmarks())
+            {
+                if (timelineBookmark.isCluster())
+                {
+                    if (displayedBookmark.startTimeMs >= timelineBookmark.cluster().startTime
+                        && displayedBookmark.endTime() <= timelineBookmark.cluster().endTime())
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (displayedBookmark.guid == timelineBookmark.bookmark().guid)
+                        return true;
+                }
+            }
+            return false;
+        };
 
     /* Draw bookmarks: */
     for (int i = 0; i < bookmarks.size(); ++i)
@@ -2920,9 +2933,9 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTime(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTime(), m_windowEnd)));
 
-        bool hovered = i == hoveredBookmarkIndex;
-        const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
-        const QColor& futureBg = hovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
+        const bool isHovered = isBookmarkHovered(bookmarkItem);
+        const QColor& pastBg = isHovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
+        const QColor& futureBg = isHovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
 
         QBrush leftBoundBrush;
         QBrush rightBoundBrush;

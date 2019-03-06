@@ -598,6 +598,8 @@ public:
 
     void resetBookmarks();
 
+    QnCameraBookmarkList getBookmarks() const;
+
 private:
     void updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params);
 
@@ -895,6 +897,11 @@ void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoun
         m_tooltip->setPosition(params);
 }
 
+QnCameraBookmarkList QnBookmarksViewer::Impl::getBookmarks() const
+{
+    return m_bookmarks;
+}
+
 ///
 
 QnBookmarksViewer::QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
@@ -929,6 +936,11 @@ int QnBookmarksViewer::helpTopicAt(const QPointF &pos) const
 {
     Q_UNUSED(pos);
     return Qn::Bookmarks_Usage_Help;
+}
+
+QnCameraBookmarkList QnBookmarksViewer::getDisplayedBookmarks() const
+{
+    return m_impl->getBookmarks();
 }
 
 void QnBookmarksViewer::setTargetLocation(qint64 location)

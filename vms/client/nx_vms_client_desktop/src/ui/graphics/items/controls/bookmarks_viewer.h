@@ -36,6 +36,8 @@ public:
 
     virtual int helpTopicAt(const QPointF &pos) const override;
 
+    QnCameraBookmarkList getDisplayedBookmarks() const;
+
 signals:
     /// @brief Edit action callback
     /// Closes tooltip after emittance
