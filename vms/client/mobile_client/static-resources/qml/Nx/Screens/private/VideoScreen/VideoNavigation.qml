@@ -111,7 +111,7 @@ Item
         {
             resumePosition = -1
             timeline.timelineView.position = position
-            videoScreenController.setPosition(position, savePosition, true)
+            videoScreenController.setPosition(position, savePosition)
         }
 
 
@@ -515,6 +515,12 @@ Item
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
                 visible: videoNavigation.hasArchive
+                onCheckedChanged:
+                {
+                    videoScreenController.mediaPlayer.autoJumpPolicy = checked
+                        ? MediaPlayer.DisableAutoJump
+                        : MediaPlayer.DisableAutoJumpOnPreviewing
+                }
             }
 
             Row

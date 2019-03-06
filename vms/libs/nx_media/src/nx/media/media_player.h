@@ -75,6 +75,11 @@ class Player: public QObject
     Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
 
     /**
+     * Policy specifies when auto jump to the nearest following chunk is available.
+     */
+    Q_PROPERTY(AutoJumpPolicy autoJumpPolicy READ autoJumpPolicy WRITE setAutoJumpPolicy NOTIFY autoJumpPolicyChanged)
+
+    /**
      * The player is either on an archive or a live position.
      */
     Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
@@ -134,6 +139,13 @@ public:
     };
     Q_ENUM(MediaStatus)
 
+    enum class AutoJumpPolicy
+    {
+        DisableAutoJump, //< Never tries to jump automatically to the nearest available chunk.
+        DisableAutoJumpOnPreviewing //< Tries to jump automatically to the nearest available chunk if state is not previewing
+    };
+    Q_ENUM(AutoJumpPolicy)
+
     enum VideoQuality
     {
         UnknownVideoQuality = -1, //< There's no a quality which could be played by a player.
@@ -184,10 +196,8 @@ public:
      */
     void setPosition(qint64 value);
 
-    /**
-     * Sets position without imeddiate adjusting to the nearest available one.
-     */
-    Q_INVOKABLE void setDirectPosition(qint64 value);
+    AutoJumpPolicy autoJumpPolicy() const;
+    void setAutoJumpPolicy(AutoJumpPolicy policy);
 
     int maxTextureSize() const;
     void setMaxTextureSize(int value);
@@ -279,6 +289,7 @@ signals:
     void currentResolutionChanged();
     void audioEnabledChanged();
     void tooManyConnectionsErrorChanged();
+    void autoJumpPolicyChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
@@ -288,7 +299,6 @@ protected: //< for tests
 
 private:
     bool checkReadyToPlay();
-    void setPositionInternal(qint64 value, bool allowDirectJumpToNearestPosition);
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;

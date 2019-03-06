@@ -245,12 +245,9 @@ Object
         mediaPlayer.preview()
     }
 
-    function setPosition(position, savePosition, preventDirectJumpToNearestPosition)
+    function setPosition(position, savePosition)
     {
-        if (preventDirectJumpToNearestPosition)
-            mediaPlayer.setDirectPosition(position)
-        else
-            mediaPlayer.position = position
+        mediaPlayer.position = position
 
         if (savePosition)
             d.savePosition()
