@@ -163,9 +163,12 @@ public:
         dispatch(
             [this, closeReason]()
             {
-                m_streamSocket.reset();
-
+                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
                 triggerConnectionClosedEvent(closeReason);
+                if (watcher.objectDestroyed())
+                    return;
+
+                m_streamSocket.reset();
             });
     }
 
@@ -220,8 +223,11 @@ public:
 protected:
     virtual void stopWhileInAioThread() override
     {
-        m_streamSocket.reset();
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
         triggerConnectionClosedEvent(SystemError::noError);
+        if (watcher.objectDestroyed())
+            return;
+        m_streamSocket.reset();
     }
 
     SocketAddress getForeignAddress() const
@@ -285,20 +291,8 @@ private:
 
     void handleSocketError(SystemError::ErrorCode errorCode)
     {
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
-        switch (errorCode)
-        {
-            case SystemError::noError:
-                NX_ASSERT(false);
-                break;
-
-            default:
-                closeConnection(errorCode);
-                break;
-        }
-
-        if (!watcher.objectDestroyed())
-            triggerConnectionClosedEvent(errorCode);
+        NX_ASSERT(errorCode != SystemError::noError);
+        closeConnection(errorCode);
     }
 
     void triggerConnectionClosedEvent(SystemError::ErrorCode closeReason)

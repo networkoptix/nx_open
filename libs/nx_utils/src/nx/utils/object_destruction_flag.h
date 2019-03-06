@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace nx {
 namespace utils {
 
@@ -27,7 +29,7 @@ namespace utils {
  * }
  * @endcode
  */
-class ObjectDestructionFlag
+class NX_UTILS_API ObjectDestructionFlag
 {
     enum class ControlledObjectState
     {
@@ -37,55 +39,29 @@ class ObjectDestructionFlag
     };
 
 public:
-    ObjectDestructionFlag():
-        m_valuePtr(nullptr)
-    {
-    }
+    ObjectDestructionFlag();
+    ~ObjectDestructionFlag();
 
     ObjectDestructionFlag(const ObjectDestructionFlag&) = delete;
     ObjectDestructionFlag& operator=(const ObjectDestructionFlag&) = delete;
 
-    ~ObjectDestructionFlag()
-    {
-        if (m_valuePtr)
-            *m_valuePtr = ControlledObjectState::deleted;
-    }
-
-    void markAsDeleted()
-    {
-        if (m_valuePtr)
-            *m_valuePtr = ControlledObjectState::markedForDeletion;
-    }
+    void markAsDeleted();
 
     /**
-     * NOTE: Objects operating with same flag must not overlap
+     * NOTE: Multiple objects using same ObjectDestructionFlag instance can be stacked.
      */
-    class Watcher
+    class NX_UTILS_API Watcher
     {
     public:
-        Watcher(ObjectDestructionFlag* const flag):
-            m_localValue(ControlledObjectState::alive),
-            m_objectDestructionFlag(flag)
-        {
-            m_objectDestructionFlag->m_valuePtr = &m_localValue;
-        }
+        Watcher(ObjectDestructionFlag* const flag);
+        ~Watcher();
 
         Watcher(const Watcher&) = delete;
         Watcher& operator=(const Watcher&) = delete;
         Watcher(Watcher&&) = default;
         Watcher& operator=(Watcher&&) = default;
 
-        ~Watcher()
-        {
-            if (m_localValue == ControlledObjectState::deleted)
-                return; //< Object has been destroyed and m_objectDestructionFlag is invalid.
-            m_objectDestructionFlag->m_valuePtr = nullptr;
-        }
-
-        bool objectDestroyed() const
-        {
-            return m_localValue > ControlledObjectState::alive;
-        }
+        bool objectDestroyed() const;
 
     private:
         ControlledObjectState m_localValue;
@@ -93,7 +69,7 @@ public:
     };
 
 private:
-    ControlledObjectState* m_valuePtr;
+    std::vector<ControlledObjectState*> m_watcherStates;
 };
 
 } // namespace nx
