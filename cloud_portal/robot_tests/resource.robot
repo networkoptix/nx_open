@@ -177,6 +177,7 @@ Share To
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
 
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}

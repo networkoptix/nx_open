@@ -278,8 +278,6 @@ Share with unregistered user - brings them to registration page with code with c
     Go To    ${link}
     Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
     Validate Log In
-    Delete All Emails
-    Close Mailbox
 
 Sharing system with a user who is already in the list updates their permissions
     [tags]    C41892
@@ -289,10 +287,11 @@ Sharing system with a user who is already in the list updates their permissions
     Share To    ${random email}    ${ADMIN TEXT}
     Check User Permissions    ${random email}    ${ADMIN TEXT}
     Share To    ${random email}    ${VIEWER TEXT}
-    Check User Permissions    ${random email}    ${VIEWER TEXT}
-    Remove User Permissions    ${random email}
+    ${email ID}    Wait For Email    recipient=${email}    timeout=120    status=UNSEEN
     Delete All Emails
     Close Mailbox
+    Check User Permissions    ${random email}    ${VIEWER TEXT}
+    Remove User Permissions    ${random email}
 
 Check share email for registered user
     [tags]    C47297
@@ -317,11 +316,9 @@ Check share email for registered user
     @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${OWNER EMAIL}
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}
-    Delete Email    ${email}
-    Close Mailbox
-    Remove User Permissions    ${EMAIL NOPERM}
     Delete All Emails
     Close Mailbox
+    Remove User Permissions    ${EMAIL NOPERM}
 
 User with client custom settings has access to system
     [tags]    Threaded
