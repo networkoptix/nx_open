@@ -107,6 +107,14 @@ Item
             onPositionChanged: d.updateTimelinePosition()
         }
 
+        function goToPosition(position, savePosition)
+        {
+            resumePosition = -1
+            timeline.timelineView.position = position
+            videoScreenController.setPosition(position, savePosition, true)
+        }
+
+
         function updateTimelinePosition()
         {
             if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
@@ -368,12 +376,9 @@ Item
                     timeline.autoReturnToBounds = true
                 }
             }
-            onPositionTapped:
-            {
-                d.resumePosition = -1
-                timeline.timelineView.position = position
-                videoScreenController.setPosition(position, true, true)
-            }
+
+            onPositionTapped: d.goToPosition(position, true)
+
             onPositionChanged:
             {
                 if (!dragging)
@@ -757,10 +762,7 @@ Item
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
 
-                onClicked:
-                {
-                    videoScreenController.setPosition(chunkPositionWatcher.prevChunkStartTimeMs())
-                }
+                onClicked: d.goToPosition(chunkPositionWatcher.prevChunkStartTimeMs(), false)
             }
 
             PlaybackJumpButton
@@ -773,7 +775,7 @@ Item
                 onClicked:
                 {
                     var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
-                    videoScreenController.setPosition(nextChunkStartTime)
+                    d.goToPosition(nextChunkStartTime, false)
                     if (nextChunkStartTime == -1)
                         videoScreenController.play()
                 }
