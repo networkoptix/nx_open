@@ -40,6 +40,7 @@
 #include <ui/models/resource/resource_list_model.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
 #include <nx/network/app_info.h>
 
@@ -828,9 +829,10 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
     {
         int acceptedEula = qnSettings->acceptedEulaVersion();
         int newEula = m_updateInfo.info.eulaVersion;
-        const bool showEula =  acceptedEula < newEula;
+        const bool showEula = acceptedEula < newEula;
 
-        if (showEula && !context()->showEulaFromString(m_updateInfo.info.eula))
+        if (showEula && EulaDialog::showEulaHtml(m_updateInfo.info.eula, mainWindowWidget())
+            != QDialog::Accepted)
         {
             return;
         }

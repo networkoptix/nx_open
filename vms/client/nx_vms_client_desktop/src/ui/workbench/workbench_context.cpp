@@ -49,7 +49,6 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/desktop/common/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/ini.h>
 
@@ -291,64 +290,6 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             break;
     }
     return false;
-}
-
-bool QnWorkbenchContext::showEulaFromString(QString eulaText) const
-{
-    // Regexp to dig out a title from html with EULA.
-    QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
-    headerRegExp.setMinimal(true);
-
-    QString eulaHeader;
-    if (headerRegExp.indexIn(eulaText) != -1)
-    {
-        QString title = headerRegExp.cap(1);
-        eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
-    }
-    else
-    {
-        // We are here only if some vile monster has chewed our eula file.
-        NX_ASSERT(false);
-        eulaHeader = tr("To use the software you must agree with the end user license agreement");
-    }
-
-    const QString eulaHtmlStyle = NxUi::generateCssStyle();;
-
-    eulaText = eulaText.replace(
-        lit("<head>"),
-        lit("<head><style>%1</style>").arg(eulaHtmlStyle)
-    );
-
-    EulaDialog eulaDialog(workbench()->context()->mainWindow());
-    eulaDialog.setTitle(eulaHeader);
-    eulaDialog.setEulaHtml(eulaText);
-
-    return eulaDialog.exec() == QDialog::Accepted;
-}
-
-bool QnWorkbenchContext::showEulaFromFile(QString eulaPath) const
-{
-    if (eulaPath.isEmpty())
-        eulaPath = ":/license.html";
-
-    const bool acceptedEula =
-        [this, eulaPath]() -> bool
-        {
-            QFile eula(eulaPath);
-            if (!eula.open(QIODevice::ReadOnly))
-            {
-                NX_ERROR(this) << "Failed to open eula file" << eulaPath;
-                return true;
-            }
-            QString eulaText = QString::fromUtf8(eula.readAll());
-            return showEulaFromString(eulaText);
-        }();
-
-    if (!acceptedEula)
-        return false;
-
-    qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
-    return true;
 }
 
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)

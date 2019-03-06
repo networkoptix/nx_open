@@ -1,17 +1,22 @@
 #include "eula_dialog.h"
 #include "ui_eula_dialog.h"
 
+#include <QtCore/QFile>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
 
+#include <client/client_app_info.h>
+#include <client/client_settings.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/webview_style.h>
 #include <ui/style/skin.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -109,6 +114,58 @@ bool EulaDialog::event(QEvent* event)
     }
 
     return base_type::event(event);
+}
+
+QDialog::DialogCode EulaDialog::showEulaHtml(const QString& html, QWidget* parent)
+{
+    // Regexp to dig out a title from html with EULA.
+    QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
+    headerRegExp.setMinimal(true);
+
+    QString eulaHeader;
+    if (headerRegExp.indexIn(html) != -1)
+    {
+        QString title = headerRegExp.cap(1);
+        eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
+    }
+    else
+    {
+        // We are here only if some vile monster has chewed our eula file.
+        NX_ASSERT(false);
+        eulaHeader = tr("To use the software you must agree with the end user license agreement");
+    }
+
+    const auto eulaHtmlStyle = NxUi::generateCssStyle();
+
+    auto eulaText = html;
+    eulaText.replace(
+        lit("<head>"),
+        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
+
+    EulaDialog eulaDialog(parent);
+    eulaDialog.setTitle(eulaHeader);
+    eulaDialog.setEulaHtml(eulaText);
+    return (QDialog::DialogCode) eulaDialog.exec();
+}
+
+QDialog::DialogCode EulaDialog::showEulaFromFile(const QString& path, QWidget* parent)
+{
+    if (!NX_ASSERT(!path.isEmpty()))
+        return DialogCode::Rejected;
+
+    QFile eula(path);
+    if (!eula.open(QIODevice::ReadOnly))
+    {
+        NX_ERROR(typeid(EulaDialog), "Failed to open eula file %1", path);
+        return DialogCode::Accepted;
+    }
+
+    const auto eulaText = QString::fromUtf8(eula.readAll());
+    if (showEulaHtml(eulaText, parent) == DialogCode::Rejected)
+        return DialogCode::Rejected;
+
+    qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+    return DialogCode::Accepted;
 }
 
 } // namespace nx::vms::client::desktop

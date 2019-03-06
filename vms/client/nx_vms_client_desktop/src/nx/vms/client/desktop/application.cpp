@@ -67,6 +67,7 @@
 #include <nx/utils/crash_dump/systemexcept.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
@@ -190,8 +191,9 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     {
         int accepted = qnSettings->acceptedEulaVersion();
         int current = QnClientAppInfo::eulaVersion();
-        const bool showEula =  accepted < current;
-        if (showEula && !context->showEulaFromFile())
+        const bool showEula = accepted < current;
+        if (showEula && EulaDialog::showEulaFromFile(":/license.html", context->mainWindow())
+            != QDialog::Accepted)
         {
             // We should exit completely.
             return 0;

@@ -2,7 +2,6 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
-
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QGraphicsWebView>
 
@@ -57,7 +56,7 @@ void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style)
 
 QString generateCssStyle()
 {
-    QString styleBase = QString::fromLatin1(R"(
+    const auto styleBase = QString::fromLatin1(R"css(
     * {
         color: %1;
         font-family: 'Roboto-Regular', 'Roboto';
@@ -71,7 +70,6 @@ QString generateCssStyle()
     }
     p {
         padding-left: 0px;
-        margin: 0px;
     }
     a {
         color: %2;
@@ -79,13 +77,13 @@ QString generateCssStyle()
     }
     a:hover {
         color: %3;
-    })");
+    })css");
 
-    auto palette = qApp->palette();
-    auto windowText = palette.color(QPalette::WindowText).name();
-    auto brand = qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(2).color().name();;
-    auto highlight = palette.color(QPalette::Highlight).name();
-    return styleBase.arg(windowText, brand, highlight);
+    const auto palette = qApp->palette();
+    const auto windowText = palette.color(QPalette::WindowText).name();
+    const auto highlight = palette.color(QPalette::Highlight).name();
+    const auto link = palette.color(QPalette::Link).name();
+    return styleBase.arg(windowText, link, highlight);
 }
 
 } // namespace NxUi
