@@ -16,6 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -62,19 +63,6 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
                 recalculateAllPermissions();
             else
                 updatePermissions(subject.user());
-        });
-
-    // Capture password setting or dropping for layout.
-    connect(qnResourceRuntimeDataManager,
-        &QnResourceRuntimeDataManager::resourceDataChanged,
-        this,
-        [this](const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
-        {
-            if (role == Qn::LayoutPasswordRole)
-            {
-                if (auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
-                    updatePermissions(layout);
-            }
         });
 
     recalculateAllPermissions();
@@ -184,12 +172,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
     {
-        if(auto videoFile = resource.dynamicCast<QnAviResource>())
-        {
-            if (videoFile->requiresPassword())
-                return Qn::NoPermissions;
-        }
-
         return Qn::ReadPermission
             | Qn::ViewContentPermission
             | Qn::ViewLivePermission
@@ -250,9 +232,9 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
         return (static_cast<Qn::Permissions>(presetPermissions.toInt()) & readOnly) | Qn::ReadPermission;
 
     // Deal with normal (non explicitly-authorized) files separately.
-    if (layout->isFile())
+    if (auto fileLayout = layout.dynamicCast<QnFileLayoutResource>())
     {
-        if(layout::requiresPassword(layout))
+        if(fileLayout->requiresPassword())
             return Qn::WriteNamePermission | Qn::ReadPermission;
 
         auto permissions = Qn::ReadWriteSavePermission
@@ -352,22 +334,19 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
-    // Capture password setting or dropping for exported video.
-    if(auto videoFile = resource.dynamicCast<QnAviResource>())
-    {
-        connect(videoFile, &QnAviResource::storageAccessChanged, this,
-            [this, videoFile]()
-            {
-                updatePermissions(videoFile);
-            });
-    }
-
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+    }
+
+    // Capture password setting or dropping for layout.
+    if (const auto& fileLayout = resource.dynamicCast<QnFileLayoutResource>())
+    {
+        connect(fileLayout, &QnFileLayoutResource::passwordChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 
