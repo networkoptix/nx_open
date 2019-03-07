@@ -15,4 +15,19 @@ void initialize(QObject* storageParent);
  */
 void registerActions(ui::action::MenuFactory* factory);
 
+/**
+ * Called after widget is added to the scene.
+ */
+void registerWidget(QnMediaResourceWidget* widget);
+
+/**
+ * Called before widget is destroyed.
+ */
+void unregisterWidget(QnMediaResourceWidget* widget);
+
+/**
+ * Paint overlays over video.
+ */
+void paintVideoOverlays(QnMediaResourceWidget* widget, QPainter* painter);
+
 } // namespace nx::vms::client::desktop::integrations
