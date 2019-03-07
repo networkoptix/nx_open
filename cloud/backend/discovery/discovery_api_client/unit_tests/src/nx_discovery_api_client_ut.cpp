@@ -120,7 +120,8 @@ protected:
 
     void whenWaitForNodeDiscoveredEvent()
     {
-        whenClientRegistersWithServer(/*clientIndex*/ 0);
+        for (size_t clientIndex = 0; clientIndex < 2; ++clientIndex)
+            whenClientRegistersWithServer(clientIndex);
         waitForCallback();
     }
 
@@ -192,9 +193,8 @@ protected:
 
     void andDiscoveredNodeMatchesExpectedNode()
     {
-        // discovery client emits discovery event when it finds itself for the first time,
-        // so compare discovered node with itself
-        compareNodeAndContext(clientContext(/*clientIndex*/ 0), m_discoveredNode);
+        // Subscription was to node 0's discovery event, so compare node 1 to discovered node.
+        compareNodeAndContext(clientContext(/*clientIndex*/ 1), m_discoveredNode);
     }
 
     void andOnlineNodesContainsClientNode()
@@ -329,7 +329,7 @@ TEST_F(DiscoveryClient, registers_with_discovery_service)
 
 TEST_F(DiscoveryClient, provides_node_discovered_event)
 {
-    givenDiscoveryClient();
+    givenTwoDiscoveryClients();
     givenSubscriptionToNodeDiscoveredEvent();
 
     whenWaitForNodeDiscoveredEvent();
