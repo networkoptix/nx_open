@@ -13,6 +13,11 @@ static QString toString(const nx::cloud::discovery::Node& node)
     return nx::cloud::discovery::NodeSerialization::serialized(node);
 }
 
+bool isHttpScheme(const nx::utils::Url& url)
+{
+    return url.scheme() == nx::network::http::kUrlSchemeName;
+}
+
 } // namespace
 
 DiscoveryManager::DiscoveryManager(
@@ -48,9 +53,19 @@ void DiscoveryManager::start(
                 return;
             }
 
-            NX_INFO(
+            nx::utils::Url url(node.urls.front());
+            if (!isHttpScheme(url))
+            {
+                NX_WARNING(
+                    this,
+                    lm("Sync engine requires http scheme but got %1: skipping connection")
+                    .arg(url.scheme()));
+                return;
+            }
+
+            NX_DEBUG(
                 this,
-                lm("Discovered node %1 at url: %2. Connecting sync engine to it.")
+                lm("Discovered node %1 at url: %2. Connecting sync engine.")
                     .arg(node.nodeId).arg(node.urls.front().c_str()));
             // Synchronization engine provides only one url.
             m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
@@ -61,10 +76,11 @@ void DiscoveryManager::start(
         {
             if (!node.urls.empty())
             {
-                NX_INFO(
+                NX_DEBUG(
                     this,
                     lm("Disconnecting from lost node %1 at url:")
                         .arg(node.nodeId.c_str()).arg(node.urls.front()));
+                m_syncEngine->connector().removeNodeUrl(clusterId, node.urls.front());
             }
         });
 
