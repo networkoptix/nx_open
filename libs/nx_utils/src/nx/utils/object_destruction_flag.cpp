@@ -23,6 +23,8 @@ void ObjectDestructionFlag::markAsDeleted()
 
 void ObjectDestructionFlag::recordCustomState(ControlledObjectState state)
 {
+    NX_ASSERT(m_watcherStates.empty() || m_lastWatchingThreadId == std::this_thread::get_id());
+
     std::for_each(
         m_watcherStates.begin(), m_watcherStates.end(),
         [state](ControlledObjectState* value) { *value = state; });
