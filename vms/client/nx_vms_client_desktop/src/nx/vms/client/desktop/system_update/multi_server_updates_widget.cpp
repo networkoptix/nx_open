@@ -857,18 +857,16 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
                 messageBox->exec();
                 return;
             }
-            else
-            {
-                messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
-                injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
-                messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
-                    QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
-                auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
-                messageBox->exec();
-                auto clicked = messageBox->clickedButton();
-                if (clicked == cancel)
-                    return;
-            }
+
+            messageBox->setText(tr("Some servers are offline and will not be updated. Skip them?"));
+            injectResourceList(*messageBox, resourcePool()->getResourcesByIds(offlineServers));
+            messageBox->addCustomButton(QnMessageBoxCustomButton::Skip,
+                QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
+            auto cancel = messageBox->addButton(QDialogButtonBox::Cancel);
+            messageBox->exec();
+            auto clicked = messageBox->clickedButton();
+            if (clicked == cancel)
+                return;
         }
 
         auto incompatible = m_stateTracker->getLegacyServers();
