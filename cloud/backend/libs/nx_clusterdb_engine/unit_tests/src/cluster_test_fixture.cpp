@@ -26,6 +26,11 @@ const nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process() const
     return m_process;
 }
 
+std::string Peer::nodeId() const
+{
+    return m_nodeId;
+}
+
 nx::utils::Url Peer::baseApiUrl() const
 {
     return nx::network::url::Builder()

@@ -22,6 +22,8 @@ public:
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
+    std::string nodeId() const;
+
     nx::utils::Url baseApiUrl() const;
     nx::utils::Url synchronizationUrl() const;
 
