@@ -142,7 +142,7 @@ private:
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
 
-    CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
+    CredentialsSource m_credentialsSource = CredentialsSource::userNameAndPassword;
 
     vms::api::PeerDataEx m_remotePeer;
     vms::api::PeerDataEx m_localPeer;

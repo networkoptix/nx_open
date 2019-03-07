@@ -344,16 +344,7 @@ void ConnectionBase::startConnection()
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
 
-    if (requestUrl.userName().isEmpty())
-    {
-        fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
-    }
-    else
-    {
-        m_credentialsSource = CredentialsSource::userNameAndPassword;
-        m_httpClient->setUserName(requestUrl.userName());
-        m_httpClient->setUserPassword(requestUrl.password());
-    }
+    fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
 
     m_httpClient->doGet(
         requestUrl,
