@@ -55,10 +55,9 @@ QJsonArray toJsonArray(const std::vector<std::string>& urls)
 
 std::vector<std::string> toVector(const QStringList& urls)
 {
-    std::vector<std::string> result;
-    result.reserve(urls.size());
-    for (const auto& url : urls)
-        result.emplace_back(url.toStdString());
+    std::vector<std::string> result(urls.size());
+    std::transform(urls.begin(), urls.end(), result.begin(),
+        [](const QString& str) { return str.toStdString(); });
     return result;
 }
 
