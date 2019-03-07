@@ -62,7 +62,7 @@ void DiscoveryManager::start(
         {
             NX_VERBOSE(this, lm("Node lost. %1. Disconnecting from all urls").arg(toString(node)));
 
-            for(const auto& url: node.urls)
+            for(const auto& url : node.urls)
                 m_syncEngine->connector().removeNodeUrl(clusterId, url);
         });
 
