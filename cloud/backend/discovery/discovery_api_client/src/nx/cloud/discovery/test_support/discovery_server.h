@@ -10,6 +10,8 @@
 
 namespace nx::cloud::discovery::test {
 
+NX_DISCOVERY_CLIENT_API std::string generateInfoJson(const std::string& nodeId);
+
 class NX_DISCOVERY_CLIENT_API DiscoveryServer
 {
 

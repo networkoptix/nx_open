@@ -13,15 +13,6 @@ namespace {
 
 static constexpr char kClusterId[] = "TestCluster";
 
-static std::string generateInfoJson(const std::string& nodeId)
-{
-    std::string random = nx::utils::random::generateName(16).toStdString();
-    return std::string("{")
-            + "\"nodeId\": \"" + nodeId + "\","
-            "\"random\": \"" + random + "\""
-        "}";
-}
-
 void sleep()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));

@@ -4,6 +4,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/utils/random.h>
 
 #include <nx/cloud/discovery/request_paths.h>
 
@@ -14,6 +15,15 @@ namespace {
 static constexpr char kClusterId[] = "clusterId";
 
 } // namespace
+
+std::string generateInfoJson(const std::string& nodeId)
+{
+    std::string random = nx::utils::random::generateName(16).toStdString();
+    return std::string("{")
+        + "\"nodeId\": \"" + nodeId + "\","
+        "\"random\": \"" + random + "\""
+        "}";
+}
 
 DiscoveryServer::DiscoveryServer(const std::string& clusterId):
     m_clusterId(clusterId)
@@ -62,7 +72,7 @@ void DiscoveryServer::serveRegisterNode(
     if (!ok)
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
-    Node node = updateNode(nodeInfo, requestContext.connection->clientEndpoint());
+    Node node = updateNode(nodeInfo);
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::created);
     result.dataSource =
@@ -83,7 +93,7 @@ void DiscoveryServer::serveGetOnlineNodes(
     if (!requestContainsThisClusterId(requestContext))
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
-    auto onlineNodes = getOnlineNodes();
+    auto onlineNodes = updateOnlineNodes();
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::ok);
     result.dataSource =
@@ -100,9 +110,7 @@ bool DiscoveryServer::requestContainsThisClusterId(
     return requestContext.requestPathParams.getByName(kClusterId) == m_clusterId;
 }
 
-Node DiscoveryServer::updateNode(
-    const NodeInfo& nodeInfo,
-    const nx::network::SocketAddress& nodeEndpoint)
+Node DiscoveryServer::updateNode(const NodeInfo& nodeInfo)
 {
     QnMutexLocker lock(&m_mutex);
     Node& node = m_onlineNodes[nodeInfo.nodeId];
