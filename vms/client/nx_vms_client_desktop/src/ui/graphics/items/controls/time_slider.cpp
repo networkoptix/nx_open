@@ -2902,23 +2902,21 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     const auto isBookmarkHovered =
         [this](const QnTimelineBookmarkItem& timelineBookmark) -> bool
         {
-            for (const auto& displayedBookmark: m_bookmarksViewer->getDisplayedBookmarks())
-            {
-                if (timelineBookmark.isCluster())
+            const auto displayedBookmarks = m_bookmarksViewer->getDisplayedBookmarks();
+            return std::any_of(displayedBookmarks.cbegin(), displayedBookmarks.cend(),
+                [timelineBookmark](const auto& displayedBookmark)
                 {
-                    if (displayedBookmark.startTimeMs >= timelineBookmark.cluster().startTime
-                        && displayedBookmark.endTime() <= timelineBookmark.cluster().endTime())
+                    if (timelineBookmark.isCluster())
                     {
-                        return true;
+                        const auto cluster = timelineBookmark.cluster();
+                        return displayedBookmark.startTimeMs >= cluster.startTime
+                            && displayedBookmark.endTime() <= cluster.endTime();
                     }
-                }
-                else
-                {
-                    if (displayedBookmark.guid == timelineBookmark.bookmark().guid)
-                        return true;
-                }
-            }
-            return false;
+                    else
+                    {
+                        return displayedBookmark.guid == timelineBookmark.bookmark().guid;
+                    }
+                });
         };
 
     /* Draw bookmarks: */
