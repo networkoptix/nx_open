@@ -15,7 +15,9 @@ NX_DISCOVERY_CLIENT_API std::string generateInfoJson(const std::string& nodeId);
 class NX_DISCOVERY_CLIENT_API DiscoveryServer
 {
 public:
-    DiscoveryServer(const std::string& clusterId);
+    DiscoveryServer(
+        const std::string& clusterId,
+        const std::chrono::milliseconds& nodeLifetime = std::chrono::seconds(1));
 
     bool bindAndListen();
 
@@ -42,6 +44,7 @@ private:
 
 private:
     const std::string m_clusterId;
+    const std::chrono::milliseconds m_nodeLifetime;
 
     mutable QnMutex m_mutex;
     std::map<std::string/*nodeId*/, Node> m_onlineNodes;

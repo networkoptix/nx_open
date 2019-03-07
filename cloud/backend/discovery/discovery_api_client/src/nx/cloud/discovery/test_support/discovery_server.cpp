@@ -25,8 +25,15 @@ std::string generateInfoJson(const std::string& nodeId)
         "}";
 }
 
-DiscoveryServer::DiscoveryServer(const std::string& clusterId):
-    m_clusterId(clusterId)
+//-------------------------------------------------------------------------------------------------
+// DiscoveryServer
+
+DiscoveryServer::DiscoveryServer(
+    const std::string & clusterId,
+    const std::chrono::milliseconds& nodeLifetime)
+    :
+    m_clusterId(clusterId),
+    m_nodeLifetime(nodeLifetime)
 {
     registerRequestHandlers(&m_httpServer.httpMessageDispatcher());
 }
@@ -121,7 +128,7 @@ Node DiscoveryServer::updateNode(const NodeInfo& nodeInfo)
     node.urls = nodeInfo.urls;
 
     node.infoJson = nodeInfo.infoJson;
-    node.expirationTime = std::chrono::system_clock::now() + std::chrono::seconds(3);
+    node.expirationTime = std::chrono::system_clock::now() + m_nodeLifetime;
 
     return node;
 }
