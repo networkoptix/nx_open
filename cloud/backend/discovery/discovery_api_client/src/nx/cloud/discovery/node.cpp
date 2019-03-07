@@ -85,10 +85,9 @@ Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr
     it = map.find(kUrls);
     if (it == map.end())
         return defaultValue;
-    QStringList urls;
-    if (!it->convert(QVariant::StringList, &urls))
+    if (!it->canConvert(QVariant::StringList))
         return defaultValue;
-    node.urls = toVector(urls);
+    node.urls = toVector(it->toStringList());
 
     it = map.find(kExpirationTime);
     if (it == map.end())
