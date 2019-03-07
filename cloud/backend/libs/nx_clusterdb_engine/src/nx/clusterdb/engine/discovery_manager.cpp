@@ -46,15 +46,20 @@ void DiscoveryManager::start(
         {
             NX_VERBOSE(
                 this,
-                lm("Discovered a new node: %1. All non http scheme urls will be ignored.")
+                lm("Discovered a new node: %1. Non http scheme urls will be ignored.")
                     .arg(toString(node)));
 
-            for (const auto& urlString : node.urls)
-            {
-                nx::utils::Url url(urlString);
-                if (isHttpScheme(url))
-                    m_syncEngine->connector().addNodeUrl(clusterId, url);
-            }
+
+                nx::utils::Url url(node.urls.front());
+                if (!isHttpScheme(url))
+                {
+                    NX_WARNING(
+                        this,
+                        lm("%1 is not an http scheme url, ignoring.").arg(url.toDisplayString()));
+                    return;
+                }
+
+                m_syncEngine->connector().addNodeUrl(clusterId, url);
         });
 
     m_discoveryClient->setOnNodeLost(
@@ -62,8 +67,7 @@ void DiscoveryManager::start(
         {
             NX_VERBOSE(this, lm("Node lost. %1. Disconnecting from all urls.").arg(toString(node)));
 
-            for(const auto& url : node.urls)
-                m_syncEngine->connector().removeNodeUrl(clusterId, url);
+            m_syncEngine->connector().removeNodeUrl(clusterId, node.urls.front());
         });
 
     m_discoveryClient->start();
