@@ -1,5 +1,9 @@
-'use strict';
+import * as Hls from 'hls.js';
 
+(function () {
+    
+    'use strict';
+    
 /**
  * This is smart video-plugin.
  * 1. It gets list of possible video-sources in different formats (each requires mime-type)
@@ -21,9 +25,9 @@
 var flashPlayer = '';
 
 angular.module('nxCommon')
-    .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http',
-        function ($interval, $timeout, animateScope, $sce, $log, $http) {
-
+    .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window',
+        function ($interval, $timeout, animateScope, $sce, $log, $http, $window) {
+    
             return {
                 restrict: 'E',
                 scope: {
@@ -53,6 +57,8 @@ angular.module('nxCommon')
                     scope.error = {};
                     scope.loading = false; // Initiate state - not loading (do nothing)
 
+                    var videowindow = element.find('.videowindow');
+                    
                     function getFormatSrc(mediaformat) {
                         var src = _.find(scope.vgSrc, function (src) {
                             return src.type === mimeTypes[mediaformat];
@@ -77,6 +83,7 @@ angular.module('nxCommon')
                             ieNoWebm: false,
                             ieWin10: false,
                             ubuntuNX: false,
+                            errorCode: '',
                             errorDescription: ''
                         };
 
@@ -115,39 +122,23 @@ angular.module('nxCommon')
                         });
                         var jsHlsSupported = Hls.isSupported();
 
-                        //Should Catch MS edge, Safari, Mobile Devices
-                        if (weHaveHls && (canPlayNatively('hls') || window.jscd.mobile)) {
-                            return 'native-hls';
-                        }
-
-                        // Hardcode native support
-                        if (window.jscd.os === 'Android') {
-                            if (weHaveWebm) {
-                                return 'webm';
-                                // TODO: Try removing this line.
-                            } else {
-                                scope.videoFlags.noArmSupport = true;
-                                return false;
-                            }
-                        }
-
                         // No native support
                         //Presume we are on desktop:
-                        switch (window.jscd.browser) {
+                            switch ($window.jscd.browser) {
                             case 'Microsoft Internet Explorer':
                                 // Check version here
                                 if (jsHlsSupported && weHaveHls) {
                                     return 'jshls';
                                 }
-                                if (window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
+                                    if ($window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
                                     return 'flashls';
                                 }
-                                if (weHaveWebm && window.jscd.osVersion < 10 && canPlayNatively('webm')) {
+                                    if (weHaveWebm && $window.jscd.osVersion < 10 && canPlayNatively('webm')) {
                                     return 'webm';
                                 }
                                 //Could not find a supported player for the Browser gonna display whats needed instead.
                                 if (weHaveWebm) {
-                                    if (window.jscd.osVersion < 10) {
+                                        if ($window.jscd.osVersion < 10) {
                                         if (weHaveHls) {
                                             scope.videoFlags.flashOrWebmRequired = true;
                                         }
@@ -167,18 +158,24 @@ angular.module('nxCommon')
                             case 'Opera':
                             case 'Webkit':
                             default:
-                                if (jsHlsSupported && weHaveHls) {
-                                    return 'jshls';// We are hoping that we have some good browser
+                                if (weHaveHls) {
+                                    if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
+                                        return 'native-hls';
+                                    }
+                                    if (jsHlsSupported) {
+                                        return 'jshls';// We are hoping that we have some good browser
+                                    }
+                                    if ($window.jscd.flashVersion) { // We have flash - try to play using flash
+                                        return 'flashls';
+                                    }
+                                    if ($window.jscd.os === 'Linux') {
+                                        scope.videoFlags.ubuntuNX = true;
+                                        return false;
+                                    }
                                 }
-                                if (window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
-                                    return 'flashls';
-                                }
+    
                                 if (weHaveWebm && canPlayNatively('webm')) {
                                     return 'webm';
-                                }
-                                if (weHaveHls && window.jscd.os === 'Linux') {
-                                    scope.videoFlags.ubuntuNX = true;
-                                    return false;
                                 }
                         }
 
@@ -198,6 +195,19 @@ angular.module('nxCommon')
                     var makingPlayer = false;
                     var nativePlayerLoadError = null;
 
+                        function resetPlayer() {
+                            if (scope.vgApi) {
+                                scope.vgApi.kill();
+                                makingPlayer = false;
+                                scope.vgApi = null;
+                            }
+                            scope.vgPlayerReady({$API: null});
+                            //Turn off all players to reset ng-class for rotation
+                            scope.native = false;
+                            scope.flashls = false;
+                            scope.jsHls = false;
+                        }
+                        
                     //For the native player. Handles webm's long loading times
                     function loadingTimeout() {
                         scope.videoFlags.errorLoading = true;
@@ -219,6 +229,29 @@ angular.module('nxCommon')
                             cancelTimeoutNativeLoad();
                             nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
                         }
+                    }
+                    
+                    function playerErrorHandler(error) {
+                        scope.loading = false; // Some error happended - stop loading
+                        resetPlayer();
+                        
+                        scope
+                            .playerHandler(error)
+                            .then(function (response) {
+                                scope.videoFlags.errorLoading = response;
+                                
+                                if (scope.videoFlags.errorLoading) {
+                                    $http
+                                        .get(error.url)
+                                        .then(function (response) {
+                                            scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
+                                            scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
+                                        });
+                                }
+                                
+                            }, function (error) {
+                                scope.videoFlags.errorLoading = error;
+                            });
                     }
     
                     function playerReadyHandler(api) {
@@ -244,32 +277,6 @@ angular.module('nxCommon')
                         scope.vgPlayerReady({$API: api});
                     }
     
-                    function playerErrorHandler(error) {
-                        scope.loading = false; // Some error happended - stop loading
-                        resetPlayer();
-                        
-                        scope
-                            .playerHandler(error)
-                            .then(function (showError) {
-                                scope.videoFlags.errorLoading = showError;
-                
-                                // Trying to get error description requesting media stream url as ajax request
-                                if (scope.videoFlags.errorLoading) {
-                                    $http
-                                        .get(error.url)
-                                        .then(function (response) {
-                                            scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
-                                        }, function (failResponse) {
-                                            // What is here?
-                                            console.error('failResponse', failResponse);
-                                        });
-                                }
-                            }, function (error) {
-                                scope.videoFlags.errorLoading = error;
-                            });
-                    }
-    
-    
                     function initNativePlayer(nativeFormat) {
 
                         scope.native = true;
@@ -277,7 +284,7 @@ angular.module('nxCommon')
                         scope.jsHls = false;
 
                         $timeout(function () {
-                            var nativePlayer = new NativePlayer();
+                            var nativePlayer = new $window.NativePlayer();
                             nativePlayer.init(element.find('.videoplayer'), function (api) {
                                 makingPlayer = false;
                                 scope.vgApi = api;
@@ -359,7 +366,7 @@ angular.module('nxCommon')
                             scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessDebugPath;
                         }
 
-                        var flashlsAPI = new FlashlsAPI(null);
+                        var flashlsAPI = new $window.FlashlsAPI(null);
 
                         if (flashlsAPI.ready()) {
                             flashlsAPI.kill();
@@ -390,7 +397,7 @@ angular.module('nxCommon')
                         scope.jsHls = true;
 
                         $timeout(function () {
-                            var jsHlsAPI = new JsHlsAPI();
+                            var jsHlsAPI = new $window.JsHlsAPI();
                             jsHlsAPI.init(element.find('.videoplayer'),
                                 Config.webclient.hlsLoadingTimeout,
                                 scope.debugMode,
@@ -429,23 +436,24 @@ angular.module('nxCommon')
                         }
                     }
 
-                    function resetPlayer() {
-                        if (scope.vgApi) {
-                            scope.vgApi.kill();
-                            makingPlayer = false;
-                            scope.vgApi = null;
+                        function updateWidth() {
+                            if (!scope.rotation || scope.rotation === 0 || scope.rotation === 180) {
+                                return;
                         }
-                        scope.vgPlayerReady({$API: null});
-                        //Turn off all players to reset ng-class for rotation
-                        scope.native = false;
-                        scope.flashls = false;
-                        scope.jsHls = false;
+    
+                            element.find('.videoplayer').css('width', videowindow.height());
+    
+                            // manuall $digest required as resize event
+                            // is outside of angular
+                            $timeout(function () {
+                               scope.$digest();
+                            });
                     }
 
                     function srcChanged() {
                         scope.loading = true; // source changed - start loading
                         scope.videoFlags.errorLoading = false;
-                        scope.preview = "";
+                        
                         if (scope.vgSrc) {
                             scope.preview = getFormatSrc('jpeg');
                             scope.player = detectBestFormat();
@@ -453,6 +461,7 @@ angular.module('nxCommon')
 
                             if (!scope.player) {
                                 scope.loading = false; // no supported format - no loading
+                                    scope.preview = null;
                                 return;
                             }
                             $timeout(initNewPlayer);
@@ -460,34 +469,21 @@ angular.module('nxCommon')
                         }
                     }
 
-                    scope.$watch('vgSrc', srcChanged, true);
-
-                    scope.$on('$destroy', function () {
-                        resetPlayer();
-                    });
-
-                    if (scope.debugMode) {
-                        scope.$watch('activeFormat', srcChanged);
-                    }
-
                     scope.initFlash = function () {
                         var playerId = !scope.playerId ? 'player0' : scope.playerId;
 
                         if (!flashPlayer) {
-                            $.ajax({
+                            $http({
                                 url: Config.viewsDirCommon + 'components/flashPlayer.html',
-                                success: function (result) {
-                                    flashPlayer = result;
-                                    flashPlayer = flashPlayer.replace(/{{playerId}}/g, playerId);
-                                    flashPlayer = flashPlayer.replace(/{{flashSource}}/g, scope.flashSource);
-                                    scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
-                                },
-                                error: function () {
-                                    $log.error('There was a problem with loading the flash player!!!');
-                                }
+                            }).success(function (result) {
+                                flashPlayer = result;
+                                flashPlayer = flashPlayer.replace(/{{playerId}}/g, playerId);
+                                flashPlayer = flashPlayer.replace(/{{flashSource}}/g, scope.flashSource);
+                                scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
+                            }).error(function () {
+                                $log.error('There was a problem with loading the flash player!!!');
                             });
-                        }
-                        else {
+                        } else {
                             scope.flashPlayer = $sce.trustAsHtml(flashPlayer);
                         }
                     };
@@ -508,18 +504,18 @@ angular.module('nxCommon')
                         }
                     };
 
-                    var $videowindow = $('.videowindow');
-                    var $window = $(window);
+                    var jqWindow = $(window);
+                    jqWindow.resize(updateWidth);
 
-                    function updateWidth() {
-                        if (!scope.rotation || scope.rotation === 0 || scope.rotation === 180) {
-                            return;
+                        if (scope.debugMode) {
+                            scope.$watch('activeFormat', srcChanged);
                         }
-                        var videoWindowHeight = $videowindow.height();
-                        $('.videoplayer').css('width', videoWindowHeight);
-                    }
+                        scope.$watch('vgSrc', srcChanged, true);
 
-                    $window.resize(updateWidth);
+                        scope.$on('$destroy', function () {
+                            resetPlayer();
+                        });
                 }
             };
         }]);
+})();

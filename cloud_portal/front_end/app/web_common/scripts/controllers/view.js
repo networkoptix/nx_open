@@ -1,3 +1,5 @@
+import * as $ from 'jquery';
+
 (function () {
     
     'use strict';
@@ -141,7 +143,7 @@
                 }
                 
                 function updateAvailableResolutions() {
-                    if ($scope.player == null) {
+                    if ($scope.player === null) {
                         $scope.availableResolutions = [LANG.common.resolution.auto];
                         return;
                     }
@@ -244,7 +246,7 @@
                     }
                     $scope.resolution = resolutionHls;
                     
-                    $scope.currentResolution = $scope.player === "webm" ? resolution : resolutionHls;
+                    $scope.currentResolution = $scope.player === 'webm' ? resolution : resolutionHls;
                     $scope.activeVideoSource = _.filter([
                         {
                             src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt,
@@ -592,24 +594,25 @@
                 };
                 
                 
-                systemAPI.checkPermissions(CONFIG.globalViewArchivePermission).then(function (result) {
-                    $scope.canViewArchive = result;
-                    return $scope.camerasProvider.requestResources();
-                }).then(function () {
-                    // instead of requesting gettime once - we request it for all servers to know each timezone
-                    return $scope.camerasProvider.getServerTimes();
-                }).then(function () {
-                    if (!isActive('embed') && $scope.activeCamera.id !== $scope.storage.cameraId) {
-                        $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
-                    }
-                    $scope.ready = true;
-                    $timeout(updateHeights);
-                    $scope.camerasProvider.startPoll();
-                    if (($scope.betaMode || $scope.debugMode) && window.jscd.browser.toLowerCase() == 'chrome') {
-                        $scope.voiceControls = {enabled: true, showCommands: true};
-                        voiceControl.initControls($scope);
-                    }
-                });
+                systemAPI.checkPermissions(CONFIG.globalViewArchivePermission)
+                    .then(function (result) {
+                        $scope.canViewArchive = result;
+                        return $scope.camerasProvider.requestResources();
+                    }).then(function () {
+                        // instead of requesting gettime once - we request it for all servers to know each timezone
+                        return $scope.camerasProvider.getServerTimes();
+                    }).then(function () {
+                        if (!isActive('embed') && (!$scope.activeCamera || $scope.activeCamera.id !== $scope.storage.cameraId)) {
+                            $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                        }
+                        $scope.ready = true;
+                        $timeout(updateHeights);
+                        $scope.camerasProvider.startPoll();
+                        if (($scope.betaMode || $scope.debugMode) && window.jscd.browser.toLowerCase() === 'chrome') {
+                            $scope.voiceControls = {enabled: true, showCommands: true};
+                            voiceControl.initControls($scope);
+                        }
+                    });
                 
                 //wait for the page to load then update
                 $timeout(updateHeights);
