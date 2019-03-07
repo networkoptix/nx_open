@@ -238,7 +238,7 @@ void DiscoveryClient::setupOnlineNodesRequest()
             }
 
             if (!nx::network::http::StatusCode::isSuccessCode(
-                m_registerNodeRequest->response()->statusLine.statusCode))
+                m_onlineNodesRequest->response()->statusLine.statusCode))
             {
                 startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
                 return;
