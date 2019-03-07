@@ -138,8 +138,6 @@ void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
 void EventConnector::at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,
     vms::api::EventReason reasonCode, const QString &reasonParamsEncoded)
 {
-    NX_WARNING(this, "Network issue %1 on %2: %3", reasonCode, resource, reasonParamsEncoded);
-
     vms::event::NetworkIssueEventPtr event(new vms::event::NetworkIssueEvent(
         resource, timeStamp, reasonCode, reasonParamsEncoded));
 
