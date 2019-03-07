@@ -31,7 +31,7 @@ DiscoveryManager::DiscoveryManager(
 
 void DiscoveryManager::start(
     const std::string& clusterId,
-    const nx::cloud::discovery::NodeInfo& nodeInfo)
+    const nx::utils::Url& synchronizationEngineUrl)
 {
     if (m_discoveryClient)
         return;
@@ -39,7 +39,7 @@ void DiscoveryManager::start(
     m_discoveryClient = std::make_unique<nx::cloud::discovery::DiscoveryClient>(
         m_discoverySettings,
         clusterId,
-        nodeInfo);
+        buildNodeInfo(clusterId, synchronizationEngineUrl));
 
     m_discoveryClient->setOnNodeDiscovered(
         [this, clusterId](nx::cloud::discovery::Node node)
@@ -60,7 +60,7 @@ void DiscoveryManager::start(
     m_discoveryClient->setOnNodeLost(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            NX_VERBOSE(this, lm("Node lost. %1. Disconnecting from all urls").arg(toString(node)));
+            NX_VERBOSE(this, lm("Node lost. %1. Disconnecting from all urls.").arg(toString(node)));
 
             for(const auto& url : node.urls)
                 m_syncEngine->connector().removeNodeUrl(clusterId, url);
@@ -83,6 +83,17 @@ void DiscoveryManager::updateInformation(const std::string& infoJson)
 const nx::cloud::discovery::DiscoveryClient* DiscoveryManager::discoveryClient() const
 {
     return m_discoveryClient.get();
+}
+
+nx::cloud::discovery::NodeInfo DiscoveryManager::buildNodeInfo(
+    const std::string& clusterId,
+    const nx::utils::Url& synchronizationEngineUrl) const
+{
+    return nx::cloud::discovery::NodeInfo{
+        /*nodeId*/ m_syncEngine->peerId().toSimpleString().toStdString(),
+        /*urls*/ {synchronizationEngineUrl.toStdString()},
+        /*infoJson*/ {}
+    };
 }
 
 } //namespace nx::clusterdb::engine

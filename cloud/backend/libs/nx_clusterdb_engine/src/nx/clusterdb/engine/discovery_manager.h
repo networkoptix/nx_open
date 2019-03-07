@@ -19,12 +19,12 @@ public:
 
     /**
      * Starts discovery service.
-     * @clusterId the id of the cluster to register with.
-     * @ nodeInfo the initial node information to register.
+     * @clusterId the cluster id that this node should advertize under and discover other nodes.
+     * @synchronizationEngineUrl the url that the synchronization engine listens on.
      */
     void start(
         const std::string& clusterId,
-        const nx::cloud::discovery::NodeInfo& nodeInfo);
+        const nx::utils::Url& synchronizationEngineUrl);
 
     /**
      * Stops the discovery service;
@@ -44,6 +44,11 @@ public:
      * or stop() was called.
      */
     const nx::cloud::discovery::DiscoveryClient* discoveryClient() const;
+
+private:
+    nx::cloud::discovery::NodeInfo buildNodeInfo(
+        const std::string& clusterId,
+        const nx::utils::Url& synchronizationEngineUrl) const;
 
 private:
     const nx::cloud::discovery::Settings& m_discoverySettings;

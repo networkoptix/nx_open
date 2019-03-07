@@ -10,7 +10,6 @@ namespace {
 
 static constexpr char kClusterId[] = "DiscoveryManagerTestCluster";
 
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -22,10 +21,15 @@ public:
     class NodeContext
     {
     public:
-        NodeContext(Peer& peer, nx::cloud::discovery::NodeInfo nodeInfo):
+        NodeContext(Peer& peer):
             m_peer(peer),
-            m_nodeInfo(std::move(nodeInfo))
+            m_syncEngineUrl(peer.baseApiUrl())
         {
+        }
+
+        const nx::utils::Url& syncEngineUrl() const
+        {
+            return m_syncEngineUrl;
         }
 
         SynchronizationEngine& syncEngine()
@@ -45,25 +49,24 @@ public:
 
         nx::network::SocketAddress endpoint() const
         {
-            auto url = m_peer.baseApiUrl();
-            return nx::network::SocketAddress(url.host(), url.port());
+            return nx::network::SocketAddress(m_syncEngineUrl.host(), m_syncEngineUrl.port());
         }
 
         nx::cloud::discovery::Node toNode()
         {
             nx::cloud::discovery::Node node;
-            node.nodeId = m_nodeInfo.nodeId;
+            node.nodeId = nodeId();
             return node;
         }
 
-        nx::cloud::discovery::NodeInfo& nodeInfo()
+        std::string nodeId() const
         {
-            return m_nodeInfo;
+            return m_peer.nodeId();
         }
 
     private:
         Peer& m_peer;
-        nx::cloud::discovery::NodeInfo m_nodeInfo;
+        nx::utils::Url m_syncEngineUrl;
     };
 
 public:
@@ -92,18 +95,7 @@ public:
 
         ASSERT_TRUE(peer.process().startAndWaitUntilStarted());
 
-        std::string nodeId =
-            peer.process().moduleInstance()->synchronizationEngine().peerId()
-                .toSimpleString().toStdString();
-
-        std::string syncUrl = peer.baseApiUrl().toStdString();
-
-        m_nodes.emplace_back(
-            peer,
-            nx::cloud::discovery::NodeInfo{
-                nodeId,
-                {syncUrl},
-                nx::cloud::discovery::test::generateInfoJson(nodeId)});
+        m_nodes.emplace_back(peer);
     }
 
     NodeContext& nodeContext(size_t index)
@@ -170,7 +162,7 @@ protected:
         auto& nodeContext = m_fixture.nodeContext(index);
         nodeContext.discoveryManager().start(
             kClusterId,
-            nodeContext.nodeInfo());
+            nodeContext.syncEngineUrl());
     }
 
     void whenNodeStopsDiscovery(size_t index = 0)
@@ -185,7 +177,7 @@ protected:
         ASSERT_NE(nodeContext.discoveryClient(), nullptr);
 
         nx::cloud::discovery::Node node = nodeContext.discoveryClient()->node();
-        while (node.nodeId != nodeContext.nodeInfo().nodeId)
+        while (node.nodeId != nodeContext.nodeId())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             node = nodeContext.discoveryClient()->node();
