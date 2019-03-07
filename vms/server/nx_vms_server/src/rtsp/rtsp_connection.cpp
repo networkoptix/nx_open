@@ -516,8 +516,8 @@ void QnRtspConnectionProcessor::sendResponse(
         d->socket->getForeignAddress().address.toString(),
         response);
 
-    NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n\n\n",
-        d->socket->getForeignAddress().toString(),
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n",
+        d->socket->getForeignAddress(),
         response);
 
     QnMutexLocker lock(&d->sockMutex);
