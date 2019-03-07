@@ -77,7 +77,12 @@ int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
         else
             status = m_camera->nextBufferedPacket(packet);
         if (status == AVERROR(EAGAIN))
+        {
+            // Some sleep needed because video reading is non blocking when no audio.
+            if (!m_camera->audioEnabled())
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
+        }
         if (status < 0)
         {
             NX_ERROR(this, "Usb camera plugin reading error: %1",
