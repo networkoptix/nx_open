@@ -212,6 +212,5 @@ Object
                     interactor.startRotation()
             }
         }
-
     }
 }

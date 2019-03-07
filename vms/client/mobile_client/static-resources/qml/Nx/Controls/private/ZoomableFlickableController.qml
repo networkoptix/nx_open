@@ -18,6 +18,9 @@ Object
     signal doubleClicked(real mouseX, real mouseY)
 
     property bool draggingGesture: false
+    readonly property bool scaling:
+        mouseAreaHandler.doubleTapScaleMode
+        || (mouseAreaHandler.doubleTapDownPos ? true : false)
 
     Object
     {
@@ -135,15 +138,15 @@ Object
 
             onPositionChanged:
             {
-                if (target.pressed)
+                if (target.pressed && !mouseAreaHandler.doubleTapDownPos)
                     controller.draggingGesture = true
 
                 if (!mouseAreaHandler.doubleTapDownPos)
                     return
 
                 var currentVector = Qt.vector2d(
-                    mouseAreaHandler.doubleTapDownPos.x - mouseX,
-                    mouseAreaHandler.doubleTapDownPos.y - mouseY)
+                    mouseAreaHandler.doubleTapDownPos.x - mouse.x,
+                    mouseAreaHandler.doubleTapDownPos.y - mouse.y)
 
                 if (!mouseAreaHandler.doubleTapScaleMode)
                 {
@@ -158,7 +161,7 @@ Object
                 var sideSize = Math.min(flickable.width, flickable.height) / 2
                 var scaleChange = 1 + Math.abs(currentVector.y / sideSize)
                 var targetScale = currentVector.y > 0 ? 1 / scaleChange : scaleChange
-                pinchAreaHand.updatePinch(mouseAreaHandler.doubleTapDownPos, mouseAreaHandler.doubleTapDownPos, targetScale)
+                pinchAreaHandler.updatePinch(mouseAreaHandler.doubleTapDownPos, mouseAreaHandler.doubleTapDownPos, targetScale)
             }
 
             onDoubleClicked:
@@ -167,8 +170,8 @@ Object
                 doubleClickFilterTimer.restart();
 
                 var mousePosition = Qt.point(mouse.x, mouse.y)
-                var acceptDoubleTap = controller.doubleTapStartCheckFuncion
-                    && controller.doubleTapStartCheckFuncion(mousePosition)
+                var acceptDoubleTap = controller.doubleTapStartCheckFunction
+                    && controller.doubleTapStartCheckFunction(mousePosition)
 
                 if (acceptDoubleTap)
                     mouseAreaHandler.doubleTapDownPos = mousePosition
