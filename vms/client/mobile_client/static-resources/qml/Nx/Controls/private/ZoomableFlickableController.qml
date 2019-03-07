@@ -138,7 +138,7 @@ Object
 
             onPositionChanged:
             {
-                if (target.pressed && !mouseAreaHandler.doubleTapDownPos)
+                if (target.pressed && !mouseAreaHandler.doubleTapDownPos && mouseArea.pressed)
                     controller.draggingGesture = true
 
                 if (!mouseAreaHandler.doubleTapDownPos)
