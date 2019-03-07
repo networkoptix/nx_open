@@ -117,7 +117,7 @@ ClusterTestFixture::ClusterTestFixture():
 {
 }
 
-void ClusterTestFixture::addPeer()
+void ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
 {
     const auto dbFileArg = lm("--db/name=%1/db_%2.sqlite")
         .args(testDataDir(), ++m_peerCounter).toStdString();
@@ -125,7 +125,9 @@ void ClusterTestFixture::addPeer()
     auto peer = std::make_unique<Peer>();
     peer->process().addArg(dbFileArg.c_str());
 
-    ASSERT_TRUE(peer->process().startAndWaitUntilStarted());
+    if (startAndWaitUntilStarted)
+        ASSERT_TRUE(peer->process().startAndWaitUntilStarted());
+
     m_peers.push_back(std::move(peer));
 }
 

@@ -47,7 +47,7 @@ class ClusterTestFixture:
 public:
     ClusterTestFixture();
 
-    void addPeer();
+    void addPeer(bool startAndWaitUntilStarted = true);
     Peer& peer(int index);
     const Peer& peer(int index) const;
     int peerCount() const;
