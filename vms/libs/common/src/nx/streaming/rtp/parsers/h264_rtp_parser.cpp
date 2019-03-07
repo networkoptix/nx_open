@@ -323,8 +323,7 @@ bool H264Parser::processData(
 
     auto processPacketLost = [this, sequenceNum]()
     {
-        NX_WARNING(this, "RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3",
-            m_resourceId, m_prevSequenceNum, sequenceNum);
+        NX_DEBUG(this, "Packet loss detected");
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     };

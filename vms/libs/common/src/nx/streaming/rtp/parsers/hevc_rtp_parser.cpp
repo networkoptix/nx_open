@@ -259,7 +259,7 @@ bool HevcParser::handlePacketLoss(
     int previousSequenceNumber,
     int currentSequenceNumber)
 {
-    NX_WARNING(this, "Packet loss detected.");
+    NX_DEBUG(this, "Packet loss detected");
     emit packetLostDetected(previousSequenceNumber, currentSequenceNumber);
     return reset();
 }

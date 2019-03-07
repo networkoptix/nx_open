@@ -20,15 +20,15 @@ public:
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
     static QString encodePrimaryStream(bool isPrimary);
 
-    struct PacketLossSequence
+    struct PacketLoss
     {
-        int prev;
-        int next;
-        bool valid;
-    };
+        size_t prev = 0;
+        size_t next = 0;
+        size_t aggregated = 0;
 
-    static PacketLossSequence decodePacketLossSequence(const QString& encoded);
-    static QString encodePacketLossSequence(int prev, int next);
+        QString toString() const;
+        static std::optional<PacketLoss> parse(const QString& string);
+    };
 };
 
 } // namespace event

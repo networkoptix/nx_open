@@ -80,7 +80,8 @@ int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
             continue;
         if (status < 0)
         {
-            NX_ERROR(this, "Usb camera plugin reading error: %1", status);
+            NX_ERROR(this, "Usb camera plugin reading error: %1",
+                ffmpeg::utils::errorToString(status));
             m_camera->uninitialize();
             return nxcip::NX_IO_ERROR;
         }
@@ -99,7 +100,8 @@ int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
 
             if (status < 0)
             {
-                NX_ERROR(this, "Usb camera plugin transcoding error: %1", status);
+                NX_ERROR(this, "Usb camera plugin transcoding error: %1",
+                    ffmpeg::utils::errorToString(status));
                 return nxcip::NX_OTHER_ERROR;
             }
             packet = transcoded;

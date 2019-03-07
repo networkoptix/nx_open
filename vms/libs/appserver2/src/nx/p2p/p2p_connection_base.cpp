@@ -211,10 +211,16 @@ void ConnectionBase::onHttpClientDone()
         if (m_credentialsSource < CredentialsSource::none)
         {
             using namespace std::placeholders;
-            fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
-            m_httpClient->doGet(
-                m_httpClient->url(),
-                std::bind(&ConnectionBase::onHttpClientDone, this));
+            if (fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
+            {
+                m_httpClient->doGet(
+                    m_httpClient->url(),
+                    std::bind(&ConnectionBase::onHttpClientDone, this));
+            }
+            else
+            {
+                cancelConnecting(State::Unauthorized, lm("Unauthorized"));
+            }
         }
         else
         {
@@ -350,7 +356,7 @@ void ConnectionBase::startConnection()
     }
     else
     {
-        m_credentialsSource = CredentialsSource::remoteUrl;
+        m_credentialsSource = CredentialsSource::userNameAndPassword;
         m_httpClient->setUserName(requestUrl.userName());
         m_httpClient->setUserPassword(requestUrl.password());
     }

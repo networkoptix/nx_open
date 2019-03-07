@@ -31,7 +31,10 @@
                          class="glyphicon glyphicon-server-online" ></div>
                     <div ng-if="server.status != 'Online' && !server.active"
                          class="glyphicon glyphicon-server-offline" ></div>
-                    <div class="server-name">{{server.name}}</div><div class="ip-info" ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</div>
+                    <div class="server-name">{{server.name}}</div>
+                    <div class="ip-info" ng-if="toggleInfo">
+                        &nbsp;{{server.ip}}
+                    </div>
                 </div>
                 <div >
                     <span>

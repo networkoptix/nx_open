@@ -10,6 +10,7 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/stream_proxy.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -97,27 +98,53 @@ public:
 protected:
     void SetUp();
 
+    /**
+     * Mediator.
+     */
+
+    void startMediator();
+    void restartMediator();
+    nx::hpm::MediatorFunctionalTest& mediator();
+    void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
+    void configureProxyBeforeMediator();
+    void blockDownTrafficThroughExistingConnectionsToMediator();
+
+    void startCloudModulesXmlProvider();
+
+    /**
+     * Relay.
+     */
+
+    void setRelayCount(int count);
+    void startRelays();
+    void startRelay(int index);
+    nx::cloud::relay::test::Launcher& trafficRelay();
+    nx::utils::Url relayUrl(int relayNum = 0) const;
+
+    /**
+     * Listening server.
+     */
+
     void startServer();
     void stopServer();
-    nx::utils::Url relayUrl(int relayNum = 0) const;
-    void restartMediator();
+    std::string serverSocketCloudAddress() const;
+    const hpm::api::SystemCredentials& cloudSystemCredentials() const;
+    void setRemotePeerName(const std::string& peerName);
 
-    void assertConnectionCanBeEstablished();
+    /**
+     * Validation functions.
+     */
+
+    void assertCloudConnectionCanBeEstablished();
+    void waitUntilCloudConnectionCanBeEstablished();
+    SystemError::ErrorCode tryEstablishCloudConnection();
 
     void startExchangingFixedData();
     void assertDataHasBeenExchangedCorrectly();
 
-    nx::hpm::MediatorFunctionalTest& mediator();
-    nx::cloud::relay::test::Launcher& trafficRelay();
-    std::string serverSocketCloudAddress() const;
-    const hpm::api::SystemCredentials& cloudSystemCredentials() const;
-
     void waitUntilServerIsRegisteredOnMediator();
     void waitUntilServerIsRegisteredOnTrafficRelay();
     void waitUntilServerIsUnRegisteredOnTrafficRelay();
-
-    void setRemotePeerName(const std::string& peerName);
-    void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
     const std::unique_ptr<network::AbstractStreamSocket>& clientSocket();
 
@@ -142,6 +169,14 @@ private:
         std::string value;
     };
 
+    struct ProxyContext
+    {
+        nx::network::SocketAddress endpoint;
+        nx::network::StreamProxy proxy;
+        std::atomic<int> lastConnectionNumber{0};
+        std::atomic<int> blockedConnectionNumber{-1};
+    };
+
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
     nx::hpm::MediatorFunctionalTest m_mediator;
@@ -160,6 +195,8 @@ private:
     nx::network::http::BufferType m_expectedMsgBody;
     std::unique_ptr<network::AbstractStreamSocket> m_clientSocket;
 
+    std::unique_ptr<ProxyContext> m_proxyBeforeMediator;
+
     RelayPtrList m_relays;
     int m_relayCount;
     std::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
@@ -169,8 +206,6 @@ private:
     void startHttpServer();
     void onHttpRequestDone(
         std::list<std::unique_ptr<nx::network::http::AsyncClient>>::iterator clientIter);
-    void startRelays();
-    void startRelay(int index);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
 
     virtual void peerAdded(const std::string& /*serverName*/) {}
