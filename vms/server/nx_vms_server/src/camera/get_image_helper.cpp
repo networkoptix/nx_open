@@ -550,8 +550,10 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
 
             return StreamIndex::secondary;
         }
-        case StreamSelectionMode::forcedPrimary: return StreamIndex::primary;
-        case StreamSelectionMode::forcedSecondary: return StreamIndex::secondary;
+        case StreamSelectionMode::forcedPrimary:
+            return StreamIndex::primary;
+        case StreamSelectionMode::forcedSecondary:
+            return StreamIndex::secondary;
         case StreamSelectionMode::sameAsAnalytics:
             return ini().analyzeSecondaryStream ? StreamIndex::secondary : StreamIndex::primary;
         case StreamSelectionMode::sameAsMotion:
