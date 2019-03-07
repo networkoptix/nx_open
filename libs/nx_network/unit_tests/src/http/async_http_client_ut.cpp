@@ -997,6 +997,21 @@ public:
     {
         m_httpClient->pleaseStopSync();
         m_testHttpServer.reset();
+
+        decltype(m_connectionToContext) connectionToContext;
+        {
+            QnMutexLocker lock(&m_mutex);
+            connectionToContext = std::exchange(m_connectionToContext, {});
+        }
+
+        for (auto& [connection, ctx]: connectionToContext)
+        {
+            connection->pleaseStopSync();
+            ctx->timer.pleaseStopSync();
+        }
+
+        // Locking mutex so that connections that are in the onConnectionClosed have exited.
+        QnMutexLocker lock(&m_mutex);
     }
 
 protected:
