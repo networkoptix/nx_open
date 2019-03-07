@@ -97,6 +97,8 @@ void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr& res
             !cameraRes->hasFlags(Qn::foreigner) &&
             !cameraRes->isInitialized())
         {
+            NX_VERBOSE(this, "Trying to init resource [%1] after status change to [%2]",
+                cameraRes, cameraRes->getStatus());
             cameraRes->initAsync(false /*optional*/);
         }
         return;

@@ -11,6 +11,7 @@ import 'hint.css/hint.min.css';
 import 'rangeslider.js/dist/rangeslider.css';
 import '../styles/main.scss';
 
+require('es6-promise/auto');
 require('./config.js');
 require('./bootstrap.js');
 

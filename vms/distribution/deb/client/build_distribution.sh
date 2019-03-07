@@ -92,6 +92,11 @@ copyLibs()
         'libtegra_video.*'
         'libmediaserver*'
         'libcloud_db.*'
+        'libnx_cassandra*'
+        'libconnection_mediator*'
+        'libnx_clusterdb*'
+        'libnx_discovery_api_client*'
+        'libtraffic_relay*'
     )
 
     for LIB in "$BUILD_DIR/lib"/*.so*
