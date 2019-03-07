@@ -23,7 +23,7 @@ public:
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
     nx::utils::Url baseApiUrl() const;
-    nx::utils::Url syncronizationUrl() const;
+    nx::utils::Url synchronizationUrl() const;
 
     void connectTo(const Peer& other);
     Customer addRandomData();

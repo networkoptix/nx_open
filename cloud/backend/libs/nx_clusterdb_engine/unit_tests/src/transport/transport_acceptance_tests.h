@@ -118,7 +118,7 @@ private:
 
     nx::utils::Url getUrlForSystem(const std::string& systemId)
     {
-        auto url = m_nodeCluster.peer(0).syncronizationUrl();
+        auto url = m_nodeCluster.peer(0).synchronizationUrl();
         url.setPath(nx::network::http::rest::substituteParameters(
             url.path().toStdString(),
             {systemId}).c_str());

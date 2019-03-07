@@ -33,7 +33,7 @@ nx::utils::Url Peer::baseApiUrl() const
         .setEndpoint(m_process.moduleInstance()->httpEndpoints().front());
 }
 
-nx::utils::Url Peer::syncronizationUrl() const
+nx::utils::Url Peer::synchronizationUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)

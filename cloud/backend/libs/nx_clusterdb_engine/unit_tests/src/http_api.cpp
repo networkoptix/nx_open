@@ -16,7 +16,7 @@ protected:
         addPeer();
 
         m_client = std::make_unique<api::Client>(
-            peer(0).syncronizationUrl(),
+            peer(0).synchronizationUrl(),
             "systemId");
     }
 
