@@ -50,10 +50,10 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (bboxes->gie_type != 3)
         return true;
 
-    auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
-    packet->setTimestampUs(GST_BUFFER_PTS(buffer));
+    auto objectMetadataPacket = new nx::sdk::analytics::ObjectMetadataPacket();
+    objectMetadataPacket->setTimestampUs(GST_BUFFER_PTS(buffer));
     // TODO: #dmishin calculate duration or take it from buffer.
-    packet->setDurationUs(ini().openAlprDefaultMetadataDurationMs * 1000);
+    objectMetadataPacket->setDurationUs(ini().openAlprDefaultMetadataDurationMs * 1000);
 
     auto pipeline = (deepstream::OpenAlprPipeline*) userData;
     auto licensePlateTracker = pipeline->licensePlateTracker();
@@ -138,7 +138,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         detectedObject->setId(info.uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
-        detectedObject->setTypeId(kLicensePlateGuid);
+        detectedObject->setTypeId(kLicensePlateObjectTypeId);
 
         if (ini().showGuids)
         {
@@ -153,10 +153,10 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 attributes.begin(),
                 attributes.end()));
 
-        packet->addItem(detectedObject.get());
+        objectMetadataPacket->addItem(detectedObject.get());
     }
 
-    pipeline->handleMetadata(packet);
+    pipeline->handleMetadata(objectMetadataPacket);
     return true;
 }
 

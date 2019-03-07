@@ -126,7 +126,7 @@ const IString* DeviceAgent::manifest(Error* error) const
     static const std::string kIndent = "        ";
     if (ini().pipelineType == kOpenAlprPipeline)
     {
-        objectTypeIds += kIndent + "\"" + kLicensePlateGuid +"\"";
+        objectTypeIds += kIndent + "\"" + kLicensePlateObjectTypeId +"\"";
     }
     else
     {
@@ -143,6 +143,9 @@ const IString* DeviceAgent::manifest(Error* error) const
 {
     "supportedObjectTypeIds": [
 )json" + objectTypeIds + R"json(
+    ],
+    "supportedEventTypeIds": [
+        ")json" + kLicensePlateDetectedEventTypeId + R"json("
     ]
 }
 )json";
