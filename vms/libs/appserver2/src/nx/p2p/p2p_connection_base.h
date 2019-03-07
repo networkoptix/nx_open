@@ -111,7 +111,7 @@ signals:
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 
 protected:
-    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
     const P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
     virtual void setState(State state);
@@ -130,9 +130,8 @@ protected:
 private:
     enum class CredentialsSource
     {
-        remoteUrl,
+        userNameAndPassword,
         serverKey,
-        appserverConnectionFactory,
         none,
     };
 protected:
