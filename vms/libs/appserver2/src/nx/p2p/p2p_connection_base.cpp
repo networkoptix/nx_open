@@ -208,19 +208,13 @@ void ConnectionBase::onHttpClientDone()
     {
         // try next credential source
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
-        if (m_credentialsSource < CredentialsSource::none)
+        using namespace std::placeholders;
+        if (m_credentialsSource < CredentialsSource::none
+            && fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
         {
-            using namespace std::placeholders;
-            if (fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
-            {
-                m_httpClient->doGet(
-                    m_httpClient->url(),
-                    std::bind(&ConnectionBase::onHttpClientDone, this));
-            }
-            else
-            {
-                cancelConnecting(State::Unauthorized, lm("Unauthorized"));
-            }
+            m_httpClient->doGet(
+                m_httpClient->url(),
+                std::bind(&ConnectionBase::onHttpClientDone, this));
         }
         else
         {
