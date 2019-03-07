@@ -1,5 +1,7 @@
 #include "server_connection.h"
 
+#include <nx/network/socket_global.h>
+
 #include "message_dispatcher.h"
 
 namespace nx {
@@ -14,6 +16,7 @@ ServerConnection::ServerConnection(
     m_peerAddress(base_type::getForeignAddress()),
     m_dispatcher(dispatcher)
 {
+    ++SocketGlobals::instance().debugCounters().stunConnectionCount;
 }
 
 ServerConnection::~ServerConnection()
@@ -21,8 +24,10 @@ ServerConnection::~ServerConnection()
     // notify, that connection is being destruct
     // NOTE: this is needed only by weak_ptr holders to know, that this
     //       weak_ptr is not valid any more
-    if( m_destructHandler )
+    if (m_destructHandler)
         m_destructHandler();
+
+    --SocketGlobals::instance().debugCounters().stunConnectionCount;
 }
 
 void ServerConnection::sendMessage(

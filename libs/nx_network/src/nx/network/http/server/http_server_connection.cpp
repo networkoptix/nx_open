@@ -5,6 +5,7 @@
 
 #include <QtCore/QDateTime>
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/datetime.h>
 
 #include "http_message_dispatcher.h"
@@ -23,6 +24,12 @@ HttpServerConnection::HttpServerConnection(
     m_authenticationManager(authenticationManager),
     m_httpMessageDispatcher(httpMessageDispatcher)
 {
+    ++SocketGlobals::instance().debugCounters().httpConnectionCount;
+}
+
+HttpServerConnection::~HttpServerConnection()
+{
+    --SocketGlobals::instance().debugCounters().httpConnectionCount;
 }
 
 SocketAddress HttpServerConnection::clientEndpoint() const

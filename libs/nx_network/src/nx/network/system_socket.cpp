@@ -1023,6 +1023,7 @@ TCPSocket::TCPSocket(int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::TCPSocket(int newConnSD, int ipVersion):
@@ -1034,10 +1035,12 @@ TCPSocket::TCPSocket(int newConnSD, int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::~TCPSocket()
 {
+    --SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 bool TCPSocket::reopen()

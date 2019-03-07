@@ -87,6 +87,7 @@ public:
         std::unique_ptr<AbstractStreamSocket> sock,
         nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
         nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher);
+    virtual ~HttpServerConnection();
 
     HttpServerConnection(const HttpServerConnection&) = delete;
     HttpServerConnection& operator=(const HttpServerConnection&) = delete;

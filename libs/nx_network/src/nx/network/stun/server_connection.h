@@ -39,6 +39,9 @@ public:
         const MessageDispatcher& dispatcher);
     ~ServerConnection();
 
+    ServerConnection(const ServerConnection&) = delete;
+    ServerConnection& operator=(const ServerConnection&) = delete;
+
     virtual void sendMessage(
         nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;

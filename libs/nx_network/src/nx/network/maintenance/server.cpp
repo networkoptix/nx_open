@@ -3,6 +3,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_parse_helper.h>
 
+#include "get_debug_counters.h"
 #include "get_malloc_info.h"
 #include "request_path.h"
 
@@ -14,6 +15,10 @@ void Server::registerRequestHandlers(
 {
     messageDispatcher->registerRequestProcessor<GetMallocInfo>(
         url::joinPath(basePath, kMaintenance, kMallocInfo).c_str(),
+        http::Method::get);
+
+    messageDispatcher->registerRequestProcessor<GetDebugCounters>(
+        url::joinPath(basePath, kMaintenance, kDebugCounters).c_str(),
         http::Method::get);
 }
 
