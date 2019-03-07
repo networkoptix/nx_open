@@ -3,6 +3,7 @@
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
 #include "private/presented_state_delegate.h"
+#include "private/found_devices_delegate.h"
 
 #include <QtCore/QScopedValueRollback>
 
@@ -319,6 +320,7 @@ void DeviceAdditionDialog::setupTable()
     const auto table = ui->foundDevicesTable;
 
     table->setCheckboxColumn(FoundDevicesModel::checkboxColumn);
+    table->setItemDelegate(new FoundDevicesDelegate(table));
     table->setPersistentDelegateForColumn(FoundDevicesModel::presentedStateColumn,
         new PresentedStateDelegate(table));
 }
