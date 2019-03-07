@@ -117,7 +117,7 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
 
 bool QnClientMessageProcessor::isConnectionHeld() const
 {
-    return  m_holdConnection;
+    return m_holdConnection;
 }
 
 Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
