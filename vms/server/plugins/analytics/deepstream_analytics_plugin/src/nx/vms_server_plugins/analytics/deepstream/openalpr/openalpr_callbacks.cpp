@@ -52,7 +52,8 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
 
     auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
     packet->setTimestampUs(GST_BUFFER_PTS(buffer));
-    packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
+    // TODO: #dmishin calculate duration or take it from buffer.
+    packet->setDurationUs(ini().openAlprDefaultMetadataDurationMs * 1000);
 
     auto pipeline = (deepstream::OpenAlprPipeline*) userData;
     auto licensePlateTracker = pipeline->licensePlateTracker();

@@ -10,6 +10,9 @@ namespace deepstream {
 static const int kDefaultPipeline = 1;
 static const int kOpenAlprPipeline = 2;
 
+static const int kDeepStreamDefaultMetadtaDurationMs = 30;
+static const int kOpenAlprDefaultMetadtaDurationMs = 100;
+
 struct DeepStreamConfig: public nx::kit::IniConfig
 {
     DeepStreamConfig():
@@ -26,6 +29,16 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         //kDefaultPipeline,
         pipelineType,
         "Type of pipeline: 1 - default pipeline, 2 - OpenALPR pipeline");
+
+    NX_INI_INT(
+        kDeepStreamDefaultMetadtaDurationMs,
+        deepstreamDefaultMetadataDurationMs,
+        "Default duration assigned to output metadata packets if pipelineType is 1");
+
+    NX_INI_INT(
+        kOpenAlprDefaultMetadtaDurationMs,
+        openAlprDefaultMetadataDurationMs,
+        "Default duration assigned to output metadata packets if pipelineType is 2");
 
     NX_INI_FLAG(1, showGuids, "Show object guids");
 
