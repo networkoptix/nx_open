@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <thread>
 
 namespace nx {
 namespace utils {
@@ -31,14 +32,15 @@ namespace utils {
  */
 class NX_UTILS_API ObjectDestructionFlag
 {
-    enum class ControlledObjectState
+public:
+    enum ControlledObjectState
     {
         alive = 0,
         markedForDeletion,
         deleted,
+        customState,
     };
 
-public:
     ObjectDestructionFlag();
     ~ObjectDestructionFlag();
 
@@ -46,6 +48,7 @@ public:
     ObjectDestructionFlag& operator=(const ObjectDestructionFlag&) = delete;
 
     void markAsDeleted();
+    void recordCustomState(ControlledObjectState state);
 
     /**
      * NOTE: Multiple objects using same ObjectDestructionFlag instance can be stacked.
@@ -61,6 +64,13 @@ public:
         Watcher(Watcher&&) = default;
         Watcher& operator=(Watcher&&) = default;
 
+        /**
+         * Effectively, does the same as Watcher::objectDestroyed.
+         * TODO: But, the objectDestroyed behavior should be changed since this class handles
+         * more than object destruction. But every usage would have to be updated.
+         * So, object destruction is a specific case of an interruption.
+         */
+        bool interrupted() const;
         bool objectDestroyed() const;
 
     private:
@@ -70,6 +80,7 @@ public:
 
 private:
     std::vector<ControlledObjectState*> m_watcherStates;
+    std::thread::id m_lastWatchingThreadId;
 };
 
 } // namespace nx

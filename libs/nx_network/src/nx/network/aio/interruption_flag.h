@@ -6,38 +6,17 @@
 
 namespace nx::network::aio {
 
-class NX_NETWORK_API InterruptionFlag
+/**
+ * Watches for object destruction and change of AIO thread.
+ * TODO: #ak This class appears to be redundant.
+ */
+class NX_NETWORK_API InterruptionFlag:
+    public nx::utils::ObjectDestructionFlag
 {
+    using base_type = nx::utils::ObjectDestructionFlag;
+
 public:
-    enum class StateChange
-    {
-        noChange,
-        aioThreadChanged,
-        thisDeleted,
-    };
-
-    class NX_NETWORK_API ScopeWatcher
-    {
-    public:
-        ScopeWatcher(
-            aio::BasicPollable* aioObject,
-            InterruptionFlag* flag);
-
-        ScopeWatcher(ScopeWatcher&&) = default;
-        ScopeWatcher& operator=(ScopeWatcher&&) = default;
-
-        bool interrupted() const;
-
-        StateChange stateChange() const;
-
-    private:
-        nx::utils::ObjectDestructionFlag::Watcher m_destructionWatcher;
-        aio::BasicPollable* m_aioObject = nullptr;
-        AbstractAioThread* m_aioThread = nullptr;
-    };
-
-private:
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    void handleAioThreadChange();
 };
 
 } // namespace nx::network::aio

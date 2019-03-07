@@ -136,9 +136,14 @@ private:
 
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
     template<typename Range> std::deque<RawSendContext> takeRawSendTasks(Range range);
-    InterruptionFlag::StateChange completeRawSendTasks(
+
+    /**
+     * @return false if was interrupted. All futher processing should be stopped until the next event.
+     */
+    bool completeRawSendTasks(
         std::deque<RawSendContext> completedRawSendTasks,
         SystemError::ErrorCode sysErrorCode);
+
     void scheduleNextRawSendTaskIfAny();
 
     void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);

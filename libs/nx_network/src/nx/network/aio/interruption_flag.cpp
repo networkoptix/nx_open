@@ -2,28 +2,12 @@
 
 namespace nx::network::aio {
 
-InterruptionFlag::ScopeWatcher::ScopeWatcher(
-    aio::BasicPollable* aioObject,
-    InterruptionFlag* flag)
-    :
-    m_destructionWatcher(&flag->m_destructionFlag),
-    m_aioObject(aioObject),
-    m_aioThread(aioObject->getAioThread())
+void InterruptionFlag::handleAioThreadChange()
 {
-}
+    constexpr auto kAioThreadChanged =
+        (base_type::ControlledObjectState) (base_type::ControlledObjectState::customState + 1);
 
-bool InterruptionFlag::ScopeWatcher::interrupted() const
-{
-    return stateChange() != StateChange::noChange;
-}
-
-InterruptionFlag::StateChange InterruptionFlag::ScopeWatcher::stateChange() const
-{
-    if (m_destructionWatcher.objectDestroyed())
-        return StateChange::thisDeleted;
-    if (m_aioObject->getAioThread() != m_aioThread)
-        return StateChange::aioThreadChanged;
-    return StateChange::noChange;
+    recordCustomState(kAioThreadChanged);
 }
 
 } // namespace nx::network::aio

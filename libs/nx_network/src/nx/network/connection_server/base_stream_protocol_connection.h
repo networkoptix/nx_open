@@ -97,7 +97,7 @@ public:
         if (m_serializerState == SerializerState::done)
         {
             // Message is sent, triggerring completion handler.
-            if (completeCurrentSendTask() != aio::InterruptionFlag::StateChange::noChange)
+            if (!completeCurrentSendTask())
                 return;
             processAnotherSendTaskIfAny();
         }
@@ -283,7 +283,7 @@ private:
         if (m_messageReported)
             return true;
 
-        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
+        aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processMessage(std::exchange(m_message, Message()));
         if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
@@ -298,7 +298,7 @@ private:
         if (msgBodyBuffer.isEmpty())
             return true;
 
-        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
+        aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processSomeMessageBody(std::move(msgBodyBuffer));
         if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
@@ -308,7 +308,7 @@ private:
 
     bool reportMessageEnd()
     {
-        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
+        aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processMessageEnd();
         return !watcher.interrupted();
     }
@@ -342,7 +342,10 @@ private:
             });
     }
 
-    aio::InterruptionFlag::StateChange completeCurrentSendTask()
+    /**
+     * @return false If was interrupted. All futher processing should be stopped until the next event.
+     */
+    bool completeCurrentSendTask()
     {
         NX_ASSERT(!m_sendQueue.empty());
         // NOTE: Completion handler is allowed to delete this connection object.
@@ -353,14 +356,12 @@ private:
 
         if (sendCompletionHandler)
         {
-            aio::InterruptionFlag::ScopeWatcher watcher(
-                this,
-                &m_connectionFreedFlag);
+            aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             sendCompletionHandler(SystemError::noError);
-            return watcher.stateChange();
+            return !watcher.interrupted();
         }
 
-        return aio::InterruptionFlag::StateChange::noChange;
+        return true;
     }
 
     void processAnotherSendTaskIfAny()
@@ -402,9 +403,7 @@ private:
 
         auto handler = std::exchange(m_sendQueue.front().handler, nullptr);
         {
-            aio::InterruptionFlag::ScopeWatcher watcher(
-                this,
-                &m_connectionFreedFlag);
+            aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             handler(errorCode);
             if (watcher.interrupted())
                 return; //< Connection has been removed by handler.
