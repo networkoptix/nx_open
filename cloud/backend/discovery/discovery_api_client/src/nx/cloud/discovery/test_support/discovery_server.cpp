@@ -118,8 +118,7 @@ Node DiscoveryServer::updateNode(const NodeInfo& nodeInfo)
     if (node.nodeId.empty())
         node.nodeId = nodeInfo.nodeId;
 
-    if (node.host.empty())
-        node.host = nodeEndpoint.toStdString();
+    node.urls = nodeInfo.urls;
 
     node.infoJson = nodeInfo.infoJson;
     node.expirationTime = std::chrono::system_clock::now() + std::chrono::seconds(3);
@@ -127,7 +126,7 @@ Node DiscoveryServer::updateNode(const NodeInfo& nodeInfo)
     return node;
 }
 
-std::vector<Node> DiscoveryServer::getOnlineNodes()
+std::vector<Node> DiscoveryServer::updateOnlineNodes()
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<Node> onlineNodes;

@@ -14,7 +14,6 @@ NX_DISCOVERY_CLIENT_API std::string generateInfoJson(const std::string& nodeId);
 
 class NX_DISCOVERY_CLIENT_API DiscoveryServer
 {
-
 public:
     DiscoveryServer(const std::string& clusterId);
 
@@ -37,11 +36,9 @@ private:
     bool requestContainsThisClusterId(
         const nx::network::http::RequestContext& requestContext) const;
 
-    Node updateNode(
-        const NodeInfo& nodeInfo,
-        const nx::network::SocketAddress& nodeEndpoint);
+    Node updateNode(const NodeInfo& nodeInfo);
 
-    std::vector<Node> getOnlineNodes();
+    std::vector<Node> updateOnlineNodes();
 
 private:
     const std::string m_clusterId;
