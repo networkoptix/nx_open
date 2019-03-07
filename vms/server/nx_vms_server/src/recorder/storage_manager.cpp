@@ -208,11 +208,11 @@ public:
 private:
     struct ScanTask
     {
-        DeviceFileCatalogPtr catalogue;
+        DeviceFileCatalogPtr catalog;
         QnStorageResourcePtr storage;
 
-        ScanTask(const DeviceFileCatalogPtr& catalogue, const QnStorageResourcePtr& storage):
-            catalogue(catalogue),
+        ScanTask(const DeviceFileCatalogPtr& catalog, const QnStorageResourcePtr& storage):
+            catalog(catalog),
             storage(storage)
         {}
     };
@@ -222,11 +222,11 @@ private:
         DeviceFileCatalog::ScanFilter scanFilter;
 
         PartialScanTask(
-            const DeviceFileCatalogPtr& catalogue,
+            const DeviceFileCatalogPtr& catalog,
             const QnStorageResourcePtr& storage,
             const DeviceFileCatalog::ScanFilter& scanFilter)
             :
-            ScanTask(catalogue, storage),
+            ScanTask(catalog, storage),
             scanFilter(scanFilter)
         {}
     };
@@ -238,7 +238,8 @@ private:
     QnWaitCondition m_waitCondition;
     QSet<QString> m_beingProcessedStoragesUrls;
     Qn::RebuildState m_lastTaskProcessed = Qn::RebuildState_None;
-    int m_cataloguesProcessed = 0;
+    int m_catalogsProcessed = 0;
+    int m_totalCatalogsCount = 0;
 
     void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
@@ -253,23 +254,27 @@ private:
         }
 
         m_beingProcessedStoragesUrls.insert(storageUrl);
-        if (!hasTasksToProcess())
-            resetRebuildInfo();
 
         const auto storageIndex = m_owner->storageDbPool()->getStorageIndex(storage);
         NX_CRITICAL(storageIndex != -1);
-        const auto cataloguesToScan = m_owner->cataloguesToScan(storageIndex);
+        const auto catalogsToScan = m_owner->catalogsToScan(storageIndex);
+
+        if (!hasTasksToProcess())
+            resetRebuildInfo();
+        else
+            m_totalCatalogsCount += catalogsToScan.size();
 
         if (partialScan)
-            addPartialScanTasks(storage, cataloguesToScan);
+            addPartialScanTasks(storage, catalogsToScan);
         else
-            addFullScanTasks(storage, cataloguesToScan);
+            addFullScanTasks(storage, catalogsToScan);
     }
 
     void resetRebuildInfo()
     {
         m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
-        m_cataloguesProcessed = 0;
+        m_catalogsProcessed = 0;
+        m_totalCatalogsCount = 0;
     }
 
     virtual void run() override
@@ -321,7 +326,8 @@ private:
             m_fullScanTasks.pop_front();
 
             lock->unlock();
-            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalogue, &archiveCameras);
+            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalog, &archiveCameras);
+            m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanTask.storage->getUrl(), ));
             lock->relock();
         }
 
@@ -343,7 +349,7 @@ private:
             m_partialScanTasks.pop_front();
 
             lock->unlock();
-            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalogue);
+            m_owner->scanMediaFiles(scanTask.storage, scanTask.catalog);
             lock->relock();
         }
     }
@@ -357,24 +363,24 @@ private:
         const QnStorageResourcePtr& storage,
         const QMap<DeviceFileCatalogPtr, qint64>& cataloguesToScan)
     {
-        for (auto catalogueIt = cataloguesToScan.cbegin();
-            catalogueIt != cataloguesToScan.cend();
-            ++catalogueIt)
+        for (auto catalogIt = cataloguesToScan.cbegin();
+            catalogIt != cataloguesToScan.cend();
+            ++catalogIt)
         {
             DeviceFileCatalog::ScanFilter scanFilter;
-            scanFilter.scanPeriod.startTimeMs = catalogueIt.value();
+            scanFilter.scanPeriod.startTimeMs = catalogIt.value();
             qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
             qint64 scanPeriodDuration = qMax(1ll, endScanTime - scanFilter.scanPeriod.startTimeMs);
             NX_VERBOSE(
                 this,
                 "[Scan]: Partial scan period duration for storage %1, catalog %2 = %3 ms (%4 hrs)",
                 nx::utils::url::hidePassword(storage->getUrl()),
-                catalogueIt.key()->cameraUniqueId(),
+                catalogIt.key()->cameraUniqueId(),
                 scanPeriodDuration,
                 scanPeriodDuration / (1000 * 60 * 60));
             scanFilter.scanPeriod.durationMs = scanPeriodDuration;
 
-            PartialScanTask scanTask(catalogueIt.key(), storage, scanFilter);
+            PartialScanTask scanTask(catalogIt.key(), storage, scanFilter);
             m_partialScanTasks.push_back(scanTask);
         }
     }
@@ -383,11 +389,11 @@ private:
         const QnStorageResourcePtr& storage,
         const QMap<DeviceFileCatalogPtr, qint64>& cataloguesToScan)
     {
-        for (auto catalogueIt = cataloguesToScan.cbegin();
-            catalogueIt != cataloguesToScan.cend();
-            ++catalogueIt)
+        for (auto catalogIt = cataloguesToScan.cbegin();
+            catalogIt != cataloguesToScan.cend();
+            ++catalogIt)
         {
-            ScanTask scanTask(catalogueIt.key(), storage);
+            ScanTask scanTask(catalogIt.key(), storage);
             m_fullScanTasks.push_back(scanTask);
         }
     }
@@ -794,7 +800,7 @@ QnStorageManager::QnStorageManager(
     startAuxTimerTasks();
 }
 
-QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::cataloguesToScan(int storageIndex)
+QMap<DeviceFileCatalogPtr, qint64> QnStorageManager::catalogsToScan(int storageIndex)
 {
     QMap<DeviceFileCatalogPtr, qint64> result;
     NX_MUTEX_LOCKER lock(&m_mutexCatalog);
