@@ -733,8 +733,12 @@ attach_metadata_full_frame (GstDsExample * dsexample, GstBuffer * inbuf,
 
     //std::cout << "PLATE: " << alpr_plate.bestPlate.characters << std::endl;
 
+    std::string encodedDisplayText = alpr_plate.bestPlate.characters
+        + std::string("%") + alpr_plate.country
+        + std::string("%") + alpr_plate.region;
+
     // display_text required heap allocated memory
-    text_params.display_text = g_strdup (alpr_plate.bestPlate.characters.c_str());
+    text_params.display_text = g_strdup (encodedDisplayText.c_str());
     // Display text above the left top corner of the object
     text_params.x_offset = rect_params.left;
     text_params.y_offset = rect_params.top - 10;
