@@ -18,7 +18,7 @@ struct NX_DISCOVERY_CLIENT_API Settings
      * When calculating how long to wait before sending a registration request, the DiscoveryClient
      * adds this value to the amount of time that a request takes to travel from
      * client to server and back, effectively making the round trip time longer.
-     * The default value is 0.
+     * The default value is 3 seconds, or 3,000 milliseconds.
      */
     std::chrono::milliseconds roundTripPadding;
 

@@ -191,17 +191,14 @@ void DiscoveryClient::setupRegisterNodeRequest()
                 return;
             }
 
-            if (auto response = m_registerNodeRequest->response())
-            {
                 if (!nx::network::http::StatusCode::isSuccessCode(
-                    response->statusLine.statusCode))
+                m_registerNodeRequest->response()->statusLine.statusCode))
                 {
                     NX_WARNING(this, lm("Request to register node failed: %1")
-                        .arg(response->statusLine.toString()));
+                    .arg(m_registerNodeRequest->response()->statusLine.toString()));
                     startRegisterNodeRequest(m_settings.registrationErrorDelay);
                     return;
                 }
-            }
 
             bool ok = false;
             Node node = NodeSerialization::deserialized(messageBody, Node(), &ok);
@@ -240,14 +237,12 @@ void DiscoveryClient::setupOnlineNodesRequest()
                 return;
             }
 
-            if (auto response = m_registerNodeRequest->response())
-            {
-                if (!nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode))
+            if (!nx::network::http::StatusCode::isSuccessCode(
+                m_registerNodeRequest->response()->statusLine.statusCode))
                 {
                     startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
                     return;
                 }
-            }
 
             bool ok = false;
             auto onlineNodes =
