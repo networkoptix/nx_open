@@ -46,7 +46,7 @@ void DiscoveryManager::start(
         {
             NX_VERBOSE(
                 this,
-                lm("Discovered a new node: %1. all non http scheme urls will be ignored.")
+                lm("Discovered a new node: %1. All non http scheme urls will be ignored.")
                     .arg(toString(node)));
 
             for (const auto& urlString : node.urls)
