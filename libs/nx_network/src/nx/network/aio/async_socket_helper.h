@@ -511,7 +511,7 @@ private:
 
         // Timer on socket (not read/write timeout, but some timer).
 
-        InterruptionFlag::Watcher watcher(&m_socketInterruptionFlag);
+        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
@@ -579,7 +579,7 @@ private:
     {
         m_recvBuffer = nullptr;
 
-        InterruptionFlag::Watcher watcher(&m_socketInterruptionFlag);
+        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
@@ -675,7 +675,7 @@ private:
     {
         m_asyncSendIssued = false;
 
-        InterruptionFlag::Watcher watcher(&m_socketInterruptionFlag);
+        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
@@ -702,7 +702,7 @@ private:
         else if (sockErrorCode == SystemError::noError)
             sockErrorCode = SystemError::notConnected;  //< MUST report some error.
 
-        InterruptionFlag::Watcher watcher(&m_socketInterruptionFlag);
+        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         if (m_connectHandler)
         {
@@ -885,7 +885,7 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> newConnection)
     {
-        InterruptionFlag::Watcher watcher(&m_socketInterruptionFlag);
+        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
