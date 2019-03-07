@@ -10,12 +10,7 @@ namespace {
 
 static QString toString(const nx::cloud::discovery::Node& node)
 {
-    return
-        QString("{ nodeId: ") + node.nodeId.c_str()
-        + ", host: " + node.host.c_str()
-        + ", expirationTime" + nx::network::http::formatDateTime(
-            nx::cloud::discovery::toDateTime(node.expirationTime))
-        + ", infoJson: " + node.infoJson.c_str() + " }";
+    return nx::cloud::discovery::NodeSerialization::serialized(node);
 }
 
 } // namespace
@@ -44,13 +39,33 @@ void DiscoveryManager::start(
     m_discoveryClient->setOnNodeDiscovered(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            m_syncEngine->connector().addNodeUrl(clusterId, node.host);
+            if (node.urls.empty())
+            {
+                NX_WARNING(
+                    this,
+                    lm("Node %1 discovered with an empty url list! Skipping sync engine connection.")
+                    .arg(node.nodeId.c_str()));
+                return;
+            }
+
+            NX_INFO(
+                this,
+                lm("Discovered node %1 at url: %2. Connecting sync engine to it.")
+                    .arg(node.nodeId).arg(node.urls.front().c_str()));
+            // Synchronization engine provides only one url.
+            m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
         });
 
     m_discoveryClient->setOnNodeLost(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            m_syncEngine->connector().removeNodeUrl(clusterId, node.host);
+            if (!node.urls.empty())
+            {
+                NX_INFO(
+                    this,
+                    lm("Disconnecting from lost node %1 at url:")
+                        .arg(node.nodeId.c_str()).arg(node.urls.front()));
+            }
         });
 
     m_discoveryClient->start();
