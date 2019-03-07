@@ -126,7 +126,9 @@ void ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
     peer->process().addArg(dbFileArg.c_str());
 
     if (startAndWaitUntilStarted)
+    {
         ASSERT_TRUE(peer->process().startAndWaitUntilStarted());
+    }
 
     m_peers.push_back(std::move(peer));
 }
