@@ -49,7 +49,6 @@ void DiscoveryManager::start(
                 lm("Discovered a new node: %1. Non http scheme urls will be ignored.")
                     .arg(toString(node)));
 
-
                 nx::utils::Url url(node.urls.front());
                 if (!isHttpScheme(url))
                 {
