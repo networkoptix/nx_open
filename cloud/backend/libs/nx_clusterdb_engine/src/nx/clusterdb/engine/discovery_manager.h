@@ -18,8 +18,10 @@ public:
         SynchronizationEngine* syncEngine);
 
     /**
-     * Starts discovery service.
-     * @clusterId the cluster id that this node should advertize under and discover other nodes.
+     * Starts discovery service under clusterId, advertising this node at synchronizationEngineUrl.
+     *
+     * @clusterId the cluster id that this node should advertize under and user to
+     *    discover other nodes.
      * @synchronizationEngineUrl the url that the synchronization engine listens on.
      */
     void start(
