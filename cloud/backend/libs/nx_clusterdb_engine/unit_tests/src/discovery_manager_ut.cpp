@@ -6,12 +6,6 @@
 
 namespace nx::clusterdb::engine::test {
 
-namespace {
-
-static constexpr char kClusterId[] = "DiscoveryManagerTestCluster";
-
-} // namespace
-
 //-------------------------------------------------------------------------------------------------
 // DiscoveryTestFixture
 
@@ -55,13 +49,18 @@ public:
         nx::cloud::discovery::Node toNode()
         {
             nx::cloud::discovery::Node node;
-            node.nodeId = nodeId();
+            node.nodeId = m_peer.nodeId();
             return node;
         }
 
-        std::string nodeId() const
+        Peer& peer()
         {
-            return m_peer.nodeId();
+            return m_peer;
+        }
+
+        std::string clusterId() const
+        {
+            return m_peer.process().moduleInstance()->clusterId();
         }
 
     private:
@@ -115,7 +114,9 @@ class DiscoveryManager: public testing::Test
 protected:
     void SetUp() override
     {
-        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(kClusterId);
+        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(
+            CustomerDbNode::defaultClusterId());
+
         ASSERT_TRUE(m_server->bindAndListen());
     }
 
@@ -137,6 +138,33 @@ protected:
         thenNodeIsRegistered(index);
     }
 
+    void givenTwoConnectedNodes()
+    {
+        givenTwoNodes();
+        whenBothNodesStartDiscovery();
+        thenNodesAreConnected();
+        andSyncEnginesAreConnected();
+        andSyncEnginesAreSynchronized();
+    }
+
+    void whenDiscoveryServiceStops()
+    {
+        m_server.reset();
+    }
+
+    void thenSyncEnginesStayConnected()
+    {
+        // Technically there is no way to know that nodes will stay connected if the discovery
+        // server goes down. All we can do is wait and see if nodes continue to synchronize
+        // new data if it is added after the discovery service stops. Let's wait a bit before
+        // trying to synchronize
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        // add two customers and check synchronization
+        for (int i = 0; i < 2; ++i)
+            andSyncEnginesAreSynchronized();
+    }
+
     void whenBothNodesStartDiscovery()
     {
         for (int i = 0; i < 2; ++i)
@@ -147,7 +175,7 @@ protected:
     {
         auto& nodeContext = m_fixture.nodeContext(index);
         nodeContext.discoveryManager().start(
-            kClusterId,
+            nodeContext.clusterId(),
             nodeContext.syncEngineUrl());
     }
 
@@ -158,7 +186,7 @@ protected:
         ASSERT_NE(nodeContext.discoveryClient(), nullptr);
 
         nx::cloud::discovery::Node node = nodeContext.discoveryClient()->node();
-        while (node.nodeId != nodeContext.nodeId())
+        while (node.nodeId != nodeContext.peer().nodeId())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             node = nodeContext.discoveryClient()->node();
@@ -181,6 +209,19 @@ protected:
 
         waitForSyncEngineConnection(a, b);
         waitForSyncEngineConnection(b, a);
+    }
+
+    void andSyncEnginesAreSynchronized()
+    {
+        // Add random data to a and wait for b to synchronize it.
+
+        auto& a = m_fixture.nodeContext(0);
+        auto& b = m_fixture.nodeContext(1);
+
+        m_expectedData.emplace_back(a.peer().addRandomData());
+
+        while (!b.peer().hasData(m_expectedData))
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
 private:
@@ -220,6 +261,7 @@ private:
 private:
     std::unique_ptr<nx::cloud::discovery::test::DiscoveryServer> m_server;
     DiscoveryTestFixture m_fixture;
+    std::vector<Customer> m_expectedData;
 };
 
 TEST_F(DiscoveryManager, discovery_service_starts)
@@ -240,6 +282,16 @@ TEST_F(DiscoveryManager, discovers_other_nodes)
     thenNodesAreConnected();
 
     andSyncEnginesAreConnected();
+    andSyncEnginesAreSynchronized();
+}
+
+TEST_F(DiscoveryManager, sync_engines_stay_connected_if_discovery_service_stops)
+{
+    givenTwoConnectedNodes();
+
+    whenDiscoveryServiceStops();
+
+    thenSyncEnginesStayConnected();
 }
 
 } // namespace nx::clusterdb::engine::test
