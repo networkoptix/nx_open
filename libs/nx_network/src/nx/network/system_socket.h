@@ -226,6 +226,8 @@ public:
     TCPServerSocket(TCPServerSocket&&) = delete;
     TCPServerSocket& operator=(TCPServerSocket&&) = delete;
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
     /**
      * Blocks until a new connection is established on this socket or error.
      * @return new connection socket.
