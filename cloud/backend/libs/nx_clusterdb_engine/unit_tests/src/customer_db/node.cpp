@@ -9,7 +9,8 @@ static constexpr char kApplicationId[] = "customer_db";
 static constexpr char kSystemId[] = "review_and_replace_this_value";
 
 CustomerDbNode::CustomerDbNode(int argc, char **argv):
-    base_type(kApplicationId, argc, argv)
+    base_type(kApplicationId, argc, argv),
+    m_clusterId(kSystemId)
 {
 }
 
@@ -23,6 +24,16 @@ CustomerManager& CustomerDbNode::customerManager()
     return *m_customerManager;
 }
 
+std::string CustomerDbNode::clusterId() const
+{
+    return m_clusterId;
+}
+
+std::string CustomerDbNode::defaultClusterId()
+{
+    return kSystemId;
+}
+
 void CustomerDbNode::setup()
 {
     dao::StructureUpdater structureUpdater(&sqlQueryExecutor());
@@ -32,7 +43,7 @@ void CustomerDbNode::setup()
     m_customerManager = std::make_unique<CustomerManager>(
         &synchronizationEngine(),
         m_customerDao.get(),
-        kSystemId);
+        clusterId());
 }
 
 void CustomerDbNode::teardown()

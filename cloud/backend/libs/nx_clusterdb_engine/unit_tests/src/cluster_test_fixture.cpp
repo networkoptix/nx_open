@@ -53,7 +53,7 @@ void Peer::connectTo(const Peer& other)
         .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
 
     m_process.moduleInstance()->connectToNode(
-        /*systemId*/ "review_and_replace_this_value",
+        process().moduleInstance()->clusterId(),
         url);
 }
 

@@ -24,6 +24,9 @@ public:
     const CustomerManager& customerManager() const;
     CustomerManager& customerManager();
 
+    std::string clusterId() const;
+    static std::string defaultClusterId();
+
 protected:
     virtual void setup() override;
     virtual void teardown() override;
@@ -31,6 +34,7 @@ protected:
 private:
     std::unique_ptr<CustomerManager> m_customerManager;
     std::unique_ptr<dao::CustomerDao> m_customerDao;
+    std::string m_clusterId;
 };
 
 } // namespace nx::clusterdb::engine::test
