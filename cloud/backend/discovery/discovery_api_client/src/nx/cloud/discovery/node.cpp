@@ -31,7 +31,7 @@ namespace NodeSerialization {
 namespace {
 
 static constexpr char kNodeId[] = "nodeId";
-static constexpr char kHost[] = "host";
+static constexpr char kUrls[] = "urls";
 static constexpr char kExpirationTime[] = "expirationTime";
 static constexpr char kInfoJson[] = "infoJson";
 
@@ -45,11 +45,27 @@ Node::time_point toTimePoint(const QDateTime& dt)
     return Node::time_point() + std::chrono::milliseconds(dt.toMSecsSinceEpoch());
 }
 
+QJsonArray toJsonArray(const std::vector<std::string>& urls)
+{
+    QJsonArray result;
+    for (const auto& url : urls)
+        result.append(url.c_str());
+    return result;
+}
+
+std::vector<std::string> toVector(const QStringList& urls)
+{
+    std::vector<std::string> result(urls.size());
+    for (const auto& url : urls)
+        result.emplace_back(url.toStdString());
+    return result;
+}
+
 QJsonObject toJsonObject(const Node& node)
 {
     return QJsonObject({
         {kNodeId, node.nodeId.c_str()},
-        {kHost, node.host.c_str()},
+        {kUrls, toJsonArray(node.urls)},
         {kExpirationTime, toString(node.expirationTime)},
         {kInfoJson, node.infoJson.c_str()} });
 }
@@ -66,10 +82,13 @@ Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr
         return defaultValue;
     node.nodeId = it->toString().toStdString();
 
-    it = map.find(kHost);
+    it = map.find(kUrls);
     if (it == map.end())
         return defaultValue;
-    node.host = it->toString().toStdString();
+    QStringList urls;
+    if (!it->convert(QVariant::StringList, &urls))
+        return defaultValue;
+    node.urls = toVector(urls);
 
     it = map.find(kExpirationTime);
     if (it == map.end())

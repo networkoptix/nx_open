@@ -14,11 +14,12 @@ namespace nx::cloud::discovery {
 struct NX_DISCOVERY_CLIENT_API NodeInfo
 {
     std::string nodeId;
+    std::vector<std::string> urls;
     /* The object under "info" key */
     std::string infoJson;
 };
 
-#define NodeInfo_Fields (nodeId)(infoJson)
+#define NodeInfo_Fields (nodeId)(urls)(infoJson)
 
 QN_FUSION_DECLARE_FUNCTIONS(NodeInfo, (json), NX_DISCOVERY_CLIENT_API)
 
@@ -29,7 +30,7 @@ struct NX_DISCOVERY_CLIENT_API Node
     using time_point = std::chrono::system_clock::time_point;
 
     std::string nodeId;
-    std::string host;
+    std::vector<std::string> urls;
     time_point expirationTime;
     /* The object under "info" key */
     std::string infoJson;

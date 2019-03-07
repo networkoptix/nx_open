@@ -49,10 +49,16 @@ protected:
 
         context->clusterId = kClusterId;
 
+        // simulate a service url to be provided.
+        std::string url = std::string("http://127.0.0.1:") + std::to_string(rand() % 65536 + 1024);
+
         context->client = std::make_unique<discovery::DiscoveryClient>(
             context->settings,
             context->clusterId,
-            NodeInfo{context->nodeId, context->infoJson});
+            NodeInfo{
+                context->nodeId,
+                {url},
+                context->infoJson});
 
         m_clients.emplace_back(std::move(context));
     }
@@ -236,7 +242,7 @@ private:
     void assertNodeEquality(const Node&a, const Node& b)
     {
         ASSERT_EQ(a.nodeId, b.nodeId);
-        ASSERT_EQ(a.host, b.host);
+        ASSERT_EQ(a.urls, b.urls);
         ASSERT_EQ(a.infoJson, b.infoJson);
         // expirationTime is volatile, so don't compare because it changes
     }
@@ -245,7 +251,7 @@ private:
     {
         ASSERT_EQ(node.nodeId, clientContext->nodeId);
         ASSERT_EQ(node.infoJson, clientContext->infoJson);
-        ASSERT_FALSE(node.host.empty());
+        ASSERT_FALSE(node.urls.empty());
 
         auto timeSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(
             node.expirationTime.time_since_epoch());
