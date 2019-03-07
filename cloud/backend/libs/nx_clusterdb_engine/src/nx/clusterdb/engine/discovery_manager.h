@@ -33,16 +33,12 @@ public:
     void updateInformation(const std::string& infoJson);
 
     /**
-     * Get the underlying discovery client.
-     *
-     * @return the underyling discovery client, or nullptr if either start() hasn't been called
-     * or stop() was called.
+     * Get the underlying discovery client. Returns nullptr if start() hasn't been called.
      */
     const nx::cloud::discovery::DiscoveryClient* discoveryClient() const;
 
 private:
     nx::cloud::discovery::NodeInfo buildNodeInfo(
-        const std::string& clusterId,
         const nx::utils::Url& synchronizationEngineUrl) const;
 
 private:

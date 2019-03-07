@@ -39,7 +39,7 @@ void DiscoveryManager::start(
     m_discoveryClient = std::make_unique<nx::cloud::discovery::DiscoveryClient>(
         m_discoverySettings,
         clusterId,
-        buildNodeInfo(clusterId, synchronizationEngineUrl));
+        buildNodeInfo(synchronizationEngineUrl));
 
     m_discoveryClient->setOnNodeDiscovered(
         [this, clusterId](nx::cloud::discovery::Node node)
@@ -77,7 +77,6 @@ const nx::cloud::discovery::DiscoveryClient* DiscoveryManager::discoveryClient()
 }
 
 nx::cloud::discovery::NodeInfo DiscoveryManager::buildNodeInfo(
-    const std::string& clusterId,
     const nx::utils::Url& synchronizationEngineUrl) const
 {
     return nx::cloud::discovery::NodeInfo{
