@@ -47,6 +47,11 @@ struct UpdateItem
     bool changedProtocol = false;
     bool installing = false;
     bool storeUpdates = true;
+    /**
+     * Actual status can become unknown when we just issue update command. We should wait for
+     * another response from /ec2/updateStatus to get relevant state.
+     */
+    bool statusUnknown = false;
     /** Row in the table. */
     int row = -1;
 };
@@ -91,6 +96,7 @@ public:
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
      * We have used direct api call to get this module information.

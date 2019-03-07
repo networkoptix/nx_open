@@ -14,6 +14,8 @@ ScrollView
     {
         boundsBehavior: Flickable.StopAtBounds
 
+        clip: true
+
         AlignedColumn
         {
             id: column
