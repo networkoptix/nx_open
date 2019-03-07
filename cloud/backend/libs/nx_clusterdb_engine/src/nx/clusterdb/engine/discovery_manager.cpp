@@ -68,7 +68,7 @@ void DiscoveryManager::start(
                 lm("Discovered node %1 at url: %2. Connecting sync engine.")
                     .arg(node.nodeId).arg(node.urls.front().c_str()));
             // Synchronization engine provides only one url.
-            m_syncEngine->connector().addNodeUrl(clusterId, node.urls.front());
+            m_syncEngine->connector().addNodeUrl(clusterId, url);
         });
 
     m_discoveryClient->setOnNodeLost(
