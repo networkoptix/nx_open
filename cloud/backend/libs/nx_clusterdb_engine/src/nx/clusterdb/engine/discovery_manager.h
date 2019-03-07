@@ -27,11 +27,6 @@ public:
         const nx::utils::Url& synchronizationEngineUrl);
 
     /**
-     * Stops the discovery service;
-     */
-    void stop();
-
-    /**
      * Update this node's information, sending to discovery service ASAP.
      * NOTE: Does nothing if start() hasn't been called, or if stop() has been called.
      */

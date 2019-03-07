@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/url/url_builder.h>
-#include <nx/network/http/rest/http_rest_client.h>
-#include <nx/clusterdb/engine/http/http_paths.h>
 #include <nx/cloud/discovery/test_support/discovery_server.h>
 
 #include "cluster_test_fixture.h"
@@ -100,7 +97,7 @@ public:
         m_nodes.emplace_back(peer);
     }
 
-    NodeContext& nodeContext(size_t index)
+    NodeContext& nodeContext(int index)
     {
         return m_nodes[index];
     }
@@ -129,37 +126,24 @@ protected:
 
     void givenTwoNodes()
     {
-        for (size_t i = 0; i < 2; ++i)
+        for (int i = 0; i < 2; ++i)
             m_fixture.addNodeContext(m_server->url());
     }
 
-    void givenRegisteredNode(size_t index = 0)
+    void givenRegisteredNode(int index = 0)
     {
         givenOneNode();
         whenNodeStartsDiscovery(index);
         thenNodeIsRegistered(index);
     }
 
-    void givenTwoConnectedNodes()
-    {
-        givenTwoNodes();
-        whenBothNodesStartDiscovery();
-        thenNodesAreConnected();
-        andSyncEnginesAreConnected();
-    }
-
-    void whenSecondNodeStopsDiscovery()
-    {
-        whenNodeStopsDiscovery(1);
-    }
-
     void whenBothNodesStartDiscovery()
     {
-        for (size_t i = 0; i < 2; ++i)
+        for (int i = 0; i < 2; ++i)
             whenNodeStartsDiscovery(i);
     }
 
-    void whenNodeStartsDiscovery(size_t index = 0)
+    void whenNodeStartsDiscovery(int index = 0)
     {
         auto& nodeContext = m_fixture.nodeContext(index);
         nodeContext.discoveryManager().start(
@@ -167,12 +151,7 @@ protected:
             nodeContext.syncEngineUrl());
     }
 
-    void whenNodeStopsDiscovery(size_t index = 0)
-    {
-        m_fixture.nodeContext(index).discoveryManager().stop();
-    }
-
-    void thenNodeIsRegistered(size_t index = 0)
+    void thenNodeIsRegistered(int index = 0)
     {
         auto nodeContext = m_fixture.nodeContext(index);
 
@@ -195,44 +174,6 @@ protected:
         waitForDiscovery(b, a);
     }
 
-    void thenNodesAreDisconnected()
-    {
-        auto& a = m_fixture.nodeContext(0);
-        auto& b = m_fixture.nodeContext(1);
-
-        // b.discoveryClient should be nullptr after DiscoveryManager::stop is called.
-        ASSERT_EQ(b.discoveryClient(), nullptr);
-
-        // the online nodes of "a" should no longer contain the node representing "b".
-        auto onlineNodes = a.discoveryClient()->onlineNodes();
-        while (std::find(onlineNodes.begin(), onlineNodes.end(), b.toNode()) != onlineNodes.end())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            onlineNodes = a.discoveryClient()->onlineNodes();
-        }
-    }
-
-    void andSyncEnginesAreDisconnected()
-    {
-        auto& a = m_fixture.nodeContext(0);
-        auto& b = m_fixture.nodeContext(1);
-
-        // Verify that the sync engine of "b" is NOT in the list of connections of "a"
-        const auto bIsEqual =
-            [&b](const engine::SystemConnectionInfo& other)
-            {
-                return b.endpoint() == other.peerEndpoint;
-            };
-
-        auto connections = a.syncEngine().connectionManager().getConnections();
-        while (std::find_if(connections.begin(), connections.end(), bIsEqual) != connections.end())
-        {
-            qDebug() << "b is present, sleeping";
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            connections = a.syncEngine().connectionManager().getConnections();
-        }
-    }
-
     void andSyncEnginesAreConnected()
     {
         auto& a = m_fixture.nodeContext(0);
@@ -241,6 +182,7 @@ protected:
         waitForSyncEngineConnection(a, b);
         waitForSyncEngineConnection(b, a);
     }
+
 private:
     void waitForDiscovery(
         DiscoveryTestFixture::NodeContext& a,
@@ -298,17 +240,6 @@ TEST_F(DiscoveryManager, discovers_other_nodes)
     thenNodesAreConnected();
 
     andSyncEnginesAreConnected();
-}
-
-TEST_F(DiscoveryManager, discovery_service_stops)
-{
-    givenTwoConnectedNodes();
-
-    whenSecondNodeStopsDiscovery();
-
-    thenNodesAreDisconnected();
-
-    andSyncEnginesAreDisconnected();
 }
 
 } // namespace nx::clusterdb::engine::test
