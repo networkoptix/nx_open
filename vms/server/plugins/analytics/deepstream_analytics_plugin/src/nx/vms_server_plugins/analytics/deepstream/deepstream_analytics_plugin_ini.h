@@ -78,7 +78,14 @@ struct DeepStreamConfig: public nx::kit::IniConfig
     NX_INI_INT(
         3000,
         licensePlateLifetimeMs,
-        "License plate preserves the same GUID during this period even if not appearing on the scene.");
+        "License plate preserves the same GUID during this period even if not appearing on the\n"
+        "scene.");
+
+    NX_INI_FLAG(
+        0,
+        generateEventWhenLicensePlateDisappears,
+        "Generate an event when license plate has not been detected for more than\n"
+        "licensePlateLifetimeMs");
 
 //------------------------------------------------------------------------------------------------
 // Primary GIE settings.
@@ -100,7 +107,7 @@ struct DeepStreamConfig: public nx::kit::IniConfig
         "0,0.2,0.1,3,0:1,0.2,0.1,3,0:2,0.2,0.1,3,0:",
         pgie_classThresholds,
         "Thresholding Parameters for all classes. Specified per-class. "
-        "Format: CLASS_ID_0(int),CONFIDENCE_THRESHOLD_0(float),EPSILON_0(float),"
+        "Format: CLASS_ID_0(int),CONFIDENCE_THRESHOLD_0(float),EPSILON_0(float), "
         "GROUP_THRESHOLD_0(int),MIN_BOXES_0(int):CLASS_ID_0...");
 
     NX_INI_FLOAT(0.0039215697906911373f, pgie_netScaleFactor, "Pixel normalization factor");

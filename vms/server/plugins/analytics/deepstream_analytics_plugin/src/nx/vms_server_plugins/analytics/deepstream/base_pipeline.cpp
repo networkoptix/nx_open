@@ -71,7 +71,6 @@ void BasePipeline::handleMetadata(nx::sdk::analytics::IMetadataPacket* packet)
 {
     NX_OUTPUT << __func__ << " Calling metadata handler";
     m_metadataCallback(packet);
-    packet->releaseRef();
 }
 
 bool BasePipeline::start()
