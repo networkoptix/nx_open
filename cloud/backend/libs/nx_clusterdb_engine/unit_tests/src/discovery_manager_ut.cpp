@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/url/url_builder.h>
+#include <nx/network/http/rest/http_rest_client.h>
+#include <nx/clusterdb/engine/http/http_paths.h>
 #include <nx/cloud/discovery/test_support/discovery_server.h>
 
 #include "cluster_test_fixture.h"
@@ -22,14 +25,13 @@ public:
     {
     public:
         NodeContext(Peer& peer):
-            m_peer(peer),
-            m_syncEngineUrl(peer.baseApiUrl())
+            m_peer(peer)
         {
         }
 
-        const nx::utils::Url& syncEngineUrl() const
+        nx::utils::Url syncEngineUrl() const
         {
-            return m_syncEngineUrl;
+            return m_peer.baseApiUrl();
         }
 
         SynchronizationEngine& syncEngine()
@@ -49,7 +51,8 @@ public:
 
         nx::network::SocketAddress endpoint() const
         {
-            return nx::network::SocketAddress(m_syncEngineUrl.host(), m_syncEngineUrl.port());
+            auto url = syncEngineUrl();
+            return nx::network::SocketAddress(url.host(), url.port());
         }
 
         nx::cloud::discovery::Node toNode()
@@ -66,7 +69,6 @@ public:
 
     private:
         Peer& m_peer;
-        nx::utils::Url m_syncEngineUrl;
     };
 
 public:
@@ -142,8 +144,8 @@ protected:
     {
         givenTwoNodes();
         whenBothNodesStartDiscovery();
-        thenBothNodesAreDiscovered();
-        andBothSyncEnginesAreConnected();
+        thenNodesAreConnected();
+        andSyncEnginesAreConnected();
     }
 
     void whenSecondNodeStopsDiscovery()
@@ -184,7 +186,7 @@ protected:
         }
     }
 
-    void thenBothNodesAreDiscovered()
+    void thenNodesAreConnected()
     {
         auto& a = m_fixture.nodeContext(0);
         auto& b = m_fixture.nodeContext(1);
@@ -231,7 +233,7 @@ protected:
         }
     }
 
-    void andBothSyncEnginesAreConnected()
+    void andSyncEnginesAreConnected()
     {
         auto& a = m_fixture.nodeContext(0);
         auto& b = m_fixture.nodeContext(1);
@@ -293,17 +295,19 @@ TEST_F(DiscoveryManager, discovers_other_nodes)
 
     whenBothNodesStartDiscovery();
 
-    thenBothNodesAreDiscovered();
+    thenNodesAreConnected();
 
-    andBothSyncEnginesAreConnected();
+    andSyncEnginesAreConnected();
 }
 
 TEST_F(DiscoveryManager, discovery_service_stops)
 {
     givenTwoConnectedNodes();
+
     whenSecondNodeStopsDiscovery();
 
     thenNodesAreDisconnected();
+
     andSyncEnginesAreDisconnected();
 }
 
