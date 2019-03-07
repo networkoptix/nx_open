@@ -515,6 +515,9 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
             ? QUrl(qmlRoot)
             : QUrl::fromLocalFile(qmlRoot));
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
+
+    for (const QString& path: m_startupParameters.qmlImportPaths)
+        m_clientCoreModule->mainQmlEngine()->addImportPath(path);
 }
 
 void QnClientModule::initLog()
