@@ -191,14 +191,14 @@ void DiscoveryClient::setupRegisterNodeRequest()
                 return;
             }
 
-                if (!nx::network::http::StatusCode::isSuccessCode(
+            if (!nx::network::http::StatusCode::isSuccessCode(
                 m_registerNodeRequest->response()->statusLine.statusCode))
-                {
-                    NX_WARNING(this, lm("Request to register node failed: %1")
+            {
+                NX_WARNING(this, lm("Request to register node failed: %1")
                     .arg(m_registerNodeRequest->response()->statusLine.toString()));
-                    startRegisterNodeRequest(m_settings.registrationErrorDelay);
-                    return;
-                }
+                startRegisterNodeRequest(m_settings.registrationErrorDelay);
+                return;
+            }
 
             bool ok = false;
             Node node = NodeSerialization::deserialized(messageBody, Node(), &ok);
@@ -239,10 +239,10 @@ void DiscoveryClient::setupOnlineNodesRequest()
 
             if (!nx::network::http::StatusCode::isSuccessCode(
                 m_registerNodeRequest->response()->statusLine.statusCode))
-                {
-                    startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
-                    return;
-                }
+            {
+                startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
+                return;
+            }
 
             bool ok = false;
             auto onlineNodes =
@@ -331,7 +331,12 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node> onlineNodes)
     }
 
     for (const auto& node : discoveredNodes)
-        emitNodeDiscovered(node);
+    {
+        // don't emit discovery event for "this" node.
+        // Clients that rely on discovery event might try to connect to themselves.
+        if (node.nodeId != m_thisNodeInfo.nodeId)
+            emitNodeDiscovered(node);
+    }
 
     for (const auto& node : lostNodes)
         emitNodeLost(node);
