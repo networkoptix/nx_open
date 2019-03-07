@@ -733,6 +733,14 @@ private:
     {
         m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
 
+        if (eventType == aio::EventType::etNone)
+        {
+            // TODO: #ak For now doing this only in case of cancellation of every event type
+            // to support popular use case: cancel socket operation, pass socket to another thread.
+            // But, same should be done separately for every event type.
+            this->m_socketInterruptionFlag.interrupt();
+        }
+
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
             this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
@@ -875,8 +883,11 @@ private:
     AcceptCompletionHandler m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
 
+    // TODO: #ak Merge this method with stopPolling().
     void cancelIoWhileInAioThread()
     {
+        this->m_socketInterruptionFlag.interrupt();
+
         this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
         ++m_acceptAsyncCallCount;
     }

@@ -59,10 +59,12 @@ void BasicPollable::pleaseStopSync()
     {
         m_aioService->cancelPostedCalls(&m_pollable);
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        InterruptionFlag::Watcher watcher(&m_interruptionFlag);
         stopWhileInAioThread();
-        if (!watcher.objectDestroyed())
-            m_aioService->cancelPostedCalls(&m_pollable);
+        if (watcher.interrupted())
+            return;
+
+        m_aioService->cancelPostedCalls(&m_pollable);
     }
     else
     {
@@ -78,6 +80,9 @@ aio::AbstractAioThread* BasicPollable::getAioThread() const
 
 void BasicPollable::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    if (m_pollable.impl()->aioThread.load() != aioThread)
+        m_interruptionFlag.handleAioThreadChange();
+
     m_aioService->bindSocketToAioThread(&m_pollable, aioThread);
 }
 
