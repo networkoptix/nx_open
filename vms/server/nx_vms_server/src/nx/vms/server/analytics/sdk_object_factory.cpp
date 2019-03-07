@@ -8,6 +8,7 @@
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/analytics/debug_helpers.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -135,6 +136,7 @@ bool SdkObjectFactory::initPluginResources()
     {
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
+            debug_helpers::nameOfFileToDumpOrLoadData(analyticsPlugin.get(), "_manifest.json"),
             makeLogger(analyticsPlugin.get()));
 
         if (!pluginManifest)

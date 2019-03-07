@@ -53,9 +53,6 @@ int makeUnixOpenFlags(const QIODevice::OpenMode& oflag)
             sysFlags |= O_APPEND;
             sysFlags &= ~O_TRUNC;
         }
-
-        if (oflag & QIODevice::Unbuffered)
-            sysFlags |= O_SYNC;
     }
 
     return sysFlags;

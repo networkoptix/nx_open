@@ -39,6 +39,7 @@ std::unique_ptr<gstreamer::Element> BasePipelineBuilder::createAppSource(
         "caps",
         gst_caps_new_simple(
             "video/x-h264",
+            NULL,
             NULL),
         "is-live",
         TRUE,

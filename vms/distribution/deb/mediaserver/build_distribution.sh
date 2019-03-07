@@ -32,43 +32,55 @@ stripIfNeeded() # dir
     fi
 }
 
-# [in] Path_to_binary library_full_path_filter
-getLibraryDependencies()
-{
-    local binaryPath=$1
-    local libraryDirFilter=$2
-
-    echo "`ldd $binaryPath | grep $libraryDirFilter | cut -d '=' -f 1 | sed 's/[ \t]*//g'`"
-}
-
 # [in] STAGE_LIB
 copyLibs()
 {
     echo ""
     echo "Copying libs"
 
-    LIBS_DIR="$BUILD_DIR/lib"
-
-    LIBS=(`getLibraryDependencies $BUILD_DIR/bin/mediaserver $BUILD_DIR`)
-
     mkdir -p "$STAGE_LIB"
     local LIB
     local LIB_BASENAME
-    for LIB in "${LIBS[@]}"
-    do
-        LIB="$LIBS_DIR/$LIB"
+    local BLACKLIST_ITEM
+    local SKIP_LIBRARY
 
+    local -r LIB_BLACKLIST=(
+        'libQt5*'
+        'libEnginio.so*'
+        'libqgsttools_p.*'
+        'libtegra_video.*'
+        'libnx_vms_client*'
+        'libcloud_db.*'
+        'libnx_cassandra*'
+        'libconnection_mediator*'
+        'libnx_clusterdb*'
+        'libnx_discovery_api_client*'
+        'libnx_relaying*'
+        'libtraffic_relay*'
+        'libvms_gateway_core*'
+    )
+
+    for LIB in "$BUILD_DIR/lib"/*.so*
+    do
         LIB_BASENAME=$(basename "$LIB")
-        if [[ "$LIB_BASENAME" != libQt5* \
-            && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" != libqgsttools_p.* \
-            && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_vms_client* ]] ||
-            [[ "$BOX" == "tx1" && "$LIB_BASENAME" == libtegra_video.* ]]
-        then
-            echo "  Copying $LIB_BASENAME"
-            cp -L "$LIB" "$STAGE_LIB/"
+
+        SKIP_LIBRARY=0
+
+        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"; do
+            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]; then
+                SKIP_LIBRARY=1
+                break
+            fi
+        done
+
+        (( $SKIP_LIBRARY == 1 )) && continue
+
+        if [[ "$LIB_BASENAME" == libtegra_video.* ]]; then
+            [[ "$BOX" != "tx1" ]] && continue
         fi
+
+        echo "  Copying $LIB_BASENAME"
+        cp -P "$LIB" "$STAGE_LIB/"
     done
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
@@ -172,12 +184,6 @@ copyStartupScripts()
         "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
     install -m 644 "init/networkoptix-root-tool.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-root-tool.conf"
-
-    install -m 755 -d "$STAGE/etc/init.d"
-    install -m 755 "init.d/networkoptix-mediaserver" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
-    install -m 755 "init.d/networkoptix-root-tool" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-root-tool"
 
     install -m 755 -d "$STAGE/etc/systemd/system"
     install -m 644 "systemd/networkoptix-mediaserver.service" \

@@ -65,6 +65,7 @@
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
 #include <nx/client/core/utils/grid_walker.h>
+#include <client_core/client_core_module.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -273,7 +274,8 @@ struct WorkbenchExportHandler::Private
             case FileExtension::mkv:
             case FileExtension::mp4:
             {
-                QnAviResourcePtr file(new QnAviResource(completeFilename));
+                QnAviResourcePtr file(
+                    new QnAviResource(completeFilename, qnClientCoreModule->commonModule()));
                 file->setStatus(Qn::Online);
                 resourcePool->addResource(file);
                 return file;

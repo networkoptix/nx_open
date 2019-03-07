@@ -1110,7 +1110,7 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     for (const auto aviResource: resourcePool()->getResources<QnAviResource>())
     {
-        if (!aviResource->isOnline())
+        if (!aviResource->isOnline() && !aviResource->isEmbedded())
             resourcesToRemove.push_back(aviResource);
     }
 

@@ -15,8 +15,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/platform/current_process.h>
 
-#include <nx/cloud/relaying/relay_engine.h>
-
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
 
 #include "access_control/authentication_manager.h"
@@ -56,16 +54,6 @@ VmsGatewayProcess::~VmsGatewayProcess()
 const std::vector<network::SocketAddress>& VmsGatewayProcess::httpEndpoints() const
 {
     return m_httpEndpoints;
-}
-
-relaying::RelayEngine& VmsGatewayProcess::relayEngine()
-{
-    return *m_relayEngine;
-}
-
-const relaying::RelayEngine& VmsGatewayProcess::relayEngine() const
-{
-    return *m_relayEngine;
 }
 
 void VmsGatewayProcess::enforceSslFor(const network::SocketAddress& targetAddress, bool enabled)
@@ -113,18 +101,12 @@ int VmsGatewayProcess::serviceMain(
             authRestrictionList,
             streeManager);
 
-        relaying::RelayEngine relayEngine(
-            settings.listeningPeer(),
-            &httpMessageDispatcher);
-        m_relayEngine = &relayEngine;
-
         HttpConnectTunnelPool httpConnectTunnelPool;
         nx::network::http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
             std::make_unique<UrlRewriter>());
         registerApiHandlers(
             settings,
             m_runTimeOptions,
-            &relayEngine,
             &httpMessageDispatcher,
             &httpConnectTunnelPool);
 
@@ -236,18 +218,16 @@ void VmsGatewayProcess::publicAddressFetched(const QString& publicAddress)
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
-    relaying::RelayEngine* relayEngine,
     nx::network::http::server::rest::MessageDispatcher* const msgDispatcher,
     HttpConnectTunnelPool* httpConnectTunnelPool)
 {
     msgDispatcher->registerRequestProcessor<ProxyHandler>(
         nx::network::http::kAnyPath,
-        [&settings, &runTimeOptions, relayEngine]() -> std::unique_ptr<ProxyHandler>
+        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
         {
             return std::make_unique<ProxyHandler>(
                 settings,
-                runTimeOptions,
-                &relayEngine->listeningPeerPool());
+                runTimeOptions);
         });
 
     if (settings.http().connectSupport)

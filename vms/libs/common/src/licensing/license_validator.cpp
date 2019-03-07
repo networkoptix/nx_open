@@ -9,15 +9,6 @@
 
 using namespace nx;
 
-namespace {
-
-bool checkForARMBox(const QString& value)
-{
-    return !value.isEmpty();
-}
-
-} // namespace
-
 QnLicenseValidator::QnLicenseValidator(QnCommonModule* commonModule, QObject* parent):
     base_type(parent),
     QnCommonModuleAware(commonModule)
@@ -62,10 +53,6 @@ QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
     // TODO: #rvasilenko make NEVER an INT64_MAX
     if (license->expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > license->expirationTime())
         return QnLicenseErrorCode::Expired;
-
-    bool isArmBox = checkForARMBox(info.data.box);
-    if (isArmBox && !isAllowedForArm(license))
-        return QnLicenseErrorCode::InvalidType; // strict allowed license type for ARM devices
 
     if (license->type() == Qn::LC_Start)
         return isValidStartLicense(license, mode);
@@ -158,9 +145,4 @@ QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& l
     }
 
     return QnLicenseErrorCode::NoError;
-}
-
-bool QnLicenseValidator::isAllowedForArm(const QnLicensePtr& license) const
-{
-    return QnLicense::licenseTypeInfo(license->type()).allowedForARM;
 }

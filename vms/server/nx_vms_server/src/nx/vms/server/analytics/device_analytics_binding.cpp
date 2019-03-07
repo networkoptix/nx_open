@@ -258,7 +258,7 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
             this,
             QString::fromStdString(toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
-            debug_helpers::nameOfFileToDumpDataTo(
+            debug_helpers::nameOfFileToDumpOrLoadData(
                 m_device,
                 m_engine,
                 nx::vms::server::resource::AnalyticsPluginResourcePtr(),
@@ -374,7 +374,11 @@ std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadDeviceAgentManife
         return std::nullopt;
 
     const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
-        deviceAgent, makeLogger("DeviceAgent"));
+        deviceAgent,
+        m_device,
+        m_engine,
+        m_engine->plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>(),
+        makeLogger("DeviceAgent"));
 
     if (!deviceAgentManifest)
     {
@@ -417,7 +421,11 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 Ptr<MetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes() const
 {
     const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
-        m_deviceAgent, makeLogger("DeviceAgent"));
+        m_deviceAgent,
+        m_device,
+        m_engine,
+        m_engine->plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>(),
+        makeLogger("DeviceAgent"));
 
     if (!NX_ASSERT(deviceAgentManifest, "Got invlaid device agent manifest"))
         return Ptr<MetadataTypes>();

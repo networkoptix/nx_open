@@ -29,6 +29,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
 #include <nx/vms/api/data/cloud_system_data.h>
+#include <helpers/system_helpers.h>
 
 using namespace nx::cloud::db;
 
@@ -295,18 +296,7 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void QnCloudStatusWatcher::resetCredentials(bool keepUser)
 {
-    if (keepUser)
-    {
-        nx::vms::client::core::settings()->cloudCredentials = {
-            nx::vms::client::core::settings()->cloudCredentials().user, QString()};
-
-        // Updating login if were logged under temporary credentials.
-        setCredentials({qnCloudStatusWatcher->effectiveUserName(), QString()});
-    }
-    else
-    {
-        setCredentials({});
-    }
+    setCredentials({keepUser ? qnCloudStatusWatcher->effectiveUserName() : QString(), QString()});
 }
 
 bool QnCloudStatusWatcher::setCredentials(
@@ -604,6 +594,7 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
     {
         NX_ERROR(this, "Detected invalid user password. Forcing logout. Could it be user has changed the password?");
         q->resetCredentials(true);
+        nx::vms::client::core::helpers::forgetSavedCloudCredentials(true);
         emit q->forcedLogout();
     }
 

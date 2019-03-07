@@ -98,7 +98,7 @@ void HandScrollInstrument::dragMove(DragInfo* info)
     if (delta.isNull())
         return;
 
-    kineticProcessor()->shift(delta);
+    kineticProcessor()->shift(QPointF(delta));
     moveViewport(info->view(), delta);
 }
 

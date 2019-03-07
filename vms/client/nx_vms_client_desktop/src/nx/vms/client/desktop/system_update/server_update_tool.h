@@ -140,7 +140,7 @@ public:
         const QString& updateUrl, const QString& build);
 
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
-    std::future<UpdateContents> checkRemoteUpdateInfo();
+    std::future<UpdateContents> checkMediaserverUpdateInfo();
 
     /**
      * Check if update info contains all the packages necessary to update the system.
@@ -190,8 +190,8 @@ public:
 
     bool haveActiveUpdate() const;
 
-    // Get servers with updated protocol.
-    QSet<QnUuid> getServersWithChangedProtocol() const;
+    /** Get authentication string for current connection to mediaserver. */
+    QString getServerAuthString() const;
 
     std::shared_ptr<ServerUpdatesModel> getModel();
     std::shared_ptr<PeerStateTracker> getStateTracker();

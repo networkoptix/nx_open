@@ -191,7 +191,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
         int accepted = qnSettings->acceptedEulaVersion();
         int current = QnClientAppInfo::eulaVersion();
         const bool showEula =  accepted < current;
-        if (showEula && !context->showEulaMessage())
+        if (showEula && !context->showEulaFromFile())
         {
             // We should exit completely.
             return 0;

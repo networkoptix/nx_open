@@ -26,6 +26,7 @@ public:
     };
 
     Builder(Action* action);
+    Action* action() const;
 
     Builder shortcut(const QString& keySequence);
     Builder shortcut(const QKeySequence& keySequence, Platform platform, bool replaceExisting);

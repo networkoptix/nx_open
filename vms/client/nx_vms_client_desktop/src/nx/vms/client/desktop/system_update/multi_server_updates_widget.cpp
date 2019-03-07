@@ -25,12 +25,10 @@
 #include <client/client_app_info.h>
 
 #include <ui/common/palette.h>
-#include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
-#include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
@@ -38,10 +36,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <update/low_free_space_warning.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
@@ -52,6 +48,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/applauncher_utils.h>
 
+#include "workbench_update_watcher.h"
 #include "peer_state_tracker.h"
 #include "server_update_tool.h"
 #include "server_updates_model.h"
@@ -75,7 +72,7 @@ static constexpr int kSectionMinHeight = 30;
 constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
 constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
-const auto kWaitForUpdateCheck = std::chrono::milliseconds(10);
+const auto kWaitForUpdateCheck = std::chrono::milliseconds(1);
 
 const int kLinkCopiedMessageTimeoutMs = 2000;
 
@@ -141,8 +138,11 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_showDebugData = ini().massSystemUpdateDebugInfo;
     m_autoCheckUpdate = qnGlobalSettings->isUpdateNotificationsEnabled();
 
-    m_serverUpdateTool.reset(new ServerUpdateTool(this));
+    auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
+    m_serverUpdateTool = watcher->getServerUpdateTool();
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
+
+    m_updateCheck = watcher->takeUpdateCheck();
 
     m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
@@ -339,7 +339,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         m_clientUpdateTool->setServerUrl(serverUrl, serverId);
         m_serverUpdateTool->setServerUrl(serverUrl, serverId);
-        m_clientUpdateTool->requestRemoteUpdateInfo();
+        //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.
     checkForInternetUpdates(/*initial=*/true);
@@ -747,11 +747,11 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     if (m_widgetState != WidgetUpdateState::initial && m_widgetState != WidgetUpdateState::ready)
         return;
 
-    if (initial)
+    if (initial && !m_updateCheck.valid())
     {
-        // QnWorkbenchUpdateWatcher checks for updates periodically. We could reuse its update
+        // WorkbenchUpdateWatcher checks for updates periodically. We could reuse its update
         // info, if there is any.
-        auto watcher = context()->instance<QnWorkbenchUpdateWatcher>();
+        auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
         auto contents = watcher->getUpdateContents();
         auto installedVersions = m_clientUpdateTool->getInstalledVersions();
         if (!contents.isEmpty()
@@ -760,6 +760,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
             // Widget FSM uses future<UpdateContents> while it spins around 'initial'->'ready'.
             // So the easiest way to advance it towards 'ready' state is by providing another
             // future to await.
+            NX_INFO(this, "checkForInternetUpdates(%1) - picking update information from "
+                "WorkbenchUpdateWatcher", initial);
             std::promise<nx::update::UpdateContents> promise;
             m_updateCheck = promise.get_future();
             promise.set_value(contents);
@@ -828,7 +830,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula =  acceptedEula < newEula;
 
-        if (showEula && !context()->showEulaMessage(m_updateInfo.eulaPath))
+        if (showEula && !context()->showEulaFromString(m_updateInfo.info.eula))
         {
             return;
         }
@@ -892,7 +894,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
         if (m_updateSourceMode == UpdateSourceType::file)
         {
-            setTargetState(WidgetUpdateState::pushing, {});
+            setTargetState(WidgetUpdateState::pushing, targets);
             m_serverUpdateTool->startUpload(m_updateInfo);
         }
         else
@@ -943,6 +945,11 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_stateTracker->getPeersInstalling();
         m_serverUpdateTool->requestFinishUpdate(true);
         m_clientUpdateTool->resetState();
+        if (m_holdConnection)
+        {
+            qnClientMessageProcessor->setHoldConnection(false);
+            m_holdConnection = false;
+        }
         setTargetState(WidgetUpdateState::initial, {});
     }
     else if (m_widgetState == WidgetUpdateState::complete)
@@ -1146,11 +1153,11 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     {
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
-        m_updateCheck = nx::update::checkLatestUpdate(updateUrl, commonModule()->engineVersion());
+        m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
     }
 
     if (!m_serverUpdateCheck.valid())
-        m_serverUpdateCheck = m_serverUpdateTool->checkRemoteUpdateInfo();
+        m_serverUpdateCheck = m_serverUpdateTool->checkMediaserverUpdateInfo();
 
     if (!m_serverStatusCheck.valid())
         m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
@@ -1673,11 +1680,11 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
 
     if (clientUpdated && !clientInstallerRequired)
     {
+        QString authString = m_serverUpdateTool->getServerAuthString();
         NX_INFO(this) << "completeInstallation() - restarting the client";
-        if (!m_clientUpdateTool->restartClient())
+        if (!m_clientUpdateTool->restartClient(authString))
         {
             NX_ERROR(this) << "completeInstallation(" << clientUpdated << ") - failed to run restart command";
-            unholdConnection = true;
             QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
         }
         else
@@ -1688,8 +1695,11 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         }
     }
 
-    if (unholdConnection)
+    if (m_holdConnection)
+    {
         qnClientMessageProcessor->setHoldConnection(false);
+        m_holdConnection = false;
+    }
 
     if (!updatedProtocol.empty())
     {
@@ -1700,19 +1710,17 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
     setTargetState(WidgetUpdateState::initial);
 }
 
-bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
+bool MultiServerUpdatesWidget::processRemoteChanges()
 {
     // We gather here updated server status from updateTool
     // and change WidgetUpdateState state accordingly.
 
     // TODO: It could be moved to UpdateTool
     ServerUpdateTool::RemoteStatus remoteStatus;
-    if (!m_serverUpdateTool->getServersStatusChanges(remoteStatus) && !force)
-        return false;
+    if (m_serverUpdateTool->getServersStatusChanges(remoteStatus))
+        m_stateTracker->setUpdateStatus(remoteStatus);
 
     m_clientUpdateTool->checkInternalState();
-
-    m_stateTracker->setUpdateStatus(remoteStatus);
 
     if (m_widgetState == WidgetUpdateState::initial)
         processRemoteInitialState();
@@ -1807,6 +1815,11 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
                     m_stateTracker->setPeersInstalling(targets, true);
                     QSet<QnUuid> servers = targets;
                     servers.remove(m_stateTracker->getClientPeerId());
+                    if (!servers.empty() && !m_holdConnection)
+                    {
+                        m_holdConnection = true;
+                        qnClientMessageProcessor->setHoldConnection(true);
+                    }
                     m_serverUpdateTool->requestInstallAction(servers);
                 }
 
@@ -2209,7 +2222,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
             QString("checkServerUpdate=%1").arg(m_serverUpdateCheck.valid()),
             QString("<a href=\"%1\">/ec2/updateStatus</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
             QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
-            QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
+            QString("<a href=\"%1\">/ec2/updateInformation?version=installed</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());

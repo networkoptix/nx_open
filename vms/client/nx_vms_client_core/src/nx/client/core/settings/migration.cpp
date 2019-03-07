@@ -5,6 +5,8 @@
 
 #include <nx/utils/range_adapters.h>
 
+#include <helpers/system_helpers.h>
+
 namespace nx::vms::client::core::settings_migration {
 
 namespace {
@@ -40,7 +42,7 @@ void migrateAuthenticationData()
     qnClientCoreSettings->setCloudPassword(QString());
 
     if (settings()->cloudCredentials().isEmpty())
-        settings()->cloudCredentials = migrateEncoded(oldCloudCredentials);
+        helpers::saveCloudCredentials(migrateEncoded(oldCloudCredentials));
 }
 
 } // namespace

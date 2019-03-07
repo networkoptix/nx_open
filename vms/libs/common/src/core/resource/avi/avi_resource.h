@@ -17,9 +17,10 @@ class QnAviResource:
     public nx::utils::Encryptable
 {
     Q_OBJECT
-        using base_type = QnAbstractArchiveResource;
+    using base_type = QnAbstractArchiveResource;
+
 public:
-    QnAviResource(const QString& file);
+    QnAviResource(const QString& file, QnCommonModule* commonModule);
     ~QnAviResource();
 
     static QnAbstractStreamDataProvider* createDataProvider(
@@ -59,6 +60,9 @@ public:
     virtual void setDewarpingParams(const QnMediaDewarpingParams& params) override;
 
     virtual QnAspectRatio customAspectRatio() const override;
+
+    /** Returns true if the entity is contained inside a layout file. */
+    bool isEmbedded() const;
 
     // All these functions actually propagate to m_storage if possible.
     /** Returns true if the entity is actually encrypted. */
