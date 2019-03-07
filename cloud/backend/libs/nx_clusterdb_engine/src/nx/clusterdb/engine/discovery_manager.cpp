@@ -44,44 +44,26 @@ void DiscoveryManager::start(
     m_discoveryClient->setOnNodeDiscovered(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            if (node.urls.empty())
-            {
-                NX_WARNING(
-                    this,
-                    lm("Node %1 discovered with an empty url list! Skipping sync engine connection.")
-                    .arg(node.nodeId.c_str()));
-                return;
-            }
-
-            nx::utils::Url url(node.urls.front());
-            if (!isHttpScheme(url))
-            {
-                NX_WARNING(
-                    this,
-                    lm("Sync engine requires http scheme but got %1: skipping connection")
-                    .arg(url.scheme()));
-                return;
-            }
-
-            NX_DEBUG(
+            NX_VERBOSE(
                 this,
-                lm("Discovered node %1 at url: %2. Connecting sync engine.")
-                    .arg(node.nodeId).arg(node.urls.front().c_str()));
-            // Synchronization engine provides only one url.
-            m_syncEngine->connector().addNodeUrl(clusterId, url);
+                lm("Discovered a new node: %1. all non http scheme urls will be ignored.")
+                    .arg(toString(node)));
+
+            for (const auto& urlString : node.urls)
+            {
+                nx::utils::Url url(urlString);
+                if (isHttpScheme(url))
+                    m_syncEngine->connector().addNodeUrl(clusterId, url);
+            }
         });
 
     m_discoveryClient->setOnNodeLost(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            if (!node.urls.empty())
-            {
-                NX_DEBUG(
-                    this,
-                    lm("Disconnecting from lost node %1 at url:")
-                        .arg(node.nodeId.c_str()).arg(node.urls.front()));
+            NX_VERBOSE(this, lm("Disconnecting from lost node: %1").arg(toString(node)));
+
+            for(const auto url: node.urls)
                 m_syncEngine->connector().removeNodeUrl(clusterId, node.urls.front());
-            }
         });
 
     m_discoveryClient->start();
