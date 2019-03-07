@@ -43,25 +43,40 @@ QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary) {
     return QString::number(isPrimary);
 }
 
-NetworkIssueEvent::PacketLossSequence NetworkIssueEvent::decodePacketLossSequence(const QString& encoded)
+QString NetworkIssueEvent::PacketLoss::toString() const
 {
-    NetworkIssueEvent::PacketLossSequence result;
-    result.valid = false;
+    const auto loss = QString("%1;%2").arg(prev).arg(next);
+    if (!aggregated)
+        return loss;
 
-    QStringList seqs = encoded.split(L';');
-    if (seqs.size() != 2)
-        return result;
-
-    bool ok1, ok2;
-    result.prev = seqs[0].toInt(&ok1);
-    result.next = seqs[1].toInt(&ok2);
-    result.valid = ok1 && ok2;
-    return result;
+    return QString("%1;%2").arg(loss).arg(aggregated);
 }
 
-QString NetworkIssueEvent::encodePacketLossSequence(int prev, int next)
+std::optional<NetworkIssueEvent::PacketLoss>
+    NetworkIssueEvent::PacketLoss::parse(const QString& string)
 {
-    return QString(QLatin1String("%1;%2")).arg(prev).arg(next);
+    PacketLoss result;
+    QStringList parts = string.split(L';');
+    if (parts.size() < 2)
+        return std::nullopt;
+
+    bool isOk = false;
+    result.prev = parts[0].toULongLong(&isOk);
+    if (!isOk)
+        return std::nullopt;
+
+    result.next = parts[1].toULongLong(&isOk);
+    if (!isOk)
+        return std::nullopt;
+
+    if (parts.size() > 2)
+    {
+        result.aggregated = parts[2].toULongLong(&isOk);
+        if (!isOk)
+            return std::nullopt;
+    }
+
+    return result;
 }
 
 } // namespace event
