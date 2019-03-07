@@ -60,10 +60,10 @@ void DiscoveryManager::start(
     m_discoveryClient->setOnNodeLost(
         [this, clusterId](nx::cloud::discovery::Node node)
         {
-            NX_VERBOSE(this, lm("Disconnecting from lost node: %1").arg(toString(node)));
+            NX_VERBOSE(this, lm("Node lost. %1. Disconnecting from all urls").arg(toString(node)));
 
-            for(const auto url: node.urls)
-                m_syncEngine->connector().removeNodeUrl(clusterId, node.urls.front());
+            for(const auto& url: node.urls)
+                m_syncEngine->connector().removeNodeUrl(clusterId, url);
         });
 
     m_discoveryClient->start();
