@@ -228,6 +228,10 @@ RoiVisualizationIntegration::RoiVisualizationIntegration(QObject* parent):
 {
 }
 
+RoiVisualizationIntegration::~RoiVisualizationIntegration()
+{
+}
+
 void RoiVisualizationIntegration::registerWidget(QnMediaResourceWidget* widget)
 {
     d->cache.insert(widget, {});

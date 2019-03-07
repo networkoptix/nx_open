@@ -13,6 +13,8 @@ class RoiVisualizationIntegration: public Integration, public IOverlayPainter
 
 public:
     explicit RoiVisualizationIntegration(QObject* parent = nullptr);
+    virtual ~RoiVisualizationIntegration();
+
     virtual void registerWidget(QnMediaResourceWidget* widget) override;
     virtual void unregisterWidget(QnMediaResourceWidget* widget) override;
     virtual void paintVideoOverlay(QnMediaResourceWidget* widget, QPainter* painter) override;
