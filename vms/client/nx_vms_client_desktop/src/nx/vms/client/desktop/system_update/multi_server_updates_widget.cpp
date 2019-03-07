@@ -887,7 +887,9 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             targets.subtract(incompatible);
         }
 
-        if (!m_clientUpdateTool->shouldInstallThis(m_updateInfo))
+        // We will not track client state during download. But we still may restart to the new
+        // version.
+        if (m_clientUpdateTool->isVersionInstalled(m_updateInfo.getVersion()))
             targets.remove(m_stateTracker->getClientPeerId());
 
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
@@ -1078,25 +1080,39 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
             auto item = m_stateTracker->findItemById(id);
             if (!item)
                 continue;
-            switch (item->state)
+            if (item->installed && m_peersIssued.contains(id))
             {
-                case nx::update::Status::Code::idle:
-                    // This stage has zero progress.
-                    ++result.active;
-                    break;
-                case nx::update::Status::Code::downloading:
-                    result.current += item->progress;
-                    ++result.active;
-                    break;
-                case nx::update::Status::Code::error:
-                case nx::update::Status::Code::preparing:
-                case nx::update::Status::Code::readyToInstall:
-                    result.current += 100;
-                    ++result.done;
-                    break;
-                case nx::update::Status::Code::latestUpdateInstalled:
-                case nx::update::Status::Code::offline:
-                    break;
+                result.current += 100;
+                ++result.done;
+            }
+            else
+            {
+                switch (item->state)
+                {
+                    case nx::update::Status::Code::idle:
+                        // This stage has zero progress.
+                        ++result.active;
+                        break;
+                    case nx::update::Status::Code::downloading:
+                        result.current += item->progress;
+                        ++result.active;
+                        break;
+                    case nx::update::Status::Code::error:
+                    case nx::update::Status::Code::preparing:
+                    case nx::update::Status::Code::readyToInstall:
+                        result.current += 100;
+                        ++result.done;
+                        break;
+                    case nx::update::Status::Code::latestUpdateInstalled:
+                        if (m_peersIssued.contains(id))
+                        {
+                            result.current += 100;
+                            ++result.done;
+                        }
+                        break;
+                    case nx::update::Status::Code::offline:
+                        break;
+                }
             }
         }
 
@@ -1114,24 +1130,10 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     else if (m_widgetState == WidgetUpdateState::installing
         || m_widgetState == WidgetUpdateState::installingStalled)
     {
-        // Note: we can get here right after we clicked 'Install' but before
-        // we get recent update from /ec2/updateStatus. Most servers will be in 'readyToInstall' state.
-        // We even can get a stale callback from /ec2/updateStatus, with data actual to
-        // the moment right before we pressed 'Install'.
-        auto serversAreInstalling = m_stateTracker->getPeersInstalling();
-        auto serversHaveInstalled = m_stateTracker->getPeersCompleteInstall();
-
+        // We will show simplified progress for this stage.
         result.installingServers = !m_peersActive.empty();
-
-        int total = m_peersIssued.size();
-
-        auto installDuration = std::chrono::duration_cast<std::chrono::seconds>(
-            m_serverUpdateTool->getInstallDuration());
-        double phase = (double)installDuration.count() / kExpectedInstallPeriodSec;
-        int fakeProgress = 85 * (1.0 - qPow(0.2, phase));
-        result.current += qMax(serversHaveInstalled.size()*100, fakeProgress*serversAreInstalling.size());
-        result.max += 100*total;
-
+        result.current = 0;
+        result.max = 0;
         if (m_clientUpdateTool->hasUpdate())
         {
             bool complete = m_clientUpdateTool->getState() == ClientUpdateTool::State::complete;
