@@ -138,23 +138,20 @@ bool QnServerArchiveDelegate::open(
     if (m_opened)
         return true;
     m_resource = resource;
-    QnNetworkResourcePtr netResource =
-        qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
 
     NX_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
     setCatalogs();
 
-    m_currentChunkCatalog[QnServer::StoragePool::Normal] =
-        isLowMediaQuality(m_quality) ?
-                m_catalogLow[QnServer::StoragePool::Normal] :
-                m_catalogHi[QnServer::StoragePool::Normal];
+    m_currentChunkCatalog[QnServer::StoragePool::Normal] = isLowMediaQuality(m_quality)
+        ? m_catalogLow[QnServer::StoragePool::Normal]
+        : m_catalogHi[QnServer::StoragePool::Normal];
 
-    m_currentChunkCatalog[QnServer::StoragePool::Backup] =
-        isLowMediaQuality(m_quality) ?
-                m_catalogLow[QnServer::StoragePool::Backup] :
-                m_catalogHi[QnServer::StoragePool::Backup];
+    m_currentChunkCatalog[QnServer::StoragePool::Backup] = isLowMediaQuality(m_quality)
+        ? m_catalogLow[QnServer::StoragePool::Backup]
+        : m_catalogHi[QnServer::StoragePool::Backup];
 
     m_opened = true;
     return true;
@@ -325,6 +322,7 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
         m_currentChunkCatalog[QnServer::StoragePool::Normal]->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
         m_currentChunkCatalog[QnServer::StoragePool::Backup]->updateChunkDuration(m_currentChunk);
     }
+
     if (m_currentChunk.durationMs == -1) {
         if (!m_reverseMode)
             m_eof = true;
@@ -522,7 +520,25 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_currentChunk = newChunk;
     m_currentChunkStoragePool = newCatalog->getStoragePool();
 
-    m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;
+    QnServer::StoragePool alternativeStoragePool;
+    QnStorageManager* alternativeStorageManager;
+
+    if (m_currentChunkStoragePool == QnServer::StoragePool::Backup)
+    {
+        alternativeStoragePool = QnServer::StoragePool::Normal;
+        alternativeStorageManager = m_serverModule->normalStorageManager();
+    }
+    else
+    {
+        alternativeStoragePool = QnServer::StoragePool::Backup;
+        alternativeStorageManager = m_serverModule->backupStorageManager();
+    }
+
+    m_currentChunkCatalog[m_currentChunkStoragePool] = newCatalog;
+    m_currentChunkCatalog[alternativeStoragePool] = alternativeStorageManager->getFileCatalog(
+        newCatalog->cameraUniqueId(),
+        newCatalog->getRole());
+
     m_lastChunkQuality = newCatalog->getRole();
     QString url = newCatalog->fullFileName(newChunk.toBaseChunk());
 
