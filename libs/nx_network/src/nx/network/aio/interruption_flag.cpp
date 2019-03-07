@@ -10,4 +10,12 @@ void InterruptionFlag::handleAioThreadChange()
     recordCustomState(kAioThreadChanged);
 }
 
+void InterruptionFlag::interrupt()
+{
+    constexpr auto kAioInterrupted =
+        (base_type::ControlledObjectState) (base_type::ControlledObjectState::customState + 2);
+
+    recordCustomState(kAioInterrupted);
+}
+
 } // namespace nx::network::aio

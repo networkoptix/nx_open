@@ -2,8 +2,6 @@
 
 #include <nx/utils/object_destruction_flag.h>
 
-#include "basic_pollable.h"
-
 namespace nx::network::aio {
 
 /**
@@ -17,6 +15,7 @@ class NX_NETWORK_API InterruptionFlag:
 
 public:
     void handleAioThreadChange();
+    void interrupt();
 };
 
 } // namespace nx::network::aio
