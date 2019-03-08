@@ -26,8 +26,17 @@ class CrossNatConnector:
 public:
     ~CrossNatConnector()
     {
+        if (m_connector)
+            m_connector->pleaseStopSync();
+
         if (m_connectorFactoryBak)
             ConnectorFactory::instance().setCustomFunc(std::move(m_connectorFactoryBak));
+
+        if (m_datagramSocketFactoryBak)
+        {
+            SocketFactory::setCustomDatagramSocketFactoryFunc(
+                std::exchange(*m_datagramSocketFactoryBak, {}));
+        }
     }
 
 protected:
@@ -46,9 +55,32 @@ protected:
         m_tunnelConnection = std::move(connectResult.connection);
     }
 
+    void whenConnectToRandomDomain()
+    {
+        if (!m_connector)
+        {
+            m_connector = std::make_unique<cloud::CrossNatConnector>(
+                &SocketGlobals::instance().cloud(),
+                AddressEntry("bla-bla-bla"));
+        }
+
+        m_connector->connect(
+            kNoTimeout,
+            [this](auto&&... args)
+                { saveConnection(std::forward<decltype(args)>(args)...); });
+    }
+
     void thenConnectionIsEstablished()
     {
         ASSERT_NE(nullptr, m_tunnelConnection.get());
+    }
+
+    void thenConnectFailed(SystemError::ErrorCode expected)
+    {
+        auto [resultCode, connection] = m_connectionResults.pop();
+
+        ASSERT_EQ(expected, resultCode);
+        ASSERT_EQ(nullptr, connection);
     }
 
     void assertConnectionHasNotBeenStarted()
@@ -65,10 +97,47 @@ protected:
             std::bind(&CrossNatConnector::connectorFactory, this, _1, _2, _3, _4));
     }
 
+    class FailingDatagramSocket:
+        public UDPSocket
+    {
+    public:
+        FailingDatagramSocket(
+            int ipVersion,
+            SystemError::ErrorCode error)
+            :
+            UDPSocket(ipVersion),
+            m_error(error)
+        {
+        }
+
+        virtual bool bind(const SocketAddress& /*address*/) override
+        {
+            SystemError::setLastErrorCode(m_error);
+            return false;
+        }
+
+    private:
+        const SystemError::ErrorCode m_error;
+    };
+
+    void installMalfunctioningDatagramSocketFactory(SystemError::ErrorCode error)
+    {
+        m_datagramSocketFactoryBak = SocketFactory::setCustomDatagramSocketFactoryFunc(
+            [this, error](int ipVersion)
+            { return std::make_unique<FailingDatagramSocket>(ipVersion, error); });
+    }
+
 private:
+    using ConnectResult = std::tuple<
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractOutgoingTunnelConnection>>;
+
     std::unique_ptr<nx::network::cloud::AbstractOutgoingTunnelConnection> m_tunnelConnection;
     ConnectorFactory::Function m_connectorFactoryBak;
     nx::utils::SyncQueue<TunnelConnectionStub*> m_establishedTestConnections;
+    std::unique_ptr<cloud::CrossNatConnector> m_connector;
+    nx::utils::SyncQueue<ConnectResult> m_connectionResults;
+    std::optional<SocketFactory::DatagramSocketFactoryFunc> m_datagramSocketFactoryBak;
 
     virtual void SetUp() override
     {
@@ -91,6 +160,13 @@ private:
         cloudConnectors.push_back(std::move(connectorContext));
 
         return cloudConnectors;
+    }
+
+    void saveConnection(
+        SystemError::ErrorCode errorCode,
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+    {
+        m_connectionResults.push(std::make_tuple(errorCode, std::move(connection)));
     }
 };
 
@@ -134,6 +210,16 @@ TEST_F(CrossNatConnector, provides_not_started_connections)
 
     givenEstablishedTunnelConnection();
     assertConnectionHasNotBeenStarted();
+}
+
+TEST_F(CrossNatConnector, datagram_socket_error_results_connect_failure)
+{
+    const auto expectedError = SystemError::addressNotAvailable;
+
+    installMalfunctioningDatagramSocketFactory(expectedError);
+
+    whenConnectToRandomDomain();
+    thenConnectFailed(expectedError);
 }
 
 //-------------------------------------------------------------------------------------------------
