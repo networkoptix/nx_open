@@ -64,7 +64,7 @@ private:
         nx::Buffer m_buffer;
         std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
         std::function<void(boost::optional<api::ModuleInformation>, QString)> m_handler;
-        nx::utils::ObjectDestructionFlag m_destructionFlag;
+        nx::utils::InterruptionFlag m_destructionFlag;
     };
 
     class Module

@@ -34,7 +34,7 @@ ProxyWorker::ProxyWorker(
 
     m_targetHostPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
         std::move(connectionToTheTargetPeer));
-    m_targetHostPipeline->setOnConnectionClosed(
+    m_targetHostPipeline->registerCloseHandler(
         [this](auto closeReason) { onConnectionClosed(closeReason); });
 
     m_targetHostPipeline->setMessageHandler(

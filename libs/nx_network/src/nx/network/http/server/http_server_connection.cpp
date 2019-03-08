@@ -5,6 +5,7 @@
 
 #include <QtCore/QDateTime>
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/datetime.h>
 
 #include "http_message_dispatcher.h"
@@ -15,19 +16,20 @@ namespace network {
 namespace http {
 
 HttpServerConnection::HttpServerConnection(
-    nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
     nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher)
     :
-    base_type(
-        [socketServer](auto... args) { socketServer->closeConnection(args...); },
-        std::move(sock)),
+    base_type(std::move(sock)),
     m_authenticationManager(authenticationManager),
-    m_httpMessageDispatcher(httpMessageDispatcher),
-    m_isPersistent(false),
-    m_persistentConnectionEnabled(true)
+    m_httpMessageDispatcher(httpMessageDispatcher)
 {
+    ++SocketGlobals::instance().debugCounters().httpConnectionCount;
+}
+
+HttpServerConnection::~HttpServerConnection()
+{
+    --SocketGlobals::instance().debugCounters().httpConnectionCount;
 }
 
 SocketAddress HttpServerConnection::clientEndpoint() const
@@ -132,12 +134,6 @@ void HttpServerConnection::authenticate(
             if (!strongThis)
                 return;
 
-            if (!socket())  //< Connection has been removed while request authentication was in progress.
-            {
-                closeConnection(SystemError::noError);
-                return;
-            }
-
             strongThis->post(
                 [this,
                     authenticationResult = std::move(authenticationResult),
@@ -160,6 +156,13 @@ void HttpServerConnection::onAuthenticationDone(
     nx::network::http::server::AuthenticationResult authenticationResult,
     std::unique_ptr<RequestContext> requestContext)
 {
+    if (!socket())
+    {
+        // Connection has been removed while request authentication was in progress.
+        closeConnection(SystemError::noError);
+        return;
+    }
+
     if (!authenticationResult.isSucceeded)
     {
         sendUnauthorizedResponse(
@@ -279,6 +282,13 @@ void HttpServerConnection::processResponse(
             requestDescriptor = std::move(requestDescriptor),
             responseMessageContext = std::move(responseMessageContext)]() mutable
         {
+            if (!socket())
+            {
+                // Connection is closed.
+                closeConnection(SystemError::noError);
+                return;
+            }
+
             prepareAndSendResponse(
                 std::move(requestDescriptor),
                 std::move(responseMessageContext));

@@ -5,8 +5,8 @@
 #include <functional>
 #include <optional>
 
-#include <nx/network/aio/interruption_flag.h>
 #include <nx/network/buffered_stream_socket.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/qnbytearrayref.h>
 
 #include "base_protocol_message_types.h"
@@ -46,12 +46,10 @@ template<
 public:
     using MessageType = Message;
 
-    template<typename OnConnectionClosedHandler>
     BaseStreamProtocolConnection(
-        OnConnectionClosedHandler handler,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(std::move(handler), std::move(streamSocket)),
+        base_type(std::move(streamSocket)),
         m_creationTimestamp(std::chrono::steady_clock::now())
     {
         static constexpr size_t kDefaultSendBufferSize = 4 * 1024;
@@ -99,7 +97,7 @@ public:
         if (m_serializerState == SerializerState::done)
         {
             // Message is sent, triggerring completion handler.
-            if (completeCurrentSendTask() != aio::InterruptionFlag::StateChange::noChange)
+            if (!completeCurrentSendTask())
                 return;
             processAnotherSendTaskIfAny();
         }
@@ -224,7 +222,7 @@ private:
     nx::Buffer m_writeBuffer;
     std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
     std::deque<SendTask> m_sendQueue;
-    aio::InterruptionFlag m_connectionFreedFlag;
+    nx::utils::InterruptionFlag m_connectionFreedFlag;
     bool m_messageReported = false;
     QnByteArrayConstRef m_dataToParse;
     std::chrono::steady_clock::time_point m_creationTimestamp;
@@ -285,7 +283,7 @@ private:
         if (m_messageReported)
             return true;
 
-        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processMessage(std::exchange(m_message, Message()));
         if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
@@ -300,7 +298,7 @@ private:
         if (msgBodyBuffer.isEmpty())
             return true;
 
-        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processSomeMessageBody(std::move(msgBodyBuffer));
         if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
@@ -310,7 +308,7 @@ private:
 
     bool reportMessageEnd()
     {
-        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processMessageEnd();
         return !watcher.interrupted();
     }
@@ -344,7 +342,10 @@ private:
             });
     }
 
-    aio::InterruptionFlag::StateChange completeCurrentSendTask()
+    /**
+     * @return false If was interrupted. All futher processing should be stopped until the next event.
+     */
+    bool completeCurrentSendTask()
     {
         NX_ASSERT(!m_sendQueue.empty());
         // NOTE: Completion handler is allowed to delete this connection object.
@@ -355,14 +356,12 @@ private:
 
         if (sendCompletionHandler)
         {
-            aio::InterruptionFlag::ScopeWatcher watcher(
-                this,
-                &m_connectionFreedFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             sendCompletionHandler(SystemError::noError);
-            return watcher.stateChange();
+            return !watcher.interrupted();
         }
 
-        return aio::InterruptionFlag::StateChange::noChange;
+        return true;
     }
 
     void processAnotherSendTaskIfAny()
@@ -404,9 +403,7 @@ private:
 
         auto handler = std::exchange(m_sendQueue.front().handler, nullptr);
         {
-            aio::InterruptionFlag::ScopeWatcher watcher(
-                this,
-                &m_connectionFreedFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             handler(errorCode);
             if (watcher.interrupted())
                 return; //< Connection has been removed by handler.
@@ -449,9 +446,7 @@ public:
     StreamProtocolConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(
-            [this](auto... args) { closeConnection(args...); },
-            std::move(streamSocket))
+        base_type(std::move(streamSocket))
     {
     }
 
@@ -478,12 +473,6 @@ public:
         m_messageEndHandler = std::forward<T>(handler);
     }
 
-    void setOnConnectionClosed(
-        OnConnectionClosedHandler handler)
-    {
-        m_onConnectionClosed = std::move(handler);
-    }
-
 protected:
     virtual void processMessage(Message msg) override
     {
@@ -507,15 +496,6 @@ private:
     std::function<void(Message)> m_messageHandler;
     std::function<void(nx::Buffer)> m_messageBodyHandler;
     std::function<void()> m_messageEndHandler;
-    OnConnectionClosedHandler m_onConnectionClosed;
-
-    void closeConnection(
-        SystemError::ErrorCode closeReason,
-        self_type* /*connection*/)
-    {
-        if (m_onConnectionClosed)
-            nx::utils::swapAndCall(m_onConnectionClosed, closeReason);
-    }
 };
 
 } // namespace nx::network::server

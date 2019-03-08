@@ -9,7 +9,6 @@
 #include <QSet>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -317,7 +316,6 @@ private:
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
     QAuthenticator m_remotePeerCredentials;
-    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     std::unique_ptr<nx::network::aio::Timer> m_timer;
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;

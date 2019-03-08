@@ -284,6 +284,16 @@ SocketGlobals& SocketGlobals::instance()
     return *s_instance;
 }
 
+const DebugCounters& SocketGlobals::debugCounters() const
+{
+    return m_debugCounters;
+}
+
+DebugCounters& SocketGlobals::debugCounters()
+{
+    return m_debugCounters;
+}
+
 void SocketGlobals::reloadIni()
 {
     m_impl->ini.reload();

@@ -239,13 +239,10 @@ void VmsGatewayProcess::registerApiHandlers(
                     [httpConnectTunnelPool](std::unique_ptr<network::aio::AsyncChannelBridge> tunnel)
                     {
                         NX_VERBOSE(tunnel.get(), "Starting CONNECT tunnel.");
-                        tunnel->start(
-                            [httpConnectTunnelPool, tunnelPtr = tunnel.get()](SystemError::ErrorCode error)
-                            {
-                                NX_VERBOSE(tunnelPtr, "Closing CONNECT tunnel.");
-                                httpConnectTunnelPool->closeConnection(error, tunnelPtr);
-                            });
-                        httpConnectTunnelPool->saveConnection(std::move(tunnel));
+                        auto connection = std::make_unique<BridgeToServerConnectionAdaptor>(
+                            std::move(tunnel));
+                        connection->start();
+                        httpConnectTunnelPool->saveConnection(std::move(connection));
                     };
                 return std::make_unique<ConnectHandler>(settings, std::move(tunnelCreatedHandler));
             };

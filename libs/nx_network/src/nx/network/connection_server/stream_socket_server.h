@@ -83,6 +83,10 @@ public:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
         QnMutexLocker lk(&m_mutex);
+
+        connection->registerCloseHandler(
+            [this, connectionPtr = connection.get()](auto closeReason)
+            { closeConnection(closeReason, connectionPtr); });
         m_connections.emplace(connection.get(), std::move(connection));
     }
 

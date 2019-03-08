@@ -154,7 +154,8 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
             m_settings.connectionInactivityTimeout);
         connection->addOnConnectionCloseHandler(
             [this, peerData, connectionPtr = connection.get(),
-                guard = m_asyncOperationGuard.sharedGuard()]()
+                guard = m_asyncOperationGuard.sharedGuard()](
+                    SystemError::ErrorCode /*closeReason*/)
             {
                 // TODO: #ak Get rid of this guard after resolving
                 // dependency issue between Controller and STUN server.

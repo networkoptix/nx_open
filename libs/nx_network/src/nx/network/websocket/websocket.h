@@ -4,7 +4,7 @@
 #include <queue>
 #include <QtCore>
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/aio/timer.h>
@@ -96,7 +96,7 @@ private:
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     std::chrono::milliseconds m_aliveTimeout;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
     bool m_readingCeased = false;

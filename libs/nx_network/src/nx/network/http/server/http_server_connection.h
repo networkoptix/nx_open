@@ -84,10 +84,10 @@ class NX_NETWORK_API HttpServerConnection:
 
 public:
     HttpServerConnection(
-        nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
         nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
         nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher);
+    virtual ~HttpServerConnection();
 
     HttpServerConnection(const HttpServerConnection&) = delete;
     HttpServerConnection& operator=(const HttpServerConnection&) = delete;
@@ -137,11 +137,11 @@ private:
         }
     };
 
-    nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
-    nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
+    nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager = nullptr;
+    nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher = nullptr;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_currentMsgBody;
-    bool m_isPersistent;
-    bool m_persistentConnectionEnabled;
+    bool m_isPersistent = false;
+    bool m_persistentConnectionEnabled = true;
     std::deque<std::unique_ptr<ResponseMessageContext>> m_responseQueue;
     std::optional<SocketAddress> m_clientEndpoint;
     std::atomic<std::int64_t> m_lastRequestSequence{0};

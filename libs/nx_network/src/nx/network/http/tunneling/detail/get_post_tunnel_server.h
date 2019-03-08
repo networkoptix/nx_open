@@ -177,7 +177,7 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
 
     auto httpPipe = std::make_unique<network::http::AsyncMessagePipeline>(
         connection->takeSocket());
-    httpPipe->setOnConnectionClosed(
+    httpPipe->registerCloseHandler(
         [this, connection = httpPipe.get()](auto closeReason)
         {
             this->closeConnection(closeReason, connection);

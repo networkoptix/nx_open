@@ -1,5 +1,7 @@
 #include "server_connection.h"
 
+#include <nx/network/socket_global.h>
+
 #include "message_dispatcher.h"
 
 namespace nx {
@@ -7,16 +9,14 @@ namespace network {
 namespace stun {
 
 ServerConnection::ServerConnection(
-    nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
-    base_type(
-        [socketServer](auto... args) { socketServer->closeConnection(args...); },
-        std::move(sock)),
+    base_type(std::move(sock)),
     m_peerAddress(base_type::getForeignAddress()),
     m_dispatcher(dispatcher)
 {
+    ++SocketGlobals::instance().debugCounters().stunConnectionCount;
 }
 
 ServerConnection::~ServerConnection()
@@ -24,8 +24,10 @@ ServerConnection::~ServerConnection()
     // notify, that connection is being destruct
     // NOTE: this is needed only by weak_ptr holders to know, that this
     //       weak_ptr is not valid any more
-    if( m_destructHandler )
+    if (m_destructHandler)
         m_destructHandler();
+
+    --SocketGlobals::instance().debugCounters().stunConnectionCount;
 }
 
 void ServerConnection::sendMessage(
@@ -48,7 +50,7 @@ SocketAddress ServerConnection::getSourceAddress() const
 }
 
 void ServerConnection::addOnConnectionCloseHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     registerCloseHandler(std::move(handler));
 }
@@ -70,7 +72,7 @@ void ServerConnection::setInactivityTimeout(
     base_type::setInactivityTimeout(value);
 }
 
-void ServerConnection::setDestructHandler(std::function< void() > handler)
+void ServerConnection::setDestructHandler(std::function<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
     NX_ASSERT(!(handler && m_destructHandler),
