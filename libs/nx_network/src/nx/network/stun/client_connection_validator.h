@@ -29,7 +29,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    MessagePipeline m_messagePipeline;
+    std::unique_ptr<MessagePipeline> m_messagePipeline;
     http::tunneling::ValidateTunnelCompletionHandler m_completionHandler;
     std::unique_ptr<AbstractStreamSocket> m_connection;
     std::optional<std::chrono::milliseconds> m_timeout;
