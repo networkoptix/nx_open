@@ -179,12 +179,9 @@ void TestHttpServer::bindToAioThread(aio::AbstractAioThread* aioThread)
 // class RandomlyFailingHttpConnection
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
-    nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
-    BaseType(
-        [socketServer](auto... args) { socketServer->closeConnection(args...); },
-        std::move(sock)),
+    BaseType(std::move(sock)),
     m_requestsToAnswer(nx::utils::random::number<int>(0, 3))
 {
 }
@@ -246,9 +243,7 @@ void RandomlyFailingHttpServer::setResponseBuffer(const QByteArray& buf)
 std::shared_ptr<RandomlyFailingHttpConnection> RandomlyFailingHttpServer::createConnection(
     std::unique_ptr<AbstractStreamSocket> _socket)
 {
-    auto result = std::make_shared<RandomlyFailingHttpConnection>(
-        this,
-        std::move(_socket));
+    auto result = std::make_shared<RandomlyFailingHttpConnection>(std::move(_socket));
     result->setResponseBuffer(m_responseBuffer);
     return result;
 }

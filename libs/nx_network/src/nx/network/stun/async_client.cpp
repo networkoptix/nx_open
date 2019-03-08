@@ -419,7 +419,7 @@ void AsyncClient::initializeMessagePipeline(
     NX_INFO(this, lm("Connected to %1").arg(*m_endpoint));
 
     m_baseConnection = std::make_unique<BaseConnectionType>(std::move(connection));
-    m_baseConnection->setOnConnectionClosed(
+    m_baseConnection->registerCloseHandler(
         [this, connection = m_baseConnection.get()](
             auto closeReason)
         {

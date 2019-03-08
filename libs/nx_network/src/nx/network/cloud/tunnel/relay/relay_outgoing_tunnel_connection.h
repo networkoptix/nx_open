@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_delegate.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "../abstract_outgoing_tunnel_connection.h"
@@ -59,7 +59,7 @@ private:
     QnMutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;
-    utils::ObjectDestructionFlag m_objectDestructionFlag;
+    utils::InterruptionFlag m_objectDestructionFlag;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::network::aio::Timer m_inactivityTimer;
     std::shared_ptr<int> m_usageCounter;

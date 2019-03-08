@@ -10,10 +10,8 @@ namespace nx {
 namespace network {
 
 TimeProtocolConnection::TimeProtocolConnection(
-    network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> _socket)
     :
-    m_socketServer(socketServer),
     m_socket(std::move(_socket)),
     m_creationTimestamp(std::chrono::steady_clock::now())
 {
@@ -37,11 +35,17 @@ void TimeProtocolConnection::startReadingConnection(
     memcpy(m_outputBuffer.data(), &utcTimeSeconds, sizeof(utcTimeSeconds));
 
     if (!m_socket->setNonBlockingMode(true))
-        return m_socketServer->closeConnection(SystemError::getLastOSErrorCode(), this);
+        return triggerConnectionClosedEvent(SystemError::getLastOSErrorCode());
 
     m_socket->sendAsync(
         m_outputBuffer,
         std::bind(&TimeProtocolConnection::onDataSent, this, _1, _2));
+}
+
+void TimeProtocolConnection::registerCloseHandler(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    m_connectionClosedHandlers.push_back(std::move(handler));
 }
 
 std::chrono::milliseconds TimeProtocolConnection::lifeDuration() const
@@ -71,7 +75,14 @@ void TimeProtocolConnection::onDataSent(
             .arg(SystemError::toString(errorCode)));
     }
 
-    m_socketServer->closeConnection(errorCode, this);
+    triggerConnectionClosedEvent(errorCode);
+}
+
+void TimeProtocolConnection::triggerConnectionClosedEvent(SystemError::ErrorCode reason)
+{
+    auto handlers = std::exchange(m_connectionClosedHandlers, {});
+    for (auto& handler: handlers)
+        handler(reason);
 }
 
 } // namespace network
