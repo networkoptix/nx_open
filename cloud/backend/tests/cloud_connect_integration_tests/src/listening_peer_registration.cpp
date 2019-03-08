@@ -51,6 +51,20 @@ TEST_F(ListenigPeerRegistration, reconnects_after_mediator_restart)
     thenConnectionToMediatorIsRestored();
 }
 
+/**
+ * In particular, checking reconnect after restart of cloud_modules.xml provider.
+ */
+TEST_F(ListenigPeerRegistration, reconnects_after_whole_cloud_restart)
+{
+    givenListeningCloudServer();
+
+    stopCloud();
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    startCloud();
+
+    thenConnectionToMediatorIsRestored();
+}
+
 TEST_F(ListenigPeerRegistration, reconnects_after_keep_alive_failure)
 {
     givenListeningCloudServer();

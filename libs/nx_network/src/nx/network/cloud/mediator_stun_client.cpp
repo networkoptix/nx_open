@@ -188,7 +188,11 @@ void MediatorStunClient::onFetchEndpointCompletion(
     nx::network::http::StatusCode::Value resultCode)
 {
     if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+    {
+        NX_ASSERT(isInSelfAioThread());
+        scheduleReconnect();
         return failPendingRequests(SystemError::hostUnreachable);
+    }
 
     m_url = nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
         .appendPath(api::kStunOverHttpTunnelPath).toUrl();

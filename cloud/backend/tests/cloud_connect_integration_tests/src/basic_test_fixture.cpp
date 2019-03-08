@@ -172,14 +172,6 @@ void BasicTestFixture::SetUp()
     startMediator();
 
     startCloudModulesXmlProvider();
-
-    if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
-    {
-        SocketGlobals::cloud().mediatorConnector().mockupCloudModulesXmlUrl(
-            nx::network::url::Builder().setScheme("http")
-                .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
-                .setPath(kCloudModulesXmlPath));
-    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -191,6 +183,20 @@ void BasicTestFixture::startMediator()
         m_mediator.addArg("-trafficRelay/url", relayUrl().toString().toStdString().c_str());
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+
+    if (m_proxyBeforeMediator)
+    {
+        switch (m_mediatorApiProtocol)
+        {
+            case MediatorApiProtocol::stun:
+                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.stunTcpEndpoint());
+                break;
+
+            case MediatorApiProtocol::http:
+                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.httpEndpoint());
+                break;
+        }
+    }
 }
 
 void BasicTestFixture::restartMediator()
@@ -237,20 +243,33 @@ void BasicTestFixture::blockDownTrafficThroughExistingConnectionsToMediator()
         m_proxyBeforeMediator->lastConnectionNumber.load());
 }
 
+//-------------------------------------------------------------------------------------------------
+// Module URL provider.
+
 void BasicTestFixture::startCloudModulesXmlProvider()
 {
     ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
+
+    registerServicesInModuleProvider();
+
+    if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
+    {
+        SocketGlobals::cloud().mediatorConnector().mockupCloudModulesXmlUrl(
+            nx::network::url::Builder().setScheme("http")
+            .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
+            .setPath(kCloudModulesXmlPath));
+    }
+}
+
+void BasicTestFixture::registerServicesInModuleProvider()
+{
     switch (m_mediatorApiProtocol)
     {
         case MediatorApiProtocol::stun:
-            if (m_proxyBeforeMediator)
-                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.stunTcpEndpoint());
             initializeCloudModulesXmlWithDirectStunPort();
             break;
 
         case MediatorApiProtocol::http:
-            if (m_proxyBeforeMediator)
-                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.httpEndpoint());
             initializeCloudModulesXmlWithStunOverHttp();
             break;
     }
@@ -362,6 +381,22 @@ const hpm::api::SystemCredentials& BasicTestFixture::cloudSystemCredentials() co
 void BasicTestFixture::setRemotePeerName(const std::string& remotePeerName)
 {
     m_remotePeerName = remotePeerName;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void BasicTestFixture::stopCloud()
+{
+    m_cloudModulesXmlProvider.httpMessageDispatcher().clear();
+    mediator().stop();
+    m_relays.clear();
+}
+
+void BasicTestFixture::startCloud()
+{
+    startRelays();
+    startMediator();
+    registerServicesInModuleProvider();
 }
 
 //-------------------------------------------------------------------------------------------------
