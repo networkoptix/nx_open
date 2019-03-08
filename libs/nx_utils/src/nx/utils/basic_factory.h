@@ -67,8 +67,8 @@ public:
     }
 
 private:
-    template<typename... Args>
-    std::unique_ptr<AbstractType> defaultFactory(Args... args)
+    template<typename... LocalArgs>
+    std::unique_ptr<AbstractType> defaultFactory(LocalArgs&&... args)
     {
         return std::make_unique<DefaultInstanceType>(
             std::forward<decltype(args)>(args)...);
