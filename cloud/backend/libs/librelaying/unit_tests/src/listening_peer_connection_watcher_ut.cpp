@@ -93,7 +93,7 @@ protected:
     {
         auto [resultCode, socket] = m_startTunnelResults.pop();
         auto socketGuard = nx::utils::makeScopeGuard(
-            [&socket]() { if (socket) socket->pleaseStopSync(); });
+            [socket = socket.get()]() { if (socket) socket->pleaseStopSync(); });
         ASSERT_EQ(SystemError::noError, resultCode);
         ASSERT_NE(nullptr, socket);
     }
