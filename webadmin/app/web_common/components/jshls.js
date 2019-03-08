@@ -312,10 +312,9 @@ window.JsHlsAPI = function(){
                 case Hls.ErrorDetails.BUFFER_APPENDING_ERROR:
                     console.log('Buffer Appending Error');
                     break;
-                /*case Hls.ErrorDetails.BUFFER_STALLED_ERROR:
-                    console.log("Buffer Stalled Error");
-                    console.log(jshlsApi.hls.streamController._bufferedFrags);
-                    //jshlsApi.hls.handleMediaError();*/
+                case Hls.ErrorDetails.BUFFER_STALLED_ERROR:
+                    jshlsApi.load(jshlsApi.video.src);
+                    break;
                 default:
                     break;
             }
