@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+
 #include <boost/optional/optional.hpp>
 
 #include "abstract_socket.h"
@@ -10,11 +11,12 @@
 namespace nx {
 namespace network {
 
-class UDPSocket;
+class SocketFactoryImpl;
 
 /**
  * Contains factory methods for creating sockets.
  * All factory methods return objects created with operator new.
+ * TODO: #ak Refactor to a single static instance instead of every field being static as of now.
  */
 class NX_NETWORK_API SocketFactory
 {
@@ -26,17 +28,26 @@ public:
         udt,    //< \class UdtSocket and \class UdtServerSocket.
     };
 
-    typedef std::function<std::unique_ptr<AbstractStreamSocket>(
+    using CreateStreamSocketFuncType = std::function<std::unique_ptr<AbstractStreamSocket>(
         bool /*sslRequired*/,
         nx::network::NatTraversalSupport /*natTraversalRequired*/,
-        boost::optional<int> /*ipVersion*/)> CreateStreamSocketFuncType;
-    typedef std::function<std::unique_ptr<AbstractStreamServerSocket>(
-        bool /*sslRequired*/,
-        nx::network::NatTraversalSupport /*natTraversalRequired*/,
-        boost::optional<int> /*ipVersion*/)> CreateStreamServerSocketFuncType;
+        boost::optional<int> /*ipVersion*/)>;
 
-    static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
-    static std::unique_ptr< nx::network::UDPSocket > createUdpSocket();
+    using CreateStreamServerSocketFuncType = std::function<std::unique_ptr<AbstractStreamServerSocket>(
+        bool /*sslRequired*/,
+        nx::network::NatTraversalSupport /*natTraversalRequired*/,
+        boost::optional<int> /*ipVersion*/)>;
+
+    using DatagramSocketFactoryFunc = nx::utils::MoveOnlyFunc<
+        std::unique_ptr<AbstractDatagramSocket>(int /*e.g., AF_INET*/)>;
+
+    static std::unique_ptr<AbstractDatagramSocket> createDatagramSocket();
+
+    /**
+     * @return Old function.
+     */
+    static DatagramSocketFactoryFunc setCustomDatagramSocketFactoryFunc(
+        DatagramSocketFactoryFunc func);
 
     /**
      * @param sslRequired If true than it is guaranteed that returned object
@@ -92,10 +103,14 @@ public:
     static int tcpClientIpVersion();
     static int tcpServerIpVersion();
 
+    static SocketFactory& instance();
+
 private:
+    std::unique_ptr<SocketFactoryImpl> m_impl;
+
     SocketFactory();
-    SocketFactory(const SocketFactory&);
-    SocketFactory& operator=(const SocketFactory&);
+    SocketFactory(const SocketFactory&) = delete;
+    SocketFactory& operator=(const SocketFactory&) = delete;
 
     ~SocketFactory();
 

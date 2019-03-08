@@ -46,5 +46,34 @@ private:
     Function m_func;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+template<
+    typename AbstractType,
+    typename DefaultInstanceType,
+    typename... Args
+>
+// requires std::is_base_of<AbstractType, DefaultInstanceType>::value
+class BasicAbstractObjectFactory:
+    public nx::utils::BasicFactory<std::unique_ptr<AbstractType>(Args...)>
+{
+    using base_type = nx::utils::BasicFactory<std::unique_ptr<AbstractType>(Args...)>;
+
+public:
+    BasicAbstractObjectFactory():
+        base_type([this](auto&&... args)
+            { return defaultFactory(std::forward<decltype(args)>(args)...); })
+    {
+    }
+
+private:
+    template<typename... Args>
+    std::unique_ptr<AbstractType> defaultFactory(Args... args)
+    {
+        return std::make_unique<DefaultInstanceType>(
+            std::forward<decltype(args)>(args)...);
+    }
+};
+
 } // namespace utils
 } // namespace nx
