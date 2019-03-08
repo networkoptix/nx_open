@@ -115,9 +115,10 @@ public:
     {
         static constexpr size_t kMaxLoginFailures{5};
         static constexpr std::chrono::seconds kLockoutTimeout{30};
+        static constexpr std::chrono::seconds kAccountTimeTimeout{5};
 
         size_t maxLoginFailures = kMaxLoginFailures;
-        std::chrono::milliseconds accountTime{5000};
+        std::chrono::milliseconds accountTime = kAccountTimeTimeout;
         std::chrono::milliseconds lockoutTime = kLockoutTimeout;
     };
 

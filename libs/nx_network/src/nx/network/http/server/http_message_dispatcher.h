@@ -146,6 +146,12 @@ public:
         m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
     }
 
+    void clear()
+    {
+        m_factories.clear();
+        m_rewritePrefixes.clear();
+    }
+
 private:
     using FactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
 

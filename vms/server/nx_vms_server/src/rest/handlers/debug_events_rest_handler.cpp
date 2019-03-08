@@ -83,9 +83,6 @@ int QnDebugEventsRestHandler::testNetworkIssue(
     }
     else if (id == "packetloss")
     {
-        if (param.isEmpty())
-            param = vms::event::NetworkIssueEvent::PacketLoss{1234, 5678, 9}.toString();
-
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),

@@ -309,6 +309,9 @@ bool H264Parser::processData(
     if (curPtr >= bufferEnd)
         return clearInternalBuffer();
 
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; //< Skip data.
+
     bool isPacketLost =
         m_prevSequenceNum != -1 &&
         quint16(m_prevSequenceNum) != quint16(sequenceNum-1) &&
@@ -321,22 +324,12 @@ bool H264Parser::processData(
         isPacketLost = true;
     }
 
-    auto processPacketLost = [this, sequenceNum]()
-    {
-        NX_DEBUG(this, "Packet loss detected");
-        clearInternalBuffer();
-        emit packetLostDetected(m_prevSequenceNum, sequenceNum);
-    };
-
     if (isPacketLost)
-        processPacketLost();
+        emit packetLostDetected(m_prevSequenceNum, sequenceNum);
 
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
         return false;
-
-    if (rtpHeader->payloadType != m_rtpChannel)
-        return true; // skip data
 
     if (rtpHeader->padding)
     {
@@ -463,10 +456,13 @@ bool H264Parser::processData(
     }
 
     if (gotData)
+    {
         backupCurrentData(rtpBufferBase);
+    }
     else if (isBufferOverflow())
     {
-        processPacketLost();
+        NX_WARNING(this, "RTP parser buffer overflow");
+        emit packetLostDetected(0, 0);
         return false;
     }
 

@@ -261,7 +261,7 @@ bool WebsocketCommandTransport::fillAuthInfo(
     bool /*authByKey*/)
 {
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
-    return true;
+    return false;
 }
 
 } // namespace nx::clusterdb::engine::transport

@@ -8,7 +8,7 @@ import 'jquery-mousewheel';
 //Vendor scripts
 require('./vendor/client-detection.js');
 require('./vendor/date.js');
-require('./vendor/hls.js');
+require('../../../node_modules/hls.js');
 require('./vendor/Impetus.js');
 require('./vendor/cast.js');
 require('./vendor/cast-framework.js');

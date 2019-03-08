@@ -46,7 +46,7 @@ static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 
 static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
-static const std::chrono::seconds PACKET_LOSS_AGGREGATE_TIME(30);
+static const std::chrono::minutes PACKET_LOSS_WARNING_TIME(1);
 
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
@@ -548,24 +548,21 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 {
     const QnResourcePtr& resource = getResource();
-    NX_DEBUG(this, "Packet loss detected on %1, prev seq %2, next seq %3", resource, prev, next);
+    NX_VERBOSE(this, "Packet loss detected on %1, prev seq %2, next seq %3", resource, prev, next);
 
     if (const auto camera = dynamic_cast<QnVirtualCameraResource*>(resource.data()))
         camera->issueOccured();
 
     const auto now = std::chrono::steady_clock::now();
-    if (m_packetLossReportTime && *m_packetLossReportTime + PACKET_LOSS_AGGREGATE_TIME >= now)
+    if (!m_packetLossReportTime || *m_packetLossReportTime + PACKET_LOSS_WARNING_TIME < now)
     {
-        ++m_aggregatedPacketLossCount;
-        return;
+        m_packetLossReportTime = now;
+        NX_WARNING(this, "Packet loss detected on %1", resource);
     }
 
-    vms::event::NetworkIssueEvent::PacketLoss packetLoss{prev, next, m_aggregatedPacketLossCount};
-    m_packetLossReportTime = now;
-    m_aggregatedPacketLossCount = 0;
     emit networkIssue(
         resource, qnSyncTime->currentUSecsSinceEpoch(),
-        vms::api::EventReason::networkRtpPacketLoss, packetLoss.toString());
+        vms::api::EventReason::networkRtpPacketLoss, QString());
 }
 
 RtspTransport QnMulticodecRtpReader::getRtpTransport() const

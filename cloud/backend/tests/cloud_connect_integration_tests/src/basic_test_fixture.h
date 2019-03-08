@@ -109,7 +109,12 @@ protected:
     void configureProxyBeforeMediator();
     void blockDownTrafficThroughExistingConnectionsToMediator();
 
+    /**
+     * Module URL provider.
+     */
+
     void startCloudModulesXmlProvider();
+    void registerServicesInModuleProvider();
 
     /**
      * Relay.
@@ -130,6 +135,16 @@ protected:
     std::string serverSocketCloudAddress() const;
     const hpm::api::SystemCredentials& cloudSystemCredentials() const;
     void setRemotePeerName(const std::string& peerName);
+
+    /**
+     * Stops all Cloud services launched with corresponding functions.
+     */
+    void stopCloud();
+
+    /**
+     * Starts Cloud services as before invokation of stopCloud().
+     */
+    void startCloud();
 
     /**
      * Validation functions.

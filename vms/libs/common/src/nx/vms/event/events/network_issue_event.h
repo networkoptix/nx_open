@@ -19,16 +19,6 @@ public:
 
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
     static QString encodePrimaryStream(bool isPrimary);
-
-    struct PacketLoss
-    {
-        size_t prev = 0;
-        size_t next = 0;
-        size_t aggregated = 0;
-
-        QString toString() const;
-        static std::optional<PacketLoss> parse(const QString& string);
-    };
 };
 
 } // namespace event

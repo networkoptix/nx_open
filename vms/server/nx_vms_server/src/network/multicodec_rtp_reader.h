@@ -169,7 +169,6 @@ private:
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
     std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
-    size_t m_aggregatedPacketLossCount = 0;
 
     static nx::utils::Mutex s_defaultTransportMutex;
     static RtspTransport s_defaultTransportToUse;
