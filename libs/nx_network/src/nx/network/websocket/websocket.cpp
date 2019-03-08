@@ -105,7 +105,6 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
         callOnReadhandler(SystemError::noError, incomingMessage.size());
         if (watcher.interrupted())
             return;
-            if (watcher.interrupted())
     }
 
     if (m_incomingMessageQueue.size() > kMaxIncomingMessageQueueSize)
@@ -182,9 +181,9 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
                 const auto incomingMessage = m_incomingMessageQueue.popFront();
                 *buffer = incomingMessage;
 
-                utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                 handler(SystemError::noError, incomingMessage.size());
-                if (watcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
 
                 if (m_readingCeased)

@@ -40,7 +40,7 @@ void ClientConnectionValidator::validate(
 
             m_messagePipeline.setMessageHandler(
                 [this](auto message) { processMessage(std::move(message)); });
-            m_messagePipeline.setOnConnectionClosed(
+            m_messagePipeline.registerCloseHandler(
                 [this](auto resultCode) { processConnectionClosure(resultCode); });
             m_messagePipeline.startReadingConnection(m_timeout);
         });
