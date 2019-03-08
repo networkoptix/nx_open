@@ -4,8 +4,8 @@
 #include <list>
 #include <map>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/network/address_resolver.h>
-#include <nx/network/system_socket.h>
 #include <nx/utils/basic_factory.h>
 
 #include "abstract_cross_nat_connector.h"
@@ -29,7 +29,7 @@ typedef CloudConnectors (ConnectorFactoryFunc)(
     const AddressEntry& /*targetAddress*/,
     const std::string& /*connectSessionId*/,
     const hpm::api::ConnectResponse& /*response*/,
-    std::unique_ptr<UDPSocket> /*udpSocket*/);
+    std::unique_ptr<AbstractDatagramSocket> /*udpSocket*/);
 
 class NX_NETWORK_API ConnectorFactory:
     public nx::utils::BasicFactory<ConnectorFactoryFunc>
@@ -55,7 +55,7 @@ private:
         const AddressEntry& targetAddress,
         const std::string& connectSessionId,
         const hpm::api::ConnectResponse& response,
-        std::unique_ptr<UDPSocket> udpSocket);
+        std::unique_ptr<AbstractDatagramSocket> udpSocket);
 };
 
 //-------------------------------------------------------------------------------------------------

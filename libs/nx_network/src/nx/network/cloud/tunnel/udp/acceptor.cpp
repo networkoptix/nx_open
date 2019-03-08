@@ -124,7 +124,7 @@ void TunnelAcceptor::connectionAckResult(
         udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());
 
         if ((udpSocket
-                ? udtSocket->bindToUdpSocket(std::move(*udpSocket))
+                ? udtSocket->bindToUdpSocket(udpSocket.get())
                 : udtSocket->bind(localAddress)) &&
             udtSocket->setRendezvous(true) &&
             udtSocket->setSendTimeout(timeout) &&

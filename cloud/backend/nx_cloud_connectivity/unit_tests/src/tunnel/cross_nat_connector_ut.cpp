@@ -79,7 +79,7 @@ private:
         const AddressEntry& targetAddress,
         const std::string& /*connectSessionId*/,
         const hpm::api::ConnectResponse& /*response*/,
-        std::unique_ptr<UDPSocket> /*udpSocket*/)
+        std::unique_ptr<AbstractDatagramSocket> /*udpSocket*/)
     {
         TunnelConnectorContext connectorContext;
         auto connector = std::make_unique<TunnelConnectorStub>(targetAddress);
@@ -135,6 +135,8 @@ TEST_F(CrossNatConnector, provides_not_started_connections)
     givenEstablishedTunnelConnection();
     assertConnectionHasNotBeenStarted();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 class CrossNatConnectorOverTcp:
     public CrossNatConnector
