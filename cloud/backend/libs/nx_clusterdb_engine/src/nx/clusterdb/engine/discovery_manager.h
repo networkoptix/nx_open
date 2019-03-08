@@ -20,7 +20,7 @@ public:
     /**
      * Starts discovery service under clusterId, advertising this node at synchronizationEngineUrl.
      *
-     * @clusterId the cluster id that this node should advertize under and user to
+     * @clusterId the cluster id that this node should advertize under and use to
      *    discover other nodes.
      * @synchronizationEngineUrl the url that the synchronization engine listens on.
      */
@@ -35,7 +35,7 @@ public:
     void updateInformation(const std::string& infoJson);
 
     /**
-     * Get the underlying discovery client. Returns nullptr if start() hasn't been called.
+     * Get the underlying discovery client. Returns nullptr if start() has not been called.
      */
     const nx::cloud::discovery::DiscoveryClient* discoveryClient() const;
 

@@ -131,13 +131,6 @@ protected:
             m_fixture.addNodeContext(m_server->url());
     }
 
-    void givenRegisteredNode(int index = 0)
-    {
-        givenOneNode();
-        whenNodeStartsDiscovery(index);
-        thenNodeIsRegistered(index);
-    }
-
     void givenTwoConnectedNodes()
     {
         givenTwoNodes();
@@ -213,7 +206,7 @@ protected:
 
     void andSyncEnginesAreSynchronized()
     {
-        // Add random data to a and wait for b to synchronize it.
+        // Add random data to "a" and wait for "b" to synchronize it.
 
         auto& a = m_fixture.nodeContext(0);
         auto& b = m_fixture.nodeContext(1);
