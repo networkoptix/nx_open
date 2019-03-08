@@ -242,7 +242,7 @@ angular.module('nxCommon')
                                 
                                 if (scope.videoFlags.errorLoading) {
                                     $http
-                                        .get(error.url)
+                                        .get(error.url || error.frag.url)
                                         .then(function (response) {
                                             scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                             scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
