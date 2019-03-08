@@ -46,15 +46,13 @@ void DiscoveryManager::start(
         {
             NX_VERBOSE(
                 this,
-                lm("Discovered a new node: %1. Non http scheme urls will be ignored.")
-                    .arg(toString(node)));
+                "Discovered a new node: %1. Non http scheme urls will be ignored.",
+                toString(node));
 
                 nx::utils::Url url(node.urls.front());
                 if (!isHttpScheme(url))
                 {
-                    NX_WARNING(
-                        this,
-                        lm("%1 is not an http scheme url, ignoring.").arg(url.toDisplayString()));
+                    NX_WARNING(this, "%1 is not an http scheme url, ignoring.", url);
                     return;
                 }
 
