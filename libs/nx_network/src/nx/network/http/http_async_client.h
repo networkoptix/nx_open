@@ -366,7 +366,7 @@ private:
     bool m_forcedEof;
     bool m_precalculatedAuthorizationDisabled;
     int m_numberOfRedirectsTried;
-    nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
+    nx::utils::InterruptionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;

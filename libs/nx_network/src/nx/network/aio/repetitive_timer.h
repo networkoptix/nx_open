@@ -41,7 +41,7 @@ private:
     Timer m_timer;
     std::chrono::milliseconds m_timeout = std::chrono::milliseconds::zero();
     TimerEventHandler m_timerFunc;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     std::atomic<bool> m_cancelled = {false};
 
     void onTimerEvent();

@@ -7,8 +7,9 @@ namespace nx {
 namespace utils {
 
 /**
- * ObjectDestructionFlag and ObjectDestructionFlag::Watcher are used to allow
+ * InterruptionFlag and InterruptionFlag::Watcher are used to allow
  * "this" destruction in some event handler.
+ *
  * Example:
  * @code{.cpp}
  * class SomeProtocolClient
@@ -16,47 +17,50 @@ namespace utils {
  *     //..
  * private:
  *     //...
- *     ObjectDestructionFlag m_destructionFlag;
+ *     InterruptionFlag m_destructionFlag;
  * }
 
  * void SomeProtocolClient::readFromSocket(...)
  * {
  *     //...
- *     ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+ *     InterruptionFlag::Watcher watcher(&m_destructionFlag);
  *     eventHandler(); //this handler can free this object
- *     if (watcher.objectDestroyed())
- *         return; //"this" has been destroyed, but watcher is still valid sine created on stack
+ *     if (watcher.interrupted())
+ *     {
+ *         // "this" destroyed, or interrupt() was invoked,
+ *         // but watcher is still valid since created on stack.
+ *         return;
+ *     }
  *     //...
  * }
  * @endcode
  */
-class NX_UTILS_API ObjectDestructionFlag
+class NX_UTILS_API InterruptionFlag
 {
 public:
-    enum ControlledObjectState
-    {
-        alive = 0,
-        markedForDeletion,
-        deleted,
-        customState,
-    };
-
-    ObjectDestructionFlag();
-    ~ObjectDestructionFlag();
-
-    ObjectDestructionFlag(const ObjectDestructionFlag&) = delete;
-    ObjectDestructionFlag& operator=(const ObjectDestructionFlag&) = delete;
-
-    void markAsDeleted();
-    void recordCustomState(ControlledObjectState state);
+    InterruptionFlag();
 
     /**
-     * NOTE: Multiple objects using same ObjectDestructionFlag instance can be stacked.
+     * Invokes InterruptionFlag::interrupt().
+     */
+    virtual ~InterruptionFlag();
+
+    InterruptionFlag(const InterruptionFlag&) = delete;
+    InterruptionFlag& operator=(const InterruptionFlag&) = delete;
+
+    /**
+     * After this call no Watcher will use InterruptionFlag.
+     * So, InterruptionFlag instance can be sefely freed.
+     */
+    void interrupt();
+
+    /**
+     * NOTE: Multiple objects using same InterruptionFlag instance can be stacked.
      */
     class NX_UTILS_API Watcher
     {
     public:
-        Watcher(ObjectDestructionFlag* const flag);
+        Watcher(InterruptionFlag* const flag);
         ~Watcher();
 
         Watcher(const Watcher&) = delete;
@@ -64,22 +68,15 @@ public:
         Watcher(Watcher&&) = default;
         Watcher& operator=(Watcher&&) = default;
 
-        /**
-         * Effectively, does the same as Watcher::objectDestroyed.
-         * TODO: But, the objectDestroyed behavior should be changed since this class handles
-         * more than object destruction. But every usage would have to be updated.
-         * So, object destruction is a specific case of an interruption.
-         */
         bool interrupted() const;
-        bool objectDestroyed() const;
 
     private:
-        ControlledObjectState m_localValue;
-        ObjectDestructionFlag* const m_objectDestructionFlag;
+        bool m_interrupted = false;
+        InterruptionFlag* const m_objectDestructionFlag;
     };
 
 private:
-    std::vector<ControlledObjectState*> m_watcherStates;
+    std::vector<bool*> m_watcherStates;
     std::thread::id m_lastWatchingThreadId;
 };
 

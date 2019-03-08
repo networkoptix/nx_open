@@ -1681,9 +1681,9 @@ AsyncClient::Result AsyncClient::invokeHandler(
     if (!handler)
         return Result::proceed;
 
-    nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
+    nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
     handler(args...);
-    return objectDestructionWatcher.objectDestroyed()
+    return objectDestructionWatcher.interrupted()
         ? Result::thisDestroyed
         : Result::proceed;
 }

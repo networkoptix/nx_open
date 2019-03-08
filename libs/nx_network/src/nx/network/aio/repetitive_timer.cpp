@@ -45,11 +45,11 @@ void RepetitiveTimer::stopWhileInAioThread()
 
 void RepetitiveTimer::onTimerEvent()
 {
-    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+    nx::utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
 
     m_timerFunc();
 
-    if (watcher.objectDestroyed() ||
+    if (watcher.interrupted() ||
         m_cancelled.exchange(false, std::memory_order_relaxed))
     {
         return;

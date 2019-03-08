@@ -213,10 +213,10 @@ void ModuleConnector::InformationReader::readUntilError()
             return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
         }
 
-        nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher destructionWatcher(&m_destructionFlag);
         const auto localHandler = m_handler;
         localHandler(std::move(moduleInformation), QString());
-        if (destructionWatcher.objectDestroyed())
+        if (destructionWatcher.interrupted())
             return;
     }
 

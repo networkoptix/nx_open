@@ -70,7 +70,7 @@ private:
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
         [](SystemError::ErrorCode) {};
     bool m_failed = false;
-    utils::ObjectDestructionFlag m_destructionFlag;
+    utils::InterruptionFlag m_destructionFlag;
     UserReadHandlerPair m_userReadHandlerPair;
 
     void onBytesRead(

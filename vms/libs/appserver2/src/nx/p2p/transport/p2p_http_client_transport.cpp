@@ -171,9 +171,9 @@ void P2PHttpClientTransport::startReading()
         {
             if (m_onStartHandler)
             {
-                utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                 reportStartResult();
-                if (watcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
             }
 
@@ -190,9 +190,9 @@ void P2PHttpClientTransport::startReading()
                         {
                             m_userReadHandlerPair->first->append(QByteArray::fromBase64(data));
 
-                            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                             m_userReadHandlerPair->second(SystemError::noError, data.size());
-                            if (watcher.objectDestroyed())
+                            if (watcher.interrupted())
                                 return;
 
                             m_userReadHandlerPair.reset();
@@ -235,9 +235,9 @@ void P2PHttpClientTransport::startReading()
 
              if (m_onStartHandler)
              {
-                 utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                 utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                  reportStartResult();
-                 if (watcher.objectDestroyed())
+                 if (watcher.interrupted())
                      return;
              }
 
@@ -260,9 +260,9 @@ void P2PHttpClientTransport::startReading()
                      errorCode = SystemError::connectionAbort;
                  }
 
-                 utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                 utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                  m_userReadHandlerPair->second(errorCode, outBuffer.size());
-                 if (watcher.objectDestroyed())
+                 if (watcher.interrupted())
                      return;
 
                  m_userReadHandlerPair.reset();

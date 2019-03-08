@@ -103,9 +103,9 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
         {
             const auto incomingMessage = m_incomingMessageQueue.popFront();
             *(m_userReadContext->bufferPtr) = incomingMessage;
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             callOnReadhandler(SystemError::noError, incomingMessage.size());
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
         else if (m_incomingMessageQueue.size() > kMaxIncomingMessageQueueSize)
@@ -250,9 +250,9 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
     {
         while (!m_writeQueue.empty())
         {
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             callOnWriteHandler(SystemError::connectionAbort, 0);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
         return;
@@ -263,17 +263,17 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
         m_failed = true;
         while (!m_writeQueue.empty())
         {
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             callOnWriteHandler(SystemError::connectionAbort, 0);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
     }
     else
     {
-        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
         callOnWriteHandler(SystemError::noError, transferred);
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return;
 
         if (!m_writeQueue.empty())

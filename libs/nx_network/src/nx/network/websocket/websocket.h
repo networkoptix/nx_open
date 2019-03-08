@@ -96,7 +96,7 @@ private:
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     std::chrono::milliseconds m_aliveTimeout;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
 

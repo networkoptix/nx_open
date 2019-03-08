@@ -34,7 +34,7 @@ StreamTransformingAsyncChannel::~StreamTransformingAsyncChannel()
 void StreamTransformingAsyncChannel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     if (getAioThread() != aioThread)
-        m_aioInterruptionFlag.handleAioThreadChange();
+        m_aioInterruptionFlag.interrupt();
 
     base_type::bindToAioThread(aioThread);
     m_rawDataChannel->bindToAioThread(aioThread);
@@ -83,7 +83,7 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
 {
     for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
-        InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
         processTask(task.get());
         if (watcher.interrupted())
             return;
@@ -362,7 +362,7 @@ bool StreamTransformingAsyncChannel::completeRawSendTasks(
         if (!sendTask.userHandler)
             continue;
 
-        InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
         nx::utils::swapAndCall(
             sendTask.userHandler,
             sysErrorCode,
@@ -414,7 +414,7 @@ void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
     for (auto& userTask: userTaskQueue)
     {
         auto handler = std::move(userTask->handler);
-        InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
         if (sysErrorCode == SystemError::noError) //< Connection closed.
         {
             if (userTask->type == UserTaskType::read)

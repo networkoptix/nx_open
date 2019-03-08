@@ -59,7 +59,7 @@ void BasicPollable::pleaseStopSync()
     {
         m_aioService->cancelPostedCalls(&m_pollable);
 
-        InterruptionFlag::Watcher watcher(&m_interruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_interruptionFlag);
         stopWhileInAioThread();
         if (watcher.interrupted())
             return;
@@ -81,7 +81,7 @@ aio::AbstractAioThread* BasicPollable::getAioThread() const
 void BasicPollable::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     if (m_pollable.impl()->aioThread.load() != aioThread)
-        m_interruptionFlag.handleAioThreadChange();
+        m_interruptionFlag.interrupt();
 
     m_aioService->bindSocketToAioThread(&m_pollable, aioThread);
 }

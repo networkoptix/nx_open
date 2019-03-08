@@ -72,7 +72,7 @@ private:
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
 
     IoCompletionHandler m_readHandler;
     bool m_readPaused;

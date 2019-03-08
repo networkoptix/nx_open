@@ -66,7 +66,7 @@ private:
     network::websocket::FrameType m_messageType;
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
-    utils::ObjectDestructionFlag m_destructionFlag;
+    utils::InterruptionFlag m_destructionFlag;
     nx::Buffer m_connectionGuid;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
 

@@ -16,7 +16,6 @@
 
 #include "aio_event_handler.h"
 #include "basic_pollable.h"
-#include "interruption_flag.h"
 #include "../abstract_socket.h"
 #include "../address_resolver.h"
 #include "../socket_global.h"
@@ -46,7 +45,7 @@ public:
             !m_aioService->isSocketBeingMonitored(this->m_socket));
 
         if (this->m_socket->impl()->aioThread.load() != aioThread)
-            m_socketInterruptionFlag.handleAioThreadChange();
+            m_socketInterruptionFlag.interrupt();
     }
 
     void post(nx::utils::MoveOnlyFunc<void()> handler)
@@ -76,7 +75,7 @@ public:
 protected:
     SocketType* m_socket = nullptr;
     nx::network::aio::AIOService* m_aioService = nullptr;
-    InterruptionFlag m_socketInterruptionFlag;
+    nx::utils::InterruptionFlag m_socketInterruptionFlag;
 };
 
 /**
@@ -511,7 +510,7 @@ private:
 
         // Timer on socket (not read/write timeout, but some timer).
 
-        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
@@ -579,7 +578,7 @@ private:
     {
         m_recvBuffer = nullptr;
 
-        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
@@ -675,7 +674,7 @@ private:
     {
         m_asyncSendIssued = false;
 
-        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
@@ -702,7 +701,7 @@ private:
         else if (sockErrorCode == SystemError::noError)
             sockErrorCode = SystemError::notConnected;  //< MUST report some error.
 
-        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         if (m_connectHandler)
         {
@@ -896,7 +895,7 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> newConnection)
     {
-        InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()

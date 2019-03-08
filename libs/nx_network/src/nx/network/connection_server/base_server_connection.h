@@ -163,9 +163,9 @@ public:
         dispatch(
             [this, closeReason]()
             {
-                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+                nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
                 triggerConnectionClosedEvent(closeReason);
-                if (watcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
 
                 m_streamSocket.reset();
@@ -223,9 +223,9 @@ public:
 protected:
     virtual void stopWhileInAioThread() override
     {
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         triggerConnectionClosedEvent(SystemError::noError);
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return;
         m_streamSocket.reset();
     }
@@ -240,7 +240,7 @@ private:
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend = 0;
     std::vector<OnConnectionClosedHandler> m_connectionClosedHandlers;
-    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+    nx::utils::InterruptionFlag m_connectionFreedFlag;
 
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData = false;
@@ -255,9 +255,9 @@ private:
         NX_ASSERT((size_t)m_readBuffer.size() == bytesRead);
 
         {
-            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return; //< Connection has been removed by handler.
         }
 

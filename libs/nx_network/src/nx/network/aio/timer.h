@@ -53,7 +53,7 @@ private:
     std::chrono::milliseconds m_timeout;
     boost::optional<std::chrono::steady_clock::time_point> m_timerStartClock;
     AIOService& m_aioService;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     int m_internalTimerId;
     QnMutex m_mutex;
 };

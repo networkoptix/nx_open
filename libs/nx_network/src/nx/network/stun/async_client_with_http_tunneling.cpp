@@ -460,9 +460,9 @@ void AsyncClientWithHttpTunneling::reportReconnect()
     for (const auto& handlerContext: m_reconnectHandlers)
     {
         // TODO: #ak Add support for m_reconnectHandlers being modified within handler.
-        nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
         handlerContext.second();
-        if (objectDestructionWatcher.objectDestroyed())
+        if (objectDestructionWatcher.interrupted())
             return;
     }
 }

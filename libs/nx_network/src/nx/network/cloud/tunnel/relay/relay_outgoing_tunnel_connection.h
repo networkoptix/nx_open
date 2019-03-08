@@ -59,7 +59,7 @@ private:
     QnMutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;
-    utils::ObjectDestructionFlag m_objectDestructionFlag;
+    utils::InterruptionFlag m_objectDestructionFlag;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::network::aio::Timer m_inactivityTimer;
     std::shared_ptr<int> m_usageCounter;

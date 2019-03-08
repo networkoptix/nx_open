@@ -1,9 +1,9 @@
 #pragma once
 
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/future.h>
 
 #include "abstract_pollable.h"
-#include "interruption_flag.h"
 #include "pollable.h"
 
 namespace nx {
@@ -188,7 +188,7 @@ protected:
 private:
     mutable Pollable m_pollable;
     AIOService* m_aioService = nullptr;
-    InterruptionFlag m_interruptionFlag;
+    nx::utils::InterruptionFlag m_interruptionFlag;
 
     template<typename Func, typename Promise>
     void executeAndSetResultToPromise(Func& func, Promise& promise)

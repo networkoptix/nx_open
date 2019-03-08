@@ -92,7 +92,7 @@ private:
     nx::utils::Url m_url;
     std::map<void*, ReconnectHandler> m_reconnectHandlers;
     nx::network::RetryTimer m_reconnectTimer;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
     int m_requestIdSequence = 0;
     /** map<request id, request context>. */

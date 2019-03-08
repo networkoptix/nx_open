@@ -4,7 +4,6 @@
 #include <memory>
 #include <tuple>
 
-#include <nx/network/aio/interruption_flag.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/optional.h>
@@ -114,7 +113,7 @@ private:
     std::deque<nx::Buffer> m_readRawData;
     std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
-    InterruptionFlag m_aioInterruptionFlag;
+    nx::utils::InterruptionFlag m_aioInterruptionFlag;
     bool m_sendShutdown = false;
 
     virtual void stopWhileInAioThread() override;

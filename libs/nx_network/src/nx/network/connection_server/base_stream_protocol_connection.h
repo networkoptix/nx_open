@@ -5,8 +5,8 @@
 #include <functional>
 #include <optional>
 
-#include <nx/network/aio/interruption_flag.h>
 #include <nx/network/buffered_stream_socket.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/qnbytearrayref.h>
 
 #include "base_protocol_message_types.h"
@@ -222,7 +222,7 @@ private:
     nx::Buffer m_writeBuffer;
     std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
     std::deque<SendTask> m_sendQueue;
-    aio::InterruptionFlag m_connectionFreedFlag;
+    nx::utils::InterruptionFlag m_connectionFreedFlag;
     bool m_messageReported = false;
     QnByteArrayConstRef m_dataToParse;
     std::chrono::steady_clock::time_point m_creationTimestamp;
@@ -283,7 +283,7 @@ private:
         if (m_messageReported)
             return true;
 
-        aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processMessage(std::exchange(m_message, Message()));
         if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
@@ -298,7 +298,7 @@ private:
         if (msgBodyBuffer.isEmpty())
             return true;
 
-        aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processSomeMessageBody(std::move(msgBodyBuffer));
         if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
@@ -308,7 +308,7 @@ private:
 
     bool reportMessageEnd()
     {
-        aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
         processMessageEnd();
         return !watcher.interrupted();
     }
@@ -356,7 +356,7 @@ private:
 
         if (sendCompletionHandler)
         {
-            aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             sendCompletionHandler(SystemError::noError);
             return !watcher.interrupted();
         }
@@ -403,7 +403,7 @@ private:
 
         auto handler = std::exchange(m_sendQueue.front().handler, nullptr);
         {
-            aio::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             handler(errorCode);
             if (watcher.interrupted())
                 return; //< Connection has been removed by handler.
