@@ -11,7 +11,7 @@ namespace nx::hpm::api {
 
 MediatorStunClient::MediatorStunClient(
     AbstractAsyncClient::Settings settings,
-    MediatorEndpointProvider* endpointProvider)
+    AbstractMediatorEndpointProvider* endpointProvider)
     :
     base_type(
         [settings]() mutable

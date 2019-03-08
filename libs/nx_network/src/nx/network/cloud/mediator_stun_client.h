@@ -8,11 +8,11 @@
 
 namespace nx::hpm::api {
 
-class MediatorEndpointProvider;
+class AbstractMediatorEndpointProvider;
 
 /**
  * Adds support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
- * It implicitly fetches endpoint from MediatorEndpointProvider before each (re-)connect and
+ * It implicitly fetches endpoint from AbstractMediatorEndpointProvider before each (re-)connect and
  * calls AbstractAsyncClient::connect.
  * In addition, it uses periodic STUN Binding requests as keep alive probes.
  */
@@ -24,7 +24,7 @@ class NX_NETWORK_API MediatorStunClient:
 public:
     MediatorStunClient(
         AbstractAsyncClient::Settings settings,
-        MediatorEndpointProvider* endpointProvider);
+        AbstractMediatorEndpointProvider* endpointProvider);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -54,7 +54,7 @@ private:
         void* client = nullptr;
     };
 
-    MediatorEndpointProvider* m_endpointProvider = nullptr;
+    AbstractMediatorEndpointProvider* m_endpointProvider = nullptr;
     std::optional<nx::utils::Url> m_url;
     std::vector<RequestContext> m_postponedRequests;
     std::unique_ptr<nx::network::stun::ServerAlivenessTester> m_alivenessTester;
