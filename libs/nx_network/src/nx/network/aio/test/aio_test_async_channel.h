@@ -8,7 +8,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/utils/byte_stream/pipeline.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {

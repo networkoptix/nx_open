@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/future.h>
 
 #include "abstract_pollable.h"

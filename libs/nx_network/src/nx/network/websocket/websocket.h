@@ -4,7 +4,7 @@
 #include <queue>
 #include <QtCore>
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/aio/timer.h>

@@ -4,7 +4,7 @@
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_parser.h>
 #include <nx/network/aio/timer.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 
 namespace nx::p2p {
 

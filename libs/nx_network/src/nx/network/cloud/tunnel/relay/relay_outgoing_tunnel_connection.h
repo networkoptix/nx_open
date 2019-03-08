@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_delegate.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "../abstract_outgoing_tunnel_connection.h"

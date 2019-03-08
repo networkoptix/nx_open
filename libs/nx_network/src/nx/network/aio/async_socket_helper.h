@@ -8,7 +8,7 @@
 
 #include <QtCore/QThread>
 
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>

@@ -5,7 +5,7 @@
 #include <tuple>
 
 #include <nx/utils/byte_stream/pipeline.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/optional.h>
 
 #include "abstract_async_channel.h"

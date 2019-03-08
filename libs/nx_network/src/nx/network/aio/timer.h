@@ -4,7 +4,7 @@
 #include <functional>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "aio_event_handler.h"

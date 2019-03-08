@@ -6,7 +6,7 @@
 
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 

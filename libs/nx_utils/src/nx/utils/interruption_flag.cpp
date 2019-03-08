@@ -1,4 +1,4 @@
-#include "object_destruction_flag.h"
+#include "interruption_flag.h"
 
 #include <algorithm>
 

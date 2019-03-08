@@ -9,7 +9,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/retry_timer.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "async_client.h"

@@ -13,7 +13,7 @@
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/network/test_support/test_outgoing_tunnel.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 

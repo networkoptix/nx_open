@@ -11,7 +11,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"

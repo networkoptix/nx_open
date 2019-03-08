@@ -10,7 +10,7 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/optional.h>
 
 #include "stream_socket_server.h"

@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 
 #include "timer.h"
 
