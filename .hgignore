@@ -22,6 +22,8 @@ CMakeLists.txt.user
 subinclude:vms/artifacts/.hgignore
 subinclude:cloud_portal/.hgignore
 subinclude:webadmin/.hgignore
+subinclude:cloud/backend/cloud_tests/monitoring/.hgignore
+subinclude:cloud/backend/cloud_tests/health_site/.hgignore
 
 # Build folders in the repository root.
 re:^build/
