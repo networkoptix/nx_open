@@ -8,8 +8,8 @@ then
     aws cloudfront create-invalidation --distribution-id EAKYCHFP0X5DM --paths "/assets/layout/tiles.json" --paths "/*"
 elif [ "$1" = "prod-sla" ]
 then
-# npm install
-# ng build --prod
+    npm install
+    ng build --prod
     grep -rl https://api.status.nxvms.com dist | while read f
     do
         sed -i '' 's%https:\/\/api.status.nxvms.com%https://api.status-sla.nxvms.com%g' "$f"
