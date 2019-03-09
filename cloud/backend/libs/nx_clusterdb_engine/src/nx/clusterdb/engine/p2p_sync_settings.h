@@ -8,6 +8,10 @@ class QnSettings;
 
 namespace nx::clusterdb::engine {
 
+/**
+ * Settings used to configure SynchronizationEngine.
+ * Settings exist under group name "p2pDb".
+ */
 class NX_DATA_SYNC_ENGINE_API SynchronizationSettings
 {
 public:
