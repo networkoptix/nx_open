@@ -44,10 +44,10 @@ void Downloader::Private::startDownload(const QString& fileName)
 {
     NX_MUTEX_LOCKER lock(&mutex);
 
-    const auto keyFileName = FileInformation::keyFromFileName(fileName);
-    if (workers.contains(keyFileName))
+    if (workers.contains(fileName))
         return;
 
+    NX_ASSERT(storage->fileInformation(fileName).isValid());
     const auto status = storage->fileInformation(fileName).status;
     if (status == FileInformation::Status::downloaded)
     {
@@ -61,13 +61,13 @@ void Downloader::Private::startDownload(const QString& fileName)
     if (!downloadsStarted)
         return;
 
-    const auto fi = storage->fileInformation(keyFileName);
+    const auto fi = storage->fileInformation(fileName);
     auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
     auto worker = std::make_shared<Worker>(
-        keyFileName,
+        fileName,
         storage.data(),
         peerManager);
-    workers[keyFileName] = worker;
+    workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,
         [this](const QString& fileName)
@@ -84,7 +84,7 @@ void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals
     Worker::State state;
     {
         NX_MUTEX_LOCKER lock(&mutex);
-        const auto worker = workers.take(FileInformation::keyFromFileName(fileName));
+        const auto worker = workers.take(fileName);
         if (!worker)
             return;
 
