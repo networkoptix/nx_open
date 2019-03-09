@@ -6,7 +6,7 @@ namespace nx::clusterdb::map {
 
 namespace {
 
-static constexpr char kClusterId[] = "clusterdbmap/clusterId";
+static constexpr char kClusterId[] = "clusterDbMap/clusterId";
 
 } // namespace
 

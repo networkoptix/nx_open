@@ -7,7 +7,7 @@ namespace nx::clusterdb::map::test {
 NodeLauncher::NodeLauncher()
 {
     addArg("--http/listenOn=127.0.0.1:0");
-    addArg("--clusterdbmap/clusterId=clusterDbMapTest");
+    addArg("--clusterDbMap/clusterId=clusterDbMapTest");
 }
 
 NodeLauncher::~NodeLauncher()

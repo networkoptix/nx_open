@@ -6,7 +6,7 @@ namespace nx::clusterdb::map {
 
 /**
  * Settings to be used by the clusterdb map.
- * Settings exist under group name "clusterdbmap".
+ * Settings exist under group name "clusterDbMap".
  */
 class NX_KEY_VALUE_DB_API Settings
 {
