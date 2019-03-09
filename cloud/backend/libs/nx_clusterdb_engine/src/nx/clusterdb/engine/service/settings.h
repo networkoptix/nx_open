@@ -17,7 +17,10 @@ class NX_DATA_SYNC_ENGINE_API Settings:
     using base_type = nx::utils::BasicServiceSettings;
 
 public:
-    Settings();
+    Settings(
+        const QString& organizationName = QString("nx"),
+        const QString& applicationName = QString("clusterdb_engine_service"),
+        const QString& moduleName = QString("clusterdb_engine"));
 
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;

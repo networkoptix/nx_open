@@ -2,8 +2,12 @@
 
 namespace nx::clusterdb::engine {
 
-Settings::Settings():
-    base_type("", "", "") //< TODO
+Settings::Settings(
+    const QString& organizationName,
+    const QString& applicationName,
+    const QString& moduleName)
+    :
+    base_type(organizationName, applicationName, moduleName)
 {
 }
 
