@@ -170,7 +170,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
         NX_WARNING(this, lm("cross-nat %1. Failed to prepare mediator udp client. %2")
             .args(m_connectSessionId, SystemError::toString(resultCode)));
         post(
-            [this, resultCode]() mutable
+            [this, resultCode = resultCode]() mutable
             {
                 s_mediatorResponseCounter.addResult(hpm::api::ResultCode::badTransport);
                 nx::utils::swapAndCall(m_completionHandler, resultCode, nullptr);
