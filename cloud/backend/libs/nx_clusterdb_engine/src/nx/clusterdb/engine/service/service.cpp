@@ -58,7 +58,7 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     View view(settings, &controller);
     m_view = &view;
 
-    setup();
+    setup(abstractSettings);
     auto customLogicGuard = nx::utils::makeScopeGuard([this]() { teardown(); });
 
     // Process privilege reduction.

@@ -45,7 +45,7 @@ protected:
      * Override this method to initialize custom logic.
      * E.g., register commands to synchronize and event handles.
      */
-    virtual void setup() {}
+    virtual void setup(const utils::AbstractServiceSettings& /*settings*/) {}
     virtual void teardown() {}
 
     nx::sql::AsyncSqlQueryExecutor& sqlQueryExecutor();
