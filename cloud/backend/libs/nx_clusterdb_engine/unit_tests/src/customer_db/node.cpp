@@ -34,7 +34,7 @@ std::string CustomerDbNode::defaultClusterId()
     return kSystemId;
 }
 
-void CustomerDbNode::setup()
+void CustomerDbNode::setup(const nx::utils::AbstractServiceSettings& /*settings*/)
 {
     dao::StructureUpdater structureUpdater(&sqlQueryExecutor());
 
