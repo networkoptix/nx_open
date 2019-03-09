@@ -6,6 +6,8 @@
 #include "data_manager.h"
 #include "event_provider.h"
 
+#include "settings.h"
+
 namespace nx::clusterdb::engine{ class SynchronizationEngine; }
 namespace nx::sql { class AsyncSqlQueryExecutor; }
 
@@ -19,7 +21,8 @@ public:
      */
     Database(
         nx::clusterdb::engine::SynchronizationEngine* syncEngine,
-        nx::sql::AsyncSqlQueryExecutor* dbManager);
+        nx::sql::AsyncSqlQueryExecutor* dbManager,
+        const std::string& clusterId);
 
     DataManager& dataManager();
     EventProvider& eventProvider();
@@ -27,9 +30,9 @@ public:
     std::string clusterId() const;
 
 private:
-    const QnUuid m_clusterId;
     nx::clusterdb::engine::SynchronizationEngine* m_syncEngine = nullptr;
     dao::StructureUpdater m_structureUpdater;
+    std::string m_clusterId;
     EventProvider m_eventProvider;
     DataManager m_dataManager;
 };

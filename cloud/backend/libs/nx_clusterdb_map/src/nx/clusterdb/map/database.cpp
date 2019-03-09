@@ -7,20 +7,15 @@
 
 namespace nx::clusterdb::map {
 
-namespace {
-
-static constexpr char kClusterId[] = "c484573f-8b0d-4458-b86c-1da31188884b";
-
-} // namespace
-
 Database::Database(
     nx::clusterdb::engine::SynchronizationEngine* syncEngine,
-    nx::sql::AsyncSqlQueryExecutor* dbManager)
+    nx::sql::AsyncSqlQueryExecutor* dbManager,
+    const std::string& clusterId)
     :
-    m_clusterId(kClusterId),
     m_syncEngine(syncEngine),
     m_structureUpdater(dbManager),
-    m_dataManager(m_syncEngine, dbManager, kClusterId, &m_eventProvider)
+    m_clusterId(clusterId),
+    m_dataManager(m_syncEngine, dbManager, m_clusterId, &m_eventProvider)
 {
 }
 
@@ -36,7 +31,7 @@ EventProvider& Database::eventProvider()
 
 std::string Database::clusterId() const
 {
-    return m_clusterId.toSimpleString().toStdString();
+    return m_clusterId;
 }
 
 } // namespace nx::clusterdb::map
