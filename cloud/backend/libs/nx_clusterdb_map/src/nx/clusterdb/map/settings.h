@@ -11,9 +11,8 @@ namespace nx::clusterdb::map {
 class NX_KEY_VALUE_DB_API Settings
 {
 public:
-    nx::clusterdb::engine::SynchronizationSettings synchronizationSettings;
-
     std::string clusterId;
+    nx::clusterdb::engine::SynchronizationSettings synchronizationSettings;
 
     void load(const QnSettings& settings);
 };
