@@ -115,7 +115,7 @@ protected:
     void SetUp() override
     {
         m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(
-            CustomerDbNode::defaultClusterId());
+            CustomerDbNode::kClusterId);
 
         ASSERT_TRUE(m_server->bindAndListen());
     }

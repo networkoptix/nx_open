@@ -4,13 +4,14 @@
 
 namespace nx::clusterdb::engine::test {
 
-static constexpr char kApplicationId[] = "customer_db";
-// TODO: #ak Remove following constant
-static constexpr char kSystemId[] = "review_and_replace_this_value";
+namespace {
+
+static const char kApplicationId[] = "customer_db";
+
+} // namespace
 
 CustomerDbNode::CustomerDbNode(int argc, char **argv):
-    base_type(kApplicationId, argc, argv),
-    m_clusterId(kSystemId)
+    base_type(kApplicationId, argc, argv)
 {
 }
 
@@ -26,12 +27,7 @@ CustomerManager& CustomerDbNode::customerManager()
 
 std::string CustomerDbNode::clusterId() const
 {
-    return m_clusterId;
-}
-
-std::string CustomerDbNode::defaultClusterId()
-{
-    return kSystemId;
+    return kClusterId;
 }
 
 void CustomerDbNode::setup(const nx::utils::AbstractServiceSettings& /*settings*/)
