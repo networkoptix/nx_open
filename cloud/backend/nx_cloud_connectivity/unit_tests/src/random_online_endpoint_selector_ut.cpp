@@ -28,7 +28,7 @@ public:
         {
             m_testEndpoints.push_back(
                 nx::network::SocketAddress(
-                    QnUuid::createUuid().toSimpleString() + ".ru", 80));
+                    QnUuid::createUuid().toSimpleString() + ".ru.", 80));
         }
     }
 
