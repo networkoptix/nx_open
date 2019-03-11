@@ -289,7 +289,11 @@ private:
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
-    QMap<DeviceFileCatalogPtr, qint64> cataloguesToScan(int storageIndex);
+    QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(int storageIndex);
+    void scanMediaCatalog(
+        const QnStorageResourcePtr& storage,
+        const DeviceFileCatalogPtr& catalog,
+        nx::caminfo::ArchiveCameraDataList* outArchiveCameras);
 
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
