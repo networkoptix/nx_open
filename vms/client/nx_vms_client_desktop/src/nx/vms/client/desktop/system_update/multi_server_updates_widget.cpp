@@ -948,8 +948,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         auto serversToCancel = m_stateTracker->getPeersInstalling();
         m_serverUpdateTool->requestFinishUpdate(true);
         m_clientUpdateTool->resetState();
-        if (qnClientMessageProcessor->isConnectionHeld())
-            qnClientMessageProcessor->setHoldConnection(false);
+        qnClientMessageProcessor->setHoldConnection(false);
         setTargetState(WidgetUpdateState::initial, {});
     }
     else if (m_widgetState == WidgetUpdateState::complete)
@@ -1672,8 +1671,7 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         }
     }
 
-    if (qnClientMessageProcessor->isConnectionHeld())
-        qnClientMessageProcessor->setHoldConnection(false);
+    qnClientMessageProcessor->setHoldConnection(false);
 
     if (!updatedProtocol.empty())
     {

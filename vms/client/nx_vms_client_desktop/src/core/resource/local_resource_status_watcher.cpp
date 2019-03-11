@@ -1,6 +1,6 @@
 #include "local_resource_status_watcher.h"
 
-#include <QFileInfo>
+#include <QtCore/QFileInfo>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>

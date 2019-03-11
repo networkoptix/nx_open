@@ -93,6 +93,7 @@ copyLibs()
         'libmediaserver*'
         'libcloud_db.*'
         'libnx_cassandra*'
+        'libnx_relaying*'
         'libconnection_mediator*'
         'libnx_clusterdb*'
         'libnx_discovery_api_client*'
