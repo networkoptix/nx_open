@@ -101,6 +101,14 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
+    void shiftSynchronizationTimestamp(
+        const QnUuid& systemId,
+        const ConfigureSystemData& remoteSystemData);
+
+    bool changeSystemId(
+        const QnUuid& systemId,
+        const ConfigureSystemData& remoteSystemData);
+
     bool isResponseOK(const nx::network::http::HttpClient& client);
 
     nx::network::http::StatusCode::Value getClientResponse(
