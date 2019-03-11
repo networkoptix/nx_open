@@ -116,7 +116,7 @@ bool EulaDialog::event(QEvent* event)
     return base_type::event(event);
 }
 
-QDialog::DialogCode EulaDialog::showEulaHtml(const QString& html, QWidget* parent)
+bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
 {
     // Regexp to dig out a title from html with EULA.
     QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
@@ -145,27 +145,28 @@ QDialog::DialogCode EulaDialog::showEulaHtml(const QString& html, QWidget* paren
     EulaDialog eulaDialog(parent);
     eulaDialog.setTitle(eulaHeader);
     eulaDialog.setEulaHtml(eulaText);
-    return (QDialog::DialogCode) eulaDialog.exec();
+    if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
+    {
+        qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+        return true;
+    }
+    return false;
 }
 
-QDialog::DialogCode EulaDialog::showEulaFromFile(const QString& path, QWidget* parent)
+bool EulaDialog::acceptEulaFromFile(const QString& path, QWidget* parent)
 {
     if (!NX_ASSERT(!path.isEmpty()))
-        return DialogCode::Rejected;
+        return false;
 
     QFile eula(path);
     if (!eula.open(QIODevice::ReadOnly))
     {
         NX_ERROR(typeid(EulaDialog), "Failed to open eula file %1", path);
-        return DialogCode::Accepted;
+        return false;
     }
 
     const auto eulaText = QString::fromUtf8(eula.readAll());
-    if (showEulaHtml(eulaText, parent) == DialogCode::Rejected)
-        return DialogCode::Rejected;
-
-    qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
-    return DialogCode::Accepted;
+    return acceptEulaHtml(eulaText, parent);
 }
 
 } // namespace nx::vms::client::desktop

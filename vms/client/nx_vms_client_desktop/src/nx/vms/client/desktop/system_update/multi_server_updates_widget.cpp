@@ -831,11 +831,8 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula = acceptedEula < newEula;
 
-        if (showEula && EulaDialog::showEulaHtml(m_updateInfo.info.eula, mainWindowWidget())
-            != QDialog::Accepted)
-        {
+        if (showEula && !EulaDialog::acceptEulaHtml(m_updateInfo.info.eula, mainWindowWidget()))
             return;
-        }
 
         auto targets = m_stateTracker->getAllPeers();
 
