@@ -20,10 +20,9 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
     encapsulation: ViewEncapsulation.None
 })
 
-// TODO: what is company used for? Its never assigned.
 export class NxCampageComponent implements OnInit, DoCheck {
-    lang: any;
-    config: any;
+    lang: any = {};
+    CONFIG: any = {};
     data: any;
     company: any;
     vendors: string[];
@@ -61,10 +60,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
       ];
 
       this.data = undefined;
-      this.company = undefined;
-
       this.resolution = '0';
-
       this.itemsPerPage = 15;
       this.query = '';
 
@@ -136,7 +132,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterResolutions() {
-        this.resolutions = JSON.parse(this.config.campage.supportedResolutions);
+        this.resolutions = JSON.parse(this.CONFIG.campage.supportedResolutions);
 
         this.filterModel.selects = [
             {
@@ -156,12 +152,12 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterTags() {
-        this.filterModel.tags = JSON.parse(this.config.campage.searchTags);
+        this.filterModel.tags = JSON.parse(this.CONFIG.campage.searchTags);
         this.filterModel.tags.forEach(tag => tag.label = this.lang.campage[tag.id]);
     }
 
     addFilterTypes() {
-        this.hardwareTypes = JSON.parse(this.config.campage.supportedHardwareTypes);
+        this.hardwareTypes = JSON.parse(this.CONFIG.campage.supportedHardwareTypes);
         this.hardwareTypes.forEach(type => {
             type.label = this.lang.campage[type.id];
         });
@@ -234,8 +230,9 @@ export class NxCampageComponent implements OnInit, DoCheck {
             .getAllCameras(this.company)
             .subscribe(data => {
                 // LANG and CONFIG are not available till now
+                this.CONFIG = this.configService.getConfig();
                 this.lang = this.translate.translations[this.translate.currentLang];
-                this.config = this.configService.getConfig();
+                this.company = this.CONFIG.companyName;
 
                 this.data = data;
                 this.camerasSuccessFn(this.data);
@@ -431,10 +428,15 @@ export class NxCampageComponent implements OnInit, DoCheck {
       this.toggleCamview = true;
   }
 
-  open(activeCamera) {
-      this.messageDialog.open(this.config.messageType.ipvd, activeCamera.model, activeCamera.model).then(() => {});
-      return false;
-  }
+    openFeedback(param) {
+        const type = (param === 'device') ? this.CONFIG.messageType.ipvd_device : this.CONFIG.messageType.ipvd_page ;
+        const device = (this.activeCamera) ? this.activeCamera.model : '';
+        this.messageDialog
+            .open(type, device, device)
+            .then(() => {});
+
+        return false;
+    }
 
   resetActiveCamera() {
       this.uri.updateURI('/campage', [{ key: 'camera', value: undefined }]);

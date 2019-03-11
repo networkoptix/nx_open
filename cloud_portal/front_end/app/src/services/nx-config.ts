@@ -258,7 +258,8 @@ export class NxConfigService {
                 skipFramesRenderingTimeline: true
             },
             messageType: {
-                ipvd: 'ipvd_feedback',
+                ipvd_page: 'ipvd_feedback_page',
+                ipvd_device: 'ipvd_feedback_device',
                 inquiry: 'sales_inquiry',
                 support: 'request_support',
                 unknown: 'unknown'

@@ -28,7 +28,7 @@
                 <p>This list is limited to actual devices auto-reporting data to {{company}}, as
                     approved by anonymous system users.
                     The complete list of supported manufacturers and models is greater in scope.
-                    Please <a href (click)="open()">submit a request</a> for additional
+                    Please <a href (click)="openFeedback('page')">submit a request</a> for additional
                     questions/concerns regarding supported devices.
                 </p>
             </div>
@@ -48,7 +48,7 @@
                 <nx-cam-view
                         [activeCamera]="activeCamera"
                         (onCloseView)="resetActiveCamera()"
-                        (onFeedbackClick)="open($event)">
+                        (onFeedbackClick)="openFeedback('device')">
                 </nx-cam-view>
             </nx-block>
         </div>

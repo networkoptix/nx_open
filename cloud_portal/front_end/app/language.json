@@ -15,7 +15,8 @@
     "messageSent": "Message has been sent."
   },
   "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
+    "ipvd_feedback_page": "Cameras page feedback",
+    "ipvd_feedback_device": "Feedback about {{product}}",
     "sales_inquiry": "Inquiry for {{product}}",
     "request_support": "Request Support for {{product}}",
     "unknown": "Unknown Message Type"

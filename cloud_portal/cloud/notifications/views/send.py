@@ -65,7 +65,7 @@ def send_event(request):
             validation_error = True
             error_data['type'] = ['This field is required.']
 
-        if 'type' in request.data and request.data['type'] != 'ipvd_feedback' and 'productId' not in request.data:
+        if 'type' in request.data and request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device' and 'productId' not in request.data:
             validation_error = True
             error_data['productId'] = ['This field is required.']
 
@@ -86,7 +86,7 @@ def send_event(request):
                                       error_data=error_data)
 
         product_id = ''
-        if request.data['type'] != 'ipvd_feedback':
+        if request.data['type'] != 'ipvd_feedback_page' and request.data['type'] != 'ipvd_feedback_device':
             product = Product.objects.filter(id=request.data['productId'])
             if product.exists():
                 request.data['product'] = product.first().name

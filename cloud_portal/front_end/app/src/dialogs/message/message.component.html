@@ -14,6 +14,7 @@
             <div class="form-group">
                 <label for="user_name" translate>Your Name</label>
                 <input type="email" class="form-control"
+                       placeholder="{{ 'John Doe' | translate}}"
                        id="user_name" name="user_name" #user_name="ngModel"
                        [(ngModel)]="userName"
                        maxlength="255"
@@ -22,6 +23,7 @@
             <div class="form-group">
                 <label for="user_email" translate>Email</label>
                 <input type="email" class="form-control"
+                       placeholder="{{ 'john@doe.com' | translate}}"
                        id="user_email" name="user_email" #user_email="ngModel"
                        [(ngModel)]="userEmail"
                        pattern="{{ config.emailRegex }}" maxlength="255"
@@ -32,6 +34,7 @@
                 <textarea class="form-control"
                           [(ngModel)]="message"
                           rows="5" id="message"
+                          placeholder="{{ 'Make sure you include your camera model and manufacture...' | translate}}"
                           name="message" type="text"
                           required nxFocusMe></textarea>
             </div>
