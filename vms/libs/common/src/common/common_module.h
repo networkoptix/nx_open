@@ -289,6 +289,9 @@ public:
 
     QnResourceDataPool* resourceDataPool() const;
 
+    bool runningInTestMode() const { return m_testMode; }
+    void setRunningInTestMode(bool value) { m_testMode = value; }
+
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -355,4 +358,5 @@ private:
     bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};
     nx::utils::SoftwareVersion m_engineVersion;
+    bool m_testMode = false;
 };
