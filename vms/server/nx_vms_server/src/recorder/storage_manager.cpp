@@ -304,7 +304,6 @@ public:
 
     void cancel()
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
         m_cancelled = true;
     }
 
@@ -350,7 +349,7 @@ private:
     int m_totalCatalogs = 0;
     int m_processedCatalogs = 0;
     QMap<QString, StorageProgress> m_storageToProgress;
-    bool m_cancelled = false;
+    std::atomic<bool> m_cancelled = false;
 
     void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
@@ -469,6 +468,11 @@ private:
         lock->unlock();
         if (!needToStop())
             m_owner->createArchiveCameras(archiveCameras);
+
+        if (m_cancelled)
+            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildCanceled);
+        else
+            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
     }
 
     void updateProgress(const QnStorageResourcePtr& storage, Qn::RebuildState state)
@@ -500,6 +504,11 @@ private:
             lock->relock();
             updateProgress(scanTask.storage, Qn::RebuildState::RebuildState_PartialScan);
         }
+
+        if (m_cancelled)
+            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildCanceled);
+        else
+            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveFastScanFinished);
     }
 
     bool hasTasksToProcess()
