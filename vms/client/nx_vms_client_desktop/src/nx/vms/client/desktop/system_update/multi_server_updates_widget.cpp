@@ -928,14 +928,33 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
 {
     closePanelNotifications();
 
+    auto showCancelDialog =
+        [this]() -> bool
+        {
+            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+            // 3. All other cases. Some servers have failed
+            messageBox->setIcon(QnMessageBoxIcon::Question);
+            messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
+            // Layout: R|Yes| |No|
+            auto ok = messageBox->addButton(tr("Yes"),
+                QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+            auto no = messageBox->addButton(tr("No"),
+                QDialogButtonBox::RejectRole);
+            messageBox->setEscapeButton(no);
+            messageBox->exec();
+            return messageBox->clickedButton() == ok;
+        };
     // Cancel all the downloading.
     if (m_widgetState == WidgetUpdateState::downloading)
     {
-        NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
-        auto serversToCancel = m_peersIssued;
-        m_serverUpdateTool->requestStopAction();
-        m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::ready, {});
+        if (showCancelDialog())
+        {
+            NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
+            auto serversToCancel = m_peersIssued;
+            m_serverUpdateTool->requestStopAction();
+            m_clientUpdateTool->resetState();
+            setTargetState(WidgetUpdateState::ready, {});
+        }
     }
     else if (m_widgetState == WidgetUpdateState::installingStalled)
     {
@@ -943,10 +962,26 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
 
         auto serversToCancel = m_stateTracker->getPeersInstalling();
-        m_serverUpdateTool->requestFinishUpdate(true);
-        m_clientUpdateTool->resetState();
-        qnClientMessageProcessor->setHoldConnection(false);
-        setTargetState(WidgetUpdateState::initial, {});
+
+        QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+        // 3. All other cases. Some servers have failed
+        messageBox->setIcon(QnMessageBoxIcon::Question);
+        messageBox->setText(tr("Cancel update and delete all downloaded data?"));
+        // Layout: R|Yes| |No|
+        auto ok = messageBox->addButton(tr("Yes"),
+            QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+        auto no = messageBox->addButton(tr("No"),
+            QDialogButtonBox::RejectRole);
+        messageBox->setEscapeButton(no);
+        messageBox->exec();
+
+        if (messageBox->clickedButton() == ok)
+        {
+            m_serverUpdateTool->requestFinishUpdate(true);
+            m_clientUpdateTool->resetState();
+            qnClientMessageProcessor->setHoldConnection(false);
+            setTargetState(WidgetUpdateState::initial, {});
+        }
     }
     else if (m_widgetState == WidgetUpdateState::complete)
     {
@@ -960,17 +995,23 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     }
     else if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        NX_VERBOSE(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
-        auto serversToCancel = m_stateTracker->getServersInState(StatusCode::readyToInstall);
-        m_serverUpdateTool->requestStopAction();
-        m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::ready, {});
+        if (showCancelDialog())
+        {
+            NX_VERBOSE(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
+            auto serversToCancel = m_stateTracker->getServersInState(StatusCode::readyToInstall);
+            m_serverUpdateTool->requestStopAction();
+            m_clientUpdateTool->resetState();
+            setTargetState(WidgetUpdateState::ready, {});
+        }
     }
     else if (m_widgetState == WidgetUpdateState::pushing)
     {
-        setTargetState(WidgetUpdateState::ready, {});
-        m_serverUpdateTool->stopUpload();
-        m_serverUpdateTool->requestStopAction();
+        if (showCancelDialog())
+        {
+            setTargetState(WidgetUpdateState::ready, {});
+            m_serverUpdateTool->stopUpload();
+            m_serverUpdateTool->requestStopAction();
+        }
     }
     else
     {
@@ -2047,6 +2088,9 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     QString updateTitle;
 
     bool storageSettingsVisible = false;
+    // We have cut storageSettings from 4.0, but I do not want to remove this from the code yet.
+    // This will suppress the warning.
+    Q_UNUSED(storageSettingsVisible);
 
     switch (m_widgetState)
     {
