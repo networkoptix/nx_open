@@ -3,6 +3,7 @@
 #include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 
+#include "../common_socket_impl.h"
 #include "../socket_global.h"
 
 namespace nx {
