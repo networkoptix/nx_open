@@ -145,7 +145,7 @@ ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//b
 ${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//button[@ng-click='share()' and @ng-disabled='!system.isAvailable || currentlyMerging']
 ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
-${DELETE USER MODAL}                  //div[@uib-modal-transclude]
+${DELETE USER MODAL}                  //ngb-modal-window
 ${DELETE USER BUTTON}                 //button[contains(text(), '${DELETE USER BUTTON TEXT}')]
 ${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${CANCEL BUTTON TEXT}")]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']

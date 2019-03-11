@@ -172,8 +172,8 @@ Should respond to tab and go in the correct order
     Element Should Be Focused    ${ACCOUNT LANGUAGE DROPDOWN}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${ENTER}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
-    Element Should Be Focused    //form[@name="accountForm"]//a//span[text()="English (US)"]/..
-    Press Key    //form[@name="accountForm"]//a//span[text()="English (US)"]/..    ${ENTER}
+    Element Should Be Focused    //form[@name="accountForm"]//a//span[1]/..
+    Press Key    //form[@name="accountForm"]//a//span[1]/..    ${ENTER}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
     Element Should Be Focused    ${ACCOUNT SAVE}
     Press Key    ${ACCOUNT SAVE}    ${ENTER}

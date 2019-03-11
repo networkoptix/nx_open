@@ -61,10 +61,10 @@ Change interface language
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //nx-footer//span[@lang='${lang}']/..
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //nx-footer//span[@lang='${lang}']/..
     \  Sleep    2    #to allow the system to change languages
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    ${CREATE ACCOUNT BODY}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    //nx-footer//span[@lang='${lang}']/..
     Click Element    //nx-footer//span[@lang='${lang}']/..
     Sleep    1
-    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
+    Wait Until Element Is Visible    ${CREATE ACCOUNT BODY}
