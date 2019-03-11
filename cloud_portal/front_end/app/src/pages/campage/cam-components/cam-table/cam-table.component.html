@@ -41,7 +41,7 @@
         <nav aria-label="Cameras table navigation" class="pagination-nav pt-3 pb-3">
             <ngb-pagination
                     [collectionSize]="pager.totalItems"
-                    [maxSize]="4"
+                    [maxSize]="pagerMaxSize"
                     [pageSize]="pager.pageSize"
                     [page]="pager.currentPage"
                     (pageChange)="setPage($event)"></ngb-pagination>

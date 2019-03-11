@@ -35,6 +35,7 @@ export class CamTableComponent implements OnChanges, OnInit {
 
   pager: any = {};
   pagedItems: any[];
+  pagerMaxSize: number;
   CONFIG: any = {};
 
   // Options for the Excel export
@@ -77,6 +78,8 @@ export class CamTableComponent implements OnChanges, OnInit {
           this.lang.campage.isMdSupported,
           this.lang.campage.isIoSupported
       ];
+
+      this.pagerMaxSize = this.CONFIG.campage.pagerMaxSize;
   }
 
     byKey(a, b) {
@@ -263,6 +266,11 @@ export class CamTableComponent implements OnChanges, OnInit {
                     key  : 'camera', value: undefined
                 }]);
             // this.uri.updateURI('camera', undefined);
+        }
+
+        // set look'n'feel for pagination element - don't ellipsize 1 page
+        if (this.pager.pages.length - 3 < this.pagerMaxSize) {
+            this.pagerMaxSize = this.pager.pages.length;
         }
     }
 

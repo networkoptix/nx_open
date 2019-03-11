@@ -299,7 +299,8 @@ export class NxConfigService {
                 carouselImageLeave: '0.25s ease-out'
             },
             campage: {
-                vendorGroups: 4
+                vendorGroups: 4,
+                pagerMaxSize: 4
             },
             search: {
                 maxLength   : 200,
