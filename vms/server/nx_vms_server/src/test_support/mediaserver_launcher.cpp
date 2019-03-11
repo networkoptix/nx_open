@@ -135,7 +135,7 @@ void MediaServerLauncher::prepareToStart()
             const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
             serverModule->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
             serverModule->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
-            serverModule->commonModule()->setRunningInTestMode(true);
+            serverModule->commonModule()->setRunningInTestMode();
         });
 
     connect(

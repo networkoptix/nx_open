@@ -290,7 +290,7 @@ public:
     QnResourceDataPool* resourceDataPool() const;
 
     bool runningInTestMode() const { return m_testMode; }
-    void setRunningInTestMode(bool value) { m_testMode = value; }
+    void setRunningInTestMode() { m_testMode = true; }
 
 signals:
     void readOnlyChanged(bool readOnly);
