@@ -205,7 +205,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
         [this](auto&&... args) { onConnectResponse(std::move(args)...); });
 }
 
-std::unique_ptr<hpm::api::MediatorClientUdpConnection> 
+std::unique_ptr<hpm::api::MediatorClientUdpConnection>
     CrossNatConnector::prepareForUdpHolePunching()
 {
     auto mediatorUdpClient =
@@ -407,7 +407,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest(
 
     connectRequest.originatingPeerId = m_cloudConnectController->outgoingTunnelPool().ownPeerId();
     connectRequest.connectSessionId = m_connectSessionId.c_str();
-    connectRequest.connectionMethods = 
+    connectRequest.connectionMethods =
         api::ConnectionMethod::udpHolePunching | api::ConnectionMethod::proxy;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();
     if (m_originatingHostAddressReplacement)

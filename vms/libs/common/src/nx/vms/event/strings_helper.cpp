@@ -450,12 +450,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkRtpPacketLoss:
         {
-            NetworkIssueEvent::PacketLossSequence seq = NetworkIssueEvent::decodePacketLossSequence(reasonParamsEncoded);
-            if (seq.valid)
-                result = tr("RTP packet loss detected, prev seq.=%1 next seq.=%2.").arg(seq.prev).arg(seq.next);
-            else
-                result = tr("RTP packet loss detected.");
-            break;
+            return tr("RTP packet loss detected.");
         }
         case EventReason::networkBadCameraTime:
         {

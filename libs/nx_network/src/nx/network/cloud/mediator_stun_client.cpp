@@ -11,7 +11,7 @@ namespace nx::hpm::api {
 
 MediatorStunClient::MediatorStunClient(
     AbstractAsyncClient::Settings settings,
-    MediatorEndpointProvider* endpointProvider)
+    AbstractMediatorEndpointProvider* endpointProvider)
     :
     base_type(
         [settings]() mutable
@@ -188,7 +188,11 @@ void MediatorStunClient::onFetchEndpointCompletion(
     nx::network::http::StatusCode::Value resultCode)
 {
     if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+    {
+        NX_ASSERT(isInSelfAioThread());
+        scheduleReconnect();
         return failPendingRequests(SystemError::hostUnreachable);
+    }
 
     m_url = nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
         .appendPath(api::kStunOverHttpTunnelPath).toUrl();

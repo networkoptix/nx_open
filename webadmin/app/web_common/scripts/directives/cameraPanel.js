@@ -38,6 +38,34 @@ angular.module('nxCommon')
                     server.collapsed = !server.collapsed;
                     scope.storage.serverStates[server.id] = server.collapsed;
                 };
+    
+                function getIP(addresses) {
+                    function checkIsIPV4(entry) {
+                        var blocks = entry.split('.');
+                        if (blocks.length === 4) {
+                            return blocks.every(function (block) {
+                                return !isNaN(block) &&
+                                    parseInt(block, 10) >= 0 &&
+                                    parseInt(block, 10) <= 255;
+                            });
+                        }
+                        return false;
+                    }
+    
+                    var ips = addresses.split(';'),
+                        ip;
+                    
+                    ips.some(function (tmpIP) {
+                        tmpIP = tmpIP.split(':')[0];
+                        
+                        if (checkIsIPV4(tmpIP)) {
+                            ip = tmpIP;
+                            return true;
+                        }
+                    });
+                    
+                    return ip;
+                }
                 
                 function searchCams(searchText){
                     function has(str, substr){
@@ -58,15 +86,15 @@ angular.module('nxCommon')
                                     has(camera.url, scope.searchCams);
                             camsVisible = camsVisible || camera.visible;
                         });
-
-                        server.visible = scope.searchCams === '' ||
-                            camsVisible /*||
+                        
+                        server.ip = getIP(server.networkAddresses);
+                        server.visible = scope.searchCams === '' || camsVisible; /*||
                             has(server.name, scope.searchCams) ||
-                            has(server.url, scope.searchCams)*/;
+                            has(server.url, scope.searchCams); */
                     });
                 }
 
                 scope.$watch('searchCams',searchCams);
-            }   
+            }
         };
     }]);

@@ -19,16 +19,6 @@ public:
 
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
     static QString encodePrimaryStream(bool isPrimary);
-
-    struct PacketLossSequence
-    {
-        int prev;
-        int next;
-        bool valid;
-    };
-
-    static PacketLossSequence decodePacketLossSequence(const QString& encoded);
-    static QString encodePacketLossSequence(int prev, int next);
 };
 
 } // namespace event
