@@ -293,7 +293,13 @@ private:
     void scanMediaCatalog(
         const QnStorageResourcePtr& storage,
         const DeviceFileCatalogPtr& catalog,
+        const DeviceFileCatalog::ScanFilter& filter,
         nx::caminfo::ArchiveCameraDataList* outArchiveCameras);
+
+    void readCameraInfo(
+        const QnStorageResourcePtr& storage,
+        const QString& cameraPath,
+        nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const;
 
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;

@@ -451,7 +451,9 @@ private:
             }
 
             lock->unlock();
-            m_owner->scanMediaCatalog(scanTask.storage, scanTask.catalog, &archiveCameras);
+            m_owner->scanMediaCatalog(
+                scanTask.storage, scanTask.catalog, DeviceFileCatalog::ScanFilter(),
+                &archiveCameras);
             lock->relock();
             updateProgress(scanTask.storage, Qn::RebuildState::RebuildState_FullScan);
         }
@@ -490,7 +492,8 @@ private:
             m_partialScanTasks.pop_front();
 
             lock->unlock();
-            m_owner->scanMediaCatalog(scanTask.storage, scanTask.catalog, nullptr);
+            m_owner->scanMediaCatalog(
+                scanTask.storage, scanTask.catalog, scanTask.scanFilter, nullptr);
             lock->relock();
             updateProgress(scanTask.storage, Qn::RebuildState::RebuildState_PartialScan);
         }
@@ -1026,11 +1029,62 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
     updateCameraHistory();
 }
 
+void QnStorageManager::readCameraInfo(
+    const QnStorageResourcePtr& storage,
+    const QString& cameraPath,
+    nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const
+{
+    auto getFileDataFunc =
+        [&storage](const QString& filePath)
+        {
+            auto file = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::ReadOnly));
+            if (!file)
+                return QByteArray();
+            return file->readAll();
+        };
+
+    nx::caminfo::ServerReaderHandler readerHandler(moduleGUID(), resourcePool());
+    nx::caminfo::Reader(
+        &readerHandler,
+        QnAbstractStorageResource::FileInfo(cameraPath, true),
+        getFileDataFunc)(outArchiveCameras);
+}
+
 void QnStorageManager::scanMediaCatalog(
     const QnStorageResourcePtr& storage,
     const DeviceFileCatalogPtr& catalog,
+    const DeviceFileCatalog::ScanFilter& filter,
     nx::caminfo::ArchiveCameraDataList* outArchiveCameras)
 {
+    const auto cameraUuid = catalog->cameraUniqueId();
+    const auto quality = catalog->getCatalog();
+    const auto qualityPath =
+        closeDirPath(closeDirPath(storage->getUrl())
+        + DeviceFileCatalog::prefixByCatalog(quality));
+
+    const auto cameraPath = QDir(qualityPath).absoluteFilePath(cameraUuid);
+    if (!storage->isDirExists(cameraPath))
+    {
+        DeviceFileCatalogPtr newCatalog(
+            new DeviceFileCatalog(serverModule(), cameraUuid, quality, m_role));
+
+        replaceChunks(
+            QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()),
+            storage, newCatalog, cameraUuid, quality);
+
+        return;
+    }
+
+    if (outArchiveCameras != nullptr)
+        readCameraInfo(storage, cameraPath, outArchiveCameras);
+
+    QMap<qint64, DeviceFileCatalog::Chunk> newChunks;
+    QVector<DeviceFileCatalog::EmptyFileInfo> emptyFileList;
+    DeviceFileCatalogPtr newCatalog(
+        new DeviceFileCatalog(serverModule(), cameraUuid, quality, m_role));
+
+    newCatalog->scanMediaFiles(cameraPath, storage, newChunks, emptyFileList, filter);
+    replaceChunks(filter.scanPeriod, storage, newCatalog, cameraUuid, quality);
 }
 
 void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter)
