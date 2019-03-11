@@ -1,10 +1,12 @@
 #include "unreliable_message_pipeline.h"
 
+#include "nx/network/socket_factory.h"
+
 namespace nx {
 namespace network {
 
 DatagramPipeline::DatagramPipeline():
-    m_socket(SocketFactory::createUdpSocket())
+    m_socket(SocketFactory::createDatagramSocket())
 {
     // TODO: #ak Should report this error to the caller.
     NX_ASSERT(m_socket->setNonBlockingMode(true));
@@ -52,12 +54,12 @@ void DatagramPipeline::stopReceivingMessagesSync()
     m_socket->cancelIOSync(aio::etRead);
 }
 
-const std::unique_ptr<network::UDPSocket>& DatagramPipeline::socket()
+const std::unique_ptr<AbstractDatagramSocket>& DatagramPipeline::socket()
 {
     return m_socket;
 }
 
-std::unique_ptr<network::UDPSocket> DatagramPipeline::takeSocket()
+std::unique_ptr<AbstractDatagramSocket> DatagramPipeline::takeSocket()
 {
     m_terminationFlag.markAsDeleted();
     m_socket->cancelIOSync(aio::etNone);

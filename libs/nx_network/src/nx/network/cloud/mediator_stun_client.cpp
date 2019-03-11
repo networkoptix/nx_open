@@ -99,10 +99,10 @@ void MediatorStunClient::setKeepAliveOptions(
 
 void MediatorStunClient::stopWhileInAioThread()
 {
-    base_type::stopWhileInAioThread();
-
     m_reconnectTimer.pleaseStopSync();
     m_alivenessTester.reset();
+
+    base_type::stopWhileInAioThread();
 }
 
 void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)

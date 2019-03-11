@@ -55,7 +55,8 @@ public:
         SocketAddress destinationEndpoint,
         const Message& message,
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
-    const std::unique_ptr<network::UDPSocket>& socket();
+
+    const std::unique_ptr<AbstractDatagramSocket>& socket();
 
     virtual nx::network::server::Statistics statistics() const override;
 

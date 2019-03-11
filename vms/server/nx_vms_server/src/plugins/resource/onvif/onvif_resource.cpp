@@ -1124,7 +1124,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     </tt:Message>
 */
 
-const char* QnPlOnvifResource::attributeTextByName(
+/*static*/ const char* QnPlOnvifResource::attributeTextByName(
     const soap_dom_element* element, const char* attributeName)
 {
     NX_ASSERT(attributeName);
@@ -1137,7 +1137,7 @@ const char* QnPlOnvifResource::attributeTextByName(
     return text;
 }
 
-QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseSimpleItem(
+/*static*/ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseSimpleItem(
     const soap_dom_element* element)
 {
     // if an element is a simple item, it has the only subelement
@@ -1147,7 +1147,7 @@ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseSimpleItem(
     return onvifSimpleItem(name, value);
 }
 
-QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseChildSimpleItem(
+/*static*/ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseChildSimpleItem(
     const soap_dom_element* element)
 {
     if (element->elts)
@@ -1156,7 +1156,7 @@ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseChildSimpleItem(
         return onvifSimpleItem();
 }
 
-std::vector<QnPlOnvifResource::onvifSimpleItem> QnPlOnvifResource::parseChildSimpleItems(
+/*static*/ std::vector<QnPlOnvifResource::onvifSimpleItem> QnPlOnvifResource::parseChildSimpleItems(
     const soap_dom_element* element)
 {
     // if an element contains a simple item, it has the only subelement
@@ -1170,7 +1170,7 @@ std::vector<QnPlOnvifResource::onvifSimpleItem> QnPlOnvifResource::parseChildSim
     return result;
 }
 
-void QnPlOnvifResource::parseSourceAndData(
+/*static*/ void QnPlOnvifResource::parseSourceAndData(
     const soap_dom_element* element,
     std::vector<QnPlOnvifResource::onvifSimpleItem>* source,
     QnPlOnvifResource::onvifSimpleItem* data)
@@ -1191,9 +1191,68 @@ void QnPlOnvifResource::parseSourceAndData(
     }
 }
 
+/*static*/ QString QnPlOnvifResource::parseEventTopic(const char* text)
+{
+    NX_ASSERT(text);
+    QString result(text);
+    // Remove namespaces: e.g. ns:Device/ns:Trigger/ns:Relay -> Device/Trigger/Relay
+    QStringList eventTopicTokens = result.split(QChar('/'));
+    for (QString& token: eventTopicTokens)
+    {
+        int nsSepIndex = token.indexOf(QChar(':'));
+        if (nsSepIndex != -1)
+            token.remove(0, nsSepIndex + 1);
+    }
+    result = eventTopicTokens.join(QChar('/'));
+    return result;
+}
+
+/*static*/ QDateTime QnPlOnvifResource::parseDateTime(
+    const soap_dom_attribute* att, QTimeZone timeZone)
+{
+    QString dateTimeAsText;
+    while (att && att->name && att->text)
+    {
+        if (QByteArray(att->name).toLower() == "utctime")
+            dateTimeAsText = QString(att->text); // example: "2018-04-30T21:18:37Z"
+        att = att->next;
+    }
+
+    QDateTime dateTime = QDateTime::fromString(dateTimeAsText, Qt::ISODate);
+    if (dateTime.timeSpec() == Qt::LocalTime)
+        dateTime.setTimeZone(timeZone);
+    if (dateTime.timeSpec() != Qt::UTC)
+        dateTime = dateTime.toUTC();
+
+    return dateTime;
+}
+
+/*static*/ std::string QnPlOnvifResource::makeItemNameList(
+    const std::vector<onvifSimpleItem>& items)
+{
+    std::string result;
+    for (const auto& item: items)
+    {
+        result += item.name;
+        result += ", ";
+    }
+    if (!result.empty())
+    {
+        result.pop_back();
+        result.pop_back();
+    }
+    return result;
+}
+
 void QnPlOnvifResource::handleOneNotification(
     const oasisWsnB2__NotificationMessageHolderType& notification, time_t minNotificationTime)
 {
+    std::cout << "Event " << std::endl;
+    /*
+        TODO: #szaitsev: This function should be completely rewritten in 4.1.
+        In does not correspond onvif specification.
+        ONVIF Core Specification – Ver. 18.12 (or later), paragraph 9.
+    */
     const auto now = qnSyncTime->currentUSecsSinceEpoch();
     if (m_clearInputsTimeoutUSec > 0)
     {
@@ -1210,31 +1269,18 @@ void QnPlOnvifResource::handleOneNotification(
 
     if (!notification.Message.__any.name)
     {
-        NX_VERBOSE(this, lit("Received notification with empty message. Ignoring..."));
+        NX_DEBUG(this, "Received notification with empty message. Notification ignored.");
         return;
     }
 
-    if (!notification.Topic ||
-        !notification.Topic->__any.text)
+    if (!notification.Topic || !notification.Topic->__any.text)
     {
-        NX_VERBOSE(this, lit("Received notification with no topic specified. Ignoring..."));
+        NX_DEBUG(this, "Received notification with no topic specified. Notification ignored.");
         return;
     }
+    NX_VERBOSE(this, "%1 Received notification %2", getUrl(), notification.Topic->__any.text);
 
-    QString eventTopic(QLatin1String(notification.Topic->__any.text));
-
-    NX_VERBOSE(this, lit("%1 Received notification %2").arg(getUrl()).arg(eventTopic));
-
-    // eventTopic may have namespaces. E.g., ns:Device/ns:Trigger/ns:Relay,
-    // but we want Device/Trigger/Relay. Fixing...
-    QStringList eventTopicTokens = eventTopic.split(QLatin1Char('/'));
-    for(QString& token: eventTopicTokens)
-    {
-        int nsSepIndex = token.indexOf(QLatin1Char(':'));
-        if (nsSepIndex != -1)
-            token.remove(0, nsSepIndex+1);
-    }
-    eventTopic = eventTopicTokens.join(QLatin1Char('/'));
+    const QString eventTopic = parseEventTopic(notification.Topic->__any.text);
 
     const auto topicsToCheck = notificationTopicsForMonitoring();
     const bool topicIsFound = std::any_of(
@@ -1244,32 +1290,19 @@ void QnPlOnvifResource::handleOneNotification(
 
     if (!topicIsFound)
     {
-        NX_VERBOSE(this, "Received notification with unknown topic: %1. Notification ignored.",
-            notification.Topic->__any.text);
+        NX_DEBUG(this,
+            "Received notification with unknown topic: %1. Notification ignored.", eventTopic);
         return;
     }
 
-    // parsing Message
-    soap_dom_attribute* att = notification.Message.__any.atts;
-    QString text;
-    while (att && att->name && att->text)
-    {
-        if (QByteArray(att->name).toLower() == "utctime")
-            text = QString(att->text); // example: "2018-04-30T21:18:37Z"
-        att = att->next;
-    }
-
-    QDateTime dateTime = QDateTime::fromString(text, Qt::ISODate);
-    if (dateTime.timeSpec() == Qt::LocalTime)
-        dateTime.setTimeZone(m_cameraTimeZone);
-    if (dateTime.timeSpec() != Qt::UTC)
-        dateTime = dateTime.toUTC();
+    const QDateTime dateTime = parseDateTime(notification.Message.__any.atts, m_cameraTimeZone);
 
     const time_t notificationTime = dateTime.toTime_t();
 
     if ((minNotificationTime != (time_t)-1) && (notificationTime < minNotificationTime))
     {
         // DW camera can deliver old cached notifications. We ignore them.
+        NX_DEBUG(this, "Received outdated notification. Notification ignored.");
         return;
     }
 
@@ -1277,15 +1310,21 @@ void QnPlOnvifResource::handleOneNotification(
     onvifSimpleItem data;
     parseSourceAndData(&notification.Message.__any, &source, &data);
 
+    if (source.empty())
+    {
+        NX_DEBUG(this, "Received notification with empty message source. Notification ignored.");
+        return;
+    }
+
     bool sourceIsExplicitRelayInput = false;
 
     //checking that there is single source and this source is a relay port
     auto portSourceIter = source.cend();
-    const auto inputSourceNames = allowedInputSourceNames();
+    const auto allowedInputSourceNameList = allowedInputSourceNames();
     for (auto it = source.cbegin(); it != source.cend(); ++it)
     {
         const auto name = QString::fromStdString(it->name);
-        if (inputSourceNames.find(name.toLower()) != inputSourceNames.cend())
+        if (allowedInputSourceNameList.find(name.toLower()) != allowedInputSourceNameList.cend())
         {
             portSourceIter = it;
             break;
@@ -1298,18 +1337,29 @@ void QnPlOnvifResource::handleOneNotification(
         }
     }
 
+    if (portSourceIter == source.cend())
+    {
+        NX_DEBUG(this,
+            "Received notification with no known message source "
+            "(Received source names = %1). Notification ignored.",
+            makeItemNameList(source));
+        return;
+    }
+
     static const std::set<QString> kStateStrings{
         "logicalstate",
         "state",
         "level",
         "relaylogicalstate"};
 
-    if (portSourceIter == source.end()  //< source is not port
-        || kStateStrings.find(QString::fromStdString(data.name).toLower()) == kStateStrings.cend())
+    if (kStateStrings.find(QString::fromStdString(data.name).toLower()) == kStateStrings.cend())
     {
+        NX_DEBUG(this,
+            "Received notification with unknown message data "
+            "(Received data name = %1). Notification ignored.",
+            data.name);
         return;
     }
-    const QString portSourceValue = QString::fromStdString(portSourceIter->value);
 
     // Some cameras (especially, Vista) send here events on output port, filtering them out.
     // And some cameras, e.g. DW-PF5M1TIR correctly send here events on input port,
@@ -1320,7 +1370,7 @@ void QnPlOnvifResource::handleOneNotification(
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
-            [value = QString::fromStdString(source.front().value).toLower(),
+            [value = QString::fromStdString(portSourceIter->value).toLower(),
                 isWrongToken = m_fixWrongOutputPortToken]
             (const RelayOutputInfo& outputInfo)
             {
@@ -1336,18 +1386,37 @@ void QnPlOnvifResource::handleOneNotification(
     const bool sourceIsRelayOutPort = sourceNameHasPrefixToIgnore
         || (sourceNameMatchesRelayOutPortName && !m_fixWrongInputPortNumber);
 
-    if (!sourceIsExplicitRelayInput && !/*handler.*/source.empty() && sourceIsRelayOutPort)
+    if (!sourceIsExplicitRelayInput && !source.empty() && sourceIsRelayOutPort)
+    {
+        NX_DEBUG(this, "Received notification is about output port.");
         return; //< This is notification about output port.
+    }
+
+    NX_DEBUG(this,
+        "Received notification has been successfully checked for correctness. "
+        "Topic = %1, Time = %2, Source = (%3, %4), Data = (%5, %6)",
+        eventTopic, dateTime.toString("yyyy-MM-dd hh:mm:ss"),
+        portSourceIter->name, portSourceIter->value, data.name, data.value);
+
+    static int e = 0;
+    std::cout << "Event " << ++e << " Topic=" << eventTopic.toStdString() << ", "
+        << dateTime.toString("yyyy-MM-dd hh:mm:ss").toStdString() << ", "
+        << "Source: " << portSourceIter->name << "=" << portSourceIter->value << ", "
+        << "Data: " << data.name << "=" << data.value << std::endl;
 
     // saving port state
     const bool newValue = (data.value == "true")
         || (data.value == "active") || (atoi(data.value.c_str()) > 0);
-    auto& state = m_relayInputStates[portSourceValue];
+
+    const QString portSourceValue = QString::fromStdString(portSourceIter->value);
+
+    auto& state = m_relayInputStates[eventTopic + portSourceValue];
     state.timestamp = now;
     if (state.value != newValue)
     {
         state.value = newValue;
         onRelayInputStateChange(portSourceValue, state);
+        std::cout << "    >>>>>>>>>>>>>Signal" << std::endl;
     }
 }
 
@@ -1731,7 +1800,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     return result;
 }
 
-static QString getRelayOutpuToken(const QnPlOnvifResource::RelayOutputInfo& relayInfo)
+static QString getRelayOutputToken(const QnPlOnvifResource::RelayOutputInfo& relayInfo)
 {
     return QString::fromStdString(relayInfo.token);
 }
@@ -1743,7 +1812,7 @@ QnIOPortDataList QnPlOnvifResource::generateOutputPorts() const
         m_relayOutputInfo.begin(),
         m_relayOutputInfo.end(),
         std::back_inserter(idList),
-        getRelayOutpuToken);
+        getRelayOutputToken);
     QnIOPortDataList result;
     for (const auto& data: idList)
     {
