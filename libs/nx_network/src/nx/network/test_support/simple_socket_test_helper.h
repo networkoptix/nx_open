@@ -636,7 +636,7 @@ void socketConnectToBadAddress(
 
     auto client = clientMaker();
     auto clientGuard = nx::utils::makeScopeGuard(
-        [&client]() { client->pleaseStopSync(); });
+        [&client]() { if (client) client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(
         std::chrono::duration_cast<std::chrono::milliseconds>(sendTimeout).count()));
