@@ -24,19 +24,17 @@ def sign_binary(
     timeout=DEFAULT_TIMEOUT,
     max_retries=DEFAULT_RETRIES
 ):
-
     params = {
         'customization': customization,
         'trusted_timestamping': bool_to_str(trusted_timestamping)
     }
 
-    files = {
-        'file': open(file, 'rb')
-    }
-
     last_status_code = 0
     for current_try in range(1, max_retries + 1):
         print('Signing file {}'.format(file))
+        files = {
+            'file': open(file, 'rb')
+        }
         retries = Retry(
             total=max_retries,
             backoff_factor=0.1)

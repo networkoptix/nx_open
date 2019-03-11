@@ -9,11 +9,9 @@ TimeProtocolServer::TimeProtocolServer(bool sslRequired):
 }
 
 std::shared_ptr<TimeProtocolServer::ConnectionType> TimeProtocolServer::createConnection(
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<AbstractStreamSocket> socket)
 {
-    return std::make_shared<TimeProtocolConnection>(
-        this,
-        std::move(connection));
+    return std::make_shared<TimeProtocolConnection>(std::move(socket));
 }
 
 } // namespace network

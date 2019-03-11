@@ -413,7 +413,13 @@ public:
         const nx::update::Information& info,
         QThread* targetThread = nullptr);
 
+    /** Get information for a current update. It requests /ec2/updateInformation. */
     Handle getUpdateInfo(
+        Result<UpdateInformationData>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Get information for installed update. It requests /ec2/updateInformation?version=installed. */
+    Handle getInstalledUpdateInfo(
         Result<UpdateInformationData>::type&& callback,
         QThread* targetThread = nullptr);
 

@@ -11,7 +11,7 @@ nx_add_target(vms_gateway_core LIBRARY ${library_type} NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway_core_app_info_impl.cpp"
     PUBLIC_LIBS
-        common nx_network nx_fusion nx_utils nx_relaying
+        common nx_network nx_fusion nx_utils
 )
 
 set(mocableNetworkFiles

@@ -132,9 +132,20 @@ void ConnectionBase::stopWhileInAioThread()
     m_httpClient.reset();
 }
 
+void ConnectionBase::pleaseStopSync()
+{
+    if (m_startedClassId)
+    {
+        NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
+            "Please call pleaseStopSync() in the destructor of the nested class.");
+        m_startedClassId = 0;
+        m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
+    }
+}
+
 ConnectionBase::~ConnectionBase()
 {
-    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
+    pleaseStopSync();
 }
 
 nx::utils::Url ConnectionBase::remoteAddr() const
@@ -315,6 +326,8 @@ void ConnectionBase::onHttpClientDone()
 
 void ConnectionBase::startConnection()
 {
+     m_startedClassId = typeid(*this).hash_code();
+
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
     m_connectionGuid = QnUuid::createUuid().toByteArray();

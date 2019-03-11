@@ -239,6 +239,8 @@ public:
 
     void clear();
 
+    bool empty() const;
+
 private:
     AbstractPollSet* m_pollSet = nullptr;
     // TODO #ak: Use cyclic array here to minimize allocations.

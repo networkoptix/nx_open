@@ -7,7 +7,9 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 
 #include <api/global_settings.h>
@@ -185,6 +187,7 @@ QnJsonRestResult SystemMergeProcessor::checkWhetherMergeIsPossible(
     }
 
     MediaServerClient remoteMediaServerClient(remoteServerUrl);
+    remoteMediaServerClient.setRequestTimeout(kRequestTimeout);
     remoteMediaServerClient.setAuthenticationKey(data.getKey);
 
     result = checkIfSystemsHaveServerWithSameId(&remoteMediaServerClient);
@@ -536,25 +539,13 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     const QString& getKey,
     const QString& postKey)
 {
-    /* Read admin user from the remote server */
+    ConfigureSystemData remoteSystemData;
+    remoteSystemData.localSystemId = systemId;
+    remoteSystemData.wholeSystem = true;
+    remoteSystemData.systemName = systemName;
+
     QnJsonRestResult result;
-
-    nx::vms::api::UserDataList users;
-    if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
-    {
-        setMergeError(&result, MergeStatus::configurationFailed);
-        return result;
-    }
-
-    QnJsonRestResult pingRestResult;
-    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
-    {
-        setMergeError(&result, MergeStatus::configurationFailed);
-        return result;
-    }
-
-    QnPingReply pingReply;
-    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
+    if (!fetchRemoteData(remoteUrl, getKey, &remoteSystemData))
     {
         setMergeError(&result, MergeStatus::configurationFailed);
         return result;
@@ -589,25 +580,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     // 2. Updating local data.
-    ConfigureSystemData data;
-    data.localSystemId = systemId;
-    data.wholeSystem = true;
-    data.sysIdTime = pingReply.sysIdTime;
-    data.tranLogTime = pingReply.tranLogTime;
-    data.systemName = systemName;
 
-    for (const auto& userData: users)
-    {
-        QnUserResourcePtr user = ec2::fromApiToResource(userData);
-        if (user->isCloud() || user->isBuiltInAdmin())
-        {
-            data.foreignUsers.push_back(userData);
-            for (const auto& param : user->params())
-                data.additionParams.push_back(param);
-        }
-    }
-
-    if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, data))
+    if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, remoteSystemData))
     {
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to change system name"));
         setMergeError(&result, MergeStatus::configurationFailed);
@@ -648,7 +622,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
-    ec2::ErrorCode errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        systemId, remoteSystemData.sysIdTime, remoteSystemData.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -659,6 +634,114 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     return result;
+}
+
+bool SystemMergeProcessor::fetchRemoteData(
+    const nx::utils::Url& remoteUrl,
+    const QString& getKey,
+    ConfigureSystemData* data)
+{
+    if (!fetchUsers(remoteUrl, getKey, data))
+        return false;
+
+    QnJsonRestResult pingRestResult;
+    if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
+        return false;
+
+    QnPingReply pingReply;
+    if (!QJson::deserialize(pingRestResult.reply, &pingReply))
+        return false;
+
+    data->sysIdTime = pingReply.sysIdTime;
+    data->tranLogTime = pingReply.tranLogTime;
+
+    return true;
+}
+
+bool SystemMergeProcessor::fetchUsers(
+    const nx::utils::Url& remoteUrl,
+    const QString& getKey,
+    ConfigureSystemData* data)
+{
+    nx::vms::api::UserDataList users;
+    if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
+        return false;
+
+    nx::vms::api::UserDataList cloudUsers;
+    std::copy_if(
+        users.begin(), users.end(),
+        std::back_inserter(cloudUsers),
+        [](const auto& user) { return user.isCloud; });
+
+    if (!fetchUserParams(remoteUrl, getKey, cloudUsers, data))
+        return false;
+
+    for (const auto& userData: users)
+    {
+        QnUserResourcePtr user = ec2::fromApiToResource(userData);
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            data->foreignUsers.push_back(userData);
+
+            for (const auto& param: user->params())
+                data->additionParams.push_back(param);
+        }
+    }
+
+    return true;
+}
+
+bool SystemMergeProcessor::fetchUserParams(
+    const nx::utils::Url& remoteUrl,
+    const QString& getKey,
+    const nx::vms::api::UserDataList& users,
+    ConfigureSystemData* data)
+{
+    MediaServerClient mediaServerClient(remoteUrl);
+    mediaServerClient.setRequestTimeout(kRequestTimeout);
+    mediaServerClient.setAuthenticationKey(getKey);
+
+    std::vector<std::tuple<QnUuid, ec2::ErrorCode, nx::vms::api::ResourceParamDataList>>
+        getUsersParamsResults;
+
+    nx::utils::Counter expectedResponseCount(users.size());
+
+    for (const auto& user: users)
+    {
+        mediaServerClient.ec2GetResourceParams(
+            user.id,
+            [this, &getUsersParamsResults, &expectedResponseCount, userId = user.id](
+                ec2::ErrorCode resultCode,
+                nx::vms::api::ResourceParamDataList params)
+            {
+                getUsersParamsResults.push_back(std::make_tuple(userId, resultCode, std::move(params)));
+                expectedResponseCount.decrement();
+            });
+    }
+
+    expectedResponseCount.wait();
+
+    for (const auto& [userId, resultCode, params]: getUsersParamsResults)
+    {
+        if (resultCode != ec2::ErrorCode::ok)
+        {
+            NX_DEBUG(this, "Failed to fetch user %1 params from %2. %3",
+                userId, remoteUrl, resultCode);
+            return false;
+        }
+
+        for (const auto& param: params)
+        {
+            NX_VERBOSE(this, "Fetching for resaving. user %1, name %2, value %3",
+                userId, param.name, param.value);
+            data->additionParams.push_back({userId, param.name, param.value});
+        }
+
+        NX_VERBOSE(this, "Fetched %1 params of user %2 from %3",
+            params.size(), userId, remoteUrl);
+    }
+
+    return true;
 }
 
 bool SystemMergeProcessor::isResponseOK(const nx::network::http::HttpClient& client)

@@ -35,7 +35,12 @@ int FileInformation::calculateDownloadedBytes() const
 
 QString FileInformation::key() const
 {
-    return QFileInfo(name).fileName();
+    return keyFromFileName(name);
+}
+
+QString FileInformation::keyFromFileName(const QString& fileName)
+{
+    return QFileInfo(fileName).fileName();
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)

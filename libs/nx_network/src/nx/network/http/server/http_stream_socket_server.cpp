@@ -13,7 +13,6 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
     std::unique_ptr<AbstractStreamSocket> _socket)
 {
     auto result = std::make_shared<HttpServerConnection>(
-        this,
         std::move(_socket),
         m_authenticationManager,
         m_httpMessageDispatcher);

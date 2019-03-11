@@ -51,20 +51,19 @@ private:
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
 
-    qint64 m_firstEncodedPts;
     bool m_mtMode;
 
     QElapsedTimer m_encodeTimer;
     qint64 m_lastEncodedTime;
     qint64 m_averageCodingTimePerFrame;
     qint64 m_averageVideoTimePerFrame;
-    qint64 m_encodedFrames;
     qint64 m_droppedFrames;
 
     bool m_useRealTimeOptimization;
     AVPacket* m_outPacket;
     QnConstMediaContextPtr m_ctxPtr;
     nx::metrics::Storage* m_metrics = nullptr;
+    std::map<qint64, qint64> m_frameNumToPts;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

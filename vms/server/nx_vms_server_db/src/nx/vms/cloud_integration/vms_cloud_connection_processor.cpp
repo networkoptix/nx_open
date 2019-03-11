@@ -10,8 +10,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <rest/server/json_rest_result.h>
+#include <utils/common/synctime.h>
 
 #include <nx/cloud/db/api/connection.h>
+#include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/sync_call.h>
 #include <nx/vms/api/data/cloud_system_data.h>
@@ -49,7 +51,11 @@ nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::bindSystemToCl
     if (!checkInternetConnection(result))
         return nx::network::http::StatusCode::badRequest;
 
-    if (!saveCloudData(data, result))
+    nx::cloud::db::api::AuthInfo cloudOwnerOfflineAuthInfo;
+    if (!fetchCloudUserOfflineAuthInfo(data, &cloudOwnerOfflineAuthInfo))
+        return nx::network::http::StatusCode::badRequest;
+
+    if (!saveCloudData(data, cloudOwnerOfflineAuthInfo, result))
         return nx::network::http::StatusCode::internalServerError;
 
     // Trying to connect to the cloud to activate system.
@@ -321,14 +327,77 @@ bool VmsCloudConnectionProcessor::checkInternetConnection(
     return true;
 }
 
+bool VmsCloudConnectionProcessor::fetchCloudUserOfflineAuthInfo(
+    const CloudCredentialsData& data,
+    nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo)
+{
+    namespace cdbApi = nx::cloud::db::api;
+    using namespace std::chrono;
+
+    // Cloud has already generated and sended keys via synchronization connection.
+    // But, it can take indefinite time for those data to reach mediaserver.
+    static constexpr auto kInitialOfflineLoginKeyPeriod = hours(24);
+
+    auto cloudConnection = m_cloudManagerGroup->connectionManager.getCloudConnection(
+        data.cloudSystemID, data.cloudAuthKey);
+
+    // Fetching nonce.
+    auto [cdbResultCode, nonceData] =
+        makeSyncCall<cdbApi::ResultCode, cdbApi::NonceData>(
+            static_cast<void(cdbApi::AuthProvider::*)(
+                std::function<void(cdbApi::ResultCode, cdbApi::NonceData)>)>(
+                    &cdbApi::AuthProvider::getCdbNonce),
+            cloudConnection->authProvider(),
+            std::placeholders::_1);
+    if (cdbResultCode != cdbApi::ResultCode::ok)
+    {
+        NX_INFO(this, "Error fetching cloud nonce for system %1. %2",
+            data.cloudSystemID, toString(cdbResultCode));
+        return false;
+    }
+
+    // Fetching authentication key.
+    cdbApi::AuthRequest authRequest;
+    authRequest.nonce = nonceData.nonce;
+    authRequest.realm = nx::network::AppInfo::realm().toStdString();
+    authRequest.username = data.cloudAccountName.toStdString();
+    cdbApi::AuthResponse authResponse;
+    std::tie(cdbResultCode, authResponse) =
+        makeSyncCall<cdbApi::ResultCode, cdbApi::AuthResponse>(
+            &cdbApi::AuthProvider::getAuthenticationResponse,
+            cloudConnection->authProvider(),
+            authRequest,
+            std::placeholders::_1);
+    if (cdbResultCode != cdbApi::ResultCode::ok)
+    {
+        NX_INFO(this, "Error fetching cloud auth keys for system %1, user %2. %3",
+            data.cloudSystemID, data.cloudAccountName, toString(cdbResultCode));
+        return false;
+    }
+
+    cloudOwnerOfflineAuthInfo->records.push_back(cdbApi::AuthInfoRecord());
+    cloudOwnerOfflineAuthInfo->records.back().nonce = nonceData.nonce;
+    cloudOwnerOfflineAuthInfo->records.back().intermediateResponse =
+        authResponse.intermediateResponse;
+    cloudOwnerOfflineAuthInfo->records.back().expirationTime =
+        system_clock::from_time_t(duration_cast<seconds>(qnSyncTime->currentTimePoint()).count()) +
+        kInitialOfflineLoginKeyPeriod;
+
+    NX_DEBUG(this, "Got cloud user %1 offline login info for system %2",
+        data.cloudAccountName, data.cloudSystemID);
+
+    return true;
+}
+
 bool VmsCloudConnectionProcessor::saveCloudData(
     const CloudCredentialsData& data,
+    const nx::cloud::db::api::AuthInfo& cloudOwnerOfflineAuthInfo,
     QnJsonRestResult* result)
 {
     if (!saveCloudCredentials(data, result))
         return false;
 
-    if (!insertCloudOwner(data, result))
+    if (!insertCloudOwner(data, cloudOwnerOfflineAuthInfo, result))
         return false;
 
     return true;
@@ -358,6 +427,7 @@ bool VmsCloudConnectionProcessor::saveCloudCredentials(
 
 bool VmsCloudConnectionProcessor::insertCloudOwner(
     const CloudCredentialsData& data,
+    const nx::cloud::db::api::AuthInfo& cloudOwnerOfflineAuthInfo,
     QnJsonRestResult* result)
 {
     nx::vms::api::UserData userData;
@@ -372,12 +442,32 @@ bool VmsCloudConnectionProcessor::insertCloudOwner(
     userData.hash = nx::vms::api::UserData::kCloudPasswordStub;
     userData.digest = nx::vms::api::UserData::kCloudPasswordStub;
 
-    const auto resultCode =
-        m_commonModule->ec2Connection()
+    auto resultCode = m_commonModule->ec2Connection()
         ->getUserManager(Qn::kSystemAccess)->saveSync(userData);
     if (resultCode != ec2::ErrorCode::ok)
     {
         NX_WARNING(this, lm("Error inserting cloud owner to the local DB. %1").arg(resultCode));
+        result->setError(
+            QnJsonRestResult::CantProcessRequest,
+            QString("Failed to save %1 owner to local DB").arg(nx::network::AppInfo::cloudName()));
+        return false;
+    }
+
+    // Saving offline login info.
+    api::ResourceParamWithRefDataList cloudOwnerParams;
+    cloudOwnerParams.resize(1);
+    cloudOwnerParams.front().resourceId = userData.id;
+    cloudOwnerParams.front().name = nx::cloud::db::api::kVmsUserAuthInfoAttributeName;
+    cloudOwnerParams.front().value = QJson::serialized(cloudOwnerOfflineAuthInfo);
+
+    NX_VERBOSE(this, "Saving offline login info. System %1, user %2, info %3",
+        data.cloudSystemID, data.cloudAccountName, cloudOwnerParams.front().value);
+
+    resultCode = m_commonModule->ec2Connection()
+        ->getResourceManager(Qn::kSystemAccess)->saveSync(std::move(cloudOwnerParams));
+    if (resultCode != ec2::ErrorCode::ok)
+    {
+        NX_WARNING(this, lm("Error inserting cloud owner params to the local DB. %1").arg(resultCode));
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             QString("Failed to save %1 owner to local DB").arg(nx::network::AppInfo::cloudName()));

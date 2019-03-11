@@ -217,12 +217,12 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    if (const auto entryPoint = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
+    if (const auto entryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib.resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
 
-        const auto plugin = entryPoint();
+        const auto plugin = entryPointFunc();
         if (!plugin)
         {
             NX_ERROR(this, "Failed to load Nx old SDK plugin [%1]: entry function returned null",

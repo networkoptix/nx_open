@@ -32,20 +32,25 @@ QnPtzControllerPtr wrap(
     Ptz::Capabilities capabilitiesToAdd,
     Ptz::Capabilities capabilitiesToRemove)
 {
-    auto wrappedController = controller;
     const auto requiredCapabilities = overridenCapabilities(
         controller,
         capabilitiesToAdd,
         capabilitiesToRemove);
 
+    QnPtzControllerPtr overridenController = controller;
     if (requiredCapabilities != capabilities(controller))
     {
-        wrappedController.reset(new core_ptz::OverridenCapabilitiesPtzController(
-            wrappedController,
+        overridenController.reset(new core_ptz::OverridenCapabilitiesPtzController(
+            controller,
             requiredCapabilities));
     }
 
+    auto wrappedController = overridenController;
     wrapper(&wrappedController);
+    if (wrappedController == overridenController)
+        return controller;
+
+    NX_VERBOSE(controller.get(), "Is wrapped by %1", wrappedController.get());
     return wrappedController;
 }
 

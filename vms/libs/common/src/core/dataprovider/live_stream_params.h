@@ -15,6 +15,8 @@ struct QnLiveStreamParams
     int bitrateKbps = 0;
     QSize resolution;
     QString codec;
+
+    QString toString() const;
 };
 #define QnLiveStreamParams_Fields (quality)(fps)(bitrateKbps)(resolution)(codec)
 QN_FUSION_DECLARE_FUNCTIONS(QnLiveStreamParams, (eq)(json))

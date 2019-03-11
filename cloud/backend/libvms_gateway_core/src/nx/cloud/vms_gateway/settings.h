@@ -12,8 +12,6 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/std/optional.h>
 
-#include <nx/cloud/relaying/settings.h>
-
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -107,7 +105,6 @@ public:
     const Http& http() const;
     const Proxy& proxy() const;
     const CloudConnect& cloudConnect() const;
-    const relaying::Settings& listeningPeer() const;
 
 protected:
     virtual void loadSettings() override;
@@ -120,7 +117,6 @@ private:
     Http m_http;
     Proxy m_proxy;
     CloudConnect m_cloudConnect;
-    relaying::Settings m_listeningPeer;
 };
 
 } // namespace conf

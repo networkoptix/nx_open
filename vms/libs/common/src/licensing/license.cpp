@@ -92,37 +92,21 @@ bool isSignatureMatch(
 
 /** Make sure class names totally the same as on the activation server. */
 static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
-    LicenseTypeInfo(Qn::LC_Trial,           "trial",         /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_Analog,          "analog",        /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_Professional,    "digital",       /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Edge,            "edge",          /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_Start,           "starter",                         0, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Free,            "free",          /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Bridge,          "bridge",        /*allowedForArm*/ 1, false),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              /*allowedForArm*/ 1, false),
+    LicenseTypeInfo{Qn::LC_Trial, "trial", false},
+    LicenseTypeInfo{Qn::LC_Analog, "analog", false},
+    LicenseTypeInfo{Qn::LC_Professional, "digital", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Edge, "edge", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_VMAX, "vmax", false},
+    LicenseTypeInfo{Qn::LC_AnalogEncoder, "analogencoder", false},
+    LicenseTypeInfo{Qn::LC_VideoWall, "videowall", false},
+    LicenseTypeInfo{Qn::LC_IO, "iomodule", false},
+    LicenseTypeInfo{Qn::LC_Start, "starter", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Free, "free", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Bridge, "bridge", false},
+    LicenseTypeInfo{Qn::LC_Invalid, "", false},
 };
 
 } // namespace
-
-//-------------------------------------------------------------------------------------------------
-// LicenseTypeInfo
-
-LicenseTypeInfo::LicenseTypeInfo(
-    Qn::LicenseType licenseType,
-    const QnLatin1Array& className,
-    bool allowedForARM,
-    bool allowedToShareChannel)
-    :
-    licenseType(licenseType),
-    className(className),
-    allowedForARM(allowedForARM),
-    allowedToShareChannel(allowedToShareChannel)
-{
-}
 
 //-------------------------------------------------------------------------------------------------
 // QnLicense

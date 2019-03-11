@@ -187,6 +187,7 @@ int VideoStream::initializeInput()
 
     setInputFormatOptions(inputFormat);
 
+    NX_DEBUG(this, "Initialize usb camera %1, with parameters: %2", m_url, m_codecParams.toString());
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;

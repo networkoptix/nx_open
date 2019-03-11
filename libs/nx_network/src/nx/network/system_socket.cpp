@@ -610,9 +610,10 @@ template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
-
+    // Calling m_aioHelper->bindToAioThread first so that it is able to detect aio thread change.
     m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 template<typename SocketInterfaceToImplement>
@@ -1022,6 +1023,7 @@ TCPSocket::TCPSocket(int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::TCPSocket(int newConnSD, int ipVersion):
@@ -1033,10 +1035,12 @@ TCPSocket::TCPSocket(int newConnSD, int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::~TCPSocket()
 {
+    --SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 bool TCPSocket::getProtocol(int* protocol) const
@@ -1440,6 +1444,16 @@ TCPServerSocket::~TCPServerSocket()
         .isSocketBeingMonitored(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
         "deleting socket if you delete socket from non-aio thread");
+}
+
+void TCPServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    // Calling asyncServerSocketHelper.bindToAioThread first so that it is able to detect
+    // aio thread change.
+    static_cast<TCPServerSocketPrivate*>(impl())->
+        asyncServerSocketHelper.bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 int TCPServerSocket::accept(int sockDesc)

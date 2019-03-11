@@ -370,9 +370,16 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $scope.enableFullScreen = screenfull.enabled;
+    
+        var fullElement = document.getElementById('fullscreen-area');
+    
+        angular.element(fullElement).on('dblclick', function (event) {
+            screenfull.toggle(fullElement);
+        });
+    
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
-                screenfull.request($('.fullscreen-area').get(0));
+                screenfull.request(fullElement);
             }
         };
 
@@ -394,7 +401,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.closeFullscreen = function(){
             screenfull.exit();
-        }
+        };
 
         $scope.showCamerasPanel = function(){
             $scope.showCameraPanel=true;

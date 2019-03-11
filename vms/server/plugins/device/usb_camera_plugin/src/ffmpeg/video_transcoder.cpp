@@ -79,7 +79,7 @@ int VideoTranscoder::initialize(
     return status;
 }
 
-std::shared_ptr<ffmpeg::Frame> VideoTranscoder::decode(const ffmpeg::Packet * packet)
+std::shared_ptr<ffmpeg::Frame> VideoTranscoder::decode(const ffmpeg::Packet* packet)
 {
     if (!m_decoder)
         return nullptr;
@@ -108,7 +108,7 @@ std::shared_ptr<ffmpeg::Frame> VideoTranscoder::decode(const ffmpeg::Packet * pa
     return frame;
 }
 
-int VideoTranscoder::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket)
+int VideoTranscoder::encode(const ffmpeg::Frame* frame, ffmpeg::Packet* outPacket)
 {
     int result = m_encoder->sendFrame(frame->frame());
     if (result == 0 || result == AVERROR(EAGAIN))

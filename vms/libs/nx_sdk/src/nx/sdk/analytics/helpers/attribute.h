@@ -20,9 +20,11 @@ public:
     virtual const char* name() const override;
     virtual const char* value() const override;
 
+    void setValue(std::string value) { m_value = std::move(value); }
+
 private:
-    Type m_type;
-    std::string m_name;
+    const Type m_type;
+    const std::string m_name;
     std::string m_value;
 };
 

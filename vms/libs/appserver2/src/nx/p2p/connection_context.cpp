@@ -29,7 +29,7 @@ bool ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
     auto itr = remoteSubscription.values.find(peerId);
     if (itr == remoteSubscription.values.end())
     {
-        if (!remoteSubscribeAll)
+        if (!isRemoteSubscribedToAll)
             return false;
         itr = remoteSubscription.values.insert(peerId, 0);
     }

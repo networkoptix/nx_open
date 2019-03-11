@@ -555,4 +555,13 @@ void AioTaskQueue::clear()
     // Freeing everything without mutex locked.
 }
 
+bool AioTaskQueue::empty() const
+{
+    QnMutexLocker lock(&mutex);
+
+    return m_postedCalls.empty()
+        && m_pollSetModificationQueue.empty()
+        && m_periodicTasksByClock.empty();
+}
+
 } // namespace nx::network::aio::detail

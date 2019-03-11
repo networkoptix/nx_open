@@ -510,7 +510,7 @@ TEST_F(QnLicenseUsageHelperTest, checkStartLicensesArmActivating)
     addLicenses(Qn::LC_Start, 8);
 
     addRecordingCameras(Qn::LC_Professional, 1, true);
-    ASSERT_FALSE(m_helper->isValid());
+    ASSERT_TRUE(m_helper->isValid());
 }
 
 TEST_F(QnLicenseUsageHelperTest, checkProLicensesArmActivating)

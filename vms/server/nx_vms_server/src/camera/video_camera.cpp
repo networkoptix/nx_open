@@ -901,6 +901,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
     }
     else if (ensureInitialized)
     {
+        NX_VERBOSE(this, "Trying to init not initialized camera [%1]", m_resource);
         m_resource->initAsync(true);
     }
 

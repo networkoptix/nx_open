@@ -368,9 +368,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
         return chunk;
     }
 
-    if (!storage->isFileExists(fileName))
-        return chunk;
-
     auto    nameParts   = QnFile::baseName(fileName).split(lit("_"));
     int64_t startTimeMs = nameParts[0].toLongLong();
     int64_t durationMs  = nameParts[1].toInt();

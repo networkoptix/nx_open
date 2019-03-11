@@ -1,5 +1,9 @@
 #include "object_metadata.h"
 
+#include <algorithm>
+
+#include <nx/kit/debug.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -64,9 +68,26 @@ void ObjectMetadata::setSubtype(const std::string& value)
     m_subtype = value;
 }
 
-void ObjectMetadata::setAttributes(const std::vector<Attribute>& value)
+void ObjectMetadata::addAttributes(const std::vector<Attribute>& value)
 {
-    m_attributes = value;
+    for (const auto& newAttribute: value)
+    {
+        auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
+            [newAttributeName = newAttribute.name()](const Attribute& attribute)
+            {
+                return strcmp(attribute.name(), newAttributeName) == 0;
+            });
+
+        if (existingAttribute != m_attributes.end())
+        {
+            NX_KIT_ASSERT(existingAttribute->type() == newAttribute.type());
+            existingAttribute->setValue(newAttribute.value());
+        }
+        else
+        {
+            m_attributes.push_back(newAttribute);
+        }
+    }
 }
 
 void ObjectMetadata::setAuxiliaryData(std::string auxiliaryData)

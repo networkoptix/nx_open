@@ -1055,35 +1055,22 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
     state.hasChanges = true;
     state.recording.enabled.setUser(value);
 
-    if (value && !state.recording.schedule.hasValue())
-    {
-        ScheduleTasks tasks;
-        for (int dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
-        {
-            QnScheduleTask data;
-            data.dayOfWeek = dayOfWeek;
-            data.startTime = 0;
-            data.endTime = 86400;
-            tasks << data;
-        }
-        state.recording.schedule.setUser(tasks);
-    }
-
     const bool emptyScheduleHintDisplayed = state.recordingHint.has_value()
-		&& *state.recordingHint == State::RecordingHint::emptySchedule;
+        && *state.recordingHint == State::RecordingHint::emptySchedule;
 
     if (value)
     {
         const auto schedule = state.recording.schedule.valueOr({});
         const bool scheduleIsEmpty = schedule.isEmpty()
             || std::all_of(schedule.cbegin(), schedule.cend(),
-				[](const QnScheduleTask& task)
+                [](const QnScheduleTask& task)
                 {
                     return task.recordingType == Qn::RecordingType::never;
                 });
+
         if (scheduleIsEmpty)
             state.recordingHint = State::RecordingHint::emptySchedule;
-		else if (emptyScheduleHintDisplayed)
+        else if (emptyScheduleHintDisplayed)
             state.recordingHint = {};
     }
     else if (emptyScheduleHintDisplayed)

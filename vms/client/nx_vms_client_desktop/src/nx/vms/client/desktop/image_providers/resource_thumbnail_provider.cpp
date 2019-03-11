@@ -1,6 +1,7 @@
 #include "resource_thumbnail_provider.h"
 
 #include <chrono>
+#include <limits>
 
 #include <QtCore/QCache>
 #include <QtCore/QString>
@@ -14,6 +15,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
+#include <utils/common/aspect_ratio.h>
 
 #include <nx/client/core/utils/geometry.h>
 #include <nx/fusion/model_functions.h>
@@ -33,25 +35,42 @@ namespace {
 using PlaceholderKey = QPair<QString, QSize>;
 static constexpr int kPlaceholderCacheLimit = 16 * 1024 * 1024;
 
+static constexpr qreal kPlaceholderIconFraction = 0.5;
+
 static constexpr QSize kDefaultPlaceholderSize(400, 300);
-static constexpr qreal kPlaceholderRatio = 0.5; //< Placeholder size fraction occupied by the icon.
+static const QnAspectRatio kDefaultPlaceholderAspectRatio(kDefaultPlaceholderSize);
+
+using nx::vms::client::core::Geometry;
 
 QSize placeholderSize(const QSize& requestedSize)
 {
-    if (requestedSize.height() <= 0)
+    enum
     {
-        if (requestedSize.width() <= 0)
+        FixedWidth = 0x1,
+        FixedHeight = 0x2
+    };
+
+    const auto flags = (requestedSize.width() > 0 ? FixedWidth : 0)
+        | (requestedSize.height() > 0 ? FixedHeight : 0);
+
+    switch (flags)
+    {
+        case FixedWidth:
+            return Geometry::expanded(kDefaultPlaceholderAspectRatio.toFloat(),
+                QSize(requestedSize.width(), std::numeric_limits<int>::max()),
+                Qt::KeepAspectRatio).toSize();
+
+        case FixedHeight:
+            return Geometry::expanded(kDefaultPlaceholderAspectRatio.toFloat(),
+                QSize(std::numeric_limits<int>::max(), requestedSize.height()),
+                Qt::KeepAspectRatio).toSize();
+
+        case FixedWidth | FixedHeight:
+            return requestedSize;
+
+        default:
             return kDefaultPlaceholderSize;
-
-        return QSize(requestedSize.width(), kDefaultPlaceholderSize.height()
-            * requestedSize.width() / kDefaultPlaceholderSize.width());
     }
-
-    if (requestedSize.width() > 0)
-        return requestedSize;
-
-    return QSize(kDefaultPlaceholderSize.width() * requestedSize.height()
-        / kDefaultPlaceholderSize.height(), requestedSize.height());
 }
 
 } // namespace
@@ -182,9 +201,8 @@ struct ResourceThumbnailProvider::Private
         destination.setDevicePixelRatio(pixmap.devicePixelRatio());
         destination.fill(colorTheme()->color("dark6"));
 
-        using nx::vms::client::core::Geometry;
         const auto rect = Geometry::aligned(
-            Geometry::scaled(pixmap.size() / pixelRatio, size * kPlaceholderRatio).toSize(),
+            Geometry::scaled(pixmap.size() / pixelRatio, size * kPlaceholderIconFraction).toSize(),
             QRect({}, size),
             Qt::AlignCenter);
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <forward_list>
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -10,7 +10,7 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/optional.h>
 
 #include "stream_socket_server.h"
@@ -72,28 +72,16 @@ template<
 
 public:
     using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode /*closeReason*/,
-        CustomConnectionType* /*connection*/)>;
+        SystemError::ErrorCode /*closeReason*/)>;
 
-    /**
-     * @param connectionManager When connection is finished,
-     * connectionManager->closeConnection(closeReason, this) is called.
-     */
     BaseServerConnection(
-        OnConnectionClosedHandler onConnectionClosedHandler,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        m_onConnectionClosedHandler(std::move(onConnectionClosedHandler)),
         m_streamSocket(std::move(streamSocket))
     {
         bindToAioThread(m_streamSocket->getAioThread());
 
         m_readBuffer.reserve(kReadBufferCapacity);
-    }
-
-    ~BaseServerConnection()
-    {
-        stopWhileInAioThread();
     }
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
@@ -148,38 +136,50 @@ public:
      */
     void sendBufAsync(const nx::Buffer& buf)
     {
-        m_streamSocket->dispatch(
+        NX_ASSERT(m_streamSocket);
+
+        dispatch(
             [this, &buf]()
             {
                 m_isSendingData = true;
                 if (m_inactivityTimeout)
                     removeInactivityTimer();
 
-                m_streamSocket->sendAsync(
-                    buf,
-                    [this](auto&&... args) { onBytesSent(std::move(args)...); });
+                if (m_streamSocket)
+                {
+                    m_streamSocket->sendAsync(
+                        buf,
+                        [this](auto&&... args) { onBytesSent(std::move(args)...); });
+                }
+                else
+                {
+                    post([this]() { onBytesSent(SystemError::notConnected, (std::size_t) -1); });
+                }
                 m_bytesToSend = buf.size();
             });
     }
 
-    void closeConnection(SystemError::ErrorCode closeReasonCode)
+    void closeConnection(SystemError::ErrorCode closeReason)
     {
-        if (m_onConnectionClosedHandler)
-        {
-            nx::utils::swapAndCall(
-                m_onConnectionClosedHandler,
-                closeReasonCode,
-                static_cast<CustomConnectionType*>(this));
-        }
+        dispatch(
+            [this, closeReason]()
+            {
+                nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+                triggerConnectionClosedEvent(closeReason);
+                if (watcher.interrupted())
+                    return;
+
+                m_streamSocket.reset();
+            });
     }
 
     /**
      * Register handler to be executed when connection just about to be destroyed.
      * NOTE: Handler is invoked in socket's aio thread.
      */
-    void registerCloseHandler(nx::utils::MoveOnlyFunc<void()> handler)
+    void registerCloseHandler(OnConnectionClosedHandler handler)
     {
-        m_connectionClosedHandlers.push_front(std::move(handler));
+        m_connectionClosedHandlers.push_back(std::move(handler));
     }
 
     bool isSsl() const
@@ -224,8 +224,11 @@ public:
 protected:
     virtual void stopWhileInAioThread() override
     {
+        nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
+        triggerConnectionClosedEvent(SystemError::noError);
+        if (watcher.interrupted())
+            return;
         m_streamSocket.reset();
-        triggerConnectionClosedEvent();
     }
 
     SocketAddress getForeignAddress() const
@@ -234,12 +237,11 @@ protected:
     }
 
 private:
-    OnConnectionClosedHandler m_onConnectionClosedHandler;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend = 0;
-    std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionClosedHandlers;
-    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+    std::vector<OnConnectionClosedHandler> m_connectionClosedHandlers;
+    nx::utils::InterruptionFlag m_connectionFreedFlag;
 
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData = false;
@@ -254,9 +256,9 @@ private:
         NX_ASSERT((size_t)m_readBuffer.size() == bytesRead);
 
         {
-            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+            nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
             BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return; //< Connection has been removed by handler.
         }
 
@@ -290,27 +292,15 @@ private:
 
     void handleSocketError(SystemError::ErrorCode errorCode)
     {
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
-        switch (errorCode)
-        {
-            case SystemError::noError:
-                NX_ASSERT(false);
-                break;
-
-            default:
-                closeConnection(errorCode);
-                break;
-        }
-
-        if (!watcher.objectDestroyed())
-            triggerConnectionClosedEvent();
+        NX_ASSERT(errorCode != SystemError::noError);
+        closeConnection(errorCode);
     }
 
-    void triggerConnectionClosedEvent()
+    void triggerConnectionClosedEvent(SystemError::ErrorCode closeReason)
     {
         auto connectionClosedHandlers = std::exchange(m_connectionClosedHandlers, {});
         for (auto& connectionCloseHandler: connectionClosedHandlers)
-            connectionCloseHandler();
+            connectionCloseHandler(closeReason);
     }
 
     void resetInactivityTimer()
@@ -351,12 +341,10 @@ class BaseServerConnectionWrapper:
 
 public:
     BaseServerConnectionWrapper(
-        OnConnectionClosedHandler onConnectionClosedHandler,
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         BaseServerConnectionHandler* handler)
         :
         BaseServerConnection<BaseServerConnectionWrapper>(
-            std::move(onConnectionClosedHandler),
             std::move(streamSocket)),
         m_handler(handler)
     {

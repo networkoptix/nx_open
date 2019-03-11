@@ -812,6 +812,13 @@ Handle ServerConnection::checkForUpdates(const QString& changeset,
     return executeGet("/ec2/updateInformation", params, callback, targetThread);
 }
 
+Handle ServerConnection::getInstalledUpdateInfo(Result<UpdateInformationData>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params {{"version", "installed"}};
+    return executeGet("/ec2/updateInformation", params, callback, targetThread);
+}
+
 Handle ServerConnection::updateActionStop(
     std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {

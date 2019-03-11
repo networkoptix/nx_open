@@ -8,6 +8,7 @@ import 'angular-ui-bootstrap';
 import 'hint.css/hint.min.css';
 import '../styles/main.scss';
 
+require('es6-promise/auto');
 require('./config.js');
 require('./bootstrap.js');
 

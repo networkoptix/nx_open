@@ -144,11 +144,11 @@
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
-#include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/applauncher_utils.h>
@@ -613,9 +613,9 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     if (qnRuntime->isDesktopMode())
     {
         if (user)
-            context()->instance<QnWorkbenchUpdateWatcher>()->start();
+            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->start();
         else
-            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->stop();
     }
     m_serverRequests.clear();
 }

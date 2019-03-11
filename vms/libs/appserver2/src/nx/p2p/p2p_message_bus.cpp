@@ -530,7 +530,7 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
         selectAndSendTransactions(
             connection,
             context(connection)->remoteSubscription,
-            context(connection)->remoteSubscribeAll);
+            context(connection)->isRemoteSubscribedToAll);
     }
 }
 
@@ -814,7 +814,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
         NX_ASSERT(!id.isNull());
         newSubscription.values.insert(id, shortPeer.sequence);
     }
-    context(connection)->remoteSubscribeAll = false;
+    context(connection)->isRemoteSubscribedToAll = false;
 
     // merge current and new subscription
     auto& oldSubscription = context(connection)->remoteSubscription;
@@ -849,7 +849,7 @@ bool MessageBus::handleSubscribeForAllDataUpdates(
     const QByteArray& data)
 {
     NX_ASSERT(connection->remotePeer().peerType == PeerType::cloudServer);
-    context(connection)->remoteSubscribeAll = true;
+    context(connection)->isRemoteSubscribedToAll = true;
     bool success = false;
     auto newSubscription = deserializeSubscribeAllRequest(data, &success);
 

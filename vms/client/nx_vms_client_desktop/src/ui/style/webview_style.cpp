@@ -65,17 +65,18 @@ QString generateCssStyle()
         font-size: 13px;
         line-height: 16px;
     }
-
     body {
-        padding: 0px;
+        padding-left: 0px;
         margin: 0px;
     }
-
+    p {
+        padding-left: 0px;
+        margin: 0px;
+    }
     a {
         color: %2;
         font-size: 13px;
     }
-
     a:hover {
         color: %3;
     })");

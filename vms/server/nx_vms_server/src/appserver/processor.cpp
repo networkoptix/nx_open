@@ -229,7 +229,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_WARNING (this, QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)));
+            NX_WARNING(this, "Can't add camera to ec2 (insCamera user attributes query error). %1", errCode);
             return;
         }
         QSet<QByteArray> modifiedFields;
@@ -245,6 +245,8 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     QnResourcePtr rpRes = resourcePool()->getResourceById(apiCameraData.id);
     if (rpRes)
     {
+        // TODO: Should be changed to reinitAsync() call?
+        NX_VERBOSE(this, "Reiniting resource [%1]", rpRes);
         rpRes->setStatus(Qn::Offline);
         rpRes->initAsync(true);
     }

@@ -161,6 +161,8 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
 void QnResourcePool::removeResources(const QnResourceList& resources)
 {
+    NX_VERBOSE(this, "Removing resources %1", resources);
+
     QnResourceList removedLayoutResources;
     QnResourceList removedUsers;
     QnResourceList removedOtherResources;
@@ -224,9 +226,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             }
         }
 
-        NX_VERBOSE(this) << "RESOURCE REMOVED"
-            << layoutResource->metaObject()->className()
-            << layoutResource->getName();
+        NX_VERBOSE(this, "Resource removed [%1] (%2)", layoutResource->getName(), layoutResource);
     }
 
     /* Remove other resources. */
@@ -240,9 +240,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
                     otherResource->getUniqueId())
                     layoutResource->removeItem(data);
 
-        NX_VERBOSE(this) << "RESOURCE REMOVED"
-            << otherResource->metaObject()->className()
-            << otherResource->getName();
+        NX_VERBOSE(this, "Resource removed [%1] (%2)", otherResource->getName(), otherResource);
     }
 
     lk.unlock();

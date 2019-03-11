@@ -43,6 +43,9 @@ public:
         DevicePositioningPtzCapability = 0x00001000,
         LogicalPositioningPtzCapability = 0x00002000,
 
+        PositioningPtzCapabilities =
+            DevicePositioningPtzCapability | LogicalPositioningPtzCapability,
+
         PresetsPtzCapability = 0x00010000,
         ToursPtzCapability = 0x00020000,
         ActivityPtzCapability = 0x00040000,

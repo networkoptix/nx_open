@@ -256,7 +256,7 @@ public:
 private:
     bool detectLdapVendor(LdapVendor&);
 
-    const QnLdapSettings& m_settings;
+    const QnLdapSettings m_settings;
     LDAP_RESULT m_lastErrorCode;
 
     std::unique_ptr<DirectoryType> m_dType;

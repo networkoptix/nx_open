@@ -96,7 +96,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
         (m_packetsByTimestamp.empty()
             ? 0
             : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp))
-            / 1000000,
+                / 1000000,
         m_cacheSizeInBytes,
         m_packetsByTimestamp.size());
     static int malloc_statsCounter = 0;

@@ -462,11 +462,7 @@ void QnTransactionTransportBase::setStateNoLock(State state)
         this->m_state = state;
 
         // TODO: #ak: if stateChanged handler frees this object then m_mutex is destroyed locked
-        nx::utils::ObjectDestructionFlag::Watcher watcher(
-            &m_connectionFreedFlag);
         emit stateChanged(state);
-        if (watcher.objectDestroyed())
-            return; //connection has been removed by handler
     }
     m_cond.wakeAll();
 }
@@ -804,14 +800,10 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
             arg(transportHeader.sequence).arg(m_remotePeer.id.toString()));
     }
 
-    nx::utils::ObjectDestructionFlag::Watcher watcher(
-        &m_connectionFreedFlag);
     emit gotTransaction(
         m_remotePeer.dataFormat,
         std::move(serializedTran),
         transportHeader);
-    if (watcher.objectDestroyed())
-        return; //connection has been removed by handler
 
     if (m_receivedTransactionsQueueControlEnabled)
         ++m_postedTranCount;
@@ -1246,21 +1238,8 @@ void QnTransactionTransportBase::at_responseReceived(
             QnUuid guid(nx::network::http::getHeaderValue(client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
             if (!guid.isNull())
             {
-                {
-                    nx::utils::ObjectDestructionFlag::Watcher watcher(
-                        &m_connectionFreedFlag);
-                    emit peerIdDiscovered(remoteAddr(), guid);
-                    if (watcher.objectDestroyed())
-                        return; //connection has been removed by handler
-                }
-
-                {
-                    nx::utils::ObjectDestructionFlag::Watcher watcher(
-                        &m_connectionFreedFlag);
-                    emit remotePeerUnauthorized(guid);
-                    if (watcher.objectDestroyed())
-                        return; //connection has been removed by handler
-                }
+                emit peerIdDiscovered(remoteAddr(), guid);
+                emit remotePeerUnauthorized(guid);
             }
             cancelConnecting();
         }
@@ -1343,11 +1322,7 @@ void QnTransactionTransportBase::at_responseReceived(
         m_remotePeer.dataFormat = Qn::UbjsonFormat;
 #endif
 
-    nx::utils::ObjectDestructionFlag::Watcher watcher(
-        &m_connectionFreedFlag);
     emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
-    if (watcher.objectDestroyed())
-        return; //connection has been removed by handler
 
     if (!m_connectionLockGuard)
     {

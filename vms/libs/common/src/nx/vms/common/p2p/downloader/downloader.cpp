@@ -23,9 +23,8 @@ public:
     Private(Downloader* q);
 
     void startDownload(const QString& fileName);
-
-private:
-    void atWorkerFinished(const QString& fileName);
+    void stopDownload(const QString& fileName, bool emitSignals = true);
+    void handleFileAdded(const FileInformation& fileInformation);
 
 public:
     QnMutex mutex;
@@ -45,39 +44,47 @@ void Downloader::Private::startDownload(const QString& fileName)
 {
     NX_MUTEX_LOCKER lock(&mutex);
 
-    if (!downloadsStarted)
-        return;
-
-    if (workers.contains(fileName))
+    const auto keyFileName = FileInformation::keyFromFileName(fileName);
+    if (workers.contains(keyFileName))
         return;
 
     const auto status = storage->fileInformation(fileName).status;
-
-    if (status != FileInformation::Status::downloaded
-        && status != FileInformation::Status::uploading)
+    if (status == FileInformation::Status::downloaded)
     {
-        const auto fi = storage->fileInformation(fileName);
-        auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
-        auto worker = std::make_shared<Worker>(
-            fileName,
-            storage.data(),
-            peerManager);
-        workers[fileName] = worker;
-
-        connect(worker.get(), &Worker::finished, this, &Downloader::Private::atWorkerFinished);
-        connect(worker.get(), &Worker::failed, this, &Downloader::Private::atWorkerFinished);
-        connect(worker.get(), &Worker::chunkDownloadFailed, q, &Downloader::chunkDownloadFailed);
-
-        worker->start();
+        emit q->downloadFinished(fileName);
+        return;
     }
+
+    if (status == FileInformation::Status::uploading)
+        return;
+
+    if (!downloadsStarted)
+        return;
+
+    const auto fi = storage->fileInformation(keyFileName);
+    auto peerManager = peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers);
+    auto worker = std::make_shared<Worker>(
+        keyFileName,
+        storage.data(),
+        peerManager);
+    workers[keyFileName] = worker;
+
+    connect(worker.get(), &Worker::finished, this,
+        [this](const QString& fileName)
+        {
+            stopDownload(fileName, true);
+        });
+    connect(worker.get(), &Worker::chunkDownloadFailed, q, &Downloader::chunkDownloadFailed);
+
+    worker->start();
 }
 
-void Downloader::Private::atWorkerFinished(const QString& fileName)
+void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals)
 {
     Worker::State state;
     {
         NX_MUTEX_LOCKER lock(&mutex);
-        const auto worker = workers.take(fileName);
+        const auto worker = workers.take(FileInformation::keyFromFileName(fileName));
         if (!worker)
             return;
 
@@ -85,10 +92,13 @@ void Downloader::Private::atWorkerFinished(const QString& fileName)
         worker->stop();
     }
 
-    if (state == Worker::State::finished)
-        emit q->downloadFinished(fileName);
-    else
-        emit q->downloadFailed(fileName);
+    if (emitSignals)
+    {
+        if (state == Worker::State::finished)
+            emit q->downloadFinished(fileName);
+        else
+            emit q->downloadFailed(fileName);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -189,13 +199,7 @@ ResultCode Downloader::writeFileChunk(
 
 ResultCode Downloader::deleteFile(const QString& fileName, bool deleteData)
 {
-    {
-        NX_MUTEX_LOCKER lock(&d->mutex);
-        auto worker = d->workers.take(fileName);
-        if (worker)
-            worker->stop();
-    }
-
+    d->stopDownload(fileName, false);
     return d->storage->deleteFile(fileName, deleteData);
 }
 
@@ -229,6 +233,11 @@ void Downloader::stopDownloads()
 
     for (const auto& worker: workers)
         worker->stop();
+}
+
+void Downloader::findExistingDownloads(bool waitForFinished)
+{
+    d->storage->findDownloads(waitForFinished);
 }
 
 void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
