@@ -56,5 +56,4 @@ public:
 protected:
     QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license,
         ValidationMode mode = VM_Regular) const;
-    bool isAllowedForArm(const QnLicensePtr& license) const;
 };

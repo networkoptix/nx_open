@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
 #include <nx/vms/client/desktop/analytics/analytics_menu_action_factory.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
@@ -1852,6 +1853,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
+
+    integrations::registerActions(&factory);
 
     // -- Developer mode actions further. Please make note: texts are untranslatable. --
 

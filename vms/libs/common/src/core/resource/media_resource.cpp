@@ -214,9 +214,16 @@ void QnMediaResource::setPtzCapability(
 
 bool QnMediaResource::canSwitchPtzPresetTypes() const
 {
-    const auto caps = getPtzCapabilities();
-    return caps.testFlag(Ptz::NativePresetsPtzCapability)
-        && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
+    const auto capabilities = getPtzCapabilities();
+    if (!(capabilities & Ptz::NativePresetsPtzCapability))
+        return false;
+
+    if (capabilities & Ptz::NoNxPresetsPtzCapability)
+        return false;
+
+    // Check if our server can emulate presets.
+    return (capabilities & Ptz::AbsolutePtrzCapabilities)
+        && (capabilities & Ptz::PositioningPtzCapabilities);
 }
 
 QString QnMediaResource::customAspectRatioKey()

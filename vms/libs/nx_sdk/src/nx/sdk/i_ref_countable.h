@@ -119,6 +119,19 @@ public:
      * @return New reference count, having deleted the object if it reaches zero.
      */
     virtual int releaseRef() const = 0;
+
+    /**
+     * Intended for debug. Is not thread-safe, because does addRef()/releaseRef() pair of calls.
+     * @return Reference counter, or 0 if the pointer is null.
+     */
+    int refCountThreadUnsafe() const
+    {
+        if (this == nullptr)
+            return 0;
+
+        /*unused*/ (void) addRef();
+        return releaseRef();
+    }
 };
 
 } // namespace sdk

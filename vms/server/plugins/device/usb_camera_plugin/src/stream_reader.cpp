@@ -81,6 +81,7 @@ int StreamReader::nextPacket(std::shared_ptr<ffmpeg::Packet>& packet)
         if (status < 0)
         {
             NX_ERROR(this, "Usb camera plugin reading error: %1", status);
+            m_camera->uninitialize();
             return nxcip::NX_IO_ERROR;
         }
         if (!packet)

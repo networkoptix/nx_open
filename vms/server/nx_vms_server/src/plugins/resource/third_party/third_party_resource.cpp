@@ -420,6 +420,8 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(StreamIn
 
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
 {
+    NX_VERBOSE(this, "Initialising camera driver...");
+
     updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
     QAuthenticator auth = getAuth();
 
@@ -427,7 +429,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     {
         QnMutexLocker lk( &m_mutex );
 
-        //restoring camera parameters
+        NX_VERBOSE(this, "Restoring camera parameters...");
         if( strlen(m_camInfo.uid) == 0 )
         {
             memset( m_camInfo.uid, 0, sizeof(m_camInfo.uid) );
@@ -478,20 +480,19 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
     }
 
-    m_camManager->setCredentials( auth.user(), auth.password() );
+    m_camManager->setCredentials(auth.user(), auth.password());
 
     int result = m_camManager->getCameraInfo( &m_camInfo );
-    if( result != nxcip::NX_NO_ERROR )
+    if (result != nxcip::NX_NO_ERROR)
     {
-        if( false )
-        NX_DEBUG(this, lit("Error getting camera info from third-party camera %1:%2 (url %3). %4").
-            arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()));
-        setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
+        NX_DEBUG(this, "Error getting camera info from third-party camera %1:%2 (url %3). %4",
+            m_discoveryManager.getVendorName(), QString::fromUtf8(m_camInfo.modelName),
+            QString::fromUtf8(m_camInfo.url), m_camManager->getLastErrorString());
+        setStatus(result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline);
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    setFirmware( QString::fromUtf8(m_camInfo.firmware) );
+    setFirmware(QString::fromUtf8(m_camInfo.firmware));
 
     m_encoderCount = 0;
     result = m_camManager->getEncoderCount( &m_encoderCount );

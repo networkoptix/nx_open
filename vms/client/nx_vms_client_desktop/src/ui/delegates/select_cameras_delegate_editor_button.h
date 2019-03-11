@@ -23,8 +23,8 @@ public:
             };
     }
 
-private slots:
-    void at_clicked();
+protected:
+    virtual void handleButtonClicked() override;
 
 private:
     std::function<bool(QnUuidSet& camerasIds)> m_selectCamerasFunction;

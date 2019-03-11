@@ -127,6 +127,7 @@ void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
 {
+    m_holdConnection = false;
     base_type::disconnectFromConnection(connection);
     connection->miscNotificationManager()->disconnect(this);
 }

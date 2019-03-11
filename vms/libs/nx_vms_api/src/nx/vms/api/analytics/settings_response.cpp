@@ -10,4 +10,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx_vms_api_analytics_SettingsResponse_Fields,
     (brief, true))
 
-} // nx::vms::api::analytics
+} // namespace nx::vms::api::analytics

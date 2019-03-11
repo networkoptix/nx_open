@@ -28,9 +28,6 @@ MediatorStunClient::MediatorStunClient(
     m_reconnectTimer(settings.reconnectPolicy)
 {
     bindToAioThread(m_endpointProvider ? m_endpointProvider->getAioThread() : getAioThread());
-
-    base_type::setOnConnectionClosedHandler(
-        [this](auto&&... args) { handleConnectionClosure(std::forward<decltype(args)>(args)...); });
 }
 
 void MediatorStunClient::bindToAioThread(
@@ -120,6 +117,18 @@ void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)
 
 void MediatorStunClient::connectInternal(ConnectHandler handler)
 {
+    NX_ASSERT(isInSelfAioThread());
+
+    if (!m_connectionClosureHandlerInstalled)
+    {
+        base_type::setOnConnectionClosedHandler(
+            [this](auto&&... args)
+            {
+                handleConnectionClosure(std::forward<decltype(args)>(args)...);
+            });
+        m_connectionClosureHandlerInstalled = true;
+    }
+
     cancelReconnectTimer();
 
     base_type::connect(

@@ -55,8 +55,8 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
     NX_CRITICAL(mediaPacket);
 
     const bool isKeyFrame = mediaPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
-    NX_VERBOSE(this, "Got frame [%1], isKeyFrame [%2], channel [%3]",
-        data->timestamp, isKeyFrame, mediaPacket->channelNumber);
+    NX_VERBOSE(this, "Got frame [%1], channel [%2], isKeyFrame [%3]",
+        data->timestamp, mediaPacket->channelNumber, isKeyFrame);
 
     if (m_packetsByTimestamp.empty() && !isKeyFrame)
         return; // Cache data MUST start with key frame.
@@ -96,7 +96,7 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
         (m_packetsByTimestamp.empty()
             ? 0
             : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp))
-            / 1000000,
+                / 1000000,
         m_cacheSizeInBytes,
         m_packetsByTimestamp.size());
     static int malloc_statsCounter = 0;

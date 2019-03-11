@@ -32,15 +32,19 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
         QStandardItem* parent,
         const QString& name,
         const QnUuid& engineId,
-        const QString& id)
+        const QString& id,
+        bool isValidEvent)
     {
         auto item = new QStandardItem(name);
         item->setData(qVariantFromValue(id), EventTypeIdRole);
         item->setData(qVariantFromValue(engineId), DriverIdRole);
+        item->setData(qVariantFromValue(isValidEvent), ValidEventRole);
         if (parent)
             parent->appendRow(item);
         else
             appendRow(item);
+        if (!isValidEvent)
+            item->setSelectable(false);
         return item;
     };
 
@@ -66,7 +70,8 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             nullptr,
             engineDescriptor->name,
             engineId,
-            QString());
+            QString(),
+            false);
 
         for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
         {
@@ -77,7 +82,8 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                     parentItem,
                     groupDescriptor->name,
                     engineId,
-                    groupDescriptor->id);
+                    groupDescriptor->id,
+                    false);
             }
 
             for (const auto& eventTypeId: eventTypeIds)
@@ -92,7 +98,8 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                     parentItem,
                     eventTypeDescriptor->name,
                     engineId,
-                    eventTypeDescriptor->id);
+                    eventTypeDescriptor->id,
+                    true);
             }
         }
     }
@@ -102,7 +109,14 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
 
 bool AnalyticsSdkEventModel::isValid() const
 {
-    return rowCount() > 0;
+    const auto items = match(
+        index(0, 0),
+        ValidEventRole,
+        /*value*/ qVariantFromValue(true),
+        /*hits*/ 1,
+        Qt::MatchExactly | Qt::MatchRecursive);
+
+    return items.size() > 0;
 }
 
 } // namespace ui

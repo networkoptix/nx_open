@@ -5,7 +5,7 @@
         <?include ../BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="NxToolDstRootDir" Name="Nxtool">
+            <Directory Id="InstallDirRoot" Name="Nxtool">
                 <Component Id="DesktopShortcut">
                     <Condition>INSTALL_NXTOOL_DESKTOP</Condition>
 
@@ -22,7 +22,7 @@
                     </Shortcut>
                 </Component>
 
-                <Directory Id="Platforms" Name="platforms"/>
+                <Directory Id="platforms" Name="platforms"/>
                 <Directory Id="NxToolDstQmlDir" Name="qml"/>
 
                 <Component Id="Executable">
@@ -51,41 +51,16 @@
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="QtLibraries" Directory="NxToolDstRootDir">
-            <Component>
-                <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="1"/>
-            </Component>
-            <Component>
-                <File Id="Qt5Gui.dll" Name="Qt5Gui.dll" Source="$(var.QtDir)\Qt5Gui.dll" DiskId="1"/>
-            </Component>
-            <Component>
-                <File Id="Qt5Network.dll" Name="Qt5Network.dll" Source="$(var.QtDir)\Qt5Network.dll" DiskId="1" />
-            </Component>
-            <Component>
-                <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="1"  />
-            </Component>
-            <Component>
-                <File Id="Qt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="1"  />
-            </Component>
-            <Component>
-                <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="1"  />
-            </Component>
-            <Component>
-                <File Id="icudt60.dll" Name="icudt60.dll" Source="$(var.IcuDir)\icudt60.dll"  />
-            </Component>
-            <Component>
-                <File Id="icuin60.dll" Name="icuin60.dll" Source="$(var.IcuDir)\icuin60.dll"  />
-            </Component>
-            <Component>
-                <File Id="icuuc60.dll" Name="icuuc60.dll" Source="$(var.IcuDir)\icuuc60.dll"  />
-            </Component>
-        </ComponentGroup>
-
-        <ComponentGroup Id="Platforms" Directory="Platforms">
-            <Component>
-                <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="1" />
-            </Component>
-        </ComponentGroup>
+        <ComponentGroup Id="QtLibraries"
+                Source="$(var.QtDir)"
+                Directory="InstallDirRoot">
+            <Component><File Name="Qt5Core.dll"/></Component>
+            <Component><File Name="Qt5Gui.dll"/></Component>
+            <Component><File Name="Qt5Network.dll"/></Component>
+            <Component><File Name="Qt5Qml.dll"/></Component>
+            <Component><File Name="Qt5Quick.dll"/></Component>
+            <Component><File Name="Qt5Widgets.dll"/></Component>
+         </ComponentGroup>
 
         <Feature Id="NxtoolFeature" Title="$(var.productName) Server Configuration Utility" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
@@ -96,8 +71,10 @@
             <ComponentRef Id="QtConf" />
             <ComponentGroupRef Id="QtLibraries" />
             <ComponentGroupRef Id="QmlComponentGroup"/>
-            <ComponentGroupRef Id="Platforms" />
-            <ComponentGroupRef Id="Vcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="shared_qt_platforms" />
+            <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="shared_ucrt_libraries"/>
+            <ComponentGroupRef Id="shared_vcrt_libraries"/>
         </Feature>
     </Fragment>
 </Wix>

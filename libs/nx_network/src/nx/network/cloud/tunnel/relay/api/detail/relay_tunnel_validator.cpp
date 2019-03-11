@@ -18,7 +18,7 @@ TunnelValidator::TunnelValidator(
 
     m_httpConnection.setMessageHandler(
         [this](auto message) { processRelayNotification(std::move(message)); });
-    m_httpConnection.setOnConnectionClosed(
+    m_httpConnection.registerCloseHandler(
         [this](auto reason) { handleConnectionClosure(reason); });
 
     bindToAioThread(m_httpConnection.getAioThread());

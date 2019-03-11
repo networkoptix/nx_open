@@ -69,7 +69,8 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
         archiveDelegate = std::move(motionDelegate);
     }
 
-    QnAviResourcePtr aviResource(new QnAviResource(temporaryFilePath));
+    QnAviResourcePtr aviResource(
+        new QnAviResource(temporaryFilePath, serverModule()->commonModule()));
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(aviResource);
     m_archiveReader->setObjectName(kReaderThreadName);
     m_archiveReader->setArchiveDelegate(archiveDelegate.release());

@@ -446,7 +446,6 @@ private:
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             m_lastListeningPeerConnection = tcpConnection.get();
             auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
-                nullptr,
                 std::move(tcpConnection),
                 nullptr,
                 nullptr);

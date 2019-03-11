@@ -3568,14 +3568,15 @@ void MediaServerProcess::stopObjects()
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
 
-    serverModule()->resourcePool()->threadPool()->waitForDone();
-    commonModule()->resourcePool()->clear();
-
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
+
+    serverModule()->resourcePool()->threadPool()->waitForDone();
+    commonModule()->resourcePool()->clear();
+
     m_ec2ConnectionFactory->shutdown();
 
     //disconnecting from EC2
@@ -3833,9 +3834,13 @@ void MediaServerProcess::connectSignals()
         [this]() { this->serverModule()->updateManager()->connectToSignals(); });
 
     using namespace nx::vms::common::p2p::downloader;
-    connect(
-        this, &MediaServerProcess::started,
-        [this]() {this->serverModule()->findInstance<Downloader>()->startDownloads(); });
+    connect(this, &MediaServerProcess::started,
+        [this]()
+        {
+            Downloader* downloader = this->serverModule()->findInstance<Downloader>();
+            downloader->startDownloads();
+            downloader->findExistingDownloads();
+        });
 
     connect(commonModule()->resourceDiscoveryManager(),
         &QnResourceDiscoveryManager::CameraIPConflict, this,

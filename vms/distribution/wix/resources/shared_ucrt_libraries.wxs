@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!--
+            These libraries may be shared between different installers, therefore they must
+            contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
+         -->
+        <?include BuildVars.wxi ?>
+        <ComponentGroup Id="shared_ucrt_libraries"
+                Source="$(var.ucrt_directory)\bin"
+                Directory="InstallDirRoot">
+            <Component><File Name="api-ms-win-core-console-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-datetime-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-debug-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-errorhandling-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-file-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-file-l1-2-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-file-l2-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-handle-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-heap-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-interlocked-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-libraryloader-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-localization-l1-2-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-memory-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-namedpipe-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-processenvironment-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-processthreads-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-processthreads-l1-1-1.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-profile-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-rtlsupport-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-string-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-synch-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-synch-l1-2-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-sysinfo-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-timezone-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-core-util-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-conio-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-convert-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-environment-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-filesystem-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-heap-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-locale-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-math-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-multibyte-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-private-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-process-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-runtime-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-stdio-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-string-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-time-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="api-ms-win-crt-utility-l1-1-0.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="ucrtbase.dll" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -528,9 +528,10 @@ bool UdtStreamSocket::setRendezvous(bool val)
 void UdtStreamSocket::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
-
+    // Calling m_aioHelper->bindToAioThread first so that it is able to detect aio thread change.
     m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 bool UdtStreamSocket::connect(
@@ -857,7 +858,7 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
 
 UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
     base_type(ipVersion),
-    m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
+    m_aioHelper(std::make_unique<aio::AsyncServerSocketHelper<UdtStreamServerSocket>>(this))
 {
     open();
 }
@@ -866,6 +867,13 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
+}
+
+void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 bool UdtStreamServerSocket::listen(int backlog)

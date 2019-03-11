@@ -4,9 +4,8 @@
 #include <memory>
 #include <tuple>
 
-#include <nx/network/aio/interruption_flag.h>
 #include <nx/utils/byte_stream/pipeline.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/optional.h>
 
 #include "abstract_async_channel.h"
@@ -114,7 +113,7 @@ private:
     std::deque<nx::Buffer> m_readRawData;
     std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
-    InterruptionFlag m_aioInterruptionFlag;
+    nx::utils::InterruptionFlag m_aioInterruptionFlag;
     bool m_sendShutdown = false;
 
     virtual void stopWhileInAioThread() override;
@@ -136,9 +135,14 @@ private:
 
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
     template<typename Range> std::deque<RawSendContext> takeRawSendTasks(Range range);
-    InterruptionFlag::StateChange completeRawSendTasks(
+
+    /**
+     * @return false if was interrupted. All futher processing should be stopped until the next event.
+     */
+    bool completeRawSendTasks(
         std::deque<RawSendContext> completedRawSendTasks,
         SystemError::ErrorCode sysErrorCode);
+
     void scheduleNextRawSendTaskIfAny();
 
     void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);

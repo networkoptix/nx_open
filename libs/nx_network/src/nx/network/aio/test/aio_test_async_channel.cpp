@@ -244,9 +244,9 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
                 m_readBuffer->resize(m_readBuffer->size() + bytesRead);
                 m_readBuffer = nullptr;
 
-                nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
+                nx::utils::InterruptionFlag::Watcher thisWatcher(&m_destructionFlag);
                 reportIoCompletion(&m_readHandler, SystemError::noError, bytesRead);
-                if (thisWatcher.objectDestroyed())
+                if (thisWatcher.interrupted())
                     return;
 
                 if (!m_readScheduled)

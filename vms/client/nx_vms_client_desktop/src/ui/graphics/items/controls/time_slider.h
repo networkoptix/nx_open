@@ -542,7 +542,7 @@ private:
 
     QLocale m_locale;
 
-    QPointF m_hoverMousePos;
+    std::optional<QPointF> m_hoverMousePos;
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer* m_bookmarksViewer;

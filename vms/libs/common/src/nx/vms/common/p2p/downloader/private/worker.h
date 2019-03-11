@@ -94,8 +94,7 @@ private:
     void cancelRequestsByType(State type);
     bool hasPendingRequestsByType(State type) const;
 
-    void finish();
-    void fail();
+    void finish(State state = State::finished);
 
     void updateLogTag();
 

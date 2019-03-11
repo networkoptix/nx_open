@@ -128,6 +128,8 @@
             <ComponentGroupRef Id="shared_qt_libraries"/>
             <ComponentGroupRef Id="shared_qt_platforms"/>
             <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="shared_ucrt_libraries"/>
+            <ComponentGroupRef Id="shared_vcrt_libraries"/>
             <ComponentGroupRef Id="server_qt_libraries"/>
             <ComponentGroupRef Id="server_qt_sqldrivers"/>
             <ComponentGroupRef Id="server_misc_libraries"/>
@@ -150,8 +152,6 @@
             <ComponentRef Id="VmaxProxyQTLibraries"/>
             <ComponentGroupRef Id="VmaxProxySDK"/>
             <?endif?>
-
-            <ComponentGroupRef Id="ServerVcrt14ComponentGroup"/>
         </Feature>
 
     </Fragment>

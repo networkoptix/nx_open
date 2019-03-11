@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/tunneling/detail/client_factory.h>
+#include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/stun_types.h>
@@ -33,6 +35,12 @@ public:
     ~AsyncClientWithHttpTunneling()
     {
         m_client.pleaseStopSync();
+
+        if (m_tunnelFactoryBak)
+        {
+            http::tunneling::detail::ClientFactory::instance().setCustomFunc(
+                std::move(*m_tunnelFactoryBak));
+        }
     }
 
 protected:
@@ -128,12 +136,23 @@ protected:
         assertStunClientIsAbleToPerformRequest(&m_client);
     }
 
+    void forceHttpConnectionUpgradeTunnel()
+    {
+        m_tunnelFactoryBak = http::tunneling::detail::ClientFactory::instance().setCustomFunc(
+            [this](const std::string& /*tag*/, const nx::utils::Url& url)
+            {
+                return std::make_unique<http::tunneling::detail::ConnectionUpgradeTunnelClient>(
+                    url, nullptr);
+            });
+    }
+
 private:
     stun::AsyncClientWithHttpTunneling m_client;
     nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_responses;
     nx::network::stun::SocketServer m_stunServer;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResults;
     std::unique_ptr<http::TestHttpServer> m_httpServer;
+    std::optional<http::tunneling::detail::ClientFactory::Function> m_tunnelFactoryBak;
 
     nx::utils::Url httpUrl() const
     {
@@ -175,6 +194,8 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 
 TEST_F(AsyncClientWithHttpTunneling, http_ok_response_to_upgrade_results_connect_error)
 {
+    forceHttpConnectionUpgradeTunnel();
+
     givenHttpServerThatAlwaysResponds(http::StatusCode::ok);
     whenConnectToHttpServer();
     thenConnectFailed();

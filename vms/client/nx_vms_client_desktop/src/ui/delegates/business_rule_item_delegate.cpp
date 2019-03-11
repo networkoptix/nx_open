@@ -27,6 +27,7 @@
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/math/color_transformations.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
@@ -35,6 +36,7 @@
 #include <ui/delegates/select_users_delegate_editor_button.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 using nx::vms::api::EventType;
@@ -192,7 +194,8 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget* editor, const QModelInde
             {
                 comboBox->setCurrentIndex(comboBox->findData(
                     index.data(Qn::EventTypeRole).value<vms::api::EventType>()));
-                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+                connect(comboBox, QnComboboxCurrentIndexChanged,
+                    this, &QnBusinessRuleItemDelegate::emitCommitData);
             }
             return;
         case Column::action:
@@ -200,15 +203,16 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget* editor, const QModelInde
             {
                 comboBox->setCurrentIndex(comboBox->findData(
                     index.data(Qn::ActionTypeRole).value<vms::api::ActionType>()));
-                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+                connect(comboBox, QnComboboxCurrentIndexChanged,
+                    this, &QnBusinessRuleItemDelegate::emitCommitData);
             }
             return;
         case Column::aggregation:
-            if (nx::vms::client::desktop::AggregationWidget* widget =
-                dynamic_cast<nx::vms::client::desktop::AggregationWidget*>(editor))
+            if (AggregationWidget* aggregationWidget = dynamic_cast<AggregationWidget*>(editor))
             {
-                widget->setValue(index.data(Qt::EditRole).toInt());
-                connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
+                aggregationWidget->setValue(index.data(Qt::EditRole).toInt());
+                connect(aggregationWidget, &AggregationWidget::valueChanged,
+                    this, &QnBusinessRuleItemDelegate::emitCommitData);
             }
             return;
         default:
@@ -269,7 +273,8 @@ QWidget* QnBusinessRuleItemDelegate::createSourceEditor(QWidget* parent,
 {
     QnSelectCamerasDialogButton* button = new QnSelectCamerasDialogButton(parent);
     // TODO: #GDM #Business server selection dialog?
-    connect(button, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+    connect(button, &QnSelectCamerasDialogButton::commit,
+        this, &QnBusinessRuleItemDelegate::emitCommitData);
 
     vms::api::EventType eventType =
         index.data(Qn::EventTypeRole).value<vms::api::EventType>();
@@ -352,7 +357,10 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     }
 
     if (editorButton)
-        connect(editorButton, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+    {
+        connect(editorButton, &QnSelectResourcesDialogButton::commit,
+            this, &QnBusinessRuleItemDelegate::emitCommitData);
+    }
 
     // TODO: #vbreus Create proper editor for exitFullscreenAction
     return editorButton;
@@ -412,7 +420,7 @@ QWidget* QnBusinessRuleItemDelegate::createAggregationEditor(QWidget* parent,
     return aggregationWidget;
 }
 
-void QnBusinessRuleItemDelegate::at_editor_commit()
+void QnBusinessRuleItemDelegate::emitCommitData()
 {
     if (QWidget* widget = dynamic_cast<QWidget*>(sender()))
         emit commitData(widget);

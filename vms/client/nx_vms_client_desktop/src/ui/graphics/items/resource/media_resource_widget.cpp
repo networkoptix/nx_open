@@ -1553,7 +1553,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     {
         const PainterTransformScaleStripper scaleStripper(painter);
 
-        const auto result = m_renderer->discardFrame(channel);
+        result = m_renderer->discardFrame(channel);
         m_paintedChannels[channel] = true;
 
         painter->drawPixmap(
@@ -1589,8 +1589,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         paintMotionGrid(painter, channel, rect,
             d->motionMetadataProvider->metadata(timestamp, channel));
 
-        /* Motion selection. */
-        if (!m_motionSelection[channel].isEmpty())
+        // Motion search region.
+        const bool isActiveWidget = navigator()->currentMediaWidget() == this;
+        if (isActiveWidget && !m_motionSelection[channel].isEmpty())
         {
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
@@ -1741,6 +1742,9 @@ void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect,
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
 {
+    if (!m_watermarkPainter->watermark().visible())
+        return;
+
     const auto imageRotation = defaultFullRotation();
     if (imageRotation == 0)
     {
@@ -1750,7 +1754,7 @@ void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect
     {
         // We have implicit camera rotation due to default rotation and/or dewarping procedure.
         // We should rotate watermark to make it appear in appropriate orientation.
-        const auto& oldTransform = painter->transform();
+        const auto oldTransform = painter->transform();
         const auto transform =
             QTransform().translate(rect.center().x(), rect.center().y()).rotate(-imageRotation);
         painter->setTransform(transform, true);

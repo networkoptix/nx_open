@@ -177,9 +177,6 @@ namespace
     const int kBookmarkTextPadding = 6;
     const int kMinBookmarkTextCharsVisible = 6;
 
-    /** Invalid hover position. To denote it we use a position outside of client area: */
-    const QPointF kInvalidHoverPos(-1.0, -1.0);
-
     /** Width of sensitive areas at the left and right of the window.
       * When a marker is dragged to these areas it causes window scroll.
       * Has effect only with DragScrollsWindow option. */
@@ -615,7 +612,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
-    m_hoverMousePos(kInvalidHoverPos),
     m_lastLineBarValue(),
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
@@ -2893,11 +2889,14 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
 
-    milliseconds hoverValueMs = timeFromPosition(m_hoverMousePos, false);
-
-    int hoveredBookmarkItem = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
-        hoverValueMs, milliseconds(qint64(m_msecsPerPixel)),
-        QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
+    int hoveredBookmarkIndex = -1;
+    if (m_hoverMousePos.has_value())
+    {
+        const auto hoverValueMs = timeFromPosition(*m_hoverMousePos, false);
+        hoveredBookmarkIndex = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
+            hoverValueMs, milliseconds(qint64(m_msecsPerPixel)),
+            QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
+    }
 
     /* Draw bookmarks: */
     for (int i = 0; i < bookmarks.size(); ++i)
@@ -2911,7 +2910,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTime(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTime(), m_windowEnd)));
 
-        bool hovered = i == hoveredBookmarkItem;
+        bool hovered = i == hoveredBookmarkIndex;
         const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
         const QColor& futureBg = hovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
 
@@ -3244,7 +3243,7 @@ void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverLeaveEvent(event);
-    m_hoverMousePos = kInvalidHoverPos;
+    m_hoverMousePos.reset();
     unsetCursor();
     m_screenshotCursor->hide();
     setThumbnailSelecting(m_lastHoverThumbnail, false);
@@ -3302,9 +3301,9 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 
 void QnTimeSlider::updateBookmarksViewerLocation()
 {
-    if (lineBarRect().contains(m_hoverMousePos))
+    if (m_hoverMousePos.has_value() && lineBarRect().contains(*m_hoverMousePos))
     {
-        qint64 location = m_hoverMousePos.x();
+        qint64 location = (*m_hoverMousePos).x();
         m_bookmarksViewer->setTargetLocation(location);
     }
 }

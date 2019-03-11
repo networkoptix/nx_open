@@ -142,6 +142,7 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
                         if (success)
                             result = httpClient->fetchMessageBodyBuffer();
 
+                        httpClient->pleaseStopSync();
                         callback(success, requestId, result);
                     }));
             }));

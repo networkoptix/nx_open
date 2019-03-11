@@ -41,7 +41,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
         if (!resource && !data.resource.uniqueId.isEmpty())
         {
             /* Try to load local resource. */
-            resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
+            resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId, commonModule()));
             resourcePool()->addResource(resource);
         }
 

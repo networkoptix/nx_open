@@ -526,7 +526,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_lastChunkQuality = newCatalog->getRole();
     QString url = newCatalog->fullFileName(newChunk.toBaseChunk());
 
-    m_fileRes = QnAviResourcePtr(new QnAviResource(url));
+    m_fileRes = QnAviResourcePtr(new QnAviResource(url, m_mediaServerModule->commonModule()));
     m_aviDelegate->close();
     m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(
         m_serverModule, url, QnServer::StoragePool::Both));
@@ -584,7 +584,8 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
 
 
             QString url = m_newQualityCatalog->fullFileName(m_newQualityChunk);
-            m_newQualityFileRes = QnAviResourcePtr(new QnAviResource(url));
+            m_newQualityFileRes =
+                QnAviResourcePtr(new QnAviResource(url, m_mediaServerModule->commonModule()));
             m_newQualityAviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
             m_newQualityAviDelegate->setUseAbsolutePos(false);
             m_newQualityAviDelegate->setFastStreamFind(true);

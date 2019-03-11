@@ -211,10 +211,17 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
 
             lock.unlock();
 
-            const bool createResource =
-                serverData.status == nx::vms::api::ResourceStatus::incompatible
-                    || (serverData.status == nx::vms::api::ResourceStatus::unauthorized
-                        && !resourcePool()->getResourceById<QnMediaServerResource>(serverData.id));
+            bool createResource = false;
+            if (serverData.status == nx::vms::api::ResourceStatus::incompatible)
+            {
+                createResource = true;
+            }
+            else if (serverData.status == nx::vms::api::ResourceStatus::unauthorized)
+            {
+                const auto serverResource =
+                    resourcePool()->getResourceById<QnMediaServerResource>(serverData.id);
+                createResource = !serverResource || !serverResource->isOnline();
+            }
 
             if (createResource)
                 addResource(serverData);

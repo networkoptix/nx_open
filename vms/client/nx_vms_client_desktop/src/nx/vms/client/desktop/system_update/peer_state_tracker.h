@@ -9,7 +9,6 @@
 #include <nx/vms/api/data/software_version.h>
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <update/updates_common.h>
 #include <nx/update/common_update_manager.h>
 
 namespace nx::vms::client::desktop {

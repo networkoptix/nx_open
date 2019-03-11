@@ -391,12 +391,13 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    const bool ptzCapabilitiesChanged = (state.canForcePanTiltCapabilities()
-        && state.expert.forcedPtzPanTiltCapability.valueOr(true))
-        || (state.canForcePanTiltCapabilities()
-        && state.expert.forcedPtzZoomCapability.valueOr(true));
+    if (state.canForcePanTiltCapabilities() &&
+        state.expert.forcedPtzPanTiltCapability.valueOr(true))
+    {
+        return false;
+    }
 
-    if (ptzCapabilitiesChanged)
+    if (state.canForcePanTiltCapabilities() && state.expert.forcedPtzZoomCapability.valueOr(true))
         return false;
 
     if (state.devicesDescription.supportsMotionStreamOverride == CombinedValue::All
@@ -433,6 +434,18 @@ std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state
 
     return state.recordingAlert;
 }
+
+bool canForceZoomCapability(const Camera& camera)
+{
+    return camera->ptzCapabilitiesUserIsAllowedToModify()
+        .testFlag(Ptz::Capability::ContinuousZoomCapability);
+};
+
+bool canForcePanTiltCapabilities(const Camera& camera)
+{
+    return camera->ptzCapabilitiesUserIsAllowedToModify() &
+        Ptz::Capability::ContinuousPanTiltCapabilities;
+};
 
 } // namespace
 
@@ -542,21 +555,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription.canSwitchPtzPresetTypes = combinedValue(cameras,
         [](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); });
 
-    state.devicesDescription.canForcePanTiltCapabilities = combinedValue(cameras,
-        [](const Camera& camera)
-        {
-            const Ptz::Capabilities ptzCapabilities =
-                camera->ptzCapabilitiesUserIsAllowedToModify();
-            return ptzCapabilities & Ptz::Capability::ContinuousPanTiltCapabilities;
-        });
+    state.devicesDescription.canForcePanTiltCapabilities =
+        combinedValue(cameras, canForcePanTiltCapabilities);
 
-    state.devicesDescription.canForceZoomCapability = combinedValue(cameras,
-        [](const Camera& camera)
-        {
-            const Ptz::Capabilities ptzCapabilities =
-                camera->ptzCapabilitiesUserIsAllowedToModify();
-            return ptzCapabilities & Ptz::Capability::ContinuousZoomCapability;
-        });
+    state.devicesDescription.canForceZoomCapability =
+        combinedValue(cameras, canForceZoomCapability);
 
     state.devicesDescription.supportsMotionStreamOverride = combinedValue(cameras,
         [](const Camera& camera)
@@ -751,36 +754,18 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     if (state.canForcePanTiltCapabilities())
     {
-        const auto editableCameras = cameras.filtered(
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesUserIsAllowedToModify()
-                    != Ptz::Capability::NoPtzCapabilities;
-            });
-
-        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, editableCameras,
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousPanTiltCapabilities);
-            });
+        fetchFromCameras<bool>(
+            state.expert.forcedPtzPanTiltCapability,
+            cameras,
+            canForcePanTiltCapabilities);
     }
 
     if (state.canForceZoomCapability())
     {
-        const auto editableCameras = cameras.filtered(
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesUserIsAllowedToModify()
-                    != Ptz::Capability::NoPtzCapabilities;
-            });
-
-        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, editableCameras,
-            [](const Camera& camera)
-            {
-                return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousZoomCapability);
-            });
+        fetchFromCameras<bool>(
+            state.expert.forcedPtzZoomCapability,
+            cameras,
+            canForceZoomCapability);
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
@@ -1070,35 +1055,22 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
     state.hasChanges = true;
     state.recording.enabled.setUser(value);
 
-    if (value && !state.recording.schedule.hasValue())
-    {
-        ScheduleTasks tasks;
-        for (int dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)
-        {
-            QnScheduleTask data;
-            data.dayOfWeek = dayOfWeek;
-            data.startTime = 0;
-            data.endTime = 86400;
-            tasks << data;
-        }
-        state.recording.schedule.setUser(tasks);
-    }
-
     const bool emptyScheduleHintDisplayed = state.recordingHint.has_value()
-		&& *state.recordingHint == State::RecordingHint::emptySchedule;
+        && *state.recordingHint == State::RecordingHint::emptySchedule;
 
     if (value)
     {
         const auto schedule = state.recording.schedule.valueOr({});
         const bool scheduleIsEmpty = schedule.isEmpty()
             || std::all_of(schedule.cbegin(), schedule.cend(),
-				[](const QnScheduleTask& task)
+                [](const QnScheduleTask& task)
                 {
                     return task.recordingType == Qn::RecordingType::never;
                 });
+
         if (scheduleIsEmpty)
             state.recordingHint = State::RecordingHint::emptySchedule;
-		else if (emptyScheduleHintDisplayed)
+        else if (emptyScheduleHintDisplayed)
             state.recordingHint = {};
     }
     else if (emptyScheduleHintDisplayed)

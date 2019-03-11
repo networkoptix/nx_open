@@ -43,7 +43,7 @@ TEST(debug, disabledOutput)
     LL NX_PRINT << "LL NX_PRINT, side effect: " << (sideEffect = true);
     ASSERT_TRUE(sideEffect);
 
-    // Compiling the code below should not produce a warning about "dangling else".
+    // Testing that the code below does not produce warnings, namely about "dangling else".
     if (!sideEffect) //< ATTENTION: No braces should be written around NX_OUTPUT inside this `if`.
         NX_OUTPUT << "Should not be executed.";
 }

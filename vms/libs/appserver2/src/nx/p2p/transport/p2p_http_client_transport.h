@@ -5,7 +5,7 @@
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 
 namespace nx::p2p {
 
@@ -66,7 +66,7 @@ private:
     network::websocket::FrameType m_messageType;
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
-    utils::ObjectDestructionFlag m_destructionFlag;
+    utils::InterruptionFlag m_destructionFlag;
     nx::Buffer m_connectionGuid;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
 

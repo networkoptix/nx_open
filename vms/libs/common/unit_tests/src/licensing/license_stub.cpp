@@ -48,9 +48,6 @@ QnLicenseErrorCode QLicenseStubValidator::validate(const QnLicensePtr& license, 
     auto stub = dynamic_cast<QnLicenseStub*>(license.data());
     if (stub)
     {
-        if (stub->isArmServer() && !isAllowedForArm(license))
-            return QnLicenseErrorCode::InvalidType;
-
         // Only single Start license per system is allowed
         if (license->type() == Qn::LC_Start)
             return isValidStartLicense(license);

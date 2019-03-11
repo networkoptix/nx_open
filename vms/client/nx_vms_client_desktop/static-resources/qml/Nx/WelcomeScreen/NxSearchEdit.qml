@@ -1,176 +1,123 @@
-import QtQuick 2.6;
-import Nx 1.0;
+import QtQuick 2.6
+import QtQuick.Controls 2.0
+import Nx 1.0
+import Nx.Controls 1.0
 
-NxTextEdit
+TextField
 {
-    id: control;
+    id: control
 
-    property int delay: 250;
-    property real targetWidth: 250;
+    property alias delay: timer.interval
+    readonly property string query: timer.query
+    readonly property bool active: control.focus || control.text
 
-    property var visualParent;
+    implicitWidth: 280
+    implicitHeight: 28
 
-    property string query;
+    leftPadding: searchIcon.width + 1
+    rightPadding: clearButton.width + 1
 
-    backgroundColor: ColorTheme.window;
-    activeColor: ColorTheme.colors.dark3;
-    textControlEnabled: (state != "masked");
-
-    state: "masked";
-    width: 280;
-
-    function clear()
+    background: Item
     {
-        text = "";
-        state = "masked";
-        animation.complete();
-    }
+        clip: true
 
-    leftControlDelegate: Image
-    {
-        source: "qrc:/skin/welcome_page/search.png";
-    }
-
-    rightControlDelegate: NxImageButton
-    {
-        visible: text.length;
-        standardIconUrl: "qrc:/skin/welcome_page/input_clear.png";
-        hoveredIconUrl: "qrc:/skin/welcome_page/input_clear_hovered.png";
-        pressedIconUrl: "qrc:/skin/welcome_page/input_clear_pressed.png";
-
-        onClicked:
+        Rectangle
         {
-            control.text = "";
-            control.forceActiveFocus();
+            anchors.fill: parent
+            color: control.active ? ColorTheme.colors.dark3 : ColorTheme.window
+        }
+
+        Rectangle
+        {
+            anchors
+            {
+                fill: parent
+                topMargin: 1
+                leftMargin: 0
+                rightMargin: 0
+                bottomMargin: -1
+            }
+            border.width: 2
+            border.color: ColorTheme.colors.dark1
+            radius: 1
+            color: "transparent"
+            visible: control.active
+        }
+
+        Rectangle
+        {
+            anchors.fill: parent
+            color: "transparent"
+            border.color: control.hovered ? ColorTheme.mid : ColorTheme.dark
+        }
+
+        Image
+        {
+            id: searchIcon
+            source: "qrc:/skin/welcome_page/search.png"
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 
-    onVisibleChanged:
+    Button
     {
-        if (enabled && visible)
-            forceActiveFocus();
-    }
+        id: clearButton
 
-    onTextChanged: { timer.restart(); }
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 1
 
-    NxLabel
-    {
-        id: searchLabel;
+        height: parent.height - 2
+        width: height
 
-        text: qsTr("Search");
+        flat: true
+        backgroundColor: ColorTheme.colors.dark5
+        iconUrl: "qrc:/skin/welcome_page/input_clear.png"
 
-        anchors.verticalCenter: parent.verticalCenter;
-        x: (parent.width - width) / 2;
-        visible: (opacity != 0 && !control.text.length);
-    }
+        visible: control.text
 
-    MouseArea
-    {
-        id: activationArea;
-        anchors.fill: parent;
-
-        hoverEnabled: true;
-        visible: (control.state == "masked");
-        acceptedButtons: (control.state == "editable" ? Qt.NoButton : Qt.AllButtons);
         onClicked:
         {
-            control.forceActiveFocus();
-            control.state = "editable";
+            control.forceActiveFocus()
+            control.clear()
         }
     }
 
+    Text
+    {
+        text: qsTr("Search")
+
+        anchors.verticalCenter: parent.verticalCenter
+        x: active ? control.leftPadding + 2 : (parent.width - width) / 2
+        Behavior on x { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        visible: !control.text
+
+        font.pixelSize: 13
+        color: ColorTheme.windowText
+    }
+
+    // This MouseArea is a dirty ad-hoc solution for de-focusing the control by a click outside.
+    // It will not work in many scenarios.
+    // TODO: Replace with something more sane.
     MouseArea
     {
-        id: cancelArea;
-
-        anchors.fill: parent;
-        parent: (visualParent ? visualParent : control.parent);
-
-        visible: control.visible && control.state == "editable";
+        anchors.fill: parent
+        parent: control.parent
+        visible: control.visible && control.active
 
         onPressed:
         {
-            if (!control.text.length)
-                control.state = "masked";
-
-            mouse.accepted = false;
+            control.focus = false
+            mouse.accepted = false
         }
     }
 
-    Rectangle
-    {
-        x: -1;
-        y: 0;
-        width: parent.width + 2;
-        height: parent.height;
-
-        color: "transparent";
-        radius: 1;
-        border.color: control.hasFocus || activationArea.containsMouse
-            ? ColorTheme.mid
-            : ColorTheme.dark;
-    }
-
-
-    states:
-    [
-        State
-        {
-            name: "editable";
-
-            PropertyChanges
-            {
-                target: searchLabel;
-                x: leftControl.width
-                    + 8; //< Offset for cursor position
-            }
-        },
-
-        State
-        {
-            name: "masked";
-
-            PropertyChanges
-            {
-                target: searchLabel;
-                x: (control.width - searchLabel.width) / 2;
-            }
-        }
-    ]
-
-    transitions: Transition
-    {
-        SequentialAnimation
-        {
-            id: animation;
-
-            NumberAnimation
-            {
-                target: searchLabel;
-                property: "x";
-                duration: 200;
-                easing.type: Easing.OutCubic;
-            }
-
-            ScriptAction
-            {
-                script:
-                {
-                    if (control.state == "editable")
-                        control.forceActiveFocus();
-                    else
-                        control.focus = false;
-                }
-            }
-        }
-    }
+    onTextChanged: timer.restart()
 
     Timer
     {
-        id: timer;
-
-        repeat: false;
-        interval: control.delay;
-        onTriggered: { control.query = control.text; }
+        id: timer
+        property string query
+        onTriggered: query = control.text
     }
 }

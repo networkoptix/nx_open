@@ -43,7 +43,7 @@ qt_plugins = [
 nx_libraries = [
     'nx_vms_client_desktop',
     'nx_vms_utils',
-	'nx_vms_applauncher_api',
+    'nx_vms_applauncher_api',
     'nx_utils',
     'nx_sql',
     'nx_network',
@@ -61,11 +61,7 @@ def create_client_update_file(config, output_file):
     binaries_dir = config['bin_source_dir']
     current_binary_dir = config['current_binary_dir']
     qt_directory = config['qt_directory']
-    vcredist_directory = config['vcredist_directory']
-    vox_dir = config['festival_vox_directory']
-    fonts_dir = config['fonts_directory']
     client_qml_dir = config['client_qml_dir']
-    help_directory = config['help_directory']
     client_binary_name = config['client_binary_name']
     launcher_version_name = config['launcher_version_file']
     minilauncher_binary_name = config['minilauncher_binary_name']
@@ -88,10 +84,11 @@ def create_client_update_file(config, output_file):
         qt_plugins_dir = os.path.join(qt_directory, 'plugins')
         e.zip_files_to(zip, e.qt_plugins_files(qt_plugins_dir, qt_plugins), qt_plugins_dir)
 
-        e.zip_rdep_package_to(zip, help_directory)
-        e.zip_rdep_package_to(zip, vcredist_directory)
-        e.zip_rdep_package_to(zip, vox_dir)
-        e.zip_rdep_package_to(zip, fonts_dir)
+        e.zip_rdep_package_to(zip, config['help_directory'])
+        e.zip_rdep_package_to(zip, config['ucrt_directory'])
+        e.zip_rdep_package_to(zip, config['vcrt_directory'])
+        e.zip_rdep_package_to(zip, config['festival_vox_directory'])
+        e.zip_rdep_package_to(zip, config['fonts_directory'])
 
         zip.write(os.path.join(binaries_dir, client_binary_name), client_binary_name)
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')

@@ -251,13 +251,16 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-
         int result = it->findCameras(&cameraInfoTempArray, dafaultURL);
+        NX_VERBOSE(this, "Find cameras for custom plugin [%1] (URL: %2) returned [%3]",
+            it->getVendorName(), dafaultURL, result);
         if( result <= 0 )
             continue;
 
         return createResListFromCameraInfoList( &*it, cameraInfoTempArray );
     }
+
+    NX_VERBOSE(this, "Custom search did not found any cameras");
     return QnResourceList();
 }
 

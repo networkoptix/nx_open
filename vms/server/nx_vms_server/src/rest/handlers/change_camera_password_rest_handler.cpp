@@ -80,6 +80,8 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
+    // NOTE: Reinitialising all camera resources from the group for multichannel cameras
+    NX_DEBUG(this, "Starting reinitialisation of camera to use new credentials");
     for (auto camera: allCamerasInGroup(requestedCamera))
     {
         camera->setAuth(auth);

@@ -338,7 +338,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     if (QnFile::baseName(fileName).indexOf(lit("_")) == -1)
     {
-        QnAviResourcePtr res(new QnAviResource(fileName));
+        QnAviResourcePtr res(new QnAviResource(fileName, serverModule()->commonModule()));
         QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
         avi->setStorage(storage);
         avi->setFastStreamFind(true);
@@ -367,9 +367,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
         delete avi;
         return chunk;
     }
-
-    if (!storage->isFileExists(fileName))
-        return chunk;
 
     auto    nameParts   = QnFile::baseName(fileName).split(lit("_"));
     int64_t startTimeMs = nameParts[0].toLongLong();

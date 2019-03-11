@@ -137,8 +137,7 @@ std::optional<QJsonObject> DeviceAnalyticsSettingsHandler::deviceAgentSettingsMo
 
     if (!engine)
     {
-        const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
-        NX_WARNING(this, message);
+        NX_WARNING(this, "Unable to find analytics engine by id %1", engineId);
         return std::nullopt;
     }
 

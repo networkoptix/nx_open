@@ -9,6 +9,11 @@ MediaServerClient::MediaServerClient(const nx::utils::Url& baseRequestUrl):
 {
 }
 
+MediaServerClient::~MediaServerClient()
+{
+    pleaseStopSync();
+}
+
 void MediaServerClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);

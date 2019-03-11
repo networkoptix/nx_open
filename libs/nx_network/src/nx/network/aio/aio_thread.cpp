@@ -25,6 +25,8 @@ AioThread::~AioThread()
 {
     pleaseStop();
     wait();
+
+    NX_ASSERT(m_taskQueue->empty());
 }
 
 void AioThread::pleaseStop()
@@ -199,8 +201,8 @@ void AioThread::run()
         //processing tasks that have been added from within processPostedCalls() call
         m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
 
-        qint64 curClock = m_taskQueue->getSystemTimerVal();
-        const qint64 nextPeriodicEventClock = m_taskQueue->nextPeriodicEventClock();
+        qint64 curClock = m_taskQueue->getMonotonicTime();
+        const auto nextPeriodicEventClock = m_taskQueue->nextPeriodicEventClock();
 
         //calculating delay to the next periodic task
         const int millisToTheNextPeriodicEvent = nextPeriodicEventClock == 0
@@ -222,7 +224,7 @@ void AioThread::run()
             std::this_thread::sleep_for(kErrorResetTimeout);
             continue;
         }
-        curClock = m_taskQueue->getSystemTimerVal();
+        curClock = m_taskQueue->getMonotonicTime();
         if (triggeredSocketCount == 0)
         {
             if (nextPeriodicEventClock == 0 ||      //no periodic event
@@ -240,6 +242,10 @@ void AioThread::run()
         if (m_taskQueue->processPeriodicTasks(curClock))
             continue;
     }
+
+    // Making sure every completion handler is removed within AIO thread.
+    // Since it can own some socket.
+    m_taskQueue->clear();
 
     NX_DEBUG(this, "AIO thread stopped");
 }

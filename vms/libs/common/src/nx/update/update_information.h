@@ -48,6 +48,7 @@ struct Information
     /** This is release notes for offline update package. */
     /** We need to be able to show this data without internet. */
     QString description;
+    QString eula;
     QList<Package> packages;
     QList<QnUuid> participants;
     qint64 lastInstallationRequestTime = -1;
@@ -62,7 +63,7 @@ struct Information
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
-    (description)(packages)(participants)(lastInstallationRequestTime)
+    (description)(packages)(participants)(lastInstallationRequestTime)(eula)
 
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
 
@@ -179,6 +180,10 @@ struct UpdateContents
     QSet<QnUuid> missingUpdate;
     /** A set of servers that can not accept update version. */
     QSet<QnUuid> invalidVersion;
+    /** A set of peers to be ignored during this update. */
+    QSet<QnUuid> ignorePeers;
+    /** A set of servers with update packages verified. */
+    QSet<QnUuid> serversWithUpdate;
     /**
      * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.

@@ -98,7 +98,7 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
             this,
             QString::fromStdString(nx::sdk::toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
-            analytics::debug_helpers::nameOfFileToDumpDataTo(
+            analytics::debug_helpers::nameOfFileToDumpOrLoadData(
                 QnVirtualCameraResourcePtr(),
                 toSharedPointer(this),
                 nx::vms::server::resource::AnalyticsPluginResourcePtr(),
@@ -152,6 +152,9 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(
         m_sdkEngine,
+        /*device*/ QnVirtualCameraResourcePtr(),
+        /*engine*/ toSharedPointer(this),
+        plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>(),
         makeLogger());
 
     if (!manifest)

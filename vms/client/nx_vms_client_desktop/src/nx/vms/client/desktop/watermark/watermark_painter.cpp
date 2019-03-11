@@ -35,6 +35,11 @@ void WatermarkPainter::setWatermark(nx::core::Watermark watermark)
     m_pixmap = QPixmap(); //< Destroy current image because now we need a new one.
 }
 
+const nx::core::Watermark& WatermarkPainter::watermark() const
+{
+    return m_watermark;
+}
+
 void WatermarkPainter::updateWatermarkImage(const QSize& size)
 {
     m_pixmap = nx::core::retrieveWatermarkImage(m_watermark, size);

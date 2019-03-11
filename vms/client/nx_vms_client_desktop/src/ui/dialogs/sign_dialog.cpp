@@ -96,7 +96,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
 
     m_srcVideoInfo = new QnSignInfo();
 
-    m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
+    m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl(), commonModule()));
 
     // Pass storage to keep password (if any) from parent AviResource to the new one.
     if (auto parentAvi = checkResource.dynamicCast<QnAviResource>())

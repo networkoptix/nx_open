@@ -327,7 +327,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
         return time;
 
     std::fill(m_keyFrameFound.begin(), m_keyFrameFound.end(), false);
-    const auto timeToSeek = qMax(time - m_startTimeUs, 0ll) + m_playlistOffsetUs;
+    const auto timeToSeek = qMax(time - m_startTimeUs, 0ll);
     if (m_hasVideo)
     {
         const auto result = av_seek_frame(
@@ -491,7 +491,6 @@ void QnAviArchiveDelegate::close()
     m_formatContext = nullptr;
     m_initialized = false;
     m_streamsFound = false;
-    m_playlistOffsetUs = 0;
     m_storage.clear();
     m_lastPacketTimes.clear();
     m_lastSeekTime = AV_NOPTS_VALUE;

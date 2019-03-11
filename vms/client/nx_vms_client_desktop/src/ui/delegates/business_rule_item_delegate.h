@@ -56,9 +56,7 @@ private:
     QWidget* createEventEditor(QWidget* parent, const QModelIndex& index) const;
     QWidget* createActionEditor(QWidget* parent, const QModelIndex& index) const;
     QWidget* createAggregationEditor(QWidget* parent, const QModelIndex& index) const;
-
-private slots:
-    void at_editor_commit();
+    void emitCommitData();
 
 private:
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;

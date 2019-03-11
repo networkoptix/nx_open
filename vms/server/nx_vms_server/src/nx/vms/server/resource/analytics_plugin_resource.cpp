@@ -64,6 +64,9 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 
     const auto manifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
         m_sdkPlugin,
+        /*device*/ QnVirtualCameraResourcePtr(),
+        /*engine*/ AnalyticsEngineResourcePtr(),
+        /*plugin*/ toSharedPointer(this),
         makeLogger());
 
     if (!manifest)

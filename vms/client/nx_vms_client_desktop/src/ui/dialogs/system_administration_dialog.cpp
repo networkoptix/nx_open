@@ -15,7 +15,6 @@
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
 #include <ui/widgets/system_settings/user_management_widget.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
-#include <ui/widgets/system_settings/server_updates_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
 #include <ui/widgets/system_settings/smtp/smtp_settings_widget.h>
 #include <ui/help/help_topics.h>
@@ -51,28 +50,12 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(LicensesPage,           new QnLicenseManagerWidget(this),       tr("Licenses"));
     addPage(SmtpPage,               smtpWidget,                             tr("Email"));
 
-    // This is prototype page for updating many servers in one run.
-    if (ini().massSystemUpdatePrototype)
-    {
-        auto multiUpdatesWidget = new MultiServerUpdatesWidget(this);
-        addPage(UpdatesPage, multiUpdatesWidget, tr("Updates"));
-        safeModeWatcher->addControlledWidget(multiUpdatesWidget,
-            QnWorkbenchSafeModeWatcher::ControlMode::Disable);
-    }
-    else
-    {
-        auto updatesWidget = new QnServerUpdatesWidget(this);
-        addPage(UpdatesPage, updatesWidget, tr("Updates"));
-        safeModeWatcher->addControlledWidget(updatesWidget,
-            QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    // This is a page for updating many servers in one run.
+    auto multiUpdatesWidget = new MultiServerUpdatesWidget(this);
+    addPage(UpdatesPage, multiUpdatesWidget, tr("Updates"));
+    safeModeWatcher->addControlledWidget(multiUpdatesWidget,
+        QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 
-        connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
-            [this](bool readOnly)
-            {
-                setPageEnabled(UpdatesPage, !readOnly);
-            });
-        setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
-    }
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     if (ini().redesignedTimeSynchronization)

@@ -647,7 +647,7 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
         .setQuery(QString("time=%1").arg(timeStampMs));
 
     NX_ASSERT(url.isValid());
-    return url.toString();
+    return url.toWebClientStandardViolatingUrl();
 }
 
 QString StringsHelper::toggleStateToString(EventState state) const

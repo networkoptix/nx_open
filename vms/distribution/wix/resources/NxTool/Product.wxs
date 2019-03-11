@@ -93,7 +93,8 @@
             <AppSearch Before="LaunchConditions" />
         </InstallUISequence>
 
-        <Media Id="1" Cabinet="media1.cab" EmbedCab="no" />
+        <Media Id="1" Cabinet="nxtool.cab" EmbedCab="no"/>
+        <Media Id="2" Cabinet="shared.cab" EmbedCab="no"/>
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="$(var.ProgramFilesFolder)">

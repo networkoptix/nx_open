@@ -73,6 +73,8 @@ ConnectionBase::ConnectionBase(
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_httpClient->setSendTimeout(keepAliveTimeout);
     m_httpClient->setResponseReadTimeout(keepAliveTimeout);
+
+    bindToAioThread(m_timer.getAioThread());
 }
 
 ConnectionBase::ConnectionBase(
@@ -92,7 +94,8 @@ ConnectionBase::ConnectionBase(
     m_connectionLockGuard(std::move(connectionLockGuard))
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_timer.bindToAioThread(m_p2pTransport->getAioThread());
+
+    bindToAioThread(m_p2pTransport->getAioThread());
 
     const auto& queryItems = requestUrlQuery.queryItems();
     std::transform(
@@ -129,27 +132,20 @@ void ConnectionBase::stopWhileInAioThread()
     m_httpClient.reset();
 }
 
+void ConnectionBase::pleaseStopSync()
+{
+    if (m_startedClassId)
+    {
+        NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
+            "Please call pleaseStopSync() in the destructor of the nested class.");
+        m_startedClassId = 0;
+        m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
+    }
+}
+
 ConnectionBase::~ConnectionBase()
 {
-    if (m_timer.isInSelfAioThread())
-    {
-        stopWhileInAioThread();
-    }
-    else
-    {
-        std::promise<void> waitToStop;
-        m_timer.pleaseStop(
-            [&]()
-            {
-                if (m_p2pTransport)
-                    m_p2pTransport->pleaseStopSync();
-                if (m_httpClient)
-                    m_httpClient->pleaseStopSync();
-                waitToStop.set_value();
-            }
-        );
-        waitToStop.get_future().wait();
-    }
+    pleaseStopSync();
 }
 
 nx::utils::Url ConnectionBase::remoteAddr() const
@@ -330,6 +326,8 @@ void ConnectionBase::onHttpClientDone()
 
 void ConnectionBase::startConnection()
 {
+     m_startedClassId = typeid(*this).hash_code();
+
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
     m_connectionGuid = QnUuid::createUuid().toByteArray();

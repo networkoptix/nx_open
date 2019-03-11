@@ -28,12 +28,12 @@ class DistributedFileDownloaderStorageTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        workingDirectory =
-            (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
-                ? QDir::homePath()
-                : nx::utils::TestOptions::temporaryDirectoryPath()) + "/storage_ut";
+        workingDirectory =(nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+            ? QDir::homePath()
+            : nx::utils::TestOptions::temporaryDirectoryPath()) + "/storage_ut";
+
         workingDirectory.removeRecursively();
-        NX_ASSERT(QDir().mkdir(workingDirectory.absolutePath()));
+        NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
 
         testFileName = kTestFileName;
         testFilePath = workingDirectory.absoluteFilePath(testFileName);
@@ -217,7 +217,7 @@ TEST_F(DistributedFileDownloaderStorageTest, fileNameWithSubdirectories)
     ASSERT_EQ(downloaderStorage->deleteFile(fileName),
         ResultCode::ok);
 
-    ASSERT_FALSE(workingDirectory.exists("one"));
+    ASSERT_FALSE(QFile::exists(filePath));
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, fileDuplicate)

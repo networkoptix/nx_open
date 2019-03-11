@@ -408,17 +408,15 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 void ExportSettingsDialog::initSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-    if (mediaPersistentSettings.canExportOverlays())
+
+    ui->exportLayoutSettingsPage->setData({ d->exportLayoutPersistentSettings().readOnly });
+
+    // No settings for exportMediaSettingsPage - it will be set up in updateWidgetsState().
+
+    if(mediaPersistentSettings.rapidReview.enabled)
     {
-        ui->exportLayoutSettingsPage->setData({ d->exportLayoutPersistentSettings().readOnly });
-
-        // No settings for exportMediaSettingsPage - it will be set up in updateWidgetsState().
-
-        if(mediaPersistentSettings.rapidReview.enabled)
-        {
-            int speed = d->storedRapidReviewSettings().speed;
-            ui->rapidReviewSettingsPage->setSpeed(speed);
-        }
+        int speed = d->storedRapidReviewSettings().speed;
+        ui->rapidReviewSettingsPage->setSpeed(speed);
     }
 
     ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);

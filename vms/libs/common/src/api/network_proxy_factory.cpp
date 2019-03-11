@@ -119,9 +119,13 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     {
         QnUuid id = server->getOriginalGuid();
         QnRoute route = commonModule()->router()->routeTo(id);
-        if (!route.gatewayId.isNull() || camera) {
+        if (!route.gatewayId.isNull() || camera)
+		{
             if (route.addr.isNull() && !route.reverseConnect)
+			{
                 NX_WARNING(this, "No route to server %1, is connection lost?", id);
+                return QNetworkProxy(QNetworkProxy::NoProxy);
+			}
 
             if (route.reverseConnect)
                 // reverse connection is not supported for a client

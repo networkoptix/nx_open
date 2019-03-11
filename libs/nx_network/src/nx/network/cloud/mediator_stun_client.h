@@ -63,6 +63,7 @@ private:
     bool m_connected = false;
     bool m_externallyProvidedUrl = false;
     nx::network::RetryTimer m_reconnectTimer;
+    bool m_connectionClosureHandlerInstalled = false;
 
     void handleConnectionClosure(SystemError::ErrorCode reason);
 

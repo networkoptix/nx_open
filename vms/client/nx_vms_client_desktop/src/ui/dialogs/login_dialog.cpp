@@ -203,7 +203,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
             break;
     }
 
-    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
+    QnAviResourcePtr resource =
+        QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath, commonModule()));
     if (FileTypeSupport::isImageFileExt(introPath))
         resource->addFlags(Qn::still_image);
     resource->setCommonModule(commonModule());

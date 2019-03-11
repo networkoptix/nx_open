@@ -473,8 +473,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
                         if (dialog->savePassword())
                         {
-                            nx::vms::client::core::settings()->cloudCredentials =
-                                cloudCredentials;
+                            nx::vms::client::core::helpers::saveCloudCredentials(cloudCredentials);
                         }
 
                         qnCloudStatusWatcher->setCredentials(cloudCredentials, true);

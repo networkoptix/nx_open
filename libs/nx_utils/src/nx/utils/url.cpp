@@ -217,6 +217,19 @@ QString Url::toString(QUrl::FormattingOptions options) const
     return url(options);
 }
 
+QString Url::toWebClientStandardViolatingUrl(QUrl::FormattingOptions options) const
+{
+    nx::utils::Url newUrl(*this);
+
+    if (hasFragment())
+    {
+        newUrl.setPath(path() + "#" + fragment());
+        newUrl.setFragment(QString());
+    }
+
+    return newUrl.toString(options).replace("%23", "#");
+}
+
 std::string Url::toStdString(QUrl::FormattingOptions options) const
 {
     return toString(options).toStdString();

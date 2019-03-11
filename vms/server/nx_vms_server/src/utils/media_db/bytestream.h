@@ -12,9 +12,10 @@ public:
 
     quint64 readUint64()
     {
-        quint64* src64 = (quint64*) src;
+        quint64 result;
+        memcpy(&result, src, sizeof(quint64));
         src += sizeof(quint64);
-        return qFromLittleEndian(*src64);
+        return qFromLittleEndian(result);
     }
 
     int readRawData(char* dst, int len)
@@ -52,9 +53,9 @@ public:
     {
         ensureFreeSize(sizeof(quint64));
 
-        quint64* dst64 = (quint64*)m_dst;
+        quint64 littleEndianValue = qToLittleEndian(value);
+        memcpy(m_dst, &littleEndianValue, sizeof(quint64));
         m_dst += sizeof(quint64);
-        *dst64 = qToLittleEndian(value);
     }
 
     void writeRawData(const char* src, int len)

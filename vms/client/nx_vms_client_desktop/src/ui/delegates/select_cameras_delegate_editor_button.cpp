@@ -13,15 +13,13 @@ QnSelectCamerasDialogButton::QnSelectCamerasDialogButton(QWidget* parent):
             return CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
                 resources, this);
         };
-
-    connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
 QnSelectCamerasDialogButton::~QnSelectCamerasDialogButton()
 {
 }
 
-void QnSelectCamerasDialogButton::at_clicked()
+void QnSelectCamerasDialogButton::handleButtonClicked()
 {
     if (!m_selectCamerasFunction)
     {

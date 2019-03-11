@@ -69,19 +69,6 @@ int InputFormat::readFrame(AVPacket * outPacket)
     return av_read_frame(m_formatContext, outPacket);
 }
 
-int InputFormat::readFrameNonBlock(AVPacket * packet, const std::chrono::milliseconds &timeout)
-{
-    int result = readFrame(packet);
-    std::chrono::milliseconds start = now();
-    while (result == AVERROR(EAGAIN) && now() - start < timeout)
-    {
-        static constexpr std::chrono::milliseconds kSleep(1);
-        std::this_thread::sleep_for(kSleep);
-        result = readFrame(packet);
-    }
-    return result;
-}
-
 AVCodecID InputFormat::videoCodecId() const
 {
     return m_formatContext->video_codec_id;

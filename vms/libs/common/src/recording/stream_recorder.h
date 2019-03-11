@@ -166,6 +166,8 @@ protected:
     virtual bool isUtcOffsetAllowed() const { return true; }
     virtual void updateContainerMetadata(QnAviArchiveMetadata* /*metadata*/) const {}
     virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& mediaData) const;
+
+    void setTranscoderQuality(Qn::StreamQuality quality);
 private:
     struct StreamRecorderContext
     {
@@ -245,6 +247,7 @@ private:
     bool m_disableRegisterFile;
     int64_t m_lastFileSize = 0;
     bool m_interleavedStream = false;
+    Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

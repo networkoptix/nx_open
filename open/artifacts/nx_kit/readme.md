@@ -1,5 +1,7 @@
+# Network Optix nx_kit
+
 ---------------------------------------------------------------------------------------------------
-# Introduction
+## Introduction
 
 `nx_kit` is a kit of pure C99/C++11 platform-agnostic utils written by Network Optix (Nx) and used
 across various Nx projects.
@@ -26,7 +28,7 @@ Currently, the following components are included into `nx_kit`:
    This framework is used for the unit tests for `ini_config` and `debug` units of `nx_kit`.
 
 ---------------------------------------------------------------------------------------------------
-# Building
+## Building
 
 This kit is suitable to form a source-only artifact `nx_kit` with the only `src` folder in it -
 the source code files will be compiled as part of the project that uses the artifact. For cmake

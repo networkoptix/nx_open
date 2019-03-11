@@ -409,9 +409,13 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resour
         return;
 
     const QnVirtualCameraResourcePtr& camera = cameraPtr->toSharedPointer().staticCast<QnVirtualCameraResource>();
-    bool ownResource = !camera->hasFlags(Qn::foreigner);
+    const bool ownResource = !camera->hasFlags(Qn::foreigner);
     if (ownResource && !camera->isInitialized())
+    {
+        NX_VERBOSE(this, "Trying to init resource [%1] after status change to [%2]",
+            camera, camera->getStatus());
         camera->initAsync(false);
+    }
 
     updateCamera(camera);
 

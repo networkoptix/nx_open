@@ -59,6 +59,8 @@ private:
 
     void processPluginEvents();
 
+    void generateObjectIds();
+
 private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
@@ -72,14 +74,13 @@ private:
 
     bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;
-    int currentEventTypeIndex = 0;
     int m_objectCounter = 0;
     int m_currentObjectIndex = -1;
-    nx::sdk::Uuid m_objectId;
+    std::vector<nx::sdk::Uuid> m_objectIds;
     std::string m_eventTypeId;
     std::string m_objectTypeId;
     int m_currentObjectTypeIndex = 0;
-    int64_t m_lastVideoFrameTimestampUsec = 0;
+    int64_t m_lastVideoFrameTimestampUs = 0;
 };
 
 const std::string kLineCrossingEventType = "nx.stub.lineCrossing";
