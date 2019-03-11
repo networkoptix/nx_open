@@ -223,9 +223,9 @@ start_server()
     echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
     set -x #< Log the next command.
     "$BIN_FILE" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1
-    EXIT_CODE=$?
+    EXIT_STATUS=$?
     { set +x; } 2>/dev/null
-    echo "Server process has finished with exit code [$EXIT_CODE]"
+    echo "Server process has finished with exit code [$EXIT_STATUS]"
 }
 
 start()
