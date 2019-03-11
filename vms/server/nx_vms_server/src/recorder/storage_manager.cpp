@@ -289,17 +289,23 @@ public:
 
     void addStorageToScan(const QnStorageResourcePtr& storage, bool partialScan)
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         addStorageToScanUnsafe(storage, partialScan);
         m_waitCondition.wakeOne();
     }
 
     void addStoragesToScan(const QVector<QnStorageResourcePtr>& storages, bool partialScan)
     {
-        QnMutexLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         for (auto storage : storages)
             addStorageToScanUnsafe(storage, partialScan);
         m_waitCondition.wakeOne();
+    }
+
+    void cancel()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_cancelled = true;
     }
 
 private:
@@ -344,6 +350,7 @@ private:
     int m_totalCatalogs = 0;
     int m_processedCatalogs = 0;
     QMap<QString, StorageProgress> m_storageToProgress;
+    bool m_cancelled = false;
 
     void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
@@ -364,7 +371,7 @@ private:
         const auto catalogsToScan = m_owner->catalogsToScan(storageIndex);
 
         if (!hasTasksToProcess())
-            resetRebuildInfo();
+            resetState();
         else
             m_totalCatalogs += catalogsToScan.size();
 
@@ -374,13 +381,14 @@ private:
             addFullScanTasks(storage, catalogsToScan);
     }
 
-    void resetRebuildInfo()
+    void resetState()
     {
         m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
         m_totalCatalogs = 0;
         m_processedCatalogs = 0;
         m_storageToProgress.clear();
         ArchiveScanPosition::reset(m_owner->m_role, m_owner->serverModule());
+        m_cancelled = false;
     }
 
     virtual void run() override
@@ -398,7 +406,7 @@ private:
             case Qn::RebuildState_None:
                 if (m_partialScanTasks.isEmpty())
                 {
-                    resetRebuildInfo();
+                    resetState();
                     m_lastTaskProcessed = Qn::RebuildState_None;
                     if (!m_fullScanTasks.isEmpty())
                         processFullTasks(&lock);
@@ -410,7 +418,7 @@ private:
             case Qn::RebuildState_FullScan:
                 if (m_fullScanTasks.isEmpty())
                 {
-                    resetRebuildInfo();
+                    resetState();
                     m_lastTaskProcessed = Qn::RebuildState_None;
                     if (!m_partialScanTasks.isEmpty())
                         processPartialTasks(&lock);
@@ -460,25 +468,20 @@ private:
 
         lock->unlock();
         if (!needToStop())
-            processArchiveCameras(archiveCameras);
+            m_owner->createArchiveCameras(archiveCameras);
     }
 
     void updateProgress(const QnStorageResourcePtr& storage, Qn::RebuildState state)
     {
         const qreal storageProgress =
-            (qreal)m_storageToProgress[storage->getUrl()].processedCatalogs++
+            (qreal) m_storageToProgress[storage->getUrl()].processedCatalogs++
             / m_storageToProgress[storage->getUrl()].totalCatalogs;
 
         m_owner->setRebuildInfo(QnStorageScanData(
             state,
             storage->getUrl(),
             storageProgress,
-            (qreal)m_processedCatalogs / m_totalCatalogs));
-    }
-
-    void processArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
-    {
-        // #TODO #akulikov Implement this.
+            (qreal) m_processedCatalogs / m_totalCatalogs));
     }
 
     void processPartialTasks(nx::utils::MutexLocker* lock)
