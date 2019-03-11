@@ -199,12 +199,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         function updateVideoSource(playingPosition) {
             // clear preview for next camera
             $scope.preview = '';
-            
-            if (!$scope.activeCamera ||
-                $scope.activeCamera.status === 'Unauthorized') {
-                
+    
+            if (!$scope.activeCamera) {
                 $scope.activeVideoSource = {src: ''};
-                
                 return;
             }
             
