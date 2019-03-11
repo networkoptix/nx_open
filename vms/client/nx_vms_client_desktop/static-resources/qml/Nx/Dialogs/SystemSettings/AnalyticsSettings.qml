@@ -11,7 +11,7 @@ Item
     id: analyticsSettings
 
     property var store
-    property alias currentEngineId: menu.currentItemId
+    readonly property alias currentEngineId: menu.currentItemId
 
     NavigationMenu
     {
@@ -45,8 +45,17 @@ Item
 
     function activateEngine(engineId)
     {
-        currentEngineId = engineId
+        menu.currentItemId = engineId
         settingsView.loadModel(store.settingsModel(engineId), store.settingsValues(engineId))
+    }
+
+    onCurrentEngineIdChanged:
+    {
+        // Workaround for META-183.
+        // TODO: #dklychkov Fix properly.
+        // For some reason the notify signal of currentEngineId is not caught by C++ for the very
+        // first time. However any handler on QML side fixes it. This is why this empty handler is
+        // here.
     }
 
     SettingsView
