@@ -1286,13 +1286,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
     else
     {
         if (d->useProprietaryFormat)
-        {
             updatePredefinedTracks();
-        }
         else
-        {
             updateRtpEncoders();
-        }
     }
 
     d->lastPlayCSeq = nx::network::http::getHeaderValue(d->request.headers, "CSeq").toInt();
