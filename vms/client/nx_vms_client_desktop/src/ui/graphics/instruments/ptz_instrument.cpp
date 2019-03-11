@@ -627,6 +627,14 @@ void PtzInstrument::processPtzDoubleClick()
     if (!target() || m_skipNextAction)
         return;
 
+    // Ptz unzoom is not supported on redirected ptz.
+    const auto camera = target()->resource().dynamicCast<QnClientCameraResource>();
+    if (camera && camera->isPtzRedirected())
+    {
+        emit doubleClicked(target());
+        return;
+    }
+
     auto splashItem = newSplashItem(target());
     splashItem->setSplashType(QnSplashItem::Rectangular);
     splashItem->setPos(target()->rect().center());

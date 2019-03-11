@@ -222,7 +222,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
             attributes.push_back(attribute);
         }
 
-        objectMetadata->setAttributes(attributes);
+        objectMetadata->addAttributes(attributes);
         outPacket->addItem(objectMetadata);
     }
 }

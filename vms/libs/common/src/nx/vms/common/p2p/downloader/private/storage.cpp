@@ -13,6 +13,8 @@
 
 using namespace std::chrono;
 
+namespace nx::vms::common::p2p::downloader {
+
 namespace {
 
 static constexpr qint64 kDefaultChunkSize = 1024 * 1024;
@@ -21,7 +23,22 @@ static const milliseconds kCleanupPeriod = 5min;
 
 } // namespace
 
-namespace nx::vms::common::p2p::downloader {
+FileMetadata FileMetadata::fromFileInformation(
+    const FileInformation& fileInformation,
+    const QDir& defaultDownloadsDirectory)
+{
+    FileMetadata info = fileInformation;
+    if (info.chunkSize <= 0)
+        info.chunkSize = kDefaultChunkSize;
+
+    if (info.absoluteDirectoryPath.isEmpty())
+        info.fullFilePath = defaultDownloadsDirectory.absoluteFilePath(info.name);
+    else
+        info.fullFilePath = QDir(info.absoluteDirectoryPath).absoluteFilePath(info.name);
+
+    info.absoluteDirectoryPath = QFileInfo(info.fullFilePath).absolutePath();
+    return info;
+}
 
 QN_FUSION_DECLARE_FUNCTIONS(FileMetadata, (json))
 
@@ -29,6 +46,7 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     QObject(parent),
     m_downloadsDirectory(downloadsDirectory)
 {
+    QDir().mkpath(metadataDirectoryPath());
     /* Cleanup expired files every 5 mins. */
     const auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
@@ -45,19 +63,23 @@ QDir Storage::downloadsDirectory() const
     return m_downloadsDirectory;
 }
 
+QString Storage::filePath(const QString& fileName) const
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.cend())
+        return QString();
+
+    return it.value().fullFilePath;
+}
+
 QStringList Storage::files() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_fileInformationByName.keys();
 }
 
-QString Storage::filePath(const QString& fileName) const
-{
-    return m_downloadsDirectory.absoluteFilePath(fileName);
-}
-
-FileInformation Storage::fileInformation(
-    const QString& fileName) const
+FileInformation Storage::fileInformation(const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_fileInformationByName.value(fileName);
@@ -83,18 +105,11 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
     if (m_fileInformationByName.contains(fileInformation.name))
         return ResultCode::fileAlreadyExists;
 
-    FileMetadata info = fileInformation;
-    const auto path = filePath(fileInformation.name);
-
-    if (info.chunkSize <= 0)
-        info.chunkSize = kDefaultChunkSize;
-
-    QFile file(path);
-
-    if (!file.exists())
+    FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
+    if (!QFile(info.fullFilePath).exists())
         return ResultCode::fileDoesNotExist;
 
-    const auto md5 = calculateMd5(path);
+    const auto md5 = calculateMd5(info.fullFilePath);
     if (md5.isEmpty())
         return ResultCode::ioError;
 
@@ -103,7 +118,7 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
     else if (info.md5 != md5)
         return ResultCode::invalidChecksum;
 
-    const auto size = calculateFileSize(path);
+    const auto size = calculateFileSize(info.fullFilePath);
     if (size < 0)
         return ResultCode::ioError;
 
@@ -113,7 +128,7 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
         return ResultCode::invalidFileSize;
 
     const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
-    info.chunkChecksums = calculateChecksums(path, info.chunkSize);
+    info.chunkChecksums = calculateChecksums(info.fullFilePath, info.chunkSize);
     if (info.chunkChecksums.size() != chunkCount)
         return ResultCode::ioError;
 
@@ -140,28 +155,22 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
     if (m_fileInformationByName.contains(fileInformation.name))
         return ResultCode::fileAlreadyExists;
 
-    FileMetadata info = fileInformation;
-    const auto path = filePath(fileInformation.name);
-
-    if (info.chunkSize <= 0)
-        info.chunkSize = kDefaultChunkSize;
-
-    const auto fileDir = QFileInfo(path).absolutePath();
-    if (!QDir(fileDir).exists())
+    FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
+    if (!QDir(info.absoluteDirectoryPath).exists())
     {
-        if (!QDir().mkpath(fileDir))
+        if (!QDir().mkpath(info.absoluteDirectoryPath))
             return ResultCode::ioError;
     }
 
-    if (!info.md5.isEmpty() && calculateMd5(path) == info.md5)
+    if (!info.md5.isEmpty() && calculateMd5(info.fullFilePath) == info.md5)
     {
         info.status = FileInformation::Status::downloaded;
-        info.size = calculateFileSize(path);
+        info.size = calculateFileSize(info.fullFilePath);
         if (info.size < 0)
             return ResultCode::ioError;
 
         const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
-        info.chunkChecksums = calculateChecksums(path, info.chunkSize);
+        info.chunkChecksums = calculateChecksums(info.fullFilePath, info.chunkSize);
         if (info.chunkChecksums.size() != chunkCount)
             return ResultCode::ioError;
 
@@ -188,7 +197,7 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
             info.chunkChecksums.resize(chunkCount);
         }
 
-        ResultCode reserveStatus = reserveSpace(path, info.size >= 0 ? info.size : 0);
+        ResultCode reserveStatus = reserveSpace(info.fullFilePath, info.size >= 0 ? info.size : 0);
         if (reserveStatus != ResultCode::ok)
             return reserveStatus;
 
@@ -207,8 +216,8 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
     return ResultCode::ok;
 }
 
-ResultCode Storage::updateFileInformation(
-    const QString& fileName, qint64 size, const QByteArray& md5)
+ResultCode Storage::updateFileInformation(const QString& fileName, qint64 size,
+    const QByteArray& md5)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -229,7 +238,7 @@ ResultCode Storage::updateFileInformation(
         const int chunkCount = calculateChunkCount(size, it->chunkSize);
         it->downloadedChunks.resize(chunkCount);
         it->chunkChecksums.resize(chunkCount);
-        resizeFailed = !QFile::resize(filePath(fileName), size);
+        resizeFailed = !QFile::resize(it->fullFilePath, size);
 
         updated = true;
     }
@@ -307,8 +316,7 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
     return ResultCode::ok;
 }
 
-ResultCode Storage::readFileChunk(
-    const QString& fileName, int chunkIndex, QByteArray& buffer)
+ResultCode Storage::readFileChunk(const QString& fileName, int chunkIndex, QByteArray& buffer)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -322,7 +330,7 @@ ResultCode Storage::readFileChunk(
     if (!it->downloadedChunks.testBit(chunkIndex))
         return ResultCode::invalidChunkIndex;
 
-    QFile file(filePath(it->name));
+    QFile file(it->fullFilePath);
     if (!file.open(QFile::ReadOnly))
         return ResultCode::ioError;
 
@@ -337,8 +345,7 @@ ResultCode Storage::readFileChunk(
     return ResultCode::ok;
 }
 
-ResultCode Storage::writeFileChunk(
-    const QString& fileName, int chunkIndex, const QByteArray& buffer)
+ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, const QByteArray& buffer)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -352,7 +359,7 @@ ResultCode Storage::writeFileChunk(
     if (it->status == FileInformation::Status::downloaded)
         return ResultCode::ioError;
 
-    QFile file(filePath(it->name));
+    QFile file(it->fullFilePath);
     if (!file.open(QFile::ReadWrite)) //< ReadWrite because WriteOnly implies Truncate.
         return ResultCode::ioError;
 
@@ -400,7 +407,7 @@ ResultCode Storage::deleteFile(const QString& fileName, bool deleteData)
             return resultCode;
     }
 
-    emit fileDeleted(fileName);
+    emit fileDeleted(filePath(fileName));
     return ResultCode::ok;
 }
 
@@ -410,37 +417,39 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
     if (it == m_fileInformationByName.end())
         return ResultCode::fileDoesNotExist;
 
-    const auto path = filePath(it->name);
-
-    if (deleteData && QFile::exists(path))
+    if (deleteData && QFile::exists(it->fullFilePath))
     {
-        if (!QFile::remove(path))
+        if (!QFile::remove(it->fullFilePath))
             return ResultCode::ioError;
     }
 
-    const auto metadataFileName = this->metadataFileName(path);
+    const auto metadataFileName = this->metadataFileName(it->fullFilePath);
     if (QFile::exists(metadataFileName))
     {
         if (!QFile::remove(metadataFileName))
             return ResultCode::ioError;
     }
 
-    QDir dir = QFileInfo(path).absoluteDir();
-    while (dir != m_downloadsDirectory)
+    // We won't delete custom user directories.
+    if (it->absoluteDirectoryPath.contains(m_downloadsDirectory.absolutePath()))
     {
-        if (dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
+        QDir dir = QFileInfo(it->absoluteDirectoryPath).absoluteDir();
+        while (dir != m_downloadsDirectory)
         {
-            const auto name = dir.dirName();
+            if (dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
+            {
+                const auto name = dir.dirName();
 
-            if (!dir.cdUp())
-                break;
+                if (!dir.cdUp())
+                    break;
 
-            if (!dir.rmdir(name))
+                if (!dir.rmdir(name))
+                    break;
+            }
+            else
+            {
                 break;
-        }
-        else
-        {
-            break;
+            }
         }
     }
 
@@ -494,7 +503,7 @@ ResultCode Storage::setChunkChecksums(
     if (it->size < 0)
         return ResultCode::ok;
 
-    auto actualChecksums = calculateChecksums(filePath(fileName), it->chunkSize);
+    auto actualChecksums = calculateChecksums(it->fullFilePath, it->chunkSize);
     if (actualChecksums.size() != it->downloadedChunks.size())
         actualChecksums.resize(it->downloadedChunks.size());
 
@@ -520,7 +529,7 @@ void Storage::cleanupExpiredFiles()
     for (const FileMetadata& data: m_fileInformationByName)
     {
         if (data.ttl > 0 && data.touchTime + data.ttl <= currentTime)
-            expiredFiles.insert(data.name);
+            expiredFiles.insert(data.fullFilePath);
     }
 
     QSet<QString> successfullyDeletedFiles;
@@ -549,7 +558,7 @@ void Storage::findDownloads(bool waitForFinished)
     m_findDownloadsWatcher.setFuture(QtConcurrent::run(
         [this]()
         {
-            findDownloadsRecursively(m_downloadsDirectory);
+            findDownloadsImpl();
             cleanupExpiredFiles();
         }));
 
@@ -560,29 +569,22 @@ void Storage::findDownloads(bool waitForFinished)
     }
 }
 
-void Storage::findDownloadsRecursively(const QDir& dir)
+void Storage::findDownloadsImpl()
 {
-    for (const auto& entry: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+    for (const auto& entry: QDir(metadataDirectoryPath()).entryInfoList(QDir::Files))
     {
         auto fileName = entry.absoluteFilePath();
-        if (entry.isDir())
+        if (!fileName.endsWith(kMetadataSuffix))
+            continue;
+
+        fileName.truncate(fileName.size() - kMetadataSuffix.size());
         {
-            findDownloadsRecursively(QDir(fileName));
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (m_fileInformationByName.contains(fileName))
+                continue;
         }
-        else if (fileName.endsWith(kMetadataSuffix))
-        {
-            fileName.truncate(fileName.size() - kMetadataSuffix.size());
-            if (entry.isFile())
-            {
-                const auto& name = m_downloadsDirectory.relativeFilePath(fileName);
-                {
-                    NX_MUTEX_LOCKER lock(&m_mutex);
-                    if (m_fileInformationByName.contains(name))
-                        continue;
-                }
-                loadDownload(fileName);
-            }
-        }
+
+        loadDownload(fileName);
     }
 }
 
@@ -650,7 +652,7 @@ QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 
 
 bool Storage::saveMetadata(const FileMetadata& fileInformation)
 {
-    const auto fileName = metadataFileName(filePath(fileInformation.name));
+    const auto fileName = metadataFileName(fileInformation.fullFilePath);
 
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly))
@@ -696,6 +698,11 @@ FileMetadata Storage::loadMetadata(const QString& fileName)
     return fileInfo;
 }
 
+QString Storage::metadataDirectoryPath() const
+{
+    return m_downloadsDirectory.absoluteFilePath(kMetadataSuffix);
+}
+
 FileMetadata Storage::fileMetadata(const QString& fileName) const
 {
     return m_fileInformationByName.value(fileName);
@@ -733,9 +740,7 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
             return;
     }
 
-    const auto path = filePath(fileInfo.name);
-
-    const auto md5 = calculateMd5(path);
+    const auto md5 = calculateMd5(fileInfo.fullFilePath);
     if (md5 != fileInfo.md5)
     {
         fileInfo.status = FileInformation::Status::corrupted;
@@ -743,7 +748,7 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
     }
 
     fileInfo.status = FileInformation::Status::downloaded;
-    fileInfo.chunkChecksums = calculateChecksums(path, fileInfo.chunkSize);
+    fileInfo.chunkChecksums = calculateChecksums(fileInfo.fullFilePath, fileInfo.chunkSize);
 }
 
 ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
@@ -765,10 +770,11 @@ ResultCode Storage::reserveSpace(const QString& fileName, const qint64 size)
 
 QString Storage::metadataFileName(const QString& fileName)
 {
+    NX_ASSERT(!fileName.isEmpty());
     if (fileName.isEmpty())
         return QString();
 
-    return fileName + kMetadataSuffix;
+    return QDir(metadataDirectoryPath()).absoluteFilePath(QFileInfo(fileName).fileName() + kMetadataSuffix);
 }
 
 qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunkSize)
@@ -785,6 +791,7 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
         : fileSize - chunkSize * (chunkCount - 1);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields \
+    (chunkChecksums)(fullFilePath))
 
 } // nx::vms::common::p2p::downloader

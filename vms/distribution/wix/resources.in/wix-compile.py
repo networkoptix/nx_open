@@ -39,35 +39,36 @@ wix_extensions = [
     'WixBalExtension'
 ]
 
-client_components = [
-    'shared_libraries',
+shared_vms_components = [
+    'shared_nx_libraries',
+    'shared_misc_libraries',
+    'shared_qt_libraries',
+    'shared_qt_platform_libraries',
+    'shared_icu_libraries',
+    'shared_ucrt_libraries',
+    'shared_vcrt_libraries',
+    'vox',
+    'MyExitDialog',
+    'UpgradeDlg',
+    'SelectionWarning'
+]
+
+client_components = shared_vms_components + [
     'client_libraries',
     'Associations',
     'ClientDlg',
     'client/msi_interface',
     'ClientFonts',
-    'vox',
     'ClientBg',
     'ClientQml',
     'Client',
     'ClientHelp',
-    'ClientVcrt14',
-    'MyExitDialog',
-    'UpgradeDlg',
-    'SelectionWarning',
     'Product-client-only']
 
-server_components = [
-    'shared_libraries',
+server_components = shared_vms_components + [
     'server_libraries',
-    'vox',
     'Server',
     'traytool',
-    'ServerVcrt14',
-    'TraytoolVcrt14',
-    'MyExitDialog',
-    'UpgradeDlg',
-    'SelectionWarning',
     'Product-server-only']
 
 client_exe_components = ['ArchCheck', 'ClientPackage', 'Product-client-exe']
@@ -121,7 +122,6 @@ def build_client(config):
     candle_msi_variables = {
         'ClientFontsSourceDir': environment.client_fonts_source_dir,
         'VoxSourceDir': environment.vox_source_dir,
-        'Vcrt14SrcDir': environment.vcrt14_source_dir,
         'ClientQmlDir': environment.client_qml_source_dir,
         'ClientHelpSourceDir': environment.client_help_source_dir,
         'ClientBgSourceDir': environment.client_background_source_dir
@@ -147,8 +147,7 @@ def build_client(config):
 
 def build_server(config):
     candle_msi_variables = {
-        'VoxSourceDir': environment.vox_source_dir,
-        'Vcrt14SrcDir': environment.vcrt14_source_dir
+        'VoxSourceDir': environment.vox_source_dir
     }
     set_embedded_cabs(candle_msi_variables, True)
     build_msi('server-msi', server_msi_file, server_components, candle_msi_variables, config)

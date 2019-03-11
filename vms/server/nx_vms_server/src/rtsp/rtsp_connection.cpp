@@ -516,8 +516,8 @@ void QnRtspConnectionProcessor::sendResponse(
         d->socket->getForeignAddress().address.toString(),
         response);
 
-    NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n\n\n",
-        d->socket->getForeignAddress().toString(),
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, "Sending response to %1:\n%2\n-------------------\n",
+        d->socket->getForeignAddress(),
         response);
 
     QnMutexLocker lock(&d->sockMutex);
@@ -1064,7 +1064,11 @@ void QnRtspConnectionProcessor::createDataProvider()
         camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
+        {
+            NX_VERBOSE(this,
+                "Trying to initialise resource if it was not initialised on some unknown reason");
             cameraRes->initAsync(true);
+        }
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
     {
@@ -1553,6 +1557,7 @@ void QnRtspConnectionProcessor::processRequest()
 {
     Q_D(QnRtspConnectionProcessor);
     QnMutexLocker lock( &d->mutex );
+    NX_VERBOSE(this, "Processing request: [%1]", d->request.requestLine.toString().trimmed());
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();

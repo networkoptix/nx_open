@@ -75,14 +75,15 @@ protected:
         const QMap<QnUuid, update::Status::Code>& expectedStatuses,
         bool isRequestLocal = false)
     {
-        QList<nx::update::Status> updateStatusList;
         while (true)
         {
             QString path = "/ec2/updateStatus";
             if (isRequestLocal)
                 path += "?local";
 
-            NX_TEST_API_GET(m_peers[0].get(), path, &updateStatusList);
+            QnJsonRestResult result;
+            NX_TEST_API_GET(m_peers[0].get(), path, &result);
+            const auto updateStatusList = result.deserialized<QList<nx::update::Status>>();
             bool ok = true;
             if (updateStatusList.size() == expectedStatuses.size())
             {
@@ -136,9 +137,10 @@ protected:
 
     void thenGlobalUpdateInformationShouldContainParticipants(const QList<QnUuid>& participants)
     {
-        update::Information receivedUpdateInfo;
-        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
 
+        update::Information receivedUpdateInfo = result.deserialized<update::Information>();
         ASSERT_EQ(participants.size(), receivedUpdateInfo.participants.size());
         for (const auto& participant: receivedUpdateInfo.participants)
             ASSERT_TRUE(participants.contains(participant));
@@ -146,9 +148,10 @@ protected:
 
     void thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime()
     {
-        update::Information receivedUpdateInfo;
-        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
 
+        update::Information receivedUpdateInfo = result.deserialized<update::Information>();
         ASSERT_NE(-1, receivedUpdateInfo.lastInstallationRequestTime);
     }
 
@@ -170,10 +173,9 @@ protected:
     {
         NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "");
 
-        update::Information receivedUpdateInfo;
-        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &receivedUpdateInfo);
-
-        ASSERT_TRUE(receivedUpdateInfo.isEmpty());
+        QnRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
+        ASSERT_NE(QnRestResult::NoError, result.error);
     }
 
     void whenServerRestartedWithNewVersion(int peerIndex, const std::string& version = "4.0.0.1")
@@ -252,17 +254,22 @@ private:
         bool shouldBeEmpty = false,
         const QString& versionKey = QString())
     {
-        update::Information receivedUpdateInfo;
         QString path = "/ec2/updateInformation";
         if (!versionKey.isNull())
             path += "?version=" + versionKey;
 
-        NX_TEST_API_GET(m_peers[0].get(), path, &receivedUpdateInfo);
-
         if (shouldBeEmpty)
-            ASSERT_TRUE(receivedUpdateInfo.isEmpty());
+        {
+            QnRestResult result;
+            NX_TEST_API_GET(m_peers[0].get(), path, &result);
+            ASSERT_NE(QnRestResult::NoError, result.error);
+        }
         else
-            ASSERT_EQ(m_updateInformation.version, receivedUpdateInfo.version);
+        {
+            QnJsonRestResult result;
+            NX_TEST_API_GET(m_peers[0].get(), path, &result);
+            ASSERT_EQ(m_updateInformation.version, result.deserialized<nx::update::Information>().version);
+        }
     }
 
     void setUpdateInformation(const QList<QnUuid>& participants = QList<QnUuid>())

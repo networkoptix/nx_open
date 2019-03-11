@@ -170,7 +170,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(co
     return m_offlineUpdateCheckResult.get_future();
 }
 
-std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
+std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdateInfo()
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
@@ -178,17 +178,27 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo(
         auto result = promise->get_future();
         // Requesting remote update info.
         connection->getUpdateInfo(
-            [promise = std::move(promise), tool=QPointer<ServerUpdateTool>(this)](bool success,
-                rest::Handle /*handle*/, const nx::update::Information& response)
+            [this, promise = std::move(promise), tool=QPointer<ServerUpdateTool>(this)](bool success,
+                rest::Handle /*handle*/, rest::UpdateInformationData response)
             {
                 UpdateContents contents;
                 if (success)
                 {
-                    contents.info = response;
-                    if (tool)
+                    if (response.error != QnRestResult::NoError)
                     {
-                        tool->m_timeStartedInstall = response.lastInstallationRequestTime;
-                        tool->m_serversAreInstalling = response.participants.toSet();
+                        NX_DEBUG(
+                            this,
+                            lm("checkMediaserverUpdateInfo: An error in response to the /ec2/updateInformation request: %1")
+                                .args(response.errorString));
+                    }
+                    else
+                    {
+                        contents.info = response.data;
+                        if (tool)
+                        {
+                            tool->m_timeStartedInstall = contents.info.lastInstallationRequestTime;
+                            tool->m_serversAreInstalling = contents.info.participants.toSet();
+                        }
                     }
                 }
                 contents.sourceType = nx::update::UpdateSourceType::mediaservers;
@@ -198,7 +208,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo(
     }
     else
     {
-        NX_WARNING(this) << "requestRemoteUpdateInfo() - have no connection to the server";
+        NX_WARNING(this) << "checkMediaserverUpdateInfo() - have no connection to the server";
         std::promise<UpdateContents> emptyPromise;
         auto result = emptyPromise.get_future();
         emptyPromise.set_value(UpdateContents());
@@ -504,6 +514,8 @@ void ServerUpdateTool::startUpload(
 {
     NX_ASSERT(server);
     auto serverId = server->getId();
+    if (filesToUpload.isEmpty())
+        NX_ERROR(this, "no packages to upload to %1, what is going on!?", serverId);
     for (const auto& path: filesToUpload)
     {
         auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
@@ -543,6 +555,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     if (recipients.empty())
     {
         // TODO: Do something meaningfull here
+        NX_WARNING(this, "startUpload(%1) - no recipients for update", contents.info.version);
         return false;
     }
 
@@ -553,8 +566,15 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_completedUploads.clear();
     m_uploadStateById.clear();
 
-    for (const auto& server: recipients)
-        startUpload(server, contents.filesToUpload, contents.storageDir);
+    if (contents.filesToUpload.isEmpty())
+    {
+        NX_WARNING(this, "startUpload(%1) - nothing to upload", contents.info.version);
+    }
+    else
+    {
+        for (const auto& server: recipients)
+            startUpload(server, contents.filesToUpload, contents.storageDir);
+    }
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);
@@ -831,12 +851,22 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        using UpdateStatusAll = std::vector<nx::update::Status>;
-
-        auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
+        auto callback =
+            [this, tool = QPointer<ServerUpdateTool>(this)](
+                bool success,
+                rest::Handle handle,
+                rest::UpdateStatusAllData response)
             {
+                if (response.error != QnRestResult::NoError)
+                {
+                    NX_DEBUG(
+                        this,
+                        lm("requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: %1")
+                            .args(response.errorString));
+                }
+
                 if (tool)
-                    tool->atUpdateStatusResponse(success, handle, response);
+                    tool->atUpdateStatusResponse(success, handle, response.data);
             };
 
         // Requesting update status for mediaservers.
@@ -847,15 +877,17 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
         // Requesting remote update info.
         handle = connection->getUpdateInfo(
-            [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [this, tool = QPointer<ServerUpdateTool>(this)](
+                bool success, rest::Handle handle, rest::UpdateInformationData response)
             {
                 if (!tool)
                     return;
+
                 tool->m_activeRequests.remove(handle);
-                if (success)
+                if (success && response.error == QnRestResult::NoError)
                 {
-                    tool->m_updateManifest = response;
-                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.participants);
+                    tool->m_updateManifest = response.data;
+                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
                 }
             }, thread());
         m_activeRequests.insert(handle);
@@ -867,14 +899,23 @@ std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpda
     auto promise = std::make_shared<std::promise<std::vector<nx::update::Status>>>();
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
-        using UpdateStatusAll = std::vector<nx::update::Status>;
         connection->getUpdateStatus(
-            [promise, tool = QPointer<ServerUpdateTool>(this)](
-                 bool success, rest::Handle handle, const UpdateStatusAll& response)
+            [this, promise, tool = QPointer<ServerUpdateTool>(this)](
+                 bool success,
+                 rest::Handle handle,
+                 rest::UpdateStatusAllData response)
             {
+                if (response.error != QnRestResult::NoError)
+                {
+                    NX_DEBUG(
+                        this,
+                        lm("requestRemoteUpdateState: An error in response to the /ec2/updateStatus request: %1")
+                            .args(response.errorString));
+                }
+
                 if (tool)
-                    tool->atUpdateStatusResponse(success, handle, response);
-                promise->set_value(response);
+                    tool->atUpdateStatusResponse(success, handle, response.data);
+                promise->set_value(response.data);
             }, thread());
     }
     else
@@ -885,6 +926,15 @@ std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpda
     return promise->get_future();
 }
 
+QString ServerUpdateTool::getServerAuthString() const
+{
+    const auto& connectionInfo = commonModule()->ec2Connection()->connectionInfo();
+    nx::utils::Url serverUrl = connectionInfo.ecUrl;
+    if (serverUrl.scheme().isEmpty())
+        serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));
+
+    return QnStartupParameters::createAuthenticationString(serverUrl, connectionInfo.version);
+}
 
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {
@@ -1018,7 +1068,7 @@ QString ServerUpdateTool::getUpdateInformationUrl() const
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
+    return getServerUrl(commonModule(), "/ec2/updateInfomation?version=installed");
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(
@@ -1035,7 +1085,7 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
     auto engineVersion = commonModule()->engineVersion();
 
     return std::async(
-        [updateUrl, connection, engineVersion, changeset]() -> UpdateContents
+        [this, updateUrl, connection, engineVersion, changeset]() -> UpdateContents
         {
             UpdateContents contents;
 
@@ -1046,24 +1096,41 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
                 contents.sourceType = nx::update::UpdateSourceType::internet;
             else
                 contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
-            contents.source = lit("%1 for build=%2").arg(updateUrl, changeset);
+            contents.source = lit("%1 by serverUpdateTool for build=%2").arg(updateUrl, changeset);
 
             if (contents.error == nx::update::InformationError::networkError && connection)
             {
                 NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
                 auto promise = std::make_shared<std::promise<bool>>();
-                contents.source = lit("%1 for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
+                contents.source = lit("%1 by serverUpdateTool for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
                 contents.info = {};
                 auto proxyCheck = promise->get_future();
                 connection->checkForUpdates(changeset,
-                    [promise = std::move(promise), &contents](bool success,
-                        rest::Handle /*handle*/, const QnJsonRestResult& response)
+                    [this, promise = std::move(promise), &contents](bool success,
+                        rest::Handle /*handle*/, rest::UpdateInformationData response)
                     {
                         if (success)
-                            contents.info = response.deserialized<nx::update::Information>();
+                        {
+                            if (response.error != QnRestResult::NoError)
+                            {
+                                NX_DEBUG(
+                                    this,
+                                    lm("checkSpecificChangeset: An error in response to the /ec2/updateInformation request: %1")
+                                        .args(response.errorString));
+
+                                QnLexical::deserialize(response.errorString, &contents.error);
+                            }
+                            else
+                            {
+                                contents.error = nx::update::InformationError::noError;
+                                contents.info = response.data;
+                            }
+                        }
                         else
+                        {
                             contents.error = nx::update::InformationError::networkError;
-                        QnLexical::deserialize(response.errorString, &contents.error);
+                        }
+
                         promise->set_value(success);
                     });
 

@@ -4,6 +4,7 @@
 
 #include <QtCore/QTimer>
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/random.h>
@@ -530,7 +531,7 @@ void Worker::handleFileInformationReply(
                     "During setting chunk size storage returned error: %1",
                 resultCode);
 
-            fail();
+            finish(State::failed);
             return;
         }
 
@@ -664,7 +665,7 @@ void Worker::handleChecksumsReply(
     if (fileInfo.status != FileInformation::Status::downloading
         || fileInfo.downloadedChunks.count(true) == fileInfo.downloadedChunks.size())
     {
-        fail();
+        finish(State::failed);
         return;
     }
 
@@ -727,14 +728,14 @@ void Worker::downloadNextChunk()
         m_peerInfoById[peerId].rank,
         m_peerManager->distanceTo(peerId));
 
-    auto handleReply =
+    auto handleReply = nx::utils::guarded(this,
         [this, chunkIndex](
             bool result,
             rest::Handle handle,
             const QByteArray& data)
         {
             handleDownloadChunkReply(result, handle, chunkIndex, data);
-        };
+        });
 
     if (m_subsequentChunksToDownload == 0)
     {
@@ -864,21 +865,12 @@ void Worker::cancelRequestsByType(State type)
     }
 }
 
-void Worker::finish()
+void Worker::finish(State state)
 {
     setState(State::finished);
-    NX_INFO(m_logTag, "Download finished.");
+    NX_INFO(m_logTag, "Download finished: %1.", state);
     m_mutex.unlock();
     emit finished(m_fileName);
-    m_mutex.lock();
-}
-
-void Worker::fail()
-{
-    setState(State::failed);
-    NX_ERROR(m_logTag, "Download failed.");
-    m_mutex.unlock();
-    emit failed(m_fileName);
     m_mutex.lock();
 }
 

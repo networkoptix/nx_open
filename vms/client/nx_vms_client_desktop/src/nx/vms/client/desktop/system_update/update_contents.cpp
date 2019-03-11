@@ -168,11 +168,11 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     contents.invalidVersion.clear();
     contents.missingUpdate.clear();
-    contents.filesToUpload.clear();
 
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerted)
     {
+        contents.filesToUpload.clear();
         QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
         QList<nx::update::Package> checked;
         for (auto& pkg: contents.info.packages)

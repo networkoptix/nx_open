@@ -13,8 +13,7 @@
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/connection_server/base_protocol_message_types.h"
 #include "nx/network/socket_common.h"
-#include "nx/network/socket_factory.h"
-#include "nx/network/system_socket.h"
+#include "nx/network/abstract_socket.h"
 
 namespace nx {
 namespace network {
@@ -36,14 +35,14 @@ public:
     void startReceivingMessages();
     void stopReceivingMessagesSync();
 
-    const std::unique_ptr<network::UDPSocket>& socket();
+    const std::unique_ptr<AbstractDatagramSocket>& socket();
     /**
      * Move ownership of socket to the caller.
      * UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
      * NOTE: Can be called within send/recv completion handler only
      *     (more specifically, within socket's aio thread)!
      */
-    std::unique_ptr<network::UDPSocket> takeSocket();
+    std::unique_ptr<AbstractDatagramSocket> takeSocket();
 
     void sendDatagram(
         SocketAddress destinationEndpoint,
@@ -77,7 +76,7 @@ private:
         OutgoingMessageContext& operator=(const OutgoingMessageContext&);
     };
 
-    std::unique_ptr<UDPSocket> m_socket;
+    std::unique_ptr<AbstractDatagramSocket> m_socket;
     nx::Buffer m_readBuffer;
     std::deque<OutgoingMessageContext> m_sendQueue;
     nx::utils::ObjectDestructionFlag m_terminationFlag;

@@ -478,9 +478,8 @@ struct ModifyResourceAccess
         const Param& param)
     {
         NX_VERBOSE(this,
-            lm("Got modify resource request. Is system access: %1, Data type: %2," \
-                " Data contents: %3").args(hasSystemAccess(accessData), typeid(param).name(),
-                    QJson::serialized(param)));
+            "Got modify resource request. Is system access: %1, Data type: %2, Data contents: %3",
+            hasSystemAccess(accessData), typeid(param), QJson::serialized(param));
 
         if (hasSystemAccess(accessData))
             return true;
@@ -499,10 +498,10 @@ struct ModifyResourceAccess
             result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
-            NX_WARNING(this, lit("%1 resource access returned false. User resource: %3. Target resource: %4")
-                .arg(isRemove ? "Remove" : "Modify")
-                .arg(userResource ? userResource->getId().toString() : QString())
-                .arg(target ? target->getId().toString() : QString()));
+            NX_INFO(this, "%1 resource access returned false. User resource: %3. Target resource: %4",
+                isRemove ? "Remove" : "Modify",
+                userResource ? userResource->getId().toString() : QString(),
+                target ? target->getId().toString() : QString());
 
         return result;
     }

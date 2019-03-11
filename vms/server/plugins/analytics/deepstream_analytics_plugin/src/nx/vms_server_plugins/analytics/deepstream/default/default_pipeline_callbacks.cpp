@@ -174,7 +174,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
                 nx::sdk::UuidHelper::toStdString(uuid));
         }
 
-        detectedObject->setAttributes(
+        detectedObject->addAttributes(
             std::vector<nx::sdk::analytics::Attribute>(
                 attributes.begin(),
                 attributes.end()));

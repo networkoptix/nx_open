@@ -106,6 +106,7 @@ void checkCloudHostRemotely(
 }
 
 int QnUpdateInformationRestHandler::checkInternetForUpdate(
+    const QnRequestParamList& params,
     const QString& publicationKey,
     QByteArray* result,
     QByteArray* contentType,
@@ -117,7 +118,8 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
 
     if (error == nx::update::InformationError::noError)
     {
-        QnFusionRestHandlerDetail::serialize(information, *result, *contentType, request.format);
+        QnFusionRestHandlerDetail::serializeJsonRestReply(information, params, *result, *contentType,
+            QnRestResult());
         return nx::network::http::StatusCode::ok;
     }
 
@@ -129,6 +131,7 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
 }
 
 static int checkForUpdateInformationRemotely(
+    const QnRequestParamList& params,
     QnCommonModule* commonModule,
     const QString& path,
     QByteArray* result,
@@ -156,8 +159,8 @@ static int checkForUpdateInformationRemotely(
 
     if (done)
     {
-        QnFusionRestHandlerDetail::serialize(
-            outputReply, *result, *contentType, context->request().format);
+        QnFusionRestHandlerDetail::serializeJsonRestReply(outputReply, params, *result, *contentType,
+            QnRestResult());
         return nx::network::http::StatusCode::ok;
     }
 
@@ -169,15 +172,25 @@ static int checkForUpdateInformationRemotely(
 }
 
 static int makeUpdateInformationResponse(
+    const QnRequestParamList& params,
     const QByteArray& updateInformationData,
     QByteArray* result,
     QByteArray* contentType,
     const UpdateInformationRequestData& request)
 {
-    *contentType = Qn::serializationFormatToHttpContentType(request.format);
-    *result = updateInformationData;
-    if (result->isEmpty())
-        *result = "{}";
+    nx::update::Information resultUpdateInformation;
+    const auto deserializeResult = nx::update::fromByteArray(updateInformationData,
+        &resultUpdateInformation, nullptr);
+
+    if (deserializeResult != nx::update::FindPackageResult::ok || !resultUpdateInformation.isValid())
+    {
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
+            toString(nx::update::InformationError::notFoundError), result, contentType,
+            request.format, request.extraFormatting, QnRestResult::CantProcessRequest);
+    }
+
+    QnFusionRestHandlerDetail::serializeJsonRestReply(resultUpdateInformation, params, *result,
+        *contentType, QnRestResult());
 
     return nx::network::http::StatusCode::ok;
 }
@@ -238,20 +251,21 @@ int QnUpdateInformationRestHandler::executeGet(
 
     if (versionValue.isNull() || versionValue == "target")
     {
-        return makeUpdateInformationResponse(
+        return makeUpdateInformationResponse(params,
             commonModule->globalSettings()->targetUpdateInformation(), &result, &contentType,
             request);
     }
 
     if (versionValue == "installed")
     {
-        return makeUpdateInformationResponse(
+        return makeUpdateInformationResponse(params,
             commonModule->globalSettings()->installedUpdateInformation(), &result, &contentType,
             request);
     }
 
     if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
-        return checkInternetForUpdate(versionValue, &result, &contentType, request);
+        return checkInternetForUpdate(params, versionValue, &result, &contentType, request);
 
-    return checkForUpdateInformationRemotely(commonModule, path, &result, &contentType, &context);
+    return checkForUpdateInformationRemotely(params, commonModule, path, &result, &contentType,
+        &context);
 }

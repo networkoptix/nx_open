@@ -35,7 +35,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
-    NX_INI_FLAG(1, massSystemUpdatePrototype, "Enable experimental system update.");
     NX_INI_FLAG(0, massSystemUpdateDebugInfo,
         "Show additional debug information for experimental update system.");
     NX_INI_FLAG(0, massSystemUpdateClearDownloads,
@@ -61,6 +60,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, startPlaybackOnTileNavigation, "Start playback if timeline navigation occured after Right Panel tile click or double click.");
     NX_INI_FLAG(0, systemUpdateProgressInformers, "Show Right Panel progress informers during System Update (unfinished functionality).");
     NX_INI_FLAG(0, compatibilityIsMediaPaused, "Check if all sync play items are paused at every request.");
+    NX_INI_STRING("", enableEntropixZoomWindowReconstructionOn,
+		"Enable Entropix 'Reconstruct Resolution' integration on the cameras, which model matches "
+		"the provided string, counted as a regular expression.");
 };
 
 inline Ini& ini()

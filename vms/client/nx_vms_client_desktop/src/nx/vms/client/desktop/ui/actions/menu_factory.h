@@ -19,6 +19,8 @@ public:
     void beginGroup();
     void endGroup();
 
+    Builder registerAction(IDType id);
+    Builder registerAction();
     Builder operator()(IDType id);
     Builder operator()();
 

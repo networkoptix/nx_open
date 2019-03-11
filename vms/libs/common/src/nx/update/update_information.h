@@ -48,6 +48,7 @@ struct Information
     /** This is release notes for offline update package. */
     /** We need to be able to show this data without internet. */
     QString description;
+    QString eula;
     QList<Package> packages;
     QList<QnUuid> participants;
     qint64 lastInstallationRequestTime = -1;
@@ -62,7 +63,7 @@ struct Information
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
-    (description)(packages)(participants)(lastInstallationRequestTime)
+    (description)(packages)(participants)(lastInstallationRequestTime)(eula)
 
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
 

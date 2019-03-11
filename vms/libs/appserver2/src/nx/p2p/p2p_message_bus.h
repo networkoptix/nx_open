@@ -20,6 +20,7 @@
 #include "connection_context.h"
 #include "p2p_serialization.h"
 #include <transaction/amend_transaction_data.h>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace p2p {
@@ -184,7 +185,7 @@ protected:
         }
         else if (connection->remotePeer().isCloudServer())
         {
-            if (!descriptor->isPersistent || context->sendDataInProgress)
+            if (!descriptor->isPersistent || context->sendDataInProgress || !context->updateSequence(tran))
                 return;
         }
 
@@ -440,6 +441,8 @@ public:
         std::chrono::milliseconds subscribeIntervalHigh = std::chrono::seconds(15);
 
         std::chrono::milliseconds outConnectionsInterval = std::chrono::seconds(1);
+
+        std::chrono::milliseconds unauthorizedConnectTimeout = std::chrono::seconds(10);
     };
 
     void setDelayIntervals(const DelayIntervals& intervals);
@@ -484,6 +487,7 @@ private:
 
         QnUuid peerId;
         nx::utils::Url url;
+        nx::utils::ElapsedTimer unauthorizedTimer;
     };
 
     std::vector<RemoteConnection> m_remoteUrls;

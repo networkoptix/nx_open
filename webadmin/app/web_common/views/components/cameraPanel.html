@@ -32,7 +32,10 @@
                           class="glyphicon glyphicon-server-online"></span>
                     <span ng-if="server.status != 'Online' && !server.active"
                           class="glyphicon glyphicon-server-offline"></span>
-                    <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
+                    <span class="server-name">&nbsp; {{server.name}}</span>
+                    <small ng-if="toggleInfo">
+                        &nbsp;{{server.ip}}
+                    </small>
                 </div>
             </a>
             <div class="collapse-box">

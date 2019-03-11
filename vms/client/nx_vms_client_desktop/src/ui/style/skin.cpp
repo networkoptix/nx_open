@@ -168,12 +168,19 @@ QPixmap QnSkin::getPixmapInternal(const QString& name)
     QPixmap pixmap;
     if (!QPixmapCache::find(name, &pixmap))
     {
-        pixmap = QPixmap::fromImage(QImage(path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
-        pixmap.setDevicePixelRatio(1); // Force to use not scaled images
-        NX_ASSERT(!pixmap.isNull() || name.contains(lit("@2x")));
+        const auto fullPath = path(name);
+        if (fullPath.isEmpty())
+        {
+            NX_ASSERT(name.contains("@2x"));
+        }
+        else
+        {
+            pixmap = QPixmap::fromImage(QImage(fullPath), Qt::OrderedDither | Qt::OrderedAlphaDither);
+            pixmap.setDevicePixelRatio(1); // Force to use not scaled images
+            NX_ASSERT(!pixmap.isNull());
+        }
         QPixmapCache::insert(name, pixmap);
     }
-
     return pixmap;
 }
 

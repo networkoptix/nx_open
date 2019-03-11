@@ -2,6 +2,8 @@
 
 #include <nx/network/http/http_types.h>
 
+#include <nx/cloud/db/api/auth_provider.h>
+
 class QnCommonModule;
 struct CloudCredentialsData;
 struct DetachFromCloudData;
@@ -54,24 +56,35 @@ private:
     bool validateInputData(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
+
     bool checkInternetConnection(QnJsonRestResult* result);
+
+    bool fetchCloudUserOfflineAuthInfo(
+        const CloudCredentialsData& data,
+        nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo);
 
     bool saveCloudData(
         const CloudCredentialsData& data,
+        const nx::cloud::db::api::AuthInfo& cloudOwnerOfflineAuthInfo,
         QnJsonRestResult* result);
+
     bool saveCloudCredentials(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
+
     bool insertCloudOwner(
         const CloudCredentialsData& data,
+        const nx::cloud::db::api::AuthInfo& cloudOwnerOfflineAuthInfo,
         QnJsonRestResult* result);
 
     bool fetchNecessaryDataFromCloud(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
+
     bool saveLocalSystemIdToCloud(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
+
     bool initializeCloudRelatedManagers(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);

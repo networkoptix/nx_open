@@ -43,10 +43,12 @@ public:
 
     /**
      * Binds UDT socket to an existing UDP socket.
+     * Takes ownership of the handler of udpSocket.
+     * If successful, then udpSocket has no system socket handler and is unusable.
      * NOTE: This method can be called just after UdtSocket creation.
      * NOTE: if method have failed UdtSocket instance MUST be destroyed!
      */
-    bool bindToUdpSocket(UDPSocket&& udpSocket);
+    bool bindToUdpSocket(AbstractDatagramSocket* udpSocket);
 
     // AbstractSocket.
     virtual bool bind(const SocketAddress& localAddress) override;

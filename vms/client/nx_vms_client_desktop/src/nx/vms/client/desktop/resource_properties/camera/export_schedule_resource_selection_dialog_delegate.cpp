@@ -72,24 +72,13 @@ bool ExportScheduleResourceSelectionDialogDelegate::validate(const QSet<QnUuid>&
     m_licensesLabel->setText(licenseUsage);
     m_licensesLabel->setPalette(palette);
 
-    bool motionOk = true;
-    if (m_motionUsed)
-    {
-        foreach(const QnVirtualCameraResourcePtr &camera, cameras)
-        {
-            bool hasMotion = (camera->getMotionType() != Qn::MotionType::MT_NoMotion);
-            if (!hasMotion)
+    const bool motionOk = !m_motionUsed
+        || std::all_of(cameras.cbegin(), cameras.cend(),
+            [this, singleStream = !m_dualStreamingUsed](const QnVirtualCameraResourcePtr& camera)
             {
-                motionOk = false;
-                break;
-            }
-            if (m_dualStreamingUsed && !camera->hasDualStreaming())
-            {
-                motionOk = false;
-                break;
-            }
-        }
-    }
+                return camera->hasMotion() && (singleStream || camera->hasDualStreaming());
+            });
+
     m_motionLabel->setVisible(!motionOk);
 
     bool dtsCamPresent = std::any_of(

@@ -127,7 +127,7 @@ public:
      * Works only in state State::complete.
      * @return true if command was successful.
      */
-    bool restartClient();
+    bool restartClient(QString authString = "");
 
     /**
      * Check if client should be restarted to this version.
@@ -178,7 +178,9 @@ signals:
 protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
-    void atRemoteUpdateInformation(const nx::update::Information& updateInformation);
+    void atRemoteUpdateInformation(nx::update::InformationError error,
+        const nx::update::Information& updateInformation);
+    void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
     void atExtractFilesFinished(int code);

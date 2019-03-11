@@ -4,6 +4,15 @@
 
 namespace nx::media_utils::h263 {
 
+const uint16_t kFormatResolutions[8][2] = {
+    {    0,    0 },
+    {  128,   96 },
+    {  176,  144 },
+    {  352,  288 },
+    {  704,  576 },
+    { 1408, 1152 },
+};
+
 // based on ff_h263_decode_picture_header
 bool PictureHeader::decode(const uint8_t* data, uint32_t size)
 {
@@ -29,6 +38,8 @@ bool PictureHeader::decode(const uint8_t* data, uint32_t size)
         {
             /* H.263v1 */
             pictureType = reader.getBit() == 1 ? PictureType::IPicture : PictureType::PPicture;
+            width = kFormatResolutions[(int)format][0];
+            height = kFormatResolutions[(int)format][1];
         }
         else
         {
@@ -48,6 +59,24 @@ bool PictureHeader::decode(const uint8_t* data, uint32_t size)
             }
             /* MPPTYPE */
             pictureType = (PictureType)reader.getBits(3);
+
+            reader.skipBits(7);
+            if (ufep)
+            {
+                if (format == Format::Reserved)
+                {
+                    // Custom Picture Format (CPFMT)
+                    reader.skipBits(4); // aspect ratio
+                    width = (reader.getBits(9) + 1) * 4;
+                    reader.skipBit(); // marker bit
+                    height = reader.getBits(9) * 4;
+                }
+                else
+                {
+                    width = kFormatResolutions[(int)format][0];
+                    height = kFormatResolutions[(int)format][1];
+                }
+            }
         }
     }
     catch(const BitStreamException&)
