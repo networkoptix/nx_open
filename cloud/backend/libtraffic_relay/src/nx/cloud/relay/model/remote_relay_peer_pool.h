@@ -37,10 +37,18 @@ public:
     /**
      * @return cf::future<Relay instance endpoint that has peer domainName listening>.
      */
-    virtual cf::future<std::string> findRelayByDomain(
-        const std::string& domainName) const override;
-    virtual cf::future<bool> addPeer(const std::string& domainName) override;
-    virtual cf::future<bool> removePeer(const std::string& domainName) override;
+    virtual void findRelayByDomain(
+        const std::string& domainName,
+        nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override;
+
+    virtual void addPeer(
+        const std::string& domainName,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
+
+    virtual void removePeer(
+        const std::string& domainName,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
+
     virtual void setNodeId(const std::string& nodeId) override;
 
 protected:
