@@ -5,7 +5,7 @@
 		"hardwareType" : "Type",
 		"maxResolution": "Max Resolution",
 		"maxFps": "Max FPS",
-		"primaryCodecamera": "Codec",
+		"primaryCodec": "Codec",
 		"isAudioSupported": "Audio",
 		"isTwAudioSupported": "2-way Audio",
 		"isPtzSupported": "PTZ",

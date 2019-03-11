@@ -123,7 +123,7 @@
         "isTwAudioSupported": "2-way Audio",
         "camera": "Camera",
         "hardwareType": "Type",
-        "primaryCodecamera": "Codec",
+        "primaryCodec": "Codec",
         "isAptzSupportedShort": "Adv. PTZ",
         "other": "Other",
         "isIoSupported": "I/O",
