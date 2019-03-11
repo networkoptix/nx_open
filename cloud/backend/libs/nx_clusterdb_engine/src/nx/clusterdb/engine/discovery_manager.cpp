@@ -36,6 +36,12 @@ void DiscoveryManager::start(
     if (m_discoveryClient)
         return;
 
+    if (clusterId.empty())
+    {
+        NX_WARNING(this, "Empty clusterId provided, discovery will not start");
+        return;
+    }
+
     m_discoveryClient = std::make_unique<nx::cloud::discovery::DiscoveryClient>(
         m_discoverySettings,
         clusterId,
@@ -60,6 +66,11 @@ void DiscoveryManager::start(
         });
 
     m_discoveryClient->start();
+
+    NX_VERBOSE(
+        this,
+        "discovery started with cluster id: %1 on url: %2",
+        clusterId, synchronizationEngineUrl.toStdString());
 }
 
 void DiscoveryManager::updateInformation(const std::string& infoJson)
