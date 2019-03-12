@@ -27,12 +27,13 @@ CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
     Qn::directConnect(
-        globalSettings(), &QnGlobalSettings::initialized,
-        this, &CloudConnectionManager::cloudSettingsChanged);
-
-    Qn::directConnect(
         globalSettings(), &QnGlobalSettings::cloudCredentialsChanged,
         this, &CloudConnectionManager::cloudSettingsChanged);
+}
+
+void CloudConnectionManager::init()
+{
+    cloudSettingsChanged();
 }
 
 void CloudConnectionManager::setCloudDbUrl(const nx::utils::Url& url)

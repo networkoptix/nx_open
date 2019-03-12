@@ -4433,6 +4433,7 @@ void MediaServerProcess::run()
 
     serverModule->sdkObjectFactory()->init();
     serverModule->analyticsManager()->init();
+    m_cloudIntegrationManager->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 
