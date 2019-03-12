@@ -197,6 +197,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     result = fetchUpdateVideoEncoder(&info, isPrimary, isCameraControlRequired, params);
     if (!result)
         return result;
+
+    m_onvifRes->setVideoEncoderConfigurationToken(
+        QnSecurityCamResource::toStreamIndex(getRole()),
+        info.videoEncoderConfigurationToken);
+
     info.videoSourceToken = m_onvifRes->videoSourceToken();
     info.videoSourceConfigurationToken = m_onvifRes->videoSourceConfigurationToken();
 
