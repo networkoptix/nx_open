@@ -1,0 +1,14 @@
+version: '3'
+services:
+  webapp:
+    image: mediaserver
+    ports:
+      - "7001:7001"
+    network_mode: "host"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./video:/recordings
+      - ./data/:/opt/networkoptix/mediaserver/var
+    tmpfs:
+      - /run
+      - /run/lock
