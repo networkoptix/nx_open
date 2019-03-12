@@ -98,11 +98,8 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
         if (data.size() >= (int)sizeof(quint32))
         {
             quint32 flags = *((quint32*)data.data());
-            if (flags & QnLayoutFileStorageResource::ReadOnly)
-            {
-                Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
-                layout->setData(Qn::LayoutPermissionsRole, (int)permissions);
-            }
+            // Currently QnFileLayoutResource::readOnly() lives together with LayoutPermissionsRole.
+            layout->setReadOnly(flags & QnLayoutFileStorageResource::ReadOnly);
             if (flags & QnLayoutFileStorageResource::ContainsCameras)
                 layoutWithCameras = true;
         }

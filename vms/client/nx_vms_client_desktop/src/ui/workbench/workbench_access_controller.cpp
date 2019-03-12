@@ -222,9 +222,13 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     NX_ASSERT(layout);
 
     // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
-    const auto readOnly = commonModule()->isReadOnly()
+    auto readOnly = commonModule()->isReadOnly()
         ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
         : Qn::AllPermissions;
+
+    // Next line is effective if LayoutPermissionsRole is set.
+    if (layout.dynamicCast<QnFileLayoutResource>() && layout.dynamicCast<QnFileLayoutResource>()->isReadOnly())
+        readOnly &= Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     // Some layouts are created with predefined permissions which are never changed.
     QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);
@@ -234,8 +238,9 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     // Deal with normal (non explicitly-authorized) files separately.
     if (auto fileLayout = layout.dynamicCast<QnFileLayoutResource>())
     {
-        if(fileLayout->requiresPassword())
-            return Qn::WriteNamePermission | Qn::ReadPermission;
+        // Effective if no LayoutPermissionsRole is set.
+        if(fileLayout->isReadOnly() || fileLayout->requiresPassword())
+            return Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
         auto permissions = Qn::ReadWriteSavePermission
             | Qn::AddRemoveItemsPermission
@@ -347,6 +352,9 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     if (const auto& fileLayout = resource.dynamicCast<QnFileLayoutResource>())
     {
         connect(fileLayout, &QnFileLayoutResource::passwordChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+        // readOnly may also change when re-reading encrypted layout.
+        connect(fileLayout, &QnFileLayoutResource::readOnlyChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 

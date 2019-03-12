@@ -614,6 +614,9 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
         if (resource->hasFlags(Qn::remote_server))
             return resource->getStatus() == Qn::Offline;
 
+        if (resource.dynamicCast<QnFileLayoutResource>()) //< Cannot remove local layout from server.
+            return false;
+
         /* All other resources can be safely deleted if we have correct permissions. */
         return true;
     };

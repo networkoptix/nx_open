@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -227,6 +228,7 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
                 return;
             }
             layout::reloadFromFile(resource, password);
+            snapshotManager()->store(resource);
         }
     }
 
