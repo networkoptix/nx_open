@@ -25,7 +25,7 @@ struct QStringHasher
         return qHash(s);
     }
 };
-class QnStorageDb : public nx::mediaserver::ServerModuleAware
+class QnStorageDb : public QObject, public nx::mediaserver::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;

@@ -103,8 +103,17 @@ int QnStorageDbPool::getStorageIndex(const QnStorageResourcePtr& storage)
 
 void QnStorageDbPool::removeSDB(const QnStorageResourcePtr &storage)
 {
-    QnMutexLocker lk(&m_sdbMutex);
-    m_chunksDB.remove(storage->getUrl());
+    nx::utils::promise<void> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    addTask(
+        [this, url = storage->getUrl(), readyPromise = std::move(readyPromise)]() mutable
+        {
+            m_chunksDB.remove(url);
+            readyPromise.set_value();
+        });
+
+    readyFuture.wait();
 }
 
 void QnStorageDbPool::run()
