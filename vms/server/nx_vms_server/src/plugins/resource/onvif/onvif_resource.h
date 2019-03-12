@@ -31,6 +31,8 @@
 #include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
 
+#include <plugins/resource/onvif/onvif_multicast_parameters_provider.h>
+
 #include "soap_wrapper.h"
 #include "video_encoder_config_options.h"
 
@@ -724,6 +726,8 @@ private:
 
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_secondaryMulticastParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };

@@ -423,6 +423,8 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_inputPortCount(0),
     m_videoLayout(nullptr),
     m_advancedParametersProvider(this),
+    m_primaryMulticastParametersProvider(this, StreamIndex::primary),
+    m_secondaryMulticastParametersProvider(this, StreamIndex::secondary),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
@@ -3053,7 +3055,11 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
 std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnPlOnvifResource::advancedParametersProviders()
 {
-    return {&m_advancedParametersProvider};
+    return {
+        &m_advancedParametersProvider,
+        &m_primaryMulticastParametersProvider,
+        &m_secondaryMulticastParametersProvider
+    };
 }
 
 QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParameters(const QSet<QString>& ids)
