@@ -90,10 +90,10 @@ copyFestivalVox()
 # [in] STAGE_LIB
 # [in] STAGE_MODULE
 # [in] SOURCE_DIR
-copyTx1SpecificFiles()
+copyTegraSpecificFiles()
 {
     echo ""
-    echo "Copying tx1-specific files"
+    echo "Copying Tegra-specific files"
 
     mkdir -p "$STAGE_LIB"
 
@@ -277,7 +277,10 @@ buildDistribution()
     copyMediaserverPlugins
     copyFestivalVox
 
-    [[ $TARGET == 'linux-arm64' ]] && copyTx1SpecificFiles
+    if [[ $TARGET == 'linux-arm64' ]]
+    then
+        copyTegraSpecificFiles
+    fi
 
     echo "Setting permissions"
     find "$STAGE" -type d -print0 |xargs -0 chmod 755
