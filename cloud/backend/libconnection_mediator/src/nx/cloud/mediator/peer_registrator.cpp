@@ -285,9 +285,10 @@ void PeerRegistrator::clientBind(
         info.connection = connection;
         info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
-        NX_DEBUG(this, lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
-            .arg(peerId).container(info.tcpReverseEndpoints)
-            .arg(connection->getSourceAddress()));
+        NX_DEBUG(this, "Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3). "
+            "Connection %4",
+            peerId, containerString(info.tcpReverseEndpoints), connection->getSourceAddress(),
+            (void*) connection.get());
 
         indication = makeIndication(peerId, info);
         listeningPeerConnections = m_listeningPeerPool->getAllConnections();
@@ -309,7 +310,8 @@ void PeerRegistrator::clientBind(
             if (it == m_boundClients.end() || it->second.connection.lock() != connection)
                 return;
 
-            NX_DEBUG(this, lm("Client %1 has disconnected").arg(peerId));
+            NX_DEBUG(this, "Client %1 has disconnected. Connection %2",
+                peerId, (void*) connection.get());
             m_boundClients.erase(it);
         });
 

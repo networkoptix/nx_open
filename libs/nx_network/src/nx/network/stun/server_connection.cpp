@@ -28,6 +28,8 @@ ServerConnection::~ServerConnection()
         m_destructHandler();
 
     --SocketGlobals::instance().debugCounters().stunConnectionCount;
+
+    NX_VERBOSE(this, "Destroying");
 }
 
 void ServerConnection::sendMessage(
