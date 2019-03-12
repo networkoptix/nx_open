@@ -17,6 +17,10 @@ Database::Database(
     m_clusterId(clusterId),
     m_dataManager(m_syncEngine, dbManager, m_clusterId, &m_eventProvider)
 {
+    if (clusterId.empty())
+        NX_DEBUG(this, "clusterId is empty, cluster db map laoded in standalone mode");
+    else
+        NX_DEBUG(this, "cluster db map loaded with clusterId: %1", clusterId);
 }
 
 DataManager& Database::dataManager()
