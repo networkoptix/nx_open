@@ -117,6 +117,7 @@ void LocalConnectionFactory::shutdown()
     pleaseStop();
     join();
 
+    messageBus()->stop();
     if (m_directConnection)
         messageBus()->removeHandler(m_directConnection->notificationManager());
 }
