@@ -305,7 +305,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             // It should call all the events and ClientUpdateTool will process its state.
             m_downloader->startDownloads();
         }
-        if (code != common::p2p::downloader::ResultCode::ok)
+        else if (code != common::p2p::downloader::ResultCode::ok)
         {
             const QString error = common::p2p::downloader::toString(code);
             NX_ERROR(this, "setUpdateTarget() - failed to add client package %1 %2",
