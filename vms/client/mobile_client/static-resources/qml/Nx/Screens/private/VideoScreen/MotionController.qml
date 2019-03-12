@@ -54,17 +54,21 @@ Item
 
     function handlePositionChanged(pos)
     {
-        if (!Utils.nearPositions(pos, pressAndHoldTimer.initialPos, controller.dragThreshold))
-            pressAndHoldTimer.stop()
+        if (!Utils.nearPositions(pos, unallowedDrawingTimer.initialPos, controller.dragThreshold))
+            unallowedDrawingTimer.stop()
+
+        if (!controller.allowDrawing)
+            return
 
         var relativePos = d.toRelative(pos)
         if (drawingRoi)
         {
             d.customSecondPoint = relativePos
             d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
-            d.selectionRoi.singlePoint = d.nearPositions(d.customFirstPoint, d.customSecondPoint)
+            d.selectionRoi.singlePoint =
+                Utils.nearPositions(d.customFirstPoint, d.customSecondPoint, d.kMaxDistance)
         }
-        else if (!d.nearPositions(d.customInitialPoint, relativePos))
+        else if (!Utils.nearPositions(d.customInitialPoint, relativePos, d.kMaxDistance))
         {
             handleCancelled()
         }
@@ -77,12 +81,12 @@ Item
 
         if (!controller.allowDrawing)
         {
-            pressAndHoldTimer.restart()
-            pressAndHoldTimer.initialPos = pos
+            unallowedDrawingTimer.restart()
+            unallowedDrawingTimer.initialPos = pos
             return
         }
 
-        pressAndHoldTimer.stop()
+        unallowedDrawingTimer.stop()
         pressFilterTimer.restart()
         var relativePos = d.toRelative(pos)
         d.customInitialPoint = relativePos
@@ -153,7 +157,7 @@ Item
 
     Timer
     {
-        id: pressAndHoldTimer
+        id: unallowedDrawingTimer
 
         property point initialPos
 
@@ -168,7 +172,7 @@ Item
     Timer
     {
         id: pressFilterTimer
-        interval: pressAndHoldTimer.interval
+        interval: unallowedDrawingTimer.interval
     }
 
     onMotionSearchModeChanged:
@@ -213,6 +217,7 @@ Item
         property MotionRoi selectionRoi: null
         property MotionRoi customRoi: null
 
+        readonly property real kMaxDistance: 0.05
         readonly property color lineColor: ColorTheme.contrast1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
         readonly property bool hasFinishedCustomRoi: toBool(
@@ -235,16 +240,6 @@ Item
             return relative
                 ? Qt.point(relative.x * controller.width, relative.y * controller.height)
                 : Qt.point(0, 0)
-        }
-
-        function nearPositions(first, second)
-        {
-            if (!first || !second)
-                return false
-
-            var firstVector = Qt.vector2d(first.x, first.y)
-            var secondVector = Qt.vector2d(second.x, second.y)
-            return firstVector.minus(secondVector).length() < 0.03
         }
 
         function getMotionFilter(first, second)
@@ -323,7 +318,7 @@ Item
                 d.selectionRoi.hide()
                 d.selectionRoi = null
             }
-            pressAndHoldTimer.stop()
+            unallowedDrawingTimer.stop()
         }
 
         function setRoiPoints(first, second)
