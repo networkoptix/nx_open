@@ -482,8 +482,7 @@ QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     return executeRemoteConfigure(data, remoteUrl, postKey);
 }
 
-void SystemMergeProcessor::shiftSynchronizationTimestamp(
-    const QnUuid& systemId,
+bool SystemMergeProcessor::shiftSynchronizationTimestamp(
     const ConfigureSystemData& remoteSystemData)
 {
     auto newTranLogTime = std::max(
@@ -495,6 +494,20 @@ void SystemMergeProcessor::shiftSynchronizationTimestamp(
         "overwritten by some en-route transactions", newTranLogTime);
 
     m_commonModule->ec2Connection()->setTransactionLogTime(newTranLogTime);
+
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        m_commonModule->moduleInformation().localSystemId,
+        m_commonModule->systemIdentityTime(),
+        newTranLogTime);
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, "Failed to save new transaction log timestamp (%1): %2",
+            newTranLogTime, ec2::toString(errorCode));
+        return false;
+    }
+
+    return true;
 }
 
 bool SystemMergeProcessor::changeSystemId(
@@ -615,15 +628,14 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
             return result;
     }
 
-    shiftSynchronizationTimestamp(systemId, remoteSystemData);
+    // 2. Updating local data.
 
-    if (!changeSystemId(systemId, remoteSystemData))
+    if (!shiftSynchronizationTimestamp(remoteSystemData))
     {
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to shift local system timestamp"));
         setMergeError(&result, MergeStatus::configurationFailed);
         return result;
     }
-
-    // 2. Updating local data.
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, remoteSystemData))
     {
@@ -663,6 +675,12 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
             setMergeError(&result, MergeStatus::configurationFailed);
             return result;
         }
+    }
+
+    if (!changeSystemId(systemId, remoteSystemData))
+    {
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
     }
 
     return result;

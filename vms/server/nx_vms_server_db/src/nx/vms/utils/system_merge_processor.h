@@ -101,9 +101,7 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
-    void shiftSynchronizationTimestamp(
-        const QnUuid& systemId,
-        const ConfigureSystemData& remoteSystemData);
+    bool shiftSynchronizationTimestamp(const ConfigureSystemData& remoteSystemData);
 
     bool changeSystemId(
         const QnUuid& systemId,
