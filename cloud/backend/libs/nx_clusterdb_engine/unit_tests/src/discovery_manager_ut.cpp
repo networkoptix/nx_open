@@ -68,6 +68,11 @@ public:
     };
 
 public:
+    std::string clusterId() const
+    {
+        return m_fixture.clusterId();
+    }
+
     void addNodeContext(const nx::utils::Url& discoveryServiceUrl)
     {
         const auto discoveryServiceUrlArg = lm("--discovery/discoveryServiceUrl=%1")
@@ -115,7 +120,7 @@ protected:
     void SetUp() override
     {
         m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(
-            CustomerDbNode::kClusterId);
+            m_fixture.clusterId());
 
         ASSERT_TRUE(m_server->bindAndListen());
     }
@@ -134,7 +139,6 @@ protected:
     void givenTwoConnectedNodes()
     {
         givenTwoNodes();
-        whenBothNodesStartDiscovery();
         thenNodesAreConnected();
         andSyncEnginesAreConnected();
         andSyncEnginesAreSynchronized();
@@ -156,20 +160,6 @@ protected:
         // add two customers and check synchronization
         for (int i = 0; i < 2; ++i)
             andSyncEnginesAreSynchronized();
-    }
-
-    void whenBothNodesStartDiscovery()
-    {
-        for (int i = 0; i < 2; ++i)
-            whenNodeStartsDiscovery(i);
-    }
-
-    void whenNodeStartsDiscovery(int index = 0)
-    {
-        auto& nodeContext = m_fixture.nodeContext(index);
-        nodeContext.discoveryManager().start(
-            nodeContext.clusterId(),
-            nodeContext.syncEngineUrl());
     }
 
     void thenNodeIsRegistered(int index = 0)
@@ -261,16 +251,12 @@ TEST_F(DiscoveryManager, discovery_service_starts)
 {
     givenOneNode();
 
-    whenNodeStartsDiscovery();
-
     thenNodeIsRegistered();
 }
 
 TEST_F(DiscoveryManager, discovers_other_nodes)
 {
     givenTwoNodes();
-
-    whenBothNodesStartDiscovery();
 
     thenNodesAreConnected();
 
