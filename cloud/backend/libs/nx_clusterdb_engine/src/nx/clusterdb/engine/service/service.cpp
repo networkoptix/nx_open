@@ -1,5 +1,7 @@
 #include "service.h"
 
+#include <nx/network/http/rest/http_rest_client.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/current_process.h>
 #include <nx/utils/type_utils.h>
@@ -8,6 +10,7 @@
 #include "model.h"
 #include "settings.h"
 #include "view.h"
+#include "../http/http_paths.h"
 
 namespace nx::clusterdb::engine {
 
@@ -26,11 +29,31 @@ std::vector<network::SocketAddress> Service::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
-void Service::connectToNode(
-    const std::string& systemId,
-    const nx::utils::Url& url)
+nx::utils::Url Service::synchronizationUrl() const
 {
-    m_controller->synchronizationEngine().connector().addNodeUrl(systemId, url);
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setEndpoint(m_view->httpEndpoints().front())
+        .setPath(kBaseSynchronizationPath);
+}
+
+std::string Service::clusterId() const
+{
+    return m_settings->synchronization().clusterId;
+}
+
+void Service::connectToNode(const nx::utils::Url& url)
+{
+    using namespace nx::network;
+
+    const auto syncApiTargetUrl = url::Builder(url).appendPath(
+        http::rest::substituteParameters(
+            kBaseSynchronizationPath,
+            {m_settings->synchronization().clusterId})).toUrl();
+
+    m_controller->synchronizationEngine().connector().addNodeUrl(
+        m_settings->synchronization().clusterId,
+        syncApiTargetUrl);
 }
 
 nx::sql::AsyncSqlQueryExecutor& Service::sqlQueryExecutor()
@@ -55,11 +78,18 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     Controller controller(m_applicationId, settings, &model);
     m_controller = &controller;
 
-    View view(settings, &controller);
+    View view(settings, kBaseSynchronizationPath, &controller);
     m_view = &view;
 
     setup(abstractSettings);
     auto customLogicGuard = nx::utils::makeScopeGuard([this]() { teardown(); });
+
+    controller.synchronizationEngine().discoveryManager().start(
+        settings.synchronization().clusterId,
+        nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+            .setEndpoint(view.httpEndpoints().front())
+            .setPath(nx::network::http::rest::substituteParameters(
+                kBaseSynchronizationPath, {settings.synchronization().clusterId})).toUrl());
 
     // Process privilege reduction.
     //nx::utils::CurrentProcess::changeUser(settings.changeUser());

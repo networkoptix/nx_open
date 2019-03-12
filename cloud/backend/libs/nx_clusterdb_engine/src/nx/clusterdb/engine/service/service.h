@@ -31,9 +31,11 @@ public:
 
     std::vector<network::SocketAddress> httpEndpoints() const;
 
-    void connectToNode(
-        const std::string& systemId,
-        const nx::utils::Url& url);
+    nx::utils::Url synchronizationUrl() const;
+
+    std::string clusterId() const;
+
+    void connectToNode(const nx::utils::Url& url);
 
     SynchronizationEngine& synchronizationEngine();
 
