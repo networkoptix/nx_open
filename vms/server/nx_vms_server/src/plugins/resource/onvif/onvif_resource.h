@@ -271,6 +271,11 @@ public:
     std::string videoSourceToken() const;
     void setVideoSourceToken(std::string token);
 
+    std::string videoEncoderConfigurationToken(nx::vms::api::StreamIndex streamIndex) const;
+    void setVideoEncoderConfigurationToken(
+        nx::vms::api::StreamIndex streamIndex,
+        std::string token);
+
     std::string audioSourceConfigurationToken() const;
     void setAudioSourceConfigurationToken(std::string token);
 
@@ -592,6 +597,8 @@ private:
     std::string m_audioOutputConfigurationToken;
     std::string m_ptzConfigurationToken;
     std::string m_ptzProfileToken;
+
+    std::map<nx::vms::api::StreamIndex, std::string> m_videoEncoderConfigurationTokens;
 
     QString m_imagingUrl;
     QString m_ptzUrl;

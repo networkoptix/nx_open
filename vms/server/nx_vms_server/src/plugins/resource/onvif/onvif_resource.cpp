@@ -1635,6 +1635,27 @@ void QnPlOnvifResource::setVideoSourceToken(std::string token)
     m_videoSourceToken = std::move(token);
 }
 
+std::string QnPlOnvifResource::videoEncoderConfigurationToken(
+    nx::vms::api::StreamIndex streamIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (const auto it = m_videoEncoderConfigurationTokens.find(streamIndex);
+        it != m_videoEncoderConfigurationTokens.cend())
+    {
+        return it->second;
+    }
+
+    return std::string();
+}
+
+void QnPlOnvifResource::setVideoEncoderConfigurationToken(
+    nx::vms::api::StreamIndex streamIndex,
+    std::string token)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_videoEncoderConfigurationTokens[streamIndex] = std::move(token);
+}
+
 std::string QnPlOnvifResource::audioSourceConfigurationToken() const
 {
     QnMutexLocker lock(&m_mutex);
