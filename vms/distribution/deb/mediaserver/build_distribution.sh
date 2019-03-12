@@ -14,7 +14,7 @@ stripIfNeeded() # dir
 {
     local -r DIR="$1" && shift
 
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "aarch64" ]]
+    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm64" ]]
     then
         local FILE
         for FILE in $(find "$DIR" -type f)
@@ -48,8 +48,7 @@ copyLibs()
             && "$LIB_BASENAME" != libEnginio.so* \
             && "$LIB_BASENAME" != libqgsttools_p.* \
             && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_vms_client* ]] ||
-            [[ "$BOX" == "tx1" && "$LIB_BASENAME" == libtegra_video.* ]]
+            && "$LIB_BASENAME" != libnx_vms_client* ]]
         then
             echo "  Copying $LIB_BASENAME"
             cp -P "$LIB" "$STAGE_LIB/"
@@ -76,8 +75,7 @@ copyMediaserverPlugins()
     distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${SERVER_PLUGINS[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins"
 
-    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" \
-        "${SERVER_PLUGINS_OPTIONAL[@]}"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${SERVER_PLUGINS_OPTIONAL[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
 }
 
@@ -87,6 +85,28 @@ copyFestivalVox()
     echo "Copying Festival Vox files"
     mkdir -p "$STAGE_BIN"
     cp -r "$BUILD_DIR/bin/vox" "$STAGE_BIN/"
+}
+
+# [in] STAGE_LIB
+# [in] STAGE_MODULE
+# [in] SOURCE_DIR
+copyTx1SpecificFiles()
+{
+    echo ""
+    echo "Copying tx1-specific files"
+
+    mkdir -p "$STAGE_LIB"
+
+    echo "  Copying libtegra_video.so"
+    cp -P "$BUILD_DIR/lib/libtegra_video.so" "$STAGE_LIB/"
+
+    local -r TEGRA_VIDEO_SOURCE_DIR="$SOURCE_DIR/artifacts/tx1/tegra_multimedia_api"
+    # Demo neural networks.
+    local -r NVIDIA_MODELS_SOURCE_DIR="$TEGRA_VIDEO_SOURCE_DIR/data/model"
+    local -r NVIDIA_MODELS_INSTALL_PATH="$STAGE_MODULE/nvidia_models"
+
+    mkdir -p "$NVIDIA_MODELS_INSTALL_PATH"
+    cp -f $NVIDIA_MODELS_SOURCE_DIR/* "$NVIDIA_MODELS_INSTALL_PATH"
 }
 
 # [in] STAGE_LIB
@@ -133,7 +153,7 @@ copyBins()
 {
     echo "Copying mediaserver binaries and scripts"
     install -m 755 "$BUILD_DIR/bin/mediaserver" "$STAGE_BIN/mediaserver-bin"
-    if [ "$ENABLE_ROOT_TOOL" = "true" ]
+    if [[ $ENABLE_ROOT_TOOL == "true" ]]
     then
         install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/root-tool-bin"
     fi
@@ -155,20 +175,24 @@ copyStartupScripts()
 
     install -m 644 "init/networkoptix-mediaserver.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
-    install -m 644 "init/networkoptix-root-tool.conf" \
-        "$STAGE/etc/init/$CUSTOMIZATION-root-tool.conf"
 
     install -m 755 -d "$STAGE/etc/init.d"
+    install -m 755 -d "$STAGE/etc/systemd/system"
+
     install -m 755 "init.d/networkoptix-mediaserver" \
         "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
-    install -m 755 "init.d/networkoptix-root-tool" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-root-tool"
-
-    install -m 755 -d "$STAGE/etc/systemd/system"
     install -m 644 "systemd/networkoptix-mediaserver.service" \
         "$STAGE/etc/systemd/system/$CUSTOMIZATION-mediaserver.service"
-    install -m 644 "systemd/networkoptix-root-tool.service" \
-        "$STAGE/etc/systemd/system/$CUSTOMIZATION-root-tool.service"
+
+    if [[ $ENABLE_ROOT_TOOL == "true" ]]
+    then
+        install -m 644 "init/networkoptix-root-tool.conf" \
+            "$STAGE/etc/init/$CUSTOMIZATION-root-tool.conf"
+        install -m 755 "init.d/networkoptix-root-tool" \
+            "$STAGE/etc/init.d/$CUSTOMIZATION-root-tool"
+        install -m 644 "systemd/networkoptix-root-tool.service" \
+            "$STAGE/etc/systemd/system/$CUSTOMIZATION-root-tool.service"
+    fi
 }
 
 # [in] STAGE
@@ -252,6 +276,8 @@ buildDistribution()
     copyQtLibs
     copyMediaserverPlugins
     copyFestivalVox
+
+    [[ $TARGET == 'linux-arm64' ]] && copyTx1SpecificFiles
 
     echo "Setting permissions"
     find "$STAGE" -type d -print0 |xargs -0 chmod 755
