@@ -209,8 +209,6 @@ copyStartupScripts()
     then
         install -m 644 "init/networkoptix-root-tool.conf" \
             "$STAGE/etc/init/$CUSTOMIZATION-root-tool.conf"
-        install -m 755 "init.d/networkoptix-root-tool" \
-            "$STAGE/etc/init.d/$CUSTOMIZATION-root-tool"
         install -m 644 "systemd/networkoptix-root-tool.service" \
             "$STAGE/etc/systemd/system/$CUSTOMIZATION-root-tool.service"
     fi
