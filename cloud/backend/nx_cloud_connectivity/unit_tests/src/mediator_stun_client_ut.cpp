@@ -62,6 +62,11 @@ TEST_F(MediatorStunClientKeepAlive, connection_is_closed_after_keep_alive_failur
     thenClientReportedConnectionClosureWithResult(SystemError::connectionReset);
 }
 
+TEST_F(MediatorStunClientKeepAlive, client_can_be_safely_removed_at_any_time)
+{
+    givenConnectedClient();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 namespace {

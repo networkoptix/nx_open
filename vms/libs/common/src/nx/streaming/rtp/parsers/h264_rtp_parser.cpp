@@ -462,6 +462,7 @@ bool H264Parser::processData(
     else if (isBufferOverflow())
     {
         NX_WARNING(this, "RTP parser buffer overflow");
+        clearInternalBuffer();
         emit packetLostDetected(0, 0);
         return false;
     }

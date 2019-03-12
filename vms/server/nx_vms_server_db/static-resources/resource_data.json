@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.14",
+    "version": "1.0.1.20",
     "data": [
         {
             "keys": [
@@ -373,7 +373,7 @@
         },
         {
             "keys":[
-                "Hanwha|*", "Samsung|*"
+                "Hanwha|*", "Samsung|*", "*|XNB-6000"
             ],
             "ignoreONVIF": true,
             "forcedAdditionalManufacturer": "Hanwha"
@@ -1177,7 +1177,6 @@
                 "HIKVISION|DS-2CD2942F-IS",
                 "HIKVISION|DS-2CD63C2F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
@@ -1190,9 +1189,11 @@
                 "Hikvision|DS-6708*",
                 "HIKVISION|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*",
-                "ONVIF|NC328-VBZ",
                 "Hikvision|DS-2DF8223*",
-                "hikvision|DS-2CD2155FWD-IS"
+                "hikvision|DS-2CD2155FWD-IS",
+                "HIKVISION|DS-2CD4026FWD-AP",
+                "HIKVISION|DS-2DE3304W-DE",
+                "ONVIF|NC328-VBZ"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -1203,7 +1204,6 @@
                 "HIKVISION|DS-2CD2742FWD-IS",
                 "HIKVISION|DS-2CD2942F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
@@ -1212,15 +1212,17 @@
                 "HIKVISION|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD-IWS",
-                "ONVIF|H47",
-                "ONVIF|IP-2CD4B26FWD-IZS",
-                "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
                 "HIKVISION|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*",
                 "Hikvision|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*"
+                "Hikvision|DS-2TD2166*",
+                "Hikvision|DS-2CD4026FWD-AP",
+                "HIKVISION|DS-2DE3304W-DE",
+                "ONVIF|H47",
+                "ONVIF|IP-2CD4B26FWD-IZS",
+                "*|NC304-WDA"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"

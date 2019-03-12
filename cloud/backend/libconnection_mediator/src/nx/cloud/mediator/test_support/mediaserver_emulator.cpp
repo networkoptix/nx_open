@@ -351,7 +351,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     udtStreamSocket->bindToAioThread(getAioThread());
     auto mediatorUdpClientSocket = m_mediatorUdpClient->takeSocket();
     m_mediatorUdpClient.reset();
-    if (!udtStreamSocket->bindToUdpSocket(std::move(*mediatorUdpClientSocket)) ||
+    if (!udtStreamSocket->bindToUdpSocket(mediatorUdpClientSocket.get()) ||
         !udtStreamSocket->setNonBlockingMode(true) ||
         !udtStreamSocket->setRendezvous(true))
     {

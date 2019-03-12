@@ -11,6 +11,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/random.h>

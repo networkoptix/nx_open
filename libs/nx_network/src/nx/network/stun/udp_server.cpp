@@ -75,7 +75,7 @@ void UdpServer::sendMessage(
         });
 }
 
-const std::unique_ptr<network::UDPSocket>& UdpServer::socket()
+const std::unique_ptr<AbstractDatagramSocket>& UdpServer::socket()
 {
     return m_messagePipeline.socket();
 }
