@@ -416,6 +416,12 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
+    if (status == Qn::Incompatible)
+    {
+        NX_VERBOSE(this, "atResourceAdded(%1) - incompatible", server->getName());
+        return;
+    }
+
     UpdateItemPtr item;
     {
         QnMutexLocker locker(&m_dataLock);
