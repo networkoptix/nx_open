@@ -527,9 +527,7 @@ private:
 
                 Node* node = m_nodes[j]->moduleInstance().get();
 
-                m_nodes[i]->moduleInstance()->connectToNode(
-                    node->database().clusterId(),
-                    nodeUrl(node));
+                m_nodes[i]->moduleInstance()->connectToNode(nodeUrl(node));
             }
         }
     }

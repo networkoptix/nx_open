@@ -25,7 +25,6 @@ public:
     std::string nodeId() const;
 
     nx::utils::Url baseApiUrl() const;
-    nx::utils::Url synchronizationUrl() const;
 
     void connectTo(const Peer& other);
     Customer addRandomData();
@@ -49,6 +48,8 @@ class ClusterTestFixture:
 public:
     ClusterTestFixture();
 
+    std::string clusterId() const;
+
     void addPeer(bool startAndWaitUntilStarted = true);
     Peer& peer(int index);
     const Peer& peer(int index) const;
@@ -58,6 +59,7 @@ public:
     bool peersAreSynchronized(std::vector<int> ids) const;
 
 private:
+    const std::string m_clusterId;
     std::vector<std::unique_ptr<Peer>> m_peers;
     std::atomic<int> m_peerCounter{0};
 };

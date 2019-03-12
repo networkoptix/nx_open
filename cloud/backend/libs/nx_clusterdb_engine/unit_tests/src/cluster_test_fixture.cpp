@@ -6,8 +6,6 @@
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/clusterdb/engine/http/http_paths.h>
-
 namespace nx::clusterdb::engine::test {
 
 Peer::Peer():
@@ -38,23 +36,13 @@ nx::utils::Url Peer::baseApiUrl() const
         .setEndpoint(m_process.moduleInstance()->httpEndpoints().front());
 }
 
-nx::utils::Url Peer::synchronizationUrl() const
-{
-    return nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
-        .setEndpoint(m_process.moduleInstance()->httpEndpoints().front())
-        .setPath(kBaseSynchronizationPath);
-}
-
 void Peer::connectTo(const Peer& other)
 {
     const auto url = network::url::Builder()
         .setScheme(network::http::kUrlSchemeName)
         .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
 
-    m_process.moduleInstance()->connectToNode(
-        process().moduleInstance()->clusterId(),
-        url);
+    m_process.moduleInstance()->connectToNode(url);
 }
 
 Customer Peer::addRandomData()
@@ -118,8 +106,14 @@ void Peer::setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& fi
 //-------------------------------------------------------------------------------------------------
 
 ClusterTestFixture::ClusterTestFixture():
-    base_type("nx_data_sync_engine_ut", "")
+    base_type("nx_data_sync_engine_ut", ""),
+    m_clusterId("test_cluster_id")
 {
+}
+
+std::string ClusterTestFixture::clusterId() const
+{
+    return m_clusterId;
 }
 
 void ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
@@ -129,6 +123,7 @@ void ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
 
     auto peer = std::make_unique<Peer>();
     peer->process().addArg(dbFileArg.c_str());
+    peer->process().addArg("-p2pDb/clusterId", m_clusterId.c_str());
 
     if (startAndWaitUntilStarted)
     {

@@ -32,7 +32,7 @@ void Node::setup(const utils::AbstractServiceSettings& settings)
     m_database = std::make_unique<Database>(
         &synchronizationEngine(),
         &sqlQueryExecutor(),
-        nodeSettings.map.clusterId);
+        nodeSettings.synchronization().clusterId);
 }
 
 void Node::teardown()

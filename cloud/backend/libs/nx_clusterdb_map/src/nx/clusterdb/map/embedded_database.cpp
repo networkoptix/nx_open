@@ -19,7 +19,7 @@ EmbeddedDatabase::EmbeddedDatabase(
         settings.synchronizationSettings,
         nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         queryExecutor),
-    m_database(&m_syncEngine, queryExecutor, settings.clusterId)
+    m_database(&m_syncEngine, queryExecutor, settings.synchronizationSettings.clusterId)
 {
 }
 

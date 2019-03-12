@@ -19,14 +19,10 @@ class CustomerDbNode:
     using base_type = Service;
 
 public:
-    static constexpr char kClusterId[] = "customer_db_test_cluster";
-
     CustomerDbNode(int argc, char **argv);
 
     const CustomerManager& customerManager() const;
     CustomerManager& customerManager();
-
-    std::string clusterId() const;
 
 protected:
     virtual void setup(const nx::utils::AbstractServiceSettings& settings) override;

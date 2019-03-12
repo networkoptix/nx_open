@@ -25,11 +25,6 @@ CustomerManager& CustomerDbNode::customerManager()
     return *m_customerManager;
 }
 
-std::string CustomerDbNode::clusterId() const
-{
-    return kClusterId;
-}
-
 void CustomerDbNode::setup(const nx::utils::AbstractServiceSettings& /*settings*/)
 {
     dao::StructureUpdater structureUpdater(&sqlQueryExecutor());
