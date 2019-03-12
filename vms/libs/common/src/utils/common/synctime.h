@@ -28,6 +28,8 @@ class QnSyncTime final
 
 public:
     QnSyncTime(QObject *parent = NULL);
+    ~QnSyncTime();
+
     void setTimeNotificationManager(ec2::AbstractTimeNotificationManagerPtr timeNotificationManager);
 
     qint64 currentMSecsSinceEpoch() const;
