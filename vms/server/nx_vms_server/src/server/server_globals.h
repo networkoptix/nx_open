@@ -35,6 +35,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
     }
     static const std::string kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
+    static const std::string kNoPlugins = "noPlugins";
 
 } // namespace QnServer
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )

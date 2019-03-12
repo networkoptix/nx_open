@@ -256,6 +256,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
         ldapSearchFilter,
         QString(),
         this);
+    m_ldapSearchTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        ldapSearchTimeoutS, ldapSearchTimeoutSDefault, this);
 
     AdaptorList result;
     result
@@ -263,8 +265,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
         << m_ldapAdminDnAdaptor
         << m_ldapAdminPasswordAdaptor
         << m_ldapSearchBaseAdaptor
-        << m_ldapSearchFilterAdaptor;
-
+        << m_ldapSearchFilterAdaptor
+        << m_ldapSearchTimeoutSAdaptor;
     for (auto adaptor: result)
     {
         connect(
@@ -679,8 +681,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRemoteArchiveSynchronizationThreadsDefault,
         this);
 
-    m_updateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
-        kUpdateInformationName,
+    m_targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kTargetUpdateInformationName,
+        QByteArray(),
+        this);
+
+    m_installedUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kInstalledUpdateInformationName,
         QByteArray(),
         this);
 
@@ -717,6 +724,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_lowQualityScreenVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kLowQualityScreenVideoCodec,
         "mpeg2video",
+        this);
+
+    m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        "maxEventLogRecords",
+        100 * 1000, //< Default value.
         this);
 
     connect(
@@ -875,10 +887,17 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_updateInformationAdaptor,
+        m_targetUpdateInformationAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
-        &QnGlobalSettings::updateInformationChanged,
+        &QnGlobalSettings::targetUpdateInformationChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_installedUpdateInformationAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::installedUpdateInformationChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -920,7 +939,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_cloudConnectRelayingEnabledAdaptor
         << m_edgeRecordingEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
-        << m_updateInformationAdaptor
+        << m_targetUpdateInformationAdaptor
+        << m_installedUpdateInformationAdaptor
         << m_maxWearableArchiveSynchronizationThreads
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
@@ -928,7 +948,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
-        << m_maxWebMTranscoders;
+        << m_maxWebMTranscoders
+        << m_maxEventLogRecordsAdaptor;
 
     if (isHanwhaEnabledCustomization())
     {
@@ -1109,6 +1130,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     result.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_ldapAdminPasswordAdaptor->value());
     result.searchBase = m_ldapSearchBaseAdaptor->value();
     result.searchFilter = m_ldapSearchFilterAdaptor->value();
+    result.searchTimeoutS = m_ldapSearchTimeoutSAdaptor->value();
     return result;
 }
 
@@ -1122,6 +1144,7 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings& settings)
         : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
+    m_ldapSearchTimeoutSAdaptor->setValue(settings.searchTimeoutS);
 }
 
 QnEmailSettings QnGlobalSettings::emailSettings() const
@@ -1172,20 +1195,20 @@ void QnGlobalSettings::synchronizeNow()
         adaptor->saveToResource();
 
     QnMutexLocker locker(&m_mutex);
-    //NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return;
-    propertyDictionary()->saveParamsAsync(m_admin->getId());
+
+    resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
 bool QnGlobalSettings::resynchronizeNowSync()
 {
     {
         QnMutexLocker locker(&m_mutex);
-        NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+        NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
-        propertyDictionary()->markAllParamsDirty(m_admin->getId());
+        resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId());
     }
     return synchronizeNowSync();
 }
@@ -1196,10 +1219,10 @@ bool QnGlobalSettings::synchronizeNowSync()
         adaptor->saveToResource();
 
     QnMutexLocker locker(&m_mutex);
-    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    NX_ASSERT(m_admin, "Invalid sync state");
     if (!m_admin)
         return false;
-    return propertyDictionary()->saveParams(m_admin->getId());
+    return resourcePropertyDictionary()->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
@@ -1400,6 +1423,16 @@ int QnGlobalSettings::keepAliveProbeCount() const
 void QnGlobalSettings::setKeepAliveProbeCount(int newProbeCount)
 {
     m_ec2KeepAliveProbeCountAdaptor->setValue(newProbeCount);
+}
+
+int QnGlobalSettings::maxEventLogRecords() const
+{
+    return m_maxEventLogRecordsAdaptor->value();
+}
+
+void QnGlobalSettings::setMaxEventLogRecords(int value)
+{
+    m_maxEventLogRecordsAdaptor->setValue(value);
 }
 
 std::chrono::seconds QnGlobalSettings::aliveUpdateInterval() const
@@ -1677,14 +1710,24 @@ void QnGlobalSettings::setEdgeRecordingEnabled(bool enabled)
     m_edgeRecordingEnabledAdaptor->setValue(enabled);
 }
 
-QByteArray QnGlobalSettings::updateInformation() const
+QByteArray QnGlobalSettings::targetUpdateInformation() const
 {
-    return m_updateInformationAdaptor->value();
+    return m_targetUpdateInformationAdaptor->value();
 }
 
-void QnGlobalSettings::setUpdateInformation(const QByteArray& updateInformation)
+void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInformation)
 {
-    m_updateInformationAdaptor->setValue(updateInformation);
+    m_targetUpdateInformationAdaptor->setValue(updateInformation);
+}
+
+QByteArray QnGlobalSettings::installedUpdateInformation() const
+{
+    return m_installedUpdateInformationAdaptor->value();
+}
+
+void QnGlobalSettings::setInstalledUpdateInformation(const QByteArray& updateInformation)
+{
+    m_installedUpdateInformationAdaptor->setValue(updateInformation);
 }
 
 FileToPeerList QnGlobalSettings::downloaderPeers() const

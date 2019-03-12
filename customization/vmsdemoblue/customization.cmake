@@ -32,8 +32,6 @@ set(customization.fullBundleUpgradeCode "{4855d804-8e44-44d5-99eb-807a28556273}"
 set(deb.customization.company.name "networkoptix")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.vmsdemoblue")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 

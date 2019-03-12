@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
+
 #include <test_storage_factory.h>
+
 #include "test_common.h"
 
 TEST(TestStorageFactoryTest, main)

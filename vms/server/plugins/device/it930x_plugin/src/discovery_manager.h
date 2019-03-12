@@ -124,8 +124,6 @@ public:
     DiscoveryManager();
     virtual ~DiscoveryManager();
 
-    // nxcip::PluginInterface
-
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
     // nxcip::CameraDiscoveryManager
@@ -161,12 +159,12 @@ private:
 private:
     static DiscoveryManager * Instance;
 
-    mutable std::mutex 			m_mutex;
-    std::atomic_bool 			m_needScan;
-    std::atomic_bool 			m_blockAutoScan;
-    std::vector<CameraPtr> 		m_cameras;
-    Timer 						m_rescanTimer;
-    std::map<int, RxDevicePtr>	m_rxDevices;
+    mutable std::mutex m_mutex;
+    std::atomic_bool m_needScan;
+    std::atomic_bool m_blockAutoScan;
+    std::vector<CameraPtr> m_cameras;
+    Timer m_rescanTimer;
+    std::map<int, RxDevicePtr> m_rxDevices;
 };
 } // namespace ite
 

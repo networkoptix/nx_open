@@ -118,7 +118,7 @@
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
         "useTextEmailFormat": "Отправка писем простым текстом",
-        "useWindowsEmailLineFeed": "Использовать перевод строки Windows в Email",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -126,7 +126,8 @@
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
-        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -190,5 +191,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web-интерфейс"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "пауза",
+            "help": "help | show commands",
+            "collapse all servers": "свернуть все серверы",
+            "collapse server": "collapse server + [server name]",
+            "play": "воспроизвести",
+            "clear search": "очистить поиск",
+            "live": "go to live | show me live",
+            "expand all servers": "развернуть все серверы",
+            "stop listening": "прекратить прослушивание",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "Система не в сети",
+        "cameraLinks": {
+            "copyToClipboard": "копировать в буфер",
+            "highStream": "Выс. кач-во",
+            "copyDefaultText": "копировать",
+            "unknown": "Неизвестный",
+            "lowStream": "Низ. кач-во",
+            "transcoding": "Перекодирование",
+            "copyActiveText": "скопировано в буфер обмена"
+        },
+        "searchCamPlaceholder": "Поиск",
+        "cameraStates": {
+            "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
+            "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+            "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+            "unauthorized": "Требуется аутентификация",
+            "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium.",
+            "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+            "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
+            "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+            "error": "Ошибка",
+            "offline": "Не в сети",
+            "noData": "Нет данных",
+            "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео."
+        },
+        "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
+        "resolution": {
+            "high": "Высокая",
+            "auto": "Авто",
+            "low": "Низкая"
+        }
     }
 }

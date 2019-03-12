@@ -107,7 +107,7 @@ bool Impl::start(const Params* params)
     for (int i = 0; i < decodersCount; ++i)
     {
         m_detectors.emplace_back(new Detector(
-            nx::kit::debug::format("%s.%d", m_id, i).c_str()));
+            nx::kit::utils::format("%s.%d", m_id, i).c_str()));
 
         const int result = m_detectors.back()->startInference(
             m_modelFile, m_deployFile, m_cacheFile);
@@ -258,7 +258,7 @@ void Impl::updateMinAndMaxPts(int64_t ptsUs)
 void Impl::writeRects(const Rect outRects[], int rectCount, int64_t ptsUs)
 {
     const bool noPrevFile = writeRectsToFile(
-        ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", ptsUs),
+        ini().rectanglesFilePrefix + nx::kit::utils::format("%lld.txt", ptsUs),
         outRects, rectCount);
 
     if (noPrevFile)

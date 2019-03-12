@@ -10,7 +10,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, PeerType,
     (nx::vms::api::PeerType::oldMobileClient, "PT_OldMobileClient")
     (nx::vms::api::PeerType::mobileClient, "PT_MobileClient")
     (nx::vms::api::PeerType::cloudServer, "PT_CloudServer")
-    (nx::vms::api::PeerType::oldServer, "PT_OldSetver"))
+    (nx::vms::api::PeerType::oldServer, "PT_OldServer"))
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::PeerType, (numeric)(debug))
 
 #define RuntimeFlagValues \

@@ -9,10 +9,11 @@
                 Desligue o dispositivo e instale um disco rígido.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Este dispositivo precisa de ligação de rede para funcionar.<br>Por favor, conecte-o à rede local ou Internet
+                Este dispositivo precisa de conexão de rede para funcionar. <br>
+                Conecte-o à rede local ou à Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
-                Este dispositivo tem configuração de rede incorreta. <br>
+                Este dispositivo tem configuração de rede incorrecta. <br>
                 Conecte-o à rede ou defina um endereço IP correto.
             </uib-alert>
 
@@ -24,7 +25,7 @@
                             <h3>Porta</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Porta" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Porto" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -64,7 +65,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Mudar senha</button>
+                                        ng-click="changePassword()">Mudar Senha</button>
                             </div>
                         </form>
                     </div>

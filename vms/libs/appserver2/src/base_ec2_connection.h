@@ -59,24 +59,23 @@ public:
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
         const Qn::UserAccessData &userAccessData) override;
 
-
-    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
-    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
-    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() override;
-    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() override;
-    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() override;
-    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
-    virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
-    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
-    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() override;
-    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
-    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
-    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
-    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
-    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
-    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
+    virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
+    virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
+    virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() override;
+    virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() override;
+    virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() override;
+    virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() override;
+    virtual AbstractUserNotificationManagerPtr userNotificationManager() override;
+    virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() override;
+    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() override;
+    virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
+    virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
+    virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
+    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() override;
+    virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
+    virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
     virtual AbstractAnalyticsNotificationManagerPtr
-        getAnalyticsNotificationManager() override;
+        analyticsNotificationManager() override;
 
     virtual QnCommonModule* commonModule() const override;
 
@@ -217,7 +216,7 @@ AbstractResourceManagerPtr BaseEc2Connection<QueryProcessorType>::getResourceMan
 
 template<class QueryProcessorType>
 AbstractResourceNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getResourceNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::resourceNotificationManager()
 {
     return m_resourceNotificationManager;
 }
@@ -232,7 +231,7 @@ AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaSer
 
 template<class QueryProcessorType>
 AbstractMediaServerNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getMediaServerNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::mediaServerNotificationManager()
 {
     return m_mediaServerNotificationManager;
 }
@@ -247,7 +246,7 @@ AbstractCameraManagerPtr BaseEc2Connection<QueryProcessorType>::getCameraManager
 
 template<class QueryProcessorType>
 AbstractCameraNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getCameraNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::cameraNotificationManager()
 {
     return m_cameraNotificationManager;
 }
@@ -262,7 +261,7 @@ AbstractLicenseManagerPtr BaseEc2Connection<QueryProcessorType>::getLicenseManag
 
 template<class QueryProcessorType>
 AbstractLicenseNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getLicenseNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::licenseNotificationManager()
 {
     return m_licenseNotificationManager;
 }
@@ -277,7 +276,7 @@ AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRule
 
 template<class QueryProcessorType>
 AbstractBusinessEventNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getBusinessEventNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::businessEventNotificationManager()
 {
     return m_businessEventNotificationManager;
 }
@@ -291,7 +290,7 @@ AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager(
 
 template<class QueryProcessorType>
 AbstractUserNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getUserNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::userNotificationManager()
 {
     return m_userNotificationManager;
 }
@@ -312,14 +311,14 @@ AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutTou
 
 template<class QueryProcessorType>
 AbstractLayoutNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getLayoutNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::layoutNotificationManager()
 {
     return m_layoutNotificationManager;
 }
 
 template<class QueryProcessorType>
 AbstractLayoutTourNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getLayoutTourNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::layoutTourNotificationManager()
 {
     return m_layoutTourNotificationManager;
 }
@@ -334,7 +333,7 @@ AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallM
 
 template<typename QueryProcessorType>
 AbstractVideowallNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getVideowallNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::videowallNotificationManager()
 {
     return m_videowallNotificationManager;
 }
@@ -355,7 +354,7 @@ AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManag
 
 template<class QueryProcessorType>
 AbstractWebPageNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getWebPageNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::webPageNotificationManager()
 {
     return m_webPageNotificationManager;
 }
@@ -370,14 +369,14 @@ AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::getStoredFil
 
 template<typename QueryProcessorType>
 AbstractStoredFileNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getStoredFileNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::storedFileNotificationManager()
 {
     return m_storedFileNotificationManager;
 }
 
 template<class QueryProcessorType>
 AbstractUpdatesNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getUpdatesNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::updatesNotificationManager()
 {
     return m_updatesNotificationManager;
 }
@@ -399,7 +398,7 @@ AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager(
 
 template<class QueryProcessorType>
 AbstractMiscNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getMiscNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::miscNotificationManager()
 {
     return m_miscNotificationManager;
 }
@@ -414,14 +413,14 @@ AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryM
 
 template<class QueryProcessorType>
 AbstractDiscoveryNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getDiscoveryNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::discoveryNotificationManager()
 {
     return m_discoveryNotificationManager;
 }
 
 template<class QueryProcessorType>
 AbstractTimeNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::timeNotificationManager()
 {
     return m_timeNotificationManager;
 }
@@ -436,7 +435,7 @@ AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsM
 
 template<class QueryProcessorType>
 AbstractAnalyticsNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::getAnalyticsNotificationManager()
+    BaseEc2Connection<QueryProcessorType>::analyticsNotificationManager()
 {
     return m_analyticsNotificationManager;
 }

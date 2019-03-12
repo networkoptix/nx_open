@@ -2,16 +2,16 @@
 
 #include <chrono>
 
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/customization/customized.h>
 
-#include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
 
 class QModelIndex;
 class QPushButton;
@@ -135,8 +135,8 @@ protected:
 
 private:
     struct Private;
-    const QScopedPointer<Private> d;
-    const QScopedPointer<Ui::EventTile> ui;
+    nx::utils::ImplPtr<Private> d;
+    nx::utils::ImplPtr<Ui::EventTile> ui;
 };
 
 } // namespace nx::vms::client::desktop

@@ -115,17 +115,17 @@ QSet<QnUuid> filterActionResources(
     const QSet<QnUuid>& ids,
     vms::api::ActionType actionType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
     if (actionType == vms::api::ActionType::fullscreenCameraAction)
     {
-        return FullscreenActionHelper::layoutIds(model) | FullscreenActionHelper::cameraIds(model);
+        return toIds(resourcePool->getResourcesByIds<QnLayoutResource>(ids))
+            | toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
     }
-    if (actionType == vms::api::ActionType::exitFullscreenAction)
+    else if (actionType == vms::api::ActionType::exitFullscreenAction)
     {
-        return ExitFullscreenActionHelper::layoutIds(model);
+        return toIds(resourcePool->getResourcesByIds<QnLayoutResource>(ids));
     }
-
-
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     if (vms::event::requiresCameraResource(actionType))
         return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
@@ -1239,7 +1239,7 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
         if (resources.isEmpty())
             return braced(tr("Any Server"));
 
-        return tr("%n Server(s)", "", resources.size());
+        return tr("%n Servers", "", resources.size());
     }
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
@@ -1376,7 +1376,7 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(vms::api::EventState v
         case vms::api::EventState::undefined: return tr("Occurs");
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Unknown EventState enumeration value.");
+            NX_ASSERT(false, "Unknown EventState enumeration value.");
             return QString();
     }
 }

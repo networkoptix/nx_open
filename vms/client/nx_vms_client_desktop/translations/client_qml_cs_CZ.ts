@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation>Povolit</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -56,10 +67,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation>BEZPEČNÝ REŽIM</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation>NEKOMPATIBILNÍ</translation>
     </message>
@@ -70,6 +77,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>NEDOSTUPNÝ</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation>BEZPEČNÝ REŽIM</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -83,20 +94,21 @@
       <translation>Nic nenalezeno</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>Nemáte přístup k %1. Některé funkce mohou být nedostupné.</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Nahrávání...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation>Připojit k jinému serveru...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Připojit k serveru...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Nahrávání...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Nemáte přístup k %1. Některé funkce mohou být nedostupné.</translation>
     </message>
   </context>
 </TS>

@@ -21,7 +21,7 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     , m_mutex(QnMutex::Recursive)
     , m_systems()
 {
-    NX_ASSERT(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
+    NX_ASSERT(qnCloudStatusWatcher, "Cloud watcher is not ready");
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
         , this, &QnCloudSystemsFinder::onCloudStatusChanged);

@@ -3,7 +3,7 @@
 #include "ui_filtered_resource_selection_widget.h"
 
 #include <ui/style/custom_style.h>
-#include <nx/vms/client/desktop/node_view/node_view/sorting/node_view_base_sort_model.h>
+#include <nx/vms/client/desktop/node_view/node_view/sorting_filtering/node_view_base_sort_model.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 

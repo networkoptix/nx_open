@@ -23,7 +23,7 @@ enum class DiscoveryMode
 /**
  * Interface for resource searcher plugins.
  */
-class QnAbstractResourceSearcher: public QnResourceFactory, public QnCommonModuleAware
+class QnAbstractResourceSearcher: public QnResourceFactory, public /*mixin*/ QnCommonModuleAware
 {
 protected:
     explicit QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept;
@@ -46,7 +46,7 @@ public:
      * iteration time very much.
      *
      */
-    virtual bool isSequential() const {return false;};
+    virtual bool isSequential() const {return false;}
 
     /**
      * Searches for resources.
@@ -75,7 +75,7 @@ public:
      * \returns                         Name of the manufacturer for the resources this searcher adds.
      *                                  For example, 'AreconVision' or 'IQInVision'.
      */
-    virtual QString manufacture() const = 0;
+    virtual QString manufacturer() const = 0;
 
     /** \returns                        Whether this factory generates virtual resources such as desktop cameras. */
     virtual bool isVirtualResource() const { return false; }
@@ -100,7 +100,7 @@ protected:
 
 private:
     DiscoveryMode m_discoveryMode;
-    bool m_localResources;
+    bool m_isLocal;
     std::atomic<bool> m_shouldStop;
 };
 

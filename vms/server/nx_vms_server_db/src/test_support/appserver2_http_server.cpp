@@ -115,7 +115,7 @@ void Appserver2MessageProcessor::onResourceStatusChanged(
     Qn::ResourceStatus status,
     ec2::NotificationSource /*source*/)
 {
-    commonModule()->statusDictionary()->setValue(resource->getId(), status);
+    commonModule()->resourceStatusDictionary()->setValue(resource->getId(), status);
 }
 
 QnResourceFactory* Appserver2MessageProcessor::getResourceFactory() const

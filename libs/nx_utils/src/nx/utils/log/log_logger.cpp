@@ -20,21 +20,21 @@ namespace utils {
 namespace log {
 
 Logger::Logger(
-    const std::set<Tag>& tags,
+    std::set<Filter> filters,
     Level defaultLevel,
     std::unique_ptr<AbstractWriter> writer)
     :
     m_mutex(QnMutex::Recursive),
-    m_tags(tags),
+    m_filters(std::move(filters)),
     m_defaultLevel(defaultLevel)
 {
     if (writer)
         m_writers.push_back(std::move(writer));
 }
 
-std::set<Tag> Logger::tags() const
+std::set<Filter> Logger::filters() const
 {
-    return m_tags;
+    return m_filters;
 }
 
 void Logger::log(Level level, const Tag& tag, const QString& message)
@@ -69,7 +69,7 @@ bool Logger::isToBeLogged(Level level, const Tag& tag)
     QnMutexLocker lock(&m_mutex);
     for (const auto& filter: m_levelFilters)
     {
-        if (tag.matches(filter.first))
+        if (filter.first.accepts(tag))
             return level <= filter.second;
     }
 
@@ -116,8 +116,8 @@ void Logger::setSettings(const LoggerSettings& loggerSettings)
     QnMutexLocker lock(&m_mutex);
 
     m_settings = loggerSettings;
-    for (const auto[tag, level]: m_settings.level.filters)
-        m_tags.insert(tag);
+    for (const auto& [filter, level]: m_settings.level.filters)
+        m_filters.insert(filter);
 }
 
 void Logger::setApplicationName(const QString& applicationName)

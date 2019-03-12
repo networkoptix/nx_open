@@ -1,6 +1,9 @@
 #include "motion_search_list_model_p.h"
 
 #include <QtCore/QTimer>
+
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
 #include <api/helpers/chunks_request_data.h>
@@ -14,6 +17,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -134,6 +138,10 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
         case Qn::ForcePrecisePreviewRole:
             return true;
+
+        case Qn::PreviewStreamSelectionRole:
+            return QVariant::fromValue(
+                nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(chunk));

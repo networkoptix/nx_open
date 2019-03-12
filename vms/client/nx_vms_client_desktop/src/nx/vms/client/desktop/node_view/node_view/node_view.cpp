@@ -2,7 +2,7 @@
 
 #include "node_view_state_reducer.h"
 #include "node_view_item_delegate.h"
-#include "sorting/node_view_group_sorting_model.h"
+#include "sorting_filtering/node_view_group_sorting_model.h"
 #include "../details/node_view_model.h"
 #include "../details/node_view_store.h"
 #include "../details/node_view_state.h"

@@ -49,7 +49,6 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
         m_status.setState(QnConnectionState::Disconnected);
     }
 
-
     if (connection)
     {
         auto info = connection->connectionInfo();
@@ -128,8 +127,9 @@ void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
 {
+    m_holdConnection = false;
     base_type::disconnectFromConnection(connection);
-    connection->getMiscNotificationManager()->disconnect(this);
+    connection->miscNotificationManager()->disconnect(this);
 }
 
 void QnClientMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)

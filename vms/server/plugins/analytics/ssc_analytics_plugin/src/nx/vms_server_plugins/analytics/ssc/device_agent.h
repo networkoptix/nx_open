@@ -5,7 +5,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QByteArray>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/sdk/analytics/i_device_agent.h>
 
@@ -17,19 +17,17 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace ssc {
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
+class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(
         Engine* engine,
-        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         const EngineManifest& typedManifest);
 
     virtual ~DeviceAgent();
 
     virtual Engine* engine() const override { return m_engine; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     void sendEventPacket(const EventType& event) const;
 
@@ -54,7 +52,7 @@ private:
 private:
     Engine* const m_engine;
     const QUrl m_url;
-    const int m_cameraLogicalId;
+    const int m_cameraLogicalId = 0;
     QByteArray m_deviceAgentManifest;
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug

@@ -102,52 +102,12 @@
       <translation>このアカウントはアクティベートされていません　メール アドレスを確認してください</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>アカウントがブロックされています</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>要求された機能は実装されていません</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>未知の領域</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>不正な要求</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>無効な nonce</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>資格情報が有効ではなりました</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>無効なデータを受信しました</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>不明なエラー</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>予期しないネットワーク エラーです　インターネット接続を確認してやり直してください</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>無効なログイン</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>要求されたオブジェクトが見つかりません</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>オブジェクトは既に存在します</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -155,14 +115,17 @@
       <translation>内部 %1 エラーです　サポート チームまでご連絡ください</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>申し訳ありませんが%1 サービスが一時的に利用不可　復元の為に最善を尽くしています　後でもう一度試してください</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>試行回数が多すぎます。暫くしてからもう一度お試しください</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>申し訳ありませんが %1 サービスはリクエストを処理できませんでした　数分後にもう一度やり直してください</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

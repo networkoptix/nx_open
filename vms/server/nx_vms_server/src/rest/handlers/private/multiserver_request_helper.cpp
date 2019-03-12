@@ -1,75 +1,67 @@
 #include "multiserver_request_helper.h"
 
+#include <network/universal_tcp_listener.h>
+
 namespace detail {
 
-void checkUpdateStatusRemotely(
-    QnCommonModule* commonModule,
-    const QString& path,
-    QList<nx::update::Status>* reply,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+QSet<QnMediaServerResourcePtr> participantServers(
+    const IfParticipantPredicate& ifPartcipantPredicate,
+    QnCommonModule* commonModule)
 {
-    static const QString kOfflineMessage = "peer is offline";
-    auto mergeFunction =
-        [](
-            const QnUuid& serverId,
-            bool success,
-            QList<nx::update::Status>& reply,
-            QList<nx::update::Status>& outputReply)
-    {
-        if (success)
-        {
-            NX_ASSERT(reply.size() == 1);
-            outputReply.append(reply[0]);
-        }
-        else
-        {
-            outputReply.append(
-                nx::update::Status(serverId, nx::update::Status::Code::offline, kOfflineMessage));
-        }
-    };
+    auto servers = QSet<QnMediaServerResourcePtr>::fromList(
+        commonModule->resourcePool()->getAllServers(Qn::Online));
 
-    detail::requestRemotePeers(commonModule, path, *reply, context, mergeFunction);
-    auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
-        commonModule->resourcePool()->getAllServers(Qn::Offline));
-    for (const auto offlineServer : offlineServers)
+    for (const auto& moduleInformation: commonModule->moduleDiscoveryManager()->getAll())
     {
-        if (std::find_if(
-            reply->cbegin(),
-            reply->cend(),
-            [&offlineServer](const nx::update::Status& updateStatus)
-            {
-                return updateStatus.serverId == offlineServer->getId();
-            }) != reply->cend())
-        {
+        if (moduleInformation.localSystemId != commonModule->globalSettings()->localSystemId())
             continue;
-        }
-        reply->append(
-            nx::update::Status(
-                offlineServer->getId(),
-                nx::update::Status::Code::offline,
-                kOfflineMessage));
+
+        // Looking for servers, which belong to our system but have another version of the
+        // protocol, so they are 'Incompatible' in the resources pool.
+        const auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+            moduleInformation.id);
+
+        if (server)
+            servers.insert(server);
     }
-}
 
-QSet<QnMediaServerResourcePtr> allServers(QnCommonModule* commonModule)
-{
-    const auto systemName = commonModule->globalSettings()->systemName();
-    auto servers = QSet<QnMediaServerResourcePtr>::fromList(commonModule->resourcePool()->getAllServers(Qn::Online));
-
-    for (const auto& moduleInformation : commonModule->moduleDiscoveryManager()->getAll())
+    if (ifPartcipantPredicate)
     {
-        if (moduleInformation.systemName != systemName)
-            continue;
+        for (auto it = servers.cbegin(); it != servers.cend();)
+        {
+            const auto participationStatus =
+                ifPartcipantPredicate((*it)->getId(), (*it)->getModuleInformation().version);
 
-        const auto server =
-            commonModule->resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
-        if (!server)
-            continue;
-
-        servers.insert(server);
+            if (participationStatus != ParticipationStatus::participant)
+                it = servers.erase(it);
+            else
+                ++it;
+        }
     }
 
     return servers;
+}
+
+bool verifyPasswordOrSetError(
+    const QnRestConnectionProcessor* owner,
+    const QString& currentPassword,
+    QnJsonRestResult* result)
+{
+    if (currentPassword.isEmpty())
+    {
+        result->setError(QnJsonRestResult::CantProcessRequest, "currentPassword is required");
+        return false;
+    }
+
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+    const auto authResult = authenticator->verifyPassword(
+        owner->getForeignAddress().address, owner->accessRights(), currentPassword);
+
+    if (authResult == Qn::Auth_OK)
+        return true;
+
+    result->setError(QnJsonRestResult::CantProcessRequest, Qn::toErrorMessage(authResult));
+    return false;
 }
 
 } // namespace detail

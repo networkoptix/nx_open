@@ -19,8 +19,7 @@
 static const int MAX_PERCENT = 100;
 //assuming that scanning ports is ten times faster than plugin check
 static const int PORT_SCAN_MAX_PROGRESS_PERCENT = 10;
-static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROGRESS_PERCENT must be less than MAX_PERCENT" );
-
+static_assert(PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROGRESS_PERCENT must be less than MAX_PERCENT");
 
 QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),

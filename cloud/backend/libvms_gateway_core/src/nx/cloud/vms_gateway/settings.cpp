@@ -165,11 +165,6 @@ const CloudConnect& Settings::cloudConnect() const
     return m_cloudConnect;
 }
 
-const relaying::Settings& Settings::listeningPeer() const
-{
-    return m_listeningPeer;
-}
-
 void Settings::loadSettings()
 {
     using namespace std::chrono;
@@ -291,8 +286,6 @@ void Settings::loadSettings()
         m_cloudConnect.preferedSslMode = proxy::SslMode::disabled;
     else
         m_cloudConnect.preferedSslMode = proxy::SslMode::followIncomingConnection;
-
-    m_listeningPeer.load(settings());
 }
 
 } // namespace conf

@@ -1,7 +1,8 @@
 #include "frame_converter.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/vms/server/analytics/generic_uncompressed_video_frame.h>
 #include <nx/vms/server/analytics/yuv420_uncompressed_video_frame.h>
 
@@ -28,7 +29,7 @@ static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat)
 
         default:
             NX_ASSERT(false, lm("Unsupported PixelFormat \"%1\" = %2").args(
-                nx::sdk::analytics::common::pixelFormatToStdString(pixelFormat),
+                nx::sdk::analytics::pixelFormatToStdString(pixelFormat),
                 (int) pixelFormat));
             return AV_PIX_FMT_NONE;
     }
@@ -64,36 +65,37 @@ static IUncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutp
 
 IDataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat)
 {
-    if (!pixelFormat)
+    if (!pixelFormat) //< Compressed frame requested.
     {
-        if (const auto compressedFrame = m_getCompressedFrame())
-        {
-            if (!m_compressedFrame)
-            {
-                m_compressedFrame.reset(new WrappingCompressedVideoPacket(compressedFrame));
-                m_compressedFrame->releaseRef(); //< Make refCount = 1.
-            }
+        if (m_compressedFrame)
             return m_compressedFrame.get();
-        }
+
         return nullptr;
     }
 
-    if (const auto uncompressedFrame = m_getUncompressedFrame())
+    if (!m_uncompressedFrame) //< Uncompressed frame requested, but is not available.
     {
-        auto it = m_uncompressedFrames.find(*pixelFormat);
-        if (it == m_uncompressedFrames.cend())
+        // First time log as Warning, other times log as Verbose.
+        auto logLevel = nx::utils::log::Level::verbose;
+        if (!*m_missingUncompressedFrameWarningIssued)
         {
-            auto insertResult = m_uncompressedFrames.emplace(
-                *pixelFormat,
-                nxpt::ScopedRef<IUncompressedVideoFrame>(
-                    createUncompressedVideoFrameFromVideoDecoderOutput(
-                        uncompressedFrame, *pixelFormat),
-                    /*increaseRef*/ false));
-            it = insertResult.first;
+            *m_missingUncompressedFrameWarningIssued = true;
+            logLevel = nx::utils::log::Level::warning;
         }
-        return it->second.get();
+        NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
+
+        return nullptr;
     }
-    return nullptr;
+
+    auto it = m_cachedUncompressedFrames.find(*pixelFormat);
+    if (it == m_cachedUncompressedFrames.cend()) //< Not found in the cache.
+    {
+        const auto insertResult = m_cachedUncompressedFrames.emplace(
+            *pixelFormat,
+            createUncompressedVideoFrameFromVideoDecoderOutput(m_uncompressedFrame, *pixelFormat));
+        it = insertResult.first;
+    }
+    return it->second.get();
 }
 
 } // namespace analytics

@@ -107,34 +107,48 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
     if (orientation != Qt::Horizontal)
         return QVariant();
 
-    switch (role) {
-    case Qt::DisplayRole:
-    case Qt::ToolTipRole:
-    case Qt::StatusTipRole:
-    case Qt::WhatsThisRole:
-    case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
-        break;
-    default:
-        return QVariant();
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        case Qt::ToolTipRole:
+        case Qt::StatusTipRole:
+        case Qt::WhatsThisRole:
+        case Qt::AccessibleTextRole:
+        case Qt::AccessibleDescriptionRole:
+            break;
+        default:
+            return QVariant();
     }
 
-    switch (section) {
-    case RecordingColumn: return tr("Recording");
-    case NameColumn:      return tr("Name");
-    case VendorColumn:    return tr("Vendor");
-    case ModelColumn:     return tr("Model");
-    case FirmwareColumn:  return tr("Firmware");
-    case IpColumn:        return tr("IP/Name");
-    case MacColumn:       return tr("MAC address");
-    case LogicalIdColumn: return tr("ID");
-    case ServerColumn:    return tr("Server");
-    default:
-        break;
+    switch (section)
+    {
+        case RecordingColumn:
+            return tr("Recording");
+        case NameColumn:
+            return tr("Name");
+        case VendorColumn:
+            return tr("Vendor");
+        case ModelColumn:
+            return tr("Model");
+        case FirmwareColumn:
+            return tr("Firmware");
+        case IpColumn:
+            return tr("IP/Name");
+        case MacColumn:
+            return tr("MAC address");
+        case LogicalIdColumn:
+            if (role == Qt::ToolTipRole)
+                return tr("Logical ID");
+            return tr("ID");
+        case ServerColumn:
+            return tr("Server");
+        default:
+            break;
     }
 
     return QVariant();

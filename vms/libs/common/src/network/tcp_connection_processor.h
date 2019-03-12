@@ -16,7 +16,7 @@
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
-class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAware
+class QnTCPConnectionProcessor: public QnLongRunnable, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QnLongRunnable;

@@ -41,13 +41,13 @@ void* ILPEmptyPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int ILPEmptyPacket::addRef()
+int ILPEmptyPacket::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int ILPEmptyPacket::releaseRef()
+int ILPEmptyPacket::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

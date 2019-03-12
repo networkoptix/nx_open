@@ -100,6 +100,8 @@ public:
 
     bool addNewConnection(ConnectionContext connectionContext);
 
+    void removeConnection(const std::string& connectionId);
+
     /**
      * @return false If connectionId does not refer to an existing connection.
      */
@@ -178,8 +180,6 @@ private:
         CompletionHandler completionHandler);
 
     void sendSystemOfflineNotificationIfNeeded(const std::string& systemId);
-
-    void removeConnection(const std::string& connectionId);
 
     void onGotTransaction(
         const std::string& connectionId,

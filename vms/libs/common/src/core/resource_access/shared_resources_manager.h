@@ -8,7 +8,7 @@
 #include <nx/utils/uuid.h>
 
 /** Manager class for shared resources: layouts, cameras, web pages and server statistics. */
-class QnSharedResourcesManager: public QObject, public QnCommonModuleAware
+class QnSharedResourcesManager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

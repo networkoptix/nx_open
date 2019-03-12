@@ -19,6 +19,7 @@ TEST_P(ConnectionUrlParserTest, assertParsedCorrectly)
 }
 
 std::vector<InputAndOutput> testData = {
+    {"",                                            ""}, // Should not crash here!
     {"localhost",                                   "https://localhost:7001"},
     {"https://localhost/test",                      "https://localhost:7001"},
     {"https://localhost?param=1",                   "https://localhost:7001"},

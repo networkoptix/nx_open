@@ -8,7 +8,7 @@ class QnPlatformMonitor;
 class QnCommonModule;
 class QnMediaServerModule;
 
-class QnStorageSpaceRestHandler: public QnJsonRestHandler, public nx::vms::server::ServerModuleAware
+class QnStorageSpaceRestHandler: public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

@@ -148,6 +148,15 @@ enum UDTOpt
     UDT_RCVDATA        // size of data available for recv
 };
 
+enum UDTShutdownOpt
+{
+#if defined(_WIN32)
+    UDT_SHUT_RDWR = SD_BOTH
+#else
+    UDT_SHUT_RDWR = SHUT_RDWR
+#endif
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct CPerfMon
@@ -319,6 +328,10 @@ UDT_API int bind2(UDTSOCKET u, UDPSOCKET udpsock);
 UDT_API int listen(UDTSOCKET u, int backlog);
 UDT_API UDTSOCKET accept(UDTSOCKET u, struct sockaddr* addr, int* addrlen);
 UDT_API int connect(UDTSOCKET u, const struct sockaddr* name, int namelen);
+/**
+ * @param how. Currently ignored. The function always works as if UDT_SHUT_RDWR was passed here.
+ */
+UDT_API int shutdown(UDTSOCKET u, int how);
 UDT_API int close(UDTSOCKET u);
 UDT_API int getpeername(UDTSOCKET u, struct sockaddr* name, int* namelen);
 UDT_API int getsockname(UDTSOCKET u, struct sockaddr* name, int* namelen);

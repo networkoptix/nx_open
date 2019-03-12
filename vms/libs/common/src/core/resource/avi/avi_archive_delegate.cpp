@@ -327,7 +327,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
         return time;
 
     std::fill(m_keyFrameFound.begin(), m_keyFrameFound.end(), false);
-    const auto timeToSeek = qMax(time - m_startTimeUs, 0ll) + m_playlistOffsetUs;
+    const auto timeToSeek = qMax(time - m_startTimeUs, 0ll);
     if (m_hasVideo)
     {
         const auto result = av_seek_frame(
@@ -403,10 +403,10 @@ void QnAviArchiveDelegate::fixG726Bug()
 }
 
 bool QnAviArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractArchiveIntegrityWatcher *archiveIntegrityWatcher)
+    const QnResourcePtr& resource,
+    AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
-    QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
+    QnMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
     m_archiveIntegrityWatcher = archiveIntegrityWatcher;
     m_resource = resource;
@@ -416,10 +416,12 @@ bool QnAviArchiveDelegate::open(
         QString url = m_resource->getUrl();
         if (m_storage == nullptr)
         {
-            m_storage = QnStorageResourcePtr(
-                resource->commonModule()->storagePluginFactory()->createStorage(
-                    resource->commonModule(),
-                    url));
+            const auto commonModule = resource->commonModule();
+            if (!NX_ASSERT(commonModule))
+                return false;
+
+            m_storage = QnStorageResourcePtr(commonModule->storagePluginFactory()->createStorage(
+                resource->commonModule(), url));
 
             // Stepa: Dirty hack, but I don't know how to do it another way in current architecture.
             auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
@@ -446,7 +448,6 @@ bool QnAviArchiveDelegate::open(
         if (!m_IOContext)
         {
             close();
-            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
         m_formatContext->pb = m_IOContext;
@@ -458,21 +459,18 @@ bool QnAviArchiveDelegate::open(
         if (!m_initialized)
         {
             close();
-            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
 
         if (!initMetadata())
         {
             close();
-            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
 
         getVideoLayout();
     }
     m_keyFrameFound.resize(m_formatContext->nb_streams, false);
-    m_resource->setStatus(Qn::Online);
     return m_initialized;
 }
 
@@ -493,7 +491,6 @@ void QnAviArchiveDelegate::close()
     m_formatContext = nullptr;
     m_initialized = false;
     m_streamsFound = false;
-    m_playlistOffsetUs = 0;
     m_storage.clear();
     m_lastPacketTimes.clear();
     m_lastSeekTime = AV_NOPTS_VALUE;

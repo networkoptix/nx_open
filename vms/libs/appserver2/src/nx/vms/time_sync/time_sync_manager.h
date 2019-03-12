@@ -54,7 +54,7 @@ namespace nx {
 namespace vms {
 namespace time_sync {
 
-class TimeSyncManager: public AbstractTimeSyncManager, public QnCommonModuleAware
+class TimeSyncManager: public AbstractTimeSyncManager, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:
@@ -107,8 +107,8 @@ private:
 
     mutable QnMutex m_mutex;
 
-    QThread* m_thread = nullptr;
-    QTimer* m_timer = nullptr;
+    std::unique_ptr<QThread> m_thread = nullptr;
+    std::unique_ptr<QTimer> m_timer = nullptr;
 };
 
 } // namespace time_sync

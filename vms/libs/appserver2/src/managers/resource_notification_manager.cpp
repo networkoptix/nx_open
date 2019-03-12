@@ -37,22 +37,22 @@ void QnResourceNotificationManager::triggerNotification(
 
 void QnResourceNotificationManager::triggerNotification(
     const QnTransaction<vms::api::ResourceParamWithRefData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     if (tran.command == ApiCommand::setResourceParam)
-        emit resourceParamChanged(tran.params);
+        emit resourceParamChanged(tran.params, source);
     else if (tran.command == ApiCommand::removeResourceParam)
         emit resourceParamRemoved(tran.params);
 }
 
 void QnResourceNotificationManager::triggerNotification(
     const QnTransaction<vms::api::ResourceParamWithRefDataList>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     for (const auto& param: tran.params)
     {
         if (tran.command == ApiCommand::setResourceParams)
-            emit resourceParamChanged(param);
+            emit resourceParamChanged(param, source);
         else if (tran.command == ApiCommand::removeResourceParams)
             emit resourceParamRemoved(param);
     }

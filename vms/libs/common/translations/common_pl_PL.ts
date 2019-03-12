@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation>MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation>MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -90,6 +101,10 @@
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Te Systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
+    </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation>Nie można połączyć systemów, ponieważ mają co najmniej jeden serwer o tym samym identyfikatorze. Usuń ten serwer i spróbuj ponownie.</translation>
     </message>
   </context>
   <context>
@@ -211,10 +226,6 @@
       <translation>Zbyt wiele błędów w transmisji. Aby uzyskać więcej informacji, otwórz okno dialogowe problemów z kamerami.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>Błąd wtyczki kamery. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>Spróbuj ponownie uruchomić moduł I/O, a następnie przywrócić fabryczne ustawienia domyślne przeglądarką WWW.</translation>
     </message>
@@ -318,6 +329,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Proszę zaktualizować firmware. Minimalna obsługiwana wersja to %1. Obecna wersja to %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation>Błąd wtyczki. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation>Wtyczka jest niedostępna</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation>Wewnętrzny błąd serwera. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +365,6 @@
       <translation>Nie można znaleźć dekodera dla kodeka %1.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>Nie można zainicjować kontekstu próbki, kodu błędu: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Nie można przydzielić buforów próbki, kodu błędu: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>Nie można wysłać ramki audio do enkodera, kod błędu: %1.</translation>
     </message>
@@ -360,6 +375,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>Nie można odebrać ramki audio z dekodera, kod błędu: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation>Nie można przydzielić buforów próbki</translation>
     </message>
   </context>
   <context>
@@ -479,10 +498,6 @@
       <translation>Bezpłatna</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>Licencja bezpłatna</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>Czas</translation>
     </message>
@@ -497,6 +512,238 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>Łączenie licencji</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation>
+        <numerusform>%n licencja okresowa</numerusform>
+        <numerusform>%n licencje okresowe</numerusform>
+        <numerusform>%n licencji okresowych</numerusform>
+        <numerusform>%n licencji okresowych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation>
+        <numerusform>%n licencja analogowa</numerusform>
+        <numerusform>%n licencje analogowe</numerusform>
+        <numerusform>%n licencji analogowych</numerusform>
+        <numerusform>%n licencji analogowych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation>
+        <numerusform>%n licencja profesjonalna</numerusform>
+        <numerusform>%n licencje profesjonalne</numerusform>
+        <numerusform>%n licencji profesjonalnych</numerusform>
+        <numerusform>%n licencji profesjonalnych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation>
+        <numerusform>%n licencja Edge</numerusform>
+        <numerusform>%n licencje Edge</numerusform>
+        <numerusform>%n licencji Edge</numerusform>
+        <numerusform>%n licencji Edge</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation>
+        <numerusform>%n licencja Vmax</numerusform>
+        <numerusform>%n licencje Vmax</numerusform>
+        <numerusform>%n licencji Vmax</numerusform>
+        <numerusform>%n licencji Vmax</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation>
+        <numerusform>%n licencja analogowa enkodera</numerusform>
+        <numerusform>%n licencje analogowe enkoderów</numerusform>
+        <numerusform>%n licencji analogowych enkoderów</numerusform>
+        <numerusform>%n licencji analogowych enkoderów</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation>
+        <numerusform>%n licencja ściany wideo</numerusform>
+        <numerusform>%n licencje ściany wideo</numerusform>
+        <numerusform>%n licencji ściany wideo</numerusform>
+        <numerusform>%n licencji ściany wideo</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation>
+        <numerusform>%n licencja modułu I/O</numerusform>
+        <numerusform>%n licencje modułów I/O</numerusform>
+        <numerusform>%n licencji modułów I/O</numerusform>
+        <numerusform>%n licencji modułów I/O</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation>
+        <numerusform>%n licencja startowa</numerusform>
+        <numerusform>%n licencje startowe</numerusform>
+        <numerusform>%n licencji startowych</numerusform>
+        <numerusform>%n licencji startowych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation>
+        <numerusform>%n licencja mostka</numerusform>
+        <numerusform>%n licencje mostków</numerusform>
+        <numerusform>%n licencji mostków</numerusform>
+        <numerusform>%n licencji mostków</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation>
+        <numerusform>%n licencja nieprawidłowa</numerusform>
+        <numerusform>%n licencje nieprawidłowe</numerusform>
+        <numerusform>%n licencji nieprawidłowych</numerusform>
+        <numerusform>%n licencji nieprawidłowych</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation>Licencje bezpłatne</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation>
+        <numerusform>%n bezpłatna licencja</numerusform>
+        <numerusform>%n bezpłatne licencje</numerusform>
+        <numerusform>%n bezpłatnych licencji</numerusform>
+        <numerusform>%n bezpłatnych licencji</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja okresowa</numerusform>
+        <numerusform>%n/%1 licencje okresowe</numerusform>
+        <numerusform>%n/%1 licencji okresowych</numerusform>
+        <numerusform>%n/%1 licencji okresowych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja analogowa</numerusform>
+        <numerusform>%n/%1 licencje analogowe</numerusform>
+        <numerusform>%n/%1 licencji analogowych</numerusform>
+        <numerusform>%n/%1 licencji analogowych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja profesjonalna</numerusform>
+        <numerusform>%n/%1 licencje profesjonalne</numerusform>
+        <numerusform>%n/%1 licencji profesjonalnych</numerusform>
+        <numerusform>%n/%1 licencji profesjonalnych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja Edge</numerusform>
+        <numerusform>%n/%1 licencje Edge</numerusform>
+        <numerusform>%n/%1 licencji Edge</numerusform>
+        <numerusform>%n/%1 licencji Edge</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja Vmax</numerusform>
+        <numerusform>%n/%1 licencje Vmax</numerusform>
+        <numerusform>%n/%1 licencji Vmax</numerusform>
+        <numerusform>%n/%1 licencji Vmax</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja analogowa enkodera</numerusform>
+        <numerusform>%n/%1 licencje analogowe enkoderów</numerusform>
+        <numerusform>%n/%1 licencji analogowych enkoderów</numerusform>
+        <numerusform>%n/%1 licencji analogowych enkoderów</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja ściany wideo</numerusform>
+        <numerusform>%n/%1 licencje ściany wideo</numerusform>
+        <numerusform>%n/%1 licencji ściany wideo</numerusform>
+        <numerusform>%n/%1 licencji ściany wideo</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja modułu I/O</numerusform>
+        <numerusform>%n/%1 licencje modułów I/O</numerusform>
+        <numerusform>%n/%1 licencji modułów I/O</numerusform>
+        <numerusform>%n/%1 licencji modułów I/O</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja startowa</numerusform>
+        <numerusform>%n/%1 licencje startowe</numerusform>
+        <numerusform>%n/%1 licencji startowych</numerusform>
+        <numerusform>%n/%1 licencji startowych</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 bezpłatna licencja</numerusform>
+        <numerusform>%n/%1 bezpłatne licencje</numerusform>
+        <numerusform>%n/%1 bezpłatnych licencji</numerusform>
+        <numerusform>%n/%1 bezpłatnych licencji</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja mostka</numerusform>
+        <numerusform>%n/%1 licencje mostków</numerusform>
+        <numerusform>%n/%1 licencji mostków</numerusform>
+        <numerusform>%n/%1 licencji mostków</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licencja nieprawidłowa</numerusform>
+        <numerusform>%n/%1 licencje nieprawidłowe</numerusform>
+        <numerusform>%n/%1 licencji nieprawidłowych</numerusform>
+        <numerusform>%n/%1 licencji nieprawidłowych</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -557,10 +804,6 @@
       <translation>Nieprawidłowy typ</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>Dla tego urządzenia dozwolona jest tylko licencja pojedyncza</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>Ten typ licencji wymaga wyższej wersji oprogramowania</translation>
     </message>
@@ -572,6 +815,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>Nie znaleziono serwera o zgodnym ID sprzętu</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation>Dozwolona jest tylko jedna licencja startowa na system.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation>Masz już jedną aktywną licencję startową.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -582,42 +833,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>%n Kamera</numerusform>
-        <numerusform>%n Kamery</numerusform>
-        <numerusform>%n Kamery</numerusform>
-        <numerusform>%n Kamer</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamery</numerusform>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamer</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>%n urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n urządzenie</numerusform>
-        <numerusform>%n urządzenia</numerusform>
-        <numerusform>%n urządzenie</numerusform>
-        <numerusform>%n urządzeń</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>Kamery</translation>
@@ -650,24 +865,6 @@
       <source>device</source>
       <translation>urzadzenie</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Moduły I/O</numerusform>
-        <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Modułów I/O</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n moduły I/O</numerusform>
-        <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n modułów I/O</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>Moduły I/O</translation>
@@ -683,6 +880,60 @@
     <message>
       <source>I/O module</source>
       <translation>moduł I/O</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamer</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamer</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation>
+        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation>
+        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation>
+        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenia</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation>
+        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenia</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -710,67 +961,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>ID sprzętu: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>Najniższy</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Niski</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Średni</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Wysoki</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Najlepszy</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Preset</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>Niezdefiniowany</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Najniż.</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Ni</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Śr</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Wy</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Naj</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Pset</translation>
     </message>
   </context>
   <context>
@@ -817,196 +1007,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>System bez nazwy</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>OK</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>Nie znaleziono</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>Nie zaimplementowano</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>Nieobsługiwany transport</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>Wewnętrzny błąd serwera</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>Nieprawidłowy parametr</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>g</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>t</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>r</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sek.</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min.</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>godz.</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dni</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>tyg.</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mies.</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>lat</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milisekunda</numerusform>
-        <numerusform>milisekundy</numerusform>
-        <numerusform>milisekundy</numerusform>
-        <numerusform>milisekund</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>sekund</numerusform>
-        <numerusform>sek.</numerusform>
-        <numerusform>sekundy</numerusform>
-        <numerusform>sek.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minuta</numerusform>
-        <numerusform>minuty</numerusform>
-        <numerusform>minuta</numerusform>
-        <numerusform>minut</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>godzin</numerusform>
-        <numerusform>godzin</numerusform>
-        <numerusform>godzina</numerusform>
-        <numerusform>godzin</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dni</numerusform>
-        <numerusform>dni</numerusform>
-        <numerusform>dzień</numerusform>
-        <numerusform>dni</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>tydzień</numerusform>
-        <numerusform>tygodnie</numerusform>
-        <numerusform>tydzień</numerusform>
-        <numerusform>tygodni</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>miesiąc</numerusform>
-        <numerusform>miesiące</numerusform>
-        <numerusform>miesiąc</numerusform>
-        <numerusform>miesięcy</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>rok</numerusform>
-        <numerusform>lata</numerusform>
-        <numerusform>rok</numerusform>
-        <numerusform>lat</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1085,6 +1085,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>Ma dostęp do całego systemu i może nim zarządzać. Może tworzyć użytkowników.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation>Plik zip jest uszkodzony.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation>Nie można znaleźć katalogu docelowego.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation>Nie można otworzyć pliku do zapisu.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation>Na dysku nie ma wolnej przestrzeni.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Nieznany błąd.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation>Anulowano wypakowywanie.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation>Program wypakowujący jest zajęty.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Zły rozmiar strumienia szyfrowanego.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Uszkodzony nagłówek strumienia szyfrowanego.</translation>
     </message>
   </context>
   <context>
@@ -1597,6 +1639,26 @@
     <message>
       <source>Exit fullscreen</source>
       <translation>Wyłącz pełny ekran</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Otwórz układ</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation>Zdarzenie wtyczki</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation>Nieznane zdarzenie wtyczki</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation>Nie można wymusić użycia czasu kamery z powodu opóźnień, zostanie wykorzystany czas systemowy</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation>Czas kamery powrócił do normy</translation>
     </message>
   </context>
   <context>

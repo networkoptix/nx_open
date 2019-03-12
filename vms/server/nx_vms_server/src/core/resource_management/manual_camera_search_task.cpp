@@ -82,7 +82,6 @@ QnManualResourceSearchEntry entryFromResource(const QnResourcePtr& resource)
 
 } // namespace
 
-
 QnSearchTask::QnSearchTask(
     QnCommonModule* commonModule,
     nx::utils::Url url,
@@ -148,7 +147,7 @@ void QnSearchTask::start()
             QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
             NX_ASSERT(camRes);
             if (camRes && !m_commonModule->cameraDriverRestrictionList()->driverAllowedForCamera(
-                checker->manufacture(),
+                checker->manufacturer(),
                 camRes->getVendor(),
                 camRes->getModel()))
             {
@@ -177,7 +176,7 @@ QString QnSearchTask::toString() const
     QString str = ::toString(this) + "( ";
 
     for (const auto& searcher: m_searchers)
-        str += "'" + searcher->manufacture() + "' ";
+        str += "'" + searcher->manufacturer() + "' ";
 
     str += ")";
     return str;

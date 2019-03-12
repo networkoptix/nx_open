@@ -11,6 +11,7 @@ class ServerUpdateManager: public CommonUpdateManager, public ServerModuleAware
 {
 public:
     ServerUpdateManager(QnMediaServerModule* serverModule);
+    virtual ~ServerUpdateManager() override;
 
 private:
     ServerUpdateInstaller m_installer;

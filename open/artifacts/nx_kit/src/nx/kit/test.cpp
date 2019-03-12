@@ -1,4 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
 #include "test.h"
 
 #include <chrono>
@@ -111,7 +110,7 @@ static std::string& suiteId()
     return value;
 }
 
-static void printSectionHeader(const std::string formatStr, ...)
+static void printSectionHeader(const char* formatStr, ...)
 {
     static bool firstSection = true;
     if (firstSection)
@@ -124,7 +123,7 @@ static void printSectionHeader(const std::string formatStr, ...)
 
     va_list args;
     va_start(args, formatStr);
-    vfprintf(stderr, formatStr.c_str(), args);
+    vfprintf(stderr, formatStr, args);
     va_end(args);
 
     std::cerr << std::endl;
@@ -141,7 +140,7 @@ static std::string testLogPrefix(const char* caption)
     return std::string(caption) + ": Suite [" + suiteId() + "]: ";
 }
 
-[[noreturn]] static void fatalError(const std::string formatStr, ...)
+[[noreturn]] static void fatalError(const char* formatStr, ...)
 {
     va_list args;
     va_start(args, formatStr);
@@ -151,7 +150,7 @@ static std::string testLogPrefix(const char* caption)
     exit(255);
 }
 
-static void printNote(const std::string formatStr, ...)
+static void printNote(const char* formatStr, ...)
 {
     va_list args;
     va_start(args, formatStr);
@@ -166,7 +165,7 @@ int regTest(const Test& test)
     if (verbose)
     {
         std::cerr << "Suite [" + suiteId() + "]: Added test #" << allTests().size() << ": "
-            << test.testCase << "." << test.testName << std::endl;
+            << test.testCaseDotName << std::endl;
     }
 
     return 0; //< Return value is not used.
@@ -281,7 +280,7 @@ static void processArgs(int argc, const char* const argv[])
         return; //< Do nothing if no args were specified.
 
     const std::vector<std::string> args{argv, argv + argc};
-    const auto arg = [&args](int i) { return (args.size() <= i) ? "" : args[i]; };
+    const auto arg = [&args](int i) { return ((int) args.size() <= i) ? "" : args[i]; };
 
     if (args.size() == 2 && (arg(1) == "-h" || arg(1) == "--help"))
     {
@@ -317,7 +316,7 @@ const char* tempDir()
 
     if (test->tempDir.empty())
     {
-        test->tempDir = baseTempDir() + test->testCase + "." + test->testName + kPathSeparator;
+        test->tempDir = baseTempDir() + test->testCaseDotName + kPathSeparator;
         createDir(test->tempDir);
 
         if (verbose)
@@ -347,7 +346,7 @@ const char* staticTempDir()
 
 static bool runTest(Test& test, int testNumber)
 {
-    printSectionHeader("Test #%lu: " + test.testCase + "." + test.testName, testNumber);
+    printSectionHeader("Test #%lu: %s", testNumber, test.testCaseDotName);
     std::cerr << std::endl;
 
     currentTest() = &test;
@@ -391,7 +390,7 @@ int runAllTests(const char* testSuiteName, int argc, const char* const argv[])
         << "Running " << allTests().size() << " test(s) from " << fullSuiteName << std::endl;
 
     std::vector<int> failedTests;
-    for (int i = 1; i <= allTests().size(); ++i)
+    for (int i = 1; i <= (int) allTests().size(); ++i)
     {
         if (!runTest(allTests()[i - 1], i))
             failedTests.push_back(i);

@@ -88,7 +88,7 @@ private:
         auto transaction = SpecificCommand(std::move(transactionHeader));
         if (!deserializeTransactionDataFunc(&transaction.params))
         {
-            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
+            NX_WARNING(this,
                 lm("Failed to deserialize transaction %1 received from %2")
                     .args(CommandDescriptor::name, transportHeader));
             m_aioTimer.post(
@@ -109,7 +109,7 @@ private:
         const CommandTransportHeader& transportHeader,
         CommandProcessedHandler completionHandler)
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
+        NX_WARNING(this,
             lm("Failed to deserialize transaction %1 received from %2")
                 .args(CommandDescriptor::name, transportHeader));
         m_aioTimer.post(
@@ -240,7 +240,7 @@ private:
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
         {
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            NX_DEBUG(this,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
                 .args(CommandDescriptor::name, transactionContext.transportHeader.systemId,
                     transactionContext.transportHeader.endpoint));
@@ -248,7 +248,7 @@ private:
         }
         else if (dbResultCode != nx::sql::DBResult::ok)
         {
-            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
+            NX_WARNING(this,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
                 .args(CommandDescriptor::name, transactionContext.transportHeader.systemId,
                     transactionContext.transportHeader.endpoint,
@@ -262,7 +262,7 @@ private:
             std::move(transactionContext.transaction.take()));
         if (dbResultCode != nx::sql::DBResult::ok)
         {
-            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
+            NX_WARNING(this,
                 lm("Error processing transaction %1 received from %2. %3")
                 .args(CommandDescriptor::name, transactionContext.transportHeader,
                     queryContext->connection()->lastErrorText()));

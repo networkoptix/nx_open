@@ -169,7 +169,7 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 
 QString CommonUpdateInstaller::installerWorkDir() const
 {
-    QString selfPath = commonModule()->moduleInformation().localSystemId.toSimpleString();
+    QString selfPath = commonModule()->moduleGUID().toString();
     // This path will look like /tmp/nx_isntaller-server_guid/
     // We add server_guid to allow to run multiple servers on a single machine.
     return closeDirPath(dataDirectoryPath()) + "nx_installer-" + selfPath;

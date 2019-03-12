@@ -217,24 +217,24 @@ QN_FUSION_DECLARE_FUNCTIONS(SocketAddress, (json), NX_NETWORK_API)
 
 struct NX_NETWORK_API KeepAliveOptions
 {
-    std::chrono::seconds inactivityPeriodBeforeFirstProbe;
-    std::chrono::seconds probeSendPeriod;
+    std::chrono::milliseconds inactivityPeriodBeforeFirstProbe;
+    std::chrono::milliseconds probeSendPeriod;
     /**
      * The number of unacknowledged probes to send before considering the connection dead and
      * notifying the application layer.
      */
-    size_t probeCount;
+    int probeCount = 0;
 
     KeepAliveOptions(
-        std::chrono::seconds inactivityPeriodBeforeFirstProbe = std::chrono::seconds::zero(),
-        std::chrono::seconds probeSendPeriod = std::chrono::seconds::zero(),
-        size_t probeCount = 0);
+        std::chrono::milliseconds inactivityPeriodBeforeFirstProbe = std::chrono::milliseconds::zero(),
+        std::chrono::milliseconds probeSendPeriod = std::chrono::milliseconds::zero(),
+        int probeCount = 0);
 
     bool operator==(const KeepAliveOptions& rhs) const;
     bool operator!=(const KeepAliveOptions& rhs) const;
 
     /** Maximum time before lost connection can be acknowledged. */
-    std::chrono::seconds maxDelay() const;
+    std::chrono::milliseconds maxDelay() const;
     QString toString() const;
 
     void resetUnsupportedFieldsToSystemDefault();

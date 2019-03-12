@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <nx/network/aio/timer.h>
@@ -85,6 +86,7 @@ private:
     const network::SocketAddress m_connectionOriginatorEndpoint;
     bool m_closed = false;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
+    std::optional<int> m_prevReceivedTransportSequence;
 
     int highestProtocolVersionCompatibleWithRemotePeer() const;
 

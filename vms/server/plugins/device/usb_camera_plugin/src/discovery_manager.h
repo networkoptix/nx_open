@@ -32,10 +32,10 @@ private:
 
         bool operator==(const DeviceDataWithNxId& rhs) const
         {
-            return 
-                nxId == rhs.nxId 
-                && device.name == rhs.device.name 
-                && device.path == rhs.device.path 
+            return
+                nxId == rhs.nxId
+                && device.name == rhs.device.name
+                && device.path == rhs.device.path
                 && device.uniqueId == rhs.device.uniqueId;
         }
 
@@ -71,8 +71,8 @@ public:
                      nxpl::TimeProvider *const timeProvider);
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
     virtual void getVendorName( char* buf ) const override;
     virtual int findCameras(
@@ -95,7 +95,6 @@ public:
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
     virtual int getReservedModelList( char** modelList, int* count ) override;
     void addOrUpdateCamera(const DeviceDataWithNxId& nxDevice);
-    std::string getFfmpegUrl(const std::string& nxId) const;
 
 private:
     nxpt::CommonRefManager m_refManager;
@@ -108,5 +107,5 @@ private:
     CameraAndDeviceDataWithNxId* getCameraAndDeviceData(const std::string& nxId);
 };
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx
+} // namespace usb_cam

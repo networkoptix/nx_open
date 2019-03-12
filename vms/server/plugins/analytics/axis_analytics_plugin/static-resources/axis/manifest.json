@@ -6,7 +6,7 @@
         "Event types with the topics not from AllowedTopics are filtered out."
         "Event types with the descriptions equal to one of the forbiddenDescriptions list are filtered out".
     ],
-    "capabilities": "deviceModelDependent",
+    "capabilities": "deviceDependent",
     "allowedTopics": [
         "tns1:RuleEngine",
         "tns1:VideoSource",

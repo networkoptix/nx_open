@@ -36,11 +36,11 @@ std::optional<std::chrono::milliseconds> updateStreamTime(const P& p)
     if (!p.contains("updateStream"))
         return std::nullopt;
 
-    std::chrono::seconds requestedTime(p.value("updateStream").toInt());
+    std::chrono::milliseconds requestedTime = std::chrono::seconds(p.value("updateStream").toInt());
     if (requestedTime.count() == 0)
         requestedTime = kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2;
 
-    return std::chrono::milliseconds(requestedTime);
+    return requestedTime;
 }
 
 } // namespace

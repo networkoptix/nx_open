@@ -52,13 +52,13 @@ void P2PHttpServerTransport::start(
         &m_sendBuffer,
         [this](SystemError::ErrorCode error, size_t transferred)
         {
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             m_onGetRequestReceived(
                 error != SystemError::noError || transferred == 0
                     ? SystemError::connectionAbort
                     : SystemError::noError);
 
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
 
             m_onGetRequestReceived = nullptr;
@@ -248,9 +248,9 @@ void P2PHttpServerTransport::onBytesRead(
             m_readContext.buffer = QByteArray::fromBase64(*buffer);
             *buffer = m_readContext.buffer;
 
-            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             handler(error, m_readContext.bytesParsed);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
 
             m_readContext.reset();

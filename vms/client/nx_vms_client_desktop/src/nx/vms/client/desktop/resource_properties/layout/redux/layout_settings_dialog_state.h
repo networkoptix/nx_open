@@ -37,11 +37,12 @@ struct LayoutSettingsDialogState: AbstractReduxState
     struct Range
     {
         int min = kBackgroundMinSize;
-        int max = kBackgroundMaxSize;
         int value = 0;
+        int max = kBackgroundMaxSize;
 
         void setRange(int min, int max)
         {
+            NX_ASSERT(min <= max);
             this->min = min;
             this->max = max;
         }
@@ -49,6 +50,25 @@ struct LayoutSettingsDialogState: AbstractReduxState
         void setValue(int value)
         {
             this->value = qBound(min, value, max);
+        }
+
+        constexpr Range() = default;
+
+        constexpr Range(int min, int value, int max):
+            min(min),
+            value(value),
+            max(max)
+        {
+        }
+
+        explicit constexpr Range(int value):
+            value(value)
+        {
+        }
+
+        constexpr bool isValid() const
+        {
+            return min <= value && value <= max;
         }
     };
 

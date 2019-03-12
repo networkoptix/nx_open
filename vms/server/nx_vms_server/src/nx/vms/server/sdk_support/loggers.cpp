@@ -7,7 +7,7 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/placeholder_binder.h>
-#include <nx/sdk/common/to_string.h>
+#include <nx/sdk/helpers/to_string.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -96,7 +96,7 @@ void ManifestLogger::log(
             m_logTag,
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),
-            analytics::debug_helpers::filename(
+            analytics::debug_helpers::nameOfFileToDumpOrLoadData(
                 m_device,
                 m_engineResource,
                 m_pluginResource,
@@ -146,7 +146,7 @@ void StartupPluginManifestLogger::log(
             m_logTag,
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),
-            analytics::debug_helpers::filename(
+            analytics::debug_helpers::nameOfFileToDumpOrLoadData(
                 m_plugin,
                 kManifestFilenamePostfix));
     }

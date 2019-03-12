@@ -275,7 +275,7 @@ void DeviceAdditionDialog::handleTabClicked(int index)
     else
     {
         ui->addressEdit->setValidator(
-            defaultNonEmptyValidator(tr("Address field can't be empty")));
+            defaultNonEmptyValidator(tr("Address field cannot be empty")));
         ui->addressEdit->setFocus();
         resetPageSize(ui->subnetScanPage);
         setHeightFromLayout(ui->knownAddressPage);

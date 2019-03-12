@@ -60,6 +60,18 @@ public:
         NX_ASSERT(runnable && m_created.contains(runnable));
 
         m_created.remove(runnable);
+        m_waitCondition.wakeAll();
+    }
+
+    void waitForDestruction()
+    {
+        QnMutexLocker lock(&m_mutex);
+        while (!m_created.isEmpty())
+        {
+            for (const auto created: m_created)
+                NX_DEBUG(this, lm("Still created: %1").args(created));
+            m_waitCondition.wait(&m_mutex);
+        }
     }
 
 private:
@@ -72,31 +84,27 @@ private:
 private:
     QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
-    QSet<QnLongRunnable *> m_created, m_running;
+    QSet<QnLongRunnable*> m_created;
+    QSet<QnLongRunnable*> m_running;
 };
 
 //-------------------------------------------------------------------------------------------------
 // QnLongRunnable.
 
-QnLongRunnable::QnLongRunnable(Tracking tracking)
+QnLongRunnable::QnLongRunnable(const char* threadName)
 {
-    if (tracking == Tracking::enabled)
+    if (threadName)
+        setObjectName(threadName);
+
+    if (QnLongRunnablePool* pool = QnLongRunnablePool::instance())
     {
-        if (QnLongRunnablePool* pool = QnLongRunnablePool::instance())
-        {
-            m_pool = pool->d;
-            m_pool->createdNotify(this);
-        }
-        else
-        {
-            NX_WARNING(this, "QnLongRunnablePool instance does not exist, "
-                "lifetime of this runnable will not be tracked.");
-        }
+        m_pool = pool->d;
+        m_pool->createdNotify(this);
     }
     else
     {
-        NX_WARNING(this, "Use nx::utils::Thread class for such usage. "
-            "In the near future, QnLongRunnable will be tracked unconditionally");
+        NX_WARNING(this, "QnLongRunnablePool instance does not exist, "
+            "lifetime of this runnable will not be tracked.");
     }
 }
 
@@ -134,6 +142,7 @@ QnLongRunnablePool::QnLongRunnablePool(QObject *parent):
 QnLongRunnablePool::~QnLongRunnablePool()
 {
     stopAll();
+    d->waitForDestruction();
 }
 
 void QnLongRunnablePool::stopAll()

@@ -1,1 +1,1 @@
-deb http://repo.mysql.com/apt/ubuntu xenial mysql-5.7
+deb http://repo.mysql.com/apt/ubuntu bionic mysql-5.7

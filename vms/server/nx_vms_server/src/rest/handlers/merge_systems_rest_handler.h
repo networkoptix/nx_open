@@ -15,7 +15,7 @@ namespace ec2 { class AbstractTransactionMessageBus; }
 class QnCommonModule;
 
 class QnMergeSystemsRestHandler:
-    public QnJsonRestHandler, public nx::vms::server::ServerModuleAware
+    public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

@@ -38,6 +38,7 @@ private:
     void setNearestValue(QComboBox* combobox, int time);
     void initDayOfWeekCheckboxes();
     void updateDayOfWeekCheckboxes();
+    void updateNextDayLabel();
 
     QCheckBox* checkboxByDayOfWeek(Qt::DayOfWeek day);
 

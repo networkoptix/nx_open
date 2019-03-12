@@ -3,7 +3,7 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_target(udt LIBRARY ${library_type} NO_MOC)
+nx_add_target(udt LIBRARY ${library_type} NO_MOC WERROR_IF LINUX)
 
 target_compile_definitions(udt
     PRIVATE UDT_API=${API_EXPORT_MACRO}

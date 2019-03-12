@@ -20,6 +20,11 @@ struct Package
     QString variant;
     QString variantVersion;
     QString file;
+    /**
+     * Local path to the package. This value is used locally by each peer.
+     * Do not add it to fusion until it is really necessary.
+     */
+    QString localFile;
     QString url;
     QString md5;
     qint64 size = 0;
@@ -31,7 +36,7 @@ struct Package
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
-QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json))
+QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json)(eq))
 
 struct Information
 {
@@ -43,7 +48,10 @@ struct Information
     /** This is release notes for offline update package. */
     /** We need to be able to show this data without internet. */
     QString description;
+    QString eula;
     QList<Package> packages;
+    QList<QnUuid> participants;
+    qint64 lastInstallationRequestTime = -1;
 
     /** Release date - in msecs since epoch. */
     qint64 releaseDateMs = 0;
@@ -54,8 +62,10 @@ struct Information
     bool isEmpty() const { return packages.isEmpty(); }
 };
 
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(description)(packages)
-QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
+    (description)(packages)(participants)(lastInstallationRequestTime)(eula)
+
+QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json)(eq))
 
 enum class InformationError
 {
@@ -66,6 +76,7 @@ enum class InformationError
     brokenPackageError,
     missingPackageError,
     incompatibleVersion,
+    incompatibleCloudHost,
     notFoundError,
     noNewVersion,
 };
@@ -163,11 +174,16 @@ struct UpdateContents
 {
     UpdateSourceType sourceType = UpdateSourceType::internet;
     QString source;
+    QString changeset;
 
     /** A set of servers without proper update file. */
     QSet<QnUuid> missingUpdate;
     /** A set of servers that can not accept update version. */
     QSet<QnUuid> invalidVersion;
+    /** A set of peers to be ignored during this update. */
+    QSet<QnUuid> ignorePeers;
+    /** A set of servers with update packages verified. */
+    QSet<QnUuid> serversWithUpdate;
     /**
      * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.
@@ -188,7 +204,8 @@ struct UpdateContents
      * Maps system information to a set of packages. We use this cache to find and check
      * if a specific OS variant is supported.
      */
-    PackageCache packageCache;
+    PackageCache serverPackageCache;
+    PackageCache clientPackageCache;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;
@@ -202,13 +219,15 @@ struct UpdateContents
      */
     QList<Package> manualPackages;
     bool cloudIsCompatible = true;
-    bool verified = false;
+
+    bool packagesGenerted = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
 
     nx::utils::SoftwareVersion getVersion() const;
+
     /** Check if we can apply this update. */
-    bool isValid() const;
+    bool isValidToInstall() const;
 
     /**
      * Check if this update info is completely empty.

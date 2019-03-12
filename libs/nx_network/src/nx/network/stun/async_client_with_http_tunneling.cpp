@@ -11,6 +11,8 @@ namespace nx {
 namespace network {
 namespace stun {
 
+static constexpr char kTunnelTag[] = "STUN over HTTP tunnel";
+
 AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     m_settings(settings),
     m_reconnectTimer(m_settings.reconnectPolicy)
@@ -30,7 +32,7 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
         m_httpTunnelingClient->bindToAioThread(aioThread);
 }
 
-void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler handler)
+void AsyncClientWithHttpTunneling::connect(const utils::Url& url, ConnectHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
     m_url = url;
@@ -74,7 +76,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
     ReconnectHandler handler,
     void* client)
 {
-    post(
+    dispatch(
         [this, client, handler = std::move(handler)]() mutable
         {
             m_reconnectHandlers.emplace(client, std::move(handler));
@@ -84,7 +86,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
 void AsyncClientWithHttpTunneling::setOnConnectionClosedHandler(
     OnConnectionClosedHandler handler)
 {
-    post(
+    dispatch(
         [this, handler = std::move(handler)]() mutable
         {
             m_connectionClosedHandler.swap(handler);
@@ -159,7 +161,7 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
                 QnMutexLocker lock(&m_mutex);
                 stunClient.swap(m_stunClient);
             }
-            
+
             if (stunClient)
             {
                 stunClient->closeConnection(reason);
@@ -171,7 +173,7 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
             decltype(m_activeRequests) activeRequests;
             activeRequests.swap(m_activeRequests);
             for (auto& requestContext: activeRequests)
-                requestContext.second.handler(reason, nx::network::stun::Message());
+                requestContext.second.handler(reason, Message());
         });
 }
 
@@ -207,6 +209,12 @@ void AsyncClientWithHttpTunneling::setKeepAliveOptions(KeepAliveOptions options)
     m_keepAliveOptions = std::move(options);
     if (m_stunClient)
         m_stunClient->setKeepAliveOptions(*m_keepAliveOptions);
+}
+
+void AsyncClientWithHttpTunneling::setTunnelValidatorFactory(
+    http::tunneling::TunnelValidatorFactoryFunc func)
+{
+    m_tunnelValidatorFactory = std::move(func);
 }
 
 void AsyncClientWithHttpTunneling::stopWhileInAioThread()
@@ -282,7 +290,7 @@ void AsyncClientWithHttpTunneling::createStunClient(
     m_stunClient->setOnConnectionClosedHandler(
         std::bind(&AsyncClientWithHttpTunneling::onStunConnectionClosed, this, _1));
     m_stunClient->setIndicationHandler(
-        nx::network::stun::kEveryIndicationMethod,
+        kEveryIndicationMethod,
         std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
         this);
 }
@@ -310,7 +318,7 @@ void AsyncClientWithHttpTunneling::dispatchIndication(
 
     auto it = m_indicationHandlers.find(indication.header.method);
     if (it == m_indicationHandlers.end())
-        it = m_indicationHandlers.find(nx::network::stun::kEveryIndicationMethod);
+        it = m_indicationHandlers.find(kEveryIndicationMethod);
 
     if (it == m_indicationHandlers.end())
     {
@@ -332,7 +340,10 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
     using namespace std::placeholders;
 
     m_httpTunnelEstablishedHandler = std::move(handler);
-    m_httpTunnelingClient = std::make_unique<nx::network::http::tunneling::Client>(url);
+    m_httpTunnelingClient = std::make_unique<http::tunneling::Client>(url, kTunnelTag);
+    m_httpTunnelingClient->setTimeout(m_settings.recvTimeout);
+    m_httpTunnelingClient->setTunnelValidatorFactory(
+        m_tunnelValidatorFactory);
     m_httpTunnelingClient->bindToAioThread(getAioThread());
     m_httpTunnelingClient->openTunnel(
         std::bind(&AsyncClientWithHttpTunneling::onOpenHttpTunnelCompletion, this, _1));
@@ -351,19 +362,12 @@ void AsyncClientWithHttpTunneling::onOpenHttpTunnelCompletion(
         });
 
     auto httpTunnelingClient = std::exchange(m_httpTunnelingClient, nullptr);
-    if (tunnelResult.sysError != SystemError::noError)
+    if (tunnelResult.resultCode != nx::network::http::tunneling::ResultCode::ok)
     {
-        NX_DEBUG(this, lm("HTTP tunnel to %1 failed with error %2")
-            .args(m_url, SystemError::toString(tunnelResult.sysError)));
-        resultCode = tunnelResult.sysError;
-        return;
-    }
-
-    if (!network::http::StatusCode::isSuccessCode(tunnelResult.httpStatus))
-    {
-        NX_DEBUG(this, lm("Connection to %1 failed with HTTP status %2")
-            .args(m_url, http::StatusCode::toString(tunnelResult.httpStatus)));
-        resultCode = SystemError::connectionRefused;
+        NX_DEBUG(this, lm("HTTP tunnel to %1 failed. %2").args(m_url, tunnelResult));
+        resultCode = tunnelResult.sysError != SystemError::noError
+            ? tunnelResult.sysError
+            : SystemError::connectionRefused;
         return;
     }
 
@@ -423,6 +427,8 @@ void AsyncClientWithHttpTunneling::onStunConnectionClosed(
 
 void AsyncClientWithHttpTunneling::scheduleReconnect()
 {
+    NX_ASSERT(isInSelfAioThread());
+
     if (!m_reconnectTimer.scheduleNextTry(
             std::bind(&AsyncClientWithHttpTunneling::reconnect, this)))
     {
@@ -460,9 +466,9 @@ void AsyncClientWithHttpTunneling::reportReconnect()
     for (const auto& handlerContext: m_reconnectHandlers)
     {
         // TODO: #ak Add support for m_reconnectHandlers being modified within handler.
-        nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
         handlerContext.second();
-        if (objectDestructionWatcher.objectDestroyed())
+        if (objectDestructionWatcher.interrupted())
             return;
     }
 }

@@ -126,7 +126,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
 
     if (currentLanguage < 0)
     {
-        NX_ASSERT(defaultLanguageIndex >= 0, Q_FUNC_INFO, "default language must definitely be present in translations");
+        NX_ASSERT(defaultLanguageIndex >= 0, "default language must definitely be present in translations");
         currentLanguage = std::max(defaultLanguageIndex, 0);
     }
 
@@ -188,7 +188,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
         new QnCustomFileDialog(
             this, tr("Select File..."),
             folder,
-            QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter)
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter())
         )
     );
     dialog->setFileMode(QFileDialog::ExistingFile);

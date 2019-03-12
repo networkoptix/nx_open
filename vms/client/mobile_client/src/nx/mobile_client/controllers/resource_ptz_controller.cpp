@@ -188,6 +188,12 @@ bool ResourcePtzController::setAutoFocus()
             {nx::core::ptz::Type::operational});
 }
 
+bool ResourcePtzController::continuousMove(const QVector3D& speed)
+{
+    const auto speedVector = core::ptz::Vector(speed, core::ptz::Vector::kPtzComponents);
+    return base_type::continuousMove(speedVector, core::ptz::Options());
+}
+
 } // namespace mobile
 } // namespace client
 } // namespace nx

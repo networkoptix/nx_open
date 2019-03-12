@@ -14,7 +14,7 @@ QString toString(const AddressType& type)
         case AddressType::cloud: return "cloud";
     };
 
-    NX_ASSERT(false, Q_FUNC_INFO, "undefined AddressType");
+    NX_ASSERT(false, "undefined AddressType");
     return lm("undefined=%1").arg(static_cast<int>(type));
 }
 
@@ -59,7 +59,7 @@ QString AddressAttribute::toString() const
             return lm("port=%1").arg(value);
     };
 
-    NX_ASSERT(false, Q_FUNC_INFO, "undefined AddressAttributeType");
+    NX_ASSERT(false, "undefined AddressAttributeType");
     return lm("undefined=%1").arg(static_cast<int>(type));
 }
 

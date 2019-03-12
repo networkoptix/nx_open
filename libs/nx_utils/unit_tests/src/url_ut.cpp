@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <nx/utils/nx_utils_ini.h>
-#include <nx/utils/log/log_message.h>
-#include <nx/utils/url.h>
 
 #include <optional>
+
+#include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace utils {
@@ -75,10 +75,22 @@ TEST(Url, parseUrlFields)
     ASSERT_FALSE(url::parseUrlFields("h*ttp://60/path").isValid());
 }
 
+TEST(Url, toWebClientStandardViolatingUrl)
+{
+    ASSERT_EQ(Url("http://hostname/path?query#fragment").toWebClientStandardViolatingUrl(),
+        "http://hostname/path#fragment?query");
+
+    ASSERT_EQ(Url("http://hostname/path#fragment").toWebClientStandardViolatingUrl(),
+        "http://hostname/path#fragment");
+
+    ASSERT_EQ(Url("http://hostname/path?query").toWebClientStandardViolatingUrl(),
+        "http://hostname/path?query");
+}
+
 TEST(Url, logging)
 {
     Url url;
-    if (nx::utils::ini().displayUrlPasswordInLogs == 0)
+    if (!nx::utils::log::showPasswords())
     {
         url.setScheme("http");
         url.setHost("zorz.com");

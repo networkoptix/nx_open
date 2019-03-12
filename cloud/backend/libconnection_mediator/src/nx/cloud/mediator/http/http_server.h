@@ -44,27 +44,28 @@ public:
     void registerStatisticsApiHandlers(const stats::Provider&);
 
 private:
-    /** Provides htdigest authentication for the maintenance server */
-    struct MaintenanceHtdigestAuthenticator
+    /** Provides htdigest authentication for maintenance server*/
+    struct MaintenanceAuthenticator
     {
         nx::network::http::server::HtdigestAuthenticationProvider provider;
         nx::network::http::server::BaseAuthenticationManager manager;
 
-        MaintenanceHtdigestAuthenticator(const std::string& maintenanceHtdigestPath):
-            provider(maintenanceHtdigestPath),
+        MaintenanceAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
             manager(&provider)
         {
+
         }
     };
 
     const conf::Settings& m_settings;
-    MaintenanceHtdigestAuthenticator m_htdigestAuthenticator;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+    std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
     network::maintenance::Server m_maintenanceServer;
 
     void loadSslCertificate();

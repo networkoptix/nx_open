@@ -25,7 +25,7 @@
     \par Usage
         You MUST have mediaserver installed to use this plugin.\n
     To use plugin simply put built library to mediaserver directory and restart server.\n
-        To use this plugin, launch client aplication and use manual camera search ("Add Camera(s)..." in media server menu) filling "Camera Address" field with 
+        To use this plugin, launch client aplication and use manual camera search ("Add Camera(s)..." in media server menu) filling "Camera Address" field with
     absolute path to local directory, containing jpeg file(s). Specified directory will be found as camera with archive and appear in tree menu.
 
     \par Implements following camera integration interfaces:
@@ -37,8 +37,8 @@
 
     \par Object life-time management:
     - plugin entry point is \a createNXPluginInstance function
-    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
-        to factory class instance (e.g., \a CameraManager is a factory for \a MediaEncoder). This garantees that \a CameraManager instance 
+    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor)
+        to factory class instance (e.g., \a CameraManager is a factory for \a MediaEncoder). This garantees that \a CameraManager instance
         is removed later than \a MediaEncoder instance
     - all factory classes (except for \a CameraDiscoveryManager) hold pointer to child class object (e.g., \a MediaEncoder is a child for \a CameraManager)
         and delete all children on destruction
@@ -61,9 +61,9 @@ public:
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementation of nxpl::PluginInterface::addRef
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementation of nxpl::PluginInterface::releaseRef
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     nxpt::CommonRefManager* refManager();
 

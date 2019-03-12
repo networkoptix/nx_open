@@ -1,14 +1,10 @@
 #pragma once
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 struct NX_VMS_API Metatypes
 {
     static void initialize();
 };
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api

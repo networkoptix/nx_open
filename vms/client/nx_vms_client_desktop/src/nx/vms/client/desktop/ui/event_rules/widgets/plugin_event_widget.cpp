@@ -155,6 +155,10 @@ nx::vms::event::EventParameters PluginEventWidget::createEventParameters()
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
 
+    eventParams.metadata.cameraRefs.clear();
+    for (const auto& camera: model()->eventResources())
+        eventParams.metadata.cameraRefs.push_back(camera.toString());
+
     using namespace nx::vms::api;
     EventLevels levels = 0;
     if (ui->cbError->isChecked()) levels |= ErrorEventLevel;

@@ -80,15 +80,15 @@ void Settings::load(const QnSettings& settings)
             settings.value(kInternalTimerPeriod).toString(),
             kDefaultInternalTimerPeriod);
 
-    tcpKeepAlive.inactivityPeriodBeforeFirstProbe = duration_cast<seconds>(
+    tcpKeepAlive.inactivityPeriodBeforeFirstProbe =
         nx::utils::parseTimerDuration(
             settings.value(kInactivityPeriodBeforeFirstProbe).toString(),
-            kDefaultInactivityPeriodBeforeFirstProbe));
+            kDefaultInactivityPeriodBeforeFirstProbe);
 
-    tcpKeepAlive.probeSendPeriod = duration_cast<seconds>(
+    tcpKeepAlive.probeSendPeriod = 
         nx::utils::parseTimerDuration(
             settings.value(kProbeSendPeriod).toString(),
-            kDefaultProbeSendPeriod));
+            kDefaultProbeSendPeriod);
 
     tcpKeepAlive.probeCount = settings.value(
         kProbeCount,

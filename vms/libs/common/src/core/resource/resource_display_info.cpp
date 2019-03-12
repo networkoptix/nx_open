@@ -48,6 +48,9 @@ nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
         return primaryUrl;
 
     auto allAddresses = server->getAllAvailableAddresses();
+    if (allAddresses.empty())
+        return primaryUrl;
+
     return *std::min_element(allAddresses.cbegin(), allAddresses.cend(),
         [](const auto& l, const auto& r)
         {

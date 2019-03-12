@@ -1,5 +1,5 @@
 {
-    "capabilities": "deviceModelDependent",
+    "capabilities": "deviceDependent",
     "eventTypes": [
         {
             "id": "nx.vca.md", 

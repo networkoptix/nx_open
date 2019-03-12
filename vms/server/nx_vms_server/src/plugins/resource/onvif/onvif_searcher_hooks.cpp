@@ -23,7 +23,7 @@ static const QString kForcedAdditionalManufacturerProperty("forcedAdditionalManu
 } // namespace
 
 void commonHooks(
-    QnResourceDataPool* /*dataPool*/,
+    QnResourceDataPool* /*resourceDataPool*/,
     EndpointAdditionalInfo* outInfo)
 {
     QString lowerName = outInfo->name.toLower();
@@ -116,7 +116,7 @@ void commonHooks(
 }
 
 void hikvisionManufacturerReplacement(
-    QnResourceDataPool* /*dataPool*/,
+    QnResourceDataPool* /*resourceDataPool*/,
     EndpointAdditionalInfo* outInfo)
 {
     const auto kHikvisionManufacturer = lit("Hikvision");
@@ -154,7 +154,7 @@ void manufacturerReplacementByModel(QnResourceDataPool* dataPool, EndpointAdditi
 }
 
 void pelcoModelNormalization(
-    QnResourceDataPool* /*dataPool*/,
+    QnResourceDataPool* /*resourceDataPool*/,
     EndpointAdditionalInfo* outInfo)
 {
     const auto& manufacturer = outInfo->manufacturer;

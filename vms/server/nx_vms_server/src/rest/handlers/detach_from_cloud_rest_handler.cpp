@@ -13,7 +13,8 @@
 #include <network/system_helpers.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/helpers/permissions_helper.h>
-#include <network/universal_tcp_listener.h>
+
+#include "private/multiserver_request_helper.h"
 
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     QnMediaServerModule* serverModule,
@@ -50,12 +51,8 @@ int QnDetachFromCloudRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult& result)
 {
-    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
-    if (!authenticator->isPasswordCorrect(owner->accessRights(), data.currentPassword))
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
+    if (!detail::verifyPasswordOrSetError(owner, data.currentPassword, &result))
         return nx::network::http::StatusCode::ok;
-    }
 
     const Qn::UserAccessData& accessRights = owner->accessRights();
 

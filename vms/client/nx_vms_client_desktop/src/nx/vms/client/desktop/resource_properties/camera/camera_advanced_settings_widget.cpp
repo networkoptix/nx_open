@@ -11,15 +11,6 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
-namespace {
-
-bool isStatusValid(Qn::ResourceStatus status)
-{
-    return status == Qn::Online || status == Qn::Recording;
-}
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
 CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
@@ -81,7 +72,7 @@ bool CameraAdvancedSettingsWidget::hasManualPage() const
     if (params.groups.empty())
         return false;
 
-     return isStatusValid(m_camera->getStatus())
+     return m_camera->isOnline()
         || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
 }
 

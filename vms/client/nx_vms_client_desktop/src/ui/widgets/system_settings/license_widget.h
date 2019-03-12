@@ -1,20 +1,21 @@
 #pragma once
 
+#include <QtCore/QEvent>
+#include <QtGui/QKeyEvent>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-
 #include <utils/common/connective.h>
 
-namespace Ui {
-class LicenseWidget;
-}
+#include <nx/utils/impl_ptr.h>
 
-class QnLicenseWidget : public Connective<QWidget>
+namespace Ui { class LicenseWidget; }
+
+class QnLicenseWidget: public Connective<QWidget>
 {
     Q_OBJECT
-
     using base_type = Connective<QWidget>;
+
 public:
     enum State
     {
@@ -22,7 +23,7 @@ public:
         Waiting,    /**< Waiting for activation. */
     };
 
-    explicit QnLicenseWidget(QWidget *parent = 0);
+    explicit QnLicenseWidget(QWidget* parent = nullptr);
     virtual ~QnLicenseWidget();
 
     bool isOnline() const;
@@ -32,11 +33,11 @@ public:
     void setFreeLicenseAvailable(bool available);
 
     QString serialKey() const;
-    void setSerialKey(const QString &serialKey);
+    void setSerialKey(const QString& serialKey);
 
     QByteArray activationKey() const;
 
-    void setHardwareId(const QString &);
+    void setHardwareId(const QString&);
 
     State state() const;
     void setState(State state);
@@ -45,20 +46,17 @@ signals:
     void stateChanged();
 
 protected:
-    virtual void changeEvent(QEvent *event) override;
-
-    private slots:
-    void updateControls();
-
-    void at_browseLicenseFileButton_clicked();
+    virtual void changeEvent(QEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
 
 private:
-    Q_DISABLE_COPY(QnLicenseWidget)
+    void updateControls();
+    void browseForLicenseFile();
 
-    QScopedPointer<Ui::LicenseWidget> ui;
-    State m_state;
+private:
+    nx::utils::ImplPtr<Ui::LicenseWidget> ui;
+    State m_state = Normal;
     QByteArray m_activationKey;
-    bool m_freeLicenseAvailable;
+    bool m_freeLicenseAvailable = true;
     QnMediaServerResourcePtr m_currentServer;
 };
-

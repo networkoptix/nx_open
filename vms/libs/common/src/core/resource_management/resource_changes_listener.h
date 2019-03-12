@@ -7,7 +7,7 @@
 #include <utils/common/connective.h>
 
 // TODO: #ynikitenkov add versions with add/remove/specified resource slot handlers
-class QnResourceChangesListener: public Connective<QObject>, public QnCommonModuleAware
+class QnResourceChangesListener: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     typedef Connective<QObject> base_type;
 public:

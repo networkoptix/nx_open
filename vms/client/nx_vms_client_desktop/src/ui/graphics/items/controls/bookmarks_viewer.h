@@ -63,7 +63,7 @@ public slots:
     /// Location is interpreted by getBookmarksFunc/getPosFunc callbacks passed to the constructor.
     void setTargetLocation(qint64 location);
 
-    /// @brief updates position of bookmark(s) when timeline window changed
+    /// @brief updates position of bookmarks when timeline window changed
     void updateOnWindowChange();
 
     /// @brief clears bookmarks

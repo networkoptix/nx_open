@@ -27,6 +27,10 @@ WearableCameraMotionWidget::WearableCameraMotionWidget(QWidget* parent):
 
     for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; i++)
         ui->sensitivityComboBox->addItem(QString::number(i));
+
+    ui->motionHintLabel->setText(tr("Motion is being detected only during video uploading.")
+		+ '\n'
+		+ tr("Enabling or disabling this setting does not change anything in the existing archive."));
 }
 
 WearableCameraMotionWidget::~WearableCameraMotionWidget()

@@ -47,6 +47,8 @@ struct NX_VMS_API RuntimeData: DataWithVersion
 
     RuntimeFlags flags = {};
 
+    QSet<QnUuid> activeAnalyticsEngines;
+
     /**
     * This operator must not be replaced with fusion implementation as it skips brand and
     * customization checking.
@@ -71,7 +73,8 @@ struct NX_VMS_API RuntimeData: DataWithVersion
     (nx1serial) \
     (userId) \
     (flags) \
-    (customization)
+    (customization) \
+    (activeAnalyticsEngines)
 
 } // namespace api
 } // namespace vms

@@ -13,6 +13,9 @@ public:
         const QString& filePath,
         const QString& outputDir,
         ExtractHandler extractHandler);
+
+private:
+    std::unique_ptr<QnZipExtractor> m_extractor;
 };
 
 } // namespace nx::update::detail

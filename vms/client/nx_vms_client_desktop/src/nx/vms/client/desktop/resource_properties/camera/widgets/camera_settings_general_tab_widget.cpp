@@ -69,8 +69,6 @@ CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
 
 void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& state)
 {
-    using CombinedValue = CameraSettingsDialogState::CombinedValue;
-
     const bool allWearableCameras = state.devicesDescription.isWearable == CombinedValue::All;
     ui->wearableArchiveLengthWidget->setVisible(allWearableCameras);
     ui->wearableMotionWidget->setVisible(allWearableCameras);

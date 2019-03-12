@@ -94,7 +94,7 @@ bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QStri
     QByteArray preface;
     preface.append("================================================================================\n");
     preface.append(QString(lit(" [%1] Starting system update:\n")).arg(QDateTime::currentDateTime().toString()));
-    preface.append(QString(lit("    Current version: %1\n")).arg(qnStaticCommon->engineVersion().toString()));
+    preface.append(QString(lit("    Current version: %1\n")).arg(serverModule()->commonModule()->engineVersion().toString()));
     preface.append(QString(lit("    Target version: %1\n")).arg(targetVersion));
     preface.append("================================================================================\n");
 
@@ -163,7 +163,7 @@ qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString& updateId, const
     case NoReply:
         return UnknownError;
     default:
-        NX_ASSERT(reply >= 0, Q_FUNC_INFO, "wrong reply code");
+        NX_ASSERT(reply >= 0, "wrong reply code");
         if (reply >= 0)
             return reply;
         return UnknownError;
@@ -191,7 +191,7 @@ void QnServerUpdateTool::addUpdateFileChunkAsync(const QString& updateId, const 
         sendReply(ec2::AbstractUpdatesManager::UnknownError);
         break;
     default:
-        NX_ASSERT(reply >= 0, Q_FUNC_INFO, "wrong reply code");
+        NX_ASSERT(reply >= 0, "wrong reply code");
         if (reply >= 0) {
             /* we work with files < 500 MB, so int type is ok */
             sendReply(static_cast<int>(reply));
@@ -207,7 +207,6 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString& updateId,
         this,
         lm("Update chunk [id = %1, offset = %2, size = %3].")
             .arg(updateId).arg(offset).arg(data.size()));
-
 
     if (m_bannedUpdates.contains(updateId))
     {

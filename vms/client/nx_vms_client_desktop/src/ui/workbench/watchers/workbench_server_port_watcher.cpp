@@ -34,7 +34,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
         {
             const auto currentServer = commonModule()->currentServer();
 
-            NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "commonModule()->currentServer() is NULL!");
+            NX_ASSERT(!currentServer.isNull(), "commonModule()->currentServer() is NULL!");
             if (!currentServer)
                 return;
 

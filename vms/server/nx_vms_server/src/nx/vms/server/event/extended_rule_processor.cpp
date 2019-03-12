@@ -207,11 +207,11 @@ struct EmailAttachmentData
                 templatePath = lit(":/email_templates/software_trigger.mustache");
                 break;
             default:
-                NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
+                NX_ASSERT(false, "All cases must be implemented.");
                 break;
         }
 
-        NX_ASSERT(!templatePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty(), "Template path must be filled");
     }
 
     QString templatePath;
@@ -342,8 +342,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     {
         auto url = lit("dbfile://notifications/") + params.url;
 
-        QnAviResourcePtr resource(new QnAviResource(url));
-        resource->setCommonModule(serverModule()->commonModule());
+        QnAviResourcePtr resource(new QnAviResource(url, serverModule()->commonModule()));
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
             serverModule()->dataProviderFactory()->createDataProvider(resource));
@@ -417,7 +416,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
     if (action->getToggleState() == vms::api::EventState::active)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
-    propertyDictionary()->saveParams(mediaServer->getId());
+    resourcePropertyDictionary()->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -795,7 +794,7 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
     }
 
     auto aggregationInfo = aggregatedData.action->aggregationInfo();
-    aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo());
+    aggregationInfo.append(action->getRuntimeParams(), action->aggregationInfo(), /*oneRecordPerKey*/ true);
     aggregatedData.action->setAggregationInfo(aggregationInfo);
 
     return false; //< Don't write action to log so far.
@@ -814,18 +813,15 @@ void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
     {
         auto actionCopy(aggregatedActionIter->action);
         actionCopy->getRuntimeParams().eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-        if (eventCount > 0)
-        {
+        if (eventCount > 1)
             actionCopy->getRuntimeParams().eventResourceId = QnUuid();
-            actionCopy->setAggregationCount(eventCount);
-        }
+        actionCopy->setAggregationCount(eventCount);
         serverModule()->serverDb()->saveActionToDB(actionCopy);
     }
     else
     {
         NX_DEBUG(this, lit("Failed to send aggregated email"));
     }
-
 
     aggregatedActionIter->action.clear();
     aggregatedActionIter->periodicTaskID = 0;
@@ -918,7 +914,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
             const auto& userId = params.metadata.instigators[0];
             const auto user = resourcePool()->getResourceById(userId);
-            NX_ASSERT(user, Q_FUNC_INFO, "Unknown user id as soft trigger instigator");
+            NX_ASSERT(user, "Unknown user id as soft trigger instigator");
 
             contextMap[tpUser] = user ? user->getName() : userId.toString();
             break;

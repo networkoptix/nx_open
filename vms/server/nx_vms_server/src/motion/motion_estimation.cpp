@@ -604,7 +604,7 @@ QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
 
     m_scaledMask = 0; // mask scaled to x * Qn::kMotionGridHeight. for internal use
     m_motionSensScaledMask = 0;
-	m_frameDeltaBuffer = 0;
+    m_frameDeltaBuffer = 0;
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         m_frameBuffer[i] = 0;
     m_filteredFrame = 0;
@@ -621,8 +621,8 @@ QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
     m_isNewMask = false;
     m_linkedNums = 0;
 
-	/*m_numFrame = 0;
-	m_sumLogTime = 0;*/
+    /*m_numFrame = 0;
+    m_sumLogTime = 0;*/
 
 #ifdef DEBUG_TRANSFORM
     static int gg = 0;
@@ -640,7 +640,7 @@ QnMotionEstimation::~QnMotionEstimation()
     delete m_decoder;
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
-	qFreeAligned(m_frameDeltaBuffer);
+    qFreeAligned(m_frameDeltaBuffer);
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
@@ -658,12 +658,12 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
     float scaledLineNum;
     int prevILineNum;
 
-	//std::vector<quint8> test0,test1;
-	//test0.resize(m_scaledWidth*Qn::kMotionGridHeight);
-	//test1.resize(m_scaledWidth*Qn::kMotionGridHeight);
+    //std::vector<quint8> test0,test1;
+    //test0.resize(m_scaledWidth*Qn::kMotionGridHeight);
+    //test1.resize(m_scaledWidth*Qn::kMotionGridHeight);
 
 #if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
-	lineStep = (m_scaledWidth-1) / float(Qn::kMotionGridWidth-1);
+    lineStep = (m_scaledWidth-1) / float(Qn::kMotionGridWidth-1);
     scaledLineNum = 0;
     prevILineNum = -1;
 
@@ -680,16 +680,16 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
                 memcpy(dst - i*Qn::kMotionGridHeight/sizeof(simd128i) , src, Qn::kMotionGridHeight);
         }
         else
-		{
-			dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
+        {
+            dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
             dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
-		}
+        }
 
-		prevILineNum = iLineNum;
+        prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
 #else
-	lineStep = (m_scaledWidth-1) / float(Qn::kMotionGridWidth-1);
+    lineStep = (m_scaledWidth-1) / float(Qn::kMotionGridWidth-1);
     scaledLineNum = 0;
     prevILineNum = -1;
 
@@ -701,34 +701,34 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
         quint8* dst = scaledMask/*&test1[0]*/ + Qn::kMotionGridHeight*iLineNum;
         quint8* src = mask + Qn::kMotionGridHeight*y;
         if (iLineNum > prevILineNum)
-		{
+        {
             for (int i = 0; i < iLineNum - prevILineNum; ++i)
                 memcpy(dst - i*Qn::kMotionGridHeight , src , Qn::kMotionGridHeight);
         }
         else
-		{
-			for (int i = 0; i < Qn::kMotionGridHeight; ++i)
-				dst[i] = qMin(dst[i], src[i]);
-		}
+        {
+            for (int i = 0; i < Qn::kMotionGridHeight; ++i)
+                dst[i] = qMin(dst[i], src[i]);
+        }
 
-		prevILineNum = iLineNum;
+        prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
 #endif
-	/*
-	Test to equality algoritms
-	int it = 0;
-	for (int x = 0; x < m_scaledWidth; ++x)
+    /*
+    Test to equality algoritms
+    int it = 0;
+    for (int x = 0; x < m_scaledWidth; ++x)
     {
-		for (int y = 0; y < Qn::kMotionGridHeight; ++y)
-		{
-			if ( test0[it] != test1[it] )
-			{
-				test0[it] = test1[it];
-			};
-			it++;
-		};
-	};*/
+        for (int y = 0; y < Qn::kMotionGridHeight; ++y)
+        {
+            if ( test0[it] != test1[it] )
+            {
+                test0[it] = test1[it];
+            };
+            it++;
+        };
+    };*/
 
 
 
@@ -741,7 +741,7 @@ void QnMotionEstimation::reallocateMask(int width, int height)
 {
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
-	qFreeAligned(m_frameDeltaBuffer);
+    qFreeAligned(m_frameDeltaBuffer);
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
@@ -766,14 +766,14 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_scaledMask = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
     m_linkedNums = (int*) qMallocAligned(Qn::kMotionGridHeight * swUp * sizeof(int), 32);
     m_motionSensScaledMask = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
-	m_frameDeltaBuffer = (uint8_t*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+    m_frameDeltaBuffer = (uint8_t*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
 
-	m_frameBuffer[0] = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
-	m_frameBuffer[1] = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
-	memset(m_frameBuffer[0], 0, Qn::kMotionGridHeight * swUp);
-	memset(m_frameBuffer[1], 0, Qn::kMotionGridHeight * swUp);
+    m_frameBuffer[0] = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+    m_frameBuffer[1] = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+    memset(m_frameBuffer[0], 0, Qn::kMotionGridHeight * swUp);
+    memset(m_frameBuffer[1], 0, Qn::kMotionGridHeight * swUp);
 
-	m_filteredFrame = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+    m_filteredFrame = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
     m_resultMotion = new quint32[Qn::kMotionGridHeight/4 * swUp];
     memset(m_resultMotion, 0, Qn::kMotionGridHeight * swUp);
 
@@ -958,16 +958,16 @@ void QnMotionEstimation::analyzeMotionAmount(quint8* frame)
 
 __forceinline int8_t fastAbs( int8_t value )
 {
-	uint8_t temp = value >> 7;     // make a mask of the sign bit
-	value ^= temp;                   // toggle the bits if value is negative
-	value += temp & 1;               // add one if value was negative
-	return value;
+    uint8_t temp = value >> 7;     // make a mask of the sign bit
+    value ^= temp;                   // toggle the bits if value is negative
+    value += temp & 1;               // add one if value was negative
+    return value;
 };
 
 void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,
                                      uint8_t* prevFrameBuffer, uint8_t* deltaBuffer)
 {
-	//saveFrame(data, width, height, stride, QString::fromUtf8("c:/src_orig.bmp"));
+    //saveFrame(data, width, height, stride, QString::fromUtf8("c:/src_orig.bmp"));
 
     // scale frame to m_scaledWidth* Qn::kMotionGridHeight and rotate it to 90 degree
     uint8_t* dst = frameBuffer;
@@ -996,9 +996,9 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
             }
             pixel /= (lines*xPixels); // get avg value
             *curDst = pixel;
-			int8_t value = (int8_t)pixel - (int8_t)prevFrameBuffer[offset];
+            int8_t value = (int8_t)pixel - (int8_t)prevFrameBuffer[offset];
             uint8_t pixelDelta = abs(value);
-			//qDebug()<<(int16_t)value<<" "<< pixelDelta<<" "<<abs(value);
+            //qDebug()<<(int16_t)value<<" "<< pixelDelta<<" "<<abs(value);
 
             deltaBuffer[offset] = pixelDelta;
 
@@ -1124,8 +1124,8 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
         || m_isNewMask)
     {
         reallocateMask(m_frames[idx]->width, m_frames[idx]->height);
-		m_scaleXStep = m_lastImgWidth * 65536 / Qn::kMotionGridWidth;
-		m_scaleYStep = m_lastImgHeight * 65536 / Qn::kMotionGridHeight;
+        m_scaleXStep = m_lastImgWidth * 65536 / Qn::kMotionGridWidth;
+        m_scaleYStep = m_lastImgHeight * 65536 / Qn::kMotionGridHeight;
         m_totalFrames = 0;
     }
 
@@ -1135,8 +1135,8 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     double PCFreq = 0.0;
     if (QueryPerformanceFrequency(&timer))
     {
-	    PCFreq = (double) timer.QuadPart / 1000.0;
-	    //qDebug() << "start" << m_numFrame;
+        PCFreq = (double) timer.QuadPart / 1000.0;
+        //qDebug() << "start" << m_numFrame;
     }
     QueryPerformanceCounter(&timer);
 #endif // 0
@@ -1197,20 +1197,20 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     #endif
 
 #if 0
-	LARGE_INTEGER end_time;
-	if ( QueryPerformanceCounter(&end_time) )
-	{
-		m_sumLogTime += double(end_time.QuadPart-timer.QuadPart)/(PCFreq);
-		//qDebug()<<"finish"<< m_numFrame;
-	};
+    LARGE_INTEGER end_time;
+    if ( QueryPerformanceCounter(&end_time) )
+    {
+        m_sumLogTime += double(end_time.QuadPart-timer.QuadPart)/(PCFreq);
+        //qDebug()<<"finish"<< m_numFrame;
+    };
 
-	if ( m_numFrame % 100 == 0 )
-	{
-		qDebug() << "Motion estimation speed:" << (m_sumLogTime / 100.0);
-		m_sumLogTime = 0.0;
-	};
-	//qDebug() << m_numFrame;
-	m_numFrame++;
+    if ( m_numFrame % 100 == 0 )
+    {
+        qDebug() << "Motion estimation speed:" << (m_sumLogTime / 100.0);
+        m_sumLogTime = 0.0;
+    };
+    //qDebug() << m_numFrame;
+    m_numFrame++;
 #endif // 0
 
     if (m_totalFrames == 0)
@@ -1263,7 +1263,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         return rez;
 
 #if 0
-	// unit test
+    // unit test
     for (int x = 0; x < Qn::kMotionGridWidth; ++x)
     {
         for (int y = 0; y < Qn::kMotionGridHeight; ++y)

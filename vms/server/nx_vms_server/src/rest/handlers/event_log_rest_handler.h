@@ -3,9 +3,9 @@
 #include <rest/server/request_handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
-class QnEventLogRestHandler: 
+class QnEventLogRestHandler:
     public QnRestRequestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

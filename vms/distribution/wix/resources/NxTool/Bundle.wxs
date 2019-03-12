@@ -8,7 +8,7 @@
             Name="$(var.productName) Server Tool"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"
+            IconSourceFile="$(var.installerIcon)"
             UpgradeCode="$(var.nxtoolBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />

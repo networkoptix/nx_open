@@ -4,9 +4,13 @@ function _createItemsRecursively(parent, model, depth)
     if (type === "GroupBox" && depth === 1)
         type = "Panel"
 
-    const component = Qt.createComponent("components/%1.qml".arg(type))
+    const componentPath = "components/%1.qml".arg(type)
+    const component = Qt.createComponent(componentPath)
     if (!component)
+    {
+        console.error("Cannot create component %1".arg(componentPath))
         return null
+    }
 
     var item = component.createObject(parent.childrenItem, model)
 
@@ -20,6 +24,11 @@ function _createItemsRecursively(parent, model, depth)
             model.items.forEach(
                 function(model) { _createItemsRecursively(item, model, depth + 1) })
         }
+    }
+    else
+    {
+        if (component.status === Component.Error)
+            console.error(component.errorString())
     }
 
     return item

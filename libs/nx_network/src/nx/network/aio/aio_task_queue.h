@@ -4,13 +4,12 @@
 #include <deque>
 #include <memory>
 
-#include <QtCore/QElapsedTimer>
-
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_pollset.h"
 #include "aio_event_handler.h"
 #include "pollable.h"
+#include "../common_socket_impl.h"
 #include "../detail/socket_sequence.h"
 
 namespace nx::network::aio::detail {
@@ -165,12 +164,14 @@ public:
 class NX_NETWORK_API AioTaskQueue
 {
 public:
-    // TODO: #ak Move all these variables to the private section.
-    // TODO: #ak Too many mutexes here. Refactoring required.
+    // TODO: #ak Leave a single mutex in this class.
 
     unsigned int newReadMonitorTaskCount = 0;
     unsigned int newWriteMonitorTaskCount = 0;
-    // Used to make AioThread public API thread-safe (to serialize access to internal structures).
+    /**
+     * Used to make AIOThread public API thread-safe (to serialize access to internal structures).
+     * TODO: #ak Move this mutex to private section or to the AIOThread class.
+     */
     mutable QnMutex mutex;
 
     AioTaskQueue(AbstractPollSet* pollSet);
@@ -178,7 +179,7 @@ public:
     /**
      * Used as a clock for periodic events. Function introduced since implementation can be changed.
      */
-    qint64 getSystemTimerVal() const;
+    qint64 getMonotonicTime() const;
 
     void addTask(SocketAddRemoveTask task);
 
@@ -209,13 +210,14 @@ public:
 
     /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
-    
+
     /**
      * @return true, if at least one task has been processed.
      */
     bool processPeriodicTasks(const qint64 curClock);
+
     void processPostedCalls();
-    
+
     /**
      * Moves elements to remove to a temporary container and returns it.
      * Elements may contain functor which may contain aio objects (sockets) which will be removed
@@ -223,7 +225,7 @@ public:
      */
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         SocketSequenceType socketSequence);
-    
+
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);
@@ -236,9 +238,12 @@ public:
 
     std::size_t periodicTasksCount() const;
 
+    void clear();
+
+    bool empty() const;
+
 private:
     AbstractPollSet* m_pollSet = nullptr;
-    QElapsedTimer m_monotonicClock;
     // TODO #ak: Use cyclic array here to minimize allocations.
     /**
      * NOTE: This variable can be accessed within aio thread only.

@@ -18,12 +18,12 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    StreamFpsSharingMethod TimePeriodContent SystemComponent
+    StreamFpsSharingMethod TimePeriodContent
     ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction MediaStreamEvent StreamIndex
-    ResourceStatus StatusChangeReason
+    RebuildAction BackupAction MediaStreamEvent
+    StatusChangeReason
     Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -354,12 +354,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TimePeriodContentCount
     };
 
-    enum SystemComponent {
-        ServerComponent,
-        ClientComponent,
-        AnyComponent
-    };
-
 using StreamQuality = nx::vms::api::StreamQuality;
 
     enum class BitrateControl {
@@ -480,6 +474,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
+    QString toErrorMessage(AuthResult value);
 
     using FailoverPriority = nx::vms::api::FailoverPriority;
 
@@ -711,15 +706,6 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     };
     QString toString(MediaStreamEvent value);
 
-    enum class StreamIndex
-    {
-        undefined = -1,
-        primary = 0,
-        secondary = 1
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
-    QString toString(StreamIndex value);
-
     enum StorageStatus
     {
         none = 0,
@@ -773,7 +759,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::MediaStreamEvent)(Qn::StreamIndex)
+    (Qn::MediaStreamEvent)
     ,
     (metatype)(lexical)
 )
@@ -781,6 +767,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permissions),
+    (debug)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

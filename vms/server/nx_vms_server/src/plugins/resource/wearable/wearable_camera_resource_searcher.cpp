@@ -14,9 +14,9 @@ QnWearableCameraResourceSearcher::~QnWearableCameraResourceSearcher()
 {
 }
 
-QString QnWearableCameraResourceSearcher::manufacture() const
+QString QnWearableCameraResourceSearcher::manufacturer() const
 {
-    return QnWearableCameraResource::kManufacture;
+    return QnWearableCameraResource::kManufacturer;
 }
 
 bool QnWearableCameraResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const
@@ -29,11 +29,11 @@ QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &res
     QnWearableCameraResourcePtr result;
 
     auto resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    NX_ASSERT(resourceType, Q_FUNC_INFO, "Wearable camera resource type not found");
+    NX_ASSERT(resourceType, "Wearable camera resource type not found");
     if (!resourceType)
         return result;
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     QUrl url(params.url);

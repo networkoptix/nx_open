@@ -59,5 +59,3 @@ void EventRulesWatcher::handleConnectionChanged()
 } // namespace mobile
 } // namespace client
 } // namespace mobile
-
-

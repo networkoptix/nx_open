@@ -6,7 +6,7 @@
 template<class T>
 class QnResourcePropertyAdaptor;
 
-class QnActivityPtzController: public QnProxyPtzController, public QnCommonModuleAware
+class QnActivityPtzController: public QnProxyPtzController, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QnProxyPtzController;

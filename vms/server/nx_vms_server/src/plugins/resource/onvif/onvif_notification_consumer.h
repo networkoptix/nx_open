@@ -15,7 +15,6 @@
 #include <onvif/soapNotificationConsumerBindingService.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
-
 //!Processes notifications from onvif resources
 class OnvifNotificationConsumer
 :
@@ -23,17 +22,17 @@ class OnvifNotificationConsumer
 {
 public:
     //!Implementation of NotificationConsumerBindingService::copy
-    virtual NotificationConsumerBindingService* copy();
+    virtual NotificationConsumerBindingService* copy() override;
     //!Implementation of NotificationConsumerBindingService::Notify
-    virtual int Notify( _oasisWsnB2__Notify* oasisWsnB2__Notify ) override;
+    virtual int Notify(_oasisWsnB2__Notify* oasisWsnB2__Notify) override;
 
     //!Pass notifications from address \a notificationProducerAddress to \a resource
     void registerResource(
         const QnPlOnvifResourcePtr& resource,
         const QString& notificationProducerAddress,
-        const QString& subscriptionReference = QString() );
+        const QString& subscriptionReference = QString());
     //!Cancel registration of \a resource
-    void removeResourceRegistration( const QnPlOnvifResourcePtr& resource );
+    void removeResourceRegistration(const QnPlOnvifResourcePtr& resource);
     virtual SOAP_SOCKET accept() override;
 
 private:

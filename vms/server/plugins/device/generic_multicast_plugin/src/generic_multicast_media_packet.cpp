@@ -49,12 +49,12 @@ void* GenericMulticastMediaPacket::queryInterface(const nxpl::NX_GUID& interface
     return nullptr;
 }
 
-unsigned int GenericMulticastMediaPacket::addRef()
+int GenericMulticastMediaPacket::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastMediaPacket::releaseRef()
+int GenericMulticastMediaPacket::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

@@ -89,7 +89,7 @@ protected:
 
     void andConnectionIsKnownOnNode()
     {
-        ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->syncronizationEngine()
+        ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->synchronizationEngine()
             .connectionManager().isSystemConnected(m_systemId));
     }
 
@@ -118,7 +118,7 @@ private:
 
     nx::utils::Url getUrlForSystem(const std::string& systemId)
     {
-        auto url = m_nodeCluster.peer(0).syncronizationUrl();
+        auto url = m_nodeCluster.peer(0).process().moduleInstance()->synchronizationUrl();
         url.setPath(nx::network::http::rest::substituteParameters(
             url.path().toStdString(),
             {systemId}).c_str());

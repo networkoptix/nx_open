@@ -42,7 +42,7 @@ void QnStatisticsSettingsWatcher::updateSettings()
 void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
 {
     const bool correctDelay = (delayMs >= 0);
-    NX_ASSERT(correctDelay, Q_FUNC_INFO, "Delay could not be less than 0!");
+    NX_ASSERT(correctDelay, "Delay could not be less than 0!");
 
     if (!correctDelay || m_handle)
         return;

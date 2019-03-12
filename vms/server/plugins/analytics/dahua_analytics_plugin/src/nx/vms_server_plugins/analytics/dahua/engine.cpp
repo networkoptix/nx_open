@@ -1,14 +1,8 @@
-﻿#include "engine.h"
-
-#include "device_agent.h"
-#include "common.h"
-#include "string_helper.h"
-#include "parser.h"
+#include "engine.h"
 
 #include <chrono>
 
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
@@ -16,7 +10,11 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
+
+#include "device_agent.h"
+#include "common.h"
+#include "parser.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
@@ -79,7 +77,7 @@ const QString manifestResourceName(":/dahua/manifest.json");
     return parsedManifest;
 }
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin)
+Engine::Engine(Plugin* plugin)
     :
     m_plugin(plugin),
     m_jsonManifest(loadManifest()),
@@ -87,46 +85,33 @@ Engine::Engine(nx::sdk::analytics::common::Plugin* plugin)
 {
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo,
+IDeviceAgent* Engine::obtainDeviceAgent(
+    const IDeviceInfo* deviceInfo,
     Error* /*outError*/)
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
-
-    if (!vendor.startsWith(kVendor))
+    if (!isCompatible(deviceInfo))
         return nullptr;
 
     const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest
-        = fetchDeviceAgentParsedManifest(*deviceInfo);
+        = fetchDeviceAgentParsedManifest(deviceInfo);
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
         return nullptr;
 
-    return new DeviceAgent(this, *deviceInfo, deviceAgentParsedManifest);
+    return new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
 }
 
 const nx::sdk::IString* Engine::manifest(Error* outError) const
@@ -138,7 +123,7 @@ const nx::sdk::IString* Engine::manifest(Error* outError) const
     }
 
     *outError = Error::noError;
-    return new nx::sdk::common::String(m_jsonManifest);
+    return new nx::sdk::String(m_jsonManifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -165,17 +150,17 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
 }
 
 nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManifest(
-    const DeviceInfo& deviceInfo)
+    const IDeviceInfo* deviceInfo)
 {
     using namespace nx::vms::api::analytics;
 
-    auto& data = m_cachedDeviceData[deviceInfo.sharedId];
+    auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
     if (!data.hasExpired())
         return DeviceAgentManifest{ data.supportedEventTypeIds };
 
     using namespace std::chrono;
 
-    nx::utils::Url url(deviceInfo.url);
+    nx::utils::Url url(deviceInfo->url());
     url.setPath("/cgi-bin/eventManager.cgi");
     url.setQuery("action=getExposureEvents");
 
@@ -183,15 +168,15 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
     httpClient.setResponseReadTimeout(kRequestTimeout);
     httpClient.setSendTimeout(kRequestTimeout);
     httpClient.setMessageBodyReadTimeout(kRequestTimeout);
-    httpClient.setUserName(deviceInfo.login);
-    httpClient.setUserPassword(deviceInfo.password);
+    httpClient.setUserName(deviceInfo->login());
+    httpClient.setUserPassword(deviceInfo->password());
 
     const auto result = httpClient.doGet(url);
     const auto response = httpClient.response();
 
     if (!result || !response)
     {
-        NX_WARNING(this, "No response for supported events request %1.", deviceInfo.url);
+        NX_WARNING(this, "No response for supported events request %1.", deviceInfo->url());
         data.timeout.invalidate();
         return DeviceAgentManifest{};
     }
@@ -201,13 +186,13 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
     if (!nx::network::http::StatusCode::isSuccessCode(statusCode) || !buffer)
     {
         NX_WARNING(this, "Unable to fetch supported events for device %1. HTTP status code: %2",
-            deviceInfo.url, statusCode);
+            deviceInfo->url(), statusCode);
         data.timeout.invalidate();
         return DeviceAgentManifest{};
     }
 
     NX_DEBUG(this, "Device url %1. RAW list of supported analytics events: %2",
-        deviceInfo.url, buffer);
+        deviceInfo->url(), buffer);
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
@@ -219,14 +204,20 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
+}
+
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
+{
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
+    return vendor.startsWith(kVendor);
 }
 
 } // namespace nx::vms_server_plugins::analytics::dahua
@@ -234,6 +225,7 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 namespace {
 
 static const std::string kLibName = "dahua_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.dahua",
@@ -246,15 +238,15 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::dahua::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

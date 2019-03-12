@@ -1,16 +1,15 @@
 #ifndef __MEDIA_DB_H__
 #define __MEDIA_DB_H__
 
-#include <deque>
+#include <queue>
 #include <cmath>
 
 #include <boost/variant.hpp>
 #include <QtCore>
 
-#include "nx/utils/thread/mutex.h"
 #include <nx/utils/log/log.h>
-#include "nx/utils/thread/wait_condition.h"
-#include "nx/utils/thread/long_runnable.h"
+#include <recorder/device_file_catalog.h>
+#include "media_file_operation.h"
 
 // Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format
 // for DB records format details.
@@ -20,66 +19,36 @@ namespace nx
 namespace media_db
 {
 
+constexpr uint8_t kDbVersion = 1;
+
 struct FileHeader
 {
     quint64 part1;
     quint64 part2;
 
+    static const int kSerializedRecordSize = sizeof(part1) + sizeof(part2);
+
     FileHeader() : part1(0), part2(0) {}
 
     uint8_t getDbVersion() const { return part1 & 0xff;  }
     void setDbVersion(uint8_t dbVersion) { part1 |= (dbVersion & 0xff); }
-};
 
-enum class RecordType
-{
-    FileOperationAdd = 0,
-    FileOperationDelete = 1,
-    CameraOperationAdd = 2,
-};
+    void serialize(ByteStreamWriter& writer) const
+    {
+        writer.writeUint64(part1);
+        writer.writeUint64(part2);
+    }
 
-enum class Mode
-{
-    Read,
-    Write
-};
+    bool deserialize(ByteStreamReader* reader)
+    {
+        if (!reader->hasBuffer(kSerializedRecordSize))
+            return false;
 
-inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
+        part1 = reader->readUint64();
+        part2 = reader->readUint64();
 
-struct RecordBase
-{
-    quint64 part1;
-
-    RecordBase(quint64 i = 0) : part1(i) {}
-    RecordType getRecordType() const;
-    void setRecordType(RecordType recordType);
-};
-
-struct MediaFileOperation : RecordBase
-{
-    quint64 part2;
-
-    MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part2(i2) {}
-    int getCameraId() const;
-    void setCameraId(int cameraId);
-
-    qint64 getStartTime() const;
-    void setStartTime(qint64 startTime);
-
-    int getDuration() const;
-    void setDuration(int duration);
-
-    int getTimeZone() const;
-    void setTimeZone(int timeZone);
-
-    qint64 getFileSize() const;
-    void setFileSize(qint64 fileSize);
-
-    int getFileTypeIndex() const;
-    void setFileTypeIndex(int fileTypeIndex);
-
-    int getCatalog() const;
-    void setCatalog(int catalog);
+        return true;
+    }
 };
 
 struct CameraOperation : RecordBase
@@ -88,7 +57,7 @@ struct CameraOperation : RecordBase
 
     CameraOperation(quint64 i1 = 0, const QByteArray &ar = QByteArray())
         : RecordBase(i1),
-          cameraUniqueId(ar)
+        cameraUniqueId(ar)
     {}
 
     int getCameraUniqueIdLen() const;
@@ -99,153 +68,75 @@ struct CameraOperation : RecordBase
 
     QByteArray getCameraUniqueId() const;
     void setCameraUniqueId(const QByteArray &uniqueId);
+
+    int serializedRecordSize() const
+    {
+        return cameraUniqueId.size() + kSerializedRecordSize;
+    }
+
+    void serialize(ByteStreamWriter& writer) const
+    {
+        writer.writeUint64(part1);
+        writer.writeRawData(cameraUniqueId.data(), cameraUniqueId.size());
+    }
 };
 
-typedef boost::variant<MediaFileOperation, CameraOperation> WriteRecordType;
-
-enum class Error
+inline bool operator==(const CameraOperation& c1, const CameraOperation& c2)
 {
-    NoError,
-    ReadError,
-    WriteError,
-    ParseError,
-    Eof,
-    WrongMode
-};
+    return c1.part1 == c2.part1 && c1.cameraUniqueId == c2.cameraUniqueId;
+}
 
-class DbHelperHandler
-{
-public:
-    virtual ~DbHelperHandler() {}
+typedef boost::variant<boost::blank, MediaFileOperation, CameraOperation> DBRecord;
 
-    virtual void handleCameraOp(const CameraOperation &cameraOp, Error error) = 0;
-    virtual void handleMediaFileOp(const MediaFileOperation &mediaFileOp, Error error) = 0;
-    virtual void handleError(Error error) = 0;
-
-    virtual void handleRecordWrite(Error error) = 0;
-};
-
-class FaultTolerantDataStream
+class DbReader
 {
 public:
-    FaultTolerantDataStream(QIODevice* device):
-        m_stream(device)
-    {}
-
-    template<typename T>
-    FaultTolerantDataStream& operator<<(T t)
+    struct RemoveData
     {
-        if (m_stream.device())
-            m_stream << t;
-        else
-            NX_WARNING(this, "[media db] attempt to use null file stream");
+        quint64 hash = 0; //< MediaFileOperation::hashInCatalog(). Just timestamp.
+        size_t removeToNumber = 0; //< Remove records till number.
 
-        return *this;
-    }
+        bool operator<(const RemoveData& right) const
+        {
+            if (hash != right.hash)
+                return hash < right.hash;
+            return removeToNumber < right.removeToNumber;
+        }
 
-    template<typename T>
-    FaultTolerantDataStream& operator>>(T& t)
+        bool operator==(const RemoveData& right) const
+        {
+            return hash == right.hash && removeToNumber == right.removeToNumber;
+        }
+    };
+
+    struct Data
     {
-        if (m_stream.device())
-            m_stream >> t;
-        else
-            NX_WARNING(this, "[media db] attempt to use null file stream");
+        FileHeader header;
+        std::vector<CameraOperation> cameras;
 
-        return *this;
-    }
+        std::unordered_map<int, std::vector<MediaFileOperation>> addRecords; //< key: cameraId*2 + catalog
+        std::unordered_map<int, std::vector<RemoveData>> removeRecords;
+    };
 
-    void setDevice(QIODevice* device)
-    {
-        m_stream.setDevice(device);
-    }
+    static bool parse(const QByteArray& fileContent, Data* parsedData);
 
-    QDataStream::Status status() const
-    {
-        return m_stream.status();
-    }
+private:
+    static bool deserialize(const QByteArray& buffer, Data* parsedData);
+};
 
-    int writeRawData(const char* s, int len)
-    {
-        if (m_stream.device())
-            return m_stream.writeRawData(s, len);
+using DBRecordQueue = std::queue<DBRecord>;
 
-        NX_WARNING(this, "[media db] attempt to use null file stream");
-        return -1;
-    }
+class MediaDbWriter
+{
+public:
+    MediaDbWriter();
+    void setDevice(QIODevice* ioDevice);
+    void writeRecord(const DBRecord &record);
 
-    void setByteOrder(QDataStream::ByteOrder order)
-    {
-        m_stream.setByteOrder(order);
-    }
-
-    void resetStatus()
-    {
-        m_stream.resetStatus();
-    }
-
-    bool atEnd() const
-    {
-        if (!m_stream.device())
-            NX_WARNING(this, "[media db] attempt to use null file stream");
-
-        return m_stream.atEnd();
-    }
-
-    int readRawData(char* s, int len)
-    {
-        if (m_stream.device())
-            return m_stream.readRawData(s, len);
-
-        NX_WARNING(this, "[media db] attempt to use null file stream");
-        return -1;
-    }
-
-    QDataStream& stream() { return m_stream; }
+    static bool writeFileHeader(QIODevice* ioDevice, uint8_t dbVersion);
 
 private:
     QDataStream m_stream;
-};
-
-class DbHelper : public QnLongRunnable
-{
-    typedef std::deque<WriteRecordType> WriteQueue;
-public:
-    DbHelper(DbHelperHandler *const handler);
-    ~DbHelper();
-
-    DbHelper& operator = (DbHelper&& other) = default;
-
-    Error readFileHeader(uint8_t *dbVersion);
-    Error writeFileHeader(uint8_t dbVersion);
-
-    Error readRecord();
-    void writeRecord(const WriteRecordType &record);
-    void stopWriter();
-    void reset();
-
-    void setMode(Mode mode);
-    Mode getMode() const;
-
-    QIODevice *getDevice() const;
-    void setDevice(QIODevice *device);
-    QDataStream& stream() { return m_stream.stream(); }
-
-public:
-    virtual void run() override;
-
-private:
-    Error getError() const;
-
-private:
-    QIODevice *m_device;
-    DbHelperHandler *m_handler;
-    WriteQueue m_writeQueue;
-    FaultTolerantDataStream m_stream;
-
-    mutable QnMutex m_mutex;
-    QnWaitCondition m_cond;
-    QnWaitCondition m_writerDoneCond;
-    Mode m_mode;
 };
 
 } // namespace media_db

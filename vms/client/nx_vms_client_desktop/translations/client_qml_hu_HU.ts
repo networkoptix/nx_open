@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation>Engedélyezés</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -56,10 +67,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation>CSÖKKENTETT MÓD</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation>NEM KOMPATIBILIS</translation>
     </message>
@@ -70,6 +77,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>NEM ELÉRHETŐ</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation>CSÖKKENTETT MÓD</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -83,20 +94,21 @@
       <translation>Nincs találat</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>Nincs jogosultsága belépni %1. Egyes funkciók nem lesznek elérhetők.</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Beolvasás...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation>Csatlakozás egy másik szerverhez...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Csatlakozás szerverhez...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Beolvasás...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Nincs jogosultsága belépni %1. Egyes funkciók nem lesznek elérhetők.</translation>
     </message>
   </context>
 </TS>

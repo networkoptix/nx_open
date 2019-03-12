@@ -183,30 +183,30 @@ void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
+QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning) const
 {
     QnMutexLocker lock( &m_mutex );
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
-        if (rt->getManufacture() == manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
+        if (rt->getManufacturer() == manufacturer && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
             return rt->getId();
     }
 
     if (showWarning)
-        NX_VERBOSE(this, lit("Cannot find resource type for manufacturer: %1, model name: %2").arg(manufacture).arg(name));
+        NX_VERBOSE(this, lit("Cannot find resource type for manufacturer: %1, model name: %2").arg(manufacturer).arg(name));
 
     // NX_ASSERT(false);
     return QnUuid();
 }
 
-QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
+QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacturer, const QString& name) const
 {
     QnMutexLocker lock( &m_mutex );
     QnUuid result;
     int bestLen = -1;
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
-        if (rt->getManufacture() == manufacture)
+        if (rt->getManufacturer() == manufacturer)
         {
             int len = rt->getName().length();
             if (len > bestLen && rt->getName() == name.left(len)) {

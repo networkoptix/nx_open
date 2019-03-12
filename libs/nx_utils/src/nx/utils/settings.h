@@ -211,3 +211,5 @@ inline QVariant Settings::Option<std::chrono::milliseconds>::toQVariant(
 
 } // namespace utils
 } // namespace nx
+
+Q_DECLARE_METATYPE(std::chrono::seconds);

@@ -1,11 +1,48 @@
 #include <gtest/gtest.h>
 
+#include <string>
+#include <vector>
+
 #include <nx/vms/api/types/resource_types.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/api/types/motion_types.h>
 
-namespace nx::vms::api::test {
+namespace nx::vms::api {
+namespace test {
+
+using MotionStreamTypeData = std::pair<StreamIndex, std::vector<std::string>>;
+class MotionStreamTypeLexicalTest: public ::testing::TestWithParam<MotionStreamTypeData>
+{
+};
+
+TEST_P(MotionStreamTypeLexicalTest, assertParsedCorrectly)
+{
+    auto [input, output] = GetParam();
+    const auto value = QnLexical::serialized<StreamIndex>(input);
+    ASSERT_EQ(value.toStdString(), output[0]);
+
+    for (const auto& sampleOutput: output)
+    {
+        const auto parsed = QnLexical::deserialized<StreamIndex>(
+            QString::fromStdString(sampleOutput),
+            StreamIndex::undefined);
+        ASSERT_EQ(input, parsed);
+    }
+}
+
+// Vector defines list of values, which must be correctly deserialized.
+// First value is the correct serialization value.
+std::vector<MotionStreamTypeData> motionStreamTestData = {
+    {StreamIndex::undefined, {"", "-1", "some_strange_string"}},
+    {StreamIndex::primary, {"primary", "0"}},
+    {StreamIndex::secondary, {"secondary", "1"}}
+};
+
+INSTANTIATE_TEST_CASE_P(MotionStreamTypeLexicalSerialization,
+    MotionStreamTypeLexicalTest,
+    ::testing::ValuesIn(motionStreamTestData));
 
 TEST(Lexical, enumSerialization)
 {
@@ -106,11 +143,12 @@ TEST(Lexical, numericDeserialization)
 
 TEST(Lexical, peerType)
 {
-    ASSERT_EQ("PT_OldSetver", QnLexical::serialized<PeerType>(PeerType::oldServer).toStdString());
+    ASSERT_EQ("PT_OldServer", QnLexical::serialized<PeerType>(PeerType::oldServer).toStdString());
 
     ASSERT_EQ(
         PeerType::oldServer,
-        QnLexical::deserialized<PeerType>("PT_OldSetver"));
+        QnLexical::deserialized<PeerType>("PT_OldServer"));
 }
 
-} // namespace nx::vms::api::test
+} // namespace test
+} // namespace nx::vms::api

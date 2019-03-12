@@ -20,34 +20,54 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
 
 }
 
-void PeerStateTracker::setResourceFeed(QnResourcePool* pool)
+bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 {
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
 
-    for (auto item: m_items)
-        emit itemRemoved(item);
+    /// Reversing item list just to make sure we remove rows from the table from last to first.
+    for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
+        emit itemRemoved(*it);
+    if (m_clientItem)
+    {
+        emit itemRemoved(m_clientItem);
+        m_clientItem.reset();
+    }
+
     m_items.clear();
     m_activeServers.clear();
 
     if (!pool)
     {
         NX_DEBUG(this, "setResourceFeed() got nullptr resource pool");
-        return;
+        return false;
     }
 
     auto systemId = helpers::currentSystemLocalId(commonModule());
+    if (systemId.isNull())
+    {
+        NX_DEBUG(this, "setResourceFeed() got null system id");
+        return false;
+    }
+
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
 
     addItemForClient();
+
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
         atResourceAdded(server);
+
+    // We will not work with incompatible systems for now. We are going to deal with it in 4.1.
+    //const auto incompatible = pool->getIncompatibleServers();
+    //for (const QnMediaServerResourcePtr& server: incompatible)
+    //    atResourceAdded(server);
 
     m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
         this, &PeerStateTracker::atResourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
         this, &PeerStateTracker::atResourceRemoved);
+    return true;
 }
 
 UpdateItemPtr PeerStateTracker::findItemById(QnUuid id) const
@@ -76,6 +96,8 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
 {
     if (!item)
         return QnMediaServerResourcePtr();
+    if (item->incompatible)
+        return resourcePool()->getIncompatibleServerById(item->id);
     return resourcePool()->getResourceById<QnMediaServerResource>(item->id);
 }
 
@@ -115,6 +137,7 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
+    NX_ASSERT(!version.isNull());
     m_targetVersion = version;
 }
 
@@ -153,6 +176,16 @@ bool PeerStateTracker::hasVerificationErrors() const
     return false;
 }
 
+bool PeerStateTracker::hasStatusErrors() const
+{
+    for (auto& item: m_items)
+    {
+        if (item->state == StatusCode::error && !item->statusMessage.isEmpty())
+            return true;
+    }
+    return false;
+}
+
 void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     for (const auto& status: statusAll)
@@ -164,7 +197,8 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 item->installing = false;
-            item->offline = (status.second.code == StatusCode::offline);
+            // Ignoring 'offline' status from /ec2/updateStatus.
+            //item->offline = (status.second.code == StatusCode::offline);
             emit itemChanged(item);
         }
     }
@@ -185,7 +219,10 @@ void PeerStateTracker::setVersionInformation(
                     || item->state == StatusCode::latestUpdateInstalled;
 
                 if (installed != item->installed)
+                {
                     item->installed = true;
+                    NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
+                }
                 emit itemChanged(item);
             }
         }
@@ -344,13 +381,6 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
-    bool fake = server->hasFlags(Qn::fake_server);
-    if (fake)
-    {
-        NX_VERBOSE(this, "atResourceAdded(%1) - server is fake", server->getName());
-        return;
-    }
-
     UpdateItemPtr item;
     {
         QnMutexLocker locker(&m_dataLock);
@@ -369,25 +399,19 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     if (!server)
         return;
 
+    server->disconnect(this);
     auto item = findItemById(server->getId());
     if (!item)
         return;
 
-    disconnect(server.data(), &QnResource::statusChanged,
-        this, &PeerStateTracker::atResourceChanged);
-    disconnect(server.data(), &QnMediaServerResource::versionChanged,
-        this, &PeerStateTracker::atResourceChanged);
-    disconnect(server.data(), &QnResource::flagsChanged,
-        this, &PeerStateTracker::atResourceChanged);
-
+    // We should emit this event before m_items size is changed
+    emit itemRemoved(item);
     {
         QnMutexLocker locker(&m_dataLock);
         m_activeServers.erase(server->getId());
         m_items.removeAt(item->row);
         updateContentsIndex();
     }
-
-    emit itemRemoved(item);
 }
 
 void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
@@ -445,6 +469,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyRestart:
             m_clientItem->statusMessage = "Client is ready to install and restart";
             m_clientItem->state = StatusCode::readyToInstall;
+            m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
         case State::installing:
@@ -505,7 +530,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
-    emit itemChanged(m_clientItem);
+    emit itemAdded(m_clientItem);
     return m_clientItem;
 }
 
@@ -513,11 +538,18 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 {
     bool changed = false;
     auto status = server->getStatus();
-    // TODO: Right now 'Incompatible' means we should use legacy update system to deal with them
-    bool incompatible = status == Qn::ResourceStatus::Incompatible;
+
+    bool incompatible = status == Qn::ResourceStatus::Incompatible
+        || server->hasFlags(Qn::fake_server);
     if (incompatible != item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = incompatible;
+        changed = true;
+    }
+
+    if (incompatible != item->incompatible)
+    {
+        item->incompatible = incompatible;
         changed = true;
     }
 
@@ -530,8 +562,16 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         changed = true;
     }
 
+    bool viewAsOffline = !server->isOnline() || incompatible;
+    if (item->offline != viewAsOffline)
+    {
+        item->offline = viewAsOffline;
+        changed = true;
+    }
+
     if (version != item->version)
     {
+        NX_INFO(this, "updateServerData() - peer %1 changing version from=%2 to %3", item->id, item->version, version);
         item->version = version;
         changed = true;
     }
@@ -540,6 +580,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     if (installed != item->installed)
     {
         item->installed = true;
+        NX_INFO(this, "updateServerData() - peer %1 changed installed=%2", item->id, item->installed);
         changed = true;
     }
 

@@ -65,12 +65,12 @@ private:
 
 QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread, QObject* parent)
 {
-    NX_ASSERT(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
+    NX_ASSERT(!(targetThread && parent), "Invalid thread and parent parameters");
 
     if (parent)
     {
         /* NX_ASSERT does not stop debugging here. */
-        NX_ASSERT(parent->thread() == QThread::currentThread(), Q_FUNC_INFO,
+        NX_ASSERT(parent->thread() == QThread::currentThread(),
             "Timer cannot be child of QObject, located in another thread. Use targetThread "
             "parameter instead and guarded callback.");
     }

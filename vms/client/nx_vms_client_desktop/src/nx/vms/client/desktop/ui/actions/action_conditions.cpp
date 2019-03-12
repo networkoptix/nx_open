@@ -34,6 +34,7 @@
 #include <camera/resource_display.h>
 
 #include <network/cloud_url_validator.h>
+#include <network/system_helpers.h>
 
 #include <core/storage/file_storage/layout_storage_resource.h>
 
@@ -305,6 +306,17 @@ bool canExportBookmarkInternal(const QnCameraBookmark& bookmark, QnWorkbenchCont
     return canExportPeriods(resources, period, context, /*ignoreLoadedChunks*/ true);
 }
 
+bool resourceHasVideo(const QnResourcePtr& resource)
+{
+    if (!resource->hasFlags(Qn::video))
+        return false;
+
+    if (const auto mediaResource = resource.dynamicCast<QnMediaResource>())
+        return mediaResource->hasVideo();
+
+    return false;
+}
+
 } // namespace
 
 Condition::Condition()
@@ -470,15 +482,6 @@ SmartSearchCondition::SmartSearchCondition():
 
 ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
 {
-    auto pureIoModule = [](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::io_module))
-                return false; //quick check
-
-            QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-            return mediaResource && !mediaResource->hasVideo(0);
-        };
-
     for (auto widget: widgets)
     {
         if (!widget)
@@ -490,7 +493,7 @@ ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets
         if (widget->isZoomWindow())
             continue;
 
-        if (pureIoModule(widget->resource()))
+        if (!resourceHasVideo(widget->resource()))
             continue;
 
         if (m_hasRequiredGridDisplayValue)
@@ -813,17 +816,21 @@ ActionVisibility AdjustVideoCondition::check(const QnResourceWidgetList& widgets
     if (widgets.size() != 1)
         return InvisibleAction;
 
-    auto widget = widgets[0];
-    if ((widget->resource()->flags() & (Qn::server | Qn::videowall | Qn::layout))
-        || (widget->resource()->flags().testFlag(Qn::web_page)))
+    const auto widget = widgets[0];
+    const auto resource = widget ? widget->resource() : QnResourcePtr();
+    NX_ASSERT(widget && resource);
+
+    if ((resource->flags() & (Qn::server | Qn::videowall | Qn::layout))
+        || (resource->hasFlags(Qn::web_page)))
+    {
+        return InvisibleAction;
+    }
+
+    const QString url = resource->getUrl().toLower();
+    if (resource->hasFlags(Qn::still_image) && !url.endsWith(".jpg") && !url.endsWith(".jpeg"))
         return InvisibleAction;
 
-    QString url = widget->resource()->getUrl().toLower();
-    if ((widget->resource()->flags() & Qn::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
-        return InvisibleAction;
-
-    QnMediaResourcePtr mediaResource = widget->resource().dynamicCast<QnMediaResource>();
-    if (mediaResource && !mediaResource->hasVideo(0))
+    if (!resourceHasVideo(resource))
         return InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
@@ -1631,6 +1638,9 @@ ActionVisibility MergeToCurrentSystemCondition::check(const QnResourceList& reso
     if (server->getModuleInformation().ecDbReadOnly)
         return InvisibleAction;
 
+    if (helpers::serverBelongsToCurrentSystem(server))
+        return InvisibleAction;
+
     return EnabledAction;
 }
 
@@ -1741,6 +1751,15 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode)
         [flags](const QnResourcePtr& resource)
         {
             return resource->hasFlags(flags);
+        }, matchMode);
+}
+
+ConditionWrapper hasVideo(MatchMode matchMode, bool value)
+{
+    return new ResourceCondition(
+        [value](const QnResourcePtr& resource)
+        {
+            return resourceHasVideo(resource) == value;
         }, matchMode);
 }
 
@@ -1942,13 +1961,22 @@ ConditionWrapper currentLayoutIsVideowallScreen()
 
 ConditionWrapper canForgetPassword()
 {
-    using namespace nx::vms::client::desktop;
     return new CustomBoolCondition(
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
             const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
             return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
     });
+}
+
+ConditionWrapper canMakeShowreel()
+{
+    return new ResourceCondition(
+        [](const QnResourcePtr& resource)
+        {
+            const auto layout = resource.dynamicCast<QnLayoutResource>();
+            return layout && !layout::isEncrypted(layout);
+        }, MatchMode::All);
 }
 
 } // namespace condition

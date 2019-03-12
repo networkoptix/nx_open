@@ -34,13 +34,11 @@ class QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 
 public:
-    static const QString kEnabledAnalyticsEnginesProperty;
+    static const QString kUserEnabledAnalyticsEnginesProperty;
+    static const QString kCompatibleAnalyticsEnginesProperty;
     static const QString kDeviceAgentsSettingsValuesProperty;
     static const QString kDeviceAgentManifestsProperty;
-    static const QString kSupportedAnalyticsEventsProperty;
-    static const QString kSupportedAnalyticsObjectsProperty;
 
-    struct MotionStreamIndex {Qn::StreamIndex index; bool isForced;};
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
@@ -62,12 +60,9 @@ public:
     void cleanCameraIssues();
 
     CameraMediaStreams mediaStreams() const;
-    CameraMediaStreamInfo streamInfo(Qn::StreamIndex index = Qn::StreamIndex::primary) const;
+    CameraMediaStreamInfo streamInfo(StreamIndex index = StreamIndex::primary) const;
 
     virtual QnAspectRatio aspectRatio() const;
-
-    /** Returns which stream should be used for motion detection and is it forced. */
-    MotionStreamIndex motionStreamIndex() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
     // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
@@ -86,9 +81,19 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
+    const QSet<QnUuid> enabledAnalyticsEngines() const;
     const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
-    QSet<QnUuid> enabledAnalyticsEngines() const;
-    void setEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
+
+    const nx::vms::common::AnalyticsEngineResourceList userEnabledAnalyticsEngineResources() const;
+    QSet<QnUuid> userEnabledAnalyticsEngines() const;
+    void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
+
+    const QSet<QnUuid> compatibleAnalyticsEngines() const;
+    nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
+    void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
+
+    std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
+    std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
     QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
     void setDeviceAgentSettingsValues(const QHash<QnUuid, QVariantMap>& settingsValues);
@@ -103,42 +108,47 @@ public:
         const QnUuid& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    virtual void setSupportedAnalyticsEventTypeIds(
-        QnUuid engineId, QSet<QString> supportedEvents);
-
-    virtual QMap<QnUuid, QSet<QString>> supportedAnalyticsEventTypeIds() const;
-    virtual QSet<QString> supportedAnalyticsEventTypeIds(const QnUuid& engineId) const;
-
-    virtual void setSupportedAnalyticsObjectTypeIds(
-        QnUuid engineId, QSet<QString> supportedObjects);
-
-    virtual QMap<QnUuid, QSet<QString>> supportedAnalyticsObjectTypeIds() const;
-    virtual QSet<QString> supportedAnalyticsObjectTypeIds(const QnUuid& engineId) const;
-
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
+    void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
+    void compatibleAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
+    void deviceAgentManifestsChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void emitPropertyChanged(const QString& key) override;
 
 private:
+    using DeviceAgentManifestMap = std::map<QnUuid, nx::vms::api::analytics::DeviceAgentManifest>;
+    using ManifestItemIdsFetcher =
+        std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
+
+private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 
-    void setSupportedAnalyticsItemTypeIds(
-        const QString& propertyName,
-        QnUuid engineId,
-        QSet<QString> supportedItems);
+    QSet<QnUuid> calculateUserEnabledAnalyticsEngines();
 
-    QMap<QnUuid, QSet<QString>> supportedAnalyticsItemTypeIds(const QString& propertyName) const;
-    QSet<QString> supportedAnalyticsItemTypeIds(
-        const QString& propertyName,
-        const QnUuid& engineId) const;
+    QSet<QnUuid> calculateCompatibleAnalyticsEngines();
+
+    std::map<QnUuid, std::set<QString>> calculateSupportedEntities(
+        ManifestItemIdsFetcher fetcher) const;
+    std::map<QnUuid, std::set<QString>> calculateSupportedEventTypes() const;
+    std::map<QnUuid, std::set<QString>> calculateSupportedObjectTypes() const;
+
+    DeviceAgentManifestMap fetchDeviceAgentManifests();
 
 private:
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
     QnMutex m_mediaStreamsMutex;
+
+    CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
+    CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
+    CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
+    CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
+    CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
+
+    mutable QnMutex m_cacheMutex;
 };
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);

@@ -51,6 +51,13 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_socketAttributes.aioThread = aioThread;
 }
 
+bool CloudStreamSocket::getProtocol(int* protocol) const
+{
+    return m_socketDelegate
+        ? m_socketDelegate->getProtocol(protocol)
+        : false;
+}
+
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
     // TODO: #ak just ignoring for now.

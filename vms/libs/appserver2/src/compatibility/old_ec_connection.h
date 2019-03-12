@@ -2,7 +2,6 @@
 
 #include <nx_ec/ec_api.h>
 
-
 namespace ec2 {
 
 //!Connection to old (python-based) EC. Does not provide any functionality, every method returns \a notImplemented error
@@ -30,22 +29,22 @@ public:
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserAccessData&) override;
 
-    virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
-    virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
-    virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() override;
-    virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() override;
-    virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() override;
-    virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
-    virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
-    virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
-    virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() override;
-    virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
-    virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
-    virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
-    virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
-    virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
-    virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
-    virtual AbstractAnalyticsNotificationManagerPtr getAnalyticsNotificationManager() override;
+    virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
+    virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
+    virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() override;
+    virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() override;
+    virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() override;
+    virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() override;
+    virtual AbstractUserNotificationManagerPtr userNotificationManager() override;
+    virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() override;
+    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() override;
+    virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
+    virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
+    virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
+    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() override;
+    virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
+    virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
+    virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() override;
 
     virtual void addRemotePeer(
         const QnUuid& id,
@@ -55,7 +54,6 @@ public:
 
     virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
-
 
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;

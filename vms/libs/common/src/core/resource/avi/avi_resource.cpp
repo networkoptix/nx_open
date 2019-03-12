@@ -30,9 +30,10 @@ QnAspectRatio getAspectRatioFromImage(const QString& fileName)
 
 } // namespace
 
-QnAviResource::QnAviResource(const QString& file)
+QnAviResource::QnAviResource(const QString& file, QnCommonModule* commonModule)
 {
     //setUrl(QDir::cleanPath(file));
+    setCommonModule(commonModule);
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
@@ -203,6 +204,11 @@ QnAspectRatio QnAviResource::customAspectRatio() const
     return m_aviMetadata && !qFuzzyIsNull(m_aviMetadata->overridenAr)
         ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
         : base_type::customAspectRatio();
+}
+
+bool QnAviResource::isEmbedded() const
+{
+    return m_storage.dynamicCast<QnLayoutFileStorageResource>();
 }
 
 bool QnAviResource::isEncrypted() const

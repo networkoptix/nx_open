@@ -14,7 +14,7 @@ class QnMediaServerModule;
 class QnPlISDResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
     public nx::network::upnp::SearchAutoHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 
 public:
@@ -25,10 +25,9 @@ public:
         const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
 
-    // return the manufacture of the server
-    virtual QString manufacture() const;
+    virtual QString manufacturer() const override;
 
-    virtual QnResourceList findResources(void) override;
+    virtual QnResourceList findResources() override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,
@@ -48,7 +47,7 @@ private:
         const nx::network::upnp::DeviceInfo& devInfo,
         const nx::utils::MacAddress& mac,
         const QAuthenticator& auth,
-        QnResourceList& result );
+        QnResourceList& result);
 
     QList<QnResourcePtr> checkHostAddrInternal(
         const nx::utils::Url& url,

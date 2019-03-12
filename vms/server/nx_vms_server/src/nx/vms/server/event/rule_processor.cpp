@@ -61,7 +61,7 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, true),
-    	Qt::QueuedConnection);
+        Qt::QueuedConnection);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, false),
@@ -200,7 +200,7 @@ void RuleProcessor::doExecuteAction(const vms::event::AbstractActionPtr& action,
 
 void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 {
-    if (!NX_ASSERT(action, Q_FUNC_INFO, "No action to execute"))
+    if (!NX_ASSERT(action, "No action to execute"))
         return; //< Something is wrong.
     NX_VERBOSE(this, "Executing action [%1]", action->getRuleId());
 

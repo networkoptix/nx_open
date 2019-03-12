@@ -35,7 +35,7 @@ void ConnectionMediationInitiator::bindToAioThread(
 }
 
 void ConnectionMediationInitiator::start(
-    const hpm::api::ConnectRequest& request, 
+    const hpm::api::ConnectRequest& request,
     Handler handler)
 {
     m_request = request;

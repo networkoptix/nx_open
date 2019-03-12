@@ -24,7 +24,7 @@ namespace event {
 
 class EventMessageBus:
     public QThread,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

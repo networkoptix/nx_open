@@ -315,6 +315,9 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!previewProvider)
         previewProvider.reset(new ResourceThumbnailProvider(request));
 
+    previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
+        .value<nx::api::CameraImageRequest::StreamSelectionMode>());
+
     widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
 }
@@ -1292,7 +1295,7 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
 void EventRibbon::Private::updateHover()
 {
     const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
-    if (q->rect().contains(pos))
+    if (q->isVisible() && q->rect().contains(pos))
     {
         const int index = indexAtPos(pos);
         if ((index < 0 && !m_tileHovered) || (index >= 0 && m_hoveredIndex.row() == index))

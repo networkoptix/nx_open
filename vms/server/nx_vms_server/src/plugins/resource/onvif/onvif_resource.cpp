@@ -582,14 +582,14 @@ void QnPlOnvifResource::checkIfOnlineAsync(std::function<void(bool)> completionH
     // Trying to get HardwareId.
     auto asyncWrapper = std::make_shared<GSoapDeviceGetNetworkIntfAsyncWrapper>(
         std::move(soapWrapper),
-        &DeviceSoapWrapper::getNetworkInterfaces );
+        &DeviceSoapWrapper::getNetworkInterfaces);
 
     const nx::utils::MacAddress resourceMAC = getMAC();
     auto onvifCallCompletionFunc =
-        [asyncWrapper, deviceUrl, resourceMAC, completionHandler]( int soapResultCode )
+        [asyncWrapper, deviceUrl, resourceMAC, completionHandler](int soapResultCode)
         {
             if (soapResultCode != SOAP_OK)
-                return completionHandler( false );
+                return completionHandler(false);
 
             completionHandler(
                 resourceMAC.toString() == QnPlOnvifResource::fetchMacAddress(
@@ -638,12 +638,12 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDriver(
+    StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto& capabilitiesList = (streamIndex == Qn::StreamIndex::primary)
+    const auto& capabilitiesList = (streamIndex == StreamIndex::primary)
         ? m_primaryStreamCapabilitiesList : m_secondaryStreamCapabilitiesList;
 
     nx::vms::server::resource::StreamCapabilityMap result;
@@ -654,7 +654,7 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
         key.codec = QString::fromStdString(supportedVideoCodecFlavorToVmsString(capabilities.encoding));
         if (key.codec.isEmpty())
         {
-            NX_DEBUG(this, "getStreamCapabilityMapFromDrives encountered unknown "
+            NX_DEBUG(this, "getStreamCapabilityMapFromDriver encountered unknown "
                 "SupportedVideoEncoding value - %1. Value will be ignored.",
                 (int) capabilities.encoding);
             continue;
@@ -1945,7 +1945,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             .arg(SystemError::getLastOSErrorText()));
         return false;
     }
-    QString localAddress = sock->getLocalAddress().address.toString();
+    std::string localAddress = sock->getLocalAddress().address.toStdString();
 
     QAuthenticator auth = getAuth();
 
@@ -1957,20 +1957,15 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         m_timeDrift);
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
-    char buf[512];
-
-    //providing local gsoap server url
     _oasisWsnB2__Subscribe request;
+    std::string address = std::string("http://") + localAddress + ":"
+        + std::to_string(QnSoapServer::instance()->port())
+        + QnSoapServer::instance()->path().toStdString();
+    request.ConsumerReference.Address = address.data();
 
-    sprintf(buf, "http://%s:%d%s", localAddress.toLatin1().data(),
-        QnSoapServer::instance()->port(), QnSoapServer::instance()->path().toLatin1().data());
-
-    request.ConsumerReference.Address = buf;
-
-    //setting InitialTerminationTime (if supported)
-    sprintf(buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT);
-    std::string initialTerminationTime(buf);
-    request.InitialTerminationTime = &initialTerminationTime;
+    std::string duration = std::string("PT")
+        + std::to_string(DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT) + "S";
+    request.InitialTerminationTime = &duration;
 
     //creating filter
     //oasisWsnB2__FilterType topicFilter;
@@ -2062,8 +2057,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     m_eventMonitorType = emtNotification;
 
-    NX_DEBUG(this, lit("Successfully registered in NotificationProducer. endpoint %1")
-        .arg(QString::fromLatin1(soapWrapper.endpoint())));
+    NX_DEBUG(this, "Successfully registered in NotificationProducer. endpoint %1",
+        QString(soapWrapper.endpoint()));
     return true;
 }
 
@@ -3228,7 +3223,7 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters()
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
     onvifXsd__VideoEncoderConfiguration& encoder,
-    Qn::StreamIndex /*streamIndex*/,
+    StreamIndex /*streamIndex*/,
     const QnLiveStreamParams& /*params*/)
 {
     return sendVideoEncoderToCamera(encoder);
@@ -3236,7 +3231,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoder2ToCameraEx(
     onvifXsd__VideoEncoder2Configuration& encoder,
-    Qn::StreamIndex /*streamIndex*/,
+    StreamIndex /*streamIndex*/,
     const QnLiveStreamParams& /*params*/)
 {
     return sendVideoEncoder2ToCamera(encoder);
@@ -4044,7 +4039,7 @@ bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInf
     return true;
 }
 
-int QnPlOnvifResource::getMaxChannels() const
+int QnPlOnvifResource::getMaxChannelsFromDriver() const
 {
     return m_maxChannels;
 }
@@ -4205,7 +4200,7 @@ void QnPlOnvifResource::afterConfigureStream(Qn::ConnectionRole /*role*/)
         m_streamConfCond.wait(&m_streamConfMutex);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole role)
+CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::ConnectionRole /*role*/)
 {
     return CameraDiagnostics::NoErrorResult();
 }
@@ -4616,9 +4611,9 @@ void QnPlOnvifResource::setMaxChannels(int value)
 }
 
 QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderCapabilities(
-    SupportedVideoEncoding encoding, Qn::StreamIndex streamIndex)
+    SupportedVideoEncoding encoding, StreamIndex streamIndex)
 {
-    const std::vector<VideoEncoderCapabilities>& list = (streamIndex == Qn::StreamIndex::primary)
+    const std::vector<VideoEncoderCapabilities>& list = (streamIndex == StreamIndex::primary)
         ? m_primaryStreamCapabilitiesList
         : m_secondaryStreamCapabilitiesList;
 
@@ -4645,7 +4640,7 @@ QnPlOnvifResource::VideoEncoderCapabilities QnPlOnvifResource::findVideoEncoderC
 
 void QnPlOnvifResource::updateVideoEncoder1(
     onvifXsd__VideoEncoderConfiguration& encoder,
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     QnLiveStreamParams params = streamParams;
@@ -4742,7 +4737,7 @@ void QnPlOnvifResource::updateVideoEncoder1(
 
 void QnPlOnvifResource::updateVideoEncoder2(
     onvifXsd__VideoEncoder2Configuration& encoder,
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
     const QnResourceData resourceData = this->resourceData();

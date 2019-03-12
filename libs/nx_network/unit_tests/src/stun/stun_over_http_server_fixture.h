@@ -9,9 +9,8 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stun_over_http_server.h>
+#include <nx/network/test_support/stun_async_client_acceptance_tests.h>
 #include <nx/utils/thread/sync_queue.h>
-
-#include "stun_async_client_acceptance_tests.h"
 
 namespace nx {
 namespace network {

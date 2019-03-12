@@ -169,7 +169,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     const auto capabilities = ptz::capabilities(controller);
     if (capabilities.testFlag(Ptz::NativePresetsPtzCapability)
         && !capabilities.testFlag(Ptz::NoNxPresetsPtzCapability)
-        || camera->isUserAllowedToModifyPtzCapabilities())
+        || camera->ptzCapabilitiesUserIsAllowedToModify() != Ptz::Capability::NoPtzCapabilities)
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(
@@ -214,12 +214,10 @@ void ServerPtzControllerPool::at_ptzConfigurationChanged(const QnResourcePtr &re
     if (!resource->isInitialized() || resource->isInitializationInProgress())
         return;
 
-    NX_DEBUG(
-        this,
-        lm("PTZ configuration changed for resource %1 (%2), initiate reinitialization")
-            .args(resource->getName(), resource->getId()));
+    NX_DEBUG(this, "PTZ configuration changed for resource %1 (%2), initiate reinitialization",
+        resource->getName(), resource->getId());
 
-    resource->setStatus(Qn::Offline);
+    resource->reinitAsync();
 }
 
 void ServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)

@@ -156,6 +156,16 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     ASSERT_TRUE(result[1].tags.contains("tag2"));
 
     result.clear();
+    filter.sparsing.minVisibleLengthMs = 101ms;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(0, result.size());
+
+    result.clear();
+    filter.sparsing.minVisibleLengthMs = 100ms;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+
+    result.clear();
     filter.text = "tag2";
     serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(1, result.size());
@@ -236,6 +246,24 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     ASSERT_EQ(1000ms, result[1].startTimeMs);
 
     result.clear();
+    filter.startTimeMs = 1001ms;
+    filter.endTimeMs = 1002ms;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(1, result.size());
+    ASSERT_EQ(1000ms, result[0].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 1001ms;
+    filter.endTimeMs = 1000s;
+    filter.limit = 2;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(1000ms, result[0].startTimeMs);
+    ASSERT_EQ(2000ms, result[1].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 0ms;
+    filter.endTimeMs = 1000ms;
     filter.orderBy.order = Qt::DescendingOrder;
     serverDb->getBookmarks(cameras, filter, result);
     ASSERT_EQ(2, result.size());

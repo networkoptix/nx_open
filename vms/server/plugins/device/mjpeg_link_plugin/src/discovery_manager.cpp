@@ -69,12 +69,12 @@ void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int DiscoveryManager::addRef()
+int DiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int DiscoveryManager::releaseRef()
+int DiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -101,7 +101,7 @@ static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
 
 bool DiscoveryManager::validateUrl(const nx::utils::Url& url)
 {
-    nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+    const auto plugin = HttpLinkPlugin::instance();
     if (!plugin)
         return false;
 

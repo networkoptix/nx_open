@@ -37,7 +37,7 @@ public:
 
     //!Ensures that \a requiredRect is uploaded to opengl memory
     /*!
-        Can create ogl texture(s), if needed.
+        Can create ogl textures, if needed.
         Current ogl context MUST NOT be NULL
         \note Simultaneous call of this method in multiple thread can result in undefined behavour
     */

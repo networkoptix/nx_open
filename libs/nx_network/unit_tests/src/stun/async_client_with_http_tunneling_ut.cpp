@@ -2,15 +2,18 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/tunneling/detail/client_factory.h>
+#include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/stun_types.h>
+#include <nx/network/test_support/stun_async_client_acceptance_tests.h>
+#include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
-#include "stun_async_client_acceptance_tests.h"
 #include "stun_over_http_server_fixture.h"
-#include "stun_simple_server.h"
 
 namespace nx {
 namespace network {
@@ -32,6 +35,12 @@ public:
     ~AsyncClientWithHttpTunneling()
     {
         m_client.pleaseStopSync();
+
+        if (m_tunnelFactoryBak)
+        {
+            http::tunneling::detail::ClientFactory::instance().setCustomFunc(
+                std::move(*m_tunnelFactoryBak));
+        }
     }
 
 protected:
@@ -47,36 +56,65 @@ protected:
 
     void givenScheduledStunRequest()
     {
-        using namespace std::placeholders;
-
         m_client.sendRequest(
             prepareRequest(),
-            std::bind(&AsyncClientWithHttpTunneling::onResponseReceived, this, _1, _2));
+            [this](auto&&... args)
+            {
+                onResponseReceived(std::forward<decltype(args)>(args)...);
+            });
+    }
+
+    void givenHttpServerThatAlwaysResponds(http::StatusCode::Value statusCode)
+    {
+        m_httpServer = std::make_unique<http::TestHttpServer>();
+        ASSERT_TRUE(m_httpServer->bindAndListen());
+        m_httpServer->registerRequestProcessorFunc(
+            http::kAnyPath,
+            [statusCode](
+                nx::network::http::RequestContext /*requestContext*/,
+                nx::network::http::RequestProcessedHandler completionHandler)
+            {
+                completionHandler(statusCode);
+            });
     }
 
     void whenConnectToStunOverHttpServer()
     {
-        nx::utils::promise<SystemError::ErrorCode> connected;
+        whenConnectToHttpServer();
+        thenConnectSucceeded();
+    }
 
+    void whenConnectToHttpServer()
+    {
         m_client.connect(
-            tunnelUrl(),
-            [&connected](SystemError::ErrorCode sysErrorCode)
+            httpUrl(),
+            [this](SystemError::ErrorCode sysErrorCode)
             {
-                connected.set_value(sysErrorCode);
+                m_connectResults.push(sysErrorCode);
             });
-        ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
 
     void whenConnectToRegularStunServer()
     {
         nx::utils::promise<SystemError::ErrorCode> done;
         m_client.connect(
-            network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
+            network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
+                .setEndpoint(m_stunServer.address()),
             [&done](SystemError::ErrorCode sysErrorCode)
             {
                 done.set_value(sysErrorCode);
             });
         ASSERT_EQ(SystemError::noError, done.get_future().get());
+    }
+
+    void thenConnectSucceeded()
+    {
+        ASSERT_EQ(SystemError::noError, m_connectResults.pop());
+    }
+
+    void thenConnectFailed()
+    {
+        ASSERT_NE(SystemError::noError, m_connectResults.pop());
     }
 
     void thenHttpTunnelIsOpened()
@@ -98,10 +136,34 @@ protected:
         assertStunClientIsAbleToPerformRequest(&m_client);
     }
 
+    void forceHttpConnectionUpgradeTunnel()
+    {
+        m_tunnelFactoryBak = http::tunneling::detail::ClientFactory::instance().setCustomFunc(
+            [this](const std::string& /*tag*/, const nx::utils::Url& url)
+            {
+                return std::make_unique<http::tunneling::detail::ConnectionUpgradeTunnelClient>(
+                    url, nullptr);
+            });
+    }
+
 private:
     stun::AsyncClientWithHttpTunneling m_client;
     nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_responses;
     nx::network::stun::SocketServer m_stunServer;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResults;
+    std::unique_ptr<http::TestHttpServer> m_httpServer;
+    std::optional<http::tunneling::detail::ClientFactory::Function> m_tunnelFactoryBak;
+
+    nx::utils::Url httpUrl() const
+    {
+        if (m_httpServer)
+        {
+            return url::Builder().setScheme(http::kUrlSchemeName)
+                .setEndpoint(m_httpServer->serverAddress());
+        }
+
+        return tunnelUrl();
+    }
 
     void onResponseReceived(
         SystemError::ErrorCode sysErrorCode,
@@ -128,6 +190,15 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 {
     whenConnectToRegularStunServer();
     thenConnectionIsEstablished();
+}
+
+TEST_F(AsyncClientWithHttpTunneling, http_ok_response_to_upgrade_results_connect_error)
+{
+    forceHttpConnectionUpgradeTunnel();
+
+    givenHttpServerThatAlwaysResponds(http::StatusCode::ok);
+    whenConnectToHttpServer();
+    thenConnectFailed();
 }
 
 //-------------------------------------------------------------------------------------------------

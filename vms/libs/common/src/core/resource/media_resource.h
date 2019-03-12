@@ -80,17 +80,12 @@ public:
     static QString rtpTransportKey();
     static QString panicRecordingKey();
     static QString dynamicVideoLayoutKey();
-    static QString motionStreamKey();
-
-    static QString primaryStreamValue();
-    static QString secondaryStreamValue();
-    static QString edgeStreamValue();
 
     static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
 
 protected:
     void initMediaResource();
-    QnCameraUserAttributePool* userAttributesPool() const;
+    virtual QnCameraUserAttributePool* userAttributesPool() const;
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     mutable QnMutex m_layoutMutex;

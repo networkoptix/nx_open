@@ -14,7 +14,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 //!Monitors mediaserver's status change and sends business event if some server goes offline
-class MediaServerStatusWatcher: public QObject, public nx::vms::server::ServerModuleAware
+class MediaServerStatusWatcher: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

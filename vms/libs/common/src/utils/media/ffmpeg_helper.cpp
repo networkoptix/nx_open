@@ -57,7 +57,7 @@ void QnFfmpegHelper::mediaContextToAvCodecContext(
     NX_ASSERT(r == 0);
     av->codec = codec;
     // codec_type is copied by avcodec_get_context_defaults3() above.
-    NX_ASSERT(av->codec_type == media->getCodecType(), Q_FUNC_INFO, "codec_type is not the same.");
+    NX_ASSERT(av->codec_type == media->getCodecType(), "codec_type is not the same.");
 
     copyMediaContextFieldsToAvCodecContext(av, media);
 }

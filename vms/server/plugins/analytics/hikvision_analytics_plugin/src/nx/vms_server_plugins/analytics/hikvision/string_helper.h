@@ -1,14 +1,8 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtCore/QFlags>
-
-#include <unordered_map>
-
-#include <boost/optional/optional.hpp>
 
 #include "common.h"
-#include <plugins/plugin_api.h>
 
 namespace nx {
 namespace vms_server_plugins {

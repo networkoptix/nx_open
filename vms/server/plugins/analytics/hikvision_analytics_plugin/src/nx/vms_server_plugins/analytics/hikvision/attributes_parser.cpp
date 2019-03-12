@@ -1,10 +1,10 @@
 #include "attributes_parser.h"
-#include "string_helper.h"
 
 #include <array>
 
-#include <nx/utils/literal.h>
 #include <nx/utils/log/log_main.h>
+
+#include "string_helper.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -27,7 +27,6 @@ QDateTime parseDateTime(QString stringDate)
 
 static QString normalizeInternalName(const QString& rawInternalName)
 {
-
     static const std::array<QString, 2> kIgnoredPostfixes = { "TriggerCap", "Cap" };
     for (const auto& postfix : kIgnoredPostfixes)
     {
@@ -64,9 +63,6 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     const QByteArray& content,
     const Hikvision::EngineManifest& manifest)
 {
-    using namespace nx::sdk::analytics;
-
-
     QString description;
     HikvisionEvent result;
     QXmlStreamReader reader(content);
@@ -196,7 +192,10 @@ HikvisionEvent AttributesParser::parsePlateData(
             const auto internalName = normalizeInternalName(reader.readElementText());
             eventTypeId = manifest.eventTypeByInternalName(internalName);
             if (eventTypeId.isEmpty())
-                NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
+            {
+                NX_WARNING(typeid(AttributesParser),
+                    lm("Unknown analytics event name %1").arg(internalName));
+            }
         }
         else
         {
@@ -204,7 +203,6 @@ HikvisionEvent AttributesParser::parsePlateData(
         }
     }
 
-    using namespace nx::sdk::analytics;
     HikvisionEvent hikvisionEvent;
     if (!eventTypeId.isEmpty())
     {

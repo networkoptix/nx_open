@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ui/dialogs/common/dialog.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace Ui {
 class ApplauncherControlDialog;

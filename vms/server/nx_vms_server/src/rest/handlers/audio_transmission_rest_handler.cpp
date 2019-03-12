@@ -42,7 +42,7 @@ int QnAudioTransmissionRestHandler::executeGet(
             QnUuid::fromStringSafe(resourceId),
             action,
             errorStr,
-			params))
+            params))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
     }

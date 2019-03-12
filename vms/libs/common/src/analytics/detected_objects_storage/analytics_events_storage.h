@@ -205,6 +205,13 @@ private:
         nx::sql::QueryContext* queryContext,
         const QnUuid& deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
+
+    void cleanupEvents(
+        nx::sql::QueryContext* queryContext,
+        const QnUuid& deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
+
+    void cleanupEventProperties(nx::sql::QueryContext* queryContext);
 };
 
 //-------------------------------------------------------------------------------------------------

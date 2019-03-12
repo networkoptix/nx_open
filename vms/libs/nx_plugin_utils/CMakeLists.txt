@@ -20,3 +20,7 @@ target_compile_definitions(nx_plugin_utils
 if(WINDOWS)
     target_link_libraries(nx_plugin_utils PUBLIC ws2_32) #< Needed for ntohl() and ntohs().
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

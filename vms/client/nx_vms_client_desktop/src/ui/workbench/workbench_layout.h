@@ -22,15 +22,13 @@ class QnWorkbenchItem;
 
 enum class QnLayoutFlag
 {
-    Empty = 0x00,
-    NoDrop = 0x01,
-    FixedViewport = 0x02, //< Disallow to zoom and hand scroll
-    NoMove = 0x04,
-    NoResize = 0x08, //< Disallow to resize (including raise) items
-    NoTimeline = 0x10,
-    SpecialBackground = 0x20,
-    FillViewport = 0x40, //< Layout must fill viewport as much as possible
-    MotionWidget = 0x80, //< Layout is a special one, that displayed on a camera motion widget.
+    Empty = 0,
+    FixedViewport = 1 << 0, //< Disallow to zoom and hand scroll
+    NoMove = 1 << 1,
+    NoResize = 1 << 2, //< Disallow to resize (including raise) items
+    NoTimeline = 1 << 3,
+    SpecialBackground = 1 << 4,
+    FillViewport = 1 << 5, //< Layout must fill viewport as much as possible
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)

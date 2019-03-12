@@ -41,13 +41,13 @@ void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
 
 void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox, QWidget *beforeWidget) {
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(buttonBox->layout());
-    NX_ASSERT(layout, Q_FUNC_INFO, "Layout must already exist here.");
+    NX_ASSERT(layout, "Layout must already exist here.");
     if (!layout)
         return;
 
     if (!beforeWidget)
         beforeWidget = buttonBox->button(QDialogButtonBox::Ok);
-    NX_ASSERT(beforeWidget, Q_FUNC_INFO, "Select correct widget to place");
+    NX_ASSERT(beforeWidget, "Select correct widget to place");
     int index = beforeWidget
         ? layout->indexOf(beforeWidget)
         : 0;

@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation>Activer</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -56,10 +67,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation>MODE SANS ÉCHEC</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation>INCOMPATIBLE</translation>
     </message>
@@ -70,6 +77,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>INACCESSIBLE</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation>MODE SANS ÉCHEC</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -83,20 +94,21 @@
       <translation>Rien trouvé</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>Vous n’avez aucun accès à %1. Certaines fonctionnalités pourraient être indisponibles.</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Chargement...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation>Connecter à un autre Serveur...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Connexion au serveur...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Chargement...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Vous n’avez aucun accès à %1. Certaines fonctionnalités pourraient être indisponibles.</translation>
     </message>
   </context>
 </TS>

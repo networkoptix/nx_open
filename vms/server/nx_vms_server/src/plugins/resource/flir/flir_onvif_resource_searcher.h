@@ -16,14 +16,14 @@ class OnvifResourceSearcher: public ::OnvifResourceSearcher
 public:
     OnvifResourceSearcher(QnMediaServerModule* serverModule);
 
+    virtual bool isSequential() const override;
+
+    virtual QnResourceList findResources() override;
+
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
-
-    virtual QnResourceList findResources() override;
-
-    virtual bool isSequential() const override;
 };
 
 } // namespace flir

@@ -218,7 +218,6 @@ public:
      */
     static QnCodecParams::Value suggestMediaStreamParams(
         AVCodecID codec,
-        QSize resolution,
         Qn::StreamQuality quality);
 
     /**

@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
+    <name>DateTimeFormats</name>
+    <message>
+      <source>MM/dd</source>
+      <translation>MM/dd</translation>
+    </message>
+    <message>
+      <source>MMMM yyyy</source>
+      <translation>MMMM yyyy</translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -90,6 +101,10 @@
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>מערכות אלה בנויות עם כתובת אתר שונה של %1. המיזוג אסור.</translation>
+    </message>
+    <message>
+      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation>לא ניתן למזג את 'מערכות' משום שיש להם לפחות שרת אחד עם אותו מזהה. הסר את השרת ונסה שוב.</translation>
     </message>
   </context>
   <context>
@@ -211,10 +226,6 @@
       <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של המצלמה למידע נוסף.</translation>
     </message>
     <message>
-      <source>Camera plugin error. %1</source>
-      <translation>שגיאת חיבור מצלמה. %1</translation>
-    </message>
-    <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
       <translation>יש לנסות לאתחל את מודול הקלט/פלט, לאחר מכן להחזיר את הגדרות היצרן בדף האינטרנט.</translation>
     </message>
@@ -318,6 +329,18 @@
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>אנא עדכן קושחה. הגירסה הנתמכת המינימלית היא %1. גרסת הקושחה הגרסה הנוכחית היא %2</translation>
     </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation>שגיאה בתוסף. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation>התוסף אינו זמין</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation>שגיאת שרת פנימית. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -342,14 +365,6 @@
       <translation>לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-      <source>Could not initialize resampling context, error code: %1</source>
-      <translation>לא ניתן לאתחל את הדגימה, קוד שגיאה: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>לא ניתן להקצות מאגרי מדגם, קוד שגיאה: %1</translation>
-    </message>
-    <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
       <translation>לא ניתן לשלוח מסגרת שמע למפענח, קוד שגיאה: %1.</translation>
     </message>
@@ -360,6 +375,10 @@
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
       <translation>לא יכול לקבל מסגרת שמע מהמפענח, קוד שגיאה: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation>לא היתה אפשרות להקצות מאגרי דגימה</translation>
     </message>
   </context>
   <context>
@@ -479,10 +498,6 @@
       <translation>פנוי</translation>
     </message>
     <message>
-      <source>Free license</source>
-      <translation>רישיון חינם</translation>
-    </message>
-    <message>
       <source>Time</source>
       <translation>שעה</translation>
     </message>
@@ -497,6 +512,238 @@
     <message>
       <source>Bridge Licenses</source>
       <translation>רישיונות Bridge</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation>
+        <numerusform>%n רישיון זמני</numerusform>
+        <numerusform>%n רישיונות זמניים</numerusform>
+        <numerusform>%n רישיונות זמניים</numerusform>
+        <numerusform>%n רישיונות זמניים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation>
+        <numerusform>%n רישיון אנלוגי</numerusform>
+        <numerusform>%n רישיונות אנלוגים</numerusform>
+        <numerusform>%n רישיונות אנלוגים</numerusform>
+        <numerusform>%n רישיונות אנלוגים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות מקצועיים</numerusform>
+        <numerusform>%n רישיונות מקצועיים</numerusform>
+        <numerusform>%n רישיונות מקצועיים</numerusform>
+        <numerusform>%n רישיונות מקצועיים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות קצה</numerusform>
+        <numerusform>%n רישיונות קצה</numerusform>
+        <numerusform>%n רישיונות קצה</numerusform>
+        <numerusform>%n רישיונות קצה</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation>
+        <numerusform>%n רשיונות Vmax</numerusform>
+        <numerusform>%n רשיונות Vmax</numerusform>
+        <numerusform>%n רשיונות Vmax</numerusform>
+        <numerusform>%n רשיונות Vmax</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation>
+        <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
+        <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
+        <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
+        <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות קיר וידאו</numerusform>
+        <numerusform>%n רישיונות קיר וידאו</numerusform>
+        <numerusform>%n רישיונות קיר וידאו</numerusform>
+        <numerusform>%n רישיונות קיר וידאו</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות התקן קלט / פלט</numerusform>
+        <numerusform>%n רישיונות התקן קלט / פלט</numerusform>
+        <numerusform>%n רישיונות קלט / פלט</numerusform>
+        <numerusform>%n רישיונות קלט / פלט</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות התחלה</numerusform>
+        <numerusform>%n רישיונות התחלה</numerusform>
+        <numerusform>%n רישיונות התחלה</numerusform>
+        <numerusform>%n רישיונות התחלה</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות גישור</numerusform>
+        <numerusform>%n רישיונות גישור</numerusform>
+        <numerusform>%n רישיונות גישור</numerusform>
+        <numerusform>%n רישיונות גישור</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות לא חוקיים</numerusform>
+        <numerusform>%n רישיונות לא חוקיים</numerusform>
+        <numerusform>%n רישיונות לא חוקיים</numerusform>
+        <numerusform>%n רישיונות לא חוקיים</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation>רישיונות חינם</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation>
+        <numerusform>%n רישיונות חינם</numerusform>
+        <numerusform>%n רישיונות חינם</numerusform>
+        <numerusform>%n רישיונות חינם</numerusform>
+        <numerusform>%n רישיונות חינם</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רישיונות זמניים</numerusform>
+        <numerusform>%n/%1 רישיונות זמניים</numerusform>
+        <numerusform>%n/%1 רישיונות זמניים</numerusform>
+        <numerusform>%n/%1 רישיונות זמניים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
+        <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
+        <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
+        <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
+        <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
+        <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
+        <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רשיונות Edge</numerusform>
+        <numerusform>%n/%1 רשיונות Edge</numerusform>
+        <numerusform>%n/%1 רשיונות Edge</numerusform>
+        <numerusform>%n/%1 רשיונות Edge</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רשיונות Vmax</numerusform>
+        <numerusform>%n/%1 רשיונות Vmax</numerusform>
+        <numerusform>%n/%1 רשיונות Vmax</numerusform>
+        <numerusform>%n/%1 רשיונות Vmax</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
+        <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
+        <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
+        <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
+        <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
+        <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
+        <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
+        <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
+        <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
+        <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רישיונות התחלה</numerusform>
+        <numerusform>%n/%1 רישיונות התחלה</numerusform>
+        <numerusform>%n/%1 רישיונות התחלה</numerusform>
+        <numerusform>%n/%1 רישיונות התחלה</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+        <numerusform>%n/%1 רישיונות חינם</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רשיונות גישור</numerusform>
+        <numerusform>%n/%1 רשיונות גישור</numerusform>
+        <numerusform>%n/%1 רשיונות גישור</numerusform>
+        <numerusform>%n/%1 רשיונות גישור</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
+        <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
+        <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
+        <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -557,10 +804,6 @@
       <translation>סוג שגוי</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>רשיון אחד בלבד מותר למכשיר זה</translation>
-    </message>
-    <message>
       <source>This license type requires higher software version</source>
       <translation>סוג רישיון זה מחייב גרסת תוכנה גבוהה יותר</translation>
     </message>
@@ -572,6 +815,14 @@
       <source>Server with matching Hardware ID not found</source>
       <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
+    <message>
+      <source>Only one starter license is allowed per System.</source>
+      <translation>רק רשיון סטרטר אחד מותר לכל מערכת.</translation>
+    </message>
+    <message>
+      <source>You already have one active starter license.</source>
+      <translation>כבר יש לך רישיון סטרטר פעיל אחד.</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
@@ -582,42 +833,6 @@
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message numerus="yes">
-      <source>%n Camera(s)</source>
-      <translation>
-        <numerusform>מצלמה %n</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n camera(s)</source>
-      <translation>
-        <numerusform>מצלמה %n</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Device(s)</source>
-      <translation>
-        <numerusform>מכשיר %n</numerusform>
-        <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n התקנים</numerusform>
-        <numerusform>%n התקנים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n device(s)</source>
-      <translation>
-        <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n מכשירים</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Cameras</source>
       <translation>מצלמות</translation>
@@ -650,24 +865,6 @@
       <source>device</source>
       <translation>מכשיר</translation>
     </message>
-    <message numerus="yes">
-      <source>%n I/O Module(s)</source>
-      <translation>
-        <numerusform>%n מודול קלט/פלט אחד</numerusform>
-        <numerusform>%n מודול קלט/פלט אחד</numerusform>
-        <numerusform>%n מודול קלט/פלט אחד</numerusform>
-        <numerusform>%n מודול קלט/פלט אחד</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O module(s)</source>
-      <translation>
-        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-      </translation>
-    </message>
     <message>
       <source>I/O Modules</source>
       <translation>מודולי קלט/פלט</translation>
@@ -683,6 +880,60 @@
     <message>
       <source>I/O module</source>
       <translation>מודול קלט/פלט</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+        <numerusform>%n מצלמות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+        <numerusform>%n התקני קלט/פלט</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -710,67 +961,6 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>מזהה חומרה: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>הנמוכה ביותר</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>נמוך</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>בינונית</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>גבוה</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>הטוב ביותר</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>פריסט</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>לא מוגדר</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>הנמוכה ביותר</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>נמוכה</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>בינונית</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>גבוהה</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>מיטבית</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>פריסט</translation>
     </message>
   </context>
   <context>
@@ -817,196 +1007,6 @@
     <message>
       <source>Unnamed System</source>
       <translation>מערכת ללא שם</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTCPConnectionProcessor</name>
-    <message>
-      <source>OK</source>
-      <translation>אישור</translation>
-    </message>
-    <message>
-      <source>Not Found</source>
-      <translation>לא נמצא</translation>
-    </message>
-    <message>
-      <source>Not Implemented</source>
-      <translation>לא מיושם</translation>
-    </message>
-    <message>
-      <source>Unsupported Transport</source>
-      <translation>תעבורה שאינה נתמכת</translation>
-    </message>
-    <message>
-      <source>Internal Server Error</source>
-      <translation>שגיאת שרת פנימית</translation>
-    </message>
-    <message>
-      <source>Invalid Parameter</source>
-      <translation>פרמטר לא תקין</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>שניות</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>דקות</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>שעות</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>ימים</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>yrs</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1085,6 +1085,48 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>יש גישה לכל המערכת ויכול לנהל את זה. יכול ליצור משתמשים.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnZipExtractor</name>
+    <message>
+      <source>Zip file is corrupted.</source>
+      <translation>קובץ ה-zip פגום.</translation>
+    </message>
+    <message>
+      <source>Could not find target dir.</source>
+      <translation>לא ניתן לאתר את היעד.</translation>
+    </message>
+    <message>
+      <source>Could not open file for writing.</source>
+      <translation>לא ניתן לפתוח קובץ לכתיבה.</translation>
+    </message>
+    <message>
+      <source>There is no free space on the disk.</source>
+      <translation>אין מקום פנוי בדיסק.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>שגיאה לא מוכרת.</translation>
+    </message>
+    <message>
+      <source>Extraction was cancelled.</source>
+      <translation>החילוץ בוטל.</translation>
+    </message>
+    <message>
+      <source>Extractor is busy.</source>
+      <translation>המחלץ אינו פנוי.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>גודל זרם שגוי.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>כותרת זרם מוצפן פגומה.</translation>
     </message>
   </context>
   <context>
@@ -1584,19 +1626,39 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>בעיית אחסון</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>שגיאת אחסון ב%1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>עבור למסך מלא</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>צא ממסך מלא</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>פתח את הפריסה</translation>
+    </message>
+    <message>
+      <source>Plugin Event</source>
+      <translation>אירוע תוסף</translation>
+    </message>
+    <message>
+      <source>Unknown plugin event</source>
+      <translation>אירוע תוסף לא ידוע</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation>נכשל השימוש בשעת המצלמה, הפרש זמן גדול מדי, יעשה שימוש בזמן המערכת</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation>זמן המצלמה חוזר למצב רגיל</translation>
     </message>
   </context>
   <context>

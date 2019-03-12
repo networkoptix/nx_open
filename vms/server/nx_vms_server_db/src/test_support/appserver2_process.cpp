@@ -211,7 +211,6 @@ int Appserver2Process::exec()
         QnMediaServerResourcePtr(),
         []() { return false; });
 
-
     m_ecConnection = ec2Connection.get();
     emit beforeStart();
 

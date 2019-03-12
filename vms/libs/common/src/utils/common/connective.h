@@ -1,10 +1,7 @@
 #pragma once
 
-#if !defined(Q_MOC_RUN)
-    #include <boost/type_traits/is_base_of.hpp>
-#endif
-
 #include <memory>
+#include <type_traits>
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
@@ -18,7 +15,8 @@
 #undef NULL
 #define NULL nullptr
 
-namespace Qn {
+namespace Qn
+{
 
 template <class T>
 inline const T* connector(const T* object)
@@ -130,14 +128,13 @@ protected:
     virtual ~ConnectiveBase() {}
 };
 
-
 /**
  * Convenience base class for objects that want to use extensible ADL-based connections.
  *
  * It replaces <tt>QObject</tt>'s <tt>connect</tt> and <tt>disconnect</tt>
  * methods with drop-in replacements that call into ADL-based implementation.
  */
-template<class Base, bool baseIsConnective = boost::is_base_of<ConnectiveBase, Base>::value>
+template<class Base, bool baseIsConnective = std::is_base_of<ConnectiveBase, Base>::value>
 class Connective: public Base, public ConnectiveBase
 {
 public:

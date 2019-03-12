@@ -21,8 +21,8 @@
                 fprintf(stdout, "%s\n", ___buf); \
                 fflush(stdout); \
             } while (0)
-	#elif defined (_WIN32)
-		#define LOG(...)
+    #elif defined (_WIN32)
+        #define LOG(...)
     #endif
 
 #else

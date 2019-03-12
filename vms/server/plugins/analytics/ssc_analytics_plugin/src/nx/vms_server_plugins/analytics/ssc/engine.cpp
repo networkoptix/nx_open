@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 #include <sstream>
 #include <iomanip>
@@ -11,9 +11,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/sdk/common/string.h>
-
-#include <nx/vms_server_plugins/utils/uuid.h>
+#include <nx/sdk/helpers/string.h>
 
 #include <nx/kit/ini_config.h>
 
@@ -41,7 +39,7 @@ static const QByteArray defaultConfiguration = /*suppress newline*/1 + R"json(
 )json";
 
 // The following constants are from "SSC System Specification" (page 5).
-static const unsigned int kCommandLength = 4;
+static const int kCommandLength = 4;
 static const char kSTX = 0x02; //< start byte
 static const char kETX = 0x03; //< stop byte
 static const char kMinDigitCode = 0x30;
@@ -65,14 +63,14 @@ void logReceivedBytes(const char* message, const QByteArray& data, int len)
 
 int extractLogicalId(const QByteArray& data)
 {
-    NX_ASSERT(data.size() >= kCommandLength);
+    NX_ASSERT((int) data.size() >= kCommandLength);
     return (data[1] - kMinDigitCode) * 10 + (data[2] - kMinDigitCode);
 };
 
 /** Check if data begins with a correct command. */
 bool isCorrectCommand(const QByteArray& data)
 {
-    NX_ASSERT(data.size() >= kCommandLength);
+    NX_ASSERT((int) data.size() >= kCommandLength);
     const bool commandEnvelopeIsCorrect = (data[0] == kSTX && data[3] == kETX);
 
     const char b1 = data[1];
@@ -117,7 +115,7 @@ bool isCorrectLogicalId(int cameraLogicalId)
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     static const char* const kManifestResourceName = ":/ssc/manifest.json";
     static const char* const kManifestFilename = "plugins/ssc/manifest.json";
@@ -274,27 +272,16 @@ void Engine::configureSerialPort(QSerialPort* port, const QString& name, int ind
     NX_PRINT << "Serial port " << name.toStdString() << " configuration finished";
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -313,7 +300,7 @@ void Engine::onDataReceived(int index)
 
     receivedData += dataChunk;
 
-    while (receivedData.size() >= kCommandLength)
+    while ((int) receivedData.size() >= kCommandLength)
     {
         while(receivedData.size() >= kCommandLength && !isCorrectCommand(receivedData))
             removeInvalidBytes(receivedData);
@@ -365,12 +352,11 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
     // We should invent more accurate test.
-    if (deviceInfo->logicalId != 0)
-        return new DeviceAgent(this, *deviceInfo, m_typedManifest);
+    if (isCompatible(deviceInfo))
+        return new DeviceAgent(this, deviceInfo, m_typedManifest);
     else
         return nullptr;
 }
@@ -378,18 +364,24 @@ nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
 const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
-void Engine::executeAction(nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
-    // Do nothing.
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
+}
+
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
+{
+    bool success = false;
+    int logicalId = QString(deviceInfo->logicalId()).toInt(&success);
+    return success && logicalId != 0;
 }
 
 } // namespace ssc
@@ -400,6 +392,7 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 namespace {
 
 static const std::string kLibName = "ssc_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.ssc",
@@ -412,15 +405,15 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::ssc::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

@@ -37,6 +37,10 @@ public:
             if (!isSpecialValue(spinBox))
                 return false;
 
+            // Ignore input events for non-editable spinboxes.
+            if (!spinBox->isEnabled() || spinBox->isReadOnly())
+                return false;
+
             switch (event->type())
             {
                 case QEvent::MouseButtonPress:

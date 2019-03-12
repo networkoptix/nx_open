@@ -33,7 +33,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher(QnMediaServerModule* se
     AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 }
 
-QString QnPlArecontResourceSearcher::manufacture() const
+QString QnPlArecontResourceSearcher::manufacturer() const
 {
     return QnPlAreconVisionResource::MANUFACTURE;
 }
@@ -218,9 +218,9 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid& resource
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufature " << resourceType->getManufacturer() << " != " << manufacturer();
         return result;
     }
 
@@ -290,13 +290,13 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), model);
     if (rt.isNull())
     {
         if (model.left(2).toLower() == lit("av"))
         {
             auto unprefixed = model.mid(2);
-            rt = qnResTypePool->getLikeResourceTypeId(manufacture(), unprefixed);
+            rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), unprefixed);
         }
     }
 

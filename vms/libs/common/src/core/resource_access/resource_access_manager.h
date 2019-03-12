@@ -22,7 +22,7 @@
 class QnResourceAccessManager:
     public Connective<QObject>,
     public QnUpdatable,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

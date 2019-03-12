@@ -279,6 +279,8 @@ private:
         const api::SystemData& what,
         const AccountWithPassword& whom,
         bool isEnabled);
+
+    std::unique_ptr<api::Connection> createConnection();
 };
 
 namespace api {

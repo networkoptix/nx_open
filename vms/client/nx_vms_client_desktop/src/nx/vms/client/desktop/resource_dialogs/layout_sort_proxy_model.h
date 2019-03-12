@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/node_view/node_view/sorting/node_view_base_sort_model.h>
+#include <nx/vms/client/desktop/node_view/node_view/sorting_filtering/node_view_base_sort_model.h>
 
 namespace nx::vms::client::desktop {
 

@@ -17,7 +17,7 @@ ProgressListModel::ProgressListModel(QObject* parent):
         {
             if (m_activities.contains(activityId))
             {
-                NX_ASSERT(false, Q_FUNC_INFO, "Duplicate activityId");
+                NX_ASSERT(false, "Duplicate activityId");
                 return;
             }
 
@@ -31,7 +31,7 @@ ProgressListModel::ProgressListModel(QObject* parent):
             const auto index = m_activities.index_of(activityId);
             if (index < 0)
             {
-                NX_ASSERT(false, Q_FUNC_INFO, "Non-existant activityId");
+                NX_ASSERT(false, "Non-existant activityId");
                 return;
             }
 

@@ -190,6 +190,11 @@ public:
         return true;
     }
 
+    virtual bool getProtocol(int* /*protocol*/) const override
+    {
+        return false;
+    }
+
     virtual SOCKET_HANDLE handle() const override
     {
         return SOCKET_HANDLE();

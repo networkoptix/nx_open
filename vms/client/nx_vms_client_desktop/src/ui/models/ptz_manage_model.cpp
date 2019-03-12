@@ -188,8 +188,12 @@ bool QnPtzManageModel::setHotkeyInternal(int hotkey, const QString &id) {
     if (id.isEmpty() || m_hotkeys.value(hotkey) == id)
         return false;
 
+    const auto keysForId = m_hotkeys.keys(id);
+    if (hotkey == -1 && keysForId.empty())
+        return false;
+
     /* Clean previous hotkeys. */
-    for (int key: m_hotkeys.keys(id))
+    for (int key: keysForId)
         m_hotkeys.remove(key);
 
     /* Set new hotkey. */
@@ -681,7 +685,8 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
 
     if (stateString) {
         qint64 time = estimatedTimeSecs(tourModel.tour);
-        *stateString = tr("Tour Time: %1.").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
+        *stateString = tr("Tour Time: %1.").arg(
+            (time < 60) ? tr("less than a minute") : tr("about %n minutes", "", time / 60));
     }
     return ValidTour;
 }
@@ -696,7 +701,7 @@ void QnPtzManageModel::updatePresetsCache() {
 
 bool QnPtzManageModel::synchronized() const {
     foreach (const QnPtzPresetItemModel &model, m_presets) {
-        if (model.local || model.modified)
+        if (model.local || model.modified || model.isNameModified())
             return false;
     }
 
@@ -714,6 +719,7 @@ void QnPtzManageModel::setSynchronized() {
     while (presetIter != m_presets.end()) {
         presetIter->local = false;
         presetIter->modified = false;
+        presetIter->initialName = presetIter->preset.name;
         presetIter++;
     }
 

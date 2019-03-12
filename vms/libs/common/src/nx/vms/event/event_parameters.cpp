@@ -68,14 +68,14 @@ void EventParameters::setAnalyticsEventTypeId(const QString& id)
     inputPortId = id;
 }
 
-QString EventParameters::getAnalyticsPluginId() const
+QnUuid EventParameters::getAnalyticsEngineId() const
 {
-    return analyticsPluginId;
+    return analyticsEngineId;
 }
 
-void EventParameters::setAnalyticsPluginId(const QString& id)
+void EventParameters::setAnalyticsEngineId(const QnUuid& id)
 {
-    analyticsPluginId = id;
+    analyticsEngineId = id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

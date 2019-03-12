@@ -34,12 +34,12 @@ class QnAviArchiveDelegate;
     \note Object belongs to the thread, it has been created in (not internal thread)
     \note Class methods are not thread-safe
 */
-class FileTranscoder: public QnLongRunnable
+class FileTranscoder: public QnLongRunnable, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    FileTranscoder(nx::metrics::Storage* metrics = nullptr);
+    explicit FileTranscoder(QnCommonModule* commonModule);
     virtual ~FileTranscoder();
 
     /*!
@@ -98,9 +98,10 @@ public:
         Creates temporary file in the same dir with \a filePath
     */
     static bool setTagValue(
+        QnCommonModule* commonModule,
         const QString& filePath,
         const QString& name,
-        const QString& value );
+        const QString& value);
 
 public slots:
     //!Overrides QnLongRunnable::pleaseStop

@@ -213,10 +213,10 @@ void ModuleConnector::InformationReader::readUntilError()
             return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
         }
 
-        nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher destructionWatcher(&m_destructionFlag);
         const auto localHandler = m_handler;
         localHandler(std::move(moduleInformation), QString());
-        if (destructionWatcher.objectDestroyed())
+        if (destructionWatcher.interrupted())
             return;
     }
 
@@ -403,6 +403,13 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (m_forbiddenEndpoints.count(endpoint))
             continue;
+
+        // TODO: Remove as soon as IPv6 is finally supported.
+        if (endpoint.address.isPureIpV6())
+        {
+            NX_VERBOSE(this, "Enpoint %1 is omited, IPv6 is not fully supported yet", endpoint);
+            continue;
+        }
 
         ++endpointsInProgress;
         NX_ASSERT(!endpoint.toString().isEmpty());

@@ -139,7 +139,7 @@ public:
     virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 
     /**
-    *   \return storage capabilities ('cap' flag(s))
+    *   \return storage capabilities ('cap' flags)
     */
     virtual int getCapabilities() const = 0;
 

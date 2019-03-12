@@ -52,10 +52,9 @@ Pane
 
         function updateDefaultAddress()
         {
-            // TODO: Make SystemHostsModel return nx::utils::Url.
             defaultAddress = count > 0
-                ? NxGlobals.url(getData(0, "url"))
-                : ""
+                ? getData(0, "url-internal")
+                : NxGlobals.emptyUrl()
         }
     }
 

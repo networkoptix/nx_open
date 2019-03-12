@@ -7,6 +7,7 @@
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchWidget;
+class AnalyticsObjectsVisualizationManager;
 
 /**
  * An utility class to synchronize Right Panel analytics tab state with current media widget
@@ -19,11 +20,19 @@ public:
         AnalyticsSearchWidget* analyticsSearchWidget, QObject* parent = nullptr);
 
 private:
+    bool calculateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget) const;
+
     void updateAreaSelection();
     void updateTimelineDisplay();
+    void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
+    void updateAllMediaResourceWidgetsAnalyticsMode();
+
+    void handleWidgetAnalyticsFilterRectChanged();
 
 private:
     const QPointer<AnalyticsSearchWidget> m_analyticsSearchWidget;
+    const QPointer<AnalyticsObjectsVisualizationManager> m_objectsVisualizationManager;
+    QMetaObject::Connection m_activeMediaWidgetConnection;
 };
 
 } // namespace nx::vms::client::desktop

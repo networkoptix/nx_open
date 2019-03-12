@@ -11,6 +11,7 @@
 #include "systraywindow.h"
 
 #include <utils/common/app_info.h>
+#include <network/system_helpers.h>
 #include <traytool_app_info.h>
 
 #include <shlobj.h>
@@ -355,7 +356,11 @@ void QnSystrayWindow::at_mediaServerWebAction()
     if (!isServerInstalled())
         return;
 
-    QString serverAdminUrl = QString(lit("http://localhost:%1/static/index.html")).arg(m_mediaServerSettings.value(lit("port")).toInt());
+    int port = m_mediaServerSettings.value(lit("port")).toInt();
+    if (port == 0)
+        port = helpers::kDefaultConnectionPort; // Should never get there, but better than 0.
+
+    QString serverAdminUrl = QString(lit("http://localhost:%1/static/index.html")).arg(port);
     QDesktopServices::openUrl(QUrl(serverAdminUrl));
 }
 

@@ -149,17 +149,17 @@ void FisheyeCalibrationWidget::at_image_animationFinished()
     switch (m_lastError)
     {
         case QnFisheyeCalibrator::ErrorNotFisheyeImage:
-            QnMessageBox::critical(this, errorCaption, tr("Image is not round."));
+            QnMessageBox::critical(this, errorCaption, tr("Image is not round"));
             break;
 
         case QnFisheyeCalibrator::ErrorTooLowLight:
-            QnMessageBox::critical(this, errorCaption, tr("Image might be too dim."));
+            QnMessageBox::critical(this, errorCaption, tr("Image might be too dim"));
             break;
         case QnFisheyeCalibrator::ErrorInvalidInput:
-            QnMessageBox::critical(this, errorCaption, tr("Invalid input image."));
+            QnMessageBox::critical(this, errorCaption, tr("Invalid input image"));
             break;
         case QnFisheyeCalibrator::ErrorInternal:
-            QnMessageBox::critical(this, errorCaption, tr("Internal error."));
+            QnMessageBox::critical(this, errorCaption, tr("Internal error"));
             break;
         default:
             break;

@@ -585,15 +585,18 @@ QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const Wearable
     case WearablePayload::Valid:
         return QString();
     case WearablePayload::UnsupportedFormat:
-        return tr("%1 has unsupported format.").arg(fileName);
+        return tr("%1 has unsupported format.", "Filename will be substituted").arg(fileName);
     case WearablePayload::NoTimestamp:
-        return tr("%1 does not have timestamp.").arg(fileName);
+        return tr("%1 does not have timestamp.", "Filename will be substituted").arg(fileName);
     case WearablePayload::FootagePastMaxDays:
-        return tr("%1 is older than allowed in camera archive settings.").arg(fileName);
+        return tr("%1 is older than allowed in camera archive settings.",
+            "Filename will be substituted").arg(fileName);
     case WearablePayload::ChunksTakenByFileInQueue:
-        return tr("%1 covers period for which video has already been uploaded.").arg(fileName);
+        return tr("%1 covers period for which video has already been uploaded.",
+            "Filename will be substituted").arg(fileName);
     case WearablePayload::ChunksTakenOnServer:
-        return tr("%1 covers period for which video is being uploaded.").arg(fileName);
+        return tr("%1 covers period for which video is being uploaded.",
+            "Filename will be substituted").arg(fileName);
     default:
         NX_ASSERT(false);
         return QString();

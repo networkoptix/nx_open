@@ -237,7 +237,7 @@ protected:
 
                     auto resourceId = cameras[cameraIndex]->getId();
                     cameraIndex = (cameraIndex + 1) % cameras.size();
-                    auto statusDict = server->moduleInstance()->commonModule()->statusDictionary();
+                    auto statusDict = server->moduleInstance()->commonModule()->resourceStatusDictionary();
                     auto oldStatus = statusDict->value(resourceId);
                     auto status = oldStatus == Qn::Offline ? Qn::Online : Qn::Offline;
 

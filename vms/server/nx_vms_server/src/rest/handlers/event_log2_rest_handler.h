@@ -5,7 +5,7 @@
 
 class QnEventLog2RestHandler:
     public QnFusionRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnEventLog2RestHandler(QnMediaServerModule* serverModule);

@@ -1,17 +1,13 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtCore/QFlag>
 #include <QtCore/QDateTime>
 
 #include <boost/optional/optional.hpp>
 
-#include <plugins/plugin_api.h>
-#include <plugins/plugin_tools.h>
 #include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 namespace nx {
 namespace vms_server_plugins {

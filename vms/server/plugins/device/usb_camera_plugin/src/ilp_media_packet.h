@@ -8,7 +8,7 @@ class CyclicAllocator;
 namespace nx {
 namespace usb_cam {
 
-class ILPMediaPacket: public nxcip::VideoDataPacket{
+class ILPMediaPacket: public nxcip::VideoDataPacket {
 public:
     ILPMediaPacket(
         CyclicAllocator* const allocator,
@@ -21,8 +21,8 @@ public:
     virtual ~ILPMediaPacket();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
     virtual nxcip::UsecUTCTimestamp timestamp() const override;
     virtual nxcip::DataPacketType type() const override;

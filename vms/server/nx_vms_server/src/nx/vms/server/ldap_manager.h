@@ -32,7 +32,7 @@ public:
     virtual LdapResult fetchUsers(QnLdapUsers &users) = 0;
 };
 
-class LdapManager: public QObject, public AbstractLdapManager, public QnCommonModuleAware
+class LdapManager: public QObject, public AbstractLdapManager, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

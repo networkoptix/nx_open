@@ -10,7 +10,7 @@ using namespace nx::core;
 
 bool deserialize(const QString& /*value*/, QnPtzPresetRecordHash* /*target*/)
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
     return false;
 }
 
@@ -32,10 +32,12 @@ QnPresetPtzController::~QnPresetPtzController()
 
 bool QnPresetPtzController::extends(Ptz::Capabilities capabilities, bool preferSystemPresets)
 {
-    return (capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities
-        && (preferSystemPresets || !capabilities.testFlag(Ptz::PresetsPtzCapability))
-        && (capabilities.testFlag(Ptz::DevicePositioningPtzCapability)
-            || capabilities.testFlag(Ptz::LogicalPositioningPtzCapability));
+    if ((capabilities & Ptz::PresetsPtzCapability) && !preferSystemPresets)
+        return false;
+
+    // Check if emulation is possible.
+    return (capabilities & Ptz::AbsolutePtrzCapabilities)
+        && (capabilities & Ptz::PositioningPtzCapabilities);
 }
 
 Ptz::Capabilities QnPresetPtzController::getCapabilities(
@@ -105,7 +107,7 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
         QnMutexLocker locker(&m_mutex);
         if ((status = doPresetsAction(updatePresetActionFunc, preset)))
         {
-            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot update preset since corresponding resource does not exist.");
+            NX_ASSERT(m_camera, "Cannot update preset since corresponding resource does not exist.");
             m_camera->savePropertiesAsync();
         }
     }
@@ -131,7 +133,7 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
         QnMutexLocker locker(&m_mutex);
         if ((status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString()))))
         {
-            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot remove preset since correspondent resource does not exist.");
+            NX_ASSERT(m_camera, "Cannot remove preset since correspondent resource does not exist.");
             m_camera->savePropertiesAsync();
         }
     }

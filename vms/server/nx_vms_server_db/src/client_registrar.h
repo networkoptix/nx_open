@@ -18,7 +18,7 @@ class QnAbstractTransactionTransport;
  */
 class ClientRegistrar:
     public QObject,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
 public:
     ClientRegistrar(

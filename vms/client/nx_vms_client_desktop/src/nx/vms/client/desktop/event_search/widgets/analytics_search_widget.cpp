@@ -2,22 +2,35 @@
 
 #include <algorithm>
 
+#include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
 #include <QtCore/QHash>
+#include <QtGui/QPalette>
+#include <QtQuick/QQuickItem>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QScrollArea>
 
+#include <api/server_rest_connection.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
@@ -41,6 +54,12 @@ public:
 
     void resetFilters();
 
+    void executePluginAction(
+        const QnUuid& engineId,
+        const QString& actionTypeId,
+        const analytics::storage::DetectedObject& object,
+        const QnVirtualCameraResourcePtr& camera) const;
+
 private:
     void setupTypeSelection();
     void updateTypeMenu();
@@ -53,6 +72,9 @@ private:
 
     QAction* addMenuAction(QMenu* menu, const QString& title, const QString& objectType);
 
+    bool requestPluginActionSettings(const QJsonObject& settingsModel,
+        QMap<QString, QString>& settingsValues) const;
+
 private:
     AnalyticsSearchListModel* const m_model;
     SelectableTextButton* const m_typeSelectionButton;
@@ -62,12 +84,12 @@ private:
     bool m_areaSelectionEnabled = false;
 
     using ObjectTypeDescriptors = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
-    struct PluginInfo
+    struct EngineInfo
     {
         QString name;
         ObjectTypeDescriptors objectTypes;
 
-        bool operator<(const PluginInfo& other) const
+        bool operator<(const EngineInfo& other) const
         {
             QCollator collator;
             collator.setNumericMode(true);
@@ -87,6 +109,9 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setRelevantControls(Control::defaults | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
     selectCameras(AbstractSearchWidget::Cameras::layout);
+
+    connect(model(), &AbstractSearchListModel::isOnlineChanged,
+        this, &AnalyticsSearchWidget::updateAllowance);
 }
 
 AnalyticsSearchWidget::~AnalyticsSearchWidget()
@@ -127,8 +152,11 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
 
 bool AnalyticsSearchWidget::calculateAllowance() const
 {
-    return !commonModule()->analyticsDescriptorListManager()
-        ->allDescriptorsInTheSystem<nx::vms::api::analytics::ObjectTypeDescriptor>().empty();
+    if (!model()->isOnline())
+        return false;
+
+    const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
+    return !manager.descriptors().empty();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -175,6 +203,9 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             if (isOnline)
                 updateAvailableObjectTypes();
         });
+
+    connect(m_model, &AnalyticsSearchListModel::pluginActionRequested,
+        this, &Private::executePluginAction);
 
     if (m_model->isOnline())
         updateAvailableObjectTypes();
@@ -237,57 +268,72 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    const auto descriptorListManager = q->commonModule()->analyticsDescriptorListManager();
-    const auto allObjectTypes = descriptorListManager
-        ->allDescriptorsInTheSystem<nx::vms::api::analytics::ObjectTypeDescriptor>();
-
-    const auto allAnalyticsPlugins = descriptorListManager
-        ->allDescriptorsInTheSystem<nx::vms::api::analytics::PluginDescriptor>();
-
-    QHash<QString, PluginInfo> pluginsById;
-    for (const auto& [pluginId, descriptor]: allAnalyticsPlugins)
-        pluginsById[pluginId].name = descriptor.name;
-
-    for (const auto& entry: allObjectTypes)
-    {
-        for (const auto& path: entry.second.paths)
-            pluginsById[path.pluginId].objectTypes.insert(entry);
-    }
-
-    QVector<PluginInfo> plugins;
-    for (const auto& pluginInfo: pluginsById)
-    {
-        if (!pluginInfo.objectTypes.empty())
-            plugins.push_back(pluginInfo);
-    }
-
-    std::sort(plugins.begin(), plugins.end());
-    const bool severalPlugins = plugins.size() > 1;
-
-    QMenu* currentMenu = m_objectTypeMenu;
+    nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(q->commonModule());
+    nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
+    const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
+    const auto engineDescriptors = engineDescriptorManager.descriptors();
     m_objectTypeMenu->clear();
 
-    for (const auto& plugin: plugins)
+    const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
+    QSet<QnUuid> enabledEngines;
+    for (const auto& camera: cameras)
+        enabledEngines.unite(camera->enabledAnalyticsEngines());
+
+    if (!objectTypeDescriptors.empty())
     {
-        if (severalPlugins)
+        QHash<QnUuid, EngineInfo> engineById;
+        for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
-            const auto pluginName = plugin.name.isEmpty()
-                ? QString("<%1>").arg(tr("unnamed analytics plugin"))
-                : plugin.name;
-
-            currentMenu = m_objectTypeMenu->addMenu(pluginName);
-
-            currentMenu->setWindowFlags(
-                currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+            if (enabledEngines.contains(engineId))
+                engineById[engineId].name = engineDescriptor.name;
         }
 
-        for (const auto entry: plugin.objectTypes)
+        for (const auto&[objectTypeId, objectTypeDescriptor]: objectTypeDescriptors)
         {
-            const auto& descriptor = entry.second;
-            addMenuAction(currentMenu, descriptor.item.name, descriptor.getId());
+            for (const auto& scope: objectTypeDescriptor.scopes)
+            {
+                if (enabledEngines.contains(scope.engineId))
+                {
+                    engineById[scope.engineId].objectTypes
+                        .emplace(objectTypeId, objectTypeDescriptor);
+                }
+            }
+        }
 
-            if (!currentSelectionStillAvailable && currentSelection == descriptor.getId())
-                currentSelectionStillAvailable = true;
+        QList<EngineInfo> engines;
+        for (const auto& engineInfo: engineById)
+            engines.push_back(engineInfo);
+
+        std::sort(engines.begin(), engines.end());
+        const bool multipleEnginesArePresent = engines.size() > 1;
+
+        QMenu* currentMenu = m_objectTypeMenu;
+        for (const auto& engine: engines)
+        {
+            if (multipleEnginesArePresent)
+            {
+                currentMenu->setWindowFlags(
+                    currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+                const auto engineName = engine.name.isEmpty()
+                    ? QString("<%1>").arg(tr("unnamed analytics engine"))
+                    : engine.name;
+
+                currentMenu = m_objectTypeMenu->addMenu(engineName);
+            }
+
+            for (const auto& [objectTypeId, objectTypeDescriptor]: engine.objectTypes)
+            {
+                addMenuAction(currentMenu,
+                    objectTypeDescriptor.name,
+                    objectTypeDescriptor.id);
+
+                if (!currentSelectionStillAvailable
+                    && currentSelection == objectTypeDescriptor.getId())
+                {
+                    currentSelectionStillAvailable = true;
+                }
+            }
         }
     }
 
@@ -364,6 +410,112 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
         });
 
     return action;
+}
+
+void AnalyticsSearchWidget::Private::executePluginAction(
+    const QnUuid& engineId,
+    const QString& actionTypeId,
+    const analytics::storage::DetectedObject& object,
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    const auto server = q->commonModule()->currentServer();
+    if (!server || !server->restConnection())
+        return;
+
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
+    const auto actionDescriptor = descriptorManager.descriptor(actionTypeId);
+    if (!actionDescriptor)
+        return;
+
+    AnalyticsAction actionData;
+    actionData.engineId = engineId;
+    actionData.actionId = actionDescriptor->id;
+    actionData.objectId = object.objectAppearanceId;
+    actionData.timestampUs = object.firstAppearanceTimeUsec;
+    actionData.deviceId = camera->getId();
+
+    if (!actionDescriptor->parametersModel.isEmpty())
+    {
+        // Show dialog asking to enter required parameters.
+        if (!requestPluginActionSettings(actionDescriptor->parametersModel, actionData.params))
+            return;
+    }
+
+    const auto resultCallback =
+        [this](bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
+        {
+            if (result.error != QnRestResult::NoError)
+            {
+                QnMessageBox::warning(q->mainWindowWidget(), tr("Failed to execute plugin action"),
+                    result.errorString);
+                return;
+            }
+
+            if (!success)
+                return;
+
+            const auto reply = result.deserialized<AnalyticsActionResult>();
+            if (!reply.messageToUser.isEmpty())
+                QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
+
+            if (!reply.actionUrl.isEmpty())
+                WebViewDialog::showUrl(QUrl(reply.actionUrl));
+        };
+
+
+    server->restConnection()->executeAnalyticsAction(
+        actionData, nx::utils::guarded(this, resultCallback), thread());
+}
+
+bool AnalyticsSearchWidget::Private::requestPluginActionSettings(const QJsonObject& settingsModel,
+    QMap<QString, QString>& settingsValues) const
+{
+    QnMessageBox parametersDialog(q->mainWindowWidget());
+    parametersDialog.addButton(QDialogButtonBox::Ok);
+    parametersDialog.addButton(QDialogButtonBox::Cancel);
+    parametersDialog.setText(tr("Enter parameters"));
+    parametersDialog.setInformativeText(tr("Action requires some parameters to be filled."));
+    parametersDialog.setIcon(QnMessageBoxIcon::Information);
+
+    auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
+    view->setClearColor(parametersDialog.palette().window().color());
+    view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    view->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
+    const auto root = view->rootObject();
+    NX_ASSERT(root);
+
+    if (!root)
+        return false;
+
+    QMetaObject::invokeMethod(
+        root,
+        "loadModel",
+        Qt::DirectConnection,
+        Q_ARG(QVariant, settingsModel.toVariantMap()),
+        Q_ARG(QVariant, {}));
+
+    auto panel = new QScrollArea(&parametersDialog);
+    panel->setFixedHeight(400);
+    auto layout = new QHBoxLayout(panel);
+    layout->addWidget(view);
+
+    parametersDialog.addCustomWidget(panel, QnMessageBox::Layout::Main);
+    if (parametersDialog.exec() != QDialogButtonBox::Ok)
+        return false;
+
+    QVariant result;
+    QMetaObject::invokeMethod(
+        root,
+        "getValues",
+        Qt::DirectConnection,
+        Q_RETURN_ARG(QVariant, result));
+
+    settingsValues.clear();
+    const auto resultMap = result.value<QVariantMap>();
+    for (auto iter = resultMap.cbegin(); iter != resultMap.cend(); ++iter)
+        settingsValues.insert(iter.key(), iter.value().toString());
+
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

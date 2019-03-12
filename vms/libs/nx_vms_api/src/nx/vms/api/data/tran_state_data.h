@@ -15,6 +15,9 @@ struct NX_VMS_API TranState
     bool operator<(const TranState& right) const;
 
     bool operator>(const TranState& right) const { return right < *this; }
+
+    /** @return true if difference of sets *this and other is not empty. false otherwise. */
+    bool containsDataMissingIn(const TranState& other) const;
 };
 #define TranState_Fields (values)
 

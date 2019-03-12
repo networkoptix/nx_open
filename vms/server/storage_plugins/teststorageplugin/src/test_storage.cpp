@@ -44,7 +44,7 @@ void removeNode(struct FsStubNode* root, enum FsStubEntryType type, const char* 
         if (ecode)
             *ecode = error::UrlNotExists;
         return;
-    } 
+    }
 
     FsStubNode_remove(nodeToRemove);
     if (ecode)
@@ -68,7 +68,7 @@ bool nodeExists(struct FsStubNode* root, const char* url, int* ecode)
 
 }
 
-TestStorage::TestStorage(const utils::VfsPair& vfsPair, 
+TestStorage::TestStorage(const utils::VfsPair& vfsPair,
                          const std::string& prefix,
                          std::function<void()> onDestroyCb):
     m_vfsPair(vfsPair),
@@ -86,7 +86,8 @@ int STORAGE_METHOD_CALL TestStorage::isAvailable() const
     return true;
 }
 
-nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(const char* url, int flags, int* ecode) const 
+nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(
+    const char* url, int flags, int* ecode) const
 {
     FileCategory category = FileCategory::media;
     if (strstr(url, ".nxdb") != nullptr)
@@ -136,9 +137,9 @@ nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(const char* url, int fla
 }
 
 nx_spl::IODevice* TestStorage::createIODevice(
-    const std::string& name, 
-    int category, 
-    int flags, 
+    const std::string& name,
+    int category,
+    int flags,
     int64_t size,
     int* ecode) const
 {
@@ -148,7 +149,7 @@ nx_spl::IODevice* TestStorage::createIODevice(
         f = fopen(m_vfsPair.sampleFilePath.c_str(), "rb");
         if (f == nullptr)
         {
-            LOG("[TestStorage, Open, IODevice] failed to open sample file %s for read\n", 
+            LOG("[TestStorage, Open, IODevice] failed to open sample file %s for read\n",
                 m_vfsPair.sampleFilePath.c_str());
             if (ecode)
                 *ecode = nx_spl::error::UrlNotExists;
@@ -162,21 +163,21 @@ nx_spl::IODevice* TestStorage::createIODevice(
     return new TestIODevice(name, (FileCategory)category, flags, size, f);
 }
 
-uint64_t STORAGE_METHOD_CALL TestStorage::getFreeSpace(int* ecode) const 
+uint64_t STORAGE_METHOD_CALL TestStorage::getFreeSpace(int* ecode) const
 {
     if (ecode)
         *ecode = nx_spl::error::NoError;
     return 5000LL * 1024 * 1024 * 1024;
 }
 
-uint64_t STORAGE_METHOD_CALL TestStorage::getTotalSpace(int* ecode) const 
+uint64_t STORAGE_METHOD_CALL TestStorage::getTotalSpace(int* ecode) const
 {
     if (ecode)
         *ecode = nx_spl::error::NoError;
     return 10000LL * 1024 * 1024 * 1024;
 }
 
-int STORAGE_METHOD_CALL TestStorage::getCapabilities() const 
+int STORAGE_METHOD_CALL TestStorage::getCapabilities() const
 {
     return cap::ListFile | cap::RemoveFile | cap::ReadFile | cap::WriteFile | cap::DBReady;
 }
@@ -184,7 +185,7 @@ int STORAGE_METHOD_CALL TestStorage::getCapabilities() const
 void STORAGE_METHOD_CALL TestStorage::removeFile(
     const char* url,
     int*        ecode
-) 
+)
 {
     removeNode(m_vfsPair.root, file, urlToPath(url).c_str(), ecode);
 }
@@ -195,13 +196,13 @@ void STORAGE_METHOD_CALL TestStorage::removeDir(
 )
 {
     removeNode(m_vfsPair.root, dir, urlToPath(url).c_str(), ecode);
-} 
+}
 
 void STORAGE_METHOD_CALL TestStorage::renameFile(
     const char*     oldUrl,
     const char*     newUrl,
     int*            ecode
-) 
+)
 {
     if (strcmp(oldUrl, newUrl) == 0)
     {
@@ -219,8 +220,8 @@ void STORAGE_METHOD_CALL TestStorage::renameFile(
     }
 
     auto resultNode = FsStubNode_add(
-        m_vfsPair.root, 
-        urlToPath(newUrl).c_str(), 
+        m_vfsPair.root,
+        urlToPath(newUrl).c_str(),
         file,
         660,
         nodeToRename->size);
@@ -240,7 +241,7 @@ void STORAGE_METHOD_CALL TestStorage::renameFile(
 nx_spl::FileInfoIterator* STORAGE_METHOD_CALL TestStorage::getFileIterator(
     const char*     dirUrl,
     int*            ecode
-) const 
+) const
 {
     struct FsStubNode* fsNode = FsStubNode_find(m_vfsPair.root, urlToPath(dirUrl).c_str());
     if (fsNode == nullptr)
@@ -259,7 +260,7 @@ nx_spl::FileInfoIterator* STORAGE_METHOD_CALL TestStorage::getFileIterator(
 int STORAGE_METHOD_CALL TestStorage::fileExists(
     const char*     url,
     int*            ecode
-) const 
+) const
 {
     return nodeExists(m_vfsPair.root, urlToPath(url).c_str(), ecode);
 }
@@ -267,7 +268,7 @@ int STORAGE_METHOD_CALL TestStorage::fileExists(
 int STORAGE_METHOD_CALL TestStorage::dirExists(
     const char*     url,
     int*            ecode
-) const 
+) const
 {
     return nodeExists(m_vfsPair.root, urlToPath(url).c_str(), ecode);
 }
@@ -275,7 +276,7 @@ int STORAGE_METHOD_CALL TestStorage::dirExists(
 uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
     const char*     url,
     int*            ecode
-) const 
+) const
 {
     struct FsStubNode* fsNode = FsStubNode_find(m_vfsPair.root, urlToPath(url).c_str());
     if (fsNode == nullptr)
@@ -288,7 +289,7 @@ uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
     return fsNode->size;
 }
 
-void* TestStorage::queryInterface(const nxpl::NX_GUID& interfaceID) 
+void* TestStorage::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
     if (std::memcmp(&interfaceID,
                     &nx_spl::IID_Storage,
@@ -307,12 +308,12 @@ void* TestStorage::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int TestStorage::addRef() 
+int TestStorage::addRef() const
 {
     return pAddRef();
 }
 
-unsigned int TestStorage::releaseRef() 
+int TestStorage::releaseRef() const
 {
     return pReleaseRef();
 }

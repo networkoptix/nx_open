@@ -10,9 +10,9 @@
 #include <memory>
 #include <unordered_map>
 
-class QnManualCameraAdditionRestHandler: 
+class QnManualCameraAdditionRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

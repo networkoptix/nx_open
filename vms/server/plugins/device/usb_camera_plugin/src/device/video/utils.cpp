@@ -49,7 +49,7 @@ void setBitrate(
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
-    if(targetCodecID)
+    if (targetCodecID)
         detail::setBitrate(devicePath, bitrate, targetCodecID);
 }
 
@@ -57,7 +57,7 @@ int getMaxBitrate(
     const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
-    if(!targetCodecID)
+    if (!targetCodecID)
         return 0;
 
     return detail::getMaxBitrate(devicePath, targetCodecID);

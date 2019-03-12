@@ -4,26 +4,19 @@
 #include <plugins/plugins_ini.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/sdk_support/pointers.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/common/to_string.h>
+#include <nx/sdk/analytics/helpers/engine_info.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
-#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/analytics/descriptor_manager.h>
 
 namespace nx::vms::server::resource {
-
-namespace {
-
-using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::IPlugin>;
-using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::IEngine>;
-
-} // namespace
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModule):
     base_type(),
@@ -32,12 +25,12 @@ AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModu
 }
 
 void AnalyticsEngineResource::setSdkEngine(
-    sdk_support::SharedPtr<nx::sdk::analytics::IEngine> sdkEngine)
+    nx::sdk::Ptr<nx::sdk::analytics::IEngine> sdkEngine)
 {
     m_sdkEngine = std::move(sdkEngine);
 }
 
-EnginePtr AnalyticsEngineResource::sdkEngine() const
+nx::sdk::Ptr<nx::sdk::analytics::IEngine> AnalyticsEngineResource::sdkEngine() const
 {
     return m_sdkEngine;
 }
@@ -81,9 +74,9 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     if (!NX_ASSERT(engine, lm("Engine: %1 (%2)").args(getName(), getId())))
         return false;
 
-    NX_DEBUG(this, "Sending settings to engine %1 (%2)", getName(), getId());
+    NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
 
-    sdk_support::UniquePtr<nx::sdk::IStringMap> effectiveSettings;
+    nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
@@ -103,9 +96,9 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     {
         analytics::debug_helpers::dumpStringToFile(
             this,
-            QString::fromStdString(nx::sdk::common::toJsonString(effectiveSettings.get())),
+            QString::fromStdString(nx::sdk::toJsonString(effectiveSettings.get())),
             pluginsIni().analyticsSettingsOutputPath,
-            analytics::debug_helpers::filename(
+            analytics::debug_helpers::nameOfFileToDumpOrLoadData(
                 QnVirtualCameraResourcePtr(),
                 toSharedPointer(this),
                 nx::vms::server::resource::AnalyticsPluginResourcePtr(),
@@ -144,22 +137,28 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     if (!m_sdkEngine)
         return CameraDiagnostics::InternalServerErrorResult("SDK Engine object is not set");
 
-    m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), toSharedPointer(this));
+    NX_DEBUG(this, "Sending engine info to the Engine %1 (%2)", getName(), getId());
+
+    auto engineInfo = nx::sdk::makePtr<nx::sdk::analytics::EngineInfo>();
+    engineInfo->setId(getId().toStdString());
+    engineInfo->setName(getName().toStdString());
+    m_sdkEngine->setEngineInfo(engineInfo.get());
+
+    m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), getId());
     m_sdkEngine->setHandler(m_handler.get());
-
-    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(
-        m_sdkEngine,
-        makeLogger());
-
-    if (!manifest)
-        return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
     if (!sendSettingsToSdkEngine())
         return CameraDiagnostics::InternalServerErrorResult("Unable to send settings to Engine");
 
-    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
-    if (!NX_ASSERT(analyticsDescriptorListManager))
-        return CameraDiagnostics::InternalServerErrorResult("No analyticsDescriptorListManager");
+    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(
+        m_sdkEngine,
+        /*device*/ QnVirtualCameraResourcePtr(),
+        /*engine*/ toSharedPointer(this),
+        plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>(),
+        makeLogger());
+
+    if (!manifest)
+        return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
@@ -167,24 +166,14 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     const auto pluginManifest = parentPlugin->manifest();
 
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::GroupDescriptor>(
-            pluginManifest.id, manifest->groups));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::EventTypeDescriptor>(
-            pluginManifest.id, manifest->eventTypes));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::ObjectTypeDescriptor>(
-            pluginManifest.id, manifest->objectTypes));
-
-    analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::ActionTypeDescriptor>(
-            pluginManifest.id, manifest->objectActions));
+    nx::analytics::DescriptorManager descriptorManager(commonModule());
+    descriptorManager.updateFromEngineManifest(pluginManifest.id, getId(), getName(), *manifest);
 
     setManifest(*manifest);
     saveProperties();
+
+    emit engineInitialized(toSharedPointer(this));
+
     return CameraDiagnostics::NoErrorResult();
 }
 

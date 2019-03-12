@@ -365,7 +365,7 @@ void LayoutBackgroundSettingsWidget::selectFile()
             this,
             tr("Select file..."),
             qnSettings->backgroundsFolder(),
-            QnCustomFileDialog::createFilter(QnCustomFileDialog::kPicturesFilter)));
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter())));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     if (!dialog->exec())

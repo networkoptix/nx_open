@@ -3,6 +3,7 @@
 #include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 
+#include "../common_socket_impl.h"
 #include "../socket_global.h"
 
 namespace nx {
@@ -18,7 +19,7 @@ BasicPollable::BasicPollable(
     aio::AIOService* aioService,
     aio::AbstractAioThread* aioThread)
     :
-    m_pollable(-1, std::make_unique<CommonSocketImpl>()),
+    m_pollable(-1),
     m_aioService(aioService)
 {
     if (!aioThread)
@@ -59,10 +60,12 @@ void BasicPollable::pleaseStopSync()
     {
         m_aioService->cancelPostedCalls(&m_pollable);
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_interruptionFlag);
         stopWhileInAioThread();
-        if (!watcher.objectDestroyed())
-            m_aioService->cancelPostedCalls(&m_pollable);
+        if (watcher.interrupted())
+            return;
+
+        m_aioService->cancelPostedCalls(&m_pollable);
     }
     else
     {
@@ -78,6 +81,9 @@ aio::AbstractAioThread* BasicPollable::getAioThread() const
 
 void BasicPollable::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    if (m_pollable.impl()->aioThread.load() != aioThread)
+        m_interruptionFlag.interrupt();
+
     m_aioService->bindSocketToAioThread(&m_pollable, aioThread);
 }
 

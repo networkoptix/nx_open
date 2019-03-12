@@ -14,7 +14,7 @@ class QnTransactionTcpProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnTransactionTcpProcessor(
-		ServerTransactionMessageBus* messageBus,
+        ServerTransactionMessageBus* messageBus,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
     virtual ~QnTransactionTcpProcessor();

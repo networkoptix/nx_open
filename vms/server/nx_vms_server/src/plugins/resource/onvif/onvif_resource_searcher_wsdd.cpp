@@ -479,7 +479,7 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
     {
         QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
         QString manufacturer = getManufacturer(source, name);
-        auto dataPool = m_onvifFetcher->serverModule()->commonModule()->dataPool();
+        auto dataPool = m_onvifFetcher->serverModule()->commonModule()->resourceDataPool();
         const QnResourceData resourceData = dataPool->data(manufacturer, name);
         ObtainMacFromMulticast obtainMacFromMulticast = ObtainMacFromMulticast::Auto;
         resourceData.value(OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME, &obtainMacFromMulticast);

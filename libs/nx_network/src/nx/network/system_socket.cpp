@@ -23,6 +23,7 @@
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "common_socket_impl.h"
 #include "address_resolver.h"
 
 #ifdef _WIN32
@@ -610,9 +611,10 @@ template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
-
+    // Calling m_aioHelper->bindToAioThread first so that it is able to detect aio thread change.
     m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 template<typename SocketInterfaceToImplement>
@@ -1022,6 +1024,7 @@ TCPSocket::TCPSocket(int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::TCPSocket(int newConnSD, int ipVersion):
@@ -1033,10 +1036,18 @@ TCPSocket::TCPSocket(int newConnSD, int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::~TCPSocket()
 {
+    --SocketGlobals::instance().debugCounters().tcpSocketCount;
+}
+
+bool TCPSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::tcp;
+    return true;
 }
 
 bool TCPSocket::reopen()
@@ -1291,12 +1302,12 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
  * @return fd (>=0) on success, <0 on error (-2 if timed out)
  */
 static int acceptWithTimeout(
-    int m_fd,
+    int fd,
     int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
     bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
-        return ::accept(m_fd, NULL, NULL);
+        return ::accept(fd, NULL, NULL);
 
     int result = 0;
     if (timeoutMillis == 0)
@@ -1305,7 +1316,7 @@ static int acceptWithTimeout(
 #ifdef _WIN32
     struct pollfd fds[1];
     memset(fds, 0, sizeof(fds));
-    fds[0].fd = m_fd;
+    fds[0].fd = fd;
     fds[0].events |= POLLIN;
     result = poll(fds, sizeof(fds) / sizeof(*fds), timeoutMillis);
     if (result < 0)
@@ -1319,16 +1330,16 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         int errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
             return -1;
         ::SetLastError(errorCode);
         return -1;
     }
-    return ::accept(m_fd, NULL, NULL);
+    return ::accept(fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset(&sockPollfd, 0, sizeof(sockPollfd));
-    sockPollfd.fd = m_fd;
+    sockPollfd.fd = fd;
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
@@ -1342,10 +1353,8 @@ static int acceptWithTimeout(
         return -1;
     }
     if (sockPollfd.revents & POLLIN)
-    {
-        auto fd = ::accept(m_fd, NULL, NULL);
-        return fd;
-    }
+        return ::accept(fd, NULL, NULL);
+
     if ((sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
@@ -1359,7 +1368,7 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         socklen_t errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
             return -1;
         errno = errorCode;
         return -1;
@@ -1436,6 +1445,16 @@ TCPServerSocket::~TCPServerSocket()
         "deleting socket if you delete socket from non-aio thread");
 }
 
+void TCPServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    // Calling asyncServerSocketHelper.bindToAioThread first so that it is able to detect
+    // aio thread change.
+    static_cast<TCPServerSocketPrivate*>(impl())->
+        asyncServerSocketHelper.bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
+}
+
 int TCPServerSocket::accept(int sockDesc)
 {
     return acceptWithTimeout(sockDesc);
@@ -1464,6 +1483,12 @@ void TCPServerSocket::cancelIoInAioThread()
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
     return d->asyncServerSocketHelper.cancelIOSync();
+}
+
+bool TCPServerSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::tcp;
+    return true;
 }
 
 bool TCPServerSocket::listen(int queueLen)
@@ -1571,6 +1596,12 @@ UDPSocket::UDPSocket(int ipVersion):
 
 UDPSocket::~UDPSocket()
 {
+}
+
+bool UDPSocket::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::udp;
+    return true;
 }
 
 SocketAddress UDPSocket::getForeignAddress() const

@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/utils/url.h>
 
@@ -18,18 +18,16 @@ namespace nx::vms_server_plugins::analytics::dahua {
 
 class DeviceAgent:
     public QObject,
-    public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(Engine* engine,
-        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest);
 
     virtual ~DeviceAgent();
 
     virtual Engine* engine() const override { return m_engine; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
@@ -44,7 +42,7 @@ public:
     virtual nx::sdk::IStringMap* pluginSideSettings() const override;
 
 private:
-    void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
+    void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
@@ -65,7 +63,7 @@ private:
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;
-    int m_channel = 0;
+    int m_channelNumber = 0;
 
     std::unique_ptr<MetadataMonitor> m_monitor;
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;

@@ -1,5 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
-
 /**@file
  * NOTE: Intended to be compiled twice - both with and without -DNX_INI_CONFIG_DISABLED. This is
  * needed to test ini_config in both Enabled and Disabled modes. To avoid symbol clashing, one or

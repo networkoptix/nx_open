@@ -10,11 +10,12 @@ Item
     property point endPoint
     property bool drawing: false
 
-    property alias animationDuration: singleSelectionMarker.animationDuration
     property color roiColor
     property color shadowColor
     property int lineWidth: 1
     property bool singlePoint: true
+
+    readonly property alias expandingFinished: singleSelectionMarker.expandingFinished
 
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y

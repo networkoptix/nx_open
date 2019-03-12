@@ -14,7 +14,11 @@ void OutgoingCommandDispatcher::dispatchTransaction(
     std::shared_ptr<const SerializableAbstractCommand> transactionSerializer)
 {
     if (!m_filter.satisfies(transactionSerializer->header()))
+    {
+        NX_VERBOSE(this, "Ignoring command %1",
+            engine::toString(transactionSerializer->header()));
         return;
+    }
 
     m_onNewTransactionSubscription.notify(
         systemId,

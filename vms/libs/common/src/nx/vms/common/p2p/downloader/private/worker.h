@@ -26,7 +26,7 @@ namespace downloader {
 class Storage;
 class AbstractPeerManager;
 
-class Worker: public QnLongRunnable, public ::std::enable_shared_from_this<Worker>
+class Worker: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -52,9 +52,8 @@ public:
     Worker(
         const QString& fileName,
         Storage* storage,
-        AbstractPeerManager* peerManager,
-        QObject* parent = nullptr);
-    virtual ~Worker();
+        AbstractPeerManager* peerManager);
+    virtual ~Worker() override;
 
     State state() const;
 
@@ -95,8 +94,7 @@ private:
     void cancelRequestsByType(State type);
     bool hasPendingRequestsByType(State type) const;
 
-    void finish();
-    void fail();
+    void finish(State state = State::finished);
 
     void updateLogTag();
 
@@ -110,13 +108,17 @@ private:
     void pleaseStopUnsafe();
     bool haveChunksToDownloadUnsafe();
     virtual qint64 delayMs() const;
+    bool hasNotDownloadingChunks() const;
 
 protected:
     FileInformation fileInformation() const;
 
     QList<QnUuid> peersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
-        int count = -1, QList<QnUuid> peers = QList<QnUuid>()) const;
+        int count = -1,
+        QList<QnUuid> peers = QList<QnUuid>(),
+        bool skipPeersWithMinimalRank = true) const;
+    void revivePeersWithMinimalRank();
     int selectNextChunk() const;
 
     bool isInternetAvailable(const QList<QnUuid>& peers = QList<QnUuid>()) const;
@@ -138,7 +140,6 @@ private:
     {
         QnUuid peerId;
         State type = State::failed;
-        bool cancelled = false;
 
         RequestContext(const QnUuid& peerId, State type):
             peerId(peerId),

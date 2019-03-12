@@ -65,6 +65,7 @@ private:
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
+        const vms::api::PeerData& localPeerData,
         nx::network::http::Response* const response);
 
     void startOutgoingChannel(

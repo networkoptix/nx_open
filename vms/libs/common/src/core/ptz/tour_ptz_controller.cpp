@@ -16,7 +16,7 @@ using namespace nx::core;
 
 bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(0, "Not implemented");
     return false;
 }
 

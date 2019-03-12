@@ -22,7 +22,7 @@ namespace pb {
 /** Per-server database. Stores event log, audit data and bookmarks. */
 class QnServerDb:
     public QObject,
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public QnDbHelper
 {
     Q_OBJECT

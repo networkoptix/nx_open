@@ -13,8 +13,8 @@ namespace ite
     class DefaultRefCounter : public T
     {
     public:
-        virtual unsigned int addRef() override { return m_refManager.addRef(); }
-        virtual unsigned int releaseRef() override
+        virtual int addRef() const override { return m_refManager.addRef(); }
+        virtual int releaseRef() const override
         {
             int refCount = m_refManager.releaseRef();
             return refCount;

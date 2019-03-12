@@ -34,6 +34,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return true; }
     static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
 };
 
 class QnCameraOutputPolicy
@@ -45,6 +46,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
 };
 
 class QnExecPtzPresetPolicy
@@ -56,6 +58,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return false; }
+    static bool showRecordingIndicator() { return false; }
 };
 
 class QnCameraMotionPolicy
@@ -67,6 +70,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return true; }
     static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return true; }
 };
 
 class QnCameraAudioTransmitPolicy
@@ -78,6 +82,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
 };
 
 class QnCameraRecordingPolicy
@@ -89,6 +94,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return true; }
 };
 
 class QnCameraAnalyticsPolicy
@@ -100,6 +106,7 @@ public:
     static QString getText(const QnResourceList& resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
 };
 
 using QnBookmarkActionPolicy = QnCameraRecordingPolicy;
@@ -113,6 +120,7 @@ public:
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return false; }
+    static bool showRecordingIndicator() { return false; }
 };
 
 template<typename CheckingPolicy>

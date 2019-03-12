@@ -17,6 +17,9 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
+
+static constexpr int kGroupBoxExtraMargin = 2;
+
 // Draws a rhombus shape to highlight current widget geometry.
 // TODO: #dkargin I want to keep it here for some time, until
 // I find a better place for it.
@@ -59,6 +62,12 @@ HintButton::HintButton(QWidget* parent):
             if (hasHelpTopic())
                 QnHelpHandler::openHelpTopic(getHelpTopicId());
         });
+}
+
+HintButton::HintButton(const QString& hint, QWidget* parent):
+    HintButton(parent)
+{
+    setHint(hint);
 }
 
 HintButton* HintButton::hintThat(QGroupBox* groupBox)
@@ -105,7 +114,7 @@ void HintButton::updateGeometry(QGroupBox* parent)
 
     // We manually add some spaces to the caption of group box, to push away its border
     // and provide some space to hint button.
-    int margin = style::Metrics::kHintButtonMargin;
+    int margin = style::Metrics::kHintButtonMargin + kGroupBoxExtraMargin;
     int offset = parent->isFlat() ? margin : margin - pixmapSize.width();
     rect.moveLeft(captionRect.right() + offset);
     setGeometry(rect);

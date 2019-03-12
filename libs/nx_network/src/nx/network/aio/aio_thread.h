@@ -76,15 +76,18 @@ public:
      *   multiple threads can cause undefined behavour.
      */
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
+
     /**
      * If called in this aio thread, then calls functor immediately,
      *   otherwise queues functor in same way as aio::AioThread::post does.
      */
     void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
+
     /**
      * Returns number of sockets handled by this object.
      */
     size_t socketsHandled() const;
+
     bool isSocketBeingMonitored(Pollable* sock) const;
 
     const detail::AioTaskQueue& taskQueue() const;

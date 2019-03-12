@@ -17,7 +17,6 @@ TEST(NxAssertHeavyCondition, All3)
 
     EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false), "");
     EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false, "oops"), "");
-    EXPECT_DEATH(NX_ASSERT_HEAVY_CONDITION(false, "here", "oops"), "");
 }
 
 TEST(NxAssert, All3)
@@ -27,7 +26,6 @@ TEST(NxAssert, All3)
 
     EXPECT_DEATH(NX_ASSERT(false), "");
     EXPECT_DEATH(NX_ASSERT(false, "oops"), "");
-    EXPECT_DEATH(NX_ASSERT(false, "here", "oops"), "");
 
     EXPECT_DEATH((enableQtMessageAsserts(), qFatal("Fatal")), "");
     EXPECT_DEATH((enableQtMessageAsserts(), qCritical("Critical")), "");
@@ -38,7 +36,6 @@ TEST(NxCritical, All3)
 {
     EXPECT_DEATH(NX_CRITICAL(false), "");
     EXPECT_DEATH(NX_CRITICAL(false, "oops"), "");
-    EXPECT_DEATH(NX_CRITICAL(false, "here", "oops"), "");
 }
 
 #endif // Q_OS_WIN32

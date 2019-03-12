@@ -22,6 +22,7 @@ Page
     [
         IconButton
         {
+            padding: 0
             icon.source: lp("/images/search.png")
             enabled: d.enabled
             opacity: !connectionManager.restoringConnection ? 1.0 : 0.2

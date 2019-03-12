@@ -8,7 +8,7 @@ StreamServerSocketToAcceptorWrapper::StreamServerSocketToAcceptorWrapper(
     :
     m_serverSocket(std::move(serverSocket))
 {
-    m_serverSocket->bindToAioThread(getAioThread());
+    bindToAioThread(m_serverSocket->getAioThread());
 }
 
 void StreamServerSocketToAcceptorWrapper::bindToAioThread(

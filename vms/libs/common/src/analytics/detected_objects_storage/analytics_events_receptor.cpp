@@ -38,7 +38,8 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
     bool isParsedSuccessfully = false;
     *detectionMetadataPacket =
         QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(
-            QByteArray::fromRawData(metadataPacket->data(), metadataPacket->dataSize()),
+            QByteArray::fromRawData(metadataPacket->data(),
+            (int) metadataPacket->dataSize()),
             nx::common::metadata::DetectionMetadataPacket(),
             &isParsedSuccessfully);
     if (!isParsedSuccessfully)

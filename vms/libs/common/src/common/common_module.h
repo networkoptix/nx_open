@@ -40,7 +40,6 @@ class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
-namespace nx { namespace analytics { class DescriptorListManager;  }}
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
@@ -67,7 +66,6 @@ struct BeforeRestoreDbData
     QByteArray storageInfo;
 };
 
-
 class QnResourceDataPool;
 
 /**
@@ -75,7 +73,7 @@ class QnResourceDataPool;
  *
  * All singletons and initialization/deinitialization code goes here.
  */
-class QnCommonModule: public QObject, public QnInstanceStorage
+class QnCommonModule: public QObject, public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT
 public:
@@ -93,7 +91,6 @@ public:
     {
         return m_storagePluginFactory;
     }
-
 
     QnSessionManager* sessionManager() const
     {
@@ -140,12 +137,12 @@ public:
         return m_resourceAccessProvider;
     }
 
-    QnResourcePropertyDictionary* propertyDictionary() const
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const
     {
         return m_resourcePropertyDictionary;
     }
 
-    QnResourceStatusDictionary* statusDictionary() const
+    QnResourceStatusDictionary* resourceStatusDictionary() const
     {
         return m_resourceStatusDictionary;
     }
@@ -277,6 +274,10 @@ public:
     void setStandAloneMode(bool value);
     bool isStandAloneMode() const;
 
+    nx::utils::SoftwareVersion engineVersion() const;
+    void setEngineVersion(const nx::utils::SoftwareVersion& version);
+
+
     nx::metrics::Storage* metrics() const;
 
     void setAuditManager(QnAuditManager* auditManager);
@@ -286,9 +287,8 @@ public:
 
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
 
-    QnResourceDataPool* dataPool() const;
+    QnResourceDataPool* resourceDataPool() const;
 
-    nx::analytics::DescriptorListManager* analyticsDescriptorListManager() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -319,7 +319,6 @@ private:
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
-    nx::vms::api::SoftwareVersion m_engineVersion;
     nx::vms::api::ModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled = false;
@@ -350,10 +349,10 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
-    QnResourceDataPool* m_dataPool = nullptr;
-    nx::analytics::DescriptorListManager* m_analyticsDescriptorListManager = nullptr;
+    QnResourceDataPool* m_resourceDataPool = nullptr;
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};
+    nx::utils::SoftwareVersion m_engineVersion;
 };

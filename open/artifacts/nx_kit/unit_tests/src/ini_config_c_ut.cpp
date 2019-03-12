@@ -23,11 +23,11 @@ static void assertIniEquals(int line, const Ini& expected, const Ini& actual)
     #undef ASSERT_INI_PARAM_STREQ
 }
 
-static void generateIniFile(const Ini& ini)
+static void generateIniFile(const Ini& iniInstance)
 {
     std::ostringstream content;
 
-    #define GENERATE_INI_PARAM(PARAM) content << #PARAM << "=" << ini.PARAM << std::endl
+    #define GENERATE_INI_PARAM(PARAM) content << #PARAM << "=" << iniInstance.PARAM << std::endl
 
     GENERATE_INI_PARAM(testFlag);
     GENERATE_INI_PARAM(testInt);

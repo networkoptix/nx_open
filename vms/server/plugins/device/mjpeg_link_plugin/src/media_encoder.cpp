@@ -54,12 +54,12 @@ void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int MediaEncoder::addRef()
+int MediaEncoder::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int MediaEncoder::releaseRef()
+int MediaEncoder::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

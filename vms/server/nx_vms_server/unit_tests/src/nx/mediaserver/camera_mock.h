@@ -55,8 +55,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual std::vector<AdvancedParametersProvider*> advancedParametersProviders() override;
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(
-        Qn::StreamIndex streamIndex) override;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDriver(
+        StreamIndex streamIndex) override;
     virtual nx::media::CameraTraits mediaTraits() const override;
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 

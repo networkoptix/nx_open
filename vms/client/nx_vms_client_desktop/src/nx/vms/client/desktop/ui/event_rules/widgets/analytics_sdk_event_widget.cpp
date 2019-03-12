@@ -97,7 +97,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::DriverIdRole).value<QString>(),
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
         ui->sdkEventTypeComboBox->currentData(
             AnalyticsSdkEventModel::EventTypeIdRole).value<QString>()));
 }
@@ -113,42 +113,57 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
-    QString pluginId = model()->eventParams().getAnalyticsPluginId();
+    QnUuid engineId = model()->eventParams().getAnalyticsEngineId();
     QString eventTypeId = model()->eventParams().getAnalyticsEventTypeId();
-
-    if (pluginId.isNull() || eventTypeId.isNull())
-    {
-        pluginId = ui->sdkEventTypeComboBox->itemData(0,
-            AnalyticsSdkEventModel::DriverIdRole).value<QString>();
-
-        eventTypeId = ui->sdkEventTypeComboBox->itemData(0,
-            AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();
-
-        model()->setEventParams(createEventParameters(pluginId, eventTypeId));
-    }
 
     auto analyticsModel = ui->sdkEventTypeComboBox->model();
 
-    auto items = analyticsModel->match(
-        analyticsModel->index(0, 0),
-        AnalyticsSdkEventModel::EventTypeIdRole,
-        /*value*/ qVariantFromValue(eventTypeId),
-        /*hits*/ 1,
-        Qt::MatchExactly | Qt::MatchRecursive);
+    if (engineId.isNull() || eventTypeId.isNull())
+    {
+        const auto selectableItems = analyticsModel->match(
+            analyticsModel->index(0, 0),
+            AnalyticsSdkEventModel::ValidEventRole,
+            /*value*/ qVariantFromValue(true),
+            /*hits*/ 10,
+            Qt::MatchExactly | Qt::MatchRecursive);
 
-    if (items.size() == 1)
-        ui->sdkEventTypeComboBox->setCurrentIndex(items.front());
+        if (selectableItems.size())
+        {
+            // Use the first selectable item
+            ui->sdkEventTypeComboBox->setCurrentIndex(selectableItems.front());
+
+            engineId = ui->sdkEventTypeComboBox->currentData(
+                AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+
+            eventTypeId = ui->sdkEventTypeComboBox->currentData(
+                AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();
+
+            model()->setEventParams(createEventParameters(engineId, eventTypeId));
+        }
+    }
+    else
+    {
+        auto items = analyticsModel->match(
+            analyticsModel->index(0, 0),
+            AnalyticsSdkEventModel::EventTypeIdRole,
+            /*value*/ qVariantFromValue(eventTypeId),
+            /*hits*/ 1,
+            Qt::MatchExactly | Qt::MatchRecursive);
+
+        if (items.size() == 1)
+            ui->sdkEventTypeComboBox->setCurrentIndex(items.front());
+    }
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(
-    const QString& pluginId,
+    const QnUuid& engineId,
     const QString& analyticsEventTypeId)
 {
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
     eventParams.setAnalyticsEventTypeId(analyticsEventTypeId);
-    eventParams.setAnalyticsPluginId(pluginId);
+    eventParams.setAnalyticsEngineId(engineId);
 
     return eventParams;
 }

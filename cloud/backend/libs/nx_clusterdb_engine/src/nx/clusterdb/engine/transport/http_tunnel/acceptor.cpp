@@ -92,7 +92,7 @@ void HttpTunnelTransportAcceptor::saveCreatedTunnel(
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
             .args(requestContext.attributes.remotePeer.id,
                 requestContext.systemId, remotePeerEndpoint,

@@ -68,7 +68,7 @@ bool requiresUserResource(ActionType actionType)
             return true;
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, "All action types must be handled.");
             return false;
     }
 }
@@ -102,7 +102,7 @@ bool requiresAdditionalUserResource(ActionType actionType)
             return true;
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, "All action types must be handled.");
             return false;
     }
 }
@@ -135,7 +135,7 @@ bool hasToggleState(ActionType actionType)
             return true;
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, "All action types must be handled.");
             break;
     }
     return false;
@@ -272,7 +272,7 @@ const QVector<QnUuid>& AbstractAction::getResources() const
 
 QVector<QnUuid> AbstractAction::getSourceResources(QnResourcePool* resourcePool) const
 {
-    NX_ASSERT(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
+    NX_ASSERT(m_params.useSource, "Method should be called only when corresponding parameter is set.");
     QVector<QnUuid> result;
     result << m_runtimeParams.eventResourceId;
     for (const auto& flexibleId: m_runtimeParams.metadata.cameraRefs)

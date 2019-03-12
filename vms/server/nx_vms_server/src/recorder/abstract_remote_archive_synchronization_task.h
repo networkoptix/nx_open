@@ -13,7 +13,7 @@ namespace vms::server {
 namespace recorder {
 
 class AbstractRemoteArchiveSynchronizationTask:
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     AbstractRemoteArchiveSynchronizationTask(QnMediaServerModule* serverModule):

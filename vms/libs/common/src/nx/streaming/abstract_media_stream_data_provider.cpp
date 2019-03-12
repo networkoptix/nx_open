@@ -105,7 +105,7 @@ const QnMediaStreamStatistics* QnAbstractMediaStreamDataProvider::getStatistics(
 
 int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
 {
-    NX_ASSERT(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    NX_ASSERT(m_numberOfchannels, "No channels?");
     return m_numberOfchannels ? m_numberOfchannels : 1;
 }
 

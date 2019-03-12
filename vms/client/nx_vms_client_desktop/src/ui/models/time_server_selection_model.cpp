@@ -66,7 +66,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     m_sameTimezoneValid(false),
     m_currentRequest(rest::Handle())
 {
-    auto processor = qnCommonMessageProcessor;
+    auto processor = commonModule()->messageProcessor();
 
     updateTimeOffset();
 

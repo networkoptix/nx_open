@@ -16,7 +16,7 @@ class Controller;
 class Model;
 class View;
 class Settings;
-class SyncronizationEngine;
+class SynchronizationEngine;
 
 class NX_DATA_SYNC_ENGINE_API Service:
     public nx::utils::Service
@@ -31,11 +31,13 @@ public:
 
     std::vector<network::SocketAddress> httpEndpoints() const;
 
-    void connectToNode(
-        const std::string& systemId,
-        const nx::utils::Url& url);
+    nx::utils::Url synchronizationUrl() const;
 
-    SyncronizationEngine& syncronizationEngine();
+    std::string clusterId() const;
+
+    void connectToNode(const nx::utils::Url& url);
+
+    SynchronizationEngine& synchronizationEngine();
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
@@ -45,7 +47,7 @@ protected:
      * Override this method to initialize custom logic.
      * E.g., register commands to synchronize and event handles.
      */
-    virtual void setup() {}
+    virtual void setup(const utils::AbstractServiceSettings& /*settings*/) {}
     virtual void teardown() {}
 
     nx::sql::AsyncSqlQueryExecutor& sqlQueryExecutor();

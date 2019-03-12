@@ -49,8 +49,6 @@ set(ios.group_identifier "group.com.senturian.SentryMobile")
 set(ios.sign.identity "iPhone Distribution: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
 
 set(mac.sign.identity "Developer ID Application: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
 set(mac.bundle.identifier "com.senturian.Sentry2")
 set(mac.protocol_handler_bundle.identifier "com.senturian.Sentry2.protocol_handler")
 

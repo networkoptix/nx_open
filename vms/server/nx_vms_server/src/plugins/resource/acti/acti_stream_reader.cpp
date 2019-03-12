@@ -41,7 +41,8 @@ int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
         {
             QnLiveStreamParams p(params);
             p.quality = (Qn::StreamQuality) i;
-            int bitrate = m_actiRes->suggestBitrateForQualityKbps((Qn::StreamQuality) i, params.resolution, params.fps, getRole());
+            int bitrate = m_actiRes->suggestBitrateForQualityKbps((Qn::StreamQuality) i,
+                params.resolution, params.fps, params.codec, getRole());
             if (abs(bitrate - srcBitrate) < bitrateDelta)
             {
                 quality = p.quality;
@@ -150,7 +151,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
         .arg(getRole()));
 
     m_multiCodec.setRequest(streamUrl);
-	m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
+    m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
     m_multiCodec.setRtpTransport(desiredTransport);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     return result;
@@ -165,7 +166,6 @@ bool QnActiStreamReader::isStreamOpened() const
 {
     return m_multiCodec.isStreamOpened();
 }
-
 
 void QnActiStreamReader::pleaseStop()
 {

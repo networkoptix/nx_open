@@ -41,6 +41,7 @@ class MediaServerClient:
 
 public:
     MediaServerClient(const nx::utils::Url &baseRequestUrl);
+    ~MediaServerClient();
 
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;

@@ -37,7 +37,7 @@ struct RequestParams
  */
 class HttpLiveStreamingProcessor:
     public QnTCPConnectionProcessor,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -55,7 +55,7 @@ public:
 
     /** Processes request, generates and sends response asynchronously. */
     void processRequest(const nx::network::http::Request& request);
-    
+
     void prepareResponse(
         const nx::network::http::Request& request,
         nx::network::http::Response* const response);

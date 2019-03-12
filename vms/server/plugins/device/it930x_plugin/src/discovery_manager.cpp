@@ -142,7 +142,6 @@ private:
 const std::string ConfigParser::kMinStrengthKey = "minStrength";
 const std::string ConfigParser::kMaxFramesPerSecKey = "maxFramesPerSecond";
 
-
 int ConfigParser::parseCount() const
 {
     return m_parsedCount;
@@ -267,7 +266,6 @@ static void parseConfigFile()
 //-------------------------------------------------------------------------------------------------
 
 } // namespace aux
-
 
 // DiscoveryManager --------------------------------------------------------------------------------
 
@@ -401,7 +399,8 @@ void DiscoveryManager::findAndSwapCamerasRx(CameraPtr cam1, CameraPtr cam2)
 }
 
 void DiscoveryManager::makeHint(const nxcip::CameraInfo &info)
-{	// We can find camera by (rxId, txId, channel) unique key.
+{
+    // We can find camera by (rxId, txId, channel) unique key.
     // This information is stored in CameraInfo::auxillary data string.
     // Format is 'rxId,txId,chan'.
     std::stringstream ss(info.auxiliaryData);
@@ -431,7 +430,8 @@ void DiscoveryManager::makeHint(const nxcip::CameraInfo &info)
     int freq = extractInt();
 
     if (rxId == -1 || txId == -1 || freq == -1)
-    {	// Bailing out if any of the key data is absent
+    {
+        // Bailing out if any of the key data is absent
         debug_printf(
             "[DiscoveryManager::findCameraByInfo] failed to extract auxillary camera data, original string is %s\n",
             info.auxiliaryData
@@ -474,14 +474,16 @@ nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::C
     RxDevicePtr foundRxDev;
 
     if (rxIt == m_rxDevices.end())
-    { 	// No camera found in already present cameras. But we have one option left.
+    {
+        // No camera found in already present cameras. But we have one option left.
         // Let's make a hint for rx watchdogs with caminfo. Maybe we've already
         // dicovered this camera earlier (on the previous mediaserver run).
         makeHint(info);
-//            ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] no camera found\n");
+        //ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] no camera found\n");
         if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
-        {	// Notify camera that its rx device is no longer operational
-//                ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
+        {
+            // Notify camera that its rx device is no longer operational
+            //ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
             std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
             (*cameraIt)->rxDeviceRef().reset();
         }
@@ -494,17 +496,20 @@ nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::C
 
     // Now we know if rx is operational. Let's deal with related cameraManager.
     if (cameraIt != m_cameras.end())
-    {	// related camera found
+    {
+        // related camera found
         if ((*cameraIt)->rxDeviceRef())
-        {	// camera has ref to some rx device
+        {
+            // camera has ref to some rx device
             if ((*cameraIt)->rxDeviceRef() == foundRxDev)
-            {	// Good! Camera's rx and found from the pool match
-//                    ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice already correct. Camera found!\n");
+            {
+                // Good! Camera's rx and found from the pool match
+                //ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice already correct. Camera found!\n");
             }
             else
             {	// Camera has reference to some other rx device. This may be the case if cameras have been
                 // physically replugged. Not critical though, we can just replace rxs.
-//                    ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice is not correct, replacing. Camera found!\n");
+                //ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice is not correct, replacing. Camera found!\n");
                 std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
                 (*cameraIt)->rxDeviceRef().reset();
                 (*cameraIt)->rxDeviceRef() = foundRxDev;
@@ -514,8 +519,9 @@ nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::C
             cam->addRef();
         }
         else
-        {	// This can be if camera's been unplugged and then replugged to the same port
-//                ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] No rxDevice for camera. Setting one and returning. Camera found!\n");
+        {
+            // This can be if camera's been unplugged and then replugged to the same port
+            //ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] No rxDevice for camera. Setting one and returning. Camera found!\n");
             std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
             (*cameraIt)->rxDeviceRef() = foundRxDev;
             (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt));
@@ -525,8 +531,9 @@ nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::C
         }
     }
     else
-    {	// This should occur once after launch. Creating brand new CameraManager.
-//            ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] creating new camera with rx device %d. Camera found!\n", (foundRxDev)->rxID());
+    {
+        // This should occur once after launch. Creating brand new CameraManager.
+        //ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] creating new camera with rx device %d. Camera found!\n", (foundRxDev)->rxID());
         CameraPtr newCam(new CameraManager(foundRxDev));
         m_cameras.push_back(newCam);
         cam = newCam;

@@ -452,6 +452,9 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
+    NX_VERBOSE(this, "Got connection from remote peer [%1]",
+        qnStaticCommon->moduleDisplayName(remotePeer.id));
+
     P2pConnectionPtr connection(new Connection(
         commonModule(),
         remotePeer,
@@ -501,7 +504,7 @@ void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connectio
         if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
             connection->remotePeer(), &tran.params))
         {
-            connection->setState(Connection::State::Error);
+            emit removeConnectionAsync(connection);
             return;
         }
         sendTransactionImpl(connection, tran, TransportHeader());
@@ -688,7 +691,7 @@ bool ServerMessageBus::selectAndSendTransactions(
                 SendTransactionToTransportFastFuction(),
                 this, _1, _2, connection)))
         {
-            connection->setState(Connection::State::Error);
+            emit removeConnectionAsync(connection);
         }
     }
     return true;
@@ -743,7 +746,7 @@ void ServerMessageBus::gotTransaction(
         sendTransaction(tran, transportHeader);
         break;
     default:
-        connection->setState(Connection::State::Error);
+        emit removeConnectionAsync(connection);
         resotreAfterDbError();
         break;
     }
@@ -804,7 +807,7 @@ void ServerMessageBus::gotTransaction(
                 .arg(ApiCommand::toString(tran.command))
                 .arg(ec2::toString(errorCode)));
             dbTran.reset(); //< rollback db data
-            connection->setState(Connection::State::Error);
+            emit removeConnectionAsync(connection);
             resotreAfterDbError();
             return;
         }

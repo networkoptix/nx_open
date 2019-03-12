@@ -80,7 +80,7 @@ namespace
             bool success = false;
             if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
-                NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
+                NX_ASSERT(success, "We should receive correct answer here");
             }
 
             ctx->executeGuarded([ctx, success, remoteData, &outputData]()
@@ -130,7 +130,7 @@ namespace
             bool success = false;
             if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
-                NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
+                NX_ASSERT(success, "We should receive correct answer here");
             }
 
             ctx->executeGuarded([ctx, success, remoteData, &outputData]()

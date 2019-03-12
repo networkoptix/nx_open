@@ -9,7 +9,7 @@
 
 namespace ec2 { class AbstractTransactionMessageBus; } // namespace ec2
 
-class CloudIntegrationManager: public QObject, public nx::vms::server::ServerModuleAware
+class CloudIntegrationManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

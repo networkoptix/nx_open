@@ -1,31 +1,32 @@
 #pragma once
 
 #include <map>
-#include <nx/utils/literal.h>
+#include <string>
 
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace tegra_video {
 
-static const std::map<QString, std::vector<QString>> kCarAttributeOptions = {
-    {lit("Object Type"), {lit("Car")}},
-    {lit("Vendor"), {
-        lit("Nissan"),
-        lit("Toyota"),
-        lit("Mercedes"),
-        lit("Audi"),
-        lit("Citroen"),
-        lit("VAZ"),
-        lit("Fiat"),
-        lit("Dodge"),
-        lit("BMW"),
-        lit("Great Wall")}}
+static const std::map<std::string, std::vector<std::string>> kCarAttributeOptions = {
+    {"Object Type", {"Car"}},
+    {"Vendor", {
+        "Nissan",
+        "Toyota",
+        "Mercedes",
+        "Audi",
+        "Citroen",
+        "VAZ",
+        "Fiat",
+        "Dodge",
+        "BMW",
+        "Great Wall"
+    }}
 };
 
-static const std::map<QString, std::vector<QString>> kHumanAttributeOptions = {
-    {lit("Object Type"), {lit("Human")}},
-    {lit("Age"), {lit("Adult"), lit("Child")}}
+static const std::map<std::string, std::vector<std::string>> kHumanAttributeOptions = {
+    {"Object Type", {"Human"}},
+    {"Age", {"Adult", "Child"}}
 };
 
 } // namespace tegra_video

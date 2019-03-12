@@ -58,12 +58,12 @@ void* AxisMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int AxisMediaEncoder::addRef()
+int AxisMediaEncoder::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int AxisMediaEncoder::releaseRef()
+int AxisMediaEncoder::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

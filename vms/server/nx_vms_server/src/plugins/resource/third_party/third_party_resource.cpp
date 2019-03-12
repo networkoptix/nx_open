@@ -75,8 +75,11 @@ QnThirdPartyResource::QnThirdPartyResource(
 {
     setVendor( discoveryManager.getVendorName() );
 
-    if( m_camManager )
-        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
+    if (m_camManager)
+    {
+        m_cameraManager3 = static_cast<nxcip::BaseCameraManager3*>(
+            m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
+    }
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
@@ -260,7 +263,8 @@ QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
         return NULL;
     }
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     if( !camManager2 )
         return NULL;
 
@@ -289,7 +293,8 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !m_camManager )
         return QnTimePeriodList();
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(
+        m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager2));
     NX_ASSERT( camManager2 );
 
     QnTimePeriodList resultTimePeriods;
@@ -361,7 +366,6 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods(
         sortOrder);
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
 void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_CameraInputEventHandler, sizeof(nxcip::IID_CameraInputEventHandler) ) == 0 )
@@ -377,14 +381,12 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
-unsigned int QnThirdPartyResource::addRef()
+int QnThirdPartyResource::addRef() const
 {
     return m_refCounter.fetchAndAddOrdered(1) + 1;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
-unsigned int QnThirdPartyResource::releaseRef()
+int QnThirdPartyResource::releaseRef() const
 {
     return m_refCounter.fetchAndAddOrdered(-1) - 1;
 }
@@ -402,13 +404,13 @@ void QnThirdPartyResource::inputPortStateChanged(
         qnSyncTime->currentUSecsSinceEpoch() );
 }
 
-const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList(Qn::StreamIndex encoderNumber) const
+const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList(StreamIndex encoderNumber) const
 {
     QnMutexLocker lk( &m_mutex );
     return m_encoderData[(size_t) encoderNumber].resolutionList;
 }
 
-nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex) const
+nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(StreamIndex encoderIndex) const
 {
     QnMutexLocker lk( &m_mutex );
     if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
@@ -416,15 +418,10 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::Stre
     return nxcip::Resolution();
 }
 
-nx::vms::server::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex /*streamIndex*/)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
 {
+    NX_VERBOSE(this, "Initialising camera driver...");
+
     updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
     QAuthenticator auth = getAuth();
 
@@ -432,7 +429,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     {
         QnMutexLocker lk( &m_mutex );
 
-        //restoring camera parameters
+        NX_VERBOSE(this, "Restoring camera parameters...");
         if( strlen(m_camInfo.uid) == 0 )
         {
             memset( m_camInfo.uid, 0, sizeof(m_camInfo.uid) );
@@ -479,23 +476,23 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             return CameraDiagnostics::UnknownErrorResult();
         m_camManager.reset( new nxcip_qt::BaseCameraManager( cameraIntf ) );
 
-        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
+        m_cameraManager3 = static_cast<nxcip::BaseCameraManager3*>(
+            m_camManager->getRef()->queryInterface(nxcip::IID_BaseCameraManager3));
     }
 
-    m_camManager->setCredentials( auth.user(), auth.password() );
+    m_camManager->setCredentials(auth.user(), auth.password());
 
     int result = m_camManager->getCameraInfo( &m_camInfo );
-    if( result != nxcip::NX_NO_ERROR )
+    if (result != nxcip::NX_NO_ERROR)
     {
-        if( false )
-        NX_DEBUG(this, lit("Error getting camera info from third-party camera %1:%2 (url %3). %4").
-            arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()));
-        setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
+        NX_DEBUG(this, "Error getting camera info from third-party camera %1:%2 (url %3). %4",
+            m_discoveryManager.getVendorName(), QString::fromUtf8(m_camInfo.modelName),
+            QString::fromUtf8(m_camInfo.url), m_camManager->getLastErrorString());
+        setStatus(result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline);
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    setFirmware( QString::fromUtf8(m_camInfo.firmware) );
+    setFirmware(QString::fromUtf8(m_camInfo.firmware));
 
     m_encoderCount = 0;
     result = m_camManager->getEncoderCount( &m_encoderCount );
@@ -636,19 +633,19 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     CameraMediaStreams mediaStreams;
     std::vector<nxcip::Resolution> selectedEncoderResolutions(m_encoderCount);
     {
-        auto resolution = getMaxResolution(Qn::StreamIndex::primary);
-        selectedEncoderResolutions[(size_t) Qn::StreamIndex::primary] = resolution;
+        auto resolution = getMaxResolution(StreamIndex::primary);
+        selectedEncoderResolutions[(size_t) StreamIndex::primary] = resolution;
         mediaStreams.streams.push_back(CameraMediaStreamInfo(
-            Qn::StreamIndex::primary,
+            StreamIndex::primary,
             QSize(resolution.width, resolution.height),
             AV_CODEC_ID_H264));
         }
-    if((int) Qn::StreamIndex::secondary < m_encoderCount )
+    if((int) StreamIndex::secondary < m_encoderCount )
     {
         auto resolution = getSecondStreamResolution();
-        selectedEncoderResolutions[(size_t) Qn::StreamIndex::secondary] = resolution;
+        selectedEncoderResolutions[(size_t) StreamIndex::secondary] = resolution;
         mediaStreams.streams.push_back(CameraMediaStreamInfo(
-            Qn::StreamIndex::secondary,
+            StreamIndex::secondary,
             QSize(resolution.width, resolution.height),
             AV_CODEC_ID_H264));
     }
@@ -740,7 +737,7 @@ bool QnThirdPartyResource::initializeIOPorts()
     return true;
 }
 
-nxcip::Resolution QnThirdPartyResource::getMaxResolution(Qn::StreamIndex encoderNumber) const
+nxcip::Resolution QnThirdPartyResource::getMaxResolution(StreamIndex encoderNumber) const
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     QList<nxcip::Resolution>::const_iterator maxResIter = std::max_element(
@@ -752,7 +749,7 @@ nxcip::Resolution QnThirdPartyResource::getMaxResolution(Qn::StreamIndex encoder
     return maxResIter != resolutionList.constEnd() ? *maxResIter : nxcip::Resolution();
 }
 
-nxcip::Resolution QnThirdPartyResource::getNearestResolution(Qn::StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const
+nxcip::Resolution QnThirdPartyResource::getNearestResolution(StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     nxcip::Resolution foundResolution;
@@ -769,10 +766,10 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution(Qn::StreamIndex enc
 
 nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
 {
-    const nxcip::Resolution& primaryStreamResolution = getMaxResolution(Qn::StreamIndex::primary);
+    const nxcip::Resolution& primaryStreamResolution = getMaxResolution(StreamIndex::primary);
     const float currentAspect = nx::vms::server::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
 
-    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList(Qn::StreamIndex::secondary);
+    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList(StreamIndex::secondary);
     if (resolutionList.isEmpty())
     {
         return nxcip::Resolution(

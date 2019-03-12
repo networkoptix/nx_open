@@ -113,7 +113,7 @@ bool CdbLauncher::waitUntilStarted()
     // Retrieving module info.
     for (int i = 0; i < kRetryCount; ++i)
     {
-        auto connection = m_connectionFactory->createConnection();
+        auto connection = createConnection();
         connection->setRequestTimeout(kRequestTimeout);
         api::ResultCode result = api::ResultCode::ok;
         std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
@@ -142,7 +142,7 @@ std::unique_ptr<nx::cloud::db::api::Connection> CdbLauncher::connection(
     const std::string& login,
     const std::string& password)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     if (!login.empty() || !password.empty())
         connection->setCredentials(login, password);
     return connection;
@@ -186,7 +186,7 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->customization.empty())
         accountData->customization = nx::utils::AppInfo::customizationName().toStdString();
 
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
 
     api::AccountRegistrationData registrationData;
     registrationData.email = accountData->email;
@@ -217,7 +217,7 @@ api::ResultCode CdbLauncher::activateAccount(
     std::string* const accountEmail)
 {
     //activating account
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
 
     api::ResultCode result = api::ResultCode::ok;
     nx::cloud::db::api::AccountEmail response;
@@ -235,7 +235,7 @@ api::ResultCode CdbLauncher::reactivateAccount(
     const std::string& email,
     api::AccountConfirmationCode* const activationCode)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
 
     api::ResultCode result = api::ResultCode::ok;
     api::AccountEmail accountEmail;
@@ -254,7 +254,7 @@ api::ResultCode CdbLauncher::getAccount(
     const std::string& password,
     api::AccountData* const accountData)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -301,7 +301,7 @@ api::ResultCode CdbLauncher::updateAccount(
     const std::string& password,
     api::AccountUpdateData updateData)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -320,7 +320,7 @@ api::ResultCode CdbLauncher::resetAccountPassword(
     const std::string& email,
     std::string* const confirmationCode)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, std::string());
 
     api::AccountEmail accountEmail;
@@ -347,7 +347,7 @@ api::ResultCode CdbLauncher::createTemporaryCredentials(
     const api::TemporaryCredentialsParams& params,
     api::TemporaryCredentials* const temporaryCredentials)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resultCode = api::ResultCode::ok;
@@ -375,7 +375,7 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     const std::string& opaque,
     api::SystemData* const systemData)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::SystemRegistrationData sysRegData;
@@ -417,7 +417,7 @@ api::ResultCode CdbLauncher::bindRandomSystem(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     //activating system
@@ -435,7 +435,7 @@ api::ResultCode CdbLauncher::unbindSystem(
     const std::string& password,
     const std::string& systemId)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(login, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -456,7 +456,7 @@ api::ResultCode CdbLauncher::getSystems(
     const std::string& password,
     std::vector<api::SystemDataEx>* const systems)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -478,7 +478,7 @@ api::ResultCode CdbLauncher::getSystemsFiltered(
     const api::Filter& filter,
     std::vector<api::SystemDataEx>* const systems)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -501,7 +501,7 @@ api::ResultCode CdbLauncher::getSystem(
     const std::string& systemId,
     std::vector<api::SystemDataEx>* const systems)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -541,7 +541,7 @@ api::ResultCode CdbLauncher::shareSystem(
     const std::string& password,
     const api::SystemSharing& systemSharing)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -562,7 +562,7 @@ api::ResultCode CdbLauncher::shareSystem(
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::SystemSharing systemSharing;
@@ -589,7 +589,7 @@ api::ResultCode CdbLauncher::updateSystemSharing(
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::SystemSharing systemSharing;
@@ -628,7 +628,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& password,
     std::vector<api::SystemSharingEx>* const sharings)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     typedef void(nx::cloud::db::api::SystemManager::*GetCloudUsersOfSystemType)
@@ -654,7 +654,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
     const std::string& systemId,
     std::set<api::SystemAccessRole>* const accessRoles)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -678,7 +678,7 @@ api::ResultCode CdbLauncher::renameSystem(
     const std::string& systemId,
     const std::string& newSystemName)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(login, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -697,7 +697,7 @@ api::ResultCode CdbLauncher::updateSystem(
     const api::SystemData& system,
     const api::SystemAttributesUpdate& updatedData)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(system.id, system.authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -720,7 +720,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
     typedef void(nx::cloud::db::api::SystemManager::*GetCloudUsersOfSystemType)
         (const std::string&, std::function<void(api::ResultCode, api::SystemSharingExList)>);
 
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -771,7 +771,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
     typedef void(nx::cloud::db::api::AuthProvider::*GetCdbNonceType)
         (std::function<void(api::ResultCode, api::NonceData)>);
 
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -793,7 +793,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
     typedef void(nx::cloud::db::api::AuthProvider::*GetCdbNonceType)
         (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
 
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(accountEmail, accountPassword);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -813,7 +813,7 @@ api::ResultCode CdbLauncher::getAuthenticationResponse(
     const api::AuthRequest& authRequest,
     api::AuthResponse* response)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(login, password);
 
     api::ResultCode resultCode = api::ResultCode::ok;
@@ -831,7 +831,7 @@ api::ResultCode CdbLauncher::ping(
     const std::string& systemId,
     const std::string& authKey)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -896,7 +896,7 @@ api::ResultCode CdbLauncher::getSystemHealthHistory(
     const std::string& systemId,
     api::SystemHealthHistory* history)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(accountEmail, accountPassword);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -914,7 +914,7 @@ api::ResultCode CdbLauncher::recordUserSessionStart(
     const AccountWithPassword& account,
     const std::string& systemId)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(account.email, account.password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -931,7 +931,7 @@ api::ResultCode CdbLauncher::recordUserSessionStart(
 api::ResultCode CdbLauncher::getVmsConnections(
     api::VmsConnectionDataList* const vmsConnections)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *vmsConnections) =
@@ -976,7 +976,7 @@ api::ResultCode CdbLauncher::getTransactionLog(
 
 api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *statistics) =
@@ -993,7 +993,7 @@ api::ResultCode CdbLauncher::mergeSystems(
     const std::string& systemToMergeTo,
     const std::string& systemBeingMerged)
 {
-    auto connection = connectionFactory()->createConnection();
+    auto connection = createConnection();
     connection->setCredentials(account.email, account.password);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -1133,6 +1133,13 @@ void CdbLauncher::setUserEnabledFlag(
         throw std::runtime_error(lm("Failed to share system. %1")
             .arg(api::toString(result)).toStdString());
     }
+}
+
+std::unique_ptr<api::Connection> CdbLauncher::createConnection()
+{
+    auto connection = m_connectionFactory->createConnection();
+    connection->setRequestTimeout(nx::network::kNoTimeout);
+    return connection;
 }
 
 namespace api {

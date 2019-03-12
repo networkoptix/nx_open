@@ -141,7 +141,7 @@ namespace {
     private:
         bool checkFrame(QWidget* parent)
         {
-            NX_ASSERT(parent && parent->layout(), Q_FUNC_INFO, "Invalid delegate frame");
+            NX_ASSERT(parent && parent->layout(), "Invalid delegate frame");
             if (!parent || !parent->layout())
                 return false;
 
@@ -154,8 +154,8 @@ namespace {
     };
 }
 
-QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
-    base_type(QnResourceSelectionDialog::Filter::cameras, parent)
+QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent):
+    base_type(parent)
 {
     const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),

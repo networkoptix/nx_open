@@ -211,10 +211,17 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
 
             lock.unlock();
 
-            const bool createResource =
-                serverData.status == nx::vms::api::ResourceStatus::incompatible
-                    || (serverData.status == nx::vms::api::ResourceStatus::unauthorized
-                        && !resourcePool()->getResourceById<QnMediaServerResource>(serverData.id));
+            bool createResource = false;
+            if (serverData.status == nx::vms::api::ResourceStatus::incompatible)
+            {
+                createResource = true;
+            }
+            else if (serverData.status == nx::vms::api::ResourceStatus::unauthorized)
+            {
+                const auto serverResource =
+                    resourcePool()->getResourceById<QnMediaServerResource>(serverData.id);
+                createResource = !serverResource || !serverResource->isOnline();
+            }
 
             if (createResource)
                 addResource(serverData);
@@ -257,7 +264,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(
             return;
 
         NX_ASSERT(serverData.status != nx::vms::api::ResourceStatus::offline,
-            Q_FUNC_INFO, "Offline status is a mark to remove fake server.");
+            "Offline status is a mark to remove fake server.");
         QnMediaServerResourcePtr server = makeResource(serverData);
         {
             QnMutexLocker lock(&mutex);
@@ -277,7 +284,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(
         auto server = resourcePool()->getIncompatibleServerById(id)
             .dynamicCast<QnFakeMediaServerResource>();
 
-        NX_ASSERT(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        NX_ASSERT(server, "There must be a resource in the resource pool.");
 
         if (!server)
             return;

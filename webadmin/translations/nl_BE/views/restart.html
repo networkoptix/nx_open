@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">Restarting System...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="modal-body">
+        <p>Het opnieuw opstarten van het systeem kan even duren. Nadien wordt de pagina automatisch vernieuwd.</p>
+        <uib-progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</uib-progressbar>
+
+        <p>Als het te lang duurt, ververs dan deze pagina handmatig</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Verversen</button>
+    </div>
+
+</form>

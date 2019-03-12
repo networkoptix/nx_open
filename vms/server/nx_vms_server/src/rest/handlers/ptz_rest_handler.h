@@ -11,7 +11,7 @@
 
 class QnPtzRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -166,7 +166,6 @@ private:
 
     QMap<QString, SequenceInfo> m_sequencedRequests;
     QnMutex m_sequenceMutex;
-
 
     struct AsyncExecInfo
     {

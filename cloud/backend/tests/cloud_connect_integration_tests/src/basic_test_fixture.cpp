@@ -36,10 +36,12 @@ std::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
-cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(const std::string& domainName)
+void MemoryRemoteRelayPeerPool::addPeer(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     m_relayTest->peerAdded(domainName);
-    return cf::make_ready_future(true);
+    return handler(true);
 }
 
 bool MemoryRemoteRelayPeerPool::connectToDb()
@@ -52,17 +54,20 @@ bool MemoryRemoteRelayPeerPool::isConnected() const
     return false;
 }
 
-cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
+void MemoryRemoteRelayPeerPool::removePeer(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     m_relayTest->peerRemoved(domainName);
-    return cf::make_ready_future(true);
+    return handler(true);
 }
 
-cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
-    const std::string& /*domainName*/) const
+void MemoryRemoteRelayPeerPool::findRelayByDomain(
+    const std::string& /*domainName*/,
+    nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const
 {
     auto redirectToEndpoint = m_relayTest->relayInstanceEndpoint(0).toStdString();
-    return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
+    return handler(std::move(redirectToEndpoint));
 }
 
 //-------------------------------------------------------------------------------------------------

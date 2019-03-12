@@ -37,6 +37,13 @@ public:
     static const int kDefaultSecondStreamFpsHigh;
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
+    using StreamIndex = nx::vms::api::StreamIndex;
+
+    struct MotionStreamIndex
+    {
+        StreamIndex index = StreamIndex::undefined;
+        bool isForced = false;
+    };
 public:
     QnSecurityCamResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnSecurityCamResource();
@@ -70,11 +77,25 @@ public:
 
     QRegion getMotionMask(int channel) const;
 
-    ////!Get camera settings, which are generally modified by user
-    ///*!
-    //    E.g., recording schedule, motion type, second stream quality, etc...
-    //*/
-    //QnCameraUserAttributes getUserCameraSettings() const;
+    /** Returns which stream should be used for motion detection and is it forced. */
+    MotionStreamIndex motionStreamIndex() const;
+
+    /**
+     * Enable forced motion detection on a selected stream or switch to automatic mode.
+     */
+    void setMotionStreamIndex(MotionStreamIndex value);
+
+    /**
+     * If motion detection in the remote archive is enabled. Actual for the Virtual (Wearable)
+     * cameras and for the edge cameras (with RemoteArchiveCapability).
+     */
+    bool isRemoteArchiveMotionDetectionEnabled() const;
+
+    /**
+     * Enable or disable motion detection in the remote archive. Actual for the Virtual (Wearable)
+     * cameras and for the edge cameras (with RemoteArchiveCapability).
+     */
+    void setRemoteArchiveMotionDetectionEnabled(bool value);
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
@@ -299,8 +320,10 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
-    virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
-    static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
+    virtual int suggestBitrateKbps(
+        const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
+    static float rawSuggestBitrateKbps(
+        Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec);
 
     /**
      * All events emitted by analytics driver bound to the resource can be captured within
@@ -323,14 +346,11 @@ public:
      */
     bool isDefaultAuth() const;
 
-    /**
-     * @return true if remote archive motion analysis is enabled by user.
-     */
-    virtual bool isRemoteArchiveMotionDetectionEnabled() const;
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps,
+        const QString& codec, Qn::ConnectionRole role = Qn::CR_Default) const;
 
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
-
-    static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
+    static Qn::ConnectionRole toConnectionRole(StreamIndex index);
+    static StreamIndex toStreamIndex(Qn::ConnectionRole role);
 
     nx::core::ptz::PresetType preferredPtzPresetType() const;
 
@@ -340,9 +360,9 @@ public:
     nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
     void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
 
-    bool isUserAllowedToModifyPtzCapabilities() const;
+    Ptz::Capabilities ptzCapabilitiesUserIsAllowedToModify() const;
 
-    void setIsUserAllowedToModifyPtzCapabilities(bool allowed);
+    void setPtzCapabilitesUserIsAllowedToModify(Ptz::Capabilities);
 
     Ptz::Capabilities ptzCapabilitiesAddedByUser() const;
 
@@ -352,7 +372,6 @@ public:
 
     virtual void setCommonModule(QnCommonModule* commonModule) override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -399,6 +418,11 @@ protected:
     virtual Qn::LicenseType calculateLicenseType() const;
 
 private:
+    Qn::MotionTypes calculateSupportedMotionType() const;
+    Qn::MotionType calculateMotionType() const;
+    MotionStreamIndex calculateMotionStreamIndex() const;
+
+private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
@@ -414,11 +438,10 @@ private:
     CachedValue<Qn::MotionType> m_motionType;
     CachedValue<bool> m_cachedIsIOModule;
     CachedValue<bool> m_cachedCanConfigureRemoteRecording;
-    Qn::MotionTypes calculateSupportedMotionType() const;
-    Qn::MotionType calculateMotionType() const;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;
+    CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
 private slots:
     void resetCachedValues();

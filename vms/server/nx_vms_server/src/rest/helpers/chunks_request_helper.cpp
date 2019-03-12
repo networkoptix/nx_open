@@ -14,6 +14,9 @@
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
 
+static const auto kAllArchive = QList<QnServer::ChunksCatalog>()
+    << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog;
+
 QnChunksRequestHelper::QnChunksRequestHelper(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
@@ -22,30 +25,28 @@ QnChunksRequestHelper::QnChunksRequestHelper(QnMediaServerModule* serverModule):
 QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request) const
 {
     // TODO: #akulikov #backup storages: Alter this for two storage managers kinds.
-    QnTimePeriodList periods;
+
+    const auto archivePeriods = QnStorageManager::getRecordedPeriods(
+        serverModule(), request, kAllArchive);
+
     switch (request.periodsType)
     {
         case Qn::MotionContent:
         {
-            periods = serverModule()->motionHelper()->matchImage(request);
-            break;
+            const auto motionPeriods = serverModule()->motionHelper()->matchImage(request);
+            return QnTimePeriodList::intersection(motionPeriods, archivePeriods);
         }
 
         case Qn::AnalyticsContent:
-            periods = loadAnalyticsTimePeriods(request);
-            break;
+        {
+            const auto analiticsPeriods = loadAnalyticsTimePeriods(request);
+            return QnTimePeriodList::intersection(analiticsPeriods, archivePeriods);
+        }
 
         case Qn::RecordingContent:
         default:
-            periods = QnStorageManager::getRecordedPeriods(
-                serverModule(),
-                request,
-                QList<QnServer::ChunksCatalog>()
-                    << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
-            break;
+            return archivePeriods;
     }
-
-    return periods;
 }
 
 QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(

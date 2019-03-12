@@ -39,6 +39,7 @@ std::unique_ptr<gstreamer::Element> BasePipelineBuilder::createAppSource(
         "caps",
         gst_caps_new_simple(
             "video/x-h264",
+            NULL,
             NULL),
         "is-live",
         TRUE,
@@ -69,7 +70,7 @@ std::unique_ptr<gstreamer::Element> BasePipelineBuilder::buildPreGieBin(const gs
 
 std::unique_ptr<gstreamer::Bin> BasePipelineBuilder::buildPrimaryGieBin(
     const gstreamer::ElementName& pipelineName,
-    BasePipeline* pipeline)
+    BasePipeline* /*pipeline*/)
 {
     NX_OUTPUT << __func__ << " Creating primary GIE bin for " << pipelineName;
     auto inputQueue = std::make_unique<nx::gstreamer::Element>(

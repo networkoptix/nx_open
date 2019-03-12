@@ -1,10 +1,9 @@
 #include "bytestream_filter.h"
-#include "common.h"
-#include "string_helper.h"
 
-#include <iostream>
-#include "attributes_parser.h"
 #include <nx/utils/log/log_main.h>
+
+#include "common.h"
+#include "attributes_parser.h"
 
 namespace nx {
 namespace vms_server_plugins {

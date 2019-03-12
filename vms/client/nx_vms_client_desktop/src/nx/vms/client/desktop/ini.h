@@ -28,7 +28,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, allowCustomArZoomWindows, "Allow zoom windows to have custom aspect ratio.");
     NX_INI_INT(500, analyticsVideoBufferLengthMs, "Video buffer length when analytics mode is enabled on a camera.");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hide enhanced video from the scene.");
-    NX_INI_FLAG(1, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
     NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree, "Display analytics engine items in the resource tree.");
@@ -36,7 +35,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
-    NX_INI_FLAG(1, massSystemUpdatePrototype, "Enable experimental system update.");
     NX_INI_FLAG(0, massSystemUpdateDebugInfo,
         "Show additional debug information for experimental update system.");
     NX_INI_FLAG(0, massSystemUpdateClearDownloads,
@@ -48,11 +46,11 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
     NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
-    NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
+    NX_INI_FLAG(1, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(1, enableCaseExport, "Enable case export.");
     NX_INI_FLAG(0, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
-    NX_INI_FLAG(0, redesignedTimeSynchronization, "Redesigned time synchronization widget in the System Adminstration dialog.");
+    NX_INI_FLAG(1, redesignedTimeSynchronization, "Redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(1, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
         "selection to \"Selected on Timeline\" mode when selection exists.");
     NX_INI_FLAG(0, raiseCameraFromClickedTile, "Raise camera after selecting it when Right Panel camera-related tile is clicked.");
@@ -60,6 +58,12 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, exclusiveMotionSelection, "Whether selecting a motion search region on a camera clears motion selection on other cameras on the layout.");
     NX_INI_FLAG(0, allowDeleteLocalFiles, "Allow delete local files from the context menu.");
     NX_INI_FLAG(1, startPlaybackOnTileNavigation, "Start playback if timeline navigation occured after Right Panel tile click or double click.");
+    NX_INI_FLAG(0, overrideDialogFramesWIN, "Replace system dialog frames with application defined ones (Windows-only).");
+    NX_INI_FLAG(0, systemUpdateProgressInformers, "Show Right Panel progress informers during System Update (unfinished functionality).");
+    NX_INI_FLAG(0, compatibilityIsMediaPaused, "Check if all sync play items are paused at every request.");
+    NX_INI_STRING("", enableEntropixZoomWindowReconstructionOn,
+		"Enable Entropix 'Reconstruct Resolution' integration on the cameras, which model matches "
+		"the provided string, counted as a regular expression.");
 };
 
 inline Ini& ini()

@@ -13,6 +13,8 @@
 #include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
+#include <nx/vms/client/desktop/analytics/analytics_menu_action_factory.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
@@ -204,6 +206,31 @@ void initialize(Manager* manager, Action* root)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission);
 
+    factory(NotificationsTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("N"))
+        .text(ContextMenu::tr("Switch to Notifications tab"));
+
+    factory(MotionTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("M"))
+        .text(ContextMenu::tr("Switch to Motion tab"));
+
+    factory(BookmarksTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("B"))
+        .text(ContextMenu::tr("Switch to Bookmarks tab"));
+
+    factory(EventsTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("E"))
+        .text(ContextMenu::tr("Switch to Events tab"));
+
+    factory(ObjectsTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut(lit("O"))
+        .text(ContextMenu::tr("Switch to Objects tab"));
+
     /* Context menu actions. */
 
     factory(FitInViewAction)
@@ -362,7 +389,7 @@ void initialize(Manager* manager, Action* root)
             .flags(Main | Scene | NoTarget | GlobalHotkey)
             .mode(DesktopMode)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            .text(ContextMenu::tr("File(s)..."))
+            .text(ContextMenu::tr("Files..."))
             .shortcut(lit("Ctrl+O"))
             .condition(!condition::tourIsRunning())
             .autoRepeat(false);
@@ -987,7 +1014,7 @@ void initialize(Manager* manager, Action* root)
     factory(MakeLayoutTourAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
+        .condition(condition::canMakeShowreel()
             && !condition::isSafeMode());
 
     factory()
@@ -1078,7 +1105,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Show Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Show Motion"), new NoArchiveCondition())
-        .shortcut(lit("A"))
         .condition(ConditionWrapper(new SmartSearchCondition(false))
             && !condition::isLayoutTourReviewMode());
 
@@ -1087,7 +1113,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Hide Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Hide Motion"), new NoArchiveCondition())
-        .shortcut(lit("A"))
         .condition(ConditionWrapper(new SmartSearchCondition(true))
             && !condition::isLayoutTourReviewMode());
 
@@ -1100,8 +1125,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
-        .shortcut(lit("A"))
-        .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition())
             && !condition::isLayoutTourReviewMode());
 
@@ -1128,6 +1151,11 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new AdjustVideoCondition())
             && !condition::isLayoutTourReviewMode());
 
+    factory(AnalyticsObjectsVisualizationModeAction)
+        .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Objects Frames and Info..."))
+        .childFactory(new AnalyticsMenuActionFactory(manager));
+
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)
         .condition(ConditionWrapper(new CreateZoomWindowCondition())
@@ -1135,7 +1163,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
-        .requiredTargetPermissions(Qn::WritePermission)
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Rotate to..."));
 
     factory.beginSubMenu();
@@ -1721,7 +1749,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleMuteAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("M"))
+        .shortcut(lit("U"))
         .text(ContextMenu::tr("Toggle Mute"))
         .checkable()
         .condition(new TimelineVisibleCondition());
@@ -1825,6 +1853,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
+
+    integrations::registerActions(&factory);
 
     // -- Developer mode actions further. Please make note: texts are untranslatable. --
 

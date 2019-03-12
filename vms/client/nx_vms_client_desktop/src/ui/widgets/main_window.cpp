@@ -15,6 +15,7 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QStackedLayout>
 
+#include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <nx/vms/discovery/manager.h>
@@ -66,6 +67,8 @@
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <ui/workbench/handlers/workbench_wearable_handler.h>
 #include <ui/workbench/handlers/startup_actions_handler.h>
+#include <nx/vms/client/desktop/analytics/analytics_menu_action_handler.h>
+#include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -108,8 +111,11 @@
 #include <utils/screen_manager.h>
 
 #include <nx/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 #include <nx/utils/app_info.h>
+
+#ifdef Q_OS_WIN
+#include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
+#endif
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
@@ -247,7 +253,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
-    context->instance<nx::vms::client::desktop::WorkbenchManualDeviceAdditionHandler>();
+    context->instance<WorkbenchManualDeviceAdditionHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
@@ -255,6 +261,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<workbench::LayoutToursHandler>();
     context->instance<RadassActionHandler>();
     context->instance<StartupActionsHandler>();
+    context->instance<AnalyticsMenuActionsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -284,6 +291,11 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         });
 
     /* Set up actions. Only these actions will be available through hotkeys. */
+    addAction(action(action::NotificationsTabAction));
+    addAction(action(action::MotionTabAction));
+    addAction(action(action::BookmarksTabAction));
+    addAction(action(action::EventsTabAction));
+    addAction(action(action::ObjectsTabAction));
     addAction(action(action::NextLayoutAction));
     addAction(action(action::PreviousLayoutAction));
     addAction(action(action::SaveCurrentLayoutAction));
@@ -353,10 +365,15 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     setLayout(m_globalLayout);
 
-    m_viewLayout->addWidget(m_view.data());
+    // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
+    // We have to use the trick below to prevent blinks on start.
+    if (nx::utils::AppInfo::isMacOsX())
+        m_viewLayout->setStackingMode(QStackedLayout::StackAll);
 
     if (m_welcomeScreen)
         m_viewLayout->addWidget(m_welcomeScreen);
+
+    m_viewLayout->addWidget(m_view.data());
 
     // Post-initialize.
     if (nx::utils::AppInfo::isMacOsX())
@@ -408,10 +425,43 @@ void MainWindow::updateWidgetsVisibility()
 {
     m_titleBar->setTabBarStuffVisible(!m_welcomeScreenVisible);
 
-    if (m_welcomeScreen && m_welcomeScreenVisible)
-        m_viewLayout->setCurrentWidget(m_welcomeScreen);
+    const auto switchWidgetsCallback =
+        [this]()
+        {
+            const auto currentWidget = m_welcomeScreen && m_welcomeScreenVisible
+                ? static_cast<QWidget*>(m_welcomeScreen)
+                : static_cast<QWidget*>(m_view.data());
+
+            if (currentWidget == m_viewLayout->currentWidget())
+                return;
+
+            // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
+            // We have to use the trick below to prevent blinks on start.
+            if (nx::utils::AppInfo::isMacOsX())
+                m_viewLayout->setStackingMode(QStackedLayout::StackOne);
+
+            m_viewLayout->setCurrentWidget(currentWidget);
+
+            // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
+            // For some reason when we switch widgets visibility we start to loose paint events.
+            // This results to hangs until you resize or hide/show main window in MacOs.
+            // Workaround below fixes it.
+            if (nx::utils::AppInfo::isMacOsX())
+            {
+                static const QSize kSizeChange(100, 100);
+                const auto currentGeometry = geometry();
+                setGeometry(QRect(currentGeometry.topLeft(), currentGeometry.size() + kSizeChange));
+                setGeometry(currentGeometry);
+            }
+        };
+
+    // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
+    // For some reason mouse events don't go to the QGraphicsView if we change visibility
+    // under some circumstances in MacOs. This ugly workaround fixes it.
+    if (nx::utils::AppInfo::isMacOsX())
+        executeLater(switchWidgetsCallback, this);
     else
-        m_viewLayout->setCurrentWidget(m_view.data());
+        switchWidgetsCallback();
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen).
     m_titleBar->setVisible(isTitleVisible());
@@ -642,20 +692,18 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Left:
         case Qt::Key_Up:
         case Qt::Key_PageUp:
-        {
             menu()->trigger(action::PreviousLayoutAction);
             break;
-        }
+
         case Qt::Key_Enter:
         case Qt::Key_Return:
         case Qt::Key_Space:
         case Qt::Key_Right:
         case Qt::Key_Down:
         case Qt::Key_PageDown:
-        {
             menu()->trigger(action::NextLayoutAction);
             break;
-        }
+
         default:
             // Stop layout tour if it is running.
             menu()->trigger(action::ToggleLayoutTourModeAction);
@@ -666,52 +714,18 @@ bool MainWindow::handleKeyPress(int key)
 
 void MainWindow::updateContentsMargins()
 {
-    if (isFullScreen())
+    m_drawCustomFrame = false;
+    m_frameMargins = QMargins{};
+
+    if (nx::utils::AppInfo::isLinux() && !isFullScreen() && !isMaximized())
     {
-        /* Full screen mode. */
-        m_drawCustomFrame = false;
-        m_frameMargins = QMargins(0, 0, 0, 0);
-
-        /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
-         * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
-#ifdef Q_OS_WIN
-        // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
-        setContentsMargins(1, 0, 0, 0); //FIXME
-#else
-        setContentsMargins(0, 0, 0, 0);
-#endif
-
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+        // In Linux window managers cannot disable titlebar leaving window border in place.
+        // Thus we have to disable decorations completely and draw our own border.
+        m_drawCustomFrame = true;
+        m_frameMargins = QMargins(2, 2, 2, 2);
     }
-    else
-    {
-        /* Windowed or maximized without aero glass. */
-#ifdef Q_OS_LINUX
-        // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
-        if (isMaximized())
-        {
-            m_drawCustomFrame = false;
-            m_frameMargins = QMargins(0, 0, 0, 0);
-        }
-        else
-        {
-            m_drawCustomFrame = true;
-            m_frameMargins = QMargins(2, 2, 2, 2);
-        }
-#else
-        m_drawCustomFrame = false;
-        m_frameMargins = QMargins(0, 0, 0, 0);
-#endif
 
-        setContentsMargins(0, 0, 0, 0);
-
-        m_viewLayout->setContentsMargins(
-            m_frameMargins.left(),
-            isTitleVisible() ? 0 : m_frameMargins.top(),
-            m_frameMargins.right(),
-            m_frameMargins.bottom()
-        );
-    }
+    m_globalLayout->setContentsMargins(m_frameMargins);
 }
 
 // -------------------------------------------------------------------------- //
@@ -817,5 +831,85 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
     else
         handleOpenFile(fileEvent->file());
 }
+
+#ifdef Q_OS_WIN
+
+bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    const auto msg = static_cast<MSG*>(message);
+    switch (msg->message)
+    {
+        // Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to
+        // turn desktop composition off and enter fullscreen mode. To avoid this behavior,
+        // an artificial delta is added to make the client area differ from the screen dimensions.
+        case WM_NCCALCSIZE:
+        {
+            if (!isFullScreen() || isMinimized())
+                return false;
+
+            auto rect = LPRECT(msg->lParam);
+            ++rect->right;
+
+            *result = WVR_REDRAW;
+            return true;
+        }
+
+        // Paint background to avoid white window background flashing when switched from the scene
+        // to the welcome screen and back.
+        case WM_ERASEBKGND:
+        {
+            const auto context = HDC(msg->wParam);
+            gdi::SolidBrush brush(palette().color(QPalette::Window));
+
+            RECT rect;
+            GetClientRect(msg->hwnd, &rect);
+            FillRect(context, &rect, brush);
+
+            *result = TRUE;
+            return true;
+        }
+
+        // Block default activation processing in fullscreen.
+        case WM_NCACTIVATE:
+        {
+            if (!isFullScreen())
+                return false;
+
+            *result = TRUE;
+            return true;
+        }
+
+        // Filling non-client area in fullscreen with the background color also improves visual
+        // behavior.
+        case WM_NCPAINT:
+        {
+            if (!isFullScreen() && !isMinimized())
+                return false;
+
+            gdi::WindowDC context(msg->hwnd);
+            gdi::SolidBrush brush(palette().color(QPalette::Window));
+
+            RECT rect;
+            GetWindowRect(msg->hwnd, &rect);
+
+            if (GetObjectType(HGDIOBJ(msg->wParam)) == OBJ_REGION)
+            {
+                OffsetRgn(HRGN(msg->wParam), -rect.left, -rect.top);
+                SelectClipRgn(context, HRGN(msg->wParam));
+            }
+
+            OffsetRect(&rect, -rect.left, -rect.top);
+            FillRect(context, &rect, brush);
+
+            *result = 0;
+            return true;
+        }
+
+        default:
+            return false;
+    }
+}
+
+#endif // Q_OS_WIN
 
 } // namespace nx::vms::client::desktop

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include <nx/network/buffer.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
@@ -60,6 +62,19 @@ public:
         std::int64_t minSequence,
         std::int64_t maxSequence,
         std::vector<dao::TransactionLogRecord>* const transactions) = 0;
+
+    /**
+     * NOTE: Throws on failure.
+     */
+    virtual void saveRecentTransactionSequence(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        const std::string& peerId,
+        int sequence) = 0;
+
+    virtual std::map<std::string /*systemId*/, int /*sequence*/> fetchRecentTransactionSequence(
+        nx::sql::QueryContext* queryContext,
+        const std::string& peerId) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------

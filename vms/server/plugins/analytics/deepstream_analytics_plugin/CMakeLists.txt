@@ -5,6 +5,6 @@ include_directories(${GSTREAMER_INCLUDE_DIRS})
 
 nx_add_server_plugin(deepstream_analytics_plugin NO_MOC OPTIONAL
     PRIVATE_LIBS
-        nx_kit nx_sdk
+        nx_sdk
         ${GSTREAMER_LDFLAGS} deepstream
 )

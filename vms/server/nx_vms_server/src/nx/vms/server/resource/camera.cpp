@@ -34,12 +34,8 @@ Camera::Camera(QnMediaServerModule* serverModule):
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
 
-    connect(this, &QnResource::initializedChanged,
-        [this]()
-        {
-            // m_initMutex is locked down the stack.
-            fixInputPortMonitoring();
-        });
+    connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
+    connect(this, &QnResource::initializedChanged, [this]() { fixInputPortMonitoring(); });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
@@ -135,7 +131,7 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
-        NX_ASSERT(this, "Get advanced parameters from camera with no providers");
+        NX_ASSERT(false, "Get advanced parameters from camera with no providers");
         return {};
     }
 
@@ -187,13 +183,12 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
     QnMutexLocker lock(&m_initMutex);
-    if (!isInitialized())
-        return {};
-
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
-        NX_ASSERT(this, "Set advanced parameters from camera with no providers");
+        // NOTE: It may sometimes occur if we are trying to set some parameters on the never
+        // initialised camera.
+        NX_VERBOSE(this, "Set advanced parameters from camera with no providers: %1", values);
         return {};
     }
 
@@ -207,12 +202,12 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
         }
         else if (m_defaultAdvancedParametersProvider)
         {
-            NX_WARNING(this, lm("Set undeclared advanced parameter: %1").arg(value.id));
+            NX_WARNING(this, "Set undeclared advanced parameter: %1", value.id);
             valuesByProvider[m_defaultAdvancedParametersProvider].push_back(value);
         }
         else
         {
-            NX_WARNING(this, lm("No provider to set parameter: %1").arg(value.id));
+            NX_WARNING(this, "No provider to set parameter: %1", value.id);
         }
     }
 
@@ -223,8 +218,8 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
         const auto& values = providerValues.second;
 
         auto ids = provider->set(values);
-        NX_VERBOSE(this, lm("Set advanced parameters %1 by %2, result %3").args(
-            containerString(values), provider, containerString(ids)));
+        NX_VERBOSE(this, "Set advanced parameters %1 by %2, result %3", containerString(values),
+            provider, containerString(ids));
 
         result += std::move(ids);
     }
@@ -242,7 +237,7 @@ bool Camera::setAdvancedParameter(const QString& id, const QString& value)
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParameters =
-        [&](Qn::StreamIndex streamIndex)
+        [&](nx::vms::api::StreamIndex streamIndex)
         {
             QnMutexLocker lock(&m_initMutex);
             if (!isInitialized())
@@ -256,8 +251,8 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         };
 
     QnAdvancedStreamParams parameters;
-    parameters.primaryStream = getStreamParameters(Qn::StreamIndex::primary);
-    parameters.secondaryStream = getStreamParameters(Qn::StreamIndex::secondary);
+    parameters.primaryStream = getStreamParameters(nx::vms::api::StreamIndex::primary);
+    parameters.secondaryStream = getStreamParameters(nx::vms::api::StreamIndex::secondary);
     return parameters;
 }
 
@@ -304,8 +299,8 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
          A = higher ratio / current ratio
          B = current ratio / lower ratio
 
-        We consider that one resolution is similar to another if their aspect ratios differs
-        no more then (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
+        We consider that one resolution is similar to another if their aspect ratios differ
+        no more than (1 + kEpsilon) times. kEpsilon estimation is heuristically inferred from
         the table above.
     */
     static const float kEpsilon = 0.10f;
@@ -353,7 +348,7 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
     if (result == EMPTY_RESOLUTION_PAIR)
     {
-        // Try to get resolution ignoring aspect ratio
+        // Try to get resolution ignoring the aspect ratio.
         result = getNearestResolution(
             idealResolution,
             0.0f,
@@ -404,9 +399,6 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    m_streamCapabilityAdvancedProviders.clear();
-    m_defaultAdvancedParametersProvider = nullptr;
-    m_advancedParametersProvidersByParameterId.clear();
     setCameraCapability(Qn::CameraTimeCapability, true);
 
     if (commonModule()->isNeedToStop())
@@ -426,6 +418,12 @@ void Camera::initializationDone()
     // TODO: Find out is it's ever required, monitoring resource state change should be enough!
     QnMutexLocker lk(&m_initMutex);
     fixInputPortMonitoring();
+}
+
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
+{
+    // Implementation may be overloaded in a driver.
+    return StreamCapabilityMap();
 }
 
 nx::media::CameraTraits Camera::mediaTraits() const
@@ -448,15 +446,19 @@ void Camera::stopInputPortStatesMonitoring()
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
+    m_streamCapabilityAdvancedProviders.clear();
+    m_defaultAdvancedParametersProvider = nullptr;
+    m_advancedParametersProvidersByParameterId.clear();
+
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
     const StreamCapabilityMaps streamCapabilityMaps = {
-        {Qn::StreamIndex::primary, getStreamCapabilityMap(Qn::StreamIndex::primary)},
-        {Qn::StreamIndex::secondary, getStreamCapabilityMap(Qn::StreamIndex::secondary)}
+        {StreamIndex::primary, getStreamCapabilityMap(StreamIndex::primary)},
+        {StreamIndex::secondary, getStreamCapabilityMap(StreamIndex::secondary)}
     };
 
     const auto traits = mediaTraits();
-    for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
+    for (const auto streamType: {StreamIndex::primary, StreamIndex::secondary})
     {
         //auto streamCapabilities = getStreamCapabilityMap(streamType);
         if (!streamCapabilityMaps[streamType].isEmpty())
@@ -495,9 +497,9 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
             advancedParameters.merge(providerParameters);
     }
 
-    NX_VERBOSE(this, lm("Default advanced parameters provider %1, providers by params: %2").args(
+    NX_VERBOSE(this, "Default advanced parameters provider %1, providers by params: %2",
         m_defaultAdvancedParametersProvider,
-        containerString(m_advancedParametersProvidersByParameterId)));
+        containerString(m_advancedParametersProvidersByParameterId));
 
     advancedParameters.packet_mode = resourceData()
         .value<bool>(ResourceDataKey::kNeedToReloadAllAdvancedParametersAfterApply, false);
@@ -506,13 +508,13 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
     return CameraDiagnostics::NoErrorResult();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex)
 {
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
-        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1);
-        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps());
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1, key.codec);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps(), key.codec);
         result.maxFps = getMaxFps();
         return result;
     };
@@ -524,7 +526,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
             dst = src;
     };
 
-    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    StreamCapabilityMap result = getStreamCapabilityMapFromDriver(streamIndex);
     for (auto itr = result.begin(); itr != result.end();)
     {
         if (kSupportedCodecs.count(itr.key().codec))
@@ -607,12 +609,18 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
         case Qn::CR_Default:
         case Qn::CR_LiveVideo:
         {
-            auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
-                ResourceDataKey::kShouldAppearAsSingleChannel);
+            QnAbstractStreamDataProvider* result = nullptr;
 
-            QnAbstractStreamDataProvider* result = shouldAppearAsSingleChannel
-                ? new nx::plugins::utils::MultisensorDataProvider(camera)
-                : camera->createLiveDataProvider();
+            #if defined(ENABLE_ONVIF)
+                auto shouldAppearAsSingleChannel = camera->resourceData().value<bool>(
+                    ResourceDataKey::kShouldAppearAsSingleChannel);
+
+                result = shouldAppearAsSingleChannel
+                    ? new nx::plugins::utils::MultisensorDataProvider(camera)
+                    : camera->createLiveDataProvider();
+            #else
+                result = camera->createLiveDataProvider();
+            #endif
             if (result)
                 result->setRole(role);
             return result;
@@ -640,6 +648,14 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
     return nullptr;
 }
 
+int Camera::getMaxChannels() const
+{
+    bool shouldAppearAsSingleChannel = resourceData().value<bool>(
+        ResourceDataKey::kShouldAppearAsSingleChannel);
+    if (shouldAppearAsSingleChannel)
+        return 1;
+    return getMaxChannelsFromDriver();
+}
 void Camera::inputPortListenerAttached()
 {
     QnMutexLocker lk(&m_initMutex);

@@ -7,14 +7,13 @@
 #include "hanwha_resource_searcher.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include "hanwha_firmware.h"
 #include "hanwha_ini_config.h"
 
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <nx/vms_server_plugins/utils/uuid.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 #include <camera/camera_pool.h>
@@ -50,11 +49,6 @@ using namespace nx::core;
 namespace {
 
 static const QString kBypassPrefix("Bypass");
-
-static bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
-{
-    return param && param->possibleValues().contains(kHanwhaTrue);
-}
 
 enum class PtzOperation
 {
@@ -133,6 +127,19 @@ struct RangeDescriptor
     QString name;
     QString cgiParameter;
     QString alternativeCgiParameter;
+
+    RangeDescriptor(
+        core::ptz::Types ptzTypes,
+        QString name,
+        QString cgiParameter,
+        QString alternativeCgiParameter = QString())
+        :
+        ptzTypes(ptzTypes),
+        name(name),
+        cgiParameter(cgiParameter),
+        alternativeCgiParameter(alternativeCgiParameter)
+    {
+    }
 };
 
 static const std::vector<RangeDescriptor> kRangeDescriptors = {
@@ -330,7 +337,7 @@ static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
 // Taken from Hanwha metadata plugin manifest.json.
-static const QString kHanwhaInputPortEventTypeId = "nx.hanwha.inputPort";
+static const QString kHanwhaInputPortEventTypeId = "nx.hanwha.AlarmInput";
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -587,8 +594,6 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
 QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
 {
     using ParameterMap = std::map<QString, QString>;
-    using SubmenuMap = std::map<QString, ParameterMap>;
-    using CgiMap = std::map<QString, SubmenuMap>;
 
     bool reopenPrimaryStream = false;
     bool reopenSecondaryStream = false;
@@ -801,13 +806,6 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
-}
-
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     setCameraCapability(Qn::customMediaPortCapability, true);
@@ -909,9 +907,9 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
 void HanwhaResource::initMediaStreamCapabilities()
 {
-    m_capabilities.streamCapabilities[Qn::StreamIndex::primary] =
+    m_capabilities.streamCapabilities[StreamIndex::primary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
-    m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
+    m_capabilities.streamCapabilities[StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
         ResourcePropertyKey::kMediaCapabilities,
@@ -1044,13 +1042,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
 
     m_hasSerialPort = (hasRs485 != boost::none && *hasRs485)
         || (hasRs422 != boost::none && *hasRs422);
-
-    if (isAnalogEncoder() || isProxiedAnalogEncoder() || hasSerialPort())
-    {
-        // We can't reliably determine if there's PTZ caps for analogous cameras
-        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
-        setIsUserAllowedToModifyPtzCapabilities(true);
-    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1293,8 +1284,8 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
         HanwhaRequestHelper helper(sharedContext());
         helper.set(
-            lit("eventsources/alarminput"),
-            {{lit("AlarmInput.%1.Enable").arg(getChannel()), kHanwhaTrue}});
+            "eventsources/alarminput",
+            {{lm("AlarmInput.%1.Enable").args(getChannel() + 1), kHanwhaTrue}});
     }
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
@@ -1397,6 +1388,30 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
     }
 
+    Ptz::Capabilities ptzCapabilitiesAllowedToBeModifiedByUser;
+    if (isAnalogEncoder() || isProxiedAnalogEncoder())
+    {
+        // We can't reliably determine if there's PTZ caps for analogous cameras
+        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+        ptzCapabilitiesAllowedToBeModifiedByUser = Ptz::Capability::ContinuousPtzCapabilities;
+    }
+    else if (hasSerialPort())
+    {
+        const Ptz::Capabilities operationalPtzCapabilites =
+            m_ptzCapabilities[core::ptz::Type::operational];
+
+        const bool hasPanOrTilt = operationalPtzCapabilites & Ptz::ContinuousPanTiltCapabilities;
+        const bool hasZoom = operationalPtzCapabilites.testFlag(Ptz::ContinuousZoomCapability);
+
+        if (!hasPanOrTilt)
+            ptzCapabilitiesAllowedToBeModifiedByUser |= Ptz::ContinuousPanTiltCapabilities;
+
+        if (!hasZoom)
+            ptzCapabilitiesAllowedToBeModifiedByUser |= Ptz::ContinuousZoomCapability;
+    }
+
+    setPtzCapabilitesUserIsAllowedToModify(ptzCapabilitiesAllowedToBeModifiedByUser);
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1452,18 +1467,14 @@ CameraDiagnostics::Result HanwhaResource::initRedirectedAreaZoomPtz()
     if (ptzTargetChannel == -1 || ptzTargetChannel == getChannel())
         return CameraDiagnostics::NoErrorResult();
 
+    const auto groupId = getGroupId();
     const auto calibratedChannels = sharedContext()->ptzCalibratedChannels();
-    const auto isCalibrated = calibratedChannels && calibratedChannels->count(getChannel());
-    if (isCalibrated)
+    if (!groupId.isEmpty() && calibratedChannels && calibratedChannels->count(getChannel()))
     {
-        const auto id = physicalIdForChannel(getGroupId(), ptzTargetChannel);
+        const auto id = physicalIdForChannel(groupId, ptzTargetChannel);
         NX_DEBUG(this, "Set PTZ target id: %1", id);
         setProperty(ResourcePropertyKey::kPtzTargetId, id);
-
-        // TODO: Remove this workaround when client fixes a bug:
-        //     Absolute move and viewport is not accessible if continious move is not supportd.
-        //
-        // m_ptzCapabilities[core::ptz::Type::operational] |= Ptz::ContinuousPanTiltCapabilities;
+        m_ptzCapabilities[core::ptz::Type::operational] &= Ptz::ViewportPtzCapability;
     }
     else
     {
@@ -1675,8 +1686,6 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
-
-    const auto channel = getChannel();
 
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(
@@ -2354,9 +2363,6 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
         &outPtzLimits->maxFov,
         lit("ptzcontrol/absolute/Zoom"));
 
-    // TODO: #dmishin don't forget it
-    outPtzLimits->maxPresetNumber;
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2513,7 +2519,10 @@ int HanwhaResource::streamBitrate(
 
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
-    streamParams.resolution = streamResolution(role);
+    if (streamParams.resolution.isEmpty())
+        streamParams.resolution = streamResolution(role); //< Set default value if empty.
+    if (streamParams.codec.isEmpty())
+        streamParams.codec = toHanwhaString(streamCodec(role)); //< Set default value if empty.
     if (bitrateKbps == 0)
     {
         // Since we can't fully control bitrate on the NVRs that don't have bypass
@@ -2521,14 +2530,12 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
         .streamCapabilities
-        .value(role == Qn::ConnectionRole::CR_LiveVideo
-            ? Qn::StreamIndex::primary
-            : Qn::StreamIndex::secondary);
+        .value(toStreamIndex(role));
 
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
@@ -2567,7 +2574,7 @@ int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile)
     return kHanwhaInvalidProfile;
 }
 
-AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole role) const
+AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole /*role*/) const
 {
     const auto& codecs = m_codecInfo.codecs(getChannel());
 
@@ -2602,7 +2609,8 @@ int HanwhaResource::defaultGovLengthForStream(Qn::ConnectionRole role) const
     return mediaCapabilityForRole(role).maxFps;
 }
 
-Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(Qn::ConnectionRole role) const
+Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(
+    Qn::ConnectionRole /*role*/) const
 {
     return Qn::BitrateControl::vbr;
 }
@@ -3089,6 +3097,7 @@ boost::optional<HanwhaAdavancedParameterInfo> HanwhaResource::advancedParameterI
 
 void HanwhaResource::updateToChannel(int value)
 {
+    NX_VERBOSE(this, "Update to channel %1", value);
     QUrl url(getUrl());
     QUrlQuery query(url.query());
     query.removeQueryItem("channel");
@@ -3108,7 +3117,7 @@ void HanwhaResource::updateToChannel(int value)
 
 QString HanwhaResource::toHanwhaAdvancedParameterValue(
     const QnCameraAdvancedParameter& parameter,
-    const HanwhaAdavancedParameterInfo& parameterInfo,
+    const HanwhaAdavancedParameterInfo& /*parameterInfo*/,
     const QString& str) const
 {
     const auto parameterType = parameter.dataType;
@@ -3131,7 +3140,7 @@ QString HanwhaResource::toHanwhaAdvancedParameterValue(
 
 QString HanwhaResource::fromHanwhaAdvancedParameterValue(
     const QnCameraAdvancedParameter& parameter,
-    const HanwhaAdavancedParameterInfo& parameterInfo,
+    const HanwhaAdavancedParameterInfo& /*parameterInfo*/,
     const QString& str) const
 {
     const auto parameterType = parameter.dataType;
@@ -3334,7 +3343,6 @@ QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
     for (const auto& entry: parameterValues)
     {
         const auto& id = entry.first;
-        const auto& value = entry.second;
 
         const auto info = advancedParameterInfo(id);
         if (!info)
@@ -3729,19 +3737,6 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
-void HanwhaResource::setSupportedAnalyticsEventTypeIds(
-    QnUuid engineId, QSet<QString> supportedEvents)
-{
-    QSet<QString> externalEvents;
-    for (const auto& eventTypeId: supportedEvents)
-    {
-        if (eventTypeId != kHanwhaInputPortEventTypeId)
-            externalEvents.insert(eventTypeId);
-    }
-
-    base_type::setSupportedAnalyticsEventTypeIds(engineId, externalEvents);
-}
-
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(
     qint64 startTimeMs,
     qint64 endTimeMs,
@@ -3963,12 +3958,15 @@ void HanwhaResource::setPtzCalibarionTimer()
 
             if (const auto calibratedChannels = sharedContext()->ptzCalibratedChannels())
             {
-                const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
-                const bool isCalibrated = calibratedChannels->count(getChannel());
-                if (isRedirected != isCalibrated)
+                if (calibratedChannels.diagnostics)
                 {
-                    NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
-                    return setStatus(Qn::Offline);
+                    const bool isRedirected = !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+                    const bool isCalibrated = calibratedChannels->count(getChannel());
+                    if (isRedirected != isCalibrated)
+                    {
+                        NX_DEBUG(this, "PTZ calibration has changed, go offline for reinitialization");
+                        return setStatus(Qn::Offline);
+                    }
                 }
             }
 

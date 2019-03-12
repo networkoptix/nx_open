@@ -596,7 +596,7 @@ QString QnAuditLogModel::textData(const Column& column, const QnAuditRecord* dat
             return eventDescriptionText(data);
 
         case UserActivityColumn:
-            return tr("%n action(s)", "", data->extractParam(ChildCntParamName).toUInt());
+            return tr("%n actions", "", data->extractParam(ChildCntParamName).toUInt());
 
         default:
             break;

@@ -9,8 +9,8 @@
                 Vänligen stäng av enheten och installera en hårddisk.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                Denna enhet behöver nätverksanslutning för att fungera. <br>
+                Vänligen anslut den till det lokala nätverket eller Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Denna enhet har fel nätverkskonfiguration. <br>
@@ -137,7 +137,7 @@
                                     Force Video Traffic Encryption
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Spara</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
                         </form>
                     </div>
                 </uib-tab>

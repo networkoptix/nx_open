@@ -9,21 +9,15 @@ namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
 
-Frame::Frame(const std::shared_ptr<std::atomic_int>& frameCount):
-    m_frame(av_frame_alloc()),
-    m_frameCount(frameCount)
+Frame::Frame():
+    m_frame(av_frame_alloc())
 {
-    if (m_frameCount)
-        ++(*m_frameCount);
 }
 
 Frame::~Frame()
 {
     if (m_frame)
         av_frame_free(&m_frame);
-    
-    if (m_frameCount)
-        --(*m_frameCount);
 }
 
 uint64_t Frame::timestamp() const

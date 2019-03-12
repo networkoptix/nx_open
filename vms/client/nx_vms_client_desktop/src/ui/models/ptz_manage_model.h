@@ -42,17 +42,22 @@ struct QnPtzPresetItemModel {
 
     QnPtzPresetItemModel(const QnPtzPreset& preset):
         preset(preset),
+        initialName(preset.name),
         modified(false),
         local(false)
     {}
 
     QnPtzPresetItemModel(const QString &name):
         preset(QnUuid::createUuid().toString(), name),
+        initialName(name),
         modified(true),
         local(true)
     {}
 
+    bool isNameModified() const { return preset.name != initialName; }
+
     QnPtzPreset preset;
+    QString initialName;
 
     /** Preset name is modified. */
     bool modified;
@@ -113,10 +118,10 @@ public:
     void setTours(const QnPtzTourList &tours);
     void addTour();
     void removeTour(const QString &id);
-    
+
     const QList<QnPtzPresetItemModel> &presetModels() const;
     const QStringList &removedPresets() const;
-    
+
     QnPtzPresetList presets() const;
     void setPresets(const QnPtzPresetList &presets);
     void addPreset();

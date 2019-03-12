@@ -14,6 +14,9 @@ nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
 {
     nx::utils::Url result;
 
+    if (input.isEmpty())
+        return result;
+
     // Trying to parse assuming we have a correct network url here.
     static const QRegularExpression re(
         "^((?<protocol>.*)://)?(.*@)?(?<address>.*?)([/?&#].*)?$");

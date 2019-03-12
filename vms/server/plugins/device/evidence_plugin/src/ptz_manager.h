@@ -28,9 +28,9 @@ public:
     //!Implementaion of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementaion of nxpl::PluginInterface::addRef
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementaion of nxpl::PluginInterface::releaseRef
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     virtual int getCapabilities() const override;
     virtual int continuousMove( double panSpeed, double tiltSpeed, double zoomSpeed ) override;

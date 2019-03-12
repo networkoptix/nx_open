@@ -80,6 +80,22 @@ private:
         const QString& getKey,
         const QString& postKey);
 
+    bool fetchRemoteData(
+        const nx::utils::Url& remoteUrl,
+        const QString& getKey,
+        ConfigureSystemData* data);
+
+    bool fetchUsers(
+        const nx::utils::Url& remoteUrl,
+        const QString& getKey,
+        ConfigureSystemData* data);
+
+    bool fetchUserParams(
+        const nx::utils::Url& remoteUrl,
+        const QString& getKey,
+        const nx::vms::api::UserDataList& users,
+        ConfigureSystemData* data);
+
     QnJsonRestResult executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,
@@ -104,7 +120,9 @@ private:
         const QString& authenticationKey,
         nx::vms::api::ModuleInformationWithAddresses* moduleInformation);
 
-    bool addMergeHistoryRecord(const MergeSystemData& data);
+    bool addMergeHistoryRecord(
+        const MergeSystemData& data,
+        nx::vms::api::SystemMergeHistoryRecord* outResult);
 };
 
 } // namespace utils

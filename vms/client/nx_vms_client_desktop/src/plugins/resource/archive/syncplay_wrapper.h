@@ -79,6 +79,8 @@ private:
     qint64 maxArchiveTime() const;
     qint64 getCurrentTimeInternal() const;
 
+    bool isMediaPausedUncached() const;
+
 protected:
     Q_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);
 

@@ -138,7 +138,7 @@ protected:
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 2));
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 3));
 
-		// It should have some offline distance because server[0] has got some data.
+        // It should have some offline distance because server[0] has got some data.
         for (int i = 0; i < kServerCount; ++i)
             ASSERT_LT(serverDistance(0, i), kMaxDistance);
     }

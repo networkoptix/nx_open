@@ -17,8 +17,6 @@ namespace ite
         VideoPacket(const uint8_t * data, unsigned size, uint64_t ts);
         virtual ~VideoPacket();
 
-        // nxcip::PluginInterface
-
         virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxpl::VideoDataPacket

@@ -129,7 +129,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     connection->bindToAioThread(getAioThread());
     m_requestPipeline = std::make_unique<stun::MessagePipeline>(
         std::move(connection));
-    m_requestPipeline->setOnConnectionClosed(
+    m_requestPipeline->registerCloseHandler(
         [this](auto... args) { onConnectionClosed(args...); });
 
     m_requestPipeline->setMessageHandler(

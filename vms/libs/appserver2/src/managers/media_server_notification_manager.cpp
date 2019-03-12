@@ -46,7 +46,7 @@ void QnMediaServerNotificationManager::triggerNotification(
     else if (tran.command == ApiCommand::removeServerUserAttributes)
     emit userAttributesRemoved(tran.params.id);
     else
-        NX_ASSERT(0, "Invalid transaction", Q_FUNC_INFO);
+        NX_ASSERT(0, "Invalid transaction");
 }
 
 void QnMediaServerNotificationManager::triggerNotification(

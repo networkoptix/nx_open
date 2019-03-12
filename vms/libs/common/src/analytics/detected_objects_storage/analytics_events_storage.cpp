@@ -641,22 +641,52 @@ nx::sql::DBResult EventsStorage::cleanupData(
     const QnUuid& deviceId,
     std::chrono::milliseconds oldestDataToKeepTimestamp)
 {
+    try
+    {
+        cleanupEvents(queryContext, deviceId, oldestDataToKeepTimestamp);
+        cleanupEventProperties(queryContext);
+    }
+    catch (const std::exception& e)
+    {
+        NX_INFO(this, lm("Error cleaning up detected objects data. %1").args(e.what()));
+    }
+
+    return nx::sql::DBResult::ok;
+}
+
+void EventsStorage::cleanupEvents(
+    nx::sql::QueryContext* queryContext,
+    const QnUuid& deviceId,
+    std::chrono::milliseconds oldestDataToKeepTimestamp)
+{
     using namespace std::chrono;
 
     sql::SqlQuery deleteEventsQuery(queryContext->connection());
-    deleteEventsQuery.prepare(QString::fromLatin1(R"sql(
+    deleteEventsQuery.prepare(R"sql(
         DELETE FROM event
         WHERE device_guid=:deviceId AND timestamp_usec_utc < :timestampUsec
-    )sql"));
+    )sql");
     deleteEventsQuery.bindValue(
         ":deviceId",
         QnSql::serialized_field(deviceId));
     deleteEventsQuery.bindValue(
         ":timestampUsec",
-        (qint64) microseconds(oldestDataToKeepTimestamp).count());
+        (qint64)microseconds(oldestDataToKeepTimestamp).count());
 
     deleteEventsQuery.exec();
-    return nx::sql::DBResult::ok;
+}
+
+void EventsStorage::cleanupEventProperties(
+    nx::sql::QueryContext* queryContext)
+{
+    sql::SqlQuery query(queryContext->connection());
+
+    query.prepare(R"sql(
+        DELETE FROM event_properties
+        WHERE docid NOT IN (SELECT rowid FROM event)
+    )sql");
+
+    query.exec();
 }
 
 //-------------------------------------------------------------------------------------------------

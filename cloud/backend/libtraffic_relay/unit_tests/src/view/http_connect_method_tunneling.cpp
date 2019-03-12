@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_connect.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_connect.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/sync_call.h>
@@ -96,7 +96,7 @@ private:
     const std::string m_serverId;
     nx::network::http::AsyncClient m_httpClient;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>> m_responseQueue;
-    std::unique_ptr<api::Client> m_relayClient;
+    std::unique_ptr<api::AbstractClient> m_relayClient;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_serverToClientConnection;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_clientToServerConnection;
 
@@ -104,7 +104,7 @@ private:
     {
         addRelayInstance();
 
-        m_relayClient = std::make_unique<api::ClientOverHttpConnect>(
+        m_relayClient = std::make_unique<api::detail::ClientOverHttpConnect>(
             relay().basicUrl(), nullptr);
     }
 

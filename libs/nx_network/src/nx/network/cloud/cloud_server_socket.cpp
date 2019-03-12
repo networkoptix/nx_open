@@ -61,19 +61,19 @@ SocketAddress CloudServerSocket::getLocalAddress() const
 
 bool CloudServerSocket::close()
 {
-    //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    //NX_ASSERT(false, "Not implemented...");
     return true;
 }
 
 bool CloudServerSocket::isClosed() const
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, "Not implemented...");
     return false;
 }
 
 bool CloudServerSocket::shutdown()
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, "Not implemented...");
     return true;
 }
 
@@ -84,6 +84,12 @@ bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 
     *errorCode = m_lastError;
     m_lastError = SystemError::noError;
+    return true;
+}
+
+bool CloudServerSocket::getProtocol(int* protocol) const
+{
+    *protocol = nx::network::Protocol::unassigned;
     return true;
 }
 

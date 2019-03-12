@@ -5,12 +5,12 @@
 
 #include <nx/utils/url.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/app_info.h>
 
 #include "discovery_manager.h"
-#include "native_media_encoder.h"
-#include "transcode_media_encoder.h"
 #include "ffmpeg/utils.h"
 #include "device/video/utils.h"
+#include "media_encoder.h"
 
 namespace nx {
 namespace usb_cam {
@@ -22,10 +22,10 @@ CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
     m_capabilities(
             nxcip::BaseCameraManager::nativeMediaStreamCapability |
             nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-            nxcip::BaseCameraManager::fixedQualityCapability |
             nxcip::BaseCameraManager::cameraTimeCapability)
 {
-    if (m_camera->hasAudio())
+    m_pluginRef->addRef();
+    if (!nx::utils::AppInfo::isRaspberryPi() && m_camera->hasAudio())
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
 }
 
@@ -55,17 +55,17 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraManager::addRef()
+int CameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraManager::releaseRef()
+int CameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
 
-int CameraManager::getEncoderCount( int* encoderCount ) const
+int CameraManager::getEncoderCount(int* encoderCount) const
 {
     *encoderCount = kEncoderCount;
     return nxcip::NX_NO_ERROR;
@@ -75,36 +75,13 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (!m_camera->isInitialized() && !m_camera->initialize())
+    if (!m_camera->initialize())
         return nxcip::NX_IO_ERROR;
-    
-    switch (encoderIndex)
-    {
-        case 0:
-        {
-            if (!m_encoders[encoderIndex])
-            {
-                m_encoders[encoderIndex].reset(new NativeMediaEncoder(
-                    refManager(),
-                    encoderIndex,
-                    m_camera));
-            }
-            break;
-        }
-        case 1:
-        {
-            if (!m_encoders[encoderIndex])
-            {
-                m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
-                    refManager(),
-                    encoderIndex,
-                    m_camera));
-            }
-            break;
-        }
-        default:
-            return nxcip::NX_INVALID_ENCODER_NUMBER;
-    }
+
+    if (encoderIndex > 1 || encoderIndex < 0)
+        return nxcip::NX_INVALID_ENCODER_NUMBER;
+    if (!m_encoders[encoderIndex])
+        m_encoders[encoderIndex].reset(new MediaEncoder(refManager(), encoderIndex, m_camera));
 
     m_encoders[encoderIndex]->addRef();
     *encoderPtr = m_encoders[encoderIndex].get();
@@ -112,9 +89,9 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     return nxcip::NX_NO_ERROR;
 }
 
-int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
+int CameraManager::getCameraInfo(nxcip::CameraInfo* info) const
 {
-    memcpy(info, &m_camera->info(), sizeof(m_camera->info()));
+    *info = m_camera->info();
     return nxcip::NX_NO_ERROR;
 }
 
@@ -152,7 +129,7 @@ nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 
 void CameraManager::getLastErrorString( char* errorString ) const
 {
-    const auto errorToString = 
+    const auto errorToString =
         [&errorString](int ffmpegError) -> bool
         {
             bool error = ffmpegError < 0;
@@ -165,10 +142,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
         };
 
     if (errorToString(m_camera->lastError()))
-    {
-        m_camera->setLastError(0);
         return;
-    }
 
     *errorString = '\0';
 }

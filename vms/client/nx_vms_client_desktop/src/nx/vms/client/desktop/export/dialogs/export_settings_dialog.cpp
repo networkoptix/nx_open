@@ -408,17 +408,15 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 void ExportSettingsDialog::initSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-    if (mediaPersistentSettings.canExportOverlays())
+
+    ui->exportLayoutSettingsPage->setData({ d->exportLayoutPersistentSettings().readOnly });
+
+    // No settings for exportMediaSettingsPage - it will be set up in updateWidgetsState().
+
+    if(mediaPersistentSettings.rapidReview.enabled)
     {
-        ui->exportLayoutSettingsPage->setData({ d->exportLayoutPersistentSettings().readOnly });
-
-        // No settings for exportMediaSettingsPage - it will be set up in updateWidgetsState().
-
-        if(mediaPersistentSettings.rapidReview.enabled)
-        {
-            int speed = d->storedRapidReviewSettings().speed;
-            ui->rapidReviewSettingsPage->setSpeed(speed);
-        }
+        int speed = d->storedRapidReviewSettings().speed;
+        ui->rapidReviewSettingsPage->setSpeed(speed);
     }
 
     ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
@@ -688,7 +686,7 @@ Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
         suggested.name = lit("%1 (%2)").arg(baseName.name).arg(i);
     }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "Failed to generate suggested filename");
+    NX_ASSERT(false, "Failed to generate suggested filename");
     return baseName;
 }
 

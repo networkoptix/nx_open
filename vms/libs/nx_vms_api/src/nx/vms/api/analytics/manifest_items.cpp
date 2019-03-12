@@ -24,9 +24,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics, EventTypeFlag
     (nx::vms::api::analytics::EventTypeFlag::noFlags, "noFlags")
     (nx::vms::api::analytics::EventTypeFlag::stateDependent, "stateDependent")
     (nx::vms::api::analytics::EventTypeFlag::regionDependent, "regionDependent")
+    (nx::vms::api::analytics::EventTypeFlag::hidden, "hidden")
 )
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics, EventTypeFlags,
     (nx::vms::api::analytics::EventTypeFlag::noFlags, "noFlags")
     (nx::vms::api::analytics::EventTypeFlag::stateDependent, "stateDependent")
     (nx::vms::api::analytics::EventTypeFlag::regionDependent, "regionDependent")
+    (nx::vms::api::analytics::EventTypeFlag::hidden, "hidden")
 )

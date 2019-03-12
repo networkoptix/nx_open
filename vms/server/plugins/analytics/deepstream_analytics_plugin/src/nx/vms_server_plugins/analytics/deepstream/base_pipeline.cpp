@@ -1,12 +1,13 @@
 #include "base_pipeline.h"
 
-#include <plugins/plugin_tools.h>
+#define NX_PRINT_PREFIX "deepstream::BasePipeline::"
+#include <nx/kit/debug.h>
+
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_data_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
-#define NX_PRINT_PREFIX "deepstream::BasePipeline::"
-#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -34,10 +35,8 @@ bool BasePipeline::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
     std::lock_guard<std::mutex> guard(m_mutex);
     NX_OUTPUT << __func__ << " Pushing data packet! Queue size is: " << m_packetQueue.size();
 
-    nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> video(
-        dataPacket->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
-
-    if (video)
+    if (const auto video =
+        nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(dataPacket))
     {
         m_lastFrameTimestampUs = video->timestampUs();
         m_currentFrameWidth = video->width();

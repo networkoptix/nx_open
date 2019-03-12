@@ -1,11 +1,6 @@
 #include "string_helper.h"
 
-#include <nx/utils/literal.h>
-#include <nx/utils/std/hashes.h>
-
-#include <plugins/plugin_tools.h>
 #include <nx/fusion/serialization/lexical_enum.h>
-#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace vms_server_plugins {

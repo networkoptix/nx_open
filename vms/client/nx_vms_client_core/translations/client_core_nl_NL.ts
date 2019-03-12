@@ -108,52 +108,12 @@
       <translation>Dit account is niet geactiveerd. Controleer uw e-mail.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Dit account is geblokkeerd.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>De gevraagde functie is niet geïmplementeerd.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Unknown realm.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Onjuist verzoek.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Invalid nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Deze inloggegevens zijn niet langer geldig.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Er is ongeldige data ontvangen.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Onbekende fout.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Onverwachte netwerkfout. Controleer uw internetverbinding en probeer het opnieuw.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Ongeldige login.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Gevraagd object niet gevonden.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Dit object bestaat al.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation>Interne %1 fout. Neem contact op met support team.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sorry, de %1 dienst is tijdelijk niet beschikbaar. We doen ons best om het te herstellen. Probeer het later nogmaals.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Te veel pogingen. Probeer het later opnieuw.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sorry, %1 service kan uw aanvraag niet verwerken. Probeer het over enkele ogenblikken nogmaals.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

@@ -13,7 +13,7 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
@@ -25,7 +25,7 @@
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
@@ -37,7 +37,7 @@
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -49,7 +49,7 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -61,7 +61,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -73,7 +73,7 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
   </context>
   <context>
@@ -102,52 +102,12 @@
       <translation>本帳號未啟動. 請檢查您的 email.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>此帳號已被封鎖.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>要求的功能未執行.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>未知的 realm.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>錯誤的要求.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>無效的 nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>憑証不再有效.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>接收到無效的資料</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>無預期的網路錯誤. 請檢查您的網際網路連接然後重試.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>無效的登入帳號.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>找不到要求的物件.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>物件已存在.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -155,14 +115,17 @@
       <translation>內部的 %1 錯誤. 請連絡支援團隊.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>抱歉, %1 服務暫時無法使用. 我們正在還原中. 請稍後再試.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>嘗試次數過多，請稍後再試。</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>抱歉, %1 服務暫時無法處理您的要求. 請稍後再試.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>
@@ -185,7 +148,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>無法初始化音源編碼器.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -230,7 +193,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <source>m</source>

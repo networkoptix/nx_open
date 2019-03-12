@@ -44,12 +44,12 @@ void* CameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraDiscoveryManager::addRef()
+int CameraDiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraDiscoveryManager::releaseRef()
+int CameraDiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -204,7 +204,7 @@ int CameraDiscoveryManager::fromMDNSData(
 #endif
 }
 
-//!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
+//!Partial parser for SSDP descrition xml (UPnP Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler

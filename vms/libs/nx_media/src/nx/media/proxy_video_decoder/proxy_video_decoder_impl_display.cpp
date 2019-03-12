@@ -2,8 +2,7 @@
 #if defined(ENABLE_PROXY_DECODER)
 
 #include <nx/kit/debug.h>
-
-#include <nx/utils/string.h>
+#include <nx/kit/utils.h>
 
 #include "proxy_video_decoder_utils.h"
 #include "proxy_video_decoder_gl_utils.h"
@@ -197,7 +196,7 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
     {
         if (logPrefix)
         {
-            NX_OUTPUT << logPrefix << nx::utils::stringFormat(" %d x %d @(%d, %d)",
+            NX_OUTPUT << logPrefix << nx::kit::utils::format(" %d x %d @(%d, %d)",
                 r.width(), r.height(), r.left(), r.top());
         }
         const ProxyDecoder::Rect rect{r.left(), r.top(), r.width(), r.height()};

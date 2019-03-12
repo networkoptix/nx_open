@@ -41,7 +41,7 @@ QByteArray QnAvCodecMediaContext::serialize() const
 void QnAvCodecMediaContext::setExtradata(
     const quint8* extradata, int extradata_size)
 {
-    NX_ASSERT(!m_context->extradata || !extradata, Q_FUNC_INFO,
+    NX_ASSERT(!m_context->extradata || !extradata,
         "Attempt to reassign AVCodecContext extradata.");
 
     QnFfmpegHelper::copyAvCodecContextField(

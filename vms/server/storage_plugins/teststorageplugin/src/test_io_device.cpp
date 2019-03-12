@@ -6,7 +6,7 @@
 
 namespace {
 
-const char* const kCamInfo = 
+const char* const kCamInfo =
     "\"cameraName\"=\"TestStorageCamera\"\n"
     "\"cameraModel\"=\"TestStorageCamera\"\n"
     "\"groupId\"=\"\"\n"
@@ -27,7 +27,8 @@ void* TestIODevice::queryInterface(const nxpl::NX_GUID& interfaceID)
         addRef();
         return static_cast<nx_spl::IODevice*>(this);
     }
-    else if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0) 
+    else if (memcmp(&interfaceID, &nxpl::IID_PluginInterface,
+        sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -35,17 +36,17 @@ void* TestIODevice::queryInterface(const nxpl::NX_GUID& interfaceID)
     return nullptr;
 }
 
-unsigned int TestIODevice::addRef()
+int TestIODevice::addRef() const
 {
     return pAddRef();
 }
 
-unsigned int TestIODevice::releaseRef()
+int TestIODevice::releaseRef() const
 {
     return pReleaseRef();
 }
 
-uint32_t TestIODevice::write(const void* /*src*/, const uint32_t size, int* ecode) 
+uint32_t TestIODevice::write(const void* /*src*/, const uint32_t size, int* ecode)
 {
     if (!(m_mode & nx_spl::io::WriteOnly))
     {
@@ -92,7 +93,7 @@ uint32_t TestIODevice::readImpl(void* dst, uint32_t size, int* ecode) const
     return fread(dst, 1, size, m_file);
 }
 
-int TestIODevice::getMode() const 
+int TestIODevice::getMode() const
 {
     return m_mode;
 }
@@ -153,8 +154,9 @@ TestIODevice::~TestIODevice()
         fclose(m_file);
 }
 
-TestIODevice::TestIODevice(const std::string& name, FileCategory category, int mode, 
-                           int64_t size, FILE* f) :
+TestIODevice::TestIODevice(const std::string& name, FileCategory category, int mode,
+    int64_t size, FILE* f)
+    :
     m_sampleFileName(name),
     m_category(category),
     m_mode(mode),

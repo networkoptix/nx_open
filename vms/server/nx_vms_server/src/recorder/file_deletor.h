@@ -15,7 +15,7 @@
 
 namespace nx::vms::server { class RootTool; }
 
-class QnFileDeletor: public QnLongRunnable, public nx::vms::server::ServerModuleAware
+class QnFileDeletor: public QnLongRunnable, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

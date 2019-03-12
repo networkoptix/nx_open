@@ -1,6 +1,8 @@
 #include "modbus_client.h"
 #include "modbus.h"
 
+#include <nx/utils/scope_guard.h>
+
 namespace
 {
 static const std::chrono::seconds kDefaultConnectionTimeout(4);
@@ -22,22 +24,20 @@ QnModbusClient::QnModbusClient(const nx::network::SocketAddress& sockaddr) :
     m_endpoint(sockaddr),
     m_connected(false)
 {
-    initSocket();
+    reinitSocket();
 }
 
 QnModbusClient::~QnModbusClient()
 {
-    if (m_socket)
-        m_socket->shutdown();
+    disconnect();
 }
 
-bool QnModbusClient::initSocket()
+bool QnModbusClient::reinitSocket()
 {
+    NX_VERBOSE(this, "Initing socket");
     m_connected = false;
 
-    if (m_socket)
-        m_socket->shutdown();
-
+    disconnect();
     m_socket = nx::network::SocketFactory::createStreamSocket(false);
 
     if (!m_socket->setRecvTimeout(kReceiveTimeout)
@@ -52,40 +52,64 @@ bool QnModbusClient::initSocket()
 void QnModbusClient::setEndpoint(const nx::network::SocketAddress& endpoint)
 {
     m_endpoint = endpoint;
-    initSocket();
+    reinitSocket();
 }
 
 bool QnModbusClient::connect()
 {
-    if (!m_socket && !initSocket())
+    NX_VERBOSE(this, "Connecting");
+    if (!m_socket && !reinitSocket())
+    {
+        NX_VERBOSE(this, "Failed to create socket");
         return false;
+    }
 
     m_connected = m_socket->connect(m_endpoint, kDefaultConnectionTimeout);
 
+    if (m_connected)
+        NX_VERBOSE(this, "Connected successfully");
+    else
+        NX_DEBUG(this, "Failed to connect");
     return m_connected;
 }
 
 ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, bool* outStatus)
 {
+    NX_VERBOSE(this, "Sending request with function code [%1]", request.functionCode);
+
+    QString errorMessage;
     ModbusResponse response;
+    const auto scopeGuard = nx::utils::makeScopeGuard(
+        [this, outStatus, &response, &errorMessage]()
+        {
+            if (!*outStatus)
+                NX_DEBUG(this, "Request error: %1", errorMessage);
+            else if (response.isException())
+                NX_DEBUG(this, "Response modbus exception: %1", response.getExceptionString());
+            else
+                NX_DEBUG(this, "Got response for function code %1", response.functionCode);
+        });
 
     if (m_endpoint.isNull())
     {
         *outStatus = false;
+        errorMessage = "Endpoint is null";
         return response;
     }
 
-    if (!m_socket && !initSocket())
+    if (!m_socket && !reinitSocket())
     {
         *outStatus = false;
+        errorMessage = "Failed to get socket: " + SystemError::getLastOSErrorText();
         return response;
     }
 
     if (!m_connected)
     {
-        initSocket();
+        reinitSocket();
         if (!connect())
         {
+            errorMessage = "Can't connect to device: "  + SystemError::getLastOSErrorText();
             *outStatus = false;
             return response;
         }
@@ -95,19 +119,18 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
 
     *outStatus = true;
 
-    auto data = ModbusRequest::encode(request);
-    auto bytesSent = m_socket->send(data.constData(), data.size());
+    const auto data = ModbusRequest::encode(request);
     int totalBytesSent = 0;
-
     while (totalBytesSent < data.size())
     {
-        bytesSent = m_socket->send(
+        const auto bytesSent = m_socket->send(
             data.constData() + totalBytesSent,
             data.size() - totalBytesSent);
 
-        if (bytesSent < 1)
+        if (bytesSent <= 0)
         {
-            initSocket();
+            errorMessage = "Failed to send request: " + SystemError::getLastOSErrorText();
+            reinitSocket();
             *outStatus = false;
             return response;
         }
@@ -115,29 +138,25 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
     }
 
     auto totalBytesRead = 0;
-    auto bytesRead = 0;
     auto bytesNeeded = kModbusMaxMessageLength;
-
-    while (true)
+    while (totalBytesRead < bytesNeeded)
     {
-        bytesRead = m_socket->recv(m_recvBuffer + totalBytesRead, kBufferSize - totalBytesRead);
+        const auto bytesRead = m_socket->recv(m_recvBuffer + totalBytesRead, kBufferSize - totalBytesRead);
         if (bytesRead <= 0)
         {
-            initSocket();
+            errorMessage = "Failed to receive response: " + SystemError::getLastOSErrorText();
+            reinitSocket();
             *outStatus = false;
             return response;
         }
 
         totalBytesRead += bytesRead;
-
-        if (totalBytesRead >= bytesNeeded)
-            break;
-
-        if (totalBytesRead >= ModbusMBAPHeader::size)
+        if (totalBytesRead >= static_cast<int>(ModbusMBAPHeader::size))
         {
-            auto header = ModbusMBAPHeader::decode(
+            const auto header = ModbusMBAPHeader::decode(
                 QByteArray(m_recvBuffer, ModbusMBAPHeader::size));
 
+            // NOTE: Size of ModbusMBAPHeader::unitId is counted in header.length.
             bytesNeeded = header.length
                 + sizeof(decltype(ModbusMBAPHeader::transactionId))
                 + sizeof(decltype(ModbusMBAPHeader::protocolId))
@@ -145,14 +164,9 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, boo
         }
     }
 
-    if (bytesRead < 0)
-        *outStatus = false;
-
-    if (*outStatus)
-        response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesNeeded));
-    else
-        initSocket();
-
+    NX_VERBOSE(this, "Received response with size [%1], totalBytesRead [%2]", bytesNeeded, totalBytesRead);
+    NX_ASSERT(*outStatus);
+    response = ModbusResponse::decode(QByteArray(m_recvBuffer, bytesNeeded));
     return response;
 }
 
@@ -236,24 +250,29 @@ void QnModbusClient::disconnect()
 {
     if (m_socket)
     {
+        NX_VERBOSE(this, "Disconnecting");
         m_socket->shutdown();
         m_socket.reset();
     }
 }
 
 ModbusResponse QnModbusClient::writeSingleHoldingRegister(
-    quint16 registerAddress,
-    const QByteArray& data,
+    quint16 /*registerAddress*/,
+    const QByteArray& /*data*/,
     bool* outStatus)
 {
-    ModbusResponse response;
+    NX_ASSERT(false, "ModbusClient::writeSingleHoldingRegister not implemented");
 
-    Q_ASSERT_X(false, "ModbusClient::writeSingleHoldingRegister", "Not implemented");
-
-    return response;
+    *outStatus = false;
+    return {};
 }
 
-ModbusResponse QnModbusClient::readDiscreteInputs(quint16 startAddress, quint16 inputCount, bool* outStatus)
+QString QnModbusClient::idForToStringFromPtr() const
+{
+    return m_endpoint.toString();
+}
+
+ModbusResponse QnModbusClient::readDiscreteInputs(quint16 /*startAddress*/, quint16 /*inputCount*/, bool* outStatus)
 {
     NX_ASSERT(false, "QnModbusClient::readDiscreteInputs not implemented.");
 
@@ -281,7 +300,7 @@ ModbusResponse QnModbusClient::readCoils(
     return doModbusRequest(request, outStatus);
 }
 
-ModbusResponse QnModbusClient::writeCoils(quint16 startCoilAddress, const QByteArray& data, bool *outStatus)
+ModbusResponse QnModbusClient::writeCoils(quint16 /*startCoilAddress*/, const QByteArray& /*data*/, bool *outStatus)
 {
     NX_ASSERT(false, "QnModbusClient::writeCoils not implemented.");
 
@@ -289,7 +308,7 @@ ModbusResponse QnModbusClient::writeCoils(quint16 startCoilAddress, const QByteA
     return ModbusResponse();
 }
 
-ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus)
+ModbusResponse QnModbusClient::readInputRegisters(quint16 /*startRegister*/, quint16 /*registerCount*/, bool* outStatus)
 {
     NX_ASSERT(false, "QnModbusClient::readInputRegisters not implemented.");
 

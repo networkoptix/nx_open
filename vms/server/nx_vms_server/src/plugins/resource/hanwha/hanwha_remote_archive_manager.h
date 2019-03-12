@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <core/resource/abstract_remote_archive_manager.h>
 

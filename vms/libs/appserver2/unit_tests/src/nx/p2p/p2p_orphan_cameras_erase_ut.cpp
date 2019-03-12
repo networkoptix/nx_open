@@ -18,7 +18,6 @@
 
 #include <atomic>
 
-
 namespace nx {
 namespace p2p {
 namespace test {

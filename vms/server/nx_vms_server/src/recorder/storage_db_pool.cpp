@@ -5,10 +5,29 @@
 #include <common/common_module.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
+#include <media_server/media_server_module.h>
+#include <media_server/settings.h>
+
+const size_t kMaxTasksQueueSize = 5000;
 
 QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
+    start();
+}
+
+QnStorageDbPool::~QnStorageDbPool()
+{
+    stop();
+}
+
+void QnStorageDbPool::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    {
+        QnMutexLocker lock(&m_sdbMutex);
+        m_tasksWaitCondition.wakeOne();
+    }
 }
 
 QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
@@ -31,7 +50,12 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             closeDirPath(dbPath) +
             QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
-        sdb = QnStorageDbPtr(new QnStorageDb(serverModule(), storage, getStorageIndex(storage)));
+        sdb = QnStorageDbPtr(
+            new QnStorageDb(
+                serverModule(),
+                storage,
+                getStorageIndex(storage),
+                serverModule()->settings().vacuumIntervalSec()));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }
@@ -56,7 +80,8 @@ int QnStorageDbPool::getStorageIndex(const QnStorageResourcePtr& storage)
     {
         return *m_storageIndexes.value(path).begin();
     }
-    else {
+    else
+    {
         int index = -1;
         for (const QSet<int>& indexes: m_storageIndexes.values())
         {
@@ -75,12 +100,34 @@ void QnStorageDbPool::removeSDB(const QnStorageResourcePtr &storage)
     m_chunksDB.remove(storage->getUrl());
 }
 
-void QnStorageDbPool::flush()
+void QnStorageDbPool::run()
 {
-    QnMutexLocker lock( &m_sdbMutex );
-    for(const QnStorageDbPtr& sdb: m_chunksDB.values())
+    QnMutexLocker lock(&m_tasksMutex);
+    while (!m_needStop)
     {
-        if (sdb)
-            sdb->flushRecords();
+        while (!needToStop() && m_tasksQueue.empty())
+            m_tasksWaitCondition.wait(&m_tasksMutex);
+
+        if (m_needStop)
+            return;
+
+        const auto vacuumTask = std::move(m_tasksQueue.front());
+        m_tasksQueue.pop();
+        lock.unlock();
+        vacuumTask();
+        lock.relock();
     }
+}
+
+void QnStorageDbPool::addTask(nx::utils::MoveOnlyFunc<void()> vacuumTask)
+{
+    QnMutexLocker lock(&m_tasksMutex);
+    if (m_tasksQueue.size() > kMaxTasksQueueSize)
+    {
+        NX_WARNING(this, "Tasks queue overflow. Dropping a task");
+        return;
+    }
+
+    m_tasksQueue.push(std::move(vacuumTask));
+    m_tasksWaitCondition.wakeOne();
 }

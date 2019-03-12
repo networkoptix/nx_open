@@ -1,8 +1,7 @@
 #include "device_agent.h"
 
-#include <plugins/plugin_tools.h>
-
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/string.h>
 
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_metadata_packet.h>
@@ -39,29 +38,7 @@ DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine
     m_pipeline->start();
 }
 
-void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == nx::sdk::analytics::IID_DeviceAgent)
-    {
-        addRef();
-        return static_cast<nx::sdk::analytics::IDeviceAgent*>(this);
-    }
-
-    if (interfaceId == nx::sdk::analytics::IID_ConsumingDeviceAgent)
-    {
-        addRef();
-        return static_cast<nx::sdk::analytics::IConsumingDeviceAgent*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
-void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";
@@ -76,12 +53,12 @@ void DeviceAgent::setSettings(const nx::sdk::IStringMap* settings)
     NX_OUTPUT << "}";
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -97,14 +74,12 @@ nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::IDeviceAgent::IHandle
     return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket)
+Error DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
+// TODO: Investigate why this code is commented out.
 #if 0
-    nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> compressedVideo(
-        dataPacket->queryInterface(nx::sdk::analytics::IID_CompressedVideoPacket));
-
-    if (!compressedVideo)
-        return nx::sdk::Error::noError;
+    if (!queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
+        return Error::noError;
 
     NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();
 #endif
@@ -117,20 +92,18 @@ nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::IDataPacket* data
     return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
-        return nx::sdk::Error::noError;
+        return Error::noError;
     }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
     return Error::noError;
@@ -141,12 +114,12 @@ void DeviceAgent::stopFetchingMetadata()
     NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
 }
 
-const nx::sdk::IString* DeviceAgent::manifest(Error* error) const
+const IString* DeviceAgent::manifest(Error* error) const
 {
     *error = Error::noError;
 
     if (!m_manifest.empty())
-        return new nx::sdk::common::String(m_manifest);
+        return new nx::sdk::String(m_manifest);
 
     std::string objectTypeIds;
     const auto& objectClassDescritions = m_engine->objectClassDescritions();
@@ -174,7 +147,7 @@ const nx::sdk::IString* DeviceAgent::manifest(Error* error) const
 }
 )json";
 
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
 DeviceAgent::~DeviceAgent()

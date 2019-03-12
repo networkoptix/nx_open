@@ -16,6 +16,7 @@
 
 #include "detail/media_stream_cache_detail.h"
 
+#include <nx/utils/log/log.h>
 
 using namespace std;
 
@@ -46,24 +47,24 @@ MediaStreamCache::SequentialReadContext::~SequentialReadContext()
 QnAbstractDataPacketPtr MediaStreamCache::SequentialReadContext::getNextFrame()
 {
     auto strongCacheRef = m_sharedCache.lock();
-    if( !strongCacheRef )
+    if (!strongCacheRef)
         return QnAbstractDataPacketPtr();
 
-    if( m_firstFrame )
+    if (m_firstFrame)
     {
+        // TODO: Add channel support. Remove 0s, check HLS.
         QnAbstractDataPacketPtr packet = strongCacheRef->findByTimestamp(
-            m_startTimestamp,
-            true,
-            &m_currentTimestamp );
-        if( !packet )
+            m_startTimestamp, true, &m_currentTimestamp, 0);
+        if (!packet)
             return QnAbstractDataPacketPtr();
         m_firstFrame = false;
         return packet;
     }
 
-    QnAbstractDataPacketPtr packet = strongCacheRef->getNextPacket( m_currentTimestamp, &m_currentTimestamp );
-    if( packet )
-        strongCacheRef->moveBlocking( m_blockingID, m_currentTimestamp );
+    QnAbstractDataPacketPtr packet = strongCacheRef->getNextPacket(
+        m_currentTimestamp, &m_currentTimestamp, 0);
+    if (packet)
+        strongCacheRef->moveBlocking(m_blockingID, m_currentTimestamp);
     return packet;
 }
 
@@ -83,10 +84,12 @@ MediaStreamCache::MediaStreamCache(
             cacheSizeMillis,
             maxCacheSizeMillis))
 {
+    NX_VERBOSE(this, "New");
 }
 
 MediaStreamCache::~MediaStreamCache()
 {
+    NX_VERBOSE(this, "Delete");
 }
 
 //!Implementation of QnAbstractMediaDataReceptor::canAcceptData
@@ -138,17 +141,20 @@ int MediaStreamCache::getMaxBitrate() const
 QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
     quint64 desiredTimestamp,
     bool findKeyFrameOnly,
-    quint64* const foundTimestamp ) const
+    quint64* const foundTimestamp,
+    int channelNumber) const
 {
     return m_sharedImpl->findByTimestamp(
         desiredTimestamp,
         findKeyFrameOnly,
-        foundTimestamp );
+        foundTimestamp,
+        channelNumber);
 }
 
-QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const
+QnAbstractDataPacketPtr MediaStreamCache::getNextPacket(
+    quint64 timestamp, quint64* const foundTimestamp, int channelNumber) const
 {
-    return m_sharedImpl->getNextPacket( timestamp, foundTimestamp );
+    return m_sharedImpl->getNextPacket(timestamp, foundTimestamp, channelNumber);
 }
 
 nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& MediaStreamCache::keyFrameFoundSubscription()

@@ -1,7 +1,8 @@
 #!/bin/sh -e
 
-COMPANY_NAME=@deb.customization.company.name@
-CLOUD_HOST=@cloudHost@
+COMPANY_NAME="@deb.customization.company.name@"
+CLOUD_HOST="@cloudHost@"
+CLOUD_NAME="@cloudName@"
 
 . /usr/share/debconf/confmodule
 
@@ -24,15 +25,24 @@ errmsg()
 
 check_cloud_host()
 {
-    # At this stage we don't have config helper
+    # Here we check cloud instances conflict during upgrade. This check is basically done by the
+    # pre-remove script, however we check it here again because old versions may have not the check
+    # in the pre-remove script.
+
+    # At this stage we don't have the config helper.
     [ -f "$CONFIG_FILE" ] || return 0
+
+    echo "Checking @cloudName@ compatibility..." >&2
 
     INSTALLED_CLOUD_HOST=$(awk -F= '/^cloudHost/ {print $2}' "$CONFIG_FILE")
     IS_CONNECTED_TO_CLOUD=$(awk -F= '/^isConnectedToCloud/ {print $2}' "$CONFIG_FILE")
 
-    if [ "$IS_CONNECTED_TO_CLOUD" = "yes" -a -n "$INSTALLED_CLOUD_HOST" -a "$INSTALLED_CLOUD_HOST" != "$CLOUD_HOST" ]
+    if [ "$IS_CONNECTED_TO_CLOUD" = "yes" -a -n "$INSTALLED_CLOUD_HOST" \
+        -a "$INSTALLED_CLOUD_HOST" != "$CLOUD_HOST" ]
     then
-        echo "This beta package is for another cloud instance. Exiting.." >&2
+        echo >&2
+        echo "This package is for another instance of $CLOUD_NAME! Exiting..." >&2
+        echo >&2
         exit 1
     fi
 }

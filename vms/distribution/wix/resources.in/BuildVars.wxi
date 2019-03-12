@@ -97,12 +97,16 @@
         <?define QtDir="${qt.dir}/bin"?>
         <?define QtPluginsDir="${qt.dir}/plugins"?>
         <?define IcuDir="${icu_directory}/bin"?>
+        <?define ucrt_directory="${ucrt_directory}"?>
+        <?define vcrt_directory="${vcrt_directory}"?>
 
-        <?define VC14RedistPath="${VC14RedistPath}"?>
         <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
         <?define enable_hanwha = "${enable_hanwha}"?>
 
         <?define eulaVersion = "${eulaVersion}"?>
         <?define developerBuild = "${developerBuild}"?>
+
+        <?define installerIcon = "${installerIcon}"?>
+        <?define productLogo = "${productLogo}"?>
      <?endif?>
 </Include>

@@ -252,11 +252,15 @@ bool FfmpegVideoDecoder::isCompatible(
     if (maxRes.isEmpty())
         return true;
 
-    if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
+    const auto fixedResolution = resolution.height() > resolution.width()
+        ? resolution.transposed()
+        : resolution;
+
+    if (fixedResolution.width() <= maxRes.width() && fixedResolution.height() <= maxRes.height())
         return true;
 
     NX_WARNING(kLogTag, lm("Max resolution %1 x %2 exceeded: %3 x %4").args(
-        maxRes.width(), maxRes.height(), resolution.width(), resolution.height()));
+        maxRes.width(), maxRes.height(), fixedResolution.width(), fixedResolution.height()));
 
     if (ini().unlimitFfmpegMaxResolution)
     {

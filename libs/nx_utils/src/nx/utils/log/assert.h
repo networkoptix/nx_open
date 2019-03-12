@@ -12,6 +12,7 @@
 #include "log_message.h"
 
 #include <nx/utils/general_macros.h>
+#include <nx/utils/nx_utils_ini.h>
 
 #if defined(ANDROID) || defined(__ANDROID__)
     #include "backtrace_android.h"
@@ -33,7 +34,11 @@ bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
 void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
 
-bool NX_UTILS_API isAssertHeavyConditionEnabled();
+namespace detail {
+
+static const bool assertHeavyConditionEnabled = ini().assertHeavyCondition;
+
+} // detail
 
 /**
  * @return Always false.
@@ -118,17 +123,14 @@ private:
  *     ```
  */
 #define NX_CRITICAL(...) \
-    NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
-        __VA_ARGS__, NX_CRITICAL3, NX_CRITICAL2, NX_CRITICAL1, args_reqired)(__VA_ARGS__))
+    NX_MSVC_EXPAND(NX_GET_3RD_ARG( \
+        __VA_ARGS__, NX_CRITICAL2, NX_CRITICAL1, args_reqired)(__VA_ARGS__))
 
 #define NX_CRITICAL1(CONDITION) \
     NX_CHECK(/*isCritical*/ true, CONDITION, "")
 
 #define NX_CRITICAL2(CONDITION, MESSAGE) \
     NX_CHECK(/*isCritical*/ true, CONDITION, MESSAGE)
-
-#define NX_CRITICAL3(CONDITION, WHERE, MESSAGE) \
-    NX_CHECK(/*isCritical*/ true, CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
  * - Debug: Causes segfault in case of assertion failure, if not disabled via
@@ -145,17 +147,14 @@ private:
  * @return Condition evaluation result.
  */
 #define NX_ASSERT(...) \
-    NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
-        __VA_ARGS__, NX_ASSERT3, NX_ASSERT2, NX_ASSERT1, args_reqired)(__VA_ARGS__))
+    NX_MSVC_EXPAND(NX_GET_3RD_ARG( \
+        __VA_ARGS__, NX_ASSERT2, NX_ASSERT1, args_reqired)(__VA_ARGS__))
 
 #define NX_ASSERT1(CONDITION) \
     NX_CHECK(/*isCritical*/ false, CONDITION, "")
 
 #define NX_ASSERT2(CONDITION, MESSAGE) \
     NX_CHECK(/*isCritical*/ false, CONDITION, MESSAGE)
-
-#define NX_ASSERT3(CONDITION, WHERE, MESSAGE) \
-    NX_CHECK(/*isCritical*/ false, CONDITION, lm("[%1] %2").arg(WHERE).arg(MESSAGE))
 
 /**
  * - Debug: Works the same way as NX_ASSERT(), if not disabled via
@@ -170,6 +169,6 @@ private:
  */
 #define NX_ASSERT_HEAVY_CONDITION(...) do \
 { \
-    if (::nx::utils::isAssertHeavyConditionEnabled()) \
+    if (::nx::utils::detail::assertHeavyConditionEnabled) \
         NX_ASSERT(__VA_ARGS__); \
 } while (0)

@@ -123,8 +123,7 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
 
     const auto status = camera->getStatus();
     const bool isEdgeRecordingEnabled = serverModule()->globalSettings()->isEdgeRecordingEnabled();
-    const auto canArchiveBeSynchronized =
-        (status == Qn::Online || status == Qn::Recording)
+    const auto canArchiveBeSynchronized = QnResource::isOnline(status)
         && camera->hasCameraCapabilities(Qn::RemoteArchiveCapability)
         && camera->isLicenseUsed()
         && !camera->hasFlags(Qn::foreigner)

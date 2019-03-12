@@ -52,12 +52,13 @@ set(target_args
         ${QML_FILES}
         ${resources}
     PUBLIC_LIBS
-        Qt5::WebChannel Qt5::WebSockets
+        Qt5::WebChannel Qt5::WebSockets Qt5::Svg
         qtsingleguiapplication
         nx_kit
         nx_vms_client_core)
 
 if(ANDROID)
+    string(REPLACE "-Wl,--as-needed" "" CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS})
     nx_add_target(mobile_client LIBRARY LIBRARY_TYPE SHARED ${target_args})
 else()
     nx_add_target(mobile_client EXECUTABLE ${target_args})
@@ -173,7 +174,7 @@ if(IOS)
     endif()
 
     setup_ios_application(mobile_client
-        ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio
+        ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio qsvg
         QML_ROOT "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
     )
 

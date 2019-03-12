@@ -304,7 +304,7 @@ qint64 RapidReviewSettingsWidgetPrivate::selectedLengthMeasureUnitInMs() const
     const auto index = std::max(m_selectedLengthUnitIndex, 0);
     NX_ASSERT(index == m_selectedLengthUnitIndex);
 
-    NX_ASSERT(unitsModel->rowCount() > index, Q_FUNC_INFO, "Make sure model is valid");
+    NX_ASSERT(unitsModel->rowCount() > index, "Make sure model is valid");
     if (index >= unitsModel->rowCount())
         return 1;
 

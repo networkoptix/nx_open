@@ -97,7 +97,7 @@ Settings::Settings(QSettings* settings)
             if (value == '*')
                 logger.level.primary = level;
             else
-                logger.level.filters[Tag(value)] = level;
+                logger.level.filters[Filter(value)] = level;
         }
         settings->endGroup();
 
@@ -117,7 +117,7 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
             continue;
         ++logSettingCount;
 
-        if (arg.first == lm("%1/logger").args(prefix).toQString())
+        if (arg.first.startsWith(lm("%1/logger").args(prefix).toQString()))
         {
             LoggerSettings loggerSettings;
             loggerSettings.parse(arg.second);

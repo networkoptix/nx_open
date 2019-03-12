@@ -47,7 +47,7 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 class QnRuntimeInfoManager:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
     Q_OBJECT

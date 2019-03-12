@@ -26,6 +26,7 @@ const QHash<Value, QString> kErrorToStringHash{
     { configurationFailed, lit("CONFIGURATION_ERROR") },
     { dependentSystemBoundToCloud, lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD") },
     { bothSystemBoundToCloud, lit("BOTH_SYSTEM_BOUND_TO_CLOUD") },
+    { cloudSystemsHaveDifferentOwners, lit("CLOUD_SYSTEMS_HAVE_DIFFERENT_OWNERS") },
     { differentCloudHost, lit("DIFFERENT_CLOUD_HOST") },
     { unconfiguredSystem, lit("UNCONFIGURED_SYSTEM") },
     { unknownError, lit("UNKNOWN_ERROR") },
@@ -95,14 +96,17 @@ public:
                 return tr("Both Systems are connected to %1. Merge is not allowed.",
                     "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::network::AppInfo::cloudName());
+            case cloudSystemsHaveDifferentOwners:
+                return tr("Cloud systems have different owners. Merge is not allowed.",
+                    "%1 is the cloud name (like Nx Cloud)")
+                    .arg(nx::network::AppInfo::cloudName());
             case differentCloudHost:
                 return tr("These Systems are built with different %1 URL. Merge is not allowed.",
                     "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::network::AppInfo::cloudName());
             case duplicateMediaServerFound:
                 return tr("Cannot merge Systems because they have at least one server with the "
-                    "same ID. Please remove this server and try again.")
-                    .arg(nx::network::AppInfo::cloudName());
+                    "same ID. Please remove this server and try again.");
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");
             default:

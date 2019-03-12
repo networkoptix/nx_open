@@ -13,41 +13,41 @@ struct AnalyticsActionResult
 
 struct AnalyticsAction
 {
-    /** Id of a plugin which should handle the action. */
-    QString pluginId;
+    /** Id of an Engine which should handle the Action. */
+    QnUuid engineId;
 
     QString actionId;
 
-    /** Id of a metadata object to which the action is applied. */
+    /** Id of an Analytics Object to which the Action is applied. */
     QnUuid objectId;
 
-    QnUuid cameraId;
+    QnUuid deviceId;
 
     qint64 timestampUs;
 
-    QMap<QString, QString> params;
+    using Parameters = QMap<QString, QString>;
+    Parameters params;
 };
-#define AnalyticsAction_Fields (pluginId)(actionId)(objectId)(cameraId)(timestampUs)(params)
+#define AnalyticsAction_Fields (engineId)(actionId)(objectId)(deviceId)(timestampUs)(params)
 
 // TODO: #dmishin: Rename to AvailableAnalyticsActionsOfEngine.
-struct AvailableAnalyticsActionsOfPlugin
+struct AvailableAnalyticsActionsOfEngine
 {
-    // TODO: #dmishin: Rename to engineId.
-    QString pluginId;
+    QnUuid engineId;
 
     QStringList actionIds;
 };
-#define AvailableAnalyticsActionsOfPlugin_Fields (pluginId)(actionIds)
+#define AvailableAnalyticsActionsOfEngine_Fields (engineId)(actionIds)
 
 struct AvailableAnalyticsActions
 {
-    QList<AvailableAnalyticsActionsOfPlugin> actions;
+    QList<AvailableAnalyticsActionsOfEngine> actions;
 };
 #define AvailableAnalyticsActions_Fields (actions)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (AnalyticsActionResult)
     (AnalyticsAction)
-    (AvailableAnalyticsActionsOfPlugin)
+    (AvailableAnalyticsActionsOfEngine)
     (AvailableAnalyticsActions),
     (json));

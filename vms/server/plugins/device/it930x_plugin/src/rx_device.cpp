@@ -12,7 +12,6 @@
 // Logger logger("/opt/networkoptix/mediaserver/var/log/it930x.log");
 #endif
 
-
 namespace ite {
 namespace aux {
 
@@ -24,7 +23,7 @@ static int minStrength()
 
 } // namespace aux
 
-//	std::mutex It930x::m_rcMutex;
+//std::mutex It930x::m_rcMutex;
 RxSyncManager rxSyncManager;
 RxHintManager rxHintManager;
 
@@ -230,7 +229,6 @@ void RxDevice::startWatchDog()
         }
     );
 }
-
 
 bool RxDevice::testChannel(int chan, int &bestChan, int &bestStrength, int &txID)
 {

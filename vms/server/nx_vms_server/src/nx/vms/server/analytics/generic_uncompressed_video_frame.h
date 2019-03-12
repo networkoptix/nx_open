@@ -3,26 +3,24 @@
 #include <vector>
 
 #include <nx/utils/log/assert.h>
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
-namespace nx {
-namespace vms::server {
-namespace analytics {
+namespace nx::vms::server::analytics {
 
 class GenericUncompressedVideoFrame:
-    public nxpt::CommonRefCounter<nx::sdk::analytics::IUncompressedVideoFrame>
+    public nx::sdk::RefCountable<nx::sdk::analytics::IUncompressedVideoFrame>
 {
 public:
     GenericUncompressedVideoFrame(
-        int64_t timestampUsec,
+        int64_t timestampUs,
         int width,
         int height,
         PixelFormat pixelFormat,
         std::vector<std::vector<char>>&& data,
         std::vector<int>&& lineSizes)
         :
-        m_timestampUs(timestampUsec),
+        m_timestampUs(timestampUs),
         m_width(width),
         m_height(height),
         m_pixelFormat(pixelFormat),
@@ -32,8 +30,6 @@ public:
         NX_ASSERT(!m_data.empty());
         NX_ASSERT(m_lineSizes.size() == m_data.size());
     }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual int64_t timestampUs() const override { return m_timestampUs; }
     virtual int width() const override { return m_width; }
@@ -57,6 +53,4 @@ private:
     const std::vector<int> m_lineSizes;
 };
 
-} // namespace nx
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server::analytics

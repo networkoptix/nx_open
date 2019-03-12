@@ -79,7 +79,7 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool /*isCameraC
     m_rtpReader.setRequest(m_request);
     m_rtpReader.setRtpTransport(m_rtpTransport);
 
-	m_camera->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
+    m_camera->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 
     const auto result = m_rtpReader.openStream();
     NX_VERBOSE(this, lm("Role %1, open stream %2 -> %3")

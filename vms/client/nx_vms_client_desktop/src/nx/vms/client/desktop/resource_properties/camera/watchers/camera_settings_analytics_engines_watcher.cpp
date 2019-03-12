@@ -35,6 +35,7 @@ public:
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
     void at_enginePropertyChanged(const QnResourcePtr& resource, const QString& key);
+    void at_engineManifestChanged(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
 
 public:
     CameraSettingsDialogStore* store = nullptr;
@@ -67,6 +68,8 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
             this, &Private::at_engineNameChanged);
         connect(engine.data(), &QnResource::propertyChanged,
             this, &Private::at_enginePropertyChanged);
+        connect(engine.data(), &nx::vms::common::AnalyticsEngineResource::manifestChanged,
+            this, &Private::at_engineManifestChanged);
 
         updateStore();
     }
@@ -100,13 +103,15 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
     {
         store->setDeviceAgentSettingsValues(engine->getId(), engine->settingsValues());
     }
-    else if (key == AnalyticsEngineResource::kEngineManifestProperty)
+}
+
+void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineManifestChanged(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+{
+    if (const auto it = engines.find(engine->getId()); it != engines.end())
     {
-        if (const auto it = engines.find(resource->getId()); it != engines.end())
-        {
-            it->settingsModel = engine->manifest().deviceAgentSettingsModel;
-            updateStore();
-        }
+        it->settingsModel = engine->manifest().deviceAgentSettingsModel;
+        updateStore();
     }
 }
 

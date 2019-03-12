@@ -2,9 +2,7 @@
 
 #include <nx/vms/api/types_fwd.h>
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 enum MotionType
 {
@@ -19,18 +17,17 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
 Q_DECLARE_FLAGS(MotionTypes, MotionType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 
-enum class MotionStreamType
+enum class StreamIndex
 {
-    automatic,
-    primary,
-    secondary,
-    edge
+    undefined = -1,
+    primary = 0,
+    secondary = 1
 };
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionStreamType)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+StreamIndex NX_VMS_API oppositeStreamIndex(StreamIndex streamIndex);
+
+} // namespace nx::vms::api
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionType,
     (metatype)(numeric)(lexical)(debug),

@@ -1,11 +1,11 @@
 #include "relay_connection_acceptor.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "api/relay_api_client_factory.h"
+
+#include "../../protocol_type.h"
 
 namespace nx::network::cloud::relay {
 
@@ -13,7 +13,6 @@ using namespace nx::cloud::relay;
 
 namespace detail {
 
-// TODO: #ak Replace this class with something more general.
 class ServerSideReverseStreamSocket:
     public StreamSocketDelegate
 {
@@ -30,6 +29,12 @@ public:
     {
     }
 
+    virtual bool getProtocol(int* protocol) const override
+    {
+        *protocol = Protocol::relay;
+        return true;
+    }
+
     virtual SocketAddress getForeignAddress() const override
     {
         return m_remotePeerAddress;
@@ -43,7 +48,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 ReverseConnection::ReverseConnection(const nx::utils::Url& relayUrl):
-    m_relayClient(api::ClientFactory::instance().create(relayUrl)),
+    m_relayClient(std::make_unique<api::Client>(relayUrl)),
     m_peerName(relayUrl.userName().toStdString())
 {
     bindToAioThread(getAioThread());
@@ -135,27 +140,34 @@ void ReverseConnection::onConnectDone(
 
         m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             std::move(streamSocket));
-        m_httpPipeline->setOnConnectionClosed(
+        m_httpPipeline->registerCloseHandler(
             [this](auto&&... args) { onConnectionClosed(std::move(args)...); });
         m_httpPipeline->setMessageHandler(
-            [this](auto&&... args) { relayNotificationReceived(std::move(args)...); });
+            [this](auto&&... args) { dispatchRelayNotificationReceived(std::move(args)...); });
         m_beginListeningResponse = response;
     }
 
     nx::utils::swapAndCall(m_connectHandler, api::toSystemError(resultCode));
 }
 
-void ReverseConnection::relayNotificationReceived(
+void ReverseConnection::dispatchRelayNotificationReceived(
     nx::network::http::Message message)
 {
-    api::OpenTunnelNotification openTunnelNotification;
-    if (!openTunnelNotification.parse(message))
-    {
-        NX_DEBUG(this, lm("Could not parse received notification. \r\n%1")
-            .arg(message));
-        m_httpPipeline.reset();
-        return; //< Just ignoring.
-    }
+    nx::cloud::relay::api::OpenTunnelNotification openTunnelNotification;
+    if (openTunnelNotification.parse(message))
+        return processOpenTunnelNotification(std::move(openTunnelNotification));
+
+    NX_VERBOSE(this, lm("Ignoring unknown notification %1")
+        .args(message.type == http::MessageType::request ? message.request->requestLine.toString()
+            : message.type == http::MessageType::response ? message.response->statusLine.toString()
+            : http::StringType()));
+}
+
+void ReverseConnection::processOpenTunnelNotification(
+    api::OpenTunnelNotification openTunnelNotification)
+{
+    NX_VERBOSE(this, lm("Received OPEN_TUNNEL notification from %1")
+        .args(m_httpPipeline->socket()->getForeignAddress()));
 
     m_streamSocket = std::make_unique<ServerSideReverseStreamSocket>(
         m_httpPipeline->takeSocket(),

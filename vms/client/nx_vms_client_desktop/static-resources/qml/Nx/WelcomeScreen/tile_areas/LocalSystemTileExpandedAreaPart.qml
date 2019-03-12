@@ -1,5 +1,6 @@
-import QtQuick 2.6;
-import Nx 1.0;
+import QtQuick 2.6
+import Nx 1.0
+import Nx.Controls 1.0
 
 import ".."
 
@@ -50,20 +51,20 @@ Column
             text: qsTr("Login");
         }
 
-        NxTextEdit
+        TextField
         {
-            id: loginTextItem;
+            id: loginTextItem
 
-            visible: !control.hasRecentConnections;
-            text: "admin";
-            width: parent.width;
+            visible: !control.hasRecentConnections
+            text: "admin"
+            width: parent.width
 
-            onAccepted: control.connectButtonClicked();
+            onAccepted: control.connectButtonClicked()
 
-            KeyNavigation.tab: passwordTextItem;
-            KeyNavigation.backtab: prevTabObject;
+            KeyNavigation.tab: passwordTextItem
+            KeyNavigation.backtab: prevTabObject
 
-            enabled: !control.isConnecting;
+            enabled: !control.isConnecting
         }
 
         NxLabel
@@ -71,23 +72,23 @@ Column
             text: qsTr("Password");
         }
 
-        NxTextEdit
+        TextField
         {
-            id: passwordTextItem;
+            id: passwordTextItem
 
-            width: parent.width;
-            echoMode: TextInput.Password;
+            width: parent.width
+            echoMode: TextInput.Password
 
-            onAccepted: control.connectButtonClicked();
+            onAccepted: control.connectButtonClicked()
 
-            KeyNavigation.tab: savePasswordCheckBoxControl;
-            KeyNavigation.backtab: (loginTextItem.visible ? loginTextItem : control.prevTabObject);
+            KeyNavigation.tab: savePasswordCheckBoxControl
+            KeyNavigation.backtab: (loginTextItem.visible ? loginTextItem : control.prevTabObject)
 
-            enabled: !control.isConnecting;
+            enabled: !control.isConnecting
             onEnabledChanged:
             {
                 if (enabled)
-                    forceActiveFocus();
+                    forceActiveFocus()
             }
          }
 

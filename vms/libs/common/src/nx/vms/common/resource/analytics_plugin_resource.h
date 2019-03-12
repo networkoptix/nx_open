@@ -29,6 +29,8 @@ public:
 
     AnalyticsEngineResourceList engines() const;
     bool hasDefaultEngine() const;
+
+    virtual QString idForToStringFromPtr() const override;
 };
 
 } // namespace nx::vms::common

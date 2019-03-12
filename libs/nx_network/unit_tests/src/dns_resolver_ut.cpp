@@ -188,7 +188,7 @@ TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
 
     {
         std::deque<HostAddress> ips;
-        const auto resultCode = dnsResolver.resolveSync("hren2349jf234.ru", AF_INET, &ips);
+        const auto resultCode = dnsResolver.resolveSync("hren2349jf234.ru.", AF_INET, &ips);
         ASSERT_EQ(SystemError::hostNotFound, resultCode);
         ASSERT_EQ(0U, ips.size());
     }

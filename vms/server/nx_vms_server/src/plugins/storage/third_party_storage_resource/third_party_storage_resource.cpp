@@ -207,6 +207,8 @@ void QnThirdPartyStorageResource::openStorage(
     if (spRaw == nullptr)
         throw std::runtime_error("Couldn't create Storage");
 
+    // TODO: Migrate to nx::sdk::Ptr.
+
     std::shared_ptr<nx_spl::Storage> sp =
         std::shared_ptr<nx_spl::Storage>(
             spRaw,
@@ -217,7 +219,7 @@ void QnThirdPartyStorageResource::openStorage(
         );
 
     void* queryResult = nullptr;
-    if ((queryResult = sp->queryInterface(nx_spl::IID_Storage)))
+    if (queryResult = sp->queryInterface(nx_spl::IID_Storage))
     {
         m_storage.reset(
             static_cast<nx_spl::Storage*>(queryResult),
@@ -252,6 +254,8 @@ QIODevice *QnThirdPartyStorageResource::open(
     if (openMode & QIODevice::WriteOnly)
         ioFlags |= nx_spl::io::WriteOnly;
 
+    // TODO: Migrate to nx::sdk::Ptr.
+
     nx_spl::IODevice* ioRaw = m_storage->open(
         QUrl(fileName).path().toLatin1().constData(),
         ioFlags,
@@ -266,7 +270,7 @@ QIODevice *QnThirdPartyStorageResource::open(
         return nullptr;
     }
 
-    void *queryResult = ioRaw->queryInterface(nx_spl::IID_IODevice);
+    void* queryResult = ioRaw->queryInterface(nx_spl::IID_IODevice);
     if (queryResult == nullptr)
     {
         ioRaw->releaseRef();
@@ -410,6 +414,8 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     if (!m_valid)
         return QnAbstractStorageResource::FileInfoList();
 
+    // TODO: Migrate to nx::sdk::Ptr.
+
     QnMutexLocker lock(&m_mutex);
     int ecode;
     nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(
@@ -425,7 +431,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
         return QnAbstractStorageResource::FileInfoList();
     }
 
-    void *queryResult = fitRaw->queryInterface(nx_spl::IID_FileInfoIterator);
+    void* queryResult = fitRaw->queryInterface(nx_spl::IID_FileInfoIterator);
     if (queryResult == nullptr)
     {
         fitRaw->releaseRef();

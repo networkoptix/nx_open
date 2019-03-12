@@ -312,7 +312,7 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
     int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTimeMs).date().daysTo(
         QDateTime::fromMSecsSinceEpoch(expirationTimeMs).date());
 
-    NX_ASSERT(daysLeft >= 0, Q_FUNC_INFO);
+    NX_ASSERT(daysLeft >= 0);
     QString message;
 
     switch (daysLeft)

@@ -1,5 +1,7 @@
 #include "simple_motion_search_list_model.h"
 
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -10,6 +12,7 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
 
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -129,6 +132,10 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
 
         case Qn::ForcePrecisePreviewRole:
             return true;
+
+        case Qn::PreviewStreamSelectionRole:
+            return QVariant::fromValue(
+                nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(chunk));
@@ -270,20 +277,25 @@ void SimpleMotionSearchListModel::requestFetch()
 
 void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 {
-    if (!NX_ASSERT(!m_fetchInProgress))
+    if (!NX_ASSERT(!m_fetchInProgress) || isFilterDegenerate())
         return;
 
-    if ((m_data.empty() && canFetchMore()) || isFilterDegenerate())
+    if (m_data.empty())
+    {
+        clear(); //< Will emit dataNeeded signal.
         return;
+    }
 
     QnScopedValueRollback<bool> progressRollback(&m_fetchInProgress, true);
 
     // Received startTimeMs covers newly added chunks, but not potentially modified last chunk.
     // This is a workaround.
     if (!m_data.empty())
-        startTimeMs = qMin(startTimeMs, m_data.front().startTimeMs);
+        startTimeMs = std::clamp(startTimeMs, m_data.back().startTimeMs, m_data.front().startTimeMs);
 
-    NX_VERBOSE(this, "Updating, from %1", utils::timestampToDebugString(startTimeMs));
+    NX_VERBOSE(this, "Updating, from %1, old item count = %2",
+        utils::timestampToDebugString(startTimeMs),
+        m_data.size());
 
     NX_ASSERT(!fetchedTimeWindow().isNull());
 
@@ -304,6 +316,15 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 
     const auto sourceEnd = std::lower_bound(periods.cbegin(), periods.cend(),
         periodToUpdate.endTime(), ascendingLowerBoundPredicate);
+
+    const int updateSize = sourceEnd - sourceBegin;
+    if ((updateSize - rowCount()) > maximumCount())
+    {
+        NX_WARNING(this, "Unexpected update, count = %1, resetting.", updateSize);
+        progressRollback.rollback();
+        clear(); //< Will emit dataNeeded signal.
+        return;
+    }
 
     const auto targetBegin = std::lower_bound(m_data.rbegin(), m_data.rend(),
         periodToUpdate.startTime(), ascendingLowerBoundPredicate);
@@ -347,10 +368,21 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
 
     NX_VERBOSE(this, "Added %1, removed %2, updated %3 chunks", numAdded, numRemoved, numUpdated);
 
+    if (!m_data.empty())
+    {
+        setFetchedTimeWindow(QnTimePeriod::fromInterval(
+            m_data.back().startTime(), m_data.front().startTime()));
+    }
+
     if (rowCount() > maximumCount())
     {
         NX_VERBOSE(this, "Truncating to maximum count");
         truncateToMaximumCount();
+    }
+    else if (rowCount() < fetchBatchSize())
+    {
+        progressRollback.rollback();
+        requestFetch();
     }
 }
 

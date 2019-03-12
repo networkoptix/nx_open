@@ -251,6 +251,8 @@ int QnTranscoder::suggestBitrate(
         // Increase bitrate due to bad quality of libopenh264 coding.
         if (strcmp(codecName, "libopenh264") == 0)
             codecFactor = 4;
+        else if (strcmp(codecName, "mpeg4") == 0)
+            codecFactor = 1.5;
     }
 
     int result = hiEnd * resolutionFactor * codecFactor;
@@ -259,7 +261,6 @@ int QnTranscoder::suggestBitrate(
 
 QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
     AVCodecID codec,
-    QSize resolution,
     Qn::StreamQuality quality)
 {
     QnCodecParams::Value params;
@@ -338,6 +339,8 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
             params.insert("max-q", 63);
             break;
         }
+        default:
+            break;
     }
 
     return params;
@@ -352,7 +355,7 @@ int QnTranscoder::setVideoCodec(
     QnCodecParams::Value params )
 {
     if (params.isEmpty())
-        params = suggestMediaStreamParams(codec, resolution, quality);
+        params = suggestMediaStreamParams(codec, quality);
 
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;

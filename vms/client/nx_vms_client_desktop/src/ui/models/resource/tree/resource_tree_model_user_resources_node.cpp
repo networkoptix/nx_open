@@ -72,9 +72,6 @@ void QnResourceTreeModelUserResourcesNode::handleAccessChanged(
 
 bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr& resource) const
 {
-    if (model()->scope() == QnResourceTreeModel::UsersScope)
-        return false;
-
     if (!QnResourceAccessFilter::isShareableMedia(resource))
         return false;
 

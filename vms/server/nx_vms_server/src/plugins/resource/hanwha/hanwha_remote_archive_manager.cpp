@@ -1,7 +1,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_remote_archive_manager.h"
 #include "hanwha_archive_delegate.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include "hanwha_time_synchronizer.h"
 
 #include <nx/utils/log/log.h>

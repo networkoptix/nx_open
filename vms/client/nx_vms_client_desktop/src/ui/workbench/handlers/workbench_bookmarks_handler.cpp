@@ -205,10 +205,11 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     }
 
     QnCameraBookmark bookmark;
+    // This should be assigned before loading data to the dialog.
     bookmark.guid = QnUuid::createUuid();
     bookmark.name = tr("Bookmark");
-    bookmark.startTimeMs = milliseconds(period.startTimeMs);  //this should be assigned before loading data to the dialog
-    bookmark.durationMs = milliseconds(period.durationMs);
+    bookmark.startTimeMs = period.startTime();
+    bookmark.durationMs = period.duration();
     bookmark.cameraId = camera->getId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
@@ -218,9 +219,9 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         return;
 
     bookmark.creatorId = context()->user()->getId();
-    bookmark.creationTime() = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
     dialog->submitData(bookmark);
-    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
+    NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
         return;
 

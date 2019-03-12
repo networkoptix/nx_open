@@ -60,6 +60,12 @@ public:
     virtual Qn::ResourceStatus getStatus() const;
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
 
+    bool isOnline() const { return isOnline(getStatus()); }
+    static bool isOnline(Qn::ResourceStatus status)
+    {
+        return status == Qn::Online || status == Qn::Recording;
+    }
+
     //!this function is called if resource changes state from offline to online or so
     /*!
         \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false
@@ -211,7 +217,7 @@ protected:
      * Update url value without mutex locking.
      * @return if value was actually changed.
      */
-    bool setUrlInternal(const QString& value);
+    bool setUrlUnsafe(const QString& value);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -295,6 +301,7 @@ private:
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     std::atomic<bool> m_initInProgress{false};
+    std::atomic<bool> m_interuptInitialization{false};
     QnCommonModule* m_commonModule;
     bool m_forceUseLocalProperties = false;
 };

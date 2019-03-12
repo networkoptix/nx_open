@@ -19,4 +19,6 @@ TEST(H263, PictureHeaderTest)
     ASSERT_FALSE(nx::media_utils::h263::isKeyFrame(header.pictureType));
     ASSERT_TRUE(header.decode(dataI, sizeof(dataI)));
     ASSERT_TRUE(nx::media_utils::h263::isKeyFrame(header.pictureType));
+    ASSERT_EQ(header.width, 640);
+    ASSERT_EQ(header.height, 360);
 }

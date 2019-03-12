@@ -1,14 +1,14 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <plugins/plugin_api.h>
+#include <nx/sdk/uuid.h>
 
 namespace nx {
 namespace vms_server_plugins {
 namespace utils {
 
-QnUuid NX_PLUGIN_UTILS_API fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid);
-nxpl::NX_GUID NX_PLUGIN_UTILS_API fromQnUuidToPluginGuid(const QnUuid& uuid);
+QnUuid NX_PLUGIN_UTILS_API fromSdkUuidToQnUuid(const nx::sdk::Uuid& guid);
+nx::sdk::Uuid NX_PLUGIN_UTILS_API fromQnUuidToSdkUuid(const QnUuid& uuid);
 
 } // namespace utils
 } // namespace vms_server_plugins

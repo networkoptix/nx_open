@@ -63,7 +63,7 @@ Connection::Connection(
     const vms::api::PeerDataEx& localPeer,
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
-    const Qn::UserAccessData& userAccessData,
+    const Qn::UserAccessData& /*userAccessData*/,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
     :
@@ -83,6 +83,7 @@ Connection::~Connection()
 {
     if (m_direction == Direction::incoming)
         commonModule()->metrics()->tcpConnections().p2p()--;
+    pleaseStopSync();
 }
 
 void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)

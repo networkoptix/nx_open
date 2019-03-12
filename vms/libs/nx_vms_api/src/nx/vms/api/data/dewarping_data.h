@@ -20,24 +20,23 @@ struct NX_VMS_API DewarpingData: Data
     /** Tilt in radians. */
     qreal yAngle = 0;
 
-    /** Fov in radians. */
+    /** Field of view in radians. */
     qreal fov = kDefaultFov;
 
     /**
-     * Aspect ratio correction?
-     * multiplier for 90 degrees of.. // TODO: #vasilenko
+     * Aspect ratio correction multiplier [1..4].
      */
     int panoFactor = 1;
 
     /**
-     * Compatibility-layer function to maintain old way of (de)serializing. Used in the server sql
-     * database and in the pre-2.3 client exported layouts.
+     * Compatibility-layer function to maintain the old way of (de)serializing. Used in the server
+     * sql database and in the pre-2.3 client exported layouts.
      */
     QByteArray toByteArray() const;
 
     /**
-     * Compatibility-layer function to maintain old way of (de)serializing. Used in the server sql
-     * database and in the pre-2.3 client exported layouts.
+     * Compatibility-layer function to maintain the old way of (de)serializing. Used in the server
+     * sql database and in the pre-2.3 client exported layouts.
      */
     static DewarpingData fromByteArray(const QByteArray& data);
 };

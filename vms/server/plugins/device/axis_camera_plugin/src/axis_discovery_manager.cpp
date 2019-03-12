@@ -43,12 +43,12 @@ void* AxisCameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interface
     return NULL;
 }
 
-unsigned int AxisCameraDiscoveryManager::addRef()
+int AxisCameraDiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int AxisCameraDiscoveryManager::releaseRef()
+int AxisCameraDiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

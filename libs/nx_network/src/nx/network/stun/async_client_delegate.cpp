@@ -7,6 +7,8 @@ AsyncClientDelegate::AsyncClientDelegate(
     :
     m_delegate(std::move(delegate))
 {
+    if (m_delegate)
+        bindToAioThread(m_delegate->getAioThread());
 }
 
 void AsyncClientDelegate::bindToAioThread(

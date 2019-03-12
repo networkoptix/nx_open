@@ -20,7 +20,7 @@
 
 namespace {
 
-using nx::kit::debug::format;
+using nx::kit::utils::format;
 
 static constexpr int kChunkSize = 4000000; //< ATTENTION: Should aссommodate any frame.
 

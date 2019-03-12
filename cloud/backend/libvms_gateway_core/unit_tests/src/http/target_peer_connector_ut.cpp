@@ -10,7 +10,6 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relaying/settings.h>
 #include <nx/cloud/vms_gateway/http/target_peer_connector.h>
 
 namespace nx {
@@ -47,46 +46,6 @@ private:
     ConnectFailureType m_connectFailureType;
 };
 
-//-------------------------------------------------------------------------------------------------
-
-class ListeningPeerPoolStub:
-    public relaying::AbstractListeningPeerPool
-{
-public:
-    virtual void addConnection(
-        const std::string& /*peerName*/,
-        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/) override
-    {
-    }
-
-    virtual std::size_t getConnectionCountByPeerName(const std::string& /*peerName*/) const
-    {
-        return 0;
-    }
-
-    virtual bool isPeerOnline(const std::string& /*peerName*/) const
-    {
-        return false;
-    }
-
-    virtual std::string findListeningPeerByDomain(const std::string& /*domainName*/) const
-    {
-        return std::string();
-    }
-
-    virtual void takeIdleConnection(
-        const relaying::ClientInfo& /*clientInfo*/,
-        const std::string& /*peerName*/,
-        relaying::TakeIdleConnectionHandler /*completionHandler*/) override
-    {
-    }
-
-    virtual relaying::Statistics statistics() const override
-    {
-        return relaying::Statistics();
-    }
-};
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -96,10 +55,7 @@ class TargetPeerConnector:
 {
 public:
     TargetPeerConnector():
-        m_peerName(nx::utils::generateRandomName(7).toStdString()),
-        m_listeningPeerPool(
-            std::make_unique<relaying::ListeningPeerPool>(
-                m_listeningPeerPoolSettings))
+        m_peerName(nx::utils::generateRandomName(7).toStdString())
     {
     }
 
@@ -125,8 +81,6 @@ protected:
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         m_serverConnection = connection.get();
 
-        m_listeningPeerPool->addConnection(m_peerName, std::move(connection));
-
         m_targetEndpoint = nx::network::SocketAddress(m_peerName.c_str(), 0);
     }
 
@@ -134,8 +88,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        m_targetPeerConnector = std::make_unique<gateway::TargetPeerConnector>(
-            m_listeningPeerPool.get());
+        m_targetPeerConnector = std::make_unique<gateway::TargetPeerConnector>();
         if (m_connectTimeout)
             m_targetPeerConnector->setTimeout(*m_connectTimeout);
 
@@ -208,11 +161,6 @@ protected:
             });
     }
 
-    void switchToListeningPeerPoolThatNeverReportsConnections()
-    {
-        m_listeningPeerPool = std::make_unique<ListeningPeerPoolStub>();
-    }
-
     void enableConnectTimeout(std::chrono::milliseconds timeout)
     {
         m_connectTimeout = timeout;
@@ -232,8 +180,6 @@ private:
     nx::network::SocketAddress m_targetEndpoint;
     boost::optional<nx::network::SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
-    relaying::Settings m_listeningPeerPoolSettings;
-    std::unique_ptr<relaying::AbstractListeningPeerPool> m_listeningPeerPool;
     ConnectResult m_prevResult;
     nx::network::AbstractStreamSocket* m_serverConnection = nullptr;
 
@@ -285,23 +231,6 @@ TEST_F(TargetPeerConnector, reports_regular_connection_error)
     givenDirectlyAccessibleServer();
     whenConnect();
     thenConnectFailed();
-}
-
-TEST_F(TargetPeerConnector, takes_connection_from_listening_peer_pool)
-{
-    givenRegisteredListeningPeer();
-    whenConnect();
-    thenConnectionIsTakenFromListeningPeer();
-}
-
-TEST_F(TargetPeerConnector, timeout_reported_if_listening_peer_pool_does_not_answer)
-{
-    switchToListeningPeerPoolThatNeverReportsConnections();
-    enableConnectTimeout(std::chrono::milliseconds(1));
-
-    givenRegisteredListeningPeer();
-    whenConnect();
-    thenTimeoutIsReported();
 }
 
 } // namespace test

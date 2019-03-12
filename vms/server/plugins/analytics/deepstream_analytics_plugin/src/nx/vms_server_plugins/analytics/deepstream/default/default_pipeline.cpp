@@ -1,12 +1,12 @@
 #include "default_pipeline.h"
 
-#include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
-
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/i_data_packet.h>
-#include <nx/sdk/analytics/i_compressed_video_packet.h>
 #define NX_PRINT_PREFIX "deepstream::DefaultPipeline::"
 #include <nx/kit/debug.h>
+
+#include <nx/sdk/analytics/i_data_packet.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
+
+#include <nx/vms_server_plugins/analytics/deepstream/deepstream_analytics_plugin_ini.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -23,7 +23,7 @@ DefaultPipeline::DefaultPipeline(
     const nx::gstreamer::ElementName& pipelineName,
     Engine* engine)
     :
-    base_type(pipelineName, m_engine),
+    base_type(pipelineName, engine),
     m_trackingMapper(kDefaultTrackingLifetime),
     m_objectClassDescriptions(m_engine->objectClassDescritions())
 {

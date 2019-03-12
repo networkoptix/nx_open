@@ -39,6 +39,7 @@
 #include <nx/client/mobile/software_trigger/software_triggers_controller.h>
 #include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 #include <nx/client/mobile/motion/motion_playback_mask_watcher.h>
+#include <nx/client/mobile/motion/chunk_position_watcher.h>
 
 using namespace nx::client::mobile;
 
@@ -46,10 +47,8 @@ void QnMobileClientMetaTypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     nx::vms::client::core::initializeMetaTypes();
 
@@ -106,4 +105,5 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     nx::client::mobile::SoftwareTriggersController::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
     nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
+    nx::client::mobile::ChunkPositionWatcher::registerQmlType();
 }

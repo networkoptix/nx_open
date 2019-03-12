@@ -456,6 +456,7 @@ void MediaServerEmulator::stopWhileInAioThread()
 
     // NOTE: m_httpServer does not support non-blocking destruction
     m_httpServer->pleaseStopSync();
+    m_mediatorConnector.reset();
 }
 
 } // namespace hpm

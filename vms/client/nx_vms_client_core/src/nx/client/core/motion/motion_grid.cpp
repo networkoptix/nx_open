@@ -28,8 +28,8 @@ void MotionGrid::fillRect(const QRect& rect, int value)
     if (!rect.isValid())
         return;
 
-    NX_ASSERT(rect.top() >= 0 && rect.bottom() < kHeight, Q_FUNC_INFO);
-    NX_ASSERT(rect.left() >= 0 && rect.right() < kWidth, Q_FUNC_INFO);
+    NX_ASSERT(rect.top() >= 0 && rect.bottom() < kHeight);
+    NX_ASSERT(rect.left() >= 0 && rect.right() < kWidth);
 
     for (int row = rect.top(); row <= rect.bottom(); ++row)
         std::fill(m_grid[row].begin() + rect.left(), m_grid[row].begin() + rect.right() + 1, value);
@@ -37,8 +37,8 @@ void MotionGrid::fillRect(const QRect& rect, int value)
 
 void MotionGrid::fillRegion(const QPoint& at, int value)
 {
-    NX_ASSERT(at.y() >= 0 && at.y() < kHeight, Q_FUNC_INFO);
-    NX_ASSERT(at.x() >= 0 && at.x() < kWidth, Q_FUNC_INFO);
+    NX_ASSERT(at.y() >= 0 && at.y() < kHeight);
+    NX_ASSERT(at.x() >= 0 && at.x() < kWidth);
 
     int regionValue = m_grid[at.y()][at.x()];
     if (regionValue == value)

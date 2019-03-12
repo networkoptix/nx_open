@@ -78,15 +78,15 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
     {
         for (const auto& error: m_view->errors())
             NX_ERROR(this, error.toString());
-        NX_CRITICAL(false, Q_FUNC_INFO, "Welcome screen loading failed.");
+        NX_CRITICAL(false, "Welcome screen loading failed.");
     }
 
     const auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
     layout->addWidget(QWidget::createWindowContainer(m_view), 1);
 
-    NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
-    NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
+    NX_CRITICAL(qnStartupTileManager, "Startup tile manager does not exists");
+    NX_CRITICAL(qnCloudStatusWatcher, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
@@ -191,6 +191,14 @@ void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
     qnStartupTileManager->skipTileAction(); //< available only on first show
 
     action(action::EscapeHotkeyAction)->setEnabled(true);
+}
+
+void QnWorkbenchWelcomeScreen::changeEvent(QEvent* event)
+{
+    if (event->type() == QEvent::PaletteChange)
+        m_view->setColor(palette().color(QPalette::Window));
+
+    base_type::changeEvent(event);
 }
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
@@ -416,7 +424,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 }
 
 void QnWorkbenchWelcomeScreen::connectToCloudSystem(
-    const QString& systemId, 
+    const QString& systemId,
     const QString& serverUrl)
 {
     if (!isLoggedInToCloud())
@@ -465,8 +473,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
                         if (dialog->savePassword())
                         {
-                            nx::vms::client::core::settings()->cloudCredentials =
-                                cloudCredentials;
+                            nx::vms::client::core::helpers::saveCloudCredentials(cloudCredentials);
                         }
 
                         qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
@@ -511,16 +518,36 @@ void QnWorkbenchWelcomeScreen::createAccount()
     menu()->trigger(action::OpenCloudRegisterUrl);
 }
 
-//
-
 void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString& localSystemId)
 {
-    qnForgottenSystemsManager->forgetSystem(systemId);
-    qnForgottenSystemsManager->forgetSystem(localSystemId);
-}
+    const auto localSystemUuid = QnUuid::fromStringSafe(localSystemId);
+    NX_ASSERT(!localSystemUuid.isNull());
+    if (localSystemUuid.isNull())
+        return;
 
-void QnWorkbenchWelcomeScreen::moveToBack(const QUuid& localSystemId)
-{
-    qnSystemWeightsManager->setWeight(localSystemId, 0); //< Moves system to the end of tile's list.
+    qnSystemWeightsManager->setWeight(localSystemUuid, 0); //< Moves system to the end of tile's list.
+    nx::vms::client::core::helpers::removeCredentials(localSystemUuid);
+    nx::vms::client::core::helpers::removeConnection(localSystemUuid);
+
+    if (const auto system = qnSystemsFinder->getSystem(systemId))
+    {
+        auto knownConnections = qnClientCoreSettings->knownServerConnections();
+        const auto moduleManager = commonModule()->moduleDiscoveryManager();
+        const auto servers = system->servers();
+        for (const auto info: servers)
+        {
+            const auto moduleId = info.id;
+            moduleManager->forgetModule(moduleId);
+
+            const auto itEnd = std::remove_if(knownConnections.begin(), knownConnections.end(),
+                [moduleId](const QnClientCoreSettings::KnownServerConnection& connection)
+                {
+                    return moduleId == connection.serverId;
+                });
+            knownConnections.erase(itEnd, knownConnections.end());
+        }
+        qnClientCoreSettings->setKnownServerConnections(knownConnections);
+    }
+
     qnClientCoreSettings->save();
 }

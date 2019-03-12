@@ -65,12 +65,7 @@ protected:
     {
         ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(2));
 
-        for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
-        {
-            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[0]));
-            m_systemCloudCredentials.push_back(
-                m_systemMergeFixture.peer(i).getCloudCredentials());
-        }
+        bindAllSystemsToCloud(m_cloudAccounts[0]);
     }
 
     void givenTwoCloudSystemsWithDifferentOwners()
@@ -82,12 +77,14 @@ protected:
         while (m_cloudAccounts.size() < numberOfSystemsToCreate)
             m_cloudAccounts.push_back(m_cdb.addActivatedAccount2());
 
-        for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
-        {
-            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[i]));
-            m_systemCloudCredentials.push_back(
-                m_systemMergeFixture.peer(i).getCloudCredentials());
-        }
+        bindAllSystemsToCloud(m_cloudAccounts);
+    }
+
+    void givenSystemProducedByAMerge()
+    {
+        givenTwoCloudSystemsWithTheSameOwner();
+        whenMergeSystems();
+        thenMergeFullyCompleted();
     }
 
     nx::cloud::db::AccountWithPassword registerCloudUser()
@@ -377,6 +374,11 @@ protected:
         ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
     }
 
+    void assertCloudOwnerIsAbleToLogin()
+    {
+        assertUserIsAbleToLogin(0, m_cloudAccounts.front());
+    }
+
     void assertUserIsAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_TRUE(testUserLogin(peerIndex, cloudUser));
@@ -399,12 +401,47 @@ protected:
         return mediaServerClient->ec2GetUsers(&users) == ::ec2::ErrorCode::ok;
     }
 
+    void generateTemporaryCloudCredentials()
+    {
+        nx::cloud::db::api::TemporaryCredentialsParams params;
+        params.type = "short";
+        nx::cloud::db::api::TemporaryCredentials temporaryCredentials;
+
+        ASSERT_EQ(
+            nx::cloud::db::api::ResultCode::ok,
+            m_cdb.createTemporaryCredentials(
+                owner().email, owner().password,
+                params,
+                &temporaryCredentials));
+
+        m_temporaryCredentials.push_back(std::move(temporaryCredentials));
+    }
+
+    void assertOwnerTemporaryCredentialsAreAcceptedByEveryServer()
+    {
+        auto client = m_systemMergeFixture.peer(0).mediaServerClient();
+        client->setUserCredentials(nx::network::http::Credentials(
+            m_temporaryCredentials.front().login.c_str(),
+            nx::network::http::PasswordAuthToken(m_temporaryCredentials.front().password.c_str())));
+
+        // TODO: Check every server.
+
+        nx::vms::api::UserDataList users;
+        ASSERT_EQ(::ec2::ErrorCode::ok, client->ec2GetUsers(&users));
+    }
+
+    const nx::cloud::db::AccountWithPassword& owner() const
+    {
+        return m_cloudAccounts.front();
+    }
+
 private:
     nx::cloud::db::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
     nx::network::http::TestHttpServer m_httpProxy;
+    std::vector<nx::cloud::db::api::TemporaryCredentials> m_temporaryCredentials;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 
@@ -428,6 +465,41 @@ private:
         m_systemMergeFixture.addSetting(
             "-cloudIntegration/delayBeforeSettingMasterFlag",
             "100ms");
+    }
+
+    void bindAllSystemsToCloud(const nx::cloud::db::AccountWithPassword& account)
+    {
+        std::vector<nx::cloud::db::AccountWithPassword> accounts(
+            m_systemMergeFixture.peerCount(),
+            account);
+
+        bindAllSystemsToCloud(accounts);
+    }
+
+    void bindAllSystemsToCloud(
+        const std::vector<nx::cloud::db::AccountWithPassword>& accounts)
+    {
+        m_systemCloudCredentials.resize(m_systemMergeFixture.peerCount());
+
+        auto bindPeer = [this, &accounts](int index)
+        {
+            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(index), accounts[index]));
+            m_systemCloudCredentials[index] =
+                m_systemMergeFixture.peer(index).getCloudCredentials();
+        };
+
+        // NOTE: Randomizing "bind to cloud" order since there is a class of bugs related to this.
+
+        if (::testing::UnitTest::GetInstance()->random_seed() & 1)
+        {
+            for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
+                bindPeer(i);
+        }
+        else
+        {
+            for (int i = m_systemMergeFixture.peerCount() - 1; i >= 0; --i)
+                bindPeer(i);
+        }
     }
 
     bool connectToCloud(
@@ -543,6 +615,15 @@ TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_clou
     shareSystem(olderSystemIndex, someCloudUser);
     waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
     assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
+}
+
+TEST_F(CloudMerge, resulting_system_can_be_accessed_via_temporary_cloud_credentials)
+{
+    givenSystemProducedByAMerge();
+    assertCloudOwnerIsAbleToLogin();
+
+    generateTemporaryCloudCredentials();
+    assertOwnerTemporaryCredentialsAreAcceptedByEveryServer();
 }
 
 } // namespace test

@@ -12,7 +12,6 @@
 
 #include <ui/workbench/workbench_context.h>
 
-
 using namespace nx;
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):

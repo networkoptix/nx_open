@@ -59,7 +59,7 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
-class QnStorageManager: public QObject, public nx::vms::server::ServerModuleAware
+class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;
@@ -75,7 +75,8 @@ public:
     QnStorageManager(
         QnMediaServerModule* serverModule,
         nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
-        QnServer::StoragePool kind);
+        QnServer::StoragePool kind,
+        const char* threadName = nullptr);
     virtual ~QnStorageManager();
     void removeStorage(const QnStorageResourcePtr &storage);
     bool hasStorageUnsafe(const QnStorageResourcePtr &storage) const;
@@ -162,7 +163,6 @@ public:
     bool clearSpaceForFile(const QString& path, qint64 size);
     bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
-    void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
     void clearMaxDaysData();

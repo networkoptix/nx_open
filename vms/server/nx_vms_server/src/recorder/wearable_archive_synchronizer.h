@@ -19,7 +19,7 @@ class RemoteArchiveWorkerPool;
 
 class WearableArchiveSynchronizer:
     public Connective<QObject>,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -45,5 +45,3 @@ private:
 } // namespace recorder
 } // namespace vms::server
 } // namespace nx
-
-

@@ -66,8 +66,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_speed(1.0),
     m_prevSpeed(1.0),
     m_pausedStart(false),
-    m_streamDataFilter(StreamDataFilter::mediaOnly),
-    m_prevStreamDataFilter(StreamDataFilter::mediaOnly),
+    m_streamDataFilter(StreamDataFilter::media),
+    m_prevStreamDataFilter(StreamDataFilter::media),
     m_outOfPlaybackMask(false),
     m_latPacketTime(DATETIME_NOW),
     m_stopCond(false)
@@ -1210,10 +1210,14 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 {
-    return jumpTo(mksec, skipTime, nullptr);
+    return jumpTo(mksec, skipTime, true, nullptr);
 }
 
-bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime)
+bool QnArchiveStreamReader::jumpTo(
+    qint64 mksec,
+    qint64 skipTime,
+    bool bindPositionToPlaybackMask,
+    qint64* outJumpTime)
 {
     if (m_navDelegate) {
         return m_navDelegate->jumpTo(mksec, skipTime);
@@ -1222,9 +1226,13 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime, qint64* outJum
     if (m_resource)
         NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
 
-    m_playbackMaskSync.lock();
-    const qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
-    m_playbackMaskSync.unlock();
+    qint64 newTime = mksec;
+    if (bindPositionToPlaybackMask)
+    {
+        m_playbackMaskSync.lock();
+        newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
+        m_playbackMaskSync.unlock();
+    }
 
     if (outJumpTime)
         *outJumpTime = newTime;

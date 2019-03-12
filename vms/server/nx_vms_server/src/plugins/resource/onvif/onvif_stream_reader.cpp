@@ -84,7 +84,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         &streamUrl, isCameraControlRequired, params);
-    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
     {
         #if defined(PL_ONVIF_DEBUG)
             qCritical() << "QnOnvifStreamReader::openStream: "
@@ -343,7 +343,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
     const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const
 {
-    Q_UNUSED( isPrimary );
+    Q_UNUSED(isPrimary);
 
     StreamUriResp response;
     StreamUriReq request;
@@ -439,12 +439,15 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         if (!currentVEConfig)
             return CameraDiagnostics::RequestFailedResult("selectVideoEncoderConfig", QString());
 
-        auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
+        auto streamIndex = isPrimary
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary;
         m_onvifRes->updateVideoEncoder1(*currentVEConfig, streamIndex, params);
 
         // Usually getMaxOnvifRequestTries returns 1, but for some OnvifResource descendants it's
         // larger. In case of failure request are repeated.
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+        constexpr std::chrono::milliseconds kTryIntervalMs(300);
 
         // Some DW cameras need two same sendVideoEncoder requests with 1 second interval.
         // Both responses are Ok, but only the second request really succeeds.
@@ -458,13 +461,13 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
             result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
             if (repeatIntervalForSendVideoEncoderMs)
             {
-                msleep(repeatIntervalForSendVideoEncoderMs);
+                std::this_thread::sleep_for(std::chrono::milliseconds(repeatIntervalForSendVideoEncoderMs));
                 result = m_onvifRes->sendVideoEncoderToCameraEx(
                     *currentVEConfig, streamIndex, params);
             }
 
             if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-                msleep(300);
+                std::this_thread::sleep_for(kTryIntervalMs);
         }
 
         return result;
@@ -493,7 +496,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 
         outInfo->videoEncoderConfigurationToken = currentVEConfig->token;
 
-        auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
+        auto streamIndex = isPrimary
+            ? nx::vms::api::StreamIndex::primary
+            : nx::vms::api::StreamIndex::secondary;
         m_onvifRes->updateVideoEncoder2(*currentVEConfig, streamIndex, params);
 
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
@@ -1005,16 +1010,6 @@ void QnOnvifStreamReader::pleaseStop()
 QnConstResourceVideoLayoutPtr QnOnvifStreamReader::getVideoLayout() const
 {
     return m_multiCodec.getVideoLayout();
-}
-
-void QnOnvifStreamReader::setMustNotConfigureResource(bool mustNotConfigureResource)
-{
-    m_mustNotConfigureResource = mustNotConfigureResource;
-}
-
-bool QnOnvifStreamReader::needConfigureProvider() const
-{
-    return CLServerPushStreamReader::needConfigureProvider() && !m_mustNotConfigureResource;
 }
 
 #endif //ENABLE_ONVIF

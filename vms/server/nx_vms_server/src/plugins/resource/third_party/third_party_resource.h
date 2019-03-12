@@ -38,7 +38,7 @@ public:
     virtual bool ping() override;
     //!Implementation of QnNetworkResource::mergeResourcesIfNeeded
     virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
-    //!Implementation of QnSecurityCamResource::manufacture
+    //!Implementation of QnSecurityCamResource::manufacturer
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -71,9 +71,9 @@ public:
     //!Implementation of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementation of nxpl::NXPluginInterface::queryInterface
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementation of nxpl::NXPluginInterface::queryInterface
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     //!Implementation of nxcip::CameraInputEventHandler::inputPortStateChanged
     virtual void inputPortStateChanged(
@@ -82,17 +82,15 @@ public:
         int newState,
         unsigned long int timestamp ) override;
 
-    const QList<nxcip::Resolution>& getEncoderResolutionList(Qn::StreamIndex encoderNumber) const;
+    const QList<nxcip::Resolution>& getEncoderResolutionList(StreamIndex encoderNumber) const;
 
-    nxcip::Resolution getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex ) const;
+    nxcip::Resolution getSelectedResolutionForEncoder(StreamIndex encoderIndex ) const;
 
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
-        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual void startInputPortStatesMonitoring() override;
@@ -108,12 +106,13 @@ private:
         QList<nxcip::Resolution> resolutionList;
     };
 
+    // TODO: Migrate to nx::sdk::Ptr.
     nxcip::CameraInfo m_camInfo;
     std::unique_ptr<nxcip_qt::BaseCameraManager> m_camManager;
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;
     QVector<EncoderData> m_encoderData;
     std::unique_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
-    QAtomicInt m_refCounter;
+    mutable QAtomicInt m_refCounter;
     QString m_defaultOutputID;
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
@@ -121,9 +120,10 @@ private:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
-    nxcip::Resolution getMaxResolution(Qn::StreamIndex encoderNumber) const;
+    nxcip::Resolution getMaxResolution(StreamIndex encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution(Qn::StreamIndex encoderNumber, const nxcip::Resolution& desiredResolution ) const;
+    nxcip::Resolution getNearestResolution(StreamIndex encoderNumber, 
+        const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);
 };

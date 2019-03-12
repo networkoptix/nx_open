@@ -62,13 +62,13 @@ void* ILPVideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int ILPVideoPacket::addRef()
+int ILPVideoPacket::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int ILPVideoPacket::releaseRef()
+int ILPVideoPacket::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

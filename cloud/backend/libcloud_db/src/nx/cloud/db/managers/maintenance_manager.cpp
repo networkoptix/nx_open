@@ -10,12 +10,11 @@
 namespace nx::cloud::db {
 
 MaintenanceManager::MaintenanceManager(
-    const QnUuid& moduleGuid,
-    clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
+    clusterdb::engine::SynchronizationEngine* const synchronizationEngine,
     const nx::sql::InstanceController& dbInstanceController)
     :
-    m_moduleGuid(moduleGuid),
-    m_syncronizationEngine(syncronizationEngine),
+    m_moduleGuid(synchronizationEngine->peerId()),
+    m_synchronizationEngine(synchronizationEngine),
     m_dbInstanceController(dbInstanceController)
 {
 }
@@ -38,7 +37,7 @@ void MaintenanceManager::getVmsConnections(
             completionHandler = std::move(completionHandler)]()
         {
             const auto ec2Connections =
-                m_syncronizationEngine->connectionManager().getConnections();
+                m_synchronizationEngine->connectionManager().getConnections();
             api::VmsConnectionDataList result;
             result.connections.reserve(ec2Connections.size());
             for (const auto& connection: ec2Connections)
@@ -60,7 +59,7 @@ void MaintenanceManager::getTransactionLog(
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->transactionLog().readTransactions(
+    m_synchronizationEngine->transactionLog().readTransactions(
         systemId.systemId.c_str(),
         nx::clusterdb::engine::ReadCommandsFilter::kEmptyFilter,
         std::bind(&MaintenanceManager::onTransactionLogRead, this,
@@ -80,7 +79,7 @@ void MaintenanceManager::getStatistics(
         {
             data::Statistics statistics;
             statistics.onlineServerCount =
-                (int)m_syncronizationEngine->connectionManager().getConnectionCount();
+                (int)m_synchronizationEngine->connectionManager().getConnectionCount();
             statistics.dbQueryStatistics =
                 m_dbInstanceController.statisticsCollector().getQueryStatistics();
             statistics.pendingSqlQueryCount =
@@ -102,8 +101,8 @@ void MaintenanceManager::onTransactionLogRead(
 {
     api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("system %1. Read %2 transactions. Result code %3")
-            .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)));
+    NX_DEBUG(this, "system %1. Read %2 transactions. Result code %3",
+        systemId, serializedTransactions.size(), api::toString(resultCode));
 
     NX_ASSERT(resultCode != api::ResultCode::partialContent);
     if (resultCode != api::ResultCode::ok)

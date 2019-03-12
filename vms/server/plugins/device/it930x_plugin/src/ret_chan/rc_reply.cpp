@@ -20,263 +20,263 @@ void User_getErrorReply(Device device, ReturnValue returnValue, Word command)
 {
     printf("=== Cmd=0x%04x: ===\n\n", command);
 
-	if(returnValue.returnCode != 0)
-	{
-		switch(returnValue.returnCode)
-		{
-		case 0x01:
-			switch(command)
-			{
-			case CMD_GetCapabilitiesOutput:
+    if(returnValue.returnCode != 0)
+    {
+        switch(returnValue.returnCode)
+        {
+        case 0x01:
+            switch(command)
+            {
+            case CMD_GetCapabilitiesOutput:
                 printf("The requested service category is not supported by the device!\n");
-				break;
-			case CMD_GetSystemLogOutput:
+                break;
+            case CMD_GetSystemLogOutput:
                 printf("There is no access log information available!\n");
-				break;
-			case CMD_SetHostnameOutput:
+                break;
+            case CMD_SetHostnameOutput:
                 printf("The requested hostname cannot be accepted by the device!\n");
-				break;
-			case CMD_SetRelayOutputStateOutput:
-			case CMD_SetRelayOutputSettingsOutput:
+                break;
+            case CMD_SetRelayOutputStateOutput:
+            case CMD_SetRelayOutputSettingsOutput:
                 printf("Unknown relay token reference!\n");
-				break;
-			case CMD_GetImagingSettingsOutput:
-			case CMD_IMG_GetStatusOutput:
-			case CMD_SetImagingSettingsOutput:
-			case CMD_IMG_MoveOutput:
-			case CMD_IMG_StopOutput:
-			case CMD_IMG_GetOptionsOutput:
-			case CMD_GetUserDefinedSettingsOutput:
-			case CMD_SetUserDefinedSettingsOutput:
-			case CMD_SetVideoPrivateAreaOutput:
-			case CMD_SetVideoSourceControlOutput:
-			case CMD_GetMetadataSettingsOutput:
-			case CMD_SetMetadataSettingsOutput:
+                break;
+            case CMD_GetImagingSettingsOutput:
+            case CMD_IMG_GetStatusOutput:
+            case CMD_SetImagingSettingsOutput:
+            case CMD_IMG_MoveOutput:
+            case CMD_IMG_StopOutput:
+            case CMD_IMG_GetOptionsOutput:
+            case CMD_GetUserDefinedSettingsOutput:
+            case CMD_SetUserDefinedSettingsOutput:
+            case CMD_SetVideoPrivateAreaOutput:
+            case CMD_SetVideoSourceControlOutput:
+            case CMD_GetMetadataSettingsOutput:
+            case CMD_SetMetadataSettingsOutput:
                 printf("The requested VideoSource does not exist!\n");
-				break;
-			case CMD_GetGuaranteedNumberOfVideoEncoderInstancesOutput:
+                break;
+            case CMD_GetGuaranteedNumberOfVideoEncoderInstancesOutput:
                 printf("The requested configuration indicated with ConfigurationToken does not exist!\n");
-				break;
-			case CMD_GetAudioSourcesOutput:
-			case CMD_GetAudioSourceConfigurationsOutput:
-			case CMD_GetAudioEncoderConfigurationsOutput:
-			case CMD_GetAudioSourceConfigurationOptionsOutput:
-			case CMD_GetAudioEncoderConfigurationOptionsOutput:
+                break;
+            case CMD_GetAudioSourcesOutput:
+            case CMD_GetAudioSourceConfigurationsOutput:
+            case CMD_GetAudioEncoderConfigurationsOutput:
+            case CMD_GetAudioSourceConfigurationOptionsOutput:
+            case CMD_GetAudioEncoderConfigurationOptionsOutput:
                 printf("The device does not support audio!\n");
-				break;
-			case CMD_SetSynchronizationPointOutput:
+                break;
+            case CMD_SetSynchronizationPointOutput:
                 printf("The profile does not exist!\n");
-				break;
-			case CMD_SetVideoSourceConfigurationOutput:
-			case CMD_SetVideoEncoderConfigurationOutput:
-			case CMD_SetAudioSourceConfigurationOutput:
-			case CMD_SetAudioEncoderConfigurationOutput:
-			case CMD_SetHomePositionOutput:
+                break;
+            case CMD_SetVideoSourceConfigurationOutput:
+            case CMD_SetVideoEncoderConfigurationOutput:
+            case CMD_SetAudioSourceConfigurationOutput:
+            case CMD_SetAudioEncoderConfigurationOutput:
+            case CMD_SetHomePositionOutput:
                 printf("The configuration does not exist!\n");
-				break;
-			case CMD_GetConfigurationsOutput:
-			case CMD_PTZ_GetStatusOutput:
-			case CMD_GetPresetsOutput:
-			case CMD_GotoPresetOutput:
-			case CMD_RemovePresetOutput:
-			case CMD_RelativeMoveOutput:
-			case CMD_GotoHomePositionOutput:
-			case CMD_PTZ_StopOutput:
-			case CMD_GetSupportedRulesOutput:
+                break;
+            case CMD_GetConfigurationsOutput:
+            case CMD_PTZ_GetStatusOutput:
+            case CMD_GetPresetsOutput:
+            case CMD_GotoPresetOutput:
+            case CMD_RemovePresetOutput:
+            case CMD_RelativeMoveOutput:
+            case CMD_GotoHomePositionOutput:
+            case CMD_PTZ_StopOutput:
+            case CMD_GetSupportedRulesOutput:
                 printf("The requested configuration token does not exist!\n");
-				break;
-			case CMD_SetPresetOutput:
+                break;
+            case CMD_SetPresetOutput:
                 printf("The requested name already exist for another preset!\n");
-				break;
-			case CMD_AbsoluteMoveOutput:
-			case CMD_ContinuousMoveOutput:
+                break;
+            case CMD_AbsoluteMoveOutput:
+            case CMD_ContinuousMoveOutput:
                 printf("Reference token does not exist!\n");
-				break;
-			case CMD_CreateRuleOutput:
-			case CMD_ModifyRuleOutput:
-			case CMD_DeleteRuleOutput:
+                break;
+            case CMD_CreateRuleOutput:
+            case CMD_ModifyRuleOutput:
+            case CMD_DeleteRuleOutput:
                 printf("Rule token already exist!\n");
-				break;
-			case CMD_UpgradeSystemFirmwareOutput:
+                break;
+            case CMD_UpgradeSystemFirmwareOutput:
                 printf("env:Sender, ter:InvalidArgs, ter:InvalidFirmware!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0x02:
-			switch(command)
-			{
-			case CMD_GetSystemLogOutput:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0x02:
+            switch(command)
+            {
+            case CMD_GetSystemLogOutput:
                 printf("There is no system log information available!\n");
-				break;
-			case CMD_SetRelayOutputSettingsOutput:
+                break;
+            case CMD_SetRelayOutputSettingsOutput:
                 printf("Monostable delay time not valid!\n");
-				break;
-			case CMD_GetImagingSettingsOutput:
-			case CMD_IMG_GetStatusOutput:
-			case CMD_SetImagingSettingsOutput:
-			case CMD_IMG_MoveOutput:
-			case CMD_IMG_StopOutput:
-			case CMD_IMG_GetOptionsOutput:
-			case CMD_GetUserDefinedSettingsOutput:
-			case CMD_SetUserDefinedSettingsOutput:
-			case CMD_SetVideoPrivateAreaOutput:
-			case CMD_SetVideoSourceControlOutput:
-			case CMD_GetMetadataSettingsOutput:
-			case CMD_SetMetadataSettingsOutput:
+                break;
+            case CMD_GetImagingSettingsOutput:
+            case CMD_IMG_GetStatusOutput:
+            case CMD_SetImagingSettingsOutput:
+            case CMD_IMG_MoveOutput:
+            case CMD_IMG_StopOutput:
+            case CMD_IMG_GetOptionsOutput:
+            case CMD_GetUserDefinedSettingsOutput:
+            case CMD_SetUserDefinedSettingsOutput:
+            case CMD_SetVideoPrivateAreaOutput:
+            case CMD_SetVideoSourceControlOutput:
+            case CMD_GetMetadataSettingsOutput:
+            case CMD_SetMetadataSettingsOutput:
                 printf("The requested VideoSource does not support imaging settings!\n");
-				break;
-			case CMD_SetVideoSourceConfigurationOutput:
-			case CMD_SetVideoEncoderConfigurationOutput:
-			case CMD_SetAudioSourceConfigurationOutput:
-			case CMD_SetAudioEncoderConfigurationOutput:
+                break;
+            case CMD_SetVideoSourceConfigurationOutput:
+            case CMD_SetVideoEncoderConfigurationOutput:
+            case CMD_SetAudioSourceConfigurationOutput:
+            case CMD_SetAudioEncoderConfigurationOutput:
                 printf("The configuration parameters are not possible to set!\n");
-				break;
-			case CMD_GetConfigurationsOutput:
-			case CMD_GetPresetsOutput:
-			case CMD_PTZ_StopOutput:
+                break;
+            case CMD_GetConfigurationsOutput:
+            case CMD_GetPresetsOutput:
+            case CMD_PTZ_StopOutput:
                 printf("PTZ is not supported!\n");
-				break;
-			case CMD_PTZ_GetStatusOutput:
+                break;
+            case CMD_PTZ_GetStatusOutput:
                 printf("No PTZ status is available!\n");
-				break;
-			case CMD_GotoPresetOutput:
-			case CMD_RemovePresetOutput:
+                break;
+            case CMD_GotoPresetOutput:
+            case CMD_RemovePresetOutput:
                 printf("The requested preset token does not exist.!\n");
-				break;
-			case CMD_SetPresetOutput:
+                break;
+            case CMD_SetPresetOutput:
                 printf("The PresetName is either too long or contains invalid characters.!\n");
-				break;
-			case CMD_AbsoluteMoveOutput:
+                break;
+            case CMD_AbsoluteMoveOutput:
                 printf("The requested position is out of bounds!\n");
-				break;
-			case CMD_RelativeMoveOutput:
+                break;
+            case CMD_RelativeMoveOutput:
                 printf("The requested translation is out of bounds!\n");
-				break;
-			case CMD_ContinuousMoveOutput:
+                break;
+            case CMD_ContinuousMoveOutput:
                 printf("The specified timeout argument is not within the supported timeout range!\n");
-				break;
-			case CMD_SetHomePositionOutput:
+                break;
+            case CMD_SetHomePositionOutput:
                 printf("The home position is fixed and cannot be overwritten!\n");
-				break;
-			case CMD_GotoHomePositionOutput:
+                break;
+            case CMD_GotoHomePositionOutput:
                 printf("No home position has been defined!\n");
-				break;
-			case CMD_CreateRuleOutput:
-			case CMD_ModifyRuleOutput:
+                break;
+            case CMD_CreateRuleOutput:
+            case CMD_ModifyRuleOutput:
                 printf("The suggested rule parameters is not valid!\n");
-				break;
-			case CMD_UpgradeSystemFirmwareOutput:
+                break;
+            case CMD_UpgradeSystemFirmwareOutput:
                 printf("env:Receiver, ter:Action, ter:FirmwareUpgrade-Failed!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0x03:
-			switch(command)
-			{
-			case CMD_SetImagingSettingsOutput:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0x03:
+            switch(command)
+            {
+            case CMD_SetImagingSettingsOutput:
                 printf("The requested settings are incorrect!\n");
-				break;
-			case CMD_SetVideoSourceConfigurationOutput:
-			case CMD_SetVideoEncoderConfigurationOutput:
-			case CMD_SetAudioSourceConfigurationOutput:
-			case CMD_SetAudioEncoderConfigurationOutput:
+                break;
+            case CMD_SetVideoSourceConfigurationOutput:
+            case CMD_SetVideoEncoderConfigurationOutput:
+            case CMD_SetAudioSourceConfigurationOutput:
+            case CMD_SetAudioEncoderConfigurationOutput:
                 printf("The new settings conflicts with other uses of the configuration!\n");
-				break;
-			case CMD_PTZ_GetStatusOutput:
-			case CMD_RemovePresetOutput:
-			case CMD_SetHomePositionOutput:
-			case CMD_GotoHomePositionOutput:
+                break;
+            case CMD_PTZ_GetStatusOutput:
+            case CMD_RemovePresetOutput:
+            case CMD_SetHomePositionOutput:
+            case CMD_GotoHomePositionOutput:
                 printf("PTZ is not supported!\n");
-				break;
-			case CMD_GotoPresetOutput:
-			case CMD_AbsoluteMoveOutput:
-			case CMD_RelativeMoveOutput:
-			case CMD_ContinuousMoveOutput:
+                break;
+            case CMD_GotoPresetOutput:
+            case CMD_AbsoluteMoveOutput:
+            case CMD_RelativeMoveOutput:
+            case CMD_ContinuousMoveOutput:
                 printf("The requested speed is out of bounds!\n");
-				break;
-			case CMD_SetPresetOutput:
+                break;
+            case CMD_SetPresetOutput:
                 printf("Preset cannot be set while PTZ unit is moving.!\n");
-				break;
-			case CMD_CreateRuleOutput:
+                break;
+            case CMD_CreateRuleOutput:
                 printf("There is not enough space in the device to add the rules to the configuration!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0x04:
-			switch(command)
-			{
-			case CMD_SetAudioSourceConfigurationOutput:
-			case CMD_SetAudioEncoderConfigurationOutput:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0x04:
+            switch(command)
+            {
+            case CMD_SetAudioSourceConfigurationOutput:
+            case CMD_SetAudioEncoderConfigurationOutput:
                 printf("The device does not support audio!\n");
-				break;
-			case CMD_GotoPresetOutput:
-			case CMD_AbsoluteMoveOutput:
-			case CMD_RelativeMoveOutput:
-			case CMD_ContinuousMoveOutput:
+                break;
+            case CMD_GotoPresetOutput:
+            case CMD_AbsoluteMoveOutput:
+            case CMD_RelativeMoveOutput:
+            case CMD_ContinuousMoveOutput:
                 printf("PTZ is not supported!\n");
-				break;
-			case CMD_SetPresetOutput:
+                break;
+            case CMD_SetPresetOutput:
                 printf("Maximum number of Presets reached!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0x05:
-			switch(command)
-			{
-			case CMD_SetPresetOutput:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0x05:
+            switch(command)
+            {
+            case CMD_SetPresetOutput:
                 printf("The requested configuration token does not exist!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0x06:
-			switch(command)
-			{
-			case CMD_SetPresetOutput:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0x06:
+            switch(command)
+            {
+            case CMD_SetPresetOutput:
                 printf("The requested preset token does not exist!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0x07:
-			switch(command)
-			{
-			case CMD_SetPresetOutput:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0x07:
+            switch(command)
+            {
+            case CMD_SetPresetOutput:
                 printf("PTZ is not supported!\n");
-				break;
-			default:
-				break;
-			}
-			break;
-		case 0xFB:
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0xFB:
             printf("Username error!\n");
-			break;
-		case 0xFC:
+            break;
+        case 0xFC:
             printf("Password error!\n");
-			break;
-		case 0xFD:
+            break;
+        case 0xFD:
             printf("Command unsupported!\n");
-			break;
-		case 0xFE:
+            break;
+        case 0xFE:
             printf("Command Cheksum error!\n");
-			break;
-		case 0xFF:
+            break;
+        case 0xFF:
             printf("Command Fail!\n");
-			break;
-		default:
-			break;
-		}
-	}
+            break;
+        default:
+            break;
+        }
+    }
     printf("Cmd=0x%04x, returnCode=0x%02x\n",command,returnValue.returnCode);
     printf("=== Cmd=0x%04x: ===\n\n", command);
 }
@@ -288,7 +288,7 @@ void User_getErrorReply(Device device, ReturnValue returnValue, Word command)
 #if 0
 void User_getDeviceAddressReply(RCHostInfo* deviceInfo, Word command)
 {
-	NewTxDevice* in_NewTxDevice = &deviceInfo->newTxDevice;
+    NewTxDevice* in_NewTxDevice = &deviceInfo->newTxDevice;
 
     printf("=== Cmd=0x%04x: User_getDeviceAddressReply ===\n\n", CMD_GetTxDeviceAddressIDOutput);
     printf("    deviceID	= %x\n",in_NewTxDevice->deviceAddressID);
@@ -298,7 +298,7 @@ void User_getDeviceAddressReply(RCHostInfo* deviceInfo, Word command)
 
 void User_getTransmissionParameterReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	TransmissionParameter* in_TransmissionParameter = &deviceInfo->transmissionParameter;
+    TransmissionParameter* in_TransmissionParameter = &deviceInfo->transmissionParameter;
 
     printf("=== Cmd=0x%04x: User_getTransmissionParameterReply ===\n\n", CMD_GetTransmissionParametersOutput);
     printf("    bandwidth			= 0x%x\n",in_TransmissionParameter->bandwidth);
@@ -309,8 +309,8 @@ void User_getTransmissionParameterReply(RCHostInfo* deviceInfo, Word /*command*/
     printf("    interval			= 0x%x\n",in_TransmissionParameter->interval);
     printf("    attenuation			= 0x%02x\n",in_TransmissionParameter->attenuation);
     printf("    extensionFlag		= %u\n",in_TransmissionParameter->extensionFlag);
-	if(in_TransmissionParameter->extensionFlag == 1)
-	{
+    if(in_TransmissionParameter->extensionFlag == 1)
+    {
         printf("    attenuation_signed		= %d\n",in_TransmissionParameter->attenuation_signed);
         printf("    TPSCellID			= 0x%x\n",in_TransmissionParameter->TPSCellID);
         printf("    channelNum			= %u\n",in_TransmissionParameter->channelNum);
@@ -321,22 +321,22 @@ void User_getTransmissionParameterReply(RCHostInfo* deviceInfo, Word /*command*/
         printf("    oneSeg_CodeRate		= 0x%x\n",in_TransmissionParameter->oneSeg_CodeRate);
     }
     else
-	{
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_getTransmissionParameterReply ===\n\n", CMD_GetTransmissionParametersOutput);
 }
 
 void User_getHwRegisterValuesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	HwRegisterInfo* in_HwRegisterInfo = &deviceInfo->hwRegisterInfo;
-	Byte i = 0;
+    HwRegisterInfo* in_HwRegisterInfo = &deviceInfo->hwRegisterInfo;
+    Byte i = 0;
 
     printf("=== Cmd=0x%04x: User_getHwRegisterValuesReply ===\n\n", CMD_GetHwRegisterValuesOutput);
     printf("    valueListSize	= %u\n",in_HwRegisterInfo->valueListSize);
 
     printf("    registerValues	=\n");
-	for( i = 0; i < in_HwRegisterInfo->valueListSize; i ++)
+    for( i = 0; i < in_HwRegisterInfo->valueListSize; i ++)
         printf("    %u : 0x%02x \n",i,in_HwRegisterInfo->registerValues[i]);
     printf("\n");
     printf("=== Cmd=0x%04x: User_getHwRegisterValuesReply ===\n\n", CMD_GetHwRegisterValuesOutput);
@@ -344,7 +344,7 @@ void User_getHwRegisterValuesReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getAdvanceOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	AdvanceOptions* in_AdvanceOptions = &deviceInfo->advanceOptions;
+    AdvanceOptions* in_AdvanceOptions = &deviceInfo->advanceOptions;
 
     printf("=== Cmd=0x%04x: User_getAdvanceOptionsReply ===\n\n", CMD_GetAdvanceOptionsOutput);
     printf("    PTS_PCR_delayTime			= %u\n",in_AdvanceOptions->PTS_PCR_delayTime);
@@ -353,8 +353,8 @@ void User_getAdvanceOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
     printf("    overFlowNumber			= %u\n",in_AdvanceOptions->overFlowNumber);
     printf("    overFlowSize			= %u\n",in_AdvanceOptions->overFlowSize);
     printf("    extensionFlag			= %u\n",in_AdvanceOptions->extensionFlag);
-	if(in_AdvanceOptions->extensionFlag == 1)
-	{
+    if(in_AdvanceOptions->extensionFlag == 1)
+    {
         printf("    Rx_LatencyRecoverTimeInterval(min)	= %u\n",in_AdvanceOptions->Rx_LatencyRecoverTimeInterval);
         printf("    SIPSITableDuration			= %u\n",in_AdvanceOptions->SIPSITableDuration);
         printf("    frameRateAdjustment			= %d\n",in_AdvanceOptions->frameRateAdjustment);
@@ -364,15 +364,15 @@ void User_getAdvanceOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    TS_TableDisable			= 0x%x\n",in_AdvanceOptions->TS_TableDisable);
     }
     else
-	{
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_getAdvanceOptionsReply ===\n\n", CMD_GetAdvanceOptionsOutput);
 }
 
 void User_getTPSInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	TPSInfo* in_TPSInfo = &deviceInfo->tpsInfo;
+    TPSInfo* in_TPSInfo = &deviceInfo->tpsInfo;
 
     printf("=== Cmd=0x%04x: User_getTPSInfoReply ===\n\n", CMD_GetTPSInformationOutput);
     printf("    Cell ID		= 0x%x\n",in_TPSInfo->cellID);
@@ -386,7 +386,7 @@ void User_getTPSInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getSiPsiTableReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	PSITable* in_PSITable = &deviceInfo->psiTable;
+    PSITable* in_PSITable = &deviceInfo->psiTable;
 
     printf("=== Cmd=0x%04x: User_getSiPsiTableReply ===\n\n", CMD_GetSiPsiTableOutput);
     printf("    ONID			= 0x%x\n",in_PSITable->ONID);
@@ -394,23 +394,23 @@ void User_getSiPsiTableReply(RCHostInfo* deviceInfo, Word /*command*/)
     printf("    TSID			= %u\n",in_PSITable->TSID);
     printf("    networkName			= %s\n",in_PSITable->networkName);
     printf("    extensionFlag		= %u\n",in_PSITable->extensionFlag);
-	if(in_PSITable->extensionFlag == 1)
-	{
+    if(in_PSITable->extensionFlag == 1)
+    {
         printf("    privateDataSpecifier	= 0x%08x\n",in_PSITable->privateDataSpecifier);
         printf("    NITVersion			= 0x%02x\n",in_PSITable->NITVersion);
         printf("    countryID			= %u\n",in_PSITable->countryID);
         printf("    languageID			= %u\n",in_PSITable->languageID);
     }
     else
-	{
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_getSiPsiTableReply ===\n\n", CMD_GetSiPsiTableOutput);
 }
 
 void User_getNitLocationReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	NITLoacation* in_NITLoacation = &deviceInfo->nitLoacation;
+    NITLoacation* in_NITLoacation = &deviceInfo->nitLoacation;
 
     printf("=== Cmd=0x%04x: User_getNitLocationReply ===\n\n", CMD_GetNitLocationOutput);
     printf("    latitude		= %u\n",in_NITLoacation->latitude);
@@ -422,7 +422,7 @@ void User_getNitLocationReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getSdtServiceReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	ServiceConfig* in_ServiceConfig = &deviceInfo->serviceConfig;
+    ServiceConfig* in_ServiceConfig = &deviceInfo->serviceConfig;
 
     printf("=== Cmd=0x%04x: User_getSdtServiceReply ===\n\n", CMD_GetSdtServiceOutput);
     printf("    serviceID				= %u\n",in_ServiceConfig->serviceID);
@@ -434,8 +434,8 @@ void User_getSdtServiceReply(RCHostInfo* deviceInfo, Word /*command*/)
     printf("    provider stringLength		= %u\n",in_ServiceConfig->provider.length());
     printf("    provider stringData			= %s\n",in_ServiceConfig->provider.data());
     printf("    extensionFlag			= %u\n",in_ServiceConfig->extensionFlag);
-	if(in_ServiceConfig->extensionFlag == 1)
-	{
+    if(in_ServiceConfig->extensionFlag == 1)
+    {
         printf("    IDAssignationMode			= %u\n",in_ServiceConfig->IDAssignationMode);
         printf("    ISDBT_RegionID			= %u\n",in_ServiceConfig->ISDBT_RegionID);
         printf("    LISDBT_BroadcasterRegionIDCN	= %u\n",in_ServiceConfig->ISDBT_BroadcasterRegionID);
@@ -445,21 +445,21 @@ void User_getSdtServiceReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    ISDBT_ServiceIDPartialReception	= 0x%04x\n",in_ServiceConfig->ISDBT_ServiceIDPartialReception);
     }
     else
-	{
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_getSdtServiceReply ===\n\n", CMD_GetSdtServiceOutput);
 }
 
 void User_getEITInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	EITInfo* in_EITInfo = &deviceInfo->eitInfo;
-	Byte i;
+    EITInfo* in_EITInfo = &deviceInfo->eitInfo;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getEITInfoReply ===\n\n", CMD_GetEITInformationOutput);
     printf("    listSize			= %u\n",in_EITInfo->listSize);
-	for( i = 0; i < in_EITInfo->listSize; i ++)
-	{
+    for( i = 0; i < in_EITInfo->listSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    enable			= %u\n",in_EITInfo->eitInfoParam[i].enable);
         printf("    startDate			= 0x%08x\n",in_EITInfo->eitInfoParam[i].startDate);
@@ -470,13 +470,13 @@ void User_getEITInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    eventText stringLength	= %u\n",in_EITInfo->eitInfoParam[i].eventText.length());
         printf("    eventText stringData	= %s\n",in_EITInfo->eitInfoParam[i].eventText.data());
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getEITInfoReply ===\n\n", CMD_GetEITInformationOutput);
 }
 
 void User_getTransmissionParameterCapabilitiesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	TransmissionParameterCapabilities* in_TransmissionParameterCapabilities = &deviceInfo->transmissionParameterCapabilities;
+    TransmissionParameterCapabilities* in_TransmissionParameterCapabilities = &deviceInfo->transmissionParameterCapabilities;
 
     printf("=== Cmd=0x%04x: User_getTransmissionParameterCapabilitiesReply ===\n\n", CMD_GetTransmissionParameterCapabilitiesOutput);
     printf("    bandwidthOptions		= %u \n",in_TransmissionParameterCapabilities->bandwidthOptions);
@@ -489,8 +489,8 @@ void User_getTransmissionParameterCapabilitiesReply(RCHostInfo* deviceInfo, Word
     printf("    attenuationMin		= %u \n",in_TransmissionParameterCapabilities->attenuationMin);
     printf("    attenuationMax		= %u \n",in_TransmissionParameterCapabilities->attenuationMax);
     printf("    extensionFlag		= %u \n",in_TransmissionParameterCapabilities->extensionFlag);
-	if(in_TransmissionParameterCapabilities->extensionFlag == 1)	// No Extension
-	{
+    if(in_TransmissionParameterCapabilities->extensionFlag == 1)	// No Extension
+    {
         printf("    attenuationMin_signed	= %d \n",in_TransmissionParameterCapabilities->attenuationMin_signed);
         printf("    attenuationMax_signed	= %d \n",in_TransmissionParameterCapabilities->attenuationMax_signed);
         printf("    TPSCellIDMin		= %u \n",in_TransmissionParameterCapabilities->TPSCellIDMin);
@@ -502,10 +502,10 @@ void User_getTransmissionParameterCapabilitiesReply(RCHostInfo* deviceInfo, Word
         printf("    segmentationMode		= %u \n",in_TransmissionParameterCapabilities->segmentationMode);
         printf("    oneSeg_Constellation	= %u \n",in_TransmissionParameterCapabilities->oneSeg_Constellation);
         printf("    oneSeg_CodeRate		= %u \n",in_TransmissionParameterCapabilities->oneSeg_CodeRate);
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_getTransmissionParameterCapabilitiesReply ===\n\n", CMD_GetTransmissionParameterCapabilitiesOutput);
 }
 //-----------------------ccHDtv Service--------------------------
@@ -513,7 +513,7 @@ void User_getTransmissionParameterCapabilitiesReply(RCHostInfo* deviceInfo, Word
 //-----------------Device Management Service-------------------
 void User_getDeviceCapabilityReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	DeviceCapability* in_DeviceCapability = &deviceInfo->deviceCapability;
+    DeviceCapability* in_DeviceCapability = &deviceInfo->deviceCapability;
 
     printf("=== Cmd=0x%04x: User_getDeviceCapabilityReply ===\n\n", CMD_GetCapabilitiesOutput);
     printf("    supportedFeatures	= 0x%x\n",in_DeviceCapability->supportedFeatures);
@@ -522,7 +522,7 @@ void User_getDeviceCapabilityReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getDeviceInformationReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	ManufactureInfo* in_ManufactureInfo = &deviceInfo->manufactureInfo;
+    ManufactureInfo* in_ManufactureInfo = &deviceInfo->manufactureInfo;
 
     printf("=== Cmd=0x%04x: User_getDeviceInformationReply ===\n\n", CMD_GetDeviceInformationOutput);
     printf("    manufactureName.stringLength	= %u\n",in_ManufactureInfo->manufactureName.length());
@@ -544,7 +544,7 @@ void User_getDeviceInformationReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getHostnameReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	HostInfo* in_HostInfo = &deviceInfo->hostInfo;
+    HostInfo* in_HostInfo = &deviceInfo->hostInfo;
 
     printf("=== Cmd=0x%04x: User_getHostnameReply ===\n\n", CMD_GetHostnameOutput);
     printf("    hostName.stringLength	= %u\n",in_HostInfo->hostName.length());
@@ -554,7 +554,7 @@ void User_getHostnameReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getSystemDateAndTimeReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	SystemTime* in_SystemTime = &deviceInfo->systemTime;
+    SystemTime* in_SystemTime = &deviceInfo->systemTime;
 
     printf("=== Cmd=0x%04x: User_getSystemDateAndTimeReply ===\n\n", CMD_GetSystemDateAndTimeOutput);
     printf("    countryCode			= %c%c%c\n",in_SystemTime->countryCode[0],in_SystemTime->countryCode[1],in_SystemTime->countryCode[2]);
@@ -568,23 +568,23 @@ void User_getSystemDateAndTimeReply(RCHostInfo* deviceInfo, Word /*command*/)
     printf("    UTCMonth			= %u\n",in_SystemTime->UTCMonth);
     printf("    UTCDay			= %u\n",in_SystemTime->UTCDay);
     printf("    extensionFlag		= %u\n",in_SystemTime->extensionFlag);
-	if(in_SystemTime->extensionFlag == 1)
-	{
+    if(in_SystemTime->extensionFlag == 1)
+    {
         printf("    UTCMillisecond		= %u\n",in_SystemTime->UTCMillisecond);
         printf("    timeAdjustmentMode		= %u\n",in_SystemTime->timeAdjustmentMode);
         printf("    timeAdjustmentCriterionMax	= %u\n",in_SystemTime->timeAdjustmentCriterionMax);
         printf("    timeAdjustmentCriterionMin	= %u\n",in_SystemTime->timeAdjustmentCriterionMin);
         printf("    timeSyncDuration		= %u\n",in_SystemTime->timeSyncDuration);
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_getSystemDateAndTimeReply ===\n\n", CMD_GetSystemDateAndTimeOutput);
 }
 
 void User_getSystemLogReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	SystemLog* in_SystemLog = &deviceInfo->systemLog;
+    SystemLog* in_SystemLog = &deviceInfo->systemLog;
 
     printf("=== Cmd=0x%04x: User_getSystemLogReply ===\n\n", CMD_GetSystemLogOutput);
     printf("    systemLog stringLength	= %u\n",in_SystemLog->logData.length());
@@ -594,7 +594,7 @@ void User_getSystemLogReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	OSDInfo* in_OSDInfo = &deviceInfo->osdInfo;
+    OSDInfo* in_OSDInfo = &deviceInfo->osdInfo;
 
     printf("=== Cmd=0x%04x: User_getOSDInfoReply ===\n\n", CMD_GetOSDInformationOutput);
     printf("    dateEnable		= %u\n",in_OSDInfo->dateEnable);
@@ -619,7 +619,7 @@ void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_systemRebootReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	SystemReboot* in_SystemReboot = &deviceInfo->systemReboot;
+    SystemReboot* in_SystemReboot = &deviceInfo->systemReboot;
 
     printf("=== Cmd=0x%04x: User_systemReboot ===\n\n", CMD_SystemRebootOutput);
     printf("    rebootMessage stringLength	= %u\n",in_SystemReboot->responseMessage.length());
@@ -629,7 +629,7 @@ void User_systemRebootReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_upgradeSystemFirmwareReply(RCHostInfo* deviceInfo, Word command)
 {
-	SystemFirmware* in_SystemFirmware = &deviceInfo->systemFirmware;
+    SystemFirmware* in_SystemFirmware = &deviceInfo->systemFirmware;
 
     printf("=== Cmd=0x%04x: User_upgradeSystemFirmwareReply ===\n\n", command);
     printf("    message stringLength	= %u\n",in_SystemFirmware->message.length());
@@ -642,32 +642,32 @@ void User_upgradeSystemFirmwareReply(RCHostInfo* deviceInfo, Word command)
 //---------------------Device_IO Service------------------------
 void User_getDigitalInputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	DigitalInputsInfo* in_DigitalInputsInfo = &deviceInfo->digitalInputsInfo;
-	Byte i =0;
+    DigitalInputsInfo* in_DigitalInputsInfo = &deviceInfo->digitalInputsInfo;
+    Byte i =0;
 
     printf("=== Cmd=0x%04x: User_getDigitalInputsReply ===\n\n", CMD_GetDigitalInputsOutput);
     printf("    listSize			= %u\n",in_DigitalInputsInfo->listSize);
 
-	for( i = 0; i < in_DigitalInputsInfo->listSize; i ++)
-	{
+    for( i = 0; i < in_DigitalInputsInfo->listSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    upgradeMessage stringLength	= %u\n",in_DigitalInputsInfo->tokenList[i].length());
         printf("    upgradeMessage stringData	= %s\n",in_DigitalInputsInfo->tokenList[i].data());
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getDigitalInputsReply ===\n\n", CMD_GetDigitalInputsOutput);
 }
 
 void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	RelayOutputs* in_RelayOutputs = &deviceInfo->relayOutputs;
-	Byte i =0;
+    RelayOutputs* in_RelayOutputs = &deviceInfo->relayOutputs;
+    Byte i =0;
 
     printf("=== Cmd=0x%04x: User_getRelayOutputsReply ===\n\n", CMD_GetRelayOutputsOutput);
     printf("    listSize		= %u\n",in_RelayOutputs->listSize);
 
-	for( i = 0; i < in_RelayOutputs->listSize; i ++)
-	{
+    for( i = 0; i < in_RelayOutputs->listSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    token stringLength	= %u\n", in_RelayOutputs->relayOutputsParam[i].token.length());
         printf("    token stringData	= %s\n", in_RelayOutputs->relayOutputsParam[i].token.data());
@@ -676,7 +676,7 @@ void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    delayTime		= %u\n", in_RelayOutputs->relayOutputsParam[i].delayTime);
         printf("    idleState		= %u\n", in_RelayOutputs->relayOutputsParam[i].idleState);
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getRelayOutputsReply ===\n\n", CMD_GetRelayOutputsOutput);
 }
 
@@ -685,7 +685,7 @@ void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 //-----------------------Imaging Service-------------------------
 void User_getImagingSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	ImageConfig* in_ImageConfig = &deviceInfo->imageConfig;
+    ImageConfig* in_ImageConfig = &deviceInfo->imageConfig;
 
     printf("=== Cmd=0x%04x: User_getImagingSettingsReply ===\n\n", CMD_GetImagingSettingsOutput);
     printf("    backlightCompensationMode	= %u\n",in_ImageConfig->backlightCompensationMode);
@@ -722,25 +722,25 @@ void User_getImagingSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
     printf("    analogTVOutputStandard	= %u\n",in_ImageConfig->analogTVOutputStandard);
     printf("    imageStabilizationLevel	= %f\n",in_ImageConfig->imageStabilizationLevel);
     printf("    extensionFlag		= %u\n",in_ImageConfig->extensionFlag);
-	if(in_ImageConfig->extensionFlag == 1)
-	{
+    if(in_ImageConfig->extensionFlag == 1)
+    {
         printf("    flickerControl		= %u\n",in_ImageConfig->flickerControl);
         printf("    imageStabilizationMode	= %u\n",in_ImageConfig->imageStabilizationMode);
         printf("    deNoiseMode			= %u\n",in_ImageConfig->deNoiseMode);
         printf("    deNoiseStrength		= %f\n",in_ImageConfig->deNoiseStrength);
         printf("    backLightControlMode	= %u\n",in_ImageConfig->backLightControlMode);
         printf("    backLightControlStrength	= %f\n",in_ImageConfig->backLightControlStrength);
-	}else
-	{
+    }else
+    {
         printf("    No Extension Member!\n");
-	}
+    }
 
     printf("=== Cmd=0x%04x: User_getImagingSettingsReply ===\n\n", CMD_GetImagingSettingsOutput);
 }
 
 void User_getStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	FocusStatusInfo* in_FocusStatusInfo = &deviceInfo->focusStatusInfo;
+    FocusStatusInfo* in_FocusStatusInfo = &deviceInfo->focusStatusInfo;
 
     printf("=== Cmd=0x%04x: User_getStatusReply ===\n\n", CMD_IMG_GetStatusOutput);
     printf("    position		= %u\n",in_FocusStatusInfo->position);
@@ -752,7 +752,7 @@ void User_getStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	ImageConfigOption* in_ImageConfigOption = &deviceInfo->imageConfigOption;
+    ImageConfigOption* in_ImageConfigOption = &deviceInfo->imageConfigOption;
 
     printf("=== Cmd=0x%04x: User_getOptionsReply ===\n\n", CMD_IMG_GetOptionsOutput);
     printf("    backlightCompensationMode		= %u\n",in_ImageConfigOption->backlightCompensationMode);
@@ -818,7 +818,7 @@ void User_getOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getUserDefinedSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	UserDefinedSettings* in_UserDefinedSettings = &deviceInfo->userDefinedSettings;
+    UserDefinedSettings* in_UserDefinedSettings = &deviceInfo->userDefinedSettings;
 
     printf("=== Cmd=0x%04x: User_getUserDefinedSettingsReply ===\n\n", CMD_GetUserDefinedSettingsInput);
     printf("    uerDefinedData 	stringLength	= %u\n",in_UserDefinedSettings->uerDefinedData.length());
@@ -830,25 +830,25 @@ void User_getUserDefinedSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 //-------------------------Media Service-------------------------
 void User_getVideoPrivateAreaReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoPrivateArea* in_VideoPrivateArea = &deviceInfo->videoPrivateArea;
-	Byte i = 0;
+    VideoPrivateArea* in_VideoPrivateArea = &deviceInfo->videoPrivateArea;
+    Byte i = 0;
 
     printf("=== Cmd=0x%04x: User_getVideoPrivateAreaReply ===\n\n", CMD_GetVideoPrivateAreaOutput);
     printf("    polygonListSize	= %u\n",in_VideoPrivateArea->polygonListSize);
-	for( i = 0; i < in_VideoPrivateArea->polygonListSize; i ++)
-	{
+    for( i = 0; i < in_VideoPrivateArea->polygonListSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    polygon_x		= %u\n",in_VideoPrivateArea->privateAreaPolygon[i].polygon_x);
         printf("    polygon_y		= %u\n",in_VideoPrivateArea->privateAreaPolygon[i].polygon_y);
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
     printf("    privateAreaEnable	= %u\n",in_VideoPrivateArea->privateAreaEnable);
     printf("=== Cmd=0x%04x: User_getVideoPrivateAreaReply ===\n\n", CMD_GetVideoPrivateAreaOutput);
 }
 
 void User_getVideoOSDConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoOSDConfig *in_VideoOSDConfig = &deviceInfo->videoOSDConfig;
+    VideoOSDConfig *in_VideoOSDConfig = &deviceInfo->videoOSDConfig;
 
     printf("=== Cmd=0x%04x: User_getVideoOSDConfigReply ===\n\n", CMD_GetVideoOSDConfigurationOutput);
     printf("    dateEnable			= %u\n",in_VideoOSDConfig->dateEnable);
@@ -872,54 +872,54 @@ void User_getVideoOSDConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getAudioEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	AudioEncConfigOptions* in_AudioEncConfigOptions = &deviceInfo->audioEncConfigOptions;
-	Byte i = 0, j = 0;
+    AudioEncConfigOptions* in_AudioEncConfigOptions = &deviceInfo->audioEncConfigOptions;
+    Byte i = 0, j = 0;
 
     printf("=== Cmd=0x%04x: User_getAudioEncConfigOptionsReply ===\n\n", CMD_GetAudioEncoderConfigurationOptionsOutput);
 
     printf("    configListSize			= %u\n",in_AudioEncConfigOptions->configListSize);
-	for( i = 0; i < in_AudioEncConfigOptions->configListSize; i ++)
-	{
+    for( i = 0; i < in_AudioEncConfigOptions->configListSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    encodingOption			= %u\n",in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].encodingOption);
         printf("    bitrateRangeMin			= %u\n",in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].bitrateRangeMin);
         printf("    bitrateRangeMax			= %u\n",in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].bitrateRangeMax);
         printf("    sampleRateAvailableListSize		= %u\n",in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].sampleRateAvailableListSize);
-		for( j = 0; j < in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].sampleRateAvailableListSize; j ++)
+        for( j = 0; j < in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].sampleRateAvailableListSize; j ++)
             printf("    sampleRateAvailableList[%u]		= %u\n", j, in_AudioEncConfigOptions->audioEncConfigOptionsParam[i].sampleRateAvailableList[j]);
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getAudioEncConfigOptionsReply ===\n\n", CMD_GetAudioEncoderConfigurationOptionsOutput);
 }
 
 void User_getAudioSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	AudioSrcConfigOptions* in_AudioSrcConfigOptions = &deviceInfo->audioSrcConfigOptions;
-	Byte i = 0;
+    AudioSrcConfigOptions* in_AudioSrcConfigOptions = &deviceInfo->audioSrcConfigOptions;
+    Byte i = 0;
 
     printf("=== Cmd=0x%04x: User_getAudioSrcConfigOptionsReply ===\n\n", CMD_GetAudioSourceConfigurationOptionsOutput);
     printf("    audioSrcTokensAvailableListSize			= %u\n",in_AudioSrcConfigOptions->audioSrcTokensAvailableListSize);
-	for( i = 0; i < in_AudioSrcConfigOptions->audioSrcTokensAvailableListSize; i ++)
-	{
+    for( i = 0; i < in_AudioSrcConfigOptions->audioSrcTokensAvailableListSize; i ++)
+    {
         printf("    audioSrcTokensAvailableList[%u] stringLength		= %u\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].length());
         printf("    audioSrcTokensAvailableList[%u] stringData		= %s\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].data());
-	}
+    }
     printf("=== Cmd=0x%04x: User_getAudioSrcConfigOptionsReply ===\n\n", CMD_GetAudioSourceConfigurationOptionsOutput);
 }
 
 void User_getVideoEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoEncConfigOptions* in_VideoEncConfigOptions = &deviceInfo->videoEncConfigOptions;
-	Byte i;
+    VideoEncConfigOptions* in_VideoEncConfigOptions = &deviceInfo->videoEncConfigOptions;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getVideoEncConfigOptionsReply ===\n\n", CMD_GetVideoEncoderConfigurationOptionsOutput);
 
     printf("    encodingOption			= 0x%x\n",in_VideoEncConfigOptions->encodingOption);
     printf("    resolutionsAvailableListSize	= %u\n",in_VideoEncConfigOptions->resolutionsAvailableListSize);
-	for( i = 0; i < in_VideoEncConfigOptions->resolutionsAvailableListSize; i ++)
-	{
+    for( i = 0; i < in_VideoEncConfigOptions->resolutionsAvailableListSize; i ++)
+    {
         printf("    width x height			= %u x %u\n",in_VideoEncConfigOptions->resolutionsAvailableList[i].width, in_VideoEncConfigOptions->resolutionsAvailableList[i].height);
-	}
+    }
     printf("    qualityMin				= %u\n",in_VideoEncConfigOptions->qualityMin);
     printf("    qualityMax				= %u\n",in_VideoEncConfigOptions->qualityMax);
     printf("    frameRateMin			= %u\n",in_VideoEncConfigOptions->frameRateMin);
@@ -935,18 +935,18 @@ void User_getVideoEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
     printf("    targetBitrateRangeMin		= %u\n",in_VideoEncConfigOptions->targetBitrateRangeMin);
     printf("    targetBitrateRangeMax		= %u\n",in_VideoEncConfigOptions->targetBitrateRangeMax);
     printf("    aspectRatioAvailableListSize	= %u\n",in_VideoEncConfigOptions->aspectRatioAvailableListSize);
-	for( i = 0; i < in_VideoEncConfigOptions->aspectRatioAvailableListSize; i ++)
-	{
+    for( i = 0; i < in_VideoEncConfigOptions->aspectRatioAvailableListSize; i ++)
+    {
         printf("    aspectRatioList[%u]			= 0x%04x\n", i ,in_VideoEncConfigOptions->aspectRatioList[i]);
-	}
+    }
 
     printf("=== Cmd=0x%04x: User_getVideoEncConfigOptionsReply ===\n\n", CMD_GetVideoEncoderConfigurationOptionsOutput);
 }
 
 void User_getVideoSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoSrcConfigOptions* in_VideoSrcConfigOptions = &deviceInfo->videoSrcConfigOptions;
-	Byte i;
+    VideoSrcConfigOptions* in_VideoSrcConfigOptions = &deviceInfo->videoSrcConfigOptions;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getVideoSrcConfigOptionsReply ===\n\n", CMD_GetVideoSourceConfigurationOptionsOutput);
 
@@ -959,11 +959,11 @@ void User_getVideoSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
     printf("    boundsRange_Height_Min				= %u\n",in_VideoSrcConfigOptions->boundsRange_Height_Min);
     printf("    boundsRange_Heigh_Max				= %u\n",in_VideoSrcConfigOptions->boundsRange_Heigh_Max);
     printf("    videoSrcTokensAvailableListSize			= %u\n",in_VideoSrcConfigOptions->videoSrcTokensAvailableListSize);
-	for( i = 0; i < in_VideoSrcConfigOptions->videoSrcTokensAvailableListSize; i ++)
-	{
+    for( i = 0; i < in_VideoSrcConfigOptions->videoSrcTokensAvailableListSize; i ++)
+    {
         printf("    videoSrcTokensAvailableList[%u] stringLength		= %u\n", i, in_VideoSrcConfigOptions->videoSrcTokensAvailableList[i].length());
         printf("    videoSrcTokensAvailableList[%u] stringData		= %s\n", i, in_VideoSrcConfigOptions->videoSrcTokensAvailableList[i].data());
-	}
+    }
     printf("    rotateModeOptions					= 0x%x\n",in_VideoSrcConfigOptions->rotateModeOptions);
     printf("    rotateDegreeMinOption				= %u\n",in_VideoSrcConfigOptions->rotateDegreeMinOption);
     printf("    mirrorModeOptions					= 0x%x\n",in_VideoSrcConfigOptions->mirrorModeOptions);
@@ -974,14 +974,14 @@ void User_getVideoSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 
 void User_getAudioEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	AudioEncConfig* in_AudioEncConfig = &deviceInfo->audioEncConfig;
-	Byte i;
+    AudioEncConfig* in_AudioEncConfig = &deviceInfo->audioEncConfig;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getAudioEncConfigReply ===\n\n", CMD_GetAudioEncoderConfigurationsOutput);
     printf("    configListSize	= %u\n",in_AudioEncConfig->configListSize);
 
-	for( i = 0; i < in_AudioEncConfig->configListSize; i ++)
-	{
+    for( i = 0; i < in_AudioEncConfig->configListSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    token stringLength	= %u\n",in_AudioEncConfig->configList[i].token.length());
         printf("    token stringData	= %s\n",in_AudioEncConfig->configList[i].token.data());
@@ -992,19 +992,19 @@ void User_getAudioEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    bitrate		= %u\n",in_AudioEncConfig->configList[i].bitrate);
         printf("    sampleRate		= %u\n",in_AudioEncConfig->configList[i].sampleRate);
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getAudioEncConfigReply ===\n\n", CMD_GetAudioEncoderConfigurationsOutput);
 }
 
 void User_getAudioSourceConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	AudioSrcConfig* in_AudioSrcConfig = &deviceInfo->audioSrcConfig;
-	Byte i;
+    AudioSrcConfig* in_AudioSrcConfig = &deviceInfo->audioSrcConfig;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getAudioSourceConfigReply ===\n\n", CMD_GetAudioSourceConfigurationsOutput);
     printf("    configListSize		= %u\n", in_AudioSrcConfig->configListSize);
-	for( i = 0; i < in_AudioSrcConfig->configListSize; i ++)
-	{
+    for( i = 0; i < in_AudioSrcConfig->configListSize; i ++)
+    {
         printf("----------------------------- Index %u ----------------------------------\n",i);
         printf("    name stringLength		= %u\n", in_AudioSrcConfig->audioSrcConfigList[i].name.length());
         printf("    name stringData		= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].name.data());
@@ -1014,32 +1014,32 @@ void User_getAudioSourceConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    sourceToken stringData	= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].sourceToken.data());
         printf("    useCount			= %u\n",in_AudioSrcConfig->audioSrcConfigList[i].useCount);
         printf("----------------------------- Index %u ----------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getAudioSourceConfigReply ===\n\n", CMD_GetAudioSourceConfigurationsOutput);
 }
 
 void User_getAudioSourcesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	AudioSources* in_AudioSources = &deviceInfo->audioSources;
-	Byte i;
+    AudioSources* in_AudioSources = &deviceInfo->audioSources;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getAudioSourcesReply ===\n\n", CMD_GetAudioSourcesInput);
     printf("    audioSourcesListSize		= %u\n", in_AudioSources->audioSourcesListSize);
-	for( i = 0; i < in_AudioSources->audioSourcesListSize; i ++)
-	{
+    for( i = 0; i < in_AudioSources->audioSourcesListSize; i ++)
+    {
         printf("----------------------------- Index %u ----------------------------------\n",i);
         printf("    audioSourcesToken stringLength	= %u\n", in_AudioSources->audioSourcesList[i].audioSourcesToken.length());
         printf("    audioSourcesToken stringData	= %s\n",  in_AudioSources->audioSourcesList[i].audioSourcesToken.data());
 
         printf("    channels				= %u\n",  in_AudioSources->audioSourcesList[i].channels);
         printf("----------------------------- Index %u ----------------------------------\n",i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getAudioSourcesReply ===\n\n", CMD_GetAudioSourcesInput);
 }
 
 void User_getGuaranteedEncsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	GuaranteedEncs* in_GuaranteedEncs = &deviceInfo->guaranteedEncs;
+    GuaranteedEncs* in_GuaranteedEncs = &deviceInfo->guaranteedEncs;
 
     printf("=== Cmd=0x%04x: User_getGuaranteedEncsReply ===\n\n", CMD_GetGuaranteedNumberOfVideoEncoderInstancesOutput);
     printf("    TotallNum	= %u\n", in_GuaranteedEncs->TotallNum);
@@ -1052,15 +1052,15 @@ void User_getGuaranteedEncsReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MediaProfiles* in_MediaProfiles = &deviceInfo->mediaProfiles;
-	Byte i;
+    MediaProfiles* in_MediaProfiles = &deviceInfo->mediaProfiles;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getProfilesReply ===\n\n", CMD_GetProfilesOutput);
     printf("    extensionFlag					= %u\n", in_MediaProfiles->extensionFlag);
     printf("    profilesListSize					= %u\n", in_MediaProfiles->profilesListSize);
 
-	for( i = 0; i < in_MediaProfiles->profilesListSize; i ++)
-	{
+    for( i = 0; i < in_MediaProfiles->profilesListSize; i ++)
+    {
         printf("----------------------------- Index %u ----------------------------------\n",i);
         printf("    name stringLength					= %u\n", in_MediaProfiles->mediaProfilesParam[i].name.length());
         printf("    name stringData					= %s\n", in_MediaProfiles->mediaProfilesParam[i].name.data());
@@ -1129,29 +1129,29 @@ void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    audioDecToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecToken.length());
         printf("    audioDecToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioDecToken.data());
         printf("    audioDecUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecUseCount);
-		if(in_MediaProfiles->extensionFlag == 1)
-		{
+        if(in_MediaProfiles->extensionFlag == 1)
+        {
             printf("    videoEncConfigRateControlTargetBitrateLimit		= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncConfigRateControlTargetBitrateLimit);
-		}else
-		{
+        }else
+        {
             printf("    No Extension Parameter!\n");
-		}
+        }
         printf("----------------------------- Index %u ----------------------------------\n",i);
-	}
+    }
 
     printf("=== Cmd=0x%04x: User_getProfilesReply ===\n\n", CMD_GetProfilesOutput);
 }
 
 void User_getVideoEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoEncConfig* in_VideoEncConfig = &deviceInfo->videoEncConfig;
-	Byte i;
+    VideoEncConfig* in_VideoEncConfig = &deviceInfo->videoEncConfig;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getVideoEncConfigReply ===\n\n", CMD_GetVideoEncoderConfigurationsOutput);
     printf("    extensionFlag		= %u\n", in_VideoEncConfig->extensionFlag);
     printf("    configListSize		= %u\n", in_VideoEncConfig->configListSize);
-	for( i = 0; i < in_VideoEncConfig->configListSize; i ++)
-	{
+    for( i = 0; i < in_VideoEncConfig->configListSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n",i);
         printf("    name stringLength		= %u\n", in_VideoEncConfig->configList[i].name.length());
         printf("    name stringData		= %s\n", in_VideoEncConfig->configList[i].name.data());
@@ -1168,30 +1168,30 @@ void User_getVideoEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    rateControlType		= %u\n", in_VideoEncConfig->configList[i].rateControlType);
         printf("    govLength			= %u\n", in_VideoEncConfig->configList[i].govLength);
         printf("    profile			= %u\n", in_VideoEncConfig->configList[i].profile);
-		if(in_VideoEncConfig->extensionFlag == 1)
-		{
+        if(in_VideoEncConfig->extensionFlag == 1)
+        {
             printf("    targetBitrateLimit		= %u\n", in_VideoEncConfig->configList[i].targetBitrateLimit);
             printf("    aspectRatio			= 0x%04x\n", in_VideoEncConfig->configList[i].aspectRatio);
-		}else
-		{
+        }else
+        {
             printf("    No Extension Parameter!\n");
-		}
+        }
         printf("---------------------------------- Index %u -------------------------------------\n",i);
-	}
+    }
 
     printf("=== Cmd=0x%04x: User_getVideoEncConfigReply ===\n\n", CMD_GetVideoEncoderConfigurationsOutput);
 }
 
 void User_getVideoSrcConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoSrcConfig* in_VideoSrcConfig = &deviceInfo->videoSrcConfig;
-	Byte i;
+    VideoSrcConfig* in_VideoSrcConfig = &deviceInfo->videoSrcConfig;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getVideoSrcConfigReply ===\n\n", CMD_GetVideoSourceConfigurationsOutput);
     printf("    extensionFlag		= %u\n",in_VideoSrcConfig->extensionFlag);
     printf("    configListSize		= %u\n",in_VideoSrcConfig->configListSize);
-	for( i = 0; i < in_VideoSrcConfig->configListSize; i ++)
-	{
+    for( i = 0; i < in_VideoSrcConfig->configListSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n", i);
         printf("    name stringLength		= %u\n",in_VideoSrcConfig->configList[i].name.length());
         printf("    name stringData		= %s\n",in_VideoSrcConfig->configList[i].name.data());
@@ -1207,27 +1207,27 @@ void User_getVideoSrcConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    rotateMode			= %u\n",in_VideoSrcConfig->configList[i].rotateMode);
         printf("    rotateDegree		= %u\n",in_VideoSrcConfig->configList[i].rotateDegree);
         printf("    mirrorMode			= %u\n",in_VideoSrcConfig->configList[i].mirrorMode);
-		if(in_VideoSrcConfig->extensionFlag == 1)
-		{
+        if(in_VideoSrcConfig->extensionFlag == 1)
+        {
             printf("    maxFrameRate		= %u\n",in_VideoSrcConfig->configList[i].maxFrameRate);
-		}else
-		{
+        }else
+        {
             printf("    No Extension Parameter!\n");
-		}
+        }
         printf("---------------------------------- Index %u -------------------------------------\n", i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getVideoSrcConfigReply ===\n\n", CMD_GetVideoSourceConfigurationsOutput);
 }
 
 void User_getVideoSrcReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	VideoSrc* in_VideoSrc = &deviceInfo->videoSrc;
-	Byte i;
+    VideoSrc* in_VideoSrc = &deviceInfo->videoSrc;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getVideoSrcReply ===\n\n", CMD_GetVideoSourcesOutput);
     printf("    videoSrcListSize	= %u\n",in_VideoSrc->videoSrcListSize);
-	for( i = 0; i < in_VideoSrc->videoSrcListSize; i ++)
-	{
+    for( i = 0; i < in_VideoSrc->videoSrcListSize; i ++)
+    {
         printf("---------------------------------- Index %u -------------------------------------\n", i);
         printf("    token stringLength	= %u\n",in_VideoSrc->srcList[i].token.length());
         printf("    token stringData	= %s\n",in_VideoSrc->srcList[i].token.data());
@@ -1235,7 +1235,7 @@ void User_getVideoSrcReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    resolutionWidth	= %u\n",in_VideoSrc->srcList[i].resolutionWidth);
         printf("    resolutionHeight	= %u\n",in_VideoSrc->srcList[i].resolutionHeight);
         printf("---------------------------------- Index %u -------------------------------------\n", i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getVideoSrcReply ===\n\n", CMD_GetVideoSourcesOutput);
 }
 //-------------------------Media Service-------------------------
@@ -1243,33 +1243,33 @@ void User_getVideoSrcReply(RCHostInfo* deviceInfo, Word /*command*/)
 //--------------------Video Analytics Service--------------------
 void User_getSupportedRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	SupportedRules* in_SupportedRules = &deviceInfo->supportedRules;
-	Byte i;
+    SupportedRules* in_SupportedRules = &deviceInfo->supportedRules;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getSupportedRulesReply ===\n\n", CMD_GetSupportedRulesOutput);
     printf("    supportListSize	= %u\n",in_SupportedRules->supportListSize);
-	for( i = 0; i < in_SupportedRules->supportListSize; i ++)
-	{
+    for( i = 0; i < in_SupportedRules->supportListSize; i ++)
+    {
         printf("    ruleType		= 0x%02x\n",in_SupportedRules->ruleType[i]);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getSupportedRulesReply ===\n\n", CMD_GetSupportedRulesOutput);
 }
 
 void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	RuleList* in_RuleList = &deviceInfo->ruleList;
-	Byte i,j;
-	Rule_LineDetector* ptrRule_LineDetector = NULL;
-	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
-	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
-	Rule_Counting* ptrRule_Counting = NULL;
-	Rule_CellMotion* ptrRule_CellMotion = NULL;
+    RuleList* in_RuleList = &deviceInfo->ruleList;
+    Byte i,j;
+    Rule_LineDetector* ptrRule_LineDetector = NULL;
+    Rule_FieldDetector* ptrRule_FieldDetector = NULL;
+    Rule_MotionDetector* ptrRule_MotionDetector = NULL;
+    Rule_Counting* ptrRule_Counting = NULL;
+    Rule_CellMotion* ptrRule_CellMotion = NULL;
 
     printf("=== Cmd=0x%04x: User_getRulesReply ===\n\n", CMD_GetRulesOutput);
     printf("    ruleListSize			= %u\n",deviceInfo->ruleList.ruleListSize);
     printf("    extensionFlag			= %u\n",deviceInfo->ruleList.extensionFlag);
-	for( i = 0; i < in_RuleList->ruleListSize; i ++)
-	{
+    for( i = 0; i < in_RuleList->ruleListSize; i ++)
+    {
         printf("--------------------rule %u--------------------\n", i );
         printf("    ruleName stringLength	= %u\n",in_RuleList->totalRuleList[i].ruleName.length());
         printf("    ruleName stringData		= %s\n",in_RuleList->totalRuleList[i].ruleName.data());
@@ -1277,77 +1277,77 @@ void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    ruleToken stringData	= %s\n",in_RuleList->totalRuleList[i].ruleToken.data());
         printf("    type			= 0x%02x\n",in_RuleList->totalRuleList[i].type);
 
-		if(deviceInfo->ruleList.extensionFlag == 1)
-		{
+        if(deviceInfo->ruleList.extensionFlag == 1)
+        {
             printf("    videoSrcToken stringLength	= %u\n",in_RuleList->totalRuleList[i].videoSrcToken.length());
             printf("    videoSrcToken stringData	= %s\n",in_RuleList->totalRuleList[i].videoSrcToken.data());
             printf("    threshold			= %u\n",in_RuleList->totalRuleList[i].threshold);
             printf("    motionSensitivity		= %u\n",in_RuleList->totalRuleList[i].motionSensitivity);
-		}else
-		{
+        }else
+        {
             printf("    No Extension Parameter!\n");
-		}
+        }
 
-		if(in_RuleList->totalRuleList[i].type == 0x10)
-		{
-			ptrRule_LineDetector = (Rule_LineDetector*) in_RuleList->totalRuleList[i].rule;
+        if(in_RuleList->totalRuleList[i].type == 0x10)
+        {
+            ptrRule_LineDetector = (Rule_LineDetector*) in_RuleList->totalRuleList[i].rule;
             printf("**************Line  Detector**************\n" );
             printf("    direction			= %u\n",ptrRule_LineDetector->direction);
             printf("    polygonListSize		= %u\n",ptrRule_LineDetector->polygonListSize);
-			for(j = 0; j < ptrRule_LineDetector->polygonListSize; j ++)
-			{
+            for(j = 0; j < ptrRule_LineDetector->polygonListSize; j ++)
+            {
                 printf("    polygon_x			= %u\n",ptrRule_LineDetector->detectPolygon[j].polygon_x);
                 printf("    polygon_y			= %u\n",ptrRule_LineDetector->detectPolygon[j].polygon_y);
-			}
+            }
             printf("    metadataStreamSwitch	= %u\n",ptrRule_LineDetector->metadataStreamSwitch);
             printf("**************Line Detector**************\n" );
-			ptrRule_LineDetector = NULL;
-		}else if(in_RuleList->totalRuleList[i].type == 0x11)
-		{
-			ptrRule_FieldDetector = (Rule_FieldDetector*) in_RuleList->totalRuleList[i].rule;
+            ptrRule_LineDetector = NULL;
+        }else if(in_RuleList->totalRuleList[i].type == 0x11)
+        {
+            ptrRule_FieldDetector = (Rule_FieldDetector*) in_RuleList->totalRuleList[i].rule;
             printf("**************Field  Detector**************\n" );
             printf("    polygonListSize		= %u\n",ptrRule_FieldDetector->polygonListSize);
-			for(j = 0; j < ptrRule_FieldDetector->polygonListSize; j ++)
-			{
+            for(j = 0; j < ptrRule_FieldDetector->polygonListSize; j ++)
+            {
                 printf("    polygon_x			= %u\n",ptrRule_FieldDetector->detectPolygon[j].polygon_x);
                 printf("    polygon_y			= %u\n",ptrRule_FieldDetector->detectPolygon[j].polygon_y);
-			}
+            }
             printf("    metadataStreamSwitch	= %u\n",ptrRule_FieldDetector->metadataStreamSwitch);
             printf("**************Field Detector**************\n" );
-			ptrRule_FieldDetector = NULL;
-		}else if(in_RuleList->totalRuleList[i].type == 0x12)
-		{
-			ptrRule_MotionDetector = (Rule_MotionDetector*) in_RuleList->totalRuleList[i].rule;
+            ptrRule_FieldDetector = NULL;
+        }else if(in_RuleList->totalRuleList[i].type == 0x12)
+        {
+            ptrRule_MotionDetector = (Rule_MotionDetector*) in_RuleList->totalRuleList[i].rule;
             printf("**************Motion Detector**************\n" );
             printf("    motionExpression		= %u\n",ptrRule_MotionDetector->motionExpression);
             printf("    polygonListSize		= %u\n",ptrRule_MotionDetector->polygonListSize);
-			for(j = 0; j < ptrRule_MotionDetector->polygonListSize; j ++)
-			{
+            for(j = 0; j < ptrRule_MotionDetector->polygonListSize; j ++)
+            {
                 printf("    polygon_x			= %u\n",ptrRule_MotionDetector->detectPolygon[j].polygon_x);
                 printf("    polygon_y			= %u\n",ptrRule_MotionDetector->detectPolygon[j].polygon_y);
-			}
+            }
             printf("    metadataStreamSwitch	= %u\n",ptrRule_MotionDetector->metadataStreamSwitch);
             printf("**************Motion Detector**************\n" );
-			ptrRule_MotionDetector = NULL;
-		}else if(in_RuleList->totalRuleList[i].type == 0x13)
-		{
-			ptrRule_Counting = (Rule_Counting*) in_RuleList->totalRuleList[i].rule;
+            ptrRule_MotionDetector = NULL;
+        }else if(in_RuleList->totalRuleList[i].type == 0x13)
+        {
+            ptrRule_Counting = (Rule_Counting*) in_RuleList->totalRuleList[i].rule;
             printf("**************Counting**************\n" );
             printf("    reportTimeInterval		= %u\n",ptrRule_Counting->reportTimeInterval);
             printf("    resetTimeInterval		= %u\n",ptrRule_Counting->resetTimeInterval);
             printf("    direction			= %u\n",ptrRule_Counting->direction);
             printf("    polygonListSize		= %u\n",ptrRule_Counting->polygonListSize);
-			for(j = 0; j < ptrRule_Counting->polygonListSize; j ++)
-			{
+            for(j = 0; j < ptrRule_Counting->polygonListSize; j ++)
+            {
                 printf("    polygon_x			= %u\n",ptrRule_Counting->detectPolygon[j].polygon_x);
                 printf("    polygon_y			= %u\n",ptrRule_Counting->detectPolygon[j].polygon_y);
-			}
+            }
             printf("    metadataStreamSwitch	= %u\n",ptrRule_Counting->metadataStreamSwitch);
             printf("**************Counting**************\n" );
-			ptrRule_Counting = NULL;
-		}else if(in_RuleList->totalRuleList[i].type == 0x14)
-		{
-			ptrRule_CellMotion = (Rule_CellMotion*) in_RuleList->totalRuleList[i].rule;
+            ptrRule_Counting = NULL;
+        }else if(in_RuleList->totalRuleList[i].type == 0x14)
+        {
+            ptrRule_CellMotion = (Rule_CellMotion*) in_RuleList->totalRuleList[i].rule;
             printf("**************Cell Motion Detector**************\n" );
             printf("    minCount			= %u\n",ptrRule_CellMotion->minCount);
             printf("    alarmOnDelay		= %u\n",ptrRule_CellMotion->alarmOnDelay);
@@ -1366,10 +1366,10 @@ void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
             printf("    layoutRows			= %u\n",ptrRule_CellMotion->layoutRows);
             printf("    metadataStreamSwitch	= %u\n",ptrRule_CellMotion->metadataStreamSwitch);
             printf("**************Cell Motion Detector**************\n" );
-			ptrRule_CellMotion = NULL;
-		}
+            ptrRule_CellMotion = NULL;
+        }
         printf("--------------------rule %u--------------------\n", i );
-	}
+    }
 
     printf("=== Cmd=0x%04x: User_getRulesReply ===\n\n", CMD_GetRulesOutput);
 }
@@ -1378,15 +1378,15 @@ void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 //--------------------------PTZ Service--------------------------
 void User_getPTZConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	PTZConfig* in_PTZConfig = &deviceInfo->ptzConfig;
-	Byte i;
+    PTZConfig* in_PTZConfig = &deviceInfo->ptzConfig;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getPTZConfigReply ===\n\n", CMD_GetConfigurationsOutput);
     printf("    extensionFlag	= %u\n",in_PTZConfig->extensionFlag);
     printf("    PTZConfigListSize	= %u\n",in_PTZConfig->PTZConfigListSize);
 
-	for( i = 0; i < in_PTZConfig->PTZConfigListSize; i ++)
-	{
+    for( i = 0; i < in_PTZConfig->PTZConfigListSize; i ++)
+    {
         printf("------------------------------------ Index %u --------------------------------------\n", i);
         printf("    name stringLength		= %u\n",in_PTZConfig->PTZConfigList[i].name.length());
         printf("    name stringData		= %s\n",in_PTZConfig->PTZConfigList[i].name.data());
@@ -1405,22 +1405,22 @@ void User_getPTZConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    zoomLimitMax		= %u\n",in_PTZConfig->PTZConfigList[i].zoomLimitMax);
         printf("    eFlipMode			= %u\n",in_PTZConfig->PTZConfigList[i].eFlipMode);
         printf("    reverseMode			= %u\n",in_PTZConfig->PTZConfigList[i].reverseMode);
-		if(in_PTZConfig->extensionFlag == 1)
-		{
+        if(in_PTZConfig->extensionFlag == 1)
+        {
             printf("    videoSrcToken stringLength	= %u\n",in_PTZConfig->PTZConfigList[i].videoSrcToken.length());
             printf("    videoSrcToken stringData	= %s\n",in_PTZConfig->PTZConfigList[i].videoSrcToken.data());
-		}else
-		{
+        }else
+        {
             printf("    No Extension Parameter!\n");
-		}
+        }
         printf("------------------------------------ Index %u --------------------------------------\n", i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getPTZConfigReply ===\n\n", CMD_GetConfigurationsOutput);
 }
 
 void User_getPTZStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	PTZStatus* in_PTZStatus = &deviceInfo->ptzStatus;
+    PTZStatus* in_PTZStatus = &deviceInfo->ptzStatus;
 
     printf("=== Cmd=0x%04x: User_getPTZStatusReply ===\n\n", CMD_PTZ_GetStatusOutput);
     printf("    panPosition		= %hd\n",in_PTZStatus->panPosition);
@@ -1441,13 +1441,13 @@ void User_getPTZStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 
 void User_getPresetsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	PTZPresets* in_PTZPresets = &deviceInfo->ptzPresetsGet;
-	Byte i;
+    PTZPresets* in_PTZPresets = &deviceInfo->ptzPresetsGet;
+    Byte i;
 
     printf("=== Cmd=0x%04x: User_getPresetsReply ===\n\n", CMD_GetPresetsOutput);
     printf("    presetListSize		= %u\n",in_PTZPresets->configListSize);
-	for( i = 0 ; i < in_PTZPresets->configListSize; i ++)
-	{
+    for( i = 0 ; i < in_PTZPresets->configListSize; i ++)
+    {
         printf("------------------------------------ Index %u --------------------------------------\n", i);
         printf("    presetName stringLength	= %u\n",in_PTZPresets->configList[i].presetName.length());
         printf("    presetName stringData	= %s\n",in_PTZPresets->configList[i].presetName.data());
@@ -1458,13 +1458,13 @@ void User_getPresetsReply(RCHostInfo* deviceInfo, Word /*command*/)
         printf("    tiltPosition		= %hd\n",in_PTZPresets->configList[i].tiltPosition);
         printf("    zoomPosition		= %hd\n",in_PTZPresets->configList[i].zoomPosition);
         printf("------------------------------------ Index %u --------------------------------------\n", i);
-	}
+    }
     printf("=== Cmd=0x%04x: User_getPresetsReply ===\n\n", CMD_GetPresetsOutput);
 }
 
 void User_setPresetReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	PTZPresetsSet* in_PTZPresetsSet = &deviceInfo->ptzPresetsSet;
+    PTZPresetsSet* in_PTZPresetsSet = &deviceInfo->ptzPresetsSet;
 
     printf("=== Cmd=0x%04x: User_setPresetReply ===\n\n", CMD_SetPresetOutput);
     printf("    presetToken stringLength	= %u\n",in_PTZPresetsSet->presetToken_set.length());
@@ -1484,8 +1484,8 @@ void User_metadataStreamDeviceReply(RCHostInfo* /*deviceInfo*/, Word /*command*/
 
 void User_metadataStreamLineEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
-	Metadata_Event* in_Metadata_Line_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
+    MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
+    Metadata_Event* in_Metadata_Line_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
     printf("\n=== Cmd=0x%04x: User_metadataStreamLineEventReply ===\r\n", CMD_MetadataStreamOutput);
     printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
@@ -1500,21 +1500,21 @@ void User_metadataStreamLineEventReply(RCHostInfo* deviceInfo, Word /*command*/)
     printf("     UTCMonth			= %u\r\n",in_Metadata_Line_Event->UTCMonth);
     printf("     UTCDay			= %u\r\n",in_Metadata_Line_Event->UTCDay);
     printf("     extensionFlag		= %u\r\n",in_Metadata_Line_Event->extensionFlag);
-	if(in_Metadata_Line_Event->extensionFlag == 1)
-	{
+    if(in_Metadata_Line_Event->extensionFlag == 1)
+    {
         printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Line_Event->videoSrcToken.length());
         printf("     videoSrcToken stringData	= %s\n",in_Metadata_Line_Event->videoSrcToken.data());
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_metadataStreamLineEventReply ===\r\n", CMD_MetadataStreamOutput);
 }
 
 void User_metadataStreamFieldEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
-	Metadata_Event* in_Metadata_Field_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
+    MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
+    Metadata_Event* in_Metadata_Field_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
     printf("\n=== Cmd=0x%04x: User_metadataStreamFieldEventReply ===\r\n", CMD_MetadataStreamOutput);
     printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
@@ -1530,21 +1530,21 @@ void User_metadataStreamFieldEventReply(RCHostInfo* deviceInfo, Word /*command*/
     printf("     UTCMonth			= %u\r\n",in_Metadata_Field_Event->UTCMonth);
     printf("     UTCDay			= %u\r\n",in_Metadata_Field_Event->UTCDay);
     printf("     extensionFlag		= %u\r\n",in_Metadata_Field_Event->extensionFlag);
-	if(in_Metadata_Field_Event->extensionFlag == 1)
-	{
+    if(in_Metadata_Field_Event->extensionFlag == 1)
+    {
         printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Field_Event->videoSrcToken.length());
         printf("     videoSrcToken stringData	= %s\n",in_Metadata_Field_Event->videoSrcToken.data());
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_metadataStreamFieldEventReply ===\r\n", CMD_MetadataStreamOutput);
 }
 
 void User_metadataStreamMotionEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
-	Metadata_Event* in_Metadata_Motion_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
+    MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
+    Metadata_Event* in_Metadata_Motion_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
     printf("\n=== Cmd=0x%04x: User_metadataStreamMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
     printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
@@ -1559,21 +1559,21 @@ void User_metadataStreamMotionEventReply(RCHostInfo* deviceInfo, Word /*command*
     printf("     UTCMonth			= %u\r\n",in_Metadata_Motion_Event->UTCMonth);
     printf("     UTCDay			= %u\r\n",in_Metadata_Motion_Event->UTCDay);
     printf("     extensionFlag		= %u\r\n",in_Metadata_Motion_Event->extensionFlag);
-	if(in_Metadata_Motion_Event->extensionFlag == 1)
-	{
+    if(in_Metadata_Motion_Event->extensionFlag == 1)
+    {
         printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Motion_Event->videoSrcToken.length());
         printf("     videoSrcToken stringData	= %s\n",in_Metadata_Motion_Event->videoSrcToken.data());
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_metadataStreamMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
 }
 
 void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
-	Metadata_Event* in_Metadata_Counting_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
+    MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
+    Metadata_Event* in_Metadata_Counting_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
     printf("\n=== Cmd=0x%04x: User_metadataStreamCountingEventReply ===\r\n", CMD_MetadataStreamOutput);
     printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
@@ -1589,21 +1589,21 @@ void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word /*comman
     printf("     UTCMonth			= %u\r\n",in_Metadata_Counting_Event->UTCMonth);
     printf("     UTCDay			= %u\r\n",in_Metadata_Counting_Event->UTCDay);
     printf("     extensionFlag		= %u\r\n",in_Metadata_Counting_Event->extensionFlag);
-	if(in_Metadata_Counting_Event->extensionFlag == 1)
-	{
+    if(in_Metadata_Counting_Event->extensionFlag == 1)
+    {
         printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Counting_Event->videoSrcToken.length());
         printf("     videoSrcToken stringData	= %s\n",in_Metadata_Counting_Event->videoSrcToken.data());
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_metadataStreamCountingEventReply ===\r\n", CMD_MetadataStreamOutput);
 }
 
 void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
-	Metadata_Event* in_Metadata_CellMotion_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
+    MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
+    Metadata_Event* in_Metadata_CellMotion_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
     printf("\n=== Cmd=0x%04x: User_metadataStreamCellMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
     printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
@@ -1618,20 +1618,20 @@ void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word /*comm
     printf("     UTCMonth			= %u\r\n",in_Metadata_CellMotion_Event->UTCMonth);
     printf("     UTCDay			= %u\r\n",in_Metadata_CellMotion_Event->UTCDay);
     printf("     extensionFlag		= %u\r\n",in_Metadata_CellMotion_Event->extensionFlag);
-	if(in_Metadata_CellMotion_Event->extensionFlag == 1)
-	{
+    if(in_Metadata_CellMotion_Event->extensionFlag == 1)
+    {
         printf("     videoSrcToken stringLength	= %u\n",in_Metadata_CellMotion_Event->videoSrcToken.length());
         printf("     videoSrcToken stringData	= %s\n",in_Metadata_CellMotion_Event->videoSrcToken.data());
-	}else
-	{
+    }else
+    {
         printf("    No Extension Parameter!\n");
-	}
+    }
     printf("=== Cmd=0x%04x: User_metadataStreamCellMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
 }
 
 void User_getMetadataSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-	MetadataSettings* in_MetadataSettings = &deviceInfo->metadataSettings;
+    MetadataSettings* in_MetadataSettings = &deviceInfo->metadataSettings;
 
     printf("=== Cmd=0x%04x: User_getMetadataSettingsReply ===\n\n", CMD_GetMetadataSettingsOutput);
 

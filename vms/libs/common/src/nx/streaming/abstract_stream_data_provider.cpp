@@ -2,16 +2,19 @@
 
 #include <core/resource/resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/utils/log/log.h>
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
     m_mutex(QnMutex::Recursive),
     m_role(Qn::CR_Default)
 {
+    NX_DEBUG(this, "New");
 }
 
 QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 {
+    NX_DEBUG(this, "Delete");
     stop();
 }
 
@@ -36,14 +39,18 @@ int QnAbstractStreamDataProvider::processorsCount() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractMediaDataReceptor* dp)
 {
-    NX_ASSERT(dp);
-    QnMutexLocker mutex( &m_mutex );
+    NX_CRITICAL(dp);
 
+    QnMutexLocker mutex (&m_mutex);
     if (!m_dataprocessors.contains(dp))
     {
+        NX_DEBUG(this, "Add data processor: %1", dp);
         m_dataprocessors.push_back(dp);
-
-
+        dp->consumers += 1;
+    }
+    else
+    {
+        NX_WARNING(this, "Data processor is already added: %1", dp);
     }
 }
 
@@ -60,8 +67,19 @@ bool QnAbstractStreamDataProvider::needConfigureProvider() const
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractMediaDataReceptor* dp)
 {
-    QnMutexLocker mutex( &m_mutex );
-    m_dataprocessors.removeOne(dp);
+    if (!dp)
+        return;
+
+    QnMutexLocker mutex (&m_mutex);
+    if (m_dataprocessors.removeOne(dp))
+    {
+        dp->consumers -= 1;
+        NX_DEBUG(this, "Remove data processor: %1", dp);
+    }
+    else
+    {
+        NX_WARNING(this, "Remove not added data processor: %1", dp);
+    }
 }
 
 void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)

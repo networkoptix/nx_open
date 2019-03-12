@@ -30,7 +30,8 @@ constexpr int kDefaultBackgroundOpacityPercent = 70;
 
 static bool tracingEnabled(false);
 
-static const nx::utils::log::Tag kTag(typeid(LayoutSettingsDialogStateReducer));
+static const nx::utils::log::Tag kLogTag(typeid(LayoutSettingsDialogStateReducer));
+static const nx::utils::log::Filter kLogFilter(kLogTag);
 
 // Default screen aspect ratio. Actual for screens of 1920*1080 and so on.
 static QnAspectRatio screenAspectRatioValue{16, 9};
@@ -40,6 +41,11 @@ static bool keepBackgroundAspectRatioValue(true);
 int boundOpacityPercent(int value)
 {
     return qBound(1, value, 100);
+}
+
+int boundBgRangeValue(int value)
+{
+    return qBound(State::kBackgroundMinSize, value, State::kBackgroundMaxSize);
 }
 
 // Aspect ratio that is optimal for cells to best fit the current image.
@@ -84,7 +90,8 @@ bool cellsAreBestAspected(const State& state)
 
     int w = qRound((qreal)state.background.height.value * (*targetAspectRatio));
     int h = qRound((qreal)state.background.width.value / (*targetAspectRatio));
-    return (w == state.background.width.value || h == state.background.height.value);
+    return (boundBgRangeValue(w) == state.background.width.value
+		|| boundBgRangeValue(h) == state.background.height.value);
 }
 
 void updateBackgroundLimits(State& state)
@@ -92,10 +99,25 @@ void updateBackgroundLimits(State& state)
     const auto targetAspectRatio = bestAspectRatioForCells(state);
     if (state.background.keepImageAspectRatio && targetAspectRatio)
     {
-        state.background.width.setRange(
-            State::kBackgroundMinSize * (*targetAspectRatio), State::kBackgroundMaxSize);
-        state.background.height.setRange(
-            State::kBackgroundMinSize, State::kBackgroundMaxSize / (*targetAspectRatio));
+        const qreal value = *targetAspectRatio;
+        if (value < 1.0)
+        {
+            state.background.width.setRange(
+                State::kBackgroundMinSize,
+                boundBgRangeValue((int) (State::kBackgroundMaxSize * value)));
+            state.background.height.setRange(
+                boundBgRangeValue((int) (State::kBackgroundMinSize / value)),
+                State::kBackgroundMaxSize);
+        }
+        else
+        {
+            state.background.width.setRange(
+                boundBgRangeValue((int) (State::kBackgroundMinSize * value)),
+                State::kBackgroundMaxSize);
+            state.background.height.setRange(
+                State::kBackgroundMinSize,
+                boundBgRangeValue((int) (State::kBackgroundMaxSize / value)));
+        }
     }
     else
     {
@@ -171,8 +193,8 @@ void trace(const State& state, nx::utils::log::Message message)
 {
     if (tracingEnabled)
     {
-        NX_DEBUG(kTag, message);
-        NX_DEBUG(kTag, state);
+        NX_DEBUG(kLogTag, message);
+        NX_DEBUG(kLogTag, state);
     }
 }
 
@@ -194,11 +216,11 @@ void LayoutSettingsDialogStateReducer::setTracingEnabled(bool value)
     if (value)
     {
         addLogger(std::make_unique<Logger>(
-            std::set<Tag>{kTag}, Level::verbose, std::make_unique<StdOut>()));
+            std::set<Filter>{kLogFilter}, Level::verbose, std::make_unique<StdOut>()));
     }
     else
     {
-         removeLoggers({kTag});
+         removeLoggers({kLogFilter});
     }
 }
 
@@ -233,6 +255,7 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     state.fixedSize = layout->fixedSize();
     state.fixedSizeEnabled = !state.fixedSize.isEmpty();
 
+
     if (layout->hasCellAspectRatio())
     {
         const auto spacing = layout->cellSpacing();
@@ -250,6 +273,7 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     state.background.width.setValue(layout->backgroundSize().width());
     state.background.height.setValue(layout->backgroundSize().height());
     state.background.opacityPercent = boundOpacityPercent(int(layout->backgroundOpacity() * 100));
+    updateBackgroundLimits(state);
 
     return state;
 }
@@ -466,6 +490,7 @@ State LayoutSettingsDialogStateReducer::setPreview(State state, const QImage& im
         // Set to true if possible (current sizes will not be changed).
         state.background.keepImageAspectRatio = cellsAreBestAspected(state);
     }
+    updateBackgroundLimits(state);
 
     return state;
 }

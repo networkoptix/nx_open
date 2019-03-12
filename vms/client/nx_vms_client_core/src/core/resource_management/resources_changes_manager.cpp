@@ -84,7 +84,6 @@ ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
         };
 }
 
-
 template<typename ResourceType>
 using ResourceCallbackFunction = std::function<void(bool, const QnSharedResourcePointer<ResourceType>&)>;
 
@@ -199,7 +198,6 @@ void QnResourcesChangesManager::deleteResources(
         makeReplyProcessor(this, handler));
 }
 
-
 /************************************************************************/
 /* Cameras block                                                        */
 /************************************************************************/
@@ -283,7 +281,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
         makeReplyProcessor(this, handler));
 
     // TODO: #GDM SafeMode values are not rolled back
-    propertyDictionary()->saveParamsAsync(idList);
+    resourcePropertyDictionary()->saveParamsAsync(idList);
 }
 
  void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList& cameras,
@@ -328,7 +326,6 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
      connection->getCameraManager(Qn::kSystemAccess)->save(apiCameras, this,
          makeReplyProcessor(this, handler));
 }
-
 
 /************************************************************************/
 /* Servers block                                                        */
@@ -412,7 +409,6 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
             emit saveChangesFailed(servers);
         };
 
-
     applyChanges();
     auto changes = pool->getAttributesList(idList);
     vms::api::MediaServerUserAttributesDataList attributes;
@@ -421,7 +417,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
         makeReplyProcessor(this, handler));
 
     // TODO: #GDM SafeMode values are not rolled back
-    propertyDictionary()->saveParamsAsync(idList);
+    resourcePropertyDictionary()->saveParamsAsync(idList);
 }
 
 /************************************************************************/
@@ -658,5 +654,5 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, replyProcessor);
 
     // TODO: #GDM Prorperties are not rolled back
-    propertyDictionary()->saveParamsAsync({webPage->getId()});
+    resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
 }

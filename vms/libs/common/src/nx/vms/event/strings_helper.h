@@ -11,7 +11,7 @@ namespace nx {
 namespace vms {
 namespace event {
 
-class StringsHelper: public QObject, public QnCommonModuleAware
+class StringsHelper: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;

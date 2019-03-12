@@ -82,7 +82,7 @@ void ErrorProcessor::processStreamError(
         return;
 
     const auto kMaxTimeFromPreviousFrameUs = 5 * 1000 * 1000;
-    auto hasGopData = [&](Qn::StreamIndex streamIndex)
+    auto hasGopData = [&](nx::vms::api::StreamIndex streamIndex)
         {
             const auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
             for (int i = 0; i < ownerResource->getVideoLayout()->channelCount(); ++i)
@@ -93,8 +93,8 @@ void ErrorProcessor::processStreamError(
             }
             return false;
         };
-    bool gotVideoFrameRecently =
-        hasGopData(Qn::StreamIndex::primary) || hasGopData(Qn::StreamIndex::secondary);
+    bool gotVideoFrameRecently = hasGopData(nx::vms::api::StreamIndex::primary)
+        || hasGopData(nx::vms::api::StreamIndex::secondary);
 
     if (!gotVideoFrameRecently)
     {

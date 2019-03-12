@@ -102,7 +102,7 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
         return;
 
     const QString existingId = ptzModel->hotkeys().value(hotkey);
-    NX_ASSERT(!existingId.isEmpty(), Q_FUNC_INFO,
+    NX_ASSERT(!existingId.isEmpty(),
         "we should get here only if the selected hotkey is in use");
     if (existingId.isEmpty())
         return;

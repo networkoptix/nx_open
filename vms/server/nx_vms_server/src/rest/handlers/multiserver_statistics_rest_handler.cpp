@@ -309,7 +309,7 @@ int SendStatisticsActionHandler::executePost(
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &request.metricsList);
 
-    NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorrect json with metrics received!");
+    NX_ASSERT(correctJson, "Incorrect json with metrics received!");
     if (!correctJson)
         return nx::network::http::StatusCode::unprocessableEntity;
 

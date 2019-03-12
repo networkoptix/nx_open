@@ -132,4 +132,4 @@ inline QString toString(ImageRequest::RoundMethod value)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_THUMBNAIL_ENUM_TYPES, (lexical))
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::api::CameraImageRequest::StreamSelectionMode, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(nx::api::CameraImageRequest::StreamSelectionMode, (metatype)(lexical))

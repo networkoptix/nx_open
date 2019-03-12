@@ -24,6 +24,7 @@ private:
 
 private:
     const QPointer<SimpleMotionSearchWidget> m_motionSearchWidget;
+    bool m_layoutChanging = false;
 };
 
 } // namespace nx::vms::client::desktop

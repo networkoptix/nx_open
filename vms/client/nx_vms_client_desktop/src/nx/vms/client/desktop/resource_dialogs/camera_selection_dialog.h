@@ -28,6 +28,7 @@ public:
         static QString getText(const QnResourceList&, bool = true) { return QString(); }
         static inline bool emptyListIsValid() { return true; }
         static bool multiChoiceListIsValid() { return true; }
+        static bool showRecordingIndicator() { return false; }
     };
 
     template<typename ResourcePolicy>
@@ -38,6 +39,7 @@ private:
         const ValidResourceCheck& validResourceCheck,
         const GetText& getText,
         const QnUuidSet& selectedCameras,
+        bool showRecordingIndicator,
         QWidget* parent);
 
     virtual ~CameraSelectionDialog() override;
@@ -46,6 +48,7 @@ private:
         const ValidResourceCheck& validResourceCheck,
         const GetText& getText,
         QnUuidSet& selectedCameras,
+        bool showRecordingIndicator,
         QWidget* parent);
 
     void updateThumbnail(const QModelIndex& index);
@@ -75,7 +78,8 @@ bool CameraSelectionDialog::selectCameras(
             return isValid ? QString() : ResourcePolicy::getText(resources);
         };
 
-    return selectCamerasInternal(validResourceCheck, getText, selectedCameras, parent);
+    return selectCamerasInternal(validResourceCheck, getText, selectedCameras,
+        ResourcePolicy::showRecordingIndicator(), parent);
 }
 
 } // namespace nx::vms::client::desktop

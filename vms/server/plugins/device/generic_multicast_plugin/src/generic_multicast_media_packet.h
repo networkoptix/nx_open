@@ -20,9 +20,9 @@ public:
     /** Implementation of nxpl::PluginInterface::queryInterface */
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     /** Implementation of nxpl::PluginInterface::addRef */
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     /** Implementation of nxpl::PluginInterface::releaseRef */
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     /** Implementation of nxcip::MediaDataPacket::timestamp */
     virtual nxcip::UsecUTCTimestamp timestamp() const override;
@@ -32,7 +32,7 @@ public:
 
     /** Implementation of nxcip::MediaDataPacket::data */
     virtual const void* data() const override;
-    
+
     /** Implementation of nxcip::MediaDataPacket::dataSize */
     virtual unsigned int dataSize() const override;
 
@@ -41,10 +41,10 @@ public:
 
     /** Implementation of nxcip::MediaDataPacket::codecType */
     virtual nxcip::CompressionType codecType() const override;
-    
+
     /** Implementation of nxcip::MediaDataPacket::flags */
     virtual unsigned int flags() const override;
-    
+
     /** Implementation of nxcip::MediaDataPacket::cSeq */
     virtual unsigned int cSeq() const override;
 

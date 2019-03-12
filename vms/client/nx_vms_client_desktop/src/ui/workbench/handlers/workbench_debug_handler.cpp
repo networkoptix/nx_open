@@ -142,7 +142,10 @@ public:
             };
 
         addButton("Applaucher control",
-            [this]() { (new QnApplauncherControlDialog(this))->show(); });
+            [this]()
+            {
+                (new QnApplauncherControlDialog(this))->show();
+            });
 
         addButton("Animations control",
             [this]() { (new AnimationsControlDialog(this))->show(); });
@@ -358,73 +361,6 @@ public:
                 addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"), "Engine 3", plugin2);
             });
 
-        addButton("Generate analytics manifests",
-            [this]()
-            {
-                auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
-                if (servers.empty())
-                    return;
-
-                int serverIndex = 0;
-
-                for (int i = 0; i < 5; ++i)
-                {
-                    nx::vms::api::analytics::EngineManifest manifest;
-                    for (int j = 0; j < 3; ++j)
-                    {
-                        nx::vms::api::analytics::EventType eventType;
-                        eventType.id = "";
-                        eventType.name = lm("Event %1").arg(j);
-                        manifest.eventTypes.push_back(eventType);
-                    }
-
-                    auto server = servers[serverIndex];
-                    auto manifests = server->analyticsDrivers();
-                    manifests.push_back(manifest);
-                    server->setAnalyticsDrivers(manifests);
-                    server->savePropertiesAsync();
-
-                    serverIndex = (serverIndex + 1) % servers.size();
-                }
-
-                for (auto server: servers)
-                {
-                    // TODO: #sivanov: Get rid of the term "driver".
-                    auto drivers = server->analyticsDrivers();
-
-                    // Some devices will not have an Engine.
-                    drivers.push_back(nx::vms::api::analytics::EngineManifest());
-
-                    for (auto camera: resourcePool()->getAllCameras(server, true))
-                    {
-                        const auto randomDriver = nx::utils::random::choice(drivers);
-                        QSet<QString> eventTypeIds;
-                        for (const auto& eventType: randomDriver.eventTypes)
-                            eventTypeIds.insert(eventType.id);
-
-                        camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
-
-                        camera->savePropertiesAsync();
-                    }
-                }
-            });
-
-        addButton("Clear analytics manifests",
-            [this]()
-            {
-                for (auto camera: resourcePool()->getAllCameras({}))
-                {
-                    camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
-                    camera->savePropertiesAsync();
-                }
-
-                for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
-                {
-                    server->setAnalyticsDrivers({});
-                    server->savePropertiesAsync();
-                }
-            });
-
         for (auto [name, handler]: nx::utils::constKeyValueRange(debugActions()))
             addButton(name, handler);
     }
@@ -505,33 +441,6 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
             &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
     #endif
-
-    auto supressLog =
-        [](const nx::utils::log::Tag& tag)
-        {
-            nx::utils::log::addLogger(
-                std::make_unique<nx::utils::log::Logger>(
-                    std::set<nx::utils::log::Tag>{tag},
-                    nx::utils::log::Level::none,
-                    std::make_unique<nx::utils::log::StdOut>()));
-        };
-
-    auto consoleLog =
-        [](const nx::utils::log::Tag& tag)
-        {
-            nx::utils::log::addLogger(
-                std::make_unique<nx::utils::log::Logger>(
-                    std::set<nx::utils::log::Tag>{tag},
-                    nx::utils::log::Level::verbose,
-                    std::make_unique<nx::utils::log::StdOut>()));
-        };
-
-    // TODO: Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
-    supressLog(nx::utils::log::Tag(QStringLiteral("__freeSlot")));
-    supressLog(nx::utils::log::Tag(QStringLiteral("__workbenchState")));
-    supressLog(nx::utils::log::Tag(QStringLiteral("__itemMap")));
-    supressLog(QnLog::PERMISSIONS_LOG);
-    //consoleLog("nx::vms::client::desktop::RadassController::Private");
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

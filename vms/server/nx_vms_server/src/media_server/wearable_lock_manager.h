@@ -13,7 +13,7 @@ struct QnWearableLockInfo
     QnUuid userId;
 };
 
-class QnWearableLockManager: public QObject, public nx::vms::server::ServerModuleAware
+class QnWearableLockManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

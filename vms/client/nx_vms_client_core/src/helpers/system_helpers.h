@@ -16,8 +16,11 @@ void storeConnection(const QnUuid& localSystemId, const QString& systemName, con
 void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url = nx::utils::Url());
 void storeCredentials(const QnUuid& localSystemId, const nx::vms::common::Credentials& credentials);
 void removeCredentials(const QnUuid& localSystemId, const QString& userName = QString());
-nx::vms::common::Credentials getCredentials(const QnUuid& localSystemId, const QString& userName);
+common::Credentials getCredentials(const QnUuid& localSystemId, const QString& userName);
 bool hasCredentials(const QnUuid& localSystemId);
+
+void saveCloudCredentials(const common::Credentials& credentials);
+void forgetSavedCloudCredentials(bool keepUser = false);
 
 } // namespace helpers
 } // namespace nx::vms::client::core

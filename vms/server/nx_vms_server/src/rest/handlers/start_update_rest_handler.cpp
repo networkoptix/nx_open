@@ -1,6 +1,6 @@
 #include "start_update_rest_handler.h"
 #include <media_server/media_server_module.h>
-#include <nx/update/common_update_manager.h>
+#include <nx/vms/server/server_update_manager.h>
 #include <api/global_settings.h>
 #include <nx/vms/server/settings.h>
 

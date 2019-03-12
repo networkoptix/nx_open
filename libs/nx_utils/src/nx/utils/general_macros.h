@@ -35,3 +35,9 @@
 /** Concatanate MSVC workadound. */
 #define NX_DIRECT_CONCATENATE(s1, s2) s1 ## s2
 #define NX_CONCATENATE(s1, s2) NX_DIRECT_CONCATENATE(s1, s2)
+
+// We can't pass function templates as template parameters, so we're unable to use them with
+// std::apply, std::invoke etc. But generic lambdas are ok in such contexts (because they are
+// essentially class templates).
+#define NX_WRAP_FUNC_TO_LAMBDA(FUNC) \
+    [](auto&&... args) { return FUNC(std::forward<decltype(args)>(args)...); }

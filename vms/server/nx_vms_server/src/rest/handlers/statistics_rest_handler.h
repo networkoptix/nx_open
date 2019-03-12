@@ -7,7 +7,7 @@
 
 class QnGlobalMonitor;
 
-class QnStatisticsRestHandler: public QnJsonRestHandler, public nx::vms::server::ServerModuleAware {
+class QnStatisticsRestHandler: public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware {
     Q_OBJECT
 public:
     QnStatisticsRestHandler(QnMediaServerModule* serverModule);
@@ -15,6 +15,5 @@ public:
 
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 };
-
 
 #endif // QN_STATISTICS_REST_HANDLER_H

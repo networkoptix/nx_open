@@ -5,7 +5,7 @@
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/uuid.h>
 
-class QnConnectToCurrentSystemTool;
+namespace nx::vms::client::desktop { class ConnectToCurrentSystemTool; }
 class QnProgressDialog;
 class QnMergeSystemsDialog;
 
@@ -16,6 +16,7 @@ class QnWorkbenchIncompatibleServersActionHandler:
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
+    using ConnectToCurrentSystemTool = nx::vms::client::desktop::ConnectToCurrentSystemTool;
 
 public:
     QnWorkbenchIncompatibleServersActionHandler(QObject* parent = nullptr);
@@ -35,6 +36,6 @@ private:
     void at_connectTool_finished(int errorCode);
 
 private:
-    QPointer<QnConnectToCurrentSystemTool> m_connectTool;
+    QPointer<ConnectToCurrentSystemTool> m_connectTool;
     QPointer<QnMergeSystemsDialog> m_mergeDialog;
 };

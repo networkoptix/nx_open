@@ -14,7 +14,9 @@
 namespace nx::network::http::tunneling::detail {
 
 using ClientFactoryFunction =
-    std::unique_ptr<BaseTunnelClient>(const nx::utils::Url& baseUrl);
+    std::unique_ptr<BaseTunnelClient>(
+        const std::string& /*tag*/,
+        const nx::utils::Url& /*baseUrl*/);
 
 /**
  * Always instantiates client type with the highest priority.
@@ -48,6 +50,8 @@ public:
             });
     }
 
+    int topTunnelTypeId(const std::string& tag) const;
+
     void clear();
 
     static ClientFactory& instance();
@@ -56,22 +60,27 @@ private:
     using InternalFactoryFunction = nx::utils::MoveOnlyFunc<
         std::unique_ptr<BaseTunnelClient>(const nx::utils::Url&, ClientFeedbackFunction)>;
 
+    using TunnelTypeSelector = nx::utils::algorithm::ItemSelector<int /*tunnel type id*/>;
+
     struct ClientTypeContext
     {
         InternalFactoryFunction factoryFunction;
     };
 
     std::map<int /*Tunnel type id*/, ClientTypeContext> m_clientTypes;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     int m_prevUsedTypeId = 0;
-    nx::utils::algorithm::ItemSelector<int /*tunnel type id*/> m_tunnelTypeSelector;
+    std::map<std::string, TunnelTypeSelector> m_tagToTunnelTypeSelector;
 
     std::unique_ptr<BaseTunnelClient> defaultFactoryFunction(
+        const std::string& tag,
         const nx::utils::Url& baseUrl);
 
     void registerClientType(InternalFactoryFunction factoryFunction);
 
-    void processClientFeedback(int typeId, bool success);
+    TunnelTypeSelector buildTunnelTypeSelector();
+
+    void processClientFeedback(int typeId, const std::string& tag, bool success);
 };
 
 } // namespace nx::network::http::tunneling::detail

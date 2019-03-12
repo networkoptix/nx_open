@@ -10,7 +10,6 @@
 #include <client/client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/guarded_callback.h>
-#include "update/media_server_update_tool.h"
 #include "ui/workbench/handlers/workbench_connect_handler.h"
 
 using namespace std::chrono_literals;
@@ -19,20 +18,44 @@ using Clock = std::chrono::steady_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 using Dialog = CompatibilityVersionInstallationDialog;
 
+namespace {
+const auto kWaitForUpdateInfo = std::chrono::milliseconds(5);
+}
+
+struct CompatibilityVersionInstallationDialog::Private
+{
+    // Update info from mediaservers.
+    std::future<UpdateContents> updateInfoMediaserver;
+    // Update info from the internet.
+    std::future<UpdateContents> updateInfoInternet;
+    int requestsLeft = 0;
+    bool checkingUpdates = false;
+
+    std::shared_ptr<ClientUpdateTool> clientUpdateTool;
+
+    Clock::time_point lastActionStamp;
+
+    nx::update::UpdateContents updateContents;
+};
+
 CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     const QnConnectionInfo& connectionInfo,
-    QWidget* parent)
+    QWidget* parent,
+    const nx::vms::api::SoftwareVersion& engineVersion)
     :
     base_type(parent),
     m_ui(new Ui::QnCompatibilityVersionInstallationDialog),
-    m_versionToInstall(connectionInfo.version)
+    m_versionToInstall(connectionInfo.version),
+    m_engineVersion(engineVersion),
+    m_private(new Private())
 {
     m_ui->setupUi(this);
     m_ui->autoRestart->setChecked(m_autoInstall);
     connect(m_ui->autoRestart, &QCheckBox::stateChanged,
         this, &CompatibilityVersionInstallationDialog::atAutoRestartChanged);
-    m_clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
-    m_clientUpdateTool->setServerUrl(connectionInfo.ecUrl, QnUuid(connectionInfo.ecsGuid));
+
+    m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
+    m_private->clientUpdateTool->setServerUrl(connectionInfo.ecUrl, QnUuid(connectionInfo.ecsGuid));
 }
 
 CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog()
@@ -56,38 +79,44 @@ bool CompatibilityVersionInstallationDialog::shouldAutoRestart() const
 
 void CompatibilityVersionInstallationDialog::reject()
 {
-    m_clientUpdateTool->resetState();
+    m_private->clientUpdateTool->resetState();
     QDialog::reject();
 }
 
 int CompatibilityVersionInstallationDialog::exec()
 {
     // Will do exec there
-    return installUpdate();
+    return startUpdate();
 }
 
-void CompatibilityVersionInstallationDialog::atReceivedUpdateContents(
+void CompatibilityVersionInstallationDialog::processUpdateContents(
     const nx::update::UpdateContents& contents)
 {
-    auto commonModule = m_clientUpdateTool->commonModule();
+    auto commonModule = m_private->clientUpdateTool->commonModule();
     nx::update::UpdateContents verifiedContents = contents;
     if (nx::vms::client::desktop::verifyUpdateContents(commonModule, verifiedContents, {}))
     {
-        m_clientUpdateTool->setUpdateTarget(verifiedContents);
+        //m_private->clientUpdateTool->setUpdateTarget(verifiedContents);
+        if (m_private->updateContents.preferOtherUpdate(verifiedContents))
+            m_private->updateContents = verifiedContents;
+        else
+        {
+            NX_ERROR(this) << "processUpdateContents() rejected update information from" << contents.source;
+        }
     }
     else
     {
-        NX_ERROR(this) << "atRecievedUpdateContents() got invalid update contents from" << contents.source;
-        m_installationResult = InstallResult::failedDownload;
-        setMessage(tr("Installation failed"));
-        done(QDialogButtonBox::StandardButton::Ok);
+        NX_ERROR(this) << "processUpdateContents() got invalid update contents from" << contents.source;
+        //m_installationResult = InstallResult::failedDownload;
+        //setMessage(tr("Installation failed"));
+        //done(QDialogButtonBox::StandardButton::Ok);
     }
 }
 
 void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int progress)
 {
-    qDebug() << "CompatibilityVersionInstallationDialog::atUpdateStateChanged("
-        << ClientUpdateTool::toString(ClientUpdateTool::State(state)) << "," << progress << ")";
+    NX_DEBUG(this, "CompatibilityVersionInstallationDialog::atUpdateStateChanged(%1, %2)",
+        ClientUpdateTool::toString(ClientUpdateTool::State(state)), progress);
     // Progress:
     // [0-20] - Requesting update info
     // [20-90] - Downloading
@@ -105,8 +134,6 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         {
             finalProgress = 20;
             setMessage(tr("Downloading update package"));
-            auto contents = m_clientUpdateTool->getRemoteUpdateInfo();
-            m_clientUpdateTool->setUpdateTarget(contents);
             break;
         }
         case ClientUpdateTool::State::downloading:
@@ -117,7 +144,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         case ClientUpdateTool::State::readyInstall:
             finalProgress = 90;
             // TODO: We should wrap it inside some thread. This call can be long.
-            m_clientUpdateTool->installUpdate();
+            m_private->clientUpdateTool->installUpdateAsync();
             break;
         case ClientUpdateTool::State::installing:
             setMessage(tr("Installing"));
@@ -156,21 +183,72 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
     m_ui->progressBar->setValue(finalProgress);
 }
 
-int CompatibilityVersionInstallationDialog::installUpdate()
+void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 {
-    connect(m_clientUpdateTool, &ClientUpdateTool::updateStateChanged,
+    if (m_private->checkingUpdates)
+    {
+        if (m_private->updateInfoInternet.valid()
+            && m_private->updateInfoInternet.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
+        {
+            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoInternet");
+            processUpdateContents(m_private->updateInfoInternet.get());
+            --m_private->requestsLeft;
+        }
+
+        if (m_private->updateInfoMediaserver.valid()
+            && m_private->updateInfoMediaserver.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
+        {
+            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
+            processUpdateContents(m_private->updateInfoMediaserver.get());
+            --m_private->requestsLeft;
+        }
+
+        // Done waiting for update information
+        if (m_private->requestsLeft == 0)
+        {
+            if (m_private->updateContents.isValidToInstall())
+            {
+                m_private->clientUpdateTool->setUpdateTarget(m_private->updateContents);
+            }
+            else
+            {
+                m_installationResult = InstallResult::failedDownload;
+                setMessage(tr("Installation failed"));
+                done(QDialogButtonBox::StandardButton::Ok);
+            }
+            m_private->checkingUpdates = false;
+        }
+    }
+
+    m_private->clientUpdateTool->checkInternalState();
+}
+
+int CompatibilityVersionInstallationDialog::startUpdate()
+{
+    connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
-    // Should request specific build from the internet
+    // Should request specific build from the internet.
     QString updateUrl = qnSettings->updateFeedUrl();
-    auto callback = nx::utils::guarded(this,
-        [this](const nx::update::UpdateContents& contents)
-        {
-            this->atReceivedUpdateContents(contents);
-        });
     QString build = QString::number(m_versionToInstall.build());
-    // Callback will be called on this thread.
-    auto future = nx::update::checkSpecificChangeset(updateUrl, build, callback);
+
+    m_private->checkingUpdates = true;
+    m_private->updateInfoInternet = nx::update::checkSpecificChangeset(
+        updateUrl, m_engineVersion, build);
+    if (m_private->updateInfoInternet.valid())
+        ++m_private->requestsLeft;
+    // Checking update info from the mediaservers.
+    m_private->updateInfoMediaserver = m_private->clientUpdateTool->requestRemoteUpdateInfo();
+    if (m_private->updateInfoMediaserver.valid())
+        ++m_private->requestsLeft;
+
+    m_private->lastActionStamp = Clock::now();
+
+    m_statusCheckTimer.reset(new QTimer(this));
+    m_statusCheckTimer->setSingleShot(false);
+    m_statusCheckTimer->start(1000);
+    connect(m_statusCheckTimer.get(), &QTimer::timeout,
+        this, &CompatibilityVersionInstallationDialog::atUpdateCurrentState);
 
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);

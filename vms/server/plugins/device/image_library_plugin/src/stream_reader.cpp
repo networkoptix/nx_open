@@ -81,13 +81,13 @@ void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 }
 
 //!Implementation of nxpl::PluginInterface::addRef
-unsigned int StreamReader::addRef()
+int StreamReader::addRef() const
 {
     return m_refManager.addRef();
 }
 
 //!Implementation of nxpl::PluginInterface::releaseRef
-unsigned int StreamReader::releaseRef()
+int StreamReader::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -168,7 +168,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_OTHER_ERROR;
     }
 
-    //reading file into 
+    //reading file into
     std::ifstream f( fileName.c_str(), std::ios_base::in | std::ios_base::binary );
     if( !f.is_open() )
         return nxcip::NX_OTHER_ERROR;

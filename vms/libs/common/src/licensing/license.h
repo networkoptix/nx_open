@@ -26,13 +26,8 @@
 
 struct LicenseTypeInfo
 {
-    LicenseTypeInfo() = default;
-    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className,
-        bool allowedForARM, bool allowedToShareChannel);
-
     Qn::LicenseType licenseType = Qn::LC_Count;
     QnLatin1Array className;
-    bool allowedForARM = false;
     bool allowedToShareChannel = false;
 };
 
@@ -152,7 +147,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
-class QnLicensePool: public QObject, public QnCommonModuleAware
+class QnLicensePool: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

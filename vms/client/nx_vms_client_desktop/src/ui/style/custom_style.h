@@ -18,6 +18,8 @@ void setWarningStyleOn(QWidget* widget, bool on = true, qreal disabledOpacity = 
 
 QString setWarningStyleHtml(const QString& source);
 
+void setWarningFrame(QWidget* widget, int frameWidth = 1, int roundingRadius = 2);
+
 void resetStyle(QWidget* widget);
 
 void resetButtonStyle(QAbstractButton* button);

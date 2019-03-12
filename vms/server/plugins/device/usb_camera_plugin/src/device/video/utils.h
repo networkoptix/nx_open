@@ -60,7 +60,7 @@ void setBitrate(
 * Get the maximum bitrate supported by the camera
 * @param[int] devicePath - the path to the device
 * * @param[in] targetCodecID - the target codec to get bitrate for
-*/ 
+*/
 int getMaxBitrate(
     const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);

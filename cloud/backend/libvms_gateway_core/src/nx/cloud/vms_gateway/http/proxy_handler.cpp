@@ -18,12 +18,10 @@ using SslMode = nx::network::http::server::proxy::SslMode;
 
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
-    const conf::RunTimeOptions& runTimeOptions,
-    relaying::AbstractListeningPeerPool* listeningPeerPool)
+    const conf::RunTimeOptions& runTimeOptions)
 :
     m_settings(settings),
-    m_runTimeOptions(runTimeOptions),
-    m_listeningPeerPool(listeningPeerPool)
+    m_runTimeOptions(runTimeOptions)
 {
     setTargetHostConnectionInactivityTimeout(
         m_settings.proxy().targetConnectionInactivityTimeout);
@@ -32,8 +30,7 @@ ProxyHandler::ProxyHandler(
 std::unique_ptr<nx::network::aio::AbstractAsyncConnector>
     ProxyHandler::createTargetConnector()
 {
-    auto targetPeerConnector = std::make_unique<TargetPeerConnector>(
-        m_listeningPeerPool);
+    auto targetPeerConnector = std::make_unique<TargetPeerConnector>();
 
     targetPeerConnector->setTargetConnectionRecvTimeout(m_settings.tcp().recvTimeout);
     targetPeerConnector->setTargetConnectionSendTimeout(m_settings.tcp().sendTimeout);

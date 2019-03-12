@@ -15,6 +15,7 @@
 #include <client/client_settings.h>
 
 #include <helpers/cloud_url_helper.h>
+#include <helpers/system_helpers.h>
 
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
@@ -91,6 +92,7 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
     // Updating login if were logged under temporary credentials.
     qnCloudStatusWatcher->resetCredentials(true);
+    nx::vms::client::core::helpers::forgetSavedCloudCredentials(true);
 }
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()

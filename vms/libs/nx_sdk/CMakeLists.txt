@@ -4,7 +4,7 @@ set(library_type)
 #endif()
 
 nx_add_target(nx_sdk LIBRARY ${library_type} NO_MOC NO_PCH
-    PRIVATE_LIBS
+    PUBLIC_LIBS
         nx_kit
 )
 

@@ -3,9 +3,9 @@
 
 #include <nx/cloud/db/lib_cloud_db_main.h>
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
     nx::network::SocketGlobals::InitGuard sgGuard(
         nx::network::InitializationFlags::disableUdt);
-    return libCloudDBMain( argc, argv );
+    return libCloudDBMain(argc, argv);
 }

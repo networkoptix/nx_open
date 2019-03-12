@@ -39,7 +39,7 @@ public:
     void setLiveMode(bool value);
     int copyLastGopFromCamera(
         QnVideoCameraPtr camera,
-        Qn::StreamIndex streamIndex,
+        nx::vms::api::StreamIndex streamIndex,
         qint64 skipTime,
         bool iFramesOnly);
     QnMutex* dataQueueMutex();
@@ -67,6 +67,7 @@ public:
     void setResource(const QnResourcePtr& resource);
     std::chrono::milliseconds timeFromLastReceiverReport();
 
+    nx::vms::api::StreamDataFilters streamDataFilter() const;
     void setStreamDataFilter(nx::vms::api::StreamDataFilters filter);
 
     virtual bool needConfigureProvider() const override { return true;  }
@@ -147,7 +148,7 @@ private:
     QByteArray m_prevRangeHeader;
     quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
-    nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::mediaOnly};
+    nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::media};
 
     MediaQuality m_currentQuality[CL_MAX_CHANNELS]{MEDIA_Quality_None};
     /**

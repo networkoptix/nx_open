@@ -12,7 +12,7 @@ struct QnAuthSession;
 
 namespace nx {
 
-class CommonUpdateInstaller: public QnCommonModuleAware
+class CommonUpdateInstaller: public /*mixin*/ QnCommonModuleAware
 {
 public:
     enum class State

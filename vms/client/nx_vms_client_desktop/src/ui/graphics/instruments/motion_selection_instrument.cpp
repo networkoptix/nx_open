@@ -27,9 +27,7 @@ bool motionSelectionEnabled(QnMediaResourceWidget* widget)
     if (!widget)
         return false;
 
-    const auto options = widget->options();
-    return options.testFlag(QnMediaResourceWidget::DisplayMotion)
-        || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
+    return widget->options().testFlag(QnMediaResourceWidget::DisplayMotion);
 }
 
 // This way we detect widget that can possibly have DisplayMotion enabled

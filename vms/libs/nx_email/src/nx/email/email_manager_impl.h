@@ -6,7 +6,7 @@
 
 class QIODevice;
 
-class EmailManagerImpl: public QnCommonModuleAware
+class EmailManagerImpl: public /*mixin*/ QnCommonModuleAware
 {
 public:
     struct Attachment

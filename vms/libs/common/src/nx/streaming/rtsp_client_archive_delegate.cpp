@@ -88,6 +88,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_frameCnt(0),
     m_maxSessionDurationMs(std::numeric_limits<qint64>::max())
 {
+    m_rtspSession->setPlayNowModeAllowed(true); //< Default value.
     m_footageUpToDate.test_and_set();
     m_currentServerUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
@@ -1029,6 +1030,17 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
 {
     m_rtspSession->setPlayNowModeAllowed(value);
+}
+
+int QnRtspClientArchiveDelegate::protocol() const
+{
+    int result = 0;
+    if (m_rtspDevice)
+    {
+        if (const auto socket = m_rtspDevice->getMediaSocket())
+            socket->getProtocol(&result);
+    }
+    return result;
 }
 
 bool QnRtspClientArchiveDelegate::hasVideo() const

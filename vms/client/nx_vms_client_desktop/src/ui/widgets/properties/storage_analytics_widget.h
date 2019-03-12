@@ -14,11 +14,16 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 
 class QnRecordingStatsModel;
 
 namespace Ui { class StorageAnalyticsWidget; }
-namespace nx::vms::client::desktop { class TableView; }
+namespace nx::vms::client::desktop {
+class TableView;
+class SnappedScrollBar;
+class WidgetAnchor;
+} // namespace nx::vms::client::desktop
 
 class QnStorageAnalyticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -39,7 +44,8 @@ public:
 private:
     void updateDataFromServer();
     void clearCache();
-    void setupTableView(nx::vms::client::desktop::TableView* table, QAbstractItemModel* model);
+    void setupTableView(nx::vms::client::desktop::TableView* table,
+        nx::vms::client::desktop::TableView* totalsTable, QAbstractItemModel* model);
     nx::vms::client::desktop::TableView* currentTable() const;
     qint64 currentForecastAveragingPeriod();
 
@@ -73,11 +79,18 @@ private:
     QAction* m_exportAction = nullptr;
     QAction* m_clipboardAction = nullptr;
     Qt::MouseButton m_lastMouseButton = Qt::NoButton;
+    nx::vms::client::desktop::SnappedScrollBar* m_statsTableScrollbar;
+    nx::vms::client::desktop::SnappedScrollBar* m_forecastTableScrollbar;
+    nx::vms::client::desktop::HintButton* m_hintButton;
+    nx::vms::client::desktop::WidgetAnchor* m_hintAnchor;
 
     // Map from averaging period to recording stats.
     QMap<quint64, QnRecordingStatsReply> m_recordingsStatData;
     QnStorageSpaceDataList m_availableStorages;
     qint64 m_availableStorageSpace = 0;
+
+    void updateTotalTablesGeometry();
+    void positionHintButton();
 
     virtual void resizeEvent(QResizeEvent*) override; //< Use this to resize table columns; accepts null.
     virtual void showEvent(QShowEvent*) override; //< Resizes columns when shown.
@@ -91,4 +104,5 @@ private slots:
     void atMouseButtonRelease(QObject*, QEvent* event);
     void atForecastParamsChanged();
     void atAveragingPeriodChanged();
+    void atPageChanged();
 };

@@ -11,6 +11,11 @@ ServerUpdateManager::ServerUpdateManager(QnMediaServerModule* serverModule):
 {
 }
 
+ServerUpdateManager::~ServerUpdateManager()
+{
+    m_installer.stopSync();
+}
+
 vms::common::p2p::downloader::Downloader* ServerUpdateManager::downloader()
 {
     return serverModule()->findInstance<vms::common::p2p::downloader::Downloader>();

@@ -7,8 +7,6 @@ class QnGetAnalyticsActionsRestHandler: public QnJsonRestHandler
     Q_OBJECT
 
 public:
-    virtual ~QnGetAnalyticsActionsRestHandler() override;
-
     virtual int executeGet(
         const QString& path,
         const QnRequestParams& params,

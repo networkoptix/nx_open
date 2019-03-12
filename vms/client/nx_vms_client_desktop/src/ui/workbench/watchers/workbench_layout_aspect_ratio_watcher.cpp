@@ -1,5 +1,7 @@
 #include "workbench_layout_aspect_ratio_watcher.h"
 
+#include <core/resource/layout_resource.h>
+
 #include <ui/graphics/items/resource/resource_widget.h>
 
 #include <ui/workbench/workbench.h>
@@ -33,7 +35,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     if (!m_watchedLayout)
         return;
 
-    if (m_watchedLayout->items().size() > 1)
+    if (m_watchedLayout->items().size() > 1 || m_watchedLayout->resource()->hasBackground())
         return;
 
     const auto hasAspectRatio = widget->hasAspectRatio();

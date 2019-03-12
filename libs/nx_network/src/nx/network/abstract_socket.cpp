@@ -8,8 +8,7 @@
 #include "aio/aio_thread.h"
 #include "aio/pollable.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 AbstractStreamSocket::~AbstractStreamSocket()
 {
@@ -29,8 +28,7 @@ bool AbstractSocket::isInSelfAioThread() const
 {
     // AbstractSocket does not provide const pollable() just to simplify implementation, so it is
     // safe to perform a const_cast.
-    const nx::network::Pollable* p = const_cast<AbstractSocket*>(this)->pollable();
-    return p->isInSelfAioThread();
+    return const_cast<AbstractSocket*>(this)->pollable()->isInSelfAioThread();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -231,5 +229,4 @@ void AbstractStreamSocket::setBeforeDestroyCallback(nx::utils::MoveOnlyFunc<void
     m_beforeDestroyCallback = std::move(callback);
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

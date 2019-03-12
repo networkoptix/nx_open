@@ -54,12 +54,12 @@ void* ImageLibraryPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int ImageLibraryPlugin::addRef()
+int ImageLibraryPlugin::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int ImageLibraryPlugin::releaseRef()
+int ImageLibraryPlugin::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

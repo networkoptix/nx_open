@@ -2,7 +2,7 @@
 
 namespace nx::cloud::db {
 
-constexpr int kMinEc2ProtocolVersionWithCloudMergeSupport = 3041;
+constexpr int kMinEc2ProtocolVersionWithCloudMergeSupport = 3044;
 
 SystemCapabilitiesProvider::SystemCapabilitiesProvider(
     AbstractSystemManager* systemManager,

@@ -35,6 +35,7 @@ int makeUnixOpenFlags(const QIODevice::OpenMode& oflag)
 
     if( oflag & QIODevice::ReadOnly )
         sysFlags = O_RDONLY;
+
     if( oflag & QIODevice::WriteOnly )
     {
         if( oflag & QIODevice::ReadOnly)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/kit/ini_config.h>
-#include <nx/sdk/analytics/common/pixel_format.h>
+#include <nx/sdk/analytics/helpers/pixel_format.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -12,7 +12,7 @@ struct Ini: public nx::kit::IniConfig
 {
     const std::string needUncompressedVideoFramesDescription =
         "Respective capability in the manifest: one of "
-            + nx::sdk::analytics::common::allPixelFormatsToStdString(", ") + ".\n"
+            + nx::sdk::analytics::allPixelFormatsToStdString(", ") + ".\n"
         "Empty means no such capability.";
 
     Ini(): IniConfig("stub_analytics_plugin.ini") { reload(); }
@@ -22,14 +22,15 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, generateObjects, "");
     NX_INI_FLAG(1, generateEvents, "");
     NX_INI_INT(1, generateObjectsEveryNFrames, "");
+    NX_INI_INT(1, objectsCount, "Number of simultaneosly shown objects.");
     NX_INI_FLAG(1, generatePreviewAttributes, "");
-    NX_INI_FLAG(0, deviceModelDependent, "Respective capability in the manifest");
+    NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
 
     NX_INI_FLAG(1, throwPluginEventsFromEngine,
-        "Periodically throw plugin events from Engine to Server");
+        "Periodically throw plugin events from Engine to Server.");
 
     NX_INI_FLAG(1, throwPluginEventsFromDeviceAgent,
-        "Periodically throw plugin events from DeviceAgent to Server");
+        "Periodically throw plugin events from DeviceAgent to Server.");
 };
 
 inline Ini& ini()

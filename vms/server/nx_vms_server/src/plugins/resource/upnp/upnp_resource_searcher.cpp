@@ -112,7 +112,6 @@ nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const nx
         m_receiveSocket = udpSock;
     }
 
-
     QMap<QString, nx::network::AbstractDatagramSocket*>::iterator it = m_socketList.find(iface.address.toString());
     if (it == m_socketList.end())
     {
@@ -126,8 +125,6 @@ nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const nx
         {
             return 0;
         }
-
-
 
         /*
         if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
@@ -297,8 +294,6 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
     return result;
 }
 
-
-
 ////////////////////////////////////////////////////////////
 //// class QnUpnpResourceSearcherAsync
 ////////////////////////////////////////////////////////////
@@ -323,6 +318,11 @@ QnResourceList QnUpnpResourceSearcherAsync::findResources()
     return result;
 }
 
+bool QnUpnpResourceSearcherAsync::isEnabled() const
+{
+    return discoveryMode() != DiscoveryMode::disabled;
+}
+
 bool QnUpnpResourceSearcherAsync::processPacket(
     const QHostAddress& localInterfaceAddress,
     const nx::network::SocketAddress& discoveredDevAddress,
@@ -341,9 +341,4 @@ bool QnUpnpResourceSearcherAsync::processPacket(
         m_resList << result;
     }
     return !result.isEmpty();
-}
-
-bool QnUpnpResourceSearcherAsync::isEnabled() const
-{
-    return discoveryMode() != DiscoveryMode::disabled;
 }

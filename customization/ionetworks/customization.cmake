@@ -41,8 +41,6 @@ set(ios.group_identifier "group.com.ioezio.ezpro")
 set(ios.sign.identity "iPhone Distribution: ioEZ INC. (MXZQG6QD9L)")
 
 set(mac.sign.identity "Developer ID Application: ioEZ INC. (MXZQG6QD9L)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: ioEZ INC. (MXZQG6QD9L)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: ioEZ INC. (MXZQG6QD9L)")
 set(mac.bundle.identifier "com.ioezio.ezpro2")
 set(mac.protocol_handler_bundle.identifier "com.ioezio.protocol_handler")
 

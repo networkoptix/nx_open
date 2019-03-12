@@ -4,6 +4,8 @@
 
 #include "logger_collection.h"
 
+#include <nx/utils/nx_utils_ini.h>
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -67,7 +69,7 @@ std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag)
     return loggerCollection()->get(tag, /*exactMatch*/ true);
 }
 
-void removeLoggers(const std::set<Tag>& filters)
+void removeLoggers(const std::set<Filter>& filters)
 {
     loggerCollection()->remove(filters);
 }
@@ -80,6 +82,11 @@ Level maxLevel()
 bool isToBeLogged(Level level, const Tag& tag)
 {
     return getLogger(tag)->isToBeLogged(level, tag);
+}
+
+bool showPasswords()
+{
+    return nx::utils::ini().showPasswordsInLogs;
 }
 
 } // namespace log

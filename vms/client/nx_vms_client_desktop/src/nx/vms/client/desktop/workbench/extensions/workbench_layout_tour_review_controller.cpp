@@ -17,6 +17,7 @@
 
 #include <nx/client/core/utils/grid_walker.h>
 
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
@@ -485,8 +486,17 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
     if (m_updating)
         return;
 
+    const auto resourceCanBeAddedToShowreel =
+		[](const QnResourcePtr& resource)
+        {
+            if (const auto layout = resource.dynamicCast<QnLayoutResource>())
+                return !layout::isEncrypted(layout);
+
+            return QnResourceAccessFilter::isOpenableInLayout(resource);
+        };
+
     QScopedValueRollback<bool> guard(m_updating, true);
-    for (const auto& resource: resources.filtered(QnResourceAccessFilter::isOpenableInEntity))
+    for (const auto& resource: resources.filtered(resourceCanBeAddedToShowreel))
         addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
 }
 

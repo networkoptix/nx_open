@@ -2,8 +2,6 @@
 
 #include <QCryptographicHash>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
 

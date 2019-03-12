@@ -19,7 +19,8 @@ class HintButton: public QAbstractButton
     Q_PROPERTY(QString hint READ hint WRITE setHint)
 
 public:
-    HintButton(QWidget* parent);
+    HintButton(QWidget* parent = nullptr);
+    HintButton(const QString& hint, QWidget* parent = nullptr);
 
     // Create hint button, that is attached to box's header.
     static HintButton* hintThat(QGroupBox* groupBox);

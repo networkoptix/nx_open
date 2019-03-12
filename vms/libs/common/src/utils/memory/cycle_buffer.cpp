@@ -12,14 +12,14 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     if (bufferSize > 0) {
         NX_ASSERT(bufferSize >= align);
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
-        NX_ASSERT(m_buffer, Q_FUNC_INFO, "not enough memory");
+        NX_ASSERT(m_buffer, "not enough memory");
     }
 }
 
 bool QnMediaCyclicBuffer::resize(size_type size)
 {
     value_type* buffer = (value_type*)qMallocAligned(size, m_align);
-    NX_ASSERT(buffer, Q_FUNC_INFO, "not enough memory");
+    NX_ASSERT(buffer, "not enough memory");
 
     if (buffer != nullptr)
     {

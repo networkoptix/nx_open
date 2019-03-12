@@ -8,7 +8,6 @@
 
 namespace nx::vms::client::desktop {
 
-class LegacyCameraSettingsDialog;
 class CameraSettingsDialog;
 
 } // namespace nx::vms::client::desktop
@@ -26,7 +25,6 @@ public:
     virtual ~QnWorkbenchResourcesSettingsHandler();
 
 private:
-    void at_legacyCameraSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_newUserAction_triggered();
@@ -41,7 +39,6 @@ private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr& layout);
 
 private:
-    QPointer<nx::vms::client::desktop::LegacyCameraSettingsDialog> m_legacyCameraSettingsDialog;
     QPointer<nx::vms::client::desktop::CameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnServerSettingsDialog> m_serverSettingsDialog;
     QPointer<QnUserSettingsDialog> m_userSettingsDialog;

@@ -94,6 +94,21 @@ EventPanel::Private::Private(EventPanel* q):
             emit this->q->currentTabChanged(m_tabIds.value(m_lastTab), {});
         });
 
+    connect(action(ui::action::NotificationsTabAction), &QAction::triggered,
+        this, [this] { setCurrentTab(Tab::notifications); });
+
+    connect(action(ui::action::MotionTabAction), &QAction::triggered,
+        this, [this] { setTabCurrent(m_motionTab, m_tabs->currentWidget() != m_motionTab); });
+
+    connect(action(ui::action::BookmarksTabAction), &QAction::triggered,
+        this, [this] { setCurrentTab(Tab::bookmarks); });
+
+    connect(action(ui::action::EventsTabAction), &QAction::triggered,
+        this, [this] { setCurrentTab(Tab::events); });
+
+    connect(action(ui::action::ObjectsTabAction), &QAction::triggered,
+        this, [this] { setCurrentTab(Tab::analytics); });
+
     q->setAutoFillBackground(false);
     q->setAttribute(Qt::WA_TranslucentBackground);
 

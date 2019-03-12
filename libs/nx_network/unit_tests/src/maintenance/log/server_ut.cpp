@@ -73,7 +73,16 @@ protected:
 
         ASSERT_EQ(loggers.size(), loggersReturnedByServer.loggers.size());
         for (std::size_t i = 0; i < loggersReturnedByServer.loggers.size(); ++i)
-            assertLoggerEquality(loggers[i], loggersReturnedByServer.loggers[i]);
+        {
+            assertLoggerEquality(
+                loggers[i], 
+                loggersReturnedByServer.loggers[i]);
+        }
+    }
+
+    void andAddloggerToAddFailed()
+    {
+        ASSERT_EQ(http::StatusCode::badRequest, m_httpClient->response()->statusLine.statusCode);
     }
 
     void whenAddLoggerConfiguration(const Logger& logger)
@@ -244,11 +253,11 @@ protected:
 
         for (int i = 0; i < 20; ++i)
         {
-            if (auto logger = loggerCollection()->get(tag, true))
+            if (auto logger = loggerCollection()->get(tag, false))
                 logger->log(kLevel, tag, QString::number(i) + '\n');
         }
 
-        if (auto logger = loggerCollection()->get(tag, true))
+        if (auto logger = loggerCollection()->get(tag, false))
             logger->log(kLevel, tag, QString(kTargetString) + '\n');
     }
 

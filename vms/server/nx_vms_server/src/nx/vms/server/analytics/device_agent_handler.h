@@ -14,7 +14,7 @@ namespace nx::vms::server::analytics {
 
 class DeviceAgentHandler:
     public QObject,
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public nx::sdk::analytics::IDeviceAgent::IHandler
 {
     Q_OBJECT
@@ -22,7 +22,7 @@ class DeviceAgentHandler:
 public:
     DeviceAgentHandler(
         QnMediaServerModule* serverModule,
-        resource::AnalyticsEngineResourcePtr engineResource,
+        QnUuid engineResourceId,
         QnVirtualCameraResourcePtr device);
 
     virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket) override;
@@ -34,7 +34,7 @@ signals:
     void pluginEventTriggered(const nx::vms::event::PluginEventPtr& pluginEvent);
 
 private:
-    resource::AnalyticsEngineResourcePtr m_engineResource;
+    QnUuid m_engineResourceId;
     QnVirtualCameraResourcePtr m_device;
     nx::vms::server::analytics::MetadataHandler m_metadataHandler;
 };

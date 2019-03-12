@@ -203,7 +203,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
             break;
     }
 
-    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
+    QnAviResourcePtr resource =
+        QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath, commonModule()));
     if (FileTypeSupport::isImageFileExt(introPath))
         resource->addFlags(Qn::still_image);
     resource->setCommonModule(commonModule());
@@ -307,7 +308,7 @@ void QnLoginDialog::accept()
 
 
             const auto status = QnConnectionDiagnosticsHelper::validateConnection(
-                connectionInfo, errorCode, this);
+                connectionInfo, errorCode, this, commonModule()->engineVersion());
 
             if (!guard)
                 return;
@@ -603,7 +604,8 @@ void QnLoginDialog::at_testButton_clicked()
 
     bool connectRequested = false;
 
-    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(
+        this, commonModule()->engineVersion()));
     connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this,
         [&connectRequested]
         {

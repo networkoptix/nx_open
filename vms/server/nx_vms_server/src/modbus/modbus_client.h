@@ -44,8 +44,10 @@ public:
     ModbusResponse writeHoldingRegisters(quint16 startRegister, const QByteArray& data, bool *outStatus);
     ModbusResponse writeSingleHoldingRegister(quint16 registerAddress, const QByteArray& data, bool* outStatus);
 
+    QString idForToStringFromPtr() const;
+
 private:
-    bool initSocket();
+    bool reinitSocket();
     ModbusMBAPHeader buildHeader(const ModbusRequest& request);
 
 private:

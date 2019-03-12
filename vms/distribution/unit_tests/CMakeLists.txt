@@ -12,6 +12,9 @@ set(depends unit_tests)
 if(TARGET nx_analytics_sdk)
     list(APPEND depends nx_analytics_sdk)
 endif()
+if(TARGET nx_sdk_ut)
+    list(APPEND depends nx_sdk_ut)
+endif()
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.py)
 

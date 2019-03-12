@@ -376,19 +376,24 @@ void QnLicenseManagerWidget::updateLicenses()
 
                 if (helper->isValid(lt))
                 {
-                    messages << tr("%1 are currently in use", "", used)
+                    messages << tr("%1 are currently in use",
+                        "Text like '6 Profesional Licenses' will be substituted",
+                        used)
                         .arg(QnLicense::displayText(lt, used));
                 }
                 else
                 {
                     const int required = helper->requiredLicenses(lt);
-                    messages << setWarningStyleHtml(tr("At least %1 are required", "", required)
+                    messages << setWarningStyleHtml(
+                        tr("At least %1 are required",
+                            "Text like '6 Profesional Licenses' will be substituted",
+                            required)
                         .arg(QnLicense::displayText(lt, required)));
                 }
             }
         }
 
-        ui->infoLabel->setText(messages.join(lit("<br/>")));
+        ui->infoLabel->setText(messages.join("<br/>"));
     }
 
     updateButtons();
@@ -485,7 +490,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
-    params.addQueryItem(lit("version"), qnStaticCommon->engineVersion().toString());
+    params.addQueryItem(lit("version"), commonModule()->engineVersion().toString());
     params.addQueryItem(lit("lang"), qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())
@@ -666,7 +671,7 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 
     static const auto kWarningText = tr("Every license can be deactivated only a few times.");
     const auto warningColor = nx::vms::client::desktop::ColorTheme::instance()->color("red_l2").name();
-    const auto warningText = tr("<font color = \"%1\">%2</font>")
+    const auto warningText = QString("<font color = \"%1\">%2</font>")
         .arg(warningColor, kWarningText);
     extras.push_back(warningText);
 
@@ -966,7 +971,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
             if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {
-                showFailedToActivateLicenseLater(QnLicenseValidator::errorMessage(errCode));
+                showFailedToActivateLicenseLater(errCode);
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else
@@ -1057,19 +1062,12 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                     showIncompatibleLicenceMessageLater();
                     break;
                 case QnLicenseErrorCode::TooManyLicensesPerDevice:
-                    showMessageLater(
-                        QnMessageBoxIcon::Critical,
-                        tr("Failed to activate license"),
-                        tr("Only one starter license is allowed per System.")
-                            + '\n'
-                            + tr("You already have one active starter license."),
-                        CopyToClipboardButton::Hide);
+                    showFailedToActivateLicenseLater(errCode);
                     break;
                 default:
                     break;
             }
         }
-
 
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
@@ -1134,6 +1132,11 @@ QString QnLicenseManagerWidget::networkErrorExtras()
 QString QnLicenseManagerWidget::getProblemPersistMessage()
 {
     return tr("If the problem persists, please contact Customer Support.");
+}
+
+void QnLicenseManagerWidget::showFailedToActivateLicenseLater(QnLicenseErrorCode errorCode)
+{
+    showFailedToActivateLicenseLater(QnLicenseValidator::errorMessage(errorCode));
 }
 
 void QnLicenseManagerWidget::showAlreadyActivatedLater(

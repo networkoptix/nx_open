@@ -32,7 +32,7 @@ std::vector<QString> QnLogs::getLoggerNames()
 
 std::shared_ptr<nx::utils::log::AbstractLogger> QnLogs::getLogger(int id)
 {
-    // Currently hardcoded in some places of desktop client.
+    // Dirty hack to allow mediaserver dynamically change log level using REST handler.
     switch (id)
     {
         case 0: return nx::utils::log::mainLogger();

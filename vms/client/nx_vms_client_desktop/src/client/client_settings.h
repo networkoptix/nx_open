@@ -13,7 +13,6 @@
 #include <client_core/local_connection_data.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <update/update_info.h>
 #include <utils/common/app_info.h>
 #include <utils/common/property_storage.h>
 

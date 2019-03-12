@@ -38,17 +38,18 @@ namespace test {
 class LdapManagerMock: public AbstractLdapManager
 {
 public:
-    virtual LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) override
+    virtual LdapResult fetchUsers(
+        QnLdapUsers& /*users*/, const QnLdapSettings& /*settings*/) override
     {
         return LdapResult();
     }
 
-    virtual LdapResult fetchUsers(QnLdapUsers &users) override
+    virtual LdapResult fetchUsers(QnLdapUsers& /*users*/) override
     {
         return LdapResult();
     }
 
-    virtual Qn::AuthResult authenticate(const QString& login, const QString& password) override
+    virtual Qn::AuthResult authenticate(const QString& /*login*/, const QString& password) override
     {
         bool success = m_ldapPassword == password;
         return success ? Qn::Auth_OK : Qn::Auth_WrongPassword;
@@ -58,6 +59,7 @@ public:
     {
         m_ldapPassword = value;
     }
+
 private:
     QString m_ldapPassword;
 };
@@ -346,6 +348,21 @@ public:
         if (!ldapUser->passwordExpired())
             isSessionExpired.get_future().wait();
     }
+
+    void verifyPassword(
+        Qn::AuthResult expectedResilt,
+        const nx::network::HostAddress& clientIp,
+        const QString& user, const QString& password)
+    {
+        const auto userResource = server->serverModule()->resourcePool()->getResource(
+            [&](const auto& resource) { return resource->getName() == user; });
+        ASSERT_TRUE(userResource) << lm("Unable to fetch user: %1").arg(user).toStdString();
+
+        Qn::UserAccessData userAccess(userResource->getId());
+        const auto result = server->authenticator()->verifyPassword(clientIp, userAccess, password);
+        ASSERT_EQ(expectedResilt, result) << lm("%1:%2 (%3) -> %4 != %5")
+            .args(user, password, clientIp, expectedResilt, result).toStdString();
+    }
 };
 
 std::unique_ptr<MediaServerLauncher> AuthenticationTest::server;
@@ -387,7 +404,7 @@ TEST_F(AuthenticationTest, cookieWrongPassword)
     // Check return code for wrong password
     testCookieAuth(
         "admin", "invalid password",
-        QnRestResult::InvalidParameter);
+        QnRestResult::CantProcessRequest);
 }
 
 TEST_F(AuthenticationTest, cookieCorrectPassword)
@@ -515,7 +532,7 @@ TEST_F(AuthenticationTest, lockoutTest)
     assertServerAcceptsUserCredentials("admin", "admin");
 
     // Trigger lockout.
-    for (int i = 0; i < kLockoutOptions.maxLoginFailures - 1; ++i)
+    for (int i = 0; i < (int) kLockoutOptions.maxLoginFailures - 1; ++i)
         assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
     assertServerRejectsUserCredentials("admin", "admin", Qn::Auth_LockedOut);
 
@@ -545,7 +562,7 @@ TEST_F(AuthenticationTest, sessionKey)
 
     // Cause user to lockout.
     server->authenticator()->setLockoutOptions(kLockoutOptions);
-    for (int i = 0; i < kLockoutOptions.maxLoginFailures; ++i)
+    for (int i = 0; i < (int) kLockoutOptions.maxLoginFailures; ++i)
         assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
     assertServerRejectsUserCredentials("admin", "admin", Qn::Auth_LockedOut);
 
@@ -607,6 +624,25 @@ TEST_F(AuthenticationTest, serverKey)
     auto client = makeClient(serverResource->getAuthKey());
     client->addAdditionalHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, userData.name.toUtf8());
     testServerReturnCode(std::move(client), nx::network::http::StatusCode::ok);
+}
+
+TEST_F(AuthenticationTest, verifyPassword)
+{
+    // Make sure server is completelly started.
+    assertServerAcceptsUserCredentials("admin", "admin");
+
+    verifyPassword(Qn::Auth_OK, "127.0.0.22", "admin", "admin");
+    verifyPassword(Qn::Auth_WrongPassword, "127.0.0.22", "admin", "qweasd123");
+
+    server->authenticator()->setLockoutOptions(kLockoutOptions);
+    for (int i = 0; i < (int) kLockoutOptions.maxLoginFailures; ++i)
+        verifyPassword(Qn::Auth_WrongPassword, "127.0.0.1", "admin", "qweasd123");
+
+    verifyPassword(Qn::Auth_LockedOut, "127.0.0.1", "admin", "admin");
+    verifyPassword(Qn::Auth_OK, "127.0.0.22", "admin", "admin");
+
+    // Verify password does not affect authentication.
+    assertServerAcceptsUserCredentials("admin", "admin");
 }
 
 } // namespace test

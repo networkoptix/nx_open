@@ -10,6 +10,7 @@ BUILD_DIR="@CMAKE_BINARY_DIR@"
 DESKTOP_CLIENT_BIN="@client.binary.name@"
 PACKAGES_DIR="@PACKAGES_DIR@/@rdep_target@"
 DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@"
+QT_DIR="@QT_DIR@"
 ENABLE_HANWHA="@enable_hanwha@"
 SERVER_PLUGINS=(@server_plugins_list@)
 SERVER_PLUGINS_OPTIONAL=(@server_plugins_optional_list@)

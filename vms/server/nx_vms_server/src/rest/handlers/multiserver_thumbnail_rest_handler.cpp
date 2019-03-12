@@ -164,7 +164,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
     }
     else if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::raw)
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemented");
+        NX_ASSERT(false, "Method is not implemented");
         // TODO: #rvasilenko implement me!!!
     }
     else

@@ -26,9 +26,9 @@ struct NX_VMS_API EngineManifest
         QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
         QString name; /**< Action name to be shown to the user. */
         QList<QString> supportedObjectTypeIds;
-        // TODO: Add params (settings).
+        QJsonObject parametersModel;
     };
-    #define ObjectAction_Fields (id)(name)(supportedObjectTypeIds)
+    #define ObjectAction_Fields (id)(name)(supportedObjectTypeIds)(parametersModel)
 
     enum Capability
     {
@@ -40,7 +40,7 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_bgra = 1 << 4,
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
-        deviceModelDependent = 1 << 7,
+        deviceDependent = 1 << 7,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 

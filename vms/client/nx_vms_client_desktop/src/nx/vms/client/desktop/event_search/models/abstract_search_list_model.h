@@ -215,16 +215,19 @@ void AbstractSearchListModel::truncateDataToTimePeriod(
         };
 
     // Remove records later than end of the period.
-    const auto frontEnd = std::upper_bound(data.begin(), data.end(),
-        period.endTime() + 1ms, upperBoundPredicate);
-
-    const auto frontLength = std::distance(data.begin(), frontEnd);
-    if (frontLength != 0)
+    if (!period.isInfinite())
     {
-        ScopedRemoveRows removeRows(this, 0, frontLength - 1);
-        if (itemCleanup)
-            std::for_each(data.begin(), frontEnd, itemCleanup);
-        data.erase(data.begin(), frontEnd);
+        const auto frontEnd = std::upper_bound(data.begin(), data.end(),
+            period.endTime() + 1ms, upperBoundPredicate);
+
+        const auto frontLength = std::distance(data.begin(), frontEnd);
+        if (frontLength != 0)
+        {
+            ScopedRemoveRows removeRows(this, 0, frontLength - 1);
+            if (itemCleanup)
+                std::for_each(data.begin(), frontEnd, itemCleanup);
+            data.erase(data.begin(), frontEnd);
+        }
     }
 
     // Remove records earlier than start of the period.

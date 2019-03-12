@@ -120,7 +120,7 @@ RapidReviewSettingsWidget::~RapidReviewSettingsWidget()
 
 void RapidReviewSettingsWidget::setSpeed(int absoluteValue)
 {
-    NX_ASSERT(!m_updating, Q_FUNC_INFO,
+    NX_ASSERT(!m_updating,
         "Function belongs to outer interface, must not be called internally.");
     if (m_updating)
         return;
@@ -143,7 +143,7 @@ qint64 RapidReviewSettingsWidget::sourcePeriodLengthMs() const
 
 void RapidReviewSettingsWidget::setSourcePeriodLengthMs(qint64 lengthMs)
 {
-    NX_ASSERT(!m_updating, Q_FUNC_INFO,
+    NX_ASSERT(!m_updating,
         "Function belongs to outer interface, must not be called internally.");
     if (m_updating)
         return;

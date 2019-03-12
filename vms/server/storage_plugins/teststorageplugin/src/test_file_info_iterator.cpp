@@ -35,7 +35,7 @@ nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) con
     return &m_fInfo;
 }
 
-void* TestFileInfoIterator::queryInterface(const nxpl::NX_GUID& interfaceID) 
+void* TestFileInfoIterator::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
     if (std::memcmp(&interfaceID,
                     &nx_spl::IID_FileInfoIterator,
@@ -55,12 +55,12 @@ void* TestFileInfoIterator::queryInterface(const nxpl::NX_GUID& interfaceID)
 
 }
 
-unsigned int TestFileInfoIterator::addRef() 
+int TestFileInfoIterator::addRef() const
 {
     return pAddRef();
 }
 
-unsigned int TestFileInfoIterator::releaseRef() 
+int TestFileInfoIterator::releaseRef() const
 {
     return pReleaseRef();
 }

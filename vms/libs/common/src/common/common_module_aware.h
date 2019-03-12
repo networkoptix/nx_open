@@ -51,7 +51,7 @@ public:
     QnSharedResourcesManager* sharedResourcesManager() const;
     QnUserRolesManager* userRolesManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
-    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnCameraUserAttributePool* cameraUserAttributesPool() const;
     QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const;
     QnResourceStatusDictionary* statusDictionary() const;

@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_selection_node_view.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/details/resource_node_view_item_delegate.h>
 #include <client/client_settings.h>
 
 namespace {
@@ -93,7 +94,9 @@ NodePtr createServerNode(
 
     const auto camerasCount = std::accumulate(children.cbegin(), children.cend(), 0,
         [](int count, const NodePtr& node)
-        { return count + (node->childrenCount() ? node->childrenCount() : 1); });
+        {
+            return count + (node->childrenCount() > 0 ? node->childrenCount() : 1);
+        });
 
     const auto extraText = lit("%1 - %2").arg(extraInfoText,
         CameraSelectionDialog::tr("%n cameras", nullptr, camerasCount)).trimmed();
@@ -306,6 +309,7 @@ CameraSelectionDialog::CameraSelectionDialog(
     const ValidResourceCheck& validResourceCheck,
     const GetText& getText,
     const QnUuidSet& selectedCameras,
+    bool showRecordingIndicator,
     QWidget* parent)
     :
     base_type(parent),
@@ -314,6 +318,11 @@ CameraSelectionDialog::CameraSelectionDialog(
 {
     ui->setupUi(this);
     const auto view = ui->filteredResourceSelectionWidget->view();
+    if (ResourceNodeViewItemDelegate* resourceDelegate =
+        dynamic_cast<ResourceNodeViewItemDelegate*>(view->itemDelegate()))
+    {
+        resourceDelegate->setShowRecordingIndicator(showRecordingIndicator);
+    }
     view->setupHeader();
     view->sortByColumn(ResourceNodeViewColumn::resourceNameColumn, Qt::AscendingOrder);
     connect(view, &ResourceSelectionNodeView::resourceSelectionChanged,
@@ -340,9 +349,11 @@ bool CameraSelectionDialog::selectCamerasInternal(
     const ValidResourceCheck& validResourceCheck,
     const GetText& getText,
     QnUuidSet& selectedCameras,
+    bool showRecordingIndicator,
     QWidget* parent)
 {
-    CameraSelectionDialog dialog(validResourceCheck, getText, selectedCameras, parent);
+    CameraSelectionDialog dialog(validResourceCheck, getText, selectedCameras,
+        showRecordingIndicator, parent);
 
     if (dialog.d->data.allCameras.isEmpty())
     {

@@ -37,7 +37,7 @@ namespace vms::server {
  */
 class Authenticator:
     public QObject,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -62,7 +62,10 @@ public:
         QString toString() const;
     };
 
-    bool isPasswordCorrect(const Qn::UserAccessData& access, const QString& password);
+    Qn::AuthResult verifyPassword(
+        const nx::network::HostAddress& clientIp,
+        const Qn::UserAccessData& access,
+        const QString& password);
 
     Result tryAllMethods(
         const nx::network::HostAddress& clientIp,

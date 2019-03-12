@@ -32,7 +32,7 @@ QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
     : base_type(parent)
 {
     const auto moduleManager = commonModule()->moduleDiscoveryManager();
-    NX_ASSERT(moduleManager, Q_FUNC_INFO, "Module finder does not exist");
+    NX_ASSERT(moduleManager, "Module finder does not exist");
     if (!moduleManager)
         return;
 
@@ -173,7 +173,7 @@ void QnDirectSystemsFinder::updateServerInternal(
     const SystemsHash::iterator systemIt, nx::vms::discovery::ModuleEndpoint module)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    NX_ASSERT(serverIsInKnownSystem, "Server is not known");
     if (!serverIsInKnownSystem)
         return;
 

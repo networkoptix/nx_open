@@ -16,7 +16,7 @@ struct QnJsonRestResult;
 /**
  * Class that receives, parses and stores statistics data from one server.
  */
-class QnMediaServerStatisticsStorage: public QObject, public QnCommonModuleAware
+class QnMediaServerStatisticsStorage: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

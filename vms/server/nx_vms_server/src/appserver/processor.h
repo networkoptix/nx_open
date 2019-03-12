@@ -20,7 +20,7 @@ namespace ec2 {
 class QnAppserverResourceProcessor:
     public QObject,
     public QnResourceProcessor,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

@@ -5,6 +5,7 @@
 
 #include <common/common_globals.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QnMediaResourceWidget;
 
@@ -15,10 +16,12 @@ namespace nx::vms::client::desktop {
  * for example Motion tab with Motion Search on camera.
  */
 class AbstractSearchSynchronizer:
-    public QObject,
+    public Connective<QObject>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    using base_type = Connective<QObject>;
 
 public:
     AbstractSearchSynchronizer(QnWorkbenchContext* context, QObject* parent = nullptr);

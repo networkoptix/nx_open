@@ -52,10 +52,11 @@ private:
         nx::network::http::server::HtdigestAuthenticationProvider provider;
         nx::network::http::server::BaseAuthenticationManager manager;
 
-        MaintenanceAuthenticator(const std::string& maintenanceHtdigestPath):
-            provider(maintenanceHtdigestPath),
+        MaintenanceAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
             manager(&provider)
         {
+
         }
     };
 
@@ -69,7 +70,7 @@ private:
     view::AuthenticationManager m_authenticationManager;
     nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
-    MaintenanceAuthenticator m_maintenanceAuthenticator;
+    std::unique_ptr<MaintenanceAuthenticator> m_maintenanceAuthenticator;
     network::maintenance::Server m_maintenanceServer;
 
     void registerAuthenticators();

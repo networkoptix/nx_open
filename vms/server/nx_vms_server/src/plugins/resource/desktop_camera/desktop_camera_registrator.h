@@ -8,7 +8,7 @@
 class QnDesktopCameraRegistratorPrivate;
 
 class QnDesktopCameraRegistrator:
-    public nx::vms::server::ServerModuleAware,
+    public /*mixin*/ nx::vms::server::ServerModuleAware,
     public QnTCPConnectionProcessor
 {
 public:

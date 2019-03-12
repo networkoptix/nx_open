@@ -38,7 +38,8 @@ public:
     AggregationInfo();
 
     void append(const EventParameters& runtimeParams,
-        const AggregationInfo& subAggregationData = AggregationInfo());
+        const AggregationInfo& subAggregationData = AggregationInfo(),
+        bool oneRecordPerKey = false);
     bool isEmpty() const;
     int totalCount() const;
     void clear();

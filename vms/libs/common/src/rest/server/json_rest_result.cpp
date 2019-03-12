@@ -13,9 +13,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
 
 QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnRestResult, (ubjson)(json)(xml)(csv_record), QnRestResult_Fields, (optional, false))
+    QnRestResult, (ubjson)(json)(xml)(csv_record), QnRestResult_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    QN_REST_RESULT_TYPES, (ubjson)(json), _Fields, (optional, false))
+    QN_REST_RESULT_TYPES, (ubjson)(json), _Fields)
 
 QnRestResult::ErrorDescriptor::ErrorDescriptor(
     QnRestResult::Error errorCode,
@@ -102,11 +102,11 @@ QnUbjsonRestResult::QnUbjsonRestResult(const QnRestResult& base): QnRestResult(b
 
 void serialize(const QJsonValue& /*value*/, QnUbjsonWriter<QByteArray>* /*stream*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    NX_ASSERT(false, "We should not serialize QJsonValue to UBJson.");
 }
 
 bool deserialize(QnUbjsonReader<QByteArray>* /*stream*/, QJsonValue* /*target*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    NX_ASSERT(false, "We should not serialize QJsonValue to UBJson.");
     return true;
 }

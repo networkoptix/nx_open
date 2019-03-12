@@ -68,11 +68,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        QString urlStr = camera->getUrl();
-        const QnResourceData resourceData = camera->resourceData();
-        if (resourceData.contains(QString("ignoreMultisensors")))
-            urlStr = urlStr.left(urlStr.indexOf('?'));
-
         if (camera->isManuallyAdded() &&
             !serverModule()->commonModule()->resourceDiscoveryManager()->isManuallyAdded(camera))
         {
@@ -80,12 +75,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         }
 
         QString uniqueId = camera->getUniqueId();
-        if( camera->hasFlags(Qn::search_upd_only) && !resourcePool()->getResourceByUniqueId(uniqueId))
-            continue;   //ignoring newly discovered camera
+        if (camera->hasFlags(Qn::search_upd_only) && !resourcePool()->getResourceByUniqueId(uniqueId))
+            continue;   //< ignoring newly discovered camera
 
         addNewCamera(camera);
     }
-
 }
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
@@ -235,7 +229,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_WARNING (this, QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)));
+            NX_WARNING(this, "Can't add camera to ec2 (insCamera user attributes query error). %1", errCode);
             return;
         }
         QSet<QByteArray> modifiedFields;
@@ -251,6 +245,8 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     QnResourcePtr rpRes = resourcePool()->getResourceById(apiCameraData.id);
     if (rpRes)
     {
+        // TODO: Should be changed to reinitAsync() call?
+        NX_VERBOSE(this, "Reiniting resource [%1]", rpRes);
         rpRes->setStatus(Qn::Offline);
         rpRes->initAsync(true);
     }

@@ -130,6 +130,8 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
 
     for (const auto& absolutePath : sourceFiles)
     {
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents); // A bit risky but probably OK.
+
         const QString relativePath = sourceRoot.relativeFilePath(absolutePath);
         if (!appendFile(dstFile, absolutePath))
             return ErrorCode::WriteFileError;

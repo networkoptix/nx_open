@@ -26,6 +26,7 @@
 */
 namespace nxcip
 {
+    // TODO: Change to signed int64_t.
     typedef unsigned long long int UsecUTCTimestamp;
     static const UsecUTCTimestamp INVALID_TIMESTAMP_VALUE = (UsecUTCTimestamp)-1LL;
 

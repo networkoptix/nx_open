@@ -30,13 +30,16 @@ NX_UTILS_API std::shared_ptr<AbstractLogger> getLogger(const Tag& tag);
 NX_UTILS_API std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag);
 
 /** Removes specific loggers for filters, so such messagess will go to main log. */
-NX_UTILS_API void removeLoggers(const std::set<Tag>& filters);
+NX_UTILS_API void removeLoggers(const std::set<Filter>& filters);
 
 /** Get the maximum log level currently used by any logger registered via addLogger(). */
 NX_UTILS_API Level maxLevel();
 
 /** Indicates if a message is going to be logged by any logger. */
 bool NX_UTILS_API isToBeLogged(Level level, const Tag& tag = {});
+
+/** Indicates if passwords should be shown in logs. */
+bool NX_UTILS_API showPasswords();
 
 namespace detail {
 
@@ -45,7 +48,7 @@ class Helper
 public:
     Helper() {} //< Constructing a helper which does not log anything.
 
-    Helper(Level level, const Tag& tag):
+    Helper(Level level, Tag tag):
         m_level(level),
         m_tag(std::move(tag)),
         m_logger(getLogger(m_tag))
@@ -73,7 +76,7 @@ public:
     Stream(const Stream&) = delete;
     Stream(Stream&&) = default;
     Stream& operator=(const Stream&) = delete;
-    Stream& operator=(Stream&&) = default;
+    Stream& operator=(Stream&&) = delete;
 
     Stream& setDelimiter(const QString& delimiter)
     {

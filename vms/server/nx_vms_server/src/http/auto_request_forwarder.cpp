@@ -30,11 +30,14 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
 {
     if (ini().verboseAutoRequestForwarder)
     {
-        nx::utils::log::addLogger(
-            std::make_unique<nx::utils::log::Logger>(
+        using namespace nx::utils::log;
+        static const Filter kFilter(Tag(typeid(this)));
+
+        addLogger(
+            std::make_unique<Logger>(
                  // Using the same tag for all instances.
-                std::set<nx::utils::log::Tag>{typeid(this)},
-                nx::utils::log::Level::verbose));
+                std::set<Filter>{kFilter},
+                Level::verbose));
         NX_VERBOSE(this, "Verbose logging started: .ini verboseAutoRequestForwarder=true");
     }
 }

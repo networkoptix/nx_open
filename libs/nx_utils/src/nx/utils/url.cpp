@@ -217,6 +217,19 @@ QString Url::toString(QUrl::FormattingOptions options) const
     return url(options);
 }
 
+QString Url::toWebClientStandardViolatingUrl(QUrl::FormattingOptions options) const
+{
+    nx::utils::Url newUrl(*this);
+
+    if (hasFragment())
+    {
+        newUrl.setPath(path() + "#" + fragment());
+        newUrl.setFragment(QString());
+    }
+
+    return newUrl.toString(options).replace("%23", "#");
+}
+
 std::string Url::toStdString(QUrl::FormattingOptions options) const
 {
     return toString(options).toStdString();
@@ -600,7 +613,7 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
 
 QString hidePassword(const QString& urlStr)
 {
-    if (displayPasswordInLogs())
+    if (nx::utils::log::showPasswords())
         return urlStr;
 
     nx::utils::Url url(urlStr);
@@ -608,11 +621,6 @@ QString hidePassword(const QString& urlStr)
         url.toDisplayString();
 
     return urlStr;
-}
-
-bool displayPasswordInLogs()
-{
-    return nx::utils::ini().displayUrlPasswordInLogs;
 }
 
 } // namespace url

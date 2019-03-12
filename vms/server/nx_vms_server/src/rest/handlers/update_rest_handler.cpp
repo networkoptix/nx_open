@@ -19,8 +19,12 @@
 #include <nx/utils/log/log.h>
 #include <common/static_common_module.h>
 
-QnUpdateRestHandler::QnUpdateRestHandler(QnServerUpdateTool* updateTool):
-    m_updateTool(updateTool)
+QnUpdateRestHandler::QnUpdateRestHandler(
+    QnServerUpdateTool* updateTool,
+    const nx::vms::api::SoftwareVersion& engineVersion)
+    :
+    m_updateTool(updateTool),
+    m_engineVersion(engineVersion)
 {
 }
 
@@ -96,7 +100,7 @@ int QnUpdateRestHandler::executePost(
         }
     }
 
-    if (version == qnStaticCommon->engineVersion())
+    if (version == m_engineVersion)
     {
         result.setError(QnJsonRestResult::NoError, lit("UP_TO_DATE"));
         return nx::network::http::StatusCode::ok;
@@ -123,7 +127,11 @@ int QnUpdateRestHandler::executePost(
     return nx::network::http::StatusCode::ok;
 }
 
-int QnUpdateRestHandler::handlePartialUpdate(const QString &updateId, const QByteArray &data, qint64 offset, QnJsonRestResult &result)
+int QnUpdateRestHandler::handlePartialUpdate(
+    const QString &updateId,
+    const QByteArray &data,
+    qint64 offset,
+    QnJsonRestResult &result)
 {
     qint64 chunkResult = m_updateTool->addUpdateFileChunkSync(updateId, data, offset);
 

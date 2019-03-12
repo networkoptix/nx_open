@@ -5,6 +5,8 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/test_support/test_options.h>
 #include <recording/time_period_list.h>
 
@@ -20,6 +22,8 @@ static const qint64 kTwoMonthMs = 1000ll * 60 * 60 * 24 * 60;
 static const qint64 kChunkLengthMs = 1000ll * 60; //< One minute each.
 static const qint64 kChunkSpaceMs = 1000ll * 5; //< 5 seconds spacing.
 static const  int kMergingListsCount = 10;
+static const  int kBigListLength = 10 * 1000;
+static const  int kBigListIterations = 1000;
 
 } // namespace
 
@@ -38,6 +42,14 @@ void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os)
 }
 
 namespace test {
+static QnTimePeriodList makeTimePeriods(
+    uint64_t start, uint64_t length, uint64_t gap = 0, int count = 1)
+{
+    QnTimePeriodList list;
+    for (int i = 0; i < count; ++i, start += length + gap)
+        list << QnTimePeriod(start, length);
+    return list;
+}
 
 TEST( QnTimePeriodsListTest, mergeBigData )
 {
@@ -228,6 +240,22 @@ TEST( QnTimePeriodsListTest, unionByLimits )
     ASSERT_EQ(resultList, sourceList);
 }
 
+TEST( QnTimePeriodsListTest, unionOfBigList )
+{
+    auto sourceList = makeTimePeriods(10, 5, 5, kBigListLength);
+    QnTimePeriodList tail;
+    tail << QnTimePeriod(kBigListLength * 10 + 10, 5);
+
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+    for (int i = 0; i < kBigListIterations; ++i)
+        QnTimePeriodList::unionTimePeriods(sourceList, tail);
+
+    const auto elapsed = timer.elapsed();
+    NX_DEBUG(this, elapsed);
+    ASSERT_EQ(makeTimePeriods(10, 5, 5, kBigListLength + 1), sourceList);
+}
+
 TEST( QnTimePeriodsListTest, serializationUnsigned )
 {
     QnTimePeriodList sourceList;
@@ -333,6 +361,61 @@ TEST( QnTimePeriodsListTest, overwriteTailByTrimAndAppend )
     resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::kInfiniteDuration);;
 
     ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, overwriteTailOfBigList )
+{
+    auto sourceList = makeTimePeriods(10, 5, 5, kBigListLength);
+    QnTimePeriodList tail;
+    tail << QnTimePeriod(kBigListLength * 10 + 10, 5);
+
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+    for (int i = 0; i < kBigListIterations; ++i)
+        QnTimePeriodList::unionTimePeriods(sourceList, tail);
+
+    const auto elapsed = timer.elapsed();
+    NX_DEBUG(this, elapsed);
+    ASSERT_EQ(makeTimePeriods(10, 5, 5, kBigListLength + 1), sourceList);
+}
+
+TEST( QnTimePeriodsListTest, intersection )
+{
+    //                                1 1 1 1 1 1 1 1 1 1 2 2 ...
+    //            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 ...
+    //  1st:      |-------------|     |-------------|     |---
+    //  2nd:            |-----------|        |-----------|
+    //  expected:       |-------|            |-------|
+    //
+    EXPECT_EQ(makeTimePeriods(/*start*/ 3, /*length*/ 4, /*gap*/ 6, /*count*/ 5),
+        QnTimePeriodList::intersection(
+            makeTimePeriods(/*start*/ 0, /*length*/ 7, /*gap*/ 3, /*count*/ 5),
+            makeTimePeriods(/*start*/ 3, /*length*/ 7, /*gap*/ 3, /*count*/ 5)));
+
+    //  1st:      -- -- -- -- -- -- -- -- -- --
+    //  2nd:       -- -- -- -- --
+    //  expected:  -  -  -  -  -
+    //
+    EXPECT_EQ(makeTimePeriods(/*start*/ 13, /*length*/ 4, /*gap*/ 6, /*count*/ 5),
+        QnTimePeriodList::intersection(
+            makeTimePeriods(/*start*/ 0, /*length*/ 7, /*gap*/ 3, /*count*/ 10),
+            makeTimePeriods(/*start*/ 13, /*length*/ 7, /*gap*/ 3, /*count*/ 5)));
+
+    QnTimePeriodList expected;
+    expected << QnTimePeriod(0, 5) << QnTimePeriod(10, 5) << QnTimePeriod(40, 5);
+
+    QnTimePeriodList limiter;
+    limiter << QnTimePeriod(0, 20) << QnTimePeriod(40, 10);
+
+    //                                                    1
+    //                1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 0
+    //            0 5 0 5 0 5 0 5 0 5 0 5 0 5 0 5 0 5 0 5 0
+    //  1st:      |-| |-| |-| |-| |-| |-| |-| |-| |-| |-|
+    //  limiter:  |-------|       |---|
+    //  expected: |-| |-|         |-|
+    //
+    EXPECT_EQ(expected, QnTimePeriodList::intersection(
+        makeTimePeriods(/*start*/ 0, /*length*/ 5, /*gap*/ 5, /*count*/ 10), limiter));
 }
 
 TEST( QnTimePeriodsListTest, includingPeriods )

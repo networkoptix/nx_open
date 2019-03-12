@@ -22,7 +22,7 @@ struct QnRoute
     bool isValid() const { return !addr.isNull(); }
 };
 
-class QnRouter: public QObject, public QnCommonModuleAware
+class QnRouter: public QObject, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 public:

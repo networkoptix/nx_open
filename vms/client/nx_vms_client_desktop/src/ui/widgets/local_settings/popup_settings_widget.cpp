@@ -125,14 +125,14 @@ void QnPopupSettingsWidget::loadDataToUi()
 
 void QnPopupSettingsWidget::applyChanges()
 {
-    NX_ASSERT(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
+    NX_ASSERT(!m_updating, "Should never get here while updating");
     QScopedValueRollback<bool> guard(m_updating, true);
 
     if (context()->user())
     {
         m_adaptor->setWatchedEvents(watchedEvents());
         m_adaptor->saveToResource();
-        propertyDictionary()->saveParamsAsync(context()->user()->getId());
+        resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
     }
 
     qnSettings->setPopupSystemHealth(watchedSystemHealth());

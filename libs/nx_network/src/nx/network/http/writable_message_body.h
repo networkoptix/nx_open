@@ -9,7 +9,7 @@ namespace nx::network::http {
 /**
  * Message body source that sends data upon availibility.
  * To make body data available, call WritableMessageBody::writeBodyData.
- * 
+ *
  */
 class NX_NETWORK_API WritableMessageBody:
     public AbstractMsgBodySource

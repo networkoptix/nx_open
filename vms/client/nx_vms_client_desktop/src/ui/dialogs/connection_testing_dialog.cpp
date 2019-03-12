@@ -37,11 +37,14 @@ namespace
 }
 
 
-QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent)
-    : QnButtonBoxDialog(parent)
+QnConnectionTestingDialog::QnConnectionTestingDialog(
+    QWidget *parent, const nx::vms::api::SoftwareVersion& engineVersion)
+    :
+    QnButtonBoxDialog(parent)
     , ui(new Ui::ConnectionTestingDialog)
     , m_timeoutTimer(new QTimer(this))
-    , m_connectButton(new QPushButton(tr("Connect"), this))
+    , m_connectButton(new QPushButton(tr("Connect"), this)),
+    m_engineVersion(engineVersion)
 {
     ui->setupUi(this);
 
@@ -95,7 +98,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     ui->progressBar->setValue(ui->progressBar->maximum());
 
     auto testResult = QnConnectionDiagnosticsHelper::validateConnectionTest(
-        connectionInfo, errorCode);
+        connectionInfo, errorCode, m_engineVersion);
 
     updateUi(testResult.result == Qn::SuccessConnectionResult,
         testResult.details, testResult.helpTopicId);

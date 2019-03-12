@@ -136,7 +136,7 @@ StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersPr
     Camera* camera,
     const StreamCapabilityMaps& capabilities,
     const nx::media::CameraTraits& traits,
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     const QSize& baseResolution)
 :
     m_camera(camera),
@@ -190,7 +190,7 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
         if (const auto camera = videoCameraPool->getVideoCamera(toSharedPointer(m_camera)))
         {
             const auto stream =
-                (m_streamIndex == Qn::StreamIndex::primary)
+                (m_streamIndex == StreamIndex::primary)
                 ? camera->getPrimaryReader()
                 : camera->getSecondaryReader();
 
@@ -215,7 +215,7 @@ void StreamCapabilityAdvancedParametersProvider::updateMediaCapabilities()
 }
 
 QSet<QString> StreamCapabilityAdvancedParametersProvider::filterResolutions(
-    Qn::StreamIndex streamIndex,
+    StreamIndex streamIndex,
     std::function<bool(const QString&)> filterFunc) const
 {
     const auto& capabilities = m_capabilities[streamIndex];
@@ -340,7 +340,7 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
         codecResolutionCapabilities[it.key().codec][sizeToString(it.key().resolution)] = it.value();
 
     QnCameraAdvancedParamGroup streamParameters;
-    streamParameters.name = m_streamIndex == Qn::StreamIndex::primary
+    streamParameters.name = m_streamIndex == StreamIndex::primary
         ? lit("Primary") : lit("Secondary");
     streamParameters.params = describeCapabilities(codecResolutionCapabilities);
 
@@ -380,7 +380,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     resolution.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
 
     const auto traitAttributes = trait(nx::media::CameraTraitType::aspectRatioDependent);
-    const bool doesResolutionDependOnAspectRatio = m_streamIndex == Qn::StreamIndex::secondary
+    const bool doesResolutionDependOnAspectRatio = m_streamIndex == StreamIndex::secondary
         && traitAttributes != boost::none;
 
     auto allowedAspectRatioDiff = kDefaultAllowedAspectRatioDiff;
@@ -430,11 +430,11 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
                     allowedAspectRatioDiff);
 
                 const auto primaryResolutionsRestrictedByAspectRatio = filterResolutions(
-                    Qn::StreamIndex::primary,
+                    StreamIndex::primary,
                     filter);
 
                 auto secondaryResolutionsRestrictedByAspectRatio = filterResolutions(
-                    Qn::StreamIndex::secondary,
+                    StreamIndex::secondary,
                     filter);
 
                 const auto availableSecondaryResolutionRange = makeRange(
@@ -452,7 +452,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
                                 codecResolution.key()),
                             QnCameraAdvancedParameterCondition(
                                 QnCameraAdvancedParameterCondition::ConditionType::inRange,
-                                streamParameterName(Qn::StreamIndex::primary, kResolution),
+                                streamParameterName(StreamIndex::primary, kResolution),
                                 primaryResolutionsRestrictedByAspectRatio.toList().join(L','))
                         },
                         lit("aspectRatio")));
@@ -460,7 +460,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
         }
     }
 
-    if (m_streamIndex == Qn::StreamIndex::primary)
+    if (m_streamIndex == StreamIndex::primary)
         return {codec, resolution};
 
     QnCameraAdvancedParameter bitrate;
@@ -507,7 +507,9 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
 }
 
 static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
-    const StreamCapabilityMap& capabilities, Qn::StreamIndex streamIndex, Camera* const camera)
+    const StreamCapabilityMap& capabilities,
+    nx::vms::api::StreamIndex streamIndex,
+    Camera* const camera)
 {
     std::map<QString, std::vector<QnLiveStreamParams>> optionsByCodec;
     for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
@@ -516,7 +518,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
         option.codec = it.key().codec;
         option.resolution = it.key().resolution;
 
-        if (streamIndex == Qn::StreamIndex::primary)
+        if (streamIndex == nx::vms::api::StreamIndex::primary)
         {
             option.fps = it.value().maxFps;
         }
@@ -534,7 +536,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
         }
 
         option.bitrateKbps = static_cast<int>(QnSecurityCamResource::rawSuggestBitrateKbps(
-            Qn::StreamQuality::normal, option.resolution, option.fps));
+            Qn::StreamQuality::normal, option.resolution, option.fps, option.codec));
 
         optionsByCodec[option.codec].push_back(option);
     }
@@ -555,7 +557,7 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
     const StreamCapabilityMap& capabilities, const QSize& baseResolution)
 {
     const auto recomendedOptions = calculateRecomendedOptions(capabilities, m_streamIndex, m_camera);
-    if (m_streamIndex == Qn::StreamIndex::primary)
+    if (m_streamIndex == StreamIndex::primary)
     {
         QnLiveStreamParams bestOption = recomendedOptions.front();
         for (const auto& option: recomendedOptions)
@@ -601,7 +603,7 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::bestParameters(
 
 QString StreamCapabilityAdvancedParametersProvider::proprtyName() const
 {
-    return m_streamIndex == Qn::StreamIndex::primary
+    return m_streamIndex == StreamIndex::primary
         ? lit("primaryStreamConfiguration") : lit("secondaryStreamConfiguration");
 }
 
@@ -611,11 +613,11 @@ QString StreamCapabilityAdvancedParametersProvider::parameterName(const QString&
 }
 
 QString StreamCapabilityAdvancedParametersProvider::streamParameterName(
-    Qn::StreamIndex stream,
+    StreamIndex stream,
     const QString & baseName)
 {
     return lm("%1.%2").args(
-        stream == Qn::StreamIndex::primary ? lit("primaryStream") : lit("secondaryStream"),
+        stream == StreamIndex::primary ? lit("primaryStream") : lit("secondaryStream"),
         baseName);
     return QString();
 }

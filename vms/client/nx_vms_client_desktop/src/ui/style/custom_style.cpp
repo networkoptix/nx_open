@@ -16,6 +16,7 @@
 #include <ui/style/globals.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/utils/log/log_message.h>
 #include <nx/vms/client/desktop/common/utils/object_companion.h>
 #include <nx/vms/client/desktop/common/utils/page_size_adjuster.h>
 
@@ -78,6 +79,23 @@ QString setWarningStyleHtml( const QString &source )
     return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);
 }
 
+void setWarningFrame(QWidget* widget, int frameWidth, int roundingRadius)
+{
+    static const auto styleTemplateRaw = lm(R"qss(
+        .QWidget {
+            border-style: solid;
+            border-color: %1;
+            border-width: %2;
+            border-radius: %3;
+        })qss");
+
+    const auto color = qnGlobals->errorTextColor();
+    const auto styleTemplate =
+        styleTemplateRaw.args(color.name(QColor::HexArgb), frameWidth, roundingRadius);
+
+    widget->setStyleSheet(styleTemplate);
+}
+
 void resetButtonStyle(QAbstractButton* button)
 {
     button->setProperty(style::Properties::kAccentStyleProperty, false);
@@ -127,19 +145,19 @@ void fadeWidget(
     std::function<void()> finishHandler,
     int animationFps)
 {
-    NX_ASSERT(widget, Q_FUNC_INFO, "No widget is specified");
+    NX_ASSERT(widget, "No widget is specified");
     if (!widget)
         return;
 
     auto oldEffect = widget->graphicsEffect();
     auto oldOpacityEffect = qobject_cast<QGraphicsOpacityEffect*>(oldEffect);
 
-    NX_ASSERT(!oldEffect || oldOpacityEffect, Q_FUNC_INFO, "Widget already has a graphics effect");
+    NX_ASSERT(!oldEffect || oldOpacityEffect, "Widget already has a graphics effect");
     if (oldEffect && !oldOpacityEffect)
         return;
 
     bool zeroSpeed = qFuzzyIsNull(fadeSpeed);
-    NX_ASSERT(!zeroSpeed, Q_FUNC_INFO, "Opacity speed should not be this low");
+    NX_ASSERT(!zeroSpeed, "Opacity speed should not be this low");
     if (zeroSpeed)
         return;
 

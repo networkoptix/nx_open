@@ -123,12 +123,12 @@ void* RelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int RelayIOManager::addRef()
+int RelayIOManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int RelayIOManager::releaseRef()
+int RelayIOManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -169,7 +169,10 @@ int RelayIOManager::setRelayOutputState(
     if( httpClient.get( QUrl(cmd) ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
     if( httpClient.statusCode() != SyncHttpClient::HTTP_OK )
-        return httpClient.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR; 
+    {
+        return httpClient.statusCode() ==
+            SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    }
 
     if( autoResetTimeoutMS > 0 )
     {
@@ -183,7 +186,7 @@ int RelayIOManager::setRelayOutputState(
 int RelayIOManager::startInputPortMonitoring()
 {
     //we can use QNetworkAccessManager from owning thread only, so performing async call
-        //this method has surely been called not from thread, object belongs to, 
+        //this method has surely been called not from thread, object belongs to,
         //so performing asynchronous call and waiting for its completion
 
     //int result = 0;
@@ -268,7 +271,7 @@ void RelayIOManager::onTimer()
         if( httpClient.get( QString::fromLatin1("/cgi-bin/io/input.cgi?check=%1").arg(portNumber) ) != QNetworkReply::NoError )
             return;
         if( httpClient.statusCode() != SyncHttpClient::HTTP_OK )
-            return; 
+            return;
         const QByteArray& body = httpClient.readWholeMessageBody().trimmed();
         const QList<QByteArray>& paramItems = body.split('=');
         if( paramItems.size() < 2 )

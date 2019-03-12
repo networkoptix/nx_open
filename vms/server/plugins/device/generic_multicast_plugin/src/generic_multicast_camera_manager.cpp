@@ -29,6 +29,7 @@ GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::Camera
     m_info(info),
     m_capabilities(0)
 {
+    m_pluginRef->addRef();
     m_capabilities
         |= nxcip::BaseCameraManager::audioCapability
         | nxcip::BaseCameraManager::shareIpCapability
@@ -68,12 +69,12 @@ void* GenericMulticastCameraManager::queryInterface(const nxpl::NX_GUID& interfa
     return nullptr;
 }
 
-unsigned int GenericMulticastCameraManager::addRef()
+int GenericMulticastCameraManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericMulticastCameraManager::releaseRef()
+int GenericMulticastCameraManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

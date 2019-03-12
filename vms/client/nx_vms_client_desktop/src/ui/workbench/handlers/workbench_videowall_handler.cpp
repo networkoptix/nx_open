@@ -533,7 +533,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
                 updateMode();
             };
         snapshotManager()->save(layout, callback);
-        propertyDictionary()->saveParamsAsync(layout->getId());
+        resourcePropertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
     {
@@ -1693,7 +1693,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
             break;
     }
 
-    NX_ASSERT(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
+    NX_ASSERT(valid, "Data should correspond to action profile.");
     if (!valid)
         return;
 

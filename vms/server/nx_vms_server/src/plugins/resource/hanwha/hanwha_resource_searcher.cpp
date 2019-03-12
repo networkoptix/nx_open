@@ -82,7 +82,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    if (resourceType->getManufacturer() != manufacturer())
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
@@ -91,7 +91,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
     return result;
 }
 
-QString HanwhaResourceSearcher::manufacture() const
+QString HanwhaResourceSearcher::manufacturer() const
 {
     return kHanwhaManufacturerName;
 }
@@ -137,7 +137,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     return result;
 }
 
-QnResourceList HanwhaResourceSearcher::findResources(void)
+QnResourceList HanwhaResourceSearcher::findResources()
 {
     QnResourceList upnpResults;
 
@@ -382,7 +382,7 @@ void HanwhaResourceSearcher::createResource(
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = commonModule()->dataPool()
+    QnResourceData resourceData = commonModule()->resourceDataPool()
         ->data(devInfo.manufacturer, devInfo.modelName);
 
     if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))

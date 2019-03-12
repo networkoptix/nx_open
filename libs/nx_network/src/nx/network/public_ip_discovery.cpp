@@ -39,7 +39,6 @@ PublicIPDiscovery::PublicIPDiscovery(QStringList primaryUrls):
 
     NX_ASSERT(
         !m_primaryUrls.isEmpty(),
-        Q_FUNC_INFO,
         "Server should have at least one public IP url");
 }
 

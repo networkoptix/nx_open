@@ -15,8 +15,6 @@
 #include <core/resource_management/layout_tour_state_manager.h>
 #include <core/dataprovider/data_provider_factory.h>
 
-#include <utils/media/ffmpeg_initializer.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
@@ -44,8 +42,6 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     m_commonModule->store(new Settings());
     settings_migration::migrate();
-
-    m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
     m_connectionFactory.reset(new ec2::RemoteConnectionFactory(

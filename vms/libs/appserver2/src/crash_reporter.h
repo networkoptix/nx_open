@@ -14,7 +14,7 @@
 
 namespace ec2 {
 
-class CrashReporter: public QnCommonModuleAware
+class CrashReporter: public /*mixin*/ QnCommonModuleAware
 {
 public:
     CrashReporter(QnCommonModule* commonModule);

@@ -15,7 +15,7 @@ namespace utils {
 class NX_UTILS_API Thread:
     public QThread,
     public QnStoppable,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
@@ -37,7 +37,7 @@ public:
     uintptr_t systemThreadId() const;
 
     /**
-     * @return Thread id of current thread. 
+     * @return Thread id of current thread.
      * On unix uses gettid function instead of pthread_self.
      * It allows to find thread in gdb.
      */

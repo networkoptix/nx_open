@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help="Config file", required=True)
     parser.add_argument('--source', help="Source binary", required=True)
-    parser.add_argument('--qml-root', help="Source binary", required=True)
+    parser.add_argument('--qml-root', help="Path to qml files", required=True)
     parser.add_argument('--output', help="Output directory", required=True)
     args = parser.parse_args()
 

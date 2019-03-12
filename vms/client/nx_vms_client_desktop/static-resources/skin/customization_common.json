@@ -598,8 +598,9 @@
     "QnTwoWayAudioWidget": {
         "palette": {
             "default": {
-            "window": "dark1.setAlpha(128)",
-            "windowText": "light1"
+                "window": "dark1.setAlpha(128)",
+                "midlight": "brand_core.setAlpha(179)",
+                "windowText": "light1"
             }
         },
         "colors": {
@@ -806,21 +807,6 @@
         }
     },
 
-    "QnMediaResourceWidget": {
-        "motionSensitivityColors": [
-            "light16",
-            "#627cd6",
-            "#23a4cb",
-            "#31baa2",
-            "#79bc66",
-            "#b8bc37",
-            "#fba405",
-            "#e97119",
-            "#d24729",
-            "#c22626"
-        ]
-    },
-
     "nx::vms::client::desktop::CameraMotionSettingsWidget": {
         "sensitivityColors": [
             "light16",
@@ -938,6 +924,14 @@
         }
     },
 
+    "QnWorkbenchWelcomeScreen": {
+        "palette": {
+            "default": {
+                "window": "dark3"
+            }
+        }
+    },
+
     "nx::vms::client::desktop::HintButton": {
         "palette": {
             "default": {
@@ -990,6 +984,23 @@
             "default": {
                 "window": "light10",
                 "windowText": "dark3"
+            }
+        }
+    },
+
+    "nx::vms::client::desktop::EmulatedNonClientArea": {
+        "palette": {
+            "default": {
+                "window": "dark14"
+            }
+        }
+    },
+
+    "nx::vms::client::desktop::DialogTitleBarWidget": {
+        "palette": {
+            "default": {
+                "window": "dark12",
+                "text": "light4"
             }
         }
     }

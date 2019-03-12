@@ -23,9 +23,6 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
-
-#include <update/updates_common.h>
-#include <update/update_info.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 
 #include <utils/color_space/image_correction.h>
@@ -33,7 +30,6 @@
 #include <utils/ping_utility.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
-#include <nx/vms/client/desktop/layout_templates/layout_template.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/client/desktop/utils/wearable_payload.h>
@@ -47,6 +43,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
+#include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
@@ -66,10 +63,8 @@ void QnClientMetaTypes::initialize()
 {
     static std::atomic_bool initialized = false;
 
-    if (initialized.load())
+    if (initialized.exchange(true))
         return;
-
-    initialized = true;
 
     nx::vms::client::core::initializeMetaTypes();
 
@@ -96,8 +91,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaType<ui::action::IDType>();
     qRegisterMetaType<ui::action::Parameters>();
-    qRegisterMetaType<QnUpdateInfo>();
-    qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
     qRegisterMetaType<Qn::ThumbnailStatus>();
@@ -132,10 +125,6 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
-    qRegisterMetaType<QnPeerUpdateStage>();
-    qRegisterMetaType<QnFullUpdateStage>();
-    qRegisterMetaType<QnUpdateResult>();
-    qRegisterMetaType<QnCheckForUpdateResult>();
     qRegisterMetaType<UploadState>();
     qRegisterMetaType<WearableState>();
     qRegisterMetaType<WearableUpload>();
@@ -145,8 +134,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<rest::QnConnectionPtr>();
 
     qRegisterMetaType<nx::vms::client::desktop::ExportMediaPersistentSettings>();
-
-    qRegisterMetaType<LayoutTemplate>();
 
     qRegisterMetaType<QnNotificationLevel::Value>();
 
@@ -203,5 +190,6 @@ void QnClientMetaTypes::registerQmlTypes()
     RecordingStatusHelper::registerQmlType();
     FocusFrameItem::registerQmlType();
     MotionRegionsItem::registerQmlType();
+    GlobalToolTip::registerQmlType();
 }
 

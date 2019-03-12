@@ -5,12 +5,12 @@
 #include <ctime>
 #include <cmath>
 
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/analytics/common/event.h>
-#include <nx/sdk/analytics/common/event_metadata_packet.h>
-#include <nx/sdk/analytics/common/object.h>
-#include <nx/sdk/analytics/common/object_metadata_packet.h>
-#include <nx/sdk/common/string_map.h>
+#include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/helpers/string_map.h>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -25,17 +25,18 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(Engine* engine):
-    VideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
-    m_objectId{{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}}
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
+    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
-    *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
+    generateObjectIds();
 }
 
 DeviceAgent::~DeviceAgent()
 {
-    m_terminated.store(true);
+    {
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_terminated = true;
+    }
     m_pluginEventGenerationLoopCondition.notify_all();
     if (m_pluginEventThread)
         m_pluginEventThread->join();
@@ -44,8 +45,9 @@ DeviceAgent::~DeviceAgent()
 /**
  * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
  * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
- * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
- * which are treated as white-list filters for the respective set.
+ * manifest. Also this manifest should declare supportedEventTypeIds and supportedObjectTypeIds
+ * lists which are treated as white-list filters for the respective set (absent lists are treated
+ * as empty lists, thus, disabling all types from the Engine).
  */
 std::string DeviceAgent::manifest() const
 {
@@ -53,6 +55,7 @@ std::string DeviceAgent::manifest() const
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
+        ")json" + kSuspiciousNoiseEventType + R"json(",
         ")json" + kObjectInTheAreaEventType + R"json("
     ],
     "supportedObjectTypeIds": [
@@ -60,13 +63,32 @@ std::string DeviceAgent::manifest() const
     ],
     "eventTypes": [
         {
-            "id": ")json" + kLineCrossingEventType + R"json(",
-            "name": "Line crossing"
+            "id": ")json" + kLoiteringEventType + R"json(",
+            "name": "Loitering"
         },
         {
-            "id": ")json" + kObjectInTheAreaEventType + R"json(",
-            "name": "Object in the area",
+            "id": ")json" + kIntrusionEventType + R"json(",
+            "name": "Intrusion",
             "flags": "stateDependent|regionDependent"
+        },
+        {
+            "id": ")json" + kGunshotEventType + R"json(",
+            "name": "Gunshot",
+            "groupId": ")json" + kSoundRelatedEventGroup + R"json("
+        }
+    ],
+    "objectTypes": [
+        {
+            "id": ")json" + kTruckObjectType + R"json(",
+            "name": "Truck"
+        },
+        {
+            "id": ")json" + kPedestrianObjectType + R"json(",
+            "name": "Pedestrian"
+        },
+        {
+            "id": ")json" + kBicycleObjectType + R"json(",
+            "name": "Bicycle"
         }
     ]
 }
@@ -86,7 +108,7 @@ void DeviceAgent::settingsReceived()
     }
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (engine()->needUncompressedVideoFrames())
     {
@@ -96,7 +118,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFra
 
     NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUsec = videoFrame->timestampUs();
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
     return true;
 }
 
@@ -111,7 +133,7 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
     NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
 
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUsec = videoFrame->timestampUs();
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
 
     return checkFrame(videoFrame);
 }
@@ -139,7 +161,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
         logMessage = "Objects generation disabled by .ini";
     }
 
-    m_lastVideoFrameTimestampUsec = 0;
+    m_lastVideoFrameTimestampUs = 0;
 
     NX_OUTPUT << __func__ << "() END -> true: " << logMessage;
     return true;
@@ -230,15 +252,19 @@ void DeviceAgent::processPluginEvents()
         // Sleep until the next event needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether
         // the timeout has occurred) and spurious wake-ups are ignored.
-        static const std::chrono::seconds kPluginEventGenerationPeriod{10};
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-        m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+        {
+            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            if (m_terminated)
+                break;
+            static const std::chrono::seconds kPluginEventGenerationPeriod{5};
+            m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+        }
     }
 }
 
-nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings() const
 {
-    auto settings = new nx::sdk::common::StringMap();
+    auto settings = new StringMap();
     settings->addItem("plugin_side_number", "100");
 
     return settings;
@@ -247,66 +273,151 @@ nx::sdk::IStringMap* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
-IMetadataPacket* DeviceAgent::cookSomeEvents()
+static IObjectMetadata* makeObjectMetadata(
+    std::string objectTypeId,
+    Uuid objectId,
+    double dt,
+    int64_t lastVideoFrameTimestampUs,
+    bool generatePreviewAttributes,
+    int objectIndex)
 {
-    ++m_counter;
-    if (m_counter > 1)
-    {
-        if (m_eventTypeId == kLineCrossingEventType)
-            m_eventTypeId = kObjectInTheAreaEventType;
-        else
-            m_eventTypeId = kLineCrossingEventType;
+    auto objectMetadata = new ObjectMetadata();
+    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
+    objectMetadata->setTypeId(objectTypeId);
+    objectMetadata->setId(objectId);
+    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) dt,
+        (float) dt + 0.05 * objectIndex, 0.25F, 0.25F));
 
-        m_counter = 0;
+    if (generatePreviewAttributes)
+    {
+        // Make a box smaller than the one in setBoundingBox() to make the change visible.
+        objectMetadata->addAttributes({
+            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
+                std::to_string(lastVideoFrameTimestampUs)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
+                std::to_string(dt)},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
+            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
+        });
     }
 
-    auto event = new nx::sdk::analytics::common::Event();
-    event->setCaption("Line crossing (caption)");
-    event->setDescription("Line crossing (description)");
-    event->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    event->setIsActive(m_counter == 1);
-    event->setTypeId(m_eventTypeId);
+    const std::map<std::string, std::vector<Attribute>> kObjectAttributes = {
+        {kCarObjectType, {
+            {IAttribute::Type::string, "Brand", "Tesla"},
+            {IAttribute::Type::string, "Model", "X"},
+            {IAttribute::Type::string, "Color", "Pink"},
+        }},
+        {kHumanFaceObjectType, {
+            {IAttribute::Type::string, "Sex", "Female"},
+            {IAttribute::Type::string, "Hair color", "Red"},
+            {IAttribute::Type::string, "Age", "29"},
+            {IAttribute::Type::string, "Name", "Triss"},
 
-    auto eventPacket = new nx::sdk::analytics::common::EventMetadataPacket();
-    eventPacket->setTimestampUs(usSinceEpoch());
-    eventPacket->setDurationUs(0);
-    eventPacket->addItem(event);
+        }},
+        {kTruckObjectType, {
+            {IAttribute::Type::string, "Length", "12 m"},
+        }},
+        {kPedestrianObjectType, {
+            {IAttribute::Type::string, "Direction", "Towards the camera"},
+            {IAttribute::Type::string, "Clothes color", "White"},
+        }},
+        {kBicycleObjectType, {
+            {IAttribute::Type::string, "Type", "Mountain bike"},
+        }},
+    };
+
+    objectMetadata->addAttributes(kObjectAttributes.at(objectTypeId));
+
+    return objectMetadata;
+}
+
+void DeviceAgent::generateObjectIds()
+{
+    int objectsCount = ini().objectsCount;
+    if (objectsCount < 1)
+    {
+        NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
+        objectsCount = 1;
+    }
+    m_objectIds.resize(objectsCount);
+    for (auto& objectId: m_objectIds)
+        objectId = UuidHelper::randomUuid();
+}
+
+IMetadataPacket* DeviceAgent::cookSomeEvents()
+{
+    std::string caption;
+    std::string description;
+    bool isActive;
+
+    if (m_eventTypeId == kLineCrossingEventType)
+    {
+        m_eventTypeId = kObjectInTheAreaEventType;
+        caption = "Object in the Area (caption)";
+        description = "Object in the Area (description)";
+        isActive = true;
+    }
+    else
+    {
+        m_eventTypeId = kLineCrossingEventType;
+        caption = "Line Crossing (caption)";
+        description = "Line Crossing (description)";
+        isActive = false;
+    }
+
+    auto eventMetadata = makePtr<EventMetadata>();
+    eventMetadata->setCaption(caption);
+    eventMetadata->setDescription(description);
+    eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
+    eventMetadata->setTypeId(m_eventTypeId);
+    eventMetadata->setIsActive(isActive);
+
+    auto eventMetadataPacket = new EventMetadataPacket();
+    eventMetadataPacket->setTimestampUs(usSinceEpoch());
+    eventMetadataPacket->setDurationUs(0);
+    eventMetadataPacket->addItem(eventMetadata.get());
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << m_eventTypeId << ", isActive: " << ((m_counter == 1) ? "true" : "false");
+        << "type: " << m_eventTypeId
+        << ", isActive: " << (isActive ? "true" : "false");
 
-    return eventPacket;
+    return eventMetadataPacket;
 }
 
 IMetadataPacket* DeviceAgent::cookSomeObjects()
 {
-    if (m_lastVideoFrameTimestampUsec == 0)
+    if (m_lastVideoFrameTimestampUs == 0)
         return nullptr;
 
     if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
         return nullptr;
-
-    auto object = new nx::sdk::analytics::common::Object();
-
-    object->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    object->setTypeId(kCarObjectType);
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
     const int sequentialNumber = static_cast<int>(intPart);
+    static const std::vector<std::string> kObjectTypes = {
+        kCarObjectType,
+        kHumanFaceObjectType,
+        kTruckObjectType,
+        kPedestrianObjectType,
+        kBicycleObjectType,
+    };
 
     if (m_currentObjectIndex != sequentialNumber)
     {
-        // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
-        std::time(reinterpret_cast<time_t*>(m_objectId.bytes)); //< Make ID pseudo-unique.
+        generateObjectIds();
         m_currentObjectIndex = sequentialNumber;
+        m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
+        ++m_currentObjectTypeIndex;
+
+        if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
+            m_currentObjectTypeIndex = 0;
     }
 
-    object->setId(m_objectId);
-    object->setBoundingBox(IObject::Rect((float) dt, (float) dt, 0.25F, 0.25F));
-
+    bool generatePreviewAttributes = false;
     if (dt < 0.5)
     {
         m_previewAttributesGenerated = false;
@@ -314,24 +425,26 @@ IMetadataPacket* DeviceAgent::cookSomeObjects()
     else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewAttributes)
     {
         m_previewAttributesGenerated = true;
-
-        // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        object->setAttributes({
-            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
-                std::to_string(m_lastVideoFrameTimestampUsec)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(dt)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y", std::to_string(dt)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"}
-        });
+        generatePreviewAttributes = true;
     }
 
-    auto objectPacket = new nx::sdk::analytics::common::ObjectMetadataPacket();
+    auto objectMetadataPacket = new ObjectMetadataPacket();
 
-    objectPacket->setTimestampUs(m_lastVideoFrameTimestampUsec);
-    objectPacket->setDurationUs(0);
-    objectPacket->addItem(object);
-    return objectPacket;
+    for (int i = 0; i < (int) m_objectIds.size(); ++i)
+    {
+        auto objectMetadata = toPtr(makeObjectMetadata(
+            m_objectTypeId,
+            m_objectIds[i],
+            dt,
+            m_lastVideoFrameTimestampUs,
+            generatePreviewAttributes,
+            i));
+        objectMetadataPacket->addItem(objectMetadata.get());
+    }
+
+    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
+    objectMetadataPacket->setDurationUs(0);
+    return objectMetadataPacket;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const
@@ -346,14 +459,13 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
     if (frame->pixelFormat() != engine()->pixelFormat())
     {
         NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
-            << nx::sdk::analytics::common::pixelFormatToStdString(frame->pixelFormat())
+            << pixelFormatToStdString(frame->pixelFormat())
             << " instead of "
-            << nx::sdk::analytics::common::pixelFormatToStdString(engine()->pixelFormat());
+            << pixelFormatToStdString(engine()->pixelFormat());
         return false;
     }
 
-    const auto* const pixelFormatDescriptor =
-        nx::sdk::analytics::common::getPixelFormatDescriptor(frame->pixelFormat());
+    const auto* const pixelFormatDescriptor = getPixelFormatDescriptor(frame->pixelFormat());
     if (!pixelFormatDescriptor)
         return false; //< Error is already logged.
 
@@ -399,7 +511,7 @@ bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
             else
             {
                 NX_PRINT_HEX_DUMP(
-                    nx::kit::debug::format("Plane %d bytes %d..%d of %d",
+                    nx::kit::utils::format("Plane %d bytes %d..%d of %d",
                         plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
                     frame->data(plane) + dumpOffset, dumpSize);
             }

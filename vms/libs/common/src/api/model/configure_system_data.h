@@ -10,7 +10,7 @@ struct ConfigureSystemData: public PasswordData
 {
     ConfigureSystemData():
         PasswordData(),
-        wholeSystem(false),
+        wholeSystem(true),
         sysIdTime(0),
         port(0),
         rewriteLocalSettings(false)

@@ -30,6 +30,9 @@ IsapiPtzController::IsapiPtzController(const QnResourcePtr& resource, QAuthentic
     if (const auto capabilities = m_client.get(url("capabilities")))
         loadCapabilities(*capabilities);
 
+    if (m_capabilities & Ptz::AbsolutePtrzCapabilities)
+        m_capabilities |= Ptz::DevicePositioningPtzCapability;
+
     NX_DEBUG(this, "Initilizad channel %1, capabilities: %2",
         *m_channel, QnLexical::serialized(m_capabilities));
 
@@ -79,7 +82,7 @@ bool IsapiPtzController::absoluteMove(
         return false;
 
     static const utils::log::Message request(R"xml(
-    <PTZData version=“2.0” xmlns=“http://www.isapi.org/ver20/XMLSchema”>
+    <PTZData version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
         <AbsoluteHigh>
             <elevation>%1</elevation>
             <azimuth>%2</azimuth>
@@ -369,7 +372,7 @@ void IsapiPtzController::loadCapabilities(
     }
     if (const auto presetNumber = capabilities.integer("maxPresetNum"))
     {
-        m_capabilities |= Ptz::PresetsPtzCapability;
+        m_capabilities |= Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability;
         m_maxPresetNumber = *presetNumber;
         if (const auto name = capabilities.child("PresetNameCap"))
         {

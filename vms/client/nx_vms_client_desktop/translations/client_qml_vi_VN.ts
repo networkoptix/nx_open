@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation>cho phép</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -56,10 +67,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation>CHẾ ĐỘ AN TOÀN</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation>KHÔNG THÍCH HỢP</translation>
     </message>
@@ -70,6 +77,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>Không thể sử dụng được</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation>CHẾ ĐỘ AN TOÀN</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -83,20 +94,21 @@
       <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>Bạn không có quyền truy cập vào %1. Một số tính năng có thể không khả dụng.</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Đang tải...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation>Kết nối đến các máy chủ khác...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation>Kết nối đến máy chủ...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Đang tải...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Bạn không có quyền truy cập vào %1. Một số tính năng có thể không khả dụng.</translation>
     </message>
   </context>
 </TS>

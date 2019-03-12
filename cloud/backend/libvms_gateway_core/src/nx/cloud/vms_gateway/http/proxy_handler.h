@@ -24,8 +24,7 @@ class ProxyHandler:
 public:
     ProxyHandler(
         const conf::Settings& settings,
-        const conf::RunTimeOptions& runTimeOptions,
-        relaying::AbstractListeningPeerPool* listeningPeerPool);
+        const conf::RunTimeOptions& runTimeOptions);
 
 protected:
     virtual void detectProxyTarget(
@@ -39,7 +38,6 @@ protected:
 private:
     const conf::Settings& m_settings;
     const conf::RunTimeOptions& m_runTimeOptions;
-    relaying::AbstractListeningPeerPool* m_listeningPeerPool;
 
     network::http::StatusCode::Value cutTargetFromUrl(
         nx::network::http::Request* const request,

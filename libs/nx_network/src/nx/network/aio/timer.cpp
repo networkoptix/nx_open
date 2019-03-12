@@ -89,13 +89,13 @@ void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
     decltype(m_handler) handler;
     m_handler.swap(handler);
 
-    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+    nx::utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
     const int internalTimerId = m_internalTimerId;
 
     m_timerStartClock = boost::none;
     handler();
 
-    if (watcher.objectDestroyed())
+    if (watcher.interrupted())
         return;
 
     QnMutexLocker lock(&m_mutex);

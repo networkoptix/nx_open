@@ -8,6 +8,8 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/vms/client/desktop/common/widgets/tree_view.h>
+#include <nx/vms/client/desktop/common/widgets/simple_selection_table_view.h>
+#include <nx/vms/client/desktop/node_view/selection_node_view/selection_node_view.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop::item_view_utils {
@@ -50,7 +52,15 @@ void toggleSelectedRows(
     {
         case BatchToggleMode::unify:
         {
-            const bool anyUnchecked = std::any_of(selectedRows.cbegin(), selectedRows.cend(),
+            QModelIndexList applicableCheckboxIndexes;
+            for (const auto& index: selectedRows)
+            {
+                if (!isCheckable || isCheckable(index))
+                    applicableCheckboxIndexes.append(index);
+            }
+
+            const bool anyUnchecked =
+                std::any_of(applicableCheckboxIndexes.cbegin(), applicableCheckboxIndexes.cend(),
                 [](const QModelIndex& index)
                 {
                     return index.data(Qt::CheckStateRole).toInt() != Qt::Checked;
@@ -58,11 +68,8 @@ void toggleSelectedRows(
 
             const int newValue = anyUnchecked ? Qt::Checked : Qt::Unchecked;
 
-            for (const auto& index: selectedRows)
-            {
-                if (!isCheckable || isCheckable(index))
-                    model->setData(index, newValue, Qt::CheckStateRole);
-            }
+            for (const auto& index: applicableCheckboxIndexes)
+                model->setData(index, newValue, Qt::CheckStateRole);
 
             break;
         }
@@ -99,27 +106,29 @@ void autoToggleOnRowClick(
         });
 }
 
+template <class T>
 void autoToggleOnSpaceKey(
-    TreeView* view,
+    T* view,
     int checkBoxColumn,
     BatchToggleMode toggleMode,
     IsCheckable isCheckable)
 {
     NX_ASSERT(view);
-    view->setIgnoreDefaultSpace(true);
+    view->setDefaultSpacePressIgnored(true);
 
-    QObject::connect(view, &TreeView::spacePressed,
+    QObject::connect(view, &T::spacePressed,
         [view, checkBoxColumn, toggleMode, isCheckable]()
         {
             toggleSelectedRows(view, checkBoxColumn, toggleMode, isCheckable);
         });
 }
 
-void autoToggleOnShiftClick(TreeView* view, int checkBoxColumn, IsCheckable isCheckable)
+template <class T>
+void autoToggleOnShiftClick(T* view, int checkBoxColumn, IsCheckable isCheckable)
 {
     NX_ASSERT(view);
 
-    QObject::connect(view, &TreeView::selectionChanging,
+    QObject::connect(view, &T::selectionChanging,
         [view, checkBoxColumn, isCheckable](
             QItemSelectionModel::SelectionFlags selectionFlags,
             const QModelIndex& index,
@@ -150,14 +159,19 @@ void autoToggleOnShiftClick(TreeView* view, int checkBoxColumn, IsCheckable isCh
 
             for (int i = range.first; i <= range.second; ++i)
             {
-                model->setData(index.sibling(i, checkBoxColumn),
-                    newCheckValue, Qt::CheckStateRole);
+                auto checkboxIndex = index.sibling(i, checkBoxColumn);
+                if (!isCheckable || isCheckable(checkboxIndex))
+                {
+                    if (checkboxIndex != index)
+                        model->setData(checkboxIndex, newCheckValue, Qt::CheckStateRole);
+                }
             }
         });
 }
 
+template <class T>
 void setupDefaultAutoToggle(
-    TreeView* view,
+    T* view,
     int checkBoxColumn,
     IsCheckable isCheckable)
 {
@@ -184,5 +198,11 @@ void setupDefaultAutoToggle(
     if (prohibitedModifiers.testFlag(Qt::ShiftModifier))
         autoToggleOnShiftClick(view, checkBoxColumn, isCheckable);
 }
+
+template void setupDefaultAutoToggle<TreeView>(TreeView*, int, IsCheckable);
+template void setupDefaultAutoToggle<SimpleSelectionTableView>(
+    SimpleSelectionTableView*, int, IsCheckable);
+template void setupDefaultAutoToggle<node_view::SelectionNodeView>(
+    node_view::SelectionNodeView*, int, IsCheckable);
 
 } // namespace nx::vms::client::desktop::item_view_utils

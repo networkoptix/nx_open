@@ -71,6 +71,7 @@
                     &quot;type&quot;: &quot;SpinBox&quot;,
                     &quot;name&quot;: &quot;number&quot;,
                     &quot;caption&quot;: &quot;Spin Box&quot;,
+                    &quot;description&quot;: &quot;A number&quot;,
                     &quot;defaultValue&quot;: 42,
                     &quot;value&quot;: 42,
                     &quot;minValue&quot;: 0,
@@ -80,6 +81,7 @@
                     &quot;type&quot;: &quot;DoubleSpinBox&quot;,
                     &quot;name&quot;: &quot;double&quot;,
                     &quot;caption&quot;: &quot;Double Spin Box&quot;,
+                    &quot;description&quot;: &quot;A real number&quot;,
                     &quot;defaultValue&quot;: 3.14,
                     &quot;value&quot;: 3.14,
                     &quot;minValue&quot;: 0.0,
@@ -89,6 +91,7 @@
                     &quot;type&quot;: &quot;ComboBox&quot;,
                     &quot;name&quot;: &quot;combobox&quot;,
                     &quot;caption&quot;: &quot;Combo Box&quot;,
+                    &quot;description&quot;: &quot;A choice&quot;,
                     &quot;defaultValue&quot;: &quot;value2&quot;,
                     &quot;value&quot;: &quot;value2&quot;,
                     &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
@@ -97,6 +100,7 @@
                     &quot;type&quot;: &quot;CheckBox&quot;,
                     &quot;name&quot;: &quot;checkbox&quot;,
                     &quot;caption&quot;: &quot;Check Box&quot;,
+                    &quot;description&quot;: &quot;True or False&quot;,
                     &quot;defaultValue&quot;: true,
                     &quot;value&quot;: true
                 },
@@ -112,12 +116,14 @@
                                 {
                                     &quot;type&quot;: &quot;Button&quot;,
                                     &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;
+                                    &quot;caption&quot;: &quot;Button 1&quot;,
+                                    &quot;description&quot;: &quot;Action 1&quot;
                                 },
                                 {
                                     &quot;type&quot;: &quot;Button&quot;,
                                     &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;
+                                    &quot;caption&quot;: &quot;Button 2&quot;,
+                                    &quot;description&quot;: &quot;Action 2&quot;
                                 }
                             ]
                         }

@@ -80,7 +80,7 @@ public:
      */
     void uncheckedWrite( const char *data, unsigned int size );
     //{
-    //    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    //    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!");
     //    memcpy(m_data + m_size, data, size);
     //    m_size += size;
     //}

@@ -13,7 +13,7 @@ namespace nx {
 namespace vms::server {
 namespace analytics {
 
-class RuleHolder: public QnCommonModuleAware
+class RuleHolder: public /*mixin*/ QnCommonModuleAware
 {
     using RuleId = QnUuid;
     using ResourceId = QnUuid;

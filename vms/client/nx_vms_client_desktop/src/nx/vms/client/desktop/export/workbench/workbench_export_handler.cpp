@@ -15,6 +15,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <platform/environment.h>
 #include <core/resource/user_resource.h>
@@ -64,6 +65,7 @@
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
 #include <nx/client/core/utils/grid_walker.h>
+#include <client_core/client_core_module.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -272,7 +274,8 @@ struct WorkbenchExportHandler::Private
             case FileExtension::mkv:
             case FileExtension::mp4:
             {
-                QnAviResourcePtr file(new QnAviResource(completeFilename));
+                QnAviResourcePtr file(
+                    new QnAviResource(completeFilename, qnClientCoreModule->commonModule()));
                 file->setStatus(Qn::Online);
                 resourcePool->addResource(file);
                 return file;
@@ -526,7 +529,19 @@ void WorkbenchExportHandler::runExport(ExportInstance&& context)
     if (exportProcessId.isNull())
         return;
 
+    QScopedPointer<QnMessageBox> startingExportMessageBox;
+    startingExportMessageBox.reset(new QnMessageBox(QnMessageBoxIcon::Information,
+        tr("Starting export..."), QString(), QDialogButtonBox::NoButton,
+        QDialogButtonBox::NoButton, mainWindowWidget()));
+
+    // Only show this message if startExport() takes some time.
+    // startExport() will call processEvents().
+    QTimer::singleShot(300, startingExportMessageBox.get(), &QDialog::show);
+
     d->exportManager->startExport(exportProcessId, std::move(exportTool));
+
+    // If no processEvents() called, the messageBox is destroyed and no timer will be called.
+    startingExportMessageBox.reset();
 
     const auto info = d->exportManager->info(exportProcessId);
 

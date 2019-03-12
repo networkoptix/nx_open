@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_factory.h>
 #include <nx/utils/random.h>
 #include <nx/utils/type_utils.h>
 
@@ -18,8 +18,8 @@ class AbstractClientTypeHolder
 public:
     virtual ~AbstractClientTypeHolder() = default;
 
-    virtual void registerType(api::ClientFactory* factory) const = 0;
-    virtual bool isSameType(api::Client* client) const = 0;
+    virtual void registerType(api::detail::ClientFactory* factory) const = 0;
+    virtual bool isSameType(api::AbstractClient* client) const = 0;
 };
 
 template<typename T>
@@ -27,12 +27,12 @@ class ClientTypeHolder:
     public AbstractClientTypeHolder
 {
 public:
-    virtual void registerType(api::ClientFactory* factory) const override
+    virtual void registerType(api::detail::ClientFactory* factory) const override
     {
         factory->registerClientType<T>();
     }
 
-    virtual bool isSameType(api::Client* client) const override
+    virtual bool isSameType(api::AbstractClient* client) const override
     {
         return dynamic_cast<T*>(client) != nullptr;
     }
@@ -217,8 +217,8 @@ protected:
 
 private:
     const nx::utils::Url m_relayUrl;
-    api::ClientFactory m_factory;
-    std::unique_ptr<api::Client> m_client;
+    api::detail::ClientFactory m_factory;
+    std::unique_ptr<api::AbstractClient> m_client;
     std::deque<std::unique_ptr<AbstractClientTypeHolder>> m_clientTypes;
     int m_operationalClientTypeId = -1;
     int m_remeberedClientTypeIndex = -1;

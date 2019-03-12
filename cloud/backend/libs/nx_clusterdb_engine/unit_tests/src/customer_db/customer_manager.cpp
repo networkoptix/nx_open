@@ -4,32 +4,47 @@
 
 namespace nx::clusterdb::engine::test {
 
+std::string toString(ResultCode result)
+{
+    switch (result)
+    {
+        case ResultCode::ok:
+            return "ok";
+        case ResultCode::error:
+            return "error";
+    }
+
+    return "unknown";
+}
+
+//-------------------------------------------------------------------------------------------------
+
 CustomerManager::CustomerManager(
-    SyncronizationEngine* syncronizationEngine,
+    SynchronizationEngine* synchronizationEngine,
     dao::CustomerDao* customerDao,
     const std::string& systemId)
     :
-    m_syncronizationEngine(syncronizationEngine),
+    m_synchronizationEngine(synchronizationEngine),
     m_customerDao(customerDao),
     m_systemId(systemId)
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->incomingCommandDispatcher()
+    m_synchronizationEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveCustomer>(
             [this](auto&&... args) { return processSaveCustomer(std::move(args)...); });
 
-    m_syncronizationEngine->incomingCommandDispatcher()
+    m_synchronizationEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::RemoveCustomer>(
             [this](auto&&... args) { return processRemoveCustomer(std::move(args)...); });
 }
 
 CustomerManager::~CustomerManager()
 {
-    m_syncronizationEngine->incomingCommandDispatcher()
+    m_synchronizationEngine->incomingCommandDispatcher()
         .removeHandler<command::RemoveCustomer>();
 
-    m_syncronizationEngine->incomingCommandDispatcher()
+    m_synchronizationEngine->incomingCommandDispatcher()
         .removeHandler<command::SaveCustomer>();
 }
 
@@ -39,7 +54,7 @@ void CustomerManager::saveCustomer(
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->transactionLog().startDbTransaction(
+    m_synchronizationEngine->transactionLog().startDbTransaction(
         m_systemId,
         [this, customer](auto&&... args)
         {
@@ -53,13 +68,22 @@ void CustomerManager::saveCustomer(
         });
 }
 
+ResultCode CustomerManager::saveCustomer(const Customer& customer)
+{
+    std::promise<ResultCode> done;
+    saveCustomer(
+        customer,
+        [&done](ResultCode resultCode) { done.set_value(resultCode); });
+    return done.get_future().get();
+}
+
 void CustomerManager::removeCustomer(
     const std::string& id,
     nx::utils::MoveOnlyFunc<void(ResultCode)> handler)
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->transactionLog().startDbTransaction(
+    m_synchronizationEngine->transactionLog().startDbTransaction(
         m_systemId,
         [this, id](auto&&... args) { return removeCustomerFromDb(std::move(args)..., id); },
         [handler = std::move(handler)](nx::sql::DBResult dbResult)
@@ -99,7 +123,7 @@ nx::sql::DBResult CustomerManager::saveCustomerToDb(
 
     m_customerDao->saveCustomer(queryContext, customer);
 
-    return m_syncronizationEngine->transactionLog()
+    return m_synchronizationEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveCustomer>(
             queryContext, m_systemId, customer);
 }
@@ -110,7 +134,7 @@ nx::sql::DBResult CustomerManager::removeCustomerFromDb(
 {
     m_customerDao->removeCustomer(queryContext, customerId);
 
-    return m_syncronizationEngine->transactionLog()
+    return m_synchronizationEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveCustomer>(
             queryContext, m_systemId, Id{customerId});
 }

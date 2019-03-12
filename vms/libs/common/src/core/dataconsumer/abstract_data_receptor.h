@@ -12,18 +12,22 @@
 class QnAbstractDataReceptor
 {
 public:
-    virtual ~QnAbstractDataReceptor() = default;
+    virtual ~QnAbstractDataReceptor() { NX_ASSERT(consumers.load() == 0,  consumers.load()); }
 
     /**
      * @return true, if subsequent QnAbstractDataReceptor::putData
      *   call is garanteed to accept input data.
      */
     virtual bool canAcceptData() const = 0;
+
     /**
      * NOTE: Can ignore data for some reasons (e.g., some internal buffer size is exceeded).
      * Data provider should use canAcceptData method to find out whether it is possible.
      */
     virtual void putData(const QnAbstractDataPacketPtr& data) = 0;
+
+    /** Sanity check. */
+    std::atomic<size_t> consumers{0};
 };
 
 using QnAbstractDataReceptorPtr = QSharedPointer<QnAbstractDataReceptor>;

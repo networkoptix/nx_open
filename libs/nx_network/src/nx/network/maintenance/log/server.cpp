@@ -20,11 +20,11 @@ using namespace nx::network::http;
 namespace {
 
 std::set<LoggerCollection::Context> removeDuplicates(
-    const LoggerCollection::LoggersByTag& loggersByTag)
+    const LoggerCollection::LoggersByFilter& loggersByFilters)
 {
     std::set<LoggerCollection::Context> uniqueLoggers;
 
-    for (const auto& element : loggersByTag)
+    for (const auto& element : loggersByFilters)
         uniqueLoggers.emplace(element.second);
 
     return uniqueLoggers;
@@ -75,7 +75,7 @@ void Server::serveGetLoggers(
     {
         loggers.loggers.push_back(utils::toLoggerInfo(
             loggerContext.logger,
-            m_loggerCollection->getEffectiveTags(loggerContext.id),
+            m_loggerCollection->getEffectiveFilters(loggerContext.id),
             loggerContext.id));
     }
 
@@ -121,11 +121,13 @@ void Server::servePostLogger(
     Settings logSettings;
     logSettings.loggers.push_back(utils::toLoggerSettings(newLoggerInfo));
 
+    // TODO: #nw I'd recommend to correctly fill logSettings.levelFilters instead of using
+    // ::tofilters here and pass raw filters to the logger.
     auto newLogger = LoggerBuilder::buildLogger(
         logSettings,
         QString(), //< TODO: #nw get the application name
         QString(), //< TODO: #nw get the appliation binary path
-        utils::toTags(newLoggerInfo.filters),
+        utils::toFilters(newLoggerInfo.filters),
         nullptr);
     if (!newLogger)
         return completionHandler(http::StatusCode::internalServerError);
@@ -140,7 +142,7 @@ void Server::servePostLogger(
 
     Logger loggerInfo = utils::toLoggerInfo(
         logger,
-        m_loggerCollection->getEffectiveTags(loggerId),
+        m_loggerCollection->getEffectiveFilters(loggerId),
         loggerId);
 
     http::RequestResult result(http::StatusCode::created);
@@ -166,11 +168,13 @@ void Server::serveGetStreamingLogger(
     Settings logSettings;
     logSettings.loggers.push_back(loggerSettings);
 
+    // TODO: #nw I'd recommend to correctly fill logSettings.levelFilters instead of using
+    // ::tofilters here and pass raw filters to the logger.
     auto newLogger = LoggerBuilder::buildLogger(
         logSettings,
         QString(), //< TODO: #nw get the application name
         QString(), //< TODO: #nw get the appliation binary path
-        utils::toTags(loggerSettings.level.filters),
+        utils::toFilters(loggerSettings.level.filters),
         std::move(logWriter));
     if (!newLogger)
         return completionHandler(http::StatusCode::internalServerError);

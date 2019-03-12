@@ -192,6 +192,7 @@ public:
     TCPSocket(TCPSocket&&) = delete;
     TCPSocket& operator=(TCPSocket&&) = delete;
 
+    virtual bool getProtocol(int* protocol) const override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -226,11 +227,15 @@ public:
     TCPServerSocket(TCPServerSocket&&) = delete;
     TCPServerSocket& operator=(TCPServerSocket&&) = delete;
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
     /**
      * Blocks until a new connection is established on this socket or error.
      * @return new connection socket.
      */
     static int accept(int sockDesc);
+
+    virtual bool getProtocol(int* protocol) const override;
 
     virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
@@ -267,6 +272,8 @@ public:
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
     UDPSocket& operator=(UDPSocket&&) = delete;
+
+    virtual bool getProtocol(int* protocol) const override;
 
     virtual SocketAddress getForeignAddress() const override;
 

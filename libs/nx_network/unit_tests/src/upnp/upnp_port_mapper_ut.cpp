@@ -119,7 +119,7 @@ TEST_F(UpnpPortMapper, ChangeExternalIp)
      EXPECT_EQ(queue7001.pop().address.toString(), lit("12.34.56.78"));
 
      portMapper.clientMock().changeExternalIp(HostAddress());
-     EXPECT_EQ(queue7001.pop().toString(), lit("12.34.56.78"));
+     EXPECT_EQ(queue7001.pop().address.toString(), lit("12.34.56.78"));
 
      portMapper.clientMock().changeExternalIp(lit("34.56.78.91"));
      EXPECT_EQ(queue7001.pop().address.toString(), lit("34.56.78.91"));

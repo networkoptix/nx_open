@@ -10,18 +10,17 @@ Controller::Controller(
     const Settings& settings,
     Model* model)
     :
-    m_syncronizationEngine(
+    m_synchronizationEngine(
         applicationId,
-        QnUuid::createUuid(), //< moduleId. TODO.
         settings.synchronization(),
         ProtocolVersionRange::any,
         &model->queryExecutor())
 {
 }
 
-SyncronizationEngine& Controller::syncronizationEngine()
+SynchronizationEngine& Controller::synchronizationEngine()
 {
-    return m_syncronizationEngine;
+    return m_synchronizationEngine;
 }
 
 } // namespace nx::clusterdb::engine

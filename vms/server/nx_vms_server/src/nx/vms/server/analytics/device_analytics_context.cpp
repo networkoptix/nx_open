@@ -58,6 +58,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
             ++itr;
     }
 
+    const bool deviceIsAlive = isDeviceAlive();
     for (const auto& engine: engines)
     {
         if (isEngineAlreadyBound(engine))
@@ -66,7 +67,9 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
         binding->setMetadataSink(m_metadataSink);
         m_bindings.emplace(engine->getId(), binding);
-        binding->startAnalytics(m_device->deviceAgentSettingsValues(engine->getId()));
+
+        if (deviceIsAlive)
+            binding->startAnalytics(m_device->deviceAgentSettingsValues(engine->getId()));
     }
 
     updateSupportedFrameTypes();
@@ -182,13 +185,7 @@ void DeviceAnalyticsContext::putFrame(
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
     FrameConverter frameConverter(
-        [&compressedFrame]() { return compressedFrame; },
-        [&uncompressedFrame, this]()
-        {
-            if (!uncompressedFrame)
-                issueMissingUncompressedFrameWarningOnce();
-            return uncompressedFrame;
-        });
+        compressedFrame, uncompressedFrame, &m_missingUncompressedFrameWarningIssued);
 
     for (auto& entry: m_bindings)
     {
@@ -234,7 +231,6 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
     }
 
     const auto isAlive = isDeviceAlive();
-
     for (auto& entry: m_bindings)
     {
         auto engineId = entry.first;
@@ -353,17 +349,6 @@ std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding
         return nullptr;
 
     return itr->second;
-}
-
-void DeviceAnalyticsContext::issueMissingUncompressedFrameWarningOnce()
-{
-    auto logLevel = nx::utils::log::Level::verbose;
-    if (!m_uncompressedFrameWarningIssued)
-    {
-        m_uncompressedFrameWarningIssued = true;
-        logLevel = nx::utils::log::Level::warning;
-    }
-    NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
 }
 
 } // namespace nx::vms::server::analytics

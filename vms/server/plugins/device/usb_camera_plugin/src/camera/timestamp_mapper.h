@@ -3,8 +3,7 @@
 #include <map>
 #include <optional>
 
-namespace nx {
-namespace usb_cam {
+namespace nx::usb_cam {
 
 class TimestampMapper
 {
@@ -14,17 +13,20 @@ public:
         // Don't allow too many dangling timestamps.
         if (m_timestamps.size() > kTimestampMaxSize)
             m_timestamps.clear();
-        m_timestamps.insert(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimestamp));
+        m_timestamps.push_back(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimestamp));
     }
 
     std::optional<uint64_t> takeNxTimestamp(int64_t ffmpegPts)
     {
         std::optional<uint64_t> nxTimeStamp;
-        auto it = m_timestamps.find(ffmpegPts);
-        if (it != m_timestamps.end())
+        for (auto it = m_timestamps.begin(); it != m_timestamps.end(); ++it)
         {
-            nxTimeStamp.emplace(it->second);
-            m_timestamps.erase(it);
+            if (ffmpegPts == it->first)
+            {
+                nxTimeStamp.emplace(it->second);
+                m_timestamps.erase(it);
+                break;
+            }
         }
         return nxTimeStamp;
     }
@@ -41,9 +43,8 @@ public:
     }
 
 private:
-    std::map<int64_t /*ffmpeg pts*/, uint64_t /*nx timestamp*/> m_timestamps;
+    std::vector<std::pair<int64_t /*ffmpeg pts*/, uint64_t /*nx timestamp*/>> m_timestamps;
     static constexpr int kTimestampMaxSize = 30;
 };
 
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam

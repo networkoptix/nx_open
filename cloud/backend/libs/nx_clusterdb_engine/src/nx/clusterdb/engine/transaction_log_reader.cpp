@@ -39,7 +39,7 @@ void CommandLogReader::readTransactions(
     const ReadCommandsFilter& readFilter,
     TransactionsReadHandler completionHandler)
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("systemId %1. Reading commands from (%2) to (%3)")
         .args(m_systemId, readFilter.from ? stateToString(*readFilter.from) : "none",
             readFilter.to ? stateToString(*readFilter.to) : "none"));
@@ -114,7 +114,8 @@ std::string stateToString(const vms::api::TranState& tranState)
         if (!str.empty())
             str += ", ";
 
-        str += it.key().id.toSimpleString().toStdString();
+        str += "{" + it.key().id.toSimpleString().toStdString() + ", " +
+            it.key().persistentId.toSimpleString().toStdString() + "}";
         str += ": ";
         str += std::to_string(it.value());
     }

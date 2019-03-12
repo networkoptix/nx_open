@@ -1,16 +1,13 @@
 import QtQuick 2.6;
-import QtQuick.Controls 1.2;
 import QtQuick.Window 2.2;
 import Nx 1.0;
 import Nx.Models 1.0;
 
 import com.networkoptix.qml 1.0;
 
-Rectangle
+Item
 {
     id: control;
-
-    color: ColorTheme.window;
 
     readonly property bool active: Window.visibility !== Window.Hidden
 
@@ -395,7 +392,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             textControl.text:
-                qsTr("You have no access to %1. Some features could be unavailable.")
+                qsTr("You have no access to %1. Some features could be unavailable.",
+                    "%1 is the cloud name (like Nx Cloud)")
                     .arg(AppInfo.cloudName());
         }
     }

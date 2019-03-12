@@ -3,8 +3,6 @@
 #include <chrono>
 #include <limits>
 
-#include <QtWidgets/QApplication>
-
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>

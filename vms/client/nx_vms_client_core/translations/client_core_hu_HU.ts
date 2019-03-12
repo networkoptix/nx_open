@@ -19,8 +19,8 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>Kilobyte</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
@@ -33,7 +33,7 @@
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabyte</numerusform>
+        <numerusform>Megabájt</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
@@ -46,7 +46,7 @@
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabyte</numerusform>
+        <numerusform>Gigabájt</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
@@ -59,7 +59,7 @@
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabyte</numerusform>
+        <numerusform>Terabájt</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
@@ -72,7 +72,7 @@
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabájt</numerusform>
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
@@ -108,52 +108,12 @@
       <translation>Ez a fiók nincs aktiválva. Kérjük ellenőrizze e-mailjét.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>A fiók zárolva van.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Igényelt szolgáltatás nem elérhető.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Ismeretlen realm.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Hibás kérés.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Érvénytelen alkalom.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Hitelesítő adatok nem érvényesek.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Érvénytelen adat érkezett.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Ismeretlen hiba.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Váratlan hálózati hiba. Ellenőrizze az Internetkapcsolatot és próbálkozzon újra.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Érvénytelen bejelentkezés.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>A kért objektum nem található.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Objektum már létezik.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -161,14 +121,17 @@
       <translation>Belső %1 hiba. Kérjük lépjen kapcsolatba az ügyfélszolgálattal.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sajnáljuk, de %1 szolgáltatás ideiglenesen nem elérhető. Mindent megteszünk a hiba mihamarabbi elhárítása érdekében. Kérjük, próbálkozzon újra később.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Túl sok próbálkozás. Próbálja újra később.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sajnáljuk, de %1 szolgáltatás nem tudta feldolgozni a kérést. Próbálja újra pár perc múlva.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

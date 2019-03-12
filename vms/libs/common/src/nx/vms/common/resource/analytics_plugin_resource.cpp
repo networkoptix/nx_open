@@ -61,4 +61,9 @@ bool AnalyticsPluginResource::hasDefaultEngine() const
     return true;
 }
 
+QString AnalyticsPluginResource::idForToStringFromPtr() const
+{
+    return lm("[%1 %2]").args(getName(), getId());
+}
+
 } // namespace nx::vms::common

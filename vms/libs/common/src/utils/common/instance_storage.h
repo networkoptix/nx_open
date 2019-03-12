@@ -54,7 +54,7 @@ protected:
     T* store(T* instance)
     {
         NX_ASSERT(&T::staticMetaObject != &QObject::staticMetaObject,
-            Q_FUNC_INFO, "Do you forget to add Q_OBJECT macro?");
+            "Do you forget to add Q_OBJECT macro?");
         NX_ASSERT(!m_instanceByMetaObject.contains(&T::staticMetaObject));
 
         m_instanceByMetaObject.insert(&T::staticMetaObject, instance);

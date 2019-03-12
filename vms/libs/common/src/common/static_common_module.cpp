@@ -11,6 +11,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
+#include <utils/media/ffmpeg_initializer.h>
 
 #include "common_meta_types.h"
 
@@ -32,12 +33,12 @@ QnStaticCommonModule::QnStaticCommonModule(
     m_private(new QnStaticCommonModulePrivate),
     m_localPeerType(localPeerType),
     m_brand(brand),
-    m_customization(customization),
-    m_engineVersion(QnAppInfo::engineVersion())
+    m_customization(customization)
 {
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
     instance<QnLongRunnablePool>();
+    instance<QnFfmpegInitializer>();
     nx::network::SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost);
 
     // Providing mediaserver-specific way of validating peer id.
@@ -51,7 +52,7 @@ QnStaticCommonModule::QnStaticCommonModule(
             });
 
     store(new QnLongRunableCleanup());
-    store(new nx::utils::TimerManager());
+    store(new nx::utils::TimerManager("QnStaticCommonModule::StandaloneTimerManager"));
 
     instance<QnSyncTime>();
     instance<nx::network::http::ClientPool>();
@@ -59,11 +60,12 @@ QnStaticCommonModule::QnStaticCommonModule(
 
 QnStaticCommonModule::~QnStaticCommonModule()
 {
-    clear();
-
+    instance<QnLongRunnablePool>()->stopAll();
     nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
         std::move(m_private->endpointVerificatorFactoryBak));
     nx::network::SocketGlobals::deinit();
+
+    clear();
 
     delete m_private;
     m_private = nullptr;
@@ -84,15 +86,6 @@ QString QnStaticCommonModule::customization() const
     return m_customization;
 }
 
-nx::utils::SoftwareVersion QnStaticCommonModule::engineVersion() const
-{
-    return m_engineVersion;
-}
-
-void QnStaticCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
-{
-    m_engineVersion = version;
-}
 
 void QnStaticCommonModule::setModuleShortId(const QnUuid& id, int number)
 {

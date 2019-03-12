@@ -10,7 +10,7 @@
 
 class QnResourceStatusWatcher:
     public QObject,
-    public QnCommonModuleAware,
+    public /*mixin*/ QnCommonModuleAware,
     public Singleton<QnResourceStatusWatcher>
 {
     Q_OBJECT

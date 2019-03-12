@@ -1,25 +1,23 @@
 #pragma once
 
 #include <client/client_color_types.h>
-
 #include <core/resource/resource_fwd.h>
-
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
-class QnTwoWayAudioWidgetPrivate;
+#include <nx/utils/impl_ptr.h>
 
-class QnTwoWayAudioWidget : public Customized<GraphicsWidget>
+class QnTwoWayAudioWidget: public Customized<GraphicsWidget>
 {
     Q_OBJECT
     Q_PROPERTY(QnTwoWayAudioWidgetColors colors READ colors WRITE setColors)
-    typedef Customized<GraphicsWidget> base_type;
+    using base_type = Customized<GraphicsWidget>;
 
 public:
     QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent = nullptr);
-    ~QnTwoWayAudioWidget();
+    virtual ~QnTwoWayAudioWidget() override;
 
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     void setFixedHeight(qreal height);
 
@@ -31,9 +29,10 @@ signals:
     void pressed();
 
 protected:
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+        override;
 
 private:
-    QScopedPointer<QnTwoWayAudioWidgetPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(QnTwoWayAudioWidget)
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };

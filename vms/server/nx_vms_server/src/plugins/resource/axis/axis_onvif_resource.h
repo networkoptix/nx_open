@@ -11,7 +11,8 @@ class QnAxisOnvifResource : public QnPlOnvifResource
     static int MAX_RESOLUTION_DECREASES_NUM;
 public:
     QnAxisOnvifResource(QnMediaServerModule* serverModule);
-    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps,
+        const QString& codec, Qn::ConnectionRole role = Qn::CR_Default) const override;
 };
 
 typedef QnSharedResourcePointer<QnAxisOnvifResource> QnAxisOnvifResourcePtr;

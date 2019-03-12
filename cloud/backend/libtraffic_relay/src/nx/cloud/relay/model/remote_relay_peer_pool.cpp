@@ -130,17 +130,18 @@ void RemoteRelayPeerPool::prepareDbStructure()
             }).wait();
 }
 
-cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
-    const std::string& domainName) const
+void RemoteRelayPeerPool::findRelayByDomain(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const
 {
     if (!m_dbReady)
-        return cf::make_ready_future(std::string());
+        return handler(std::string());
 
     auto whereString = whereStringForFind(domainName);
     std::string queryString = "SELECT node_id FROM cdb.relay_peers " + whereString;
     NX_VERBOSE(this, lm("find relay: query string: %1").arg(queryString));
 
-    return m_cassConnection->prepareQuery(queryString.c_str())
+    m_cassConnection->prepareQuery(queryString.c_str())
         .then(
             [this](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
             {
@@ -156,12 +157,14 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 return m_cassConnection->executeSelect(std::move(result.second));
             })
         .then(
-            [this, domainName](cf::future<std::pair<CassError, cassandra::QueryResult>> selectFuture)
+            [this, domainName, handler = std::move(handler)](
+                cf::future<std::pair<CassError, cassandra::QueryResult>> selectFuture)
             {
                 auto result = selectFuture.get();
                 if (result.first != CASS_OK)
                 {
                     NX_DEBUG(this, lm("Error selecting from cdb.relay_peers. %1").arg(result.first));
+                    handler(std::string());
                     return std::string();
                 }
 
@@ -169,7 +172,10 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 while (result.second.next())
                 {
                     if (!getQueryResultValue(result.second, "node_id", &relayHost))
+                    {
+                        handler(std::string());
                         return std::string();
+                    }
 
                     if (*relayHost == m_nodeId)
                     {
@@ -183,28 +189,32 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                         .arg(*relayHost)
                         .arg(domainName));
 
+                    handler(*relayHost);
                     return *relayHost;
                 }
 
                 NX_VERBOSE(this, lm("Failed to find relay host for domain %2").arg(domainName));
 
+                handler(std::string());
                 return std::string();
             });
 }
 
-cf::future<bool> RemoteRelayPeerPool::addPeer(const std::string& domainName)
+void RemoteRelayPeerPool::addPeer(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     if (!m_dbReady)
-        return cf::make_ready_future(false);
+        return handler(false);
 
     NX_ASSERT(!m_nodeId.empty());
     if (m_nodeId.empty())
     {
         NX_ERROR(this, "Node id must be set before adding peers");
-        return cf::make_ready_future(false);
+        return handler(false);
     }
 
-    return m_cassConnection->prepareQuery(
+    m_cassConnection->prepareQuery(
                     "INSERT INTO cdb.relay_peers ( \
                         node_id, \
                         domain_suffix_1, \
@@ -232,27 +242,31 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(const std::string& domainName)
                 return m_cassConnection->executeUpdate(std::move(prepareResult.second));
             })
         .then(
-            [this](cf::future<CassError> executeFuture)
+            [this, handler = std::move(handler)](cf::future<CassError> executeFuture)
             {
                 const auto resultCode = executeFuture.get();
                 if (resultCode != CASS_OK)
                 {
                     NX_VERBOSE(this,
                         lm("Error executing insert into cdb.relay_peers. %1").arg(resultCode));
+                    handler(false);
                     return false;
                 }
 
                 NX_VERBOSE(this, "Execute insert into cdb.relay_peers succeded");
+                handler(true);
                 return true;
             });
 }
 
-cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
+void RemoteRelayPeerPool::removePeer(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     if (!m_dbReady)
-        return cf::make_ready_future(false);
+        return handler(false);
 
-    return m_cassConnection->prepareQuery(
+    m_cassConnection->prepareQuery(
                     "DELETE FROM cdb.relay_peers WHERE \
                         domain_suffix_1=? AND \
                         domain_suffix_2=? AND \
@@ -279,17 +293,19 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
                 return m_cassConnection->executeUpdate(std::move(prepareResult.second));
             })
         .then(
-            [this](cf::future<CassError> executeFuture)
+            [this, handler = std::move(handler)](cf::future<CassError> executeFuture)
             {
                 const auto executeResult = executeFuture.get();
                 if (executeFuture.get() != CASS_OK)
                 {
                     NX_DEBUG(this, lm("Error executing delete from cdb.relay_peers. %1")
                         .arg(executeResult));
+                    handler(false);
                     return false;
                 }
 
                 NX_VERBOSE(this, "Execute delete from cdb.relay_peers succeded");
+                handler(true);
                 return true;
             });
 }

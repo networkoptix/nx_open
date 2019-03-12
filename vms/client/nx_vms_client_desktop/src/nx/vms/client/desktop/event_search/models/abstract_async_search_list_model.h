@@ -2,11 +2,10 @@
 
 #include <functional>
 
-#include <QtCore/QScopedPointer>
-
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
 
 namespace nx::vms::client::desktop {
@@ -24,7 +23,7 @@ protected:
     class Private;
     using CreatePrivate = std::function<Private*()>;
 
-    const QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 
     explicit AbstractAsyncSearchListModel(
         QnWorkbenchContext* context, CreatePrivate dCreator, QObject* parent = nullptr);

@@ -21,7 +21,7 @@ namespace ec2
     {
     public:
         QnHttpTransactionReceiver(
-			ServerTransactionMessageBus* messageBus,
+            ServerTransactionMessageBus* messageBus,
             std::unique_ptr<nx::network::AbstractStreamSocket> socket,
             QnTcpListener* owner );
         virtual ~QnHttpTransactionReceiver();

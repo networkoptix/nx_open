@@ -436,6 +436,12 @@
                     $scope.activeResolution = resolution;
                     updateVideoSource($scope.positionProvider.liveMode ? null : $scope.positionProvider.playedPosition);
                 };
+    
+                var fullElement = document.getElementById('fullscreen-area');
+    
+                angular.element(fullElement).on('dblclick', function (event) {
+                    screenfull.toggle(fullElement);
+                });
                 
                 $scope.enableFullScreen = screenfull.enabled;
                 var fullElement = $('.fullscreen-area').get(0);

@@ -1,44 +1,54 @@
-
 #pragma once
 
-namespace Qn
+namespace Qn {
+// Constant value set order of the button
+enum WidgetButtons
 {
-    // @note Constant value set order of the button
-    enum WidgetButtons
-    {
-        // Buttons for right panel
+    //---------------------------------------------------------------------------------------------
+    // Buttons for the right panel, sorting right-to-left.
 
-        // QnResourceWidget
-        CloseButton                 = 0x00001
-        , InfoButton                = 0x00004
-        , RotateButton              = 0x00008
+    // Close widgets, actual for all widgets.
+    CloseButton = 1 << 0,
 
-        // QnWebResourceWidget
-        , FullscreenButton          = 0x00002
+    // Switch to fullscreen, web pages only.
+    FullscreenButton = 1 << 1,
 
-        // QnMediaResourceWidget
-        , ScreenshotButton          = 0x00010
-        , MotionSearchButton        = 0x00020
-        , PtzButton                 = 0x00040
-        , FishEyeButton             = 0x00080
-        , ZoomWindowButton          = 0x00100
-        , EnhancementButton         = 0x00200
-        , DbgScreenshotButton       = 0x00400
-        , IoModuleButton            = 0x00800
-        , AnalyticsButton           = 0x01000
-        , EntropixEnhancementButton = 0x02000
+    // Show info, actual for all widgets.
+    InfoButton = 1 << 2,
 
-        // QnServerResourceWidget
-        , ShowLogButton             = 0x04000
-        , CheckIssuesButton         = 0x08000
+    // Rotate, actual for all widgets.
+    RotateButton = 1 << 3,
 
-        // Buttons for left panel
+    //---------------------------------------------------------------------------------------------
+    // Media Widget specific buttons.
 
-        // QnResourceWidget
-        , RecordingStatusIconButton = 0x10000
+    ScreenshotButton = 1 << 4,
+    MotionSearchButton = 1 << 5,
+    PtzButton = 1 << 6,
+    FishEyeButton = 1 << 7,
+    ZoomWindowButton = 1 << 8,
+    EnhancementButton = 1 << 9,
+    DbgScreenshotButton = 1 << 10,
+    IoModuleButton = 1 << 11,
+    EntropixEnhancementButton = 1 << 12,
 
-        // QnWebResourceWidget
-        , ReloadPageButton          = 0x20000
-        , BackButton                = 0x40000
-    };
-}
+    //---------------------------------------------------------------------------------------------
+    // Server statistics specific buttons.
+
+    ShowLogButton = 1 << 13,
+    CheckIssuesButton = 1 << 14,
+
+    //---------------------------------------------------------------------------------------------
+    // Buttons for the left panel, sorting left-to-right.
+
+    // Status of the recording, actual for cameras.
+    RecordingStatusIconButton = 1 << 15,
+
+    // Reload web page, web pages only.
+    ReloadPageButton = 1 << 16,
+
+    // Navigate back, web pages only.
+    BackButton = 1 << 17,
+};
+
+} // namespace Qn

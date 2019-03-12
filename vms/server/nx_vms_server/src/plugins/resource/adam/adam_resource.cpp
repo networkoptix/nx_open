@@ -17,7 +17,7 @@
 #include "adam_modbus_io_manager.h"
 #include <nx/utils/timer_manager.h>
 
-const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
+const QString QnAdamResource::kManufacturer(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule)
@@ -37,14 +37,7 @@ QnAdamResource::~QnAdamResource()
 
 QString QnAdamResource::getDriverName() const
 {
-    return kManufacture;
-}
-
-nx::vms::server::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
+    return kManufacturer;
 }
 
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
@@ -72,16 +65,16 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 
     m_ioManager.reset(new QnAdamModbusIOManager(this));
 
-    auto ports = m_ioManager->getInputPortList();
+    auto allPorts = m_ioManager->getInputPortList();
     auto outputs = m_ioManager->getOutputPortList();
-    ports.insert(ports.begin(), ports.begin(), ports.end());
+    allPorts.insert(allPorts.begin(), outputs.begin(), outputs.end());
 
     m_portTypes.clear();
-    for (const auto& port: ports)
+    for (const auto& port: allPorts)
         m_portTypes[port.id] = port.portType;
 
     setPortDefaultStates();
-    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
 
     setFlags(flags() | Qn::io_module);
     setProperty(ResourcePropertyKey::kIoConfigCapability, 1);
@@ -177,53 +170,52 @@ QnIOStateDataList QnAdamResource::ioPortStates() const
 
 bool QnAdamResource::setOutputPortState(
     const QString& outputId,
-    bool isActive,
-    unsigned int autoResetTimeoutMs )
+    bool newState,
+    unsigned int autoResetTimeoutMs)
 {
     QnMutexLocker lock(&m_mutex);
 
+    NX_VERBOSE(this, "Setting port [%1] state to [%2], auto reset timeout [%3]",
+        outputId, newState, autoResetTimeoutMs);
     if (!m_ioManager)
         return false;
 
-    if (!isActive)
+    auto timerIt = std::find_if(m_autoResetTimers.begin(), m_autoResetTimers.end(),
+        [&outputId](const auto &timer){ return timer.second.portId == outputId; });
+    if (timerIt != m_autoResetTimers.end())
     {
-        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end(); ++it)
-        {
-            auto timerId = it->first;
-            auto portTimerEntry = it->second;
-            if (it->second.portId == outputId)
-            {
-                nx::utils::TimerManager::instance()->deleteTimer(timerId);
-                it = m_autoResetTimers.erase(it);
-                break;
-            }
-        }
+        NX_VERBOSE(this, "Cancelling scheduled IO port [%1] change", outputId);
+        nx::utils::TimerManager::instance()->deleteTimer(timerIt->first);
+        m_autoResetTimers.erase(timerIt);
     }
 
-    if (isActive && autoResetTimeoutMs)
+    if (autoResetTimeoutMs &&
+        newState != nx_io_managment::isActiveIOPortState(m_ioManager->getPortDefaultState(outputId)))
     {
-        auto autoResetTimer = nx::utils::TimerManager::instance()->addTimer(
-            [this](quint64  timerId)
+        auto autoResetTimerId = nx::utils::TimerManager::instance()->addTimer(
+            [this, outputId, newState](quint64  timerId)
             {
                 QnMutexLocker lock(&m_mutex);
-                if (m_autoResetTimers.count(timerId))
-                {
-                    auto timerEntry = m_autoResetTimers[timerId];
-                    m_ioManager->setOutputPortState(
-                        timerEntry.portId,
-                        timerEntry.state);
-                }
+                if (!m_autoResetTimers.count(timerId))
+                    return;
+
+                NX_VERBOSE(this, "Setting port [%1] back to state [%2]", outputId, !newState);
+                auto timerEntry = m_autoResetTimers[timerId];
                 m_autoResetTimers.erase(timerId);
+
+                m_ioManager->setOutputPortState(
+                    timerEntry.portId,
+                    timerEntry.state);
             },
             std::chrono::milliseconds(autoResetTimeoutMs));
 
         PortTimerEntry portTimerEntry;
         portTimerEntry.portId = outputId;
-        portTimerEntry.state = !isActive;
-        m_autoResetTimers[autoResetTimer] = portTimerEntry;
+        portTimerEntry.state = !newState;
+        m_autoResetTimers[autoResetTimerId] = portTimerEntry;
     }
 
-    return m_ioManager->setOutputPortState(outputId, isActive);
+    return m_ioManager->setOutputPortState(outputId, newState);
 }
 
 void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)

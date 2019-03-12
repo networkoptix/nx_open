@@ -79,7 +79,7 @@ void View::registerStunApiHandlers(
                     std::move(connection), std::move(message));
             });
 
-    NX_ASSERT(result, Q_FUNC_INFO, "Could not register ping processor");
+    NX_ASSERT(result, "Could not register ping processor");
 }
 
 void View::registerStunApiHandlers(
@@ -114,7 +114,7 @@ void View::registerStunApiHandlers(
             network::stun::extension::methods::clientBind,
             detail::createRequestProcessor(&PeerRegistrator::clientBind, peerRegistrator));
 
-    NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of PeerRegistrator methods");
+    NX_ASSERT(result, "Could not register one of PeerRegistrator methods");
 }
 
 void View::registerStunApiHandlers(

@@ -36,12 +36,12 @@ void* GenericRTSPDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfac
     return NULL;
 }
 
-unsigned int GenericRTSPDiscoveryManager::addRef()
+int GenericRTSPDiscoveryManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int GenericRTSPDiscoveryManager::releaseRef()
+int GenericRTSPDiscoveryManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }
@@ -67,7 +67,7 @@ int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const 
     QByteArray auxData = QByteArray("test_aux_data_") + QByteArray::number(++seq);
     strcpy( cameras[0].auxiliaryData, auxData.constData() );
     strcpy( cameras[0].modelName, "rtsp_model_name" );
-    
+
     return 1;
 #else
     return 0;

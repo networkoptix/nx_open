@@ -60,7 +60,7 @@ void ConnectorExecutor::start(CompletionHandler handler)
             if (m_connectors.empty())
                 return reportNoSuitableConnectMethod();
 
-            NX_VERBOSE(this, lm("cross-nat %1. Starting %2 connector(s)")
+            NX_VERBOSE(this, lm("cross-nat %1. Starting %2 connectors")
                 .arg(m_connectSessionId).arg(m_connectors.size()));
 
             auto connectorWithMinDelayIter = std::min_element(

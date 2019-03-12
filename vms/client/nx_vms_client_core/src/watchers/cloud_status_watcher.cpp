@@ -18,7 +18,7 @@
 
 #include <cloud/cloud_connection.h>
 #include <network/cloud_system_data.h>
-#include <utils/common/app_info.h>
+#include <network/connection_validator.h>
 #include <utils/common/delayed.h>
 #include <utils/common/id.h>
 
@@ -27,7 +27,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 #include <nx/vms/api/data/cloud_system_data.h>
+#include <helpers/system_helpers.h>
 
 using namespace nx::cloud::db;
 
@@ -44,20 +46,9 @@ const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
-bool isCustomizationCompatible(const QString& customization, bool isMobile)
-{
-    const auto currentCustomization = QnAppInfo::customizationName();
-
-    if (customization.isEmpty() || currentCustomization.isEmpty())
-        return true;
-
-    return currentCustomization == customization
-        || (isMobile
-            && currentCustomization.section(L'_', 0, 0) == customization.section(L'_', 0, 0));
-}
-
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, bool isMobile)
 {
+    const auto currentCustomization = nx::utils::AppInfo::customizationName();
     QnCloudSystemList result;
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
@@ -67,7 +58,9 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
 
         const auto customization = QString::fromStdString(systemData.customization);
 
-        if (!isCustomizationCompatible(customization, isMobile))
+        const bool compatibleCustomization = QnConnectionValidator::isCompatibleCustomization(
+            customization, currentCustomization, isMobile);
+        if (!compatibleCustomization)
             continue;
 
         auto data = QJson::deserialized<nx::vms::api::CloudSystemData>(
@@ -197,7 +190,6 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
                 case QnCloudStatusWatcher::LoggedOut:
                     d->setRecentCloudSystems(QnCloudSystemList());
                     d->cloudConnection.reset();
-                    resetCredentials(true);
                     break;
                 default:
                     break;
@@ -304,18 +296,7 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void QnCloudStatusWatcher::resetCredentials(bool keepUser)
 {
-    if (keepUser)
-    {
-        nx::vms::client::core::settings()->cloudCredentials = {
-            nx::vms::client::core::settings()->cloudCredentials().user, QString()};
-
-        // Updating login if were logged under temporary credentials.
-        setCredentials({qnCloudStatusWatcher->effectiveUserName(), QString()});
-    }
-    else
-    {
-        setCredentials({});
-    }
+    setCredentials({keepUser ? qnCloudStatusWatcher->effectiveUserName() : QString(), QString()});
 }
 
 bool QnCloudStatusWatcher::setCredentials(
@@ -577,7 +558,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     }
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
-    cloudConnection->setCredentials(credentials.user.toStdString(), 
+    cloudConnection->setCredentials(credentials.user.toStdString(),
         credentials.password.toStdString());
 
     /* Very simple email check. */
@@ -612,6 +593,8 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
         && errorCode == QnCloudStatusWatcher::InvalidPassword)
     {
         NX_ERROR(this, "Detected invalid user password. Forcing logout. Could it be user has changed the password?");
+        q->resetCredentials(true);
+        nx::vms::client::core::helpers::forgetSavedCloudCredentials(true);
         emit q->forcedLogout();
     }
 

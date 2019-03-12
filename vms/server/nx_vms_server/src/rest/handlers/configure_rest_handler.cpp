@@ -26,7 +26,9 @@
 #include "media_server/serverutil.h"
 #include "media_server/settings.h"
 #include <nx/vms/utils/system_merge_processor.h>
-#include <network/universal_tcp_listener.h>
+
+#include "private/multiserver_request_helper.h"
+#include <media_server/new_system_flag_watcher.h>
 
 namespace
 {
@@ -107,21 +109,10 @@ int QnConfigureRestHandler::execute(
         return nx::network::http::StatusCode::ok;
     }
 
-    if (data.hasPassword())
+    if (data.hasPassword()
+        && !detail::verifyPasswordOrSetError(owner, data.currentPassword, &result))
     {
-        if (data.currentPassword.isEmpty())
-        {
-            result.setError(QnJsonRestResult::CantProcessRequest,
-                lit("currentPassword is required for password change"));
-            return nx::network::http::StatusCode::ok;
-        }
-
-        const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
-        if (!authenticator->isPasswordCorrect(owner->accessRights(), data.currentPassword))
-        {
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
-            return nx::network::http::StatusCode::ok;
-        }
+        return nx::network::http::StatusCode::ok;
     }
 
     // Configure request must support systemName changes to maintain compatibility with NxTool
@@ -129,6 +120,8 @@ int QnConfigureRestHandler::execute(
     {
         owner->globalSettings()->setSystemName(data.systemName);
         owner->globalSettings()->synchronizeNowSync();
+        // Update it now to prevent race condition. Normally it is updated with delay.
+        serverModule()->findInstance<QnNewSystemServerFlagWatcher>()->update();
     }
 
     /* set system id and move tran log time */

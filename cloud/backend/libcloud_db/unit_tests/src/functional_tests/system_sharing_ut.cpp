@@ -26,7 +26,7 @@ protected:
         m_otherAccount = addActivatedAccount2();
     }
 
-    void givenSystemSharedToMultipleAccount()
+    void givenSystemSharedToMultipleAccounts()
     {
         m_system = addRandomSystemToAccount(m_ownerAccount);
         shareSystemEx(
@@ -41,10 +41,48 @@ protected:
         m_prevResult = getSystemSharings(m_system.id, m_system.authKey, &m_systemUsers);
     }
 
+    void whenRequestUserList(const AccountWithPassword& account)
+    {
+        m_prevResult = getSystemSharings(account.email, account.password, &m_systemUsers);
+    }
+
+    void whenUserRemovesAnotherUser(
+        const AccountWithPassword& user,
+        const std::string& userToRemove)
+    {
+        m_prevResult = shareSystem(
+            user.email,
+            user.password,
+            m_system.id,
+            userToRemove,
+            api::SystemAccessRole::none);
+    }
+
+    void thenRequestSucceeded()
+    {
+        ASSERT_EQ(api::ResultCode::ok, m_prevResult);
+    }
+
+    void thenRequestFailedWithResult(api::ResultCode expected)
+    {
+        ASSERT_EQ(expected, m_prevResult);
+    }
+
     void thenUserListIsReturned()
     {
         ASSERT_EQ(api::ResultCode::ok, m_prevResult);
         ASSERT_EQ(2U, m_systemUsers.size());
+    }
+
+    void assertOwnerHasAccessToTheSystem()
+    {
+        whenRequestUserList(m_ownerAccount);
+        thenRequestSucceeded();
+    }
+
+    const AccountWithPassword& ownerAccount() const
+    {
+        return m_ownerAccount;
     }
 
 private:
@@ -57,9 +95,17 @@ private:
 
 TEST_F(SystemSharingNew, system_credentials_can_be_used_to_get_user_list)
 {
-    givenSystemSharedToMultipleAccount();
+    givenSystemSharedToMultipleAccounts();
     whenRequestUserListUsingSystemCredentials();
     thenUserListIsReturned();
+}
+
+TEST_F(SystemSharingNew, owner_cannot_be_removed)
+{
+    whenUserRemovesAnotherUser(ownerAccount(), ownerAccount().email);
+
+    thenRequestFailedWithResult(api::ResultCode::forbidden);
+    assertOwnerHasAccessToTheSystem();
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -13,7 +13,7 @@ Button
     property color textColor: ColorTheme.windowText
     property color highlightColor: "#30ffffff"
     property real radius: 2
-    property real labelPadding: 24
+    property real labelPadding: text ? 24 : 0
 
     property alias mouseX: mouseTracker.mouseX
     property alias mouseY: mouseTracker.mouseY

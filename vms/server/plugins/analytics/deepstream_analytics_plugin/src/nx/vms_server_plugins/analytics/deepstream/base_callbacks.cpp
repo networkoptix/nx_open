@@ -1,11 +1,13 @@
 #include "base_callbacks.h"
-#include "base_pipeline.h"
 
-#include "deepstream_analytics_plugin_ini.h"
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
+
+#include "deepstream_analytics_plugin_ini.h"
+#include "base_pipeline.h"
 
 namespace nx{
 namespace vms_server_plugins {
@@ -16,20 +18,18 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    nxpt::ScopedRef<nx::sdk::analytics::IDataPacket> frame(pipeline->nextDataPacket(), false);
+    const auto frame = nx::sdk::toPtr(pipeline->nextDataPacket());
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
         return;
     }
 
-    nxpt::ScopedRef<nx::sdk::analytics::CompressedVideoPacket> video(
-        (nx::sdk::analytics::CompressedVideoPacket*) frame->queryInterface(
-            nx::sdk::analytics::IID_CompressedVideoPacket));
-
+    const auto video =
+        nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(frame);
     if (!video)
     {
-        NX_OUTPUT << __func__ << " Can not convert data packet to 'CompressedVideoPacket'";
+        NX_OUTPUT << __func__ << " Can not convert data packet to 'ICompressedVideoPacket'";
         return;
     }
 
@@ -51,8 +51,6 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
     gst_memory_unmap(memory, &info);
     gst_buffer_unref(buffer);
 
-    video->releaseRef();
-
     if (result != GST_FLOW_OK)
     {
         NX_PRINT << __func__ << " Error while pushing buffer";
@@ -60,7 +58,7 @@ void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
     }
 }
 
-void connectPads(GstElement* source, GstPad* newPad, gpointer userData)
+void connectPads(GstElement* /*source*/, GstPad* newPad, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Connecting pads on 'pad-added' signal";
     GstPad* sinkPad = (GstPad*) userData;
@@ -82,7 +80,7 @@ void connectPads(GstElement* source, GstPad* newPad, gpointer userData)
     NX_OUTPUT << "Pad succesfully linked" << std::endl;
 }
 
-gboolean busCallback(GstBus* bus, GstMessage* message, gpointer userData)
+gboolean busCallback(GstBus* /*bus*/, GstMessage* message, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling GStreamer bus callback";
     auto pipeline = (deepstream::BasePipeline*) userData;

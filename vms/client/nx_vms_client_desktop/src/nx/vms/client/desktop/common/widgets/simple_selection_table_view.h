@@ -13,29 +13,16 @@ class SimpleSelectionTableView: public TableView
 
 public:
     SimpleSelectionTableView(QWidget* parent = nullptr);
-
     virtual ~SimpleSelectionTableView() override;
 
     void setCheckboxColumn(int column, bool checkboxInHeader = true);
-
     int getCheckedCount() const;
 
 public:
-    virtual void keyPressEvent(QKeyEvent* event) override;
-
-    virtual void setModel(QAbstractItemModel *newModel) override;
+    virtual void setModel(QAbstractItemModel* newModel) override;
 
 private:
     void setupHeader();
-
-    void handleClicked(const QModelIndex& index);
-
-    void handleSpacePressed();
-
-    QModelIndex getCheckboxIndex(const QModelIndex& index) const;
-
-    bool isChecked(const QModelIndex& index) const;
-
     void handleHeaderCheckedStateChanged(Qt::CheckState state);
 
 private:

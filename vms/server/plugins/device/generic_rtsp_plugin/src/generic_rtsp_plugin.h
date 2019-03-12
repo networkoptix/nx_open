@@ -15,7 +15,7 @@
 
 /*! \main
     Object life-time management:\n
-    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
+    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor)
         to factory class instance (e.g., \a AxisCameraManager is a factory for \a AxisRelayIOManager, \a AxisMediaEncoder, etc.)
     - all factory classes (except for \a AxisCameraDiscoveryManager) hold pointer to child class object (e.g., \a AxisRelayIOManager is a child for \a AxisCameraManager)
         and delete all children on destruction
@@ -38,9 +38,9 @@ public:
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementation of nxpl::PluginInterface::addRef
-    virtual unsigned int addRef() override;
+    virtual int addRef() const override;
     //!Implementation of nxpl::PluginInterface::releaseRef
-    virtual unsigned int releaseRef() override;
+    virtual int releaseRef() const override;
 
     //!Implementation of nxpl::Plugin::name
     virtual const char* name() const override;

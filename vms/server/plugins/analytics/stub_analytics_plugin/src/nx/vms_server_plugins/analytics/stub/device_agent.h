@@ -4,8 +4,11 @@
 #include <atomic>
 #include <memory>
 #include <condition_variable>
+#include <vector>
+#include <string>
 
-#include <nx/sdk/analytics/common/video_frame_processing_device_agent.h>
+#include <nx/sdk/uuid.h>
+#include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 
 #include "engine.h"
 
@@ -14,10 +17,10 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
-class DeviceAgent: public nx::sdk::analytics::common::VideoFrameProcessingDeviceAgent
+class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
-    DeviceAgent(Engine* engine);
+    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
@@ -31,7 +34,7 @@ protected:
     virtual void settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;
+        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
     virtual bool pushUncompressedVideoFrame(
         const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
@@ -47,7 +50,7 @@ private:
 
     int64_t usSinceEpoch() const;
 
-    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) const;
+    bool checkFrame(const nx::sdk::analytics::IUncompressedVideoFrame* frame) const;
 
     nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
@@ -56,11 +59,13 @@ private:
 
     void processPluginEvents();
 
+    void generateObjectIds();
+
 private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_terminated{false};
+    bool m_terminated = false;
 
     std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;
@@ -69,18 +74,27 @@ private:
 
     bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;
-    int m_counter = 0;
     int m_objectCounter = 0;
     int m_currentObjectIndex = -1;
-    nxpl::NX_GUID m_objectId;
+    std::vector<nx::sdk::Uuid> m_objectIds;
     std::string m_eventTypeId;
-    int64_t m_lastVideoFrameTimestampUsec = 0;
+    std::string m_objectTypeId;
+    int m_currentObjectTypeIndex = 0;
+    int64_t m_lastVideoFrameTimestampUs = 0;
 };
 
 const std::string kLineCrossingEventType = "nx.stub.lineCrossing";
 const std::string kObjectInTheAreaEventType = "nx.stub.objectInTheArea";
+const std::string kLoiteringEventType = "nx.stub.loitering";
+const std::string kIntrusionEventType = "nx.stub.intrusion";
+const std::string kGunshotEventType = "nx.stub.gunshot";
+const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
+const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
 const std::string kCarObjectType = "nx.stub.car";
 const std::string kHumanFaceObjectType = "nx.stub.humanFace";
+const std::string kTruckObjectType = "nx.stub.truck";
+const std::string kPedestrianObjectType = "nx.stub.pedestrian";
+const std::string kBicycleObjectType = "nx.stub.bicycle";
 
 } // namespace stub
 } // namespace analytics

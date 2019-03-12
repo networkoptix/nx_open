@@ -38,6 +38,8 @@ public:
     const bool isIoModule;
     bool isExportedLayout = false;
     bool isPreviewSearchLayout = false;
+    bool isAnalyticsSupported = false;
+    QnUuid twoWayAudioWidgetId;
 
     QScopedPointer<nx::vms::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
@@ -77,6 +79,9 @@ private:
 
     void updateIsUnauthorized();
     void setIsUnauthorized(bool value);
+
+    bool calculateIsAnalyticsSupported() const;
+    void updateIsAnalyticsSupported();
 
 private:
     QnResourceDisplayPtr m_display;

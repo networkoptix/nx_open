@@ -16,7 +16,7 @@ class QnPtzControllerPoolPrivate;
 
 class QnPtzControllerPool:
     public Connective<QObject>,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

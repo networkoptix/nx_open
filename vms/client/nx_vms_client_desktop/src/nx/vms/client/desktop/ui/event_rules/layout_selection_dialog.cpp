@@ -119,7 +119,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             treeView->header()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
-            treeView->setIgnoreDefaultSpace(true);
+            treeView->setDefaultSpacePressIgnored(true);
             item_view_utils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             if (singlePick)
             {

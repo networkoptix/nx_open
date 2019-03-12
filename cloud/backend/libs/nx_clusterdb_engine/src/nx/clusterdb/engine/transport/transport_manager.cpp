@@ -28,16 +28,13 @@ std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createC
 {
     using namespace nx::network;
 
-    const auto syncApiTargetUrl = url::Builder(targetUrl).appendPath(
-        http::rest::substituteParameters(kBaseSynchronizationPath, {systemId})).toUrl();
-
     // TODO: #ak Is this class really needed?
 
     return ConnectorFactory::instance().create(
         m_protocolVersionRange,
         m_commandLog,
         m_outgoingCommandFilter,
-        syncApiTargetUrl,
+        targetUrl,
         systemId,
         m_nodeId);
 }

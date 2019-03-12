@@ -25,12 +25,43 @@ bool TranState::operator<(const TranState& right) const
             return false;    //< Equal.
 
         if (thisIter.key() < rightIter.key())
-            return true;   //< this has a record with a lesser key on the some position.
+            return true;   //< this has a record with a lesser key on the same position.
         if (thisIter.key() > rightIter.key())
-            return false;  //< this has a record with a greater key on the some position.
+            return false;  //< this has a record with a greater key on the same position.
         if (thisIter.value() != rightIter.value())
             return thisIter.value() < rightIter.value();
         //< right has greater sequence than this in corresponding record
+
+        ++thisIter;
+        ++rightIter;
+    }
+}
+
+bool TranState::containsDataMissingIn(const TranState& right) const
+{
+    // TODO: #ak Replace QMap with std::map and use std::set_difference.
+
+    auto thisIter = values.cbegin();
+    auto rightIter = right.values.cbegin();
+
+    for (;;)
+    {
+        if (thisIter == values.cend())
+            return false;
+        if (rightIter == right.values.cend())
+            return true;
+
+        if (thisIter.key() < rightIter.key())
+            return true;
+
+        if (thisIter.key() > rightIter.key())
+        {
+            ++rightIter;
+            continue;
+        }
+
+        if (thisIter.value() > rightIter.value())
+            return true;
 
         ++thisIter;
         ++rightIter;

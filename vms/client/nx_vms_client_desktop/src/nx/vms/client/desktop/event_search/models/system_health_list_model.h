@@ -2,7 +2,7 @@
 
 #include "abstract_event_list_model.h"
 
-#include <QtCore/QScopedPointer>
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 
@@ -25,7 +25,7 @@ protected:
 
 private:
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

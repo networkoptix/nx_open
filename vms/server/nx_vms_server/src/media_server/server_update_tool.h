@@ -17,7 +17,7 @@ class QnZipExtractor;
 
 class QnServerUpdateTool:
     public QObject,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

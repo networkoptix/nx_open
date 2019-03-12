@@ -50,7 +50,6 @@
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_data_pool.h>
 
-#include <nx/analytics/descriptor_list_manager.h>
 #include <core/resource/storage_plugin_factory.h>
 
 using namespace nx;
@@ -199,16 +198,15 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();
-    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::engineVersion());
+    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::applicationVersion());
     m_moduleInformation.type = clientMode
         ? nx::vms::api::ModuleInformation::nxClientId()
         : nx::vms::api::ModuleInformation::nxMediaServerId();
     m_moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     m_moduleInformation.realm = nx::network::AppInfo::realm();
 
-    m_dataPool = instance<QnResourceDataPool>();
-
-    m_analyticsDescriptorListManager = new nx::analytics::DescriptorListManager(this);
+    m_resourceDataPool = instance<QnResourceDataPool>();
+    m_engineVersion = nx::vms::api::SoftwareVersion(QnAppInfo::applicationVersion());
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -218,6 +216,16 @@ void QnCommonModule::setModuleGUID(const QnUuid& guid)
         m_uuid = guid;
     }
     resetCachedValue(); //< Update module information
+}
+
+nx::utils::SoftwareVersion QnCommonModule::engineVersion() const
+{
+    return m_engineVersion;
+}
+
+void QnCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
+{
+    m_engineVersion = version;
 }
 
 QnCommonModule::~QnCommonModule()
@@ -544,12 +552,7 @@ CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
     return m_cameraDriverRestrictionList;
 }
 
-QnResourceDataPool* QnCommonModule::dataPool() const
+QnResourceDataPool* QnCommonModule::resourceDataPool() const
 {
-    return m_dataPool;
-}
-
-nx::analytics::DescriptorListManager* QnCommonModule::analyticsDescriptorListManager() const
-{
-    return m_analyticsDescriptorListManager;
+    return m_resourceDataPool;
 }

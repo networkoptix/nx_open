@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource_fwd.h>
@@ -7,11 +9,12 @@
 
 #include <media_server/media_server_module.h>
 
-#include <nx/utils/std/optional.h>
-#include <nx/utils/log/log_level.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/member_detector.h>
 
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+
+#include <nx/fusion/model_functions.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -19,20 +22,18 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/analytics/debug_helpers.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/helpers/device_info.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <plugins/settings.h>
+#include <plugins/plugins_ini.h>
 
 class QnMediaServerModule;
-
-namespace nx::analytics {
-
-class DescriptorListManager;
-
-} // namespace nx::analytics
 
 namespace nx::vms::server::analytics {
 
@@ -45,18 +46,58 @@ namespace nx::vms::server::sdk_support {
 namespace detail {
 
 NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths,
+    std::set<nx::vms::api::analytics::DescriptorScope>);
 NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace detail
 
-template<typename ManifestType, typename SdkObjectPtr>
-std::optional<ManifestType> manifest(
+template<typename Manifest>
+std::optional<Manifest> loadManifestFromFile(const QString& filename)
+{
+    using nx::utils::log::Level;
+    static const nx::utils::log::Tag kLogTag(
+        QString("nx::vms::server::sdk_support::loadManifestFromFile"));
+
+    auto logger =
+        [&](Level level, const QString& message)
+        {
+            NX_UTILS_LOG(level, kLogTag) << lm("Loading manifest from file: %1: [%2]")
+                .args(message, filename);
+        };
+
+    if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
+        return std::nullopt;
+
+    const QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(
+        pluginsIni().analyticsManifestSubstitutePath));
+
+    const QString fileData = analytics::debug_helpers::loadStringFromFile(
+        dir.absoluteFilePath(filename), logger);
+
+    if (fileData.isEmpty())
+    {
+        logger(Level::info, "Unable to read file");
+        return std::nullopt;
+    }
+
+    bool success = false;
+    const Manifest deserializedManifest =
+        QJson::deserialized(fileData.toUtf8(), Manifest(), &success);
+
+    if (success)
+        return deserializedManifest;
+
+    return std::nullopt;
+}
+
+template<typename Manifest, typename SdkObjectPtr>
+std::optional<Manifest> manifestFromSdkObject(
     const SdkObjectPtr& sdkObject,
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    UniquePtr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
+    const auto manifestStr = nx::sdk::toPtr(sdkObject->manifest(&error));
 
     auto log =
         [&logger](
@@ -85,7 +126,7 @@ std::optional<ManifestType> manifest(
         return std::nullopt;
 
     bool success = false;
-    auto deserializedManifest = QJson::deserialized(rawString, ManifestType(), &success);
+    auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
     if (!success)
     {
         log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
@@ -96,10 +137,39 @@ std::optional<ManifestType> manifest(
     return deserializedManifest;
 }
 
-template<typename Interface, typename SdkObject>
-Interface* queryInterface(SdkObject sdkObject, const nxpl::NX_GUID& guid)
+template<typename Manifest, typename SdkObjectPtr>
+std::optional<Manifest> manifest(
+    const SdkObjectPtr& sdkObject,
+    const QString& substitutionFilename,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
-    return static_cast<Interface*>(sdkObject->queryInterface(guid));
+    const std::optional<Manifest> sdkObjectManifest =
+        manifestFromSdkObject<Manifest>(sdkObject, std::move(logger));
+
+    if (pluginsIni().analyticsManifestSubstitutePath[0])
+    {
+        const std::optional<Manifest> manifestSubstitution =
+            loadManifestFromFile<Manifest>(substitutionFilename);
+
+        if (manifestSubstitution)
+            return manifestSubstitution;
+    }
+
+    return sdkObjectManifest;
+}
+
+template<typename Manifest, typename SdkObjectPtr>
+std::optional<Manifest> manifest(
+    const SdkObjectPtr& sdkObject,
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr)
+{
+    const auto substitutionFilename = analytics::debug_helpers::nameOfFileToDumpOrLoadData(
+        device, engine, plugin, "_manifest.json");
+
+    return manifest<Manifest>(sdkObject, substitutionFilename, std::move(logger));
 }
 
 template<typename ResourceType>
@@ -122,17 +192,20 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
 }
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule);
-nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule);
 
-bool deviceInfoFromResource(
-    const QnVirtualCameraResourcePtr& device,
-    nx::sdk::DeviceInfo* outDeviceInfo);
+nx::sdk::Ptr<nx::sdk::DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device);
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
 
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
-UniquePtr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QVariantMap& map);
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map);
+
+/**
+ * @param mapJson Json array of objects with string fields "name" and "value".
+ * @return Null if the json is invalid, has unexpected structure (besides potentially added
+ * unknown fields) or there are duplicate keys.
+ */
+nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
 
@@ -143,42 +216,6 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
 
 resource::AnalyticsEngineResourceList toServerEngineList(
     const nx::vms::common::AnalyticsEngineResourceList engineList);
-
-template <typename Descriptor, typename Item>
-std::map<QString, Descriptor> descriptorsFromItemList(
-    const QString& pluginId,
-    const QList<Item>& itemList)
-{
-    std::map<QString, Descriptor> result;
-    for (const auto& item: itemList)
-    {
-        Descriptor descriptor;
-        if constexpr(detail::hasItem<Descriptor>::value)
-        {
-            descriptor.item = item;
-        }
-        else
-        {
-            descriptor.id = item.id;
-            descriptor.name = item.name;
-        }
-
-        if constexpr (detail::hasPaths<Descriptor>::value)
-        {
-            nx::vms::api::analytics::HierarchyPath path;
-            path.pluginId = pluginId;
-
-            if constexpr (detail::hasGroupId<Item>::value)
-                path.groupId = item.groupId;
-
-            descriptor.paths.insert(path);
-        }
-
-        result[item.id] = std::move(descriptor);
-    }
-
-    return result;
-}
 
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 

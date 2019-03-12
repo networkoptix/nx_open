@@ -16,11 +16,14 @@ public:
     QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule);
     virtual ~QnMServerResourceDiscoveryManager();
 
-    //!Implementation of QnResourceFactory::createResource
-    /*!
-        Calls \a QnResourceDiscoveryManager::createResource first. If resource was not created and resource type is present in system, returns data-only resource
-    */
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
+    /**
+     * Implementation of QnResourceFactory::createResource
+     * Calls \a QnResourceDiscoveryManager::createResource first.
+     * If resource was not created and resource type is present in system,
+     * returns data-only resource
+     */
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 
     static bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras);
 
@@ -28,7 +31,8 @@ signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
 protected:
-    virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType) override;
+    virtual bool processDiscoveredResources(
+        QnResourceList& resources, SearchType searchType) override;
 
     virtual nx::vms::common::AnalyticsPluginResourcePtr
         createAnalyticsPluginResource(const QnResourceParams& params) override;
@@ -46,9 +50,12 @@ private:
 
     bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource) const;
 
-    // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
+    /**
+     * ping resources from time to time to keep OS ARP table updated;
+     * speeds up resource (start) time in case if not recorded
+     */
     void pingResources(const QnResourcePtr& res);
-    void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
+
     void sortForeignResources(QList<QnSecurityCamResourcePtr>& foreignResources);
 private:
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared

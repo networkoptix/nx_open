@@ -78,5 +78,4 @@ void QnDesktopCameraDeleter::updateQueue()
     }
 }
 
-
 #endif

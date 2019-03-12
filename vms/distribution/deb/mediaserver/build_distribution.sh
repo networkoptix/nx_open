@@ -14,7 +14,7 @@ stripIfNeeded() # dir
 {
     local -r DIR="$1" && shift
 
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm" ]]
+    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "aarch64" ]]
     then
         local FILE
         for FILE in $(find "$DIR" -type f)
@@ -41,23 +41,51 @@ copyLibs()
     mkdir -p "$STAGE_LIB"
     local LIB
     local LIB_BASENAME
+    local BLACKLIST_ITEM
+    local SKIP_LIBRARY
+
+    local -r LIB_BLACKLIST=(
+        'libQt5*'
+        'libEnginio.so*'
+        'libqgsttools_p.*'
+        'libtegra_video.*'
+        'libnx_vms_client*'
+        'libcloud_db.*'
+        'libnx_cassandra*'
+        'libconnection_mediator*'
+        'libnx_clusterdb*'
+        'libnx_discovery_api_client*'
+        'libnx_relaying*'
+        'libtraffic_relay*'
+        'libvms_gateway_core*'
+    )
+
     for LIB in "$BUILD_DIR/lib"/*.so*
     do
         LIB_BASENAME=$(basename "$LIB")
-        if [[ "$LIB_BASENAME" != libQt5* \
-            && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" != libqgsttools_p.* \
-            && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_vms_client* ]]
-        then
-            echo "  Copying $LIB_BASENAME"
-            cp -P "$LIB" "$STAGE_LIB/"
+
+        SKIP_LIBRARY=0
+
+        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"; do
+            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]; then
+                SKIP_LIBRARY=1
+                break
+            fi
+        done
+
+        (( $SKIP_LIBRARY == 1 )) && continue
+
+        if [[ "$LIB_BASENAME" == libtegra_video.* ]]; then
+            [[ "$BOX" != "tx1" ]] && continue
         fi
+
+        echo "  Copying $LIB_BASENAME"
+        cp -P "$LIB" "$STAGE_LIB/"
     done
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
-    if [ "$ARCH" != "arm" ]
+    if [[ "$ARCH" != "arm" ]]
     then
         echo "Copying libicu"
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
@@ -127,24 +155,6 @@ copyQtLibs()
     done
 }
 
-# [in] STAGE_SHARE
-# [in] STAGE_MODULE
-copyDbSyncIfNeeded()
-{
-    if [ "$ARCH" != "arm" ]
-    then
-        echo ""
-        echo "Copying dbsync 2.2"
-        local -r STAGE_SHARE="$STAGE_MODULE/share"
-        mkdir -p "$STAGE_SHARE"
-        cp -r "$PLATFORM_PACKAGES_DIR/appserver-2.2.1/share/dbsync-2.2" "$STAGE_SHARE/"
-        cp "$BUILD_DIR/version.py" "$STAGE_SHARE/dbsync-2.2/bin/"
-        find "$STAGE_SHARE" -type d -print0 |xargs -0 chmod 755
-        find "$STAGE_SHARE" -type f -print0 |xargs -0 chmod 644
-        chmod 755 "$STAGE_SHARE/dbsync-2.2/bin"/{dbsync,certgen}
-    fi
-}
-
 # [in] STAGE_BIN
 copyBins()
 {
@@ -174,12 +184,6 @@ copyStartupScripts()
         "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
     install -m 644 "init/networkoptix-root-tool.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-root-tool.conf"
-
-    install -m 755 -d "$STAGE/etc/init.d"
-    install -m 755 "init.d/networkoptix-mediaserver" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
-    install -m 755 "init.d/networkoptix-root-tool" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-root-tool"
 
     install -m 755 -d "$STAGE/etc/systemd/system"
     install -m 644 "systemd/networkoptix-mediaserver.service" \
@@ -275,7 +279,6 @@ buildDistribution()
     find "$STAGE" -type f -print0 |xargs -0 chmod 644
     chmod -R 755 "$STAGE_BIN" #< Restore executable permission for the files in "bin" recursively.
 
-    copyDbSyncIfNeeded
     copyBins
     copyStartupScripts
 

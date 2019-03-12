@@ -7,13 +7,12 @@
 #include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/stun_async_client_acceptance_tests.h>
+#include <nx/network/test_support/stun_simple_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/sync_queue.h>
-
-#include "stun_async_client_acceptance_tests.h"
-#include "stun_simple_server.h"
 
 namespace nx {
 namespace network {

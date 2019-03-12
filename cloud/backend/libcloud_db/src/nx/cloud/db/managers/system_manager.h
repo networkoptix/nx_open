@@ -39,7 +39,7 @@
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -118,7 +118,7 @@ public:
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::sql::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -290,7 +290,7 @@ private:
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    clusterdb::engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    clusterdb::engine::SynchronizationEngine* const m_ec2SynchronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;

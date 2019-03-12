@@ -14,12 +14,9 @@
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/common_update_manager.h>
-#include <update/updates_common.h>
 
 #include "server_update_tool.h"
 #include "client_update_tool.h"
-
-struct QnLowFreeSpaceWarning;
 
 namespace Ui { class MultiServerUpdatesWidget; }
 
@@ -45,7 +42,7 @@ class MultiServerUpdatesWidget:
 
 public:
     MultiServerUpdatesWidget(QWidget* parent = nullptr);
-    ~MultiServerUpdatesWidget();
+    virtual ~MultiServerUpdatesWidget() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
@@ -60,9 +57,6 @@ public:
 
     virtual bool canDiscardChanges() const override;
 
-    bool cancelUpdatesCheck();
-    bool isChecking() const;
-
 protected:
     /** This one is called by timer periodically. */
     void atUpdateCurrentState();
@@ -71,8 +65,8 @@ protected:
     bool atCancelCurrentAction();
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
+    void atCloudSettingsChanged();
 
-    void syncStatusVisibility();
     void clearUpdateInfo();
     void pickLocalFile();
     void pickSpecificBuild();
@@ -99,12 +93,14 @@ private:
         ready,
         /** We have issued a command to remote servers to start downloading the updates. */
         downloading,
-        /** Pushing local update package to server(s). */
+        /** Pushing local update package to the servers. */
         pushing,
         /** Some servers have downloaded update data and ready to install it. */
         readyInstall,
         /** Some servers are installing an update. */
         installing,
+        /** Some servers are installing an update, but it took too long. */
+        installingStalled,
         /** Installation process is complete. */
         complete,
     };
@@ -121,7 +117,7 @@ private:
 
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
-    void checkForInternetUpdates();
+    void checkForInternetUpdates(bool initial = false);
 
     /**
      * Describes all possible display modes for update version.
@@ -172,17 +168,19 @@ private:
     void syncUpdateCheckToUi();
     void syncRemoteUpdateStateToUi();
     void syncProgress();
-    void syncReportToUi();
+    void syncStatusVisibility();
+    void syncVersionInfoVisibility();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
-    bool processRemoteChanges(bool force = false);
+    bool processRemoteChanges();
     /** Part of processRemoteChanges FSM processor. */
     void processRemoteInitialState();
     void processRemoteUpdateInformation();
     void processRemoteDownloading();
     void processRemoteInstalling();
-    void processRemoteCanceling();
+
+    bool isChecking() const;
 
     bool processUploaderChanges(bool force = false);
 
@@ -217,7 +215,7 @@ private:
 
     nx::update::UpdateSourceType m_updateSourceMode = nx::update::UpdateSourceType::internet;
 
-    std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
+    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::shared_ptr<PeerStateTracker> m_stateTracker;
@@ -235,6 +233,7 @@ private:
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;
     nx::utils::SoftwareVersion m_targetVersion;
+    bool m_holdConnection = false;
 
     WidgetUpdateState m_widgetState = WidgetUpdateState::initial;
 

@@ -1,4 +1,4 @@
-﻿#include "resource_browser_widget.h"
+#include "resource_browser_widget.h"
 #include "ui_resource_browser_widget.h"
 
 #include <QtCore/QItemSelectionModel>
@@ -75,6 +75,7 @@
 #include <ui/style/skin.h>
 #include <ui/common/indents.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -255,6 +256,15 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     installEventHandler({ui->scrollArea->verticalScrollBar()}, {QEvent::Show, QEvent::Hide},
         this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
+
+    m_connections << connect(this, &QnResourceBrowserWidget::scrollBarVisibleChanged, this,
+        [this]()
+        {
+            auto margins = ui->scrollAreaWidgetContents->contentsMargins();
+            margins.setRight(isScrollBarVisible() ?
+                style()->pixelMetric(QStyle::PM_ScrollBarExtent) : 0);
+            ui->scrollAreaWidgetContents->setContentsMargins(margins);
+        });
 
     /* Run handlers. */
     updateIcons();
@@ -1303,8 +1313,25 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
 
     if (nodeType == NodeType::cloudSystem)
     {
-        menu()->trigger(action::ConnectToCloudSystemAction,
-            {Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()});
+        const auto callback =
+            [this, cloudSystemId = index.data(Qn::CloudSystemIdRole).toString()]()
+            {
+                menu()->trigger(action::ConnectToCloudSystemAction,
+                    {Qn::CloudSystemIdRole, cloudSystemId});
+            };
+
+        // Looks like Qt has some bug when mouse events hangs and are targeted to
+        // the wrong widget if we switch between QGLWidget-based views and QQuickView.
+        // This workaround gives time to all (double)click-related events to be processed.
+        if (nx::utils::AppInfo::isMacOsX())
+        {
+            static constexpr int kSomeEnoughDelayToProcessDoubleClick = 100;
+            executeDelayedParented(callback, kSomeEnoughDelayToProcessDoubleClick, this);
+        }
+        else
+        {
+            callback();
+        }
         return;
     }
 

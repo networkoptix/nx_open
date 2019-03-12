@@ -16,7 +16,7 @@ class AnalyticsSdkEvent: public ProlongedEvent
 public:
     AnalyticsSdkEvent(
         const QnResourcePtr& resource,
-        const QString& pluginId,
+        const QnUuid& engineId,
         const QString& eventTypeId,
         EventState toggleState,
         const QString& caption,
@@ -24,7 +24,7 @@ public:
         const QString& auxiliaryData,
         qint64 timeStampUsec);
 
-    QString pluginId() const;
+    QnUuid engineId() const;
     const QString& eventTypeId() const;
 
     virtual EventParameters getRuntimeParams() const override;
@@ -36,7 +36,7 @@ public:
     QString auxiliaryData() const;
 
 private:
-    const QString m_pluginId;
+    const QnUuid m_engineId;
     const QString m_eventTypeId;
     const QString m_caption;
     const QString m_description;

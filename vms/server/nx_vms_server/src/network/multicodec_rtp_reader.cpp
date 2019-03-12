@@ -163,7 +163,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     QnAbstractMediaDataPtr result;
     do {
-        if (m_RtpSession.getTransport() == RtspTransport::tcp)
+        if (m_RtpSession.getPreferedTransport() == RtspTransport::tcp)
             result = getNextDataTCP();
         else
             result = getNextDataUDP();
@@ -344,10 +344,19 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 continue;
         }
 
-        if (bytesRead < 1)
-            break; // error
-
         auto trackIndexIter = m_trackIndices.find(rtpChannelNum);
+
+        if (bytesRead < 1)
+        {
+            const bool isInvalidTrack = trackIndexIter == m_trackIndices.end();
+            const bool isBufferAllocated = m_demuxedData.size() > rtpChannelNum
+                && m_demuxedData[rtpChannelNum];
+
+            if (isInvalidTrack && isBufferAllocated)
+                m_demuxedData[rtpChannelNum]->clear();
+            break; // error
+        }
+
         if (trackIndexIter != m_trackIndices.end())
         {
             auto& track = m_tracks[trackIndexIter->second];

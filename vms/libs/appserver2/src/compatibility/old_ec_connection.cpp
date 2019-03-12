@@ -105,82 +105,82 @@ AbstractAnalyticsManagerPtr OldEcConnection::getAnalyticsManager(const Qn::UserA
     return AbstractAnalyticsManagerPtr();
 }
 
-    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+    AbstractLicenseNotificationManagerPtr OldEcConnection::licenseNotificationManager()
 {
     return AbstractLicenseNotificationManagerPtr();
 }
 
-AbstractTimeNotificationManagerPtr OldEcConnection::getTimeNotificationManager()
+AbstractTimeNotificationManagerPtr OldEcConnection::timeNotificationManager()
 {
     return AbstractTimeNotificationManagerPtr();
 }
 
-AbstractResourceNotificationManagerPtr OldEcConnection::getResourceNotificationManager()
+AbstractResourceNotificationManagerPtr OldEcConnection::resourceNotificationManager()
 {
     return AbstractResourceNotificationManagerPtr();
 }
 
-AbstractMediaServerNotificationManagerPtr OldEcConnection::getMediaServerNotificationManager()
+AbstractMediaServerNotificationManagerPtr OldEcConnection::mediaServerNotificationManager()
 {
     return AbstractMediaServerNotificationManagerPtr();
 }
 
-AbstractCameraNotificationManagerPtr OldEcConnection::getCameraNotificationManager()
+AbstractCameraNotificationManagerPtr OldEcConnection::cameraNotificationManager()
 {
     return AbstractCameraNotificationManagerPtr();
 }
 
-AbstractBusinessEventNotificationManagerPtr OldEcConnection::getBusinessEventNotificationManager()
+AbstractBusinessEventNotificationManagerPtr OldEcConnection::businessEventNotificationManager()
 {
     return AbstractBusinessEventNotificationManagerPtr();
 }
 
-AbstractUserNotificationManagerPtr OldEcConnection::getUserNotificationManager()
+AbstractUserNotificationManagerPtr OldEcConnection::userNotificationManager()
 {
     return AbstractUserNotificationManagerPtr();
 }
 
-AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
+AbstractLayoutNotificationManagerPtr OldEcConnection::layoutNotificationManager()
 {
     return AbstractLayoutNotificationManagerPtr();
 }
 
-AbstractLayoutTourNotificationManagerPtr OldEcConnection::getLayoutTourNotificationManager()
+AbstractLayoutTourNotificationManagerPtr OldEcConnection::layoutTourNotificationManager()
 {
     return AbstractLayoutTourNotificationManagerPtr();
 }
 
-AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
+AbstractWebPageNotificationManagerPtr OldEcConnection::webPageNotificationManager()
 {
     return AbstractWebPageNotificationManagerPtr();
 }
 
-AbstractDiscoveryNotificationManagerPtr OldEcConnection::getDiscoveryNotificationManager()
+AbstractDiscoveryNotificationManagerPtr OldEcConnection::discoveryNotificationManager()
 {
     return AbstractDiscoveryNotificationManagerPtr();
 }
 
-AbstractMiscNotificationManagerPtr OldEcConnection::getMiscNotificationManager()
+AbstractMiscNotificationManagerPtr OldEcConnection::miscNotificationManager()
 {
     return AbstractMiscNotificationManagerPtr();
 }
 
-AbstractUpdatesNotificationManagerPtr OldEcConnection::getUpdatesNotificationManager()
+AbstractUpdatesNotificationManagerPtr OldEcConnection::updatesNotificationManager()
 {
     return AbstractUpdatesNotificationManagerPtr();
 }
 
-AbstractStoredFileNotificationManagerPtr OldEcConnection::getStoredFileNotificationManager()
+AbstractStoredFileNotificationManagerPtr OldEcConnection::storedFileNotificationManager()
 {
     return AbstractStoredFileNotificationManagerPtr();
 }
 
-AbstractVideowallNotificationManagerPtr OldEcConnection::getVideowallNotificationManager()
+AbstractVideowallNotificationManagerPtr OldEcConnection::videowallNotificationManager()
 {
     return AbstractVideowallNotificationManagerPtr();
 }
 
-AbstractAnalyticsNotificationManagerPtr OldEcConnection::getAnalyticsNotificationManager()
+AbstractAnalyticsNotificationManagerPtr OldEcConnection::analyticsNotificationManager()
 {
     return AbstractAnalyticsNotificationManagerPtr();
 }

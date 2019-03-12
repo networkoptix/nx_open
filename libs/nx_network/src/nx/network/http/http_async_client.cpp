@@ -1165,8 +1165,11 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
             break;
         }
 
-        case StatusCode::found:
         case StatusCode::movedPermanently:
+        case StatusCode::found:
+        case StatusCode::seeOther:
+        case StatusCode::temporaryRedirect:
+        case StatusCode::permanentRedirect:
             return sendRequestToNewLocation(response);
 
         default:
@@ -1678,9 +1681,9 @@ AsyncClient::Result AsyncClient::invokeHandler(
     if (!handler)
         return Result::proceed;
 
-    nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
+    nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
     handler(args...);
-    return objectDestructionWatcher.objectDestroyed()
+    return objectDestructionWatcher.interrupted()
         ? Result::thisDestroyed
         : Result::proceed;
 }

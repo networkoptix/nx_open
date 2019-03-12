@@ -9,7 +9,6 @@
 #include <nx/vms/api/data/software_version.h>
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <update/updates_common.h>
 #include <nx/update/common_update_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -36,9 +35,10 @@ struct UpdateItem
     /** Current version of the component. */
     nx::utils::SoftwareVersion version;
     Component component;
+
+    bool incompatible = false;
     /** Flag for servers, that can be updated using legacy 3.2 system. */
     bool onlyLegacyUpdate = false;
-    bool legacyUpdateUsed = false;
     /** Client is uploading files to this server. */
     bool uploading = false;
     bool offline = false;
@@ -62,7 +62,13 @@ class PeerStateTracker:
 
 public:
     PeerStateTracker(QObject* parent = nullptr);
-    void setResourceFeed(QnResourcePool* pool);
+
+    /**
+     * Attaches state tracker to a resource pool. All previous attachments are discarded.
+     * @param pool Pointer to the resource pool.
+     * @return False if got empty resource pool or systemId.
+     */
+    bool setResourceFeed(QnResourcePool* pool);
 
     UpdateItemPtr findItemById(QnUuid id) const;
     UpdateItemPtr findItemByRow(int row) const;
@@ -107,6 +113,7 @@ public:
     void clearVerificationErrors();
 
     bool hasVerificationErrors() const;
+    bool hasStatusErrors() const;
 
 public:
     std::map<QnUuid, nx::update::Status::Code> getAllPeerStates() const;

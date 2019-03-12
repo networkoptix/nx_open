@@ -55,7 +55,7 @@ PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
     }
 
     // 3. The most complicated case: non-conformal mapping.
-    NX_ASSERT(false, Q_FUNC_INFO, "Non-conformal mapping is not supported.");
+    NX_ASSERT(false, "Non-conformal mapping is not supported.");
 }
 
 PainterTransformScaleStripper::~PainterTransformScaleStripper()

@@ -99,7 +99,7 @@ public:
     void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
         camera->copyLastGop(
-            Qn::StreamIndex::primary,
+            nx::vms::api::StreamIndex::primary,
             /*skipTime*/ 0,
             m_dataQueue,
             /*iFramesOnly*/ false);
@@ -635,7 +635,7 @@ void QnProgressiveDownloadingConsumer::run()
                     && (resolutionStr.isEmpty() ||
                         requestedResolutionStr == streamInfo.resolution))
                 {
-                    qualityToUse = streamInfo.getEncoderIndex() == Qn::StreamIndex::primary
+                    qualityToUse = streamInfo.getEncoderIndex() == nx::vms::api::StreamIndex::primary
                         ? QnServer::HiQualityCatalog
                         : QnServer::LowQualityCatalog;
                     transcodeMethod = QnTranscoder::TM_DirectStreamCopy;

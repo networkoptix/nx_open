@@ -2,17 +2,17 @@
 
 #include <boost/preprocessor/seq/for_each.hpp>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_get_post_tunnel.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_connect.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_upgrade.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_get_post_tunnel.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_connect.h>
 
 namespace nx::cloud::relay::test {
 
 #define DETAIL_INSTANTIATE_RELAY_METHOD_TESTS(ClientSideClass, ServerSideClass, StructName, CaseName) \
     struct StructName \
     { \
-        using ClientSideApiClient = api::ClientSideClass; \
-        using ServerSideApiClient = api::ServerSideClass; \
+        using ClientSideApiClient = api::detail::ClientSideClass; \
+        using ServerSideApiClient = api::detail::ServerSideClass; \
     }; \
     \
     INSTANTIATE_TYPED_TEST_CASE_P( \

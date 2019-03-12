@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/utils/string.h>
 
 namespace nx {

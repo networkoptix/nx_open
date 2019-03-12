@@ -176,13 +176,28 @@ int runUi(QtSingleGuiApplication* application)
 
     const bool forceSoftwareOnlyDecoderForIPhone =
         #if defined(Q_OS_IOS)
-            ini().forceSoftwareDecoderForIPhoneXs
-            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXs
-            && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
+            []()
+            {
+                if (!ini().forceSoftwareDecoderForA12XBionicChip)
+                    return false;
+
+                const auto majorVersion = iosDeviceInformation().majorVersion;
+                const auto deviceType = iosDeviceInformation().type;
+
+                if (majorVersion == IosDeviceInformation::iPadProA12XBionic
+                     && deviceType == IosDeviceInformation::Type::iPad)
+                {
+                    return true;
+                }
+
+                return majorVersion == IosDeviceInformation::iPhoneXs
+                    && deviceType == IosDeviceInformation::Type::iPhone;
+            }();
+
         #else
             false;
         #endif
-    
+
     if (maxFfmpegResolution.isEmpty())
     {
         // Use platform-dependent defaults.
@@ -338,21 +353,8 @@ void initLog(const QString& logLevel)
                 logSettings,
                 /*applicationName*/ lit("mobile_client"),
                 QString(),
-                std::set<nx::utils::log::Tag>(),
+                std::set<nx::utils::log::Filter>(),
                 std::move(logWriter)));
-    }
-
-    if (ini().enableEc2TranLog)
-    {
-        logSettings.loggers.front().logBaseName = QnAppInfo::isAndroid()
-            ? lit("-")
-            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran"));
-        nx::utils::log::addLogger(
-            nx::utils::log::buildLogger(
-                logSettings,
-                /*applicationName*/ lit("mobile_client"),
-                /*binaryPath*/ QString(),
-                {QnLog::EC2_TRAN_LOG}));
     }
 }
 
@@ -381,7 +383,7 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 int main(int argc, char *argv[])
 {
 	nx::kit::OutputRedirector::ensureOutputRedirection();
-	
+
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
     #if defined(Q_OS_WIN)
         AllowSetForegroundWindow(ASFW_ANY);

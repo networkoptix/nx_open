@@ -22,7 +22,7 @@ struct BaseCommandDescriptor
 {
     using Data = DataType;
     static constexpr int code = commandCode;
-    using HashFunctor = 
+    using HashFunctor =
         CommandDataHashFunctor<BaseCommandDescriptor<DataType, commandCode>>;
 
     static nx::Buffer hash(const Data& data)

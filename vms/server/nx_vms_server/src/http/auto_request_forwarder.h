@@ -8,7 +8,7 @@
 /**
  * Forwards requests addressed to resources belonging to other servers.
  */
-class QnAutoRequestForwarder: public QnCommonModuleAware
+class QnAutoRequestForwarder: public /*mixin*/ QnCommonModuleAware
 {
 public:
     QnAutoRequestForwarder(QnCommonModule* commonModule);

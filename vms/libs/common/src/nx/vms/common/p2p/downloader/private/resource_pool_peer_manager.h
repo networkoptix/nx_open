@@ -12,7 +12,7 @@ namespace nx::vms::common::p2p::downloader {
 
 class InternetOnlyPeerManager;
 
-class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModuleAware
+class ResourcePoolPeerManager: public AbstractPeerManager, public /*mixin*/ QnCommonModuleAware
 {
 public:
     ResourcePoolPeerManager(
@@ -67,7 +67,7 @@ private:
 
 class ResourcePoolPeerManagerFactory:
     public AbstractPeerManagerFactory,
-    public QnCommonModuleAware
+    public /*mixin*/ QnCommonModuleAware
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);

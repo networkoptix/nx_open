@@ -61,8 +61,7 @@ View::View(
     m_authenticationManager(m_authRestrictionList),
     m_multiAddressHttpServer(
         &m_authenticationDispatcher,
-        &m_httpMessageDispatcher),
-    m_maintenanceAuthenticator(m_settings.http().maintenanceHtdigestPath)
+        &m_httpMessageDispatcher)
 {
     registerApiHandlers();
     registerAuthenticators();
@@ -119,9 +118,20 @@ const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
 
 void View::registerAuthenticators()
 {
-    m_authenticationDispatcher.add(
-        std::regex(m_maintenanceServer.maintenancePath() + "/.*"),
-        &m_maintenanceAuthenticator.manager);
+    if (!m_settings.http().maintenanceHtdigestPath.empty())
+    {
+        NX_INFO(
+            this,
+            lm("htdigest authentication for traffic relay maintenance server enabled. File path: %1")
+               .arg(m_settings.http().maintenanceHtdigestPath));
+
+        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
+            m_settings.http().maintenanceHtdigestPath);
+
+        m_authenticationDispatcher.add(
+            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
+            &m_maintenanceAuthenticator->manager);
+    }
 
     m_authenticationDispatcher.add(std::regex(".*"), &m_authenticationManager);
 }
@@ -178,10 +188,7 @@ void View::registerApiHandler(
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, args...]() -> std::unique_ptr<Handler>
-        {
-            return std::make_unique<Handler>(args...);
-        },
+        [args...]() { return std::make_unique<Handler>(args...); },
         method);
 }
 

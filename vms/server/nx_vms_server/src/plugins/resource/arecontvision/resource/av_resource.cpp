@@ -55,6 +55,9 @@ bool QnPlAreconVisionResource::isDualSensor() const
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 {
+    if (commonModule()->isNeedToStop())
+        return CL_HTTP_SERVICEUNAVAILABLE;
+
     QString req;
     QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
@@ -81,6 +84,9 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 
 CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 {
+    if (commonModule()->isNeedToStop())
+        return CL_HTTP_SERVICEUNAVAILABLE;
+
     QString req;
     QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
     QUrl devUrl(getUrl());
@@ -157,12 +163,6 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
              Qt::DirectConnection );
 
     httpClientCaptured->doGet( url );
-}
-
-nx::vms::server::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
-{
-    // TODO: implement me
-    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
@@ -440,6 +440,9 @@ QString QnPlAreconVisionResource::generateRequestString(
 // ===============================================================================================================================
 bool QnPlAreconVisionResource::getApiParameter(const QString& id, QString& value)
 {
+    if (commonModule()->isNeedToStop())
+        return false;
+
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -467,6 +470,9 @@ bool QnPlAreconVisionResource::getApiParameter(const QString& id, QString& value
 
 bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString& value)
 {
+    if (commonModule()->isNeedToStop())
+        return false;
+
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -515,7 +521,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMed
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
-    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
+    if (resourceType.isNull() || (resourceType->getManufacturer() != MANUFACTURE))
     {
         NX_ERROR(typeid(QnPlAreconVisionResource), lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()));
         return 0;
@@ -541,7 +547,7 @@ bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
+    NX_ASSERT(false, "QnPlAreconVisionResource is abstract.");
     return 0;
 }
 

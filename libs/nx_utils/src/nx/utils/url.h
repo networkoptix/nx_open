@@ -50,6 +50,17 @@ public:
     Q_INVOKABLE QString toString(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
+    /**
+     * WARNING! URL string created by this method is not complient with RFC3986#section-4.1. This is
+     * a dirty work-around to fix some problems with web client. Please, think twice before using it!
+     *
+     * Creates string with swapped fragment and query URL fields.
+     * NOTE: Creating the Url from the string produced by this method will be parsed incorrectly, if
+     * the fragment field is non-empty.
+     */
+    QString toWebClientStandardViolatingUrl(
+        QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
+
     std::string toStdString(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
@@ -186,8 +197,6 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
  */
 NX_UTILS_API QString hidePassword(const QString& urlStr);
 
-NX_UTILS_API bool displayPasswordInLogs();
-
 } // namespace url
 } // namespace utils
 } // namespace nx
@@ -201,7 +210,7 @@ NX_UTILS_API bool displayPasswordInLogs();
 template<>
 inline QString toString<nx::utils::Url>(const nx::utils::Url& value)
 {
-    if (nx::utils::url::displayPasswordInLogs())
+    if (nx::utils::log::showPasswords())
         return value.toString();
 
     return value.toDisplayString();

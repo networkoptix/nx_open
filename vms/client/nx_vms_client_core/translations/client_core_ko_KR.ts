@@ -102,52 +102,12 @@
       <translation>이 계정을 활성화 되지 않습니다. 귀하의 이메일을 확인 하시기 바랍니다.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>이 계정은 차단 됩니다.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>요청한 기능이 구현 되지 않았습니다.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Unknown realm.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>잘못된 요청입니다.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Invalid nonce.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>자격 증명은 더 이상 유효 합니다.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>잘못 된 데이터를 받았습니다.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>알수없는 오류</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>예기치 않은 네트워크 오류가 발생 했습니다. 인터넷 연결을 확인 하 고 다시 시도 하십시오.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>잘못된 로그인입니다</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>요청 된 개체 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>개체가 이미 존재합니다.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -155,14 +115,17 @@
       <translation>%1 내부 오류가 발생 했습니다. 지원 팀에 문의 하십시오.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 서비스는 임시 사용할 수 없습니다. 그것을 복원 위해 최선을 다하고 있습니다. 나중에 다시 시도 하십시오.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>죄송 합니다, %1 서비스 요청을 처리 할수 없습니다. 잠시후 다시 시도 하십시오.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

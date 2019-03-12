@@ -20,7 +20,7 @@ static constexpr auto kNextActionPeriodMs = 4000;
 static constexpr auto kImmediateActionDelayMs = 0;
 
 static const auto kCheckEmptyTileMessage =
-    lit("Please check if there is an empty item(s) on the screen");
+    lit("Please check if there is an empty items on the screen");
 
 int castTileToInt(QnTileTest test)
 {

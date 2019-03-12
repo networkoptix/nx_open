@@ -89,11 +89,19 @@ void CameraAdvancedParamWidgetsManager::loadValues(
         // Disable all parameter widgets, we'll enable only those that are on the list.
         for (auto [parameterId, widget]: nx::utils::constKeyValueRange(m_paramWidgetsById))
         {
+            // TODO: #dmishin some attribute like `isEnabledByDefault` is needed.
             const bool isButton = m_parametersById[parameterId].dataType
                 == QnCameraAdvancedParameter::DataType::Button;
 
-            // We always show buttons since their "values" don't arrive from server.
-            widget->setEnabled(isButton);
+            const bool isPtrControl = m_parametersById[parameterId].dataType
+                == QnCameraAdvancedParameter::DataType::PtrControl;
+
+            const bool isSlider = m_parametersById[parameterId].dataType
+                == QnCameraAdvancedParameter::DataType::SliderControl;
+
+            // We always show buttons, joysticks and sliders since their "values"
+            // don't arrive from server.
+            widget->setEnabled(isButton || isPtrControl || isSlider);
         }
     }
 
@@ -111,7 +119,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(
         widget->setValue(param.value);
         widget->setEnabled(true);
 
-        if (m_parametersById[param.id].keepInitialValue)
+        if (+m_parametersById[param.id].keepInitialValue)
             valuesToKeep[param.id] = param.value;
     }
 

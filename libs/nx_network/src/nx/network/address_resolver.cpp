@@ -32,7 +32,7 @@ AddressResolver::AddressResolver():
 void AddressResolver::addFixedAddress(
     const HostAddress& hostName, const SocketAddress& endpoint)
 {
-    NX_ASSERT(!hostName.isIpAddress(), Q_FUNC_INFO, "Hostname should be unresolved");
+    NX_ASSERT(!hostName.isIpAddress(), "Hostname should be unresolved");
     NX_ASSERT(endpoint.address.isIpAddress());
     NX_VERBOSE(this, lm("Added fixed address for %1: %2").args(hostName, endpoint));
 
@@ -147,9 +147,7 @@ void AddressResolver::cancel(
         const auto range = m_requests.equal_range(requestId);
         for (auto it = range.first; it != range.second;)
         {
-            NX_ASSERT(!it->second.guard, Q_FUNC_INFO,
-                "Cancel has already been called for this requestId");
-
+            NX_ASSERT(!it->second.guard, "Cancel has already been called for this requestId");
             if (it->second.inProgress && !it->second.guard)
                 (it++)->second.guard = barrier.fork();
             else

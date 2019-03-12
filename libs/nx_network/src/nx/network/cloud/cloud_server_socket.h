@@ -50,6 +50,7 @@ public:
     bool isClosed() const override;
     bool shutdown() override;
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
+    virtual bool getProtocol(int* protocol) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
 
     bool listen(int queueLen) override;

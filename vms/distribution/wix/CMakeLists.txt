@@ -10,15 +10,21 @@ set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
 set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
-set(VC14RedistPath "${vcredist_directory}")
 
 # These folders are configured, and are required for update packages only.
 set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
 set(server_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/server")
 
+set(productLogo "${customization.dir}/icons/all/favicon.ico")
+set(customInstallerIcon "${customization.dir}/icons/windows/installer_icon.ico")
+
+if(EXISTS "${customInstallerIcon}")
+   set(installerIcon ${customInstallerIcon})
+else()
+   set(installerIcon ${productLogo})
+endif()
+
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
-file(TO_CMAKE_PATH ${certificates_path} certificates_path)
-file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
 add_subdirectory(custom_actions)
 

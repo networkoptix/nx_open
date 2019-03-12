@@ -16,7 +16,11 @@ nx_option(developerBuild
 if(developerBuild)
     set(default_cmake_build_type "Debug")
 else()
-    set(default_cmake_build_type "Release")
+    if(targetDevice MATCHES "edge1")
+        set(default_cmake_build_type "MinSizeRel")
+    else()
+        set(default_cmake_build_type "Release")
+    endif()
 endif()
 
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
@@ -45,7 +49,14 @@ nx_rdep_configure()
 
 include(cmake/mercurial.cmake)
 hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
+if(NOT changeSet AND NOT developerBuild)
+    message(FATAL_ERROR "Hg changeset cannot be calculated.")
+endif()
+
 hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
+if(NOT branch AND NOT developerBuild)
+    message(FATAL_ERROR "Hg branch cannot be calculated.")
+endif()
 
 include(cmake/dependencies.cmake)
 

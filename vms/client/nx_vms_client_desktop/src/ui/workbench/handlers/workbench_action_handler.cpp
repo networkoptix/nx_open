@@ -144,11 +144,11 @@
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
-#include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/applauncher_utils.h>
@@ -613,9 +613,9 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     if (qnRuntime->isDesktopMode())
     {
         if (user)
-            context()->instance<QnWorkbenchUpdateWatcher>()->start();
+            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->start();
         else
-            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->stop();
     }
     m_serverRequests.clear();
 }
@@ -669,16 +669,18 @@ void ActionHandler::showMultipleCamerasErrorMessage(
     const QnVirtualCameraResourceList& camerasWithError,
     const QString& explanation)
 {
-    static const auto kMessageTemplate = tr("Failed to change password on %1 of %2 cameras");
     static const auto kSimpleOptions = QnResourceListView::Options(
         QnResourceListView::HideStatusOption
         | QnResourceListView::ServerAsHealthMonitorOption
         | QnResourceListView::SortAsInTreeOption);
 
+    const QString message = tr("Failed to change password on %n cameras of %1",
+        "Total number of cameras will be substituted as %1",
+        camerasWithError.size()).arg(totalCameras);
+
     QnSessionAwareMessageBox messageBox(mainWindowWidget());
     messageBox.setIcon(QnMessageBoxIcon::Critical);
-    messageBox.setText(kMessageTemplate.arg(
-        QString::number(camerasWithError.size()), QString::number(totalCameras)));
+    messageBox.setText(message);
     if (!explanation.isEmpty())
         messageBox.setInformativeText(explanation);
     messageBox.addCustomWidget(
@@ -810,7 +812,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
     const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = (layout->getItems().isEmpty() || !layout->hasCellAspectRatio())
-        && layout->backgroundSize().isEmpty(); // TODO: implement layout->hasBackground().
+        && !layout->hasBackground();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
@@ -1281,7 +1283,7 @@ void ActionHandler::at_openFileAction_triggered()
 {
     static const QStringList kProprietaryFormats{"nov"};
     static const QStringList kVideoFormats = QnCustomFileDialog::kVideoFilter.second;
-    static const QStringList kPicturesFormats = QnCustomFileDialog::kPicturesFilter.second;
+    static const QStringList kPicturesFormats = QnCustomFileDialog::picturesFilter().second;
     static const QStringList kAllSupportedFormats = kProprietaryFormats
         + kVideoFormats
         + kPicturesFormats;
@@ -1292,7 +1294,7 @@ void ActionHandler::at_openFileAction_triggered()
         QnCustomFileDialog::createFilter({
             {tr("All Supported"), kAllSupportedFormats},
             QnCustomFileDialog::kVideoFilter,
-            QnCustomFileDialog::kPicturesFilter,
+            QnCustomFileDialog::picturesFilter(),
             QnCustomFileDialog::kAllFilesFilter
             }),
         nullptr,
@@ -2164,7 +2166,7 @@ void ActionHandler::at_renameAction_triggered()
     }
     else
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, "Invalid resource type to rename");
     }
 }
 
@@ -2375,7 +2377,7 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            propertyDictionary()->saveParamsAsync(resource->getId());
+            resourcePropertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
 }
@@ -2428,8 +2430,10 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (!watcher->hasMismatches())
         return;
 
+    constexpr auto kServerComponent = QnWorkbenchVersionMismatchWatcher::Component::server;
+
     const auto latestVersion = watcher->latestVersion();
-    auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    auto latestMsVersion = watcher->latestVersion(kServerComponent);
 
     // if some component is newer than the newest mediaserver, focus on its version
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
@@ -2437,13 +2441,13 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
 
     QnResourceList mismatched;
 
-    for (const QnAppInfoMismatchData &data : watcher->mismatchData())
+    for (const auto& data: watcher->components())
     {
-        if (data.component == Qn::ServerComponent)
+        if (data.component == kServerComponent)
         {
-            QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            if (resource)
-                mismatched << data.resource;
+            NX_ASSERT(data.server);
+            if (data.server)
+                mismatched << data.server;
         }
     }
 
@@ -2510,9 +2514,9 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
         return;
 
     QString header = tr("Beta version %1").arg(qApp->applicationVersion());
-    QString contents = lit("<html><p style=\"color:#d04437\">%1</p>%2</html>").arg(
-        tr("Warning! This build is for testing purposes only!"),
-        tr("Please upgrade to a next available patch or release version once available."));
+    QString contents = setWarningStyleHtml(tr("This build is for testing purposes only."))
+        + "<br/>"
+        + tr("Please upgrade to a next available patch or release version once available.");
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning, header, contents,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindowWidget());
@@ -2557,7 +2561,7 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
 void ActionHandler::at_queueAppRestartAction_triggered()
 {
 
-    auto tryToRestartClient = []
+    auto tryToRestartClient = [this]
         {
             using namespace applauncher::api;
 

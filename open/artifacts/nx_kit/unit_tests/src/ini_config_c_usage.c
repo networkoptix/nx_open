@@ -23,7 +23,7 @@ int testIniConfigCUsage()
     ASSERT_TRUE(strlen(nx_ini_iniFile()) > 0);
 
     ASSERT_TRUE(nx_ini_iniFilesDir() != NULL);
-    ASSERT_TRUE(strlen(nx_ini_iniFilesDir()) >= 0);
+    ASSERT_TRUE(strlen(nx_ini_iniFilesDir()) > 0);
 
     ASSERT_TRUE(nx_ini_iniFilePath() != NULL);
     ASSERT_TRUE(strlen(nx_ini_iniFilePath()) > 0);

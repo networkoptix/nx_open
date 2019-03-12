@@ -29,7 +29,7 @@ T maxUnit()
 template<typename T>
 T prevUnit(T value)
 {
-    NX_ASSERT(value > minUnit<T>(), Q_FUNC_INFO, "Mimimal unit already");
+    NX_ASSERT(value > minUnit<T>(), "Mimimal unit already");
     return static_cast<T>(value >> 1);
 }
 
@@ -37,7 +37,7 @@ T prevUnit(T value)
 template<typename T>
 T nextUnit(T value)
 {
-    NX_ASSERT(value < maxUnit<T>(), Q_FUNC_INFO, "Maximal unit already");
+    NX_ASSERT(value < maxUnit<T>(), "Maximal unit already");
     return static_cast<T>(value << 1);
 }
 
@@ -48,7 +48,7 @@ T smallestUnit(QFlags<T> format)
     while (result < maxUnit<T>() && !format.testFlag(result))
         result = nextUnit(result);
 
-    NX_ASSERT(format.testFlag(result), Q_FUNC_INFO, "Invalid format");
+    NX_ASSERT(format.testFlag(result), "Invalid format");
     return result;
 }
 

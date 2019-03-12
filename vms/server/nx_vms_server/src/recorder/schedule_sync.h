@@ -20,8 +20,8 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/api/types/days_of_week.h>
 
-class QnScheduleSync: 
-    public QnLongRunnable, public nx::vms::server::ServerModuleAware
+class QnScheduleSync:
+    public QnLongRunnable, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 private:
@@ -166,4 +166,3 @@ private:
 };
 
 #endif
-

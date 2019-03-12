@@ -5,8 +5,6 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <plugins/plugin_api.h>
-#include <plugins/plugin_tools.h>
 #include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
 

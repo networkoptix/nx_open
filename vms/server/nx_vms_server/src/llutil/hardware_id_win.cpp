@@ -609,29 +609,29 @@ void LLUtil::fillHardwareIds(
 #endif
             }
 
-			for (int i = 0; i < kInterfaceWaitingTries; i++)
-			{
+            for (int i = 0; i < kInterfaceWaitingTries; i++)
+            {
                 QnPathToMacAndDeviceClassMap devices2;
                 findMacAddresses(pSvc, devices2);
 
                 std::vector<_bstr_t> disabled;
                 GetDisabledNICSWithEmptyMac(pSvc, disabled, devices2);
 
-				std::vector<_bstr_t> remaining;
+                std::vector<_bstr_t> remaining;
 
-				std::copy_if(paths.cbegin(), paths.cend(),
+                std::copy_if(paths.cbegin(), paths.cend(),
                                     std::back_inserter(remaining),
-					[disabled] (const auto& path) {
-						return std::find(disabled.cbegin(), disabled.cend(),
-									path) == disabled.cend();
-					});
+                    [disabled] (const auto& path) {
+                        return std::find(disabled.cbegin(), disabled.cend(),
+                                    path) == disabled.cend();
+                    });
 
-				if (remaining.empty())
+                if (remaining.empty())
                     break;
 
-				// Disable enabled NICs again if were any
+                // Disable enabled NICs again if were any
                 DisableNICSAtPaths(pSvc, remaining);
-			}
+            }
         }
     }
 

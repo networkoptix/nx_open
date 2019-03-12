@@ -210,6 +210,6 @@ Qn::PtzCommand QnAbstractPtzController::spaceCommand(
 
 bool deserialize(const QString& /*value*/, QnPtzObject* /*target*/)
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
     return false;
 }

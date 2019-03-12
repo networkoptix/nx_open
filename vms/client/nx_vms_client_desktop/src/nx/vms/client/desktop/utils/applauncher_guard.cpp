@@ -15,8 +15,7 @@ static const int kCheckIntervalMs = 60 * 1000;
 
 } // namespace
 
-ApplauncherGuard::ApplauncherGuard(QObject* parent):
-    base_type(parent)
+ApplauncherGuard::ApplauncherGuard(QObject* parent): base_type(parent)
 {
     // Do not check right now because client is not fully initialized yet
     startTimer(kCheckIntervalMs);

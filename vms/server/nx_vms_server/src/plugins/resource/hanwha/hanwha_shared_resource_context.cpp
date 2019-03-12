@@ -1,7 +1,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
-#include "hanwha_chunk_reader.h"
+#include "hanwha_chunk_loader.h"
 #include "hanwha_common.h"
 
 #include <core/resource/abstract_remote_archive_manager.h>

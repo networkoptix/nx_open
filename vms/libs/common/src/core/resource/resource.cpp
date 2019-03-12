@@ -292,7 +292,7 @@ void QnResource::setTypeByName(const QString& resTypeName)
 Qn::ResourceStatus QnResource::getStatus() const
 {
     return commonModule()
-        ? commonModule()->statusDictionary()->value(getId())
+        ? commonModule()->resourceStatusDictionary()->value(getId())
         : Qn::NotDefined;
 }
 
@@ -308,14 +308,14 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
         return;
 
     QnUuid id = getId();
-    Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
+    Qn::ResourceStatus oldStatus = commonModule()->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
 
-    NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
+    NX_INFO(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
         oldStatus, newStatus, reason, getName(), getUrl());
 
-    commonModule()->statusDictionary()->setValue(id, newStatus);
+    commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
@@ -361,7 +361,7 @@ void QnResource::setUrl(const QString& url)
 {
     {
         QnMutexLocker mutexLocker(&m_mutex);
-        if (!setUrlInternal(url))
+        if (!setUrlUnsafe(url))
             return;
     }
 
@@ -439,7 +439,7 @@ bool QnResource::hasProperty(const QString &key) const
             return true;
         }
     }
-    return commonModule()->propertyDictionary()->hasProperty(getId(), key);
+    return commonModule()->resourcePropertyDictionary()->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key) const
@@ -455,7 +455,7 @@ QString QnResource::getProperty(const QString &key) const
         }
         else if (auto module = commonModule())
         {
-            value = module->propertyDictionary()->value(m_id, key);
+            value = module->resourcePropertyDictionary()->value(m_id, key);
         }
     }
 
@@ -477,11 +477,11 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceTypeId)
 {
     // TODO: #GDM think about code duplication
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is required.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), "Invalid input, reading from local data is required.");
 
     NX_ASSERT(commonModule);
     QString value = commonModule
-        ? commonModule->propertyDictionary()->value(resourceId, key)
+        ? commonModule->resourcePropertyDictionary()->value(resourceId, key)
         : QString();
 
     if (value.isNull())
@@ -509,7 +509,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
             // Will apply to global dictionary when id is known.
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary()->saveProperties(...) does not make any sense
+            //calling resourcePropertyDictionary()->saveProperties(...) does not make any sense
             return false;
         }
     }
@@ -517,7 +517,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     NX_ASSERT(!getId().isNull());
     NX_ASSERT(commonModule());
 
-    bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
+    bool isModified = commonModule() && commonModule()->resourcePropertyDictionary()->setValue(
         getId(), key, value, markDirty, replaceIfExists);
 
     if (isModified)
@@ -531,16 +531,28 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
     return setProperty(key, value.toString(), options);
 }
 
+static QString hidePasswordIfCredentialsPropety(const QString& key, const QString& value)
+{
+    if (nx::utils::log::showPasswords())
+        return value;
+
+    if (key == ResourcePropertyKey::kCredentials || key == ResourcePropertyKey::kDefaultCredentials)
+        return value.left(value.indexOf(':')) + ":******";
+
+    return value;
+}
+
 void QnResource::emitPropertyChanged(const QString& key)
 {
     if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
-    NX_VERBOSE(this, "Changed property %1 = '%2'", key, getProperty(key));
+    NX_VERBOSE(this, "Changed property '%1' = '%2'", key,
+        hidePasswordIfCredentialsPropety(key, getProperty(key)));
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-bool QnResource::setUrlInternal(const QString& value)
+bool QnResource::setUrlUnsafe(const QString& value)
 {
     if (m_url == value)
         return false;
@@ -560,7 +572,7 @@ nx::vms::api::ResourceParamDataList QnResource::getRuntimeProperties() const
     }
 
     if (const auto module = commonModule())
-        return module->propertyDictionary()->allProperties(getId());
+        return module->resourcePropertyDictionary()->allProperties(getId());
 
     return {};
 }
@@ -570,7 +582,7 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
     nx::vms::api::ResourceParamDataList result;
     nx::vms::api::ResourceParamDataList runtimeProperties;
     if (const auto module = commonModule())
-        runtimeProperties = module->propertyDictionary()->allProperties(getId());
+        runtimeProperties = module->resourcePropertyDictionary()->allProperties(getId());
 
     ParamTypeMap defaultProperties;
 
@@ -594,7 +606,7 @@ bool QnResource::saveProperties()
 {
     NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
-        return module->propertyDictionary()->saveParams(getId());
+        return module->resourcePropertyDictionary()->saveParams(getId());
     return false;
 }
 
@@ -602,7 +614,7 @@ int QnResource::savePropertiesAsync()
 {
     NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
-        return module->propertyDictionary()->saveParamsAsync(getId());
+        return module->resourcePropertyDictionary()->saveParamsAsync(getId());
     return false;
 }
 
@@ -621,6 +633,7 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 bool QnResource::init()
 {
     auto commonModule = this->commonModule();
+    auto parentId = getParentId();
     {
         QnMutexLocker lock(&m_initMutex);
         if (!commonModule || commonModule->isNeedToStop())
@@ -631,33 +644,42 @@ bool QnResource::init()
         if (m_initInProgress)
             return false; /* Skip request if init is already running. */
         m_initInProgress = true;
+        m_interuptInitialization = false;
     }
 
     NX_DEBUG(this, "Initiatialize...");
     CameraDiagnostics::Result initResult = initInternal();
-    NX_DEBUG(this, "Initialization result: %1",
+    NX_INFO(this, "Initialization result: %1",
         initResult.toString(commonModule->resourcePool()));
 
-    bool changed = false;
+    bool isInitialized = false;
     {
         QnMutexLocker lock(&m_initMutex);
         m_initInProgress = false;
-        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+        if (m_interuptInitialization)
+        {
+            NX_VERBOSE(this, "Initialization is interrupted");
+            return init();
+        }
+
         {
             QnMutexLocker lk(&m_mutex);
             m_prevInitializationResult = initResult;
+
+            if (parentId != m_parentId)
+                return false; //< Initialization has been interrupted by changing parentId.
+            isInitialized = m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
         }
 
         m_initializationAttemptCount.fetchAndAddOrdered(1);
 
-        changed = m_initialized;
-        if (m_initialized)
+        if (isInitialized)
             initializationDone();
-        else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
+        else if (isOnline())
             setStatus(Qn::Offline);
     }
 
-    if (changed)
+    if (isInitialized)
         emit initializedChanged(toSharedPointer(this));
 
     return true;
@@ -680,45 +702,73 @@ void QnResource::reinitAsync()
     if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
 
-    setStatus(Qn::Offline);
-    QnMutexLocker lock(&m_initAsyncMutex);
-    m_lastInitTime = getUsecTimer();
+    NX_DEBUG(this, "Reinitialization is requested");
+    {
+        QnMutexLocker lock(&m_initAsyncMutex);
+        if (m_initInProgress)
+        {
+            m_interuptInitialization = true;
+            return;
+        }
+
+        m_lastInitTime = getUsecTimer();
+        setStatus(Qn::Offline);
+    }
+
     if (const auto pool = resourcePool())
         pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }
 
 void QnResource::initAsync(bool optional)
 {
+    NX_VERBOSE(this, "Async init requested (optional: %1)", optional);
+
     qint64 t = getUsecTimer();
 
     QnMutexLocker lock(&m_initAsyncMutex);
 
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
+    {
+        NX_VERBOSE(this, "Not running init task: init was recently (%1us < %2us)",
+            t - m_lastInitTime, MIN_INIT_INTERVAL);
         return;
+    }
 
     if (commonModule()->isNeedToStop())
+    {
+        NX_VERBOSE(this, "Not running init task: server is stopping");
         return;
+    }
 
     if (hasFlags(Qn::foreigner))
-        return; // removed to other server
+    {
+        NX_VERBOSE(this, "Not running init task: removed to other server");
+        return;
+    }
 
     auto resourcePool = this->resourcePool();
     if (!resourcePool)
+    {
+        NX_DEBUG(this, "Not running init task: resource pool is unavailable");
         return;
+    }
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    if (optional)
-    {
-        if (resourcePool->threadPool()->tryStart(task))
-            m_lastInitTime = t;
-        else
-            delete task;
-    }
-    else
+    if (!optional)
     {
         m_lastInitTime = t;
         resourcePool->threadPool()->start(task);
+        return;
     }
+
+    if (!resourcePool->threadPool()->tryStart(task))
+    {
+        delete task;
+        NX_DEBUG(this, "Init task was not started");
+        return;
+    }
+
+    m_lastInitTime = t;
 }
 
 CameraDiagnostics::Result QnResource::prevInitializationResult() const
@@ -744,7 +794,7 @@ bool QnResource::isInitializationInProgress() const
 
 void QnResource::setUniqId(const QString& /*value*/)
 {
-    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, "Not implemented");
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

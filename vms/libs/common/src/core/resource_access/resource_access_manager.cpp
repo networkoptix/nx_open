@@ -146,9 +146,12 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
     if (!subject.isValid() || !resource)
         return Qn::NoPermissions;
 
-    /* User is already removed. */
-    if (subject.user() && !subject.user()->resourcePool())
-        return Qn::NoPermissions;
+    // User is already removed.
+    if (const auto& user = subject.user())
+	{
+        if (!user->resourcePool() || !user->resourcePool()->getResourceById(user->getId()))
+            return Qn::NoPermissions;
+	}
 
     /* Resource is not added to pool, checking if we can create such resource. */
     if (!resource->resourcePool())

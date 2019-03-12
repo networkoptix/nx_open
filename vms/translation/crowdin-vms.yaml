@@ -1,45 +1,45 @@
 project_identifier: nx-witness
 api_key: 42f3cd326fea96b19ad3bf2eb9009b45
-base_path: ..
+base_path: ../..
 preserve_hierarchy: true
 
 files:
   -
     dest: '/Common/qtbase.ts'
-    source:      '/libs/common/translations/qtbase.ts'
-    translation: '/libs/common/translations/qtbase_%locale_with_underscore%.ts'
+    source:      '/vms/libs/common/translations/qtbase.ts'
+    translation: '/vms/libs/common/translations/qtbase_%locale_with_underscore%.ts'
   -
     dest: '/Common/common.ts'
-    source:      '/libs/common/translations/common_en_US.ts'
-    translation: '/libs/common/translations/common_%locale_with_underscore%.ts'
+    source:      '/vms/libs/common/translations/common_en_US.ts'
+    translation: '/vms/libs/common/translations/common_%locale_with_underscore%.ts'
   -
     dest: '/TrayTool/traytool.ts'
-    source:      '/traytool/translations/traytool_en_US.ts'
-    translation: '/traytool/translations/traytool_%locale_with_underscore%.ts'
+    source:      '/vms/traytool/translations/traytool_en_US.ts'
+    translation: '/vms/traytool/translations/traytool_%locale_with_underscore%.ts'
   -
     dest: '/Client/client_core.ts'
-    source:      '/client/nx_vms_client_core/translations/client_core_en_US.ts'
-    translation: '/client/nx_vms_client_core/translations/client_core_%locale_with_underscore%.ts'
+    source:      '/vms/client/nx_vms_client_core/translations/client_core_en_US.ts'
+    translation: '/vms/client/nx_vms_client_core/translations/client_core_%locale_with_underscore%.ts'
   -
     dest: '/Client/client_qml.ts'
-    source:      '/client/nx_vms_client_desktop/translations/client_qml_en_US.ts'
-    translation: '/client/nx_vms_client_desktop/translations/client_qml_%locale_with_underscore%.ts'
+    source:      '/vms/client/nx_vms_client_desktop/translations/client_qml_en_US.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_qml_%locale_with_underscore%.ts'
   -
     dest: '/Client/client_base.ts'
-    source:      '/client/nx_vms_client_desktop/translations/client_base_en_US.ts'
-    translation: '/client/nx_vms_client_desktop/translations/client_base_%locale_with_underscore%.ts'
+    source:      '/vms/client/nx_vms_client_desktop/translations/client_base_en_US.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_base_%locale_with_underscore%.ts'
   -
     dest: '/Client/client_ui.ts'
-    source:      '/client/nx_vms_client_desktop/translations/client_ui_en_US.ts'
-    translation: '/client/nx_vms_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
+    source:      '/vms/client/nx_vms_client_desktop/translations/client_ui_en_US.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
   -
     dest: '/Installer/OptixTheme.wxl'
-    source:      '/distribution/wix/translations/strings_en_US.wxl'
-    translation: '/distribution/wix/translations/strings_%locale_with_underscore%.wxl'
+    source:      '/vms/distribution/wix/translations/strings_en_US.wxl'
+    translation: '/vms/distribution/wix/translations/strings_%locale_with_underscore%.wxl'
   -
-    source: '/webadmin/.tmp/language.json'
-    translation: '/webadmin/translations/%locale_with_underscore%/language.json'
     dest: '/webadmin/app/language.json'
+    source:      '/webadmin/.tmp/language.json'
+    translation: '/webadmin/translations/%locale_with_underscore%/language.json'
   -
     source: '/webadmin/app/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%'

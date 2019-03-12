@@ -45,16 +45,14 @@ public:
     virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+    virtual CameraDiagnostics::Result openStreamInternal(
+        bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
     virtual void pleaseStop() override;
     virtual void beforeRun() override;
     virtual void afterRun() override;
-
-    //!Overrides QnLiveStreamProvider::onStreamResolutionChanged()
-    virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 
 private:
     //virtual bool needMetaData() const override;
@@ -66,6 +64,7 @@ private:
     mutable QnMutex m_streamReaderMutex;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
+    // TODO: Migrate to nx::sdk::Ptr.
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;

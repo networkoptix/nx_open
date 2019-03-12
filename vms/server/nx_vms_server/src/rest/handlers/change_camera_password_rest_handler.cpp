@@ -35,7 +35,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
     {
         result.setError(
             QnJsonRestResult::InvalidParameter,
-            lit("Invalid Json object provided"));
+            lit("Invalid JSON object provided"));
         return nx::network::http::StatusCode::ok;
     }
 
@@ -80,6 +80,8 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
+    // NOTE: Reinitialising all camera resources from the group for multichannel cameras
+    NX_DEBUG(this, "Starting reinitialisation of camera to use new credentials");
     for (auto camera: allCamerasInGroup(requestedCamera))
     {
         camera->setAuth(auth);

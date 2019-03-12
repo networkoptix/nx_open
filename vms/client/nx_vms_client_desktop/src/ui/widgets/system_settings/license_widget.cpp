@@ -24,31 +24,30 @@
 using namespace nx::vms::client::desktop;
 
 namespace {
-bool isValidSerialKey(const QString &key)
+
+bool isValidSerialKey(const QString& key)
 {
     return key.length() == QnAppInfo::freeLicenseKey().length() && !key.contains(QLatin1Char(' '));
 }
 
-} // anonymous namespace
+} // namespace
 
-
-QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
+QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::LicenseWidget),
-    m_state(Normal),
-    m_freeLicenseAvailable(true)
+    ui(new Ui::LicenseWidget)
 {
     ui->setupUi(this);
 
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
-    /* Workaround for initially hidden tab providing incorrect size hint: */
-    autoResizePagesToContents(ui->tabWidget, { QSizePolicy::Expanding, QSizePolicy::Preferred }, false);
+    // Workaround for initially hidden tab providing incorrect size hint.
+    autoResizePagesToContents(ui->tabWidget, {QSizePolicy::Expanding, QSizePolicy::Preferred},
+        false);
 
-    /* Choose monospace font for license input line: */
+    // Choose monospace font for license input line.
     setMonospaceFont(ui->onlineKeyEdit);
 
-    /* Upon taking focus by license input line set cursor to first empty position: */
+    // Upon taking focus by license input line set cursor to first empty position.
     installEventHandler(ui->onlineKeyEdit, QEvent::FocusIn, this,
         [this]()
         {
@@ -101,7 +100,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
 
     connect(ui->onlineKeyEdit, &QLineEdit::textChanged, this, &QnLicenseWidget::updateControls);
     connect(ui->browseLicenseFileButton, &QPushButton::clicked,
-        this, &QnLicenseWidget::at_browseLicenseFileButton_clicked);
+        this, &QnLicenseWidget::browseForLicenseFile);
 
     setAccentStyle(ui->activateLicenseButton);
     connect(ui->activateLicenseButton, &QPushButton::clicked, this,
@@ -135,7 +134,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
 
 QnLicenseWidget::~QnLicenseWidget()
 {
-    return;
 }
 
 QnLicenseWidget::State QnLicenseWidget::state() const
@@ -189,7 +187,7 @@ QString QnLicenseWidget::serialKey() const
     return ui->onlineKeyEdit->text();
 }
 
-void QnLicenseWidget::setSerialKey(const QString &serialKey)
+void QnLicenseWidget::setSerialKey(const QString& serialKey)
 {
     ui->onlineKeyEdit->setText(serialKey);
 }
@@ -219,26 +217,54 @@ void QnLicenseWidget::updateControls()
     }
 }
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnLicenseWidget::changeEvent(QEvent *event)
+void QnLicenseWidget::changeEvent(QEvent* event)
 {
-    QWidget::changeEvent(event);
+    base_type::changeEvent(event);
 
     if (event->type() == QEvent::LanguageChange)
         ui->retranslateUi(this);
 }
 
-void QnLicenseWidget::at_browseLicenseFileButton_clicked()
+void QnLicenseWidget::keyPressEvent(QKeyEvent* event)
 {
-    QString fileName = QFileDialog::getOpenFileName(
+    const auto lineEdit = qobject_cast<QLineEdit*>(QApplication::focusWidget());
+    if (!lineEdit || !lineEdit->isEnabled() || lineEdit->isReadOnly() || !lineEdit->isVisible())
+    {
+        event->ignore();
+        return;
+    }
+
+    switch (event->key())
+    {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        {
+            event->accept(); //< Do not propagate Enter key up to the dialog.
+
+            if (event->modifiers() && event->modifiers() != Qt::KeypadModifier)
+                break;
+
+            if (lineEdit == ui->onlineKeyEdit)
+                ui->activateLicenseButton->click();
+
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+void QnLicenseWidget::browseForLicenseFile()
+{
+    const auto fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open License File"),
         QString(),
         QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter),
         nullptr,
         QnCustomFileDialog::fileDialogOptions());
+
     if (fileName.isEmpty())
         return;
 
@@ -252,24 +278,21 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked()
     ui->fileLineEdit->setText(file.fileName());
     ui->fileLineEdit->setPalette(this->palette());
 
-    QString source = QString::fromLatin1(file.readAll());
+    const auto source = QString::fromLatin1(file.readAll());
     file.close();
 
     QStringList lines = source.split(L'\n');
-    QStringList filtered_lines;
-    foreach(QString line, lines)
+    QStringList filteredLines;
+    for (const auto& line: lines)
     {
-        line = line.trimmed();
-        if (!line.isEmpty())
-        {
-            filtered_lines.append(line);
-        }
+        const auto trimmedLine = line.trimmed();
+        if (!trimmedLine.isEmpty())
+            filteredLines.append(line);
     }
-    m_activationKey = filtered_lines.join(L'\n').toLatin1();
+
+    m_activationKey = filteredLines.join(L'\n').toLatin1();
     if (m_activationKey.isEmpty())
-    {
         setWarningStyle(ui->fileLineEdit);
-    }
 
     updateControls();
 }

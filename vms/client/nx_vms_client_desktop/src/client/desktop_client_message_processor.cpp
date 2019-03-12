@@ -35,7 +35,7 @@ void QnDesktopClientMessageProcessor::connectToConnection(const ec2::AbstractECC
 {
     base_type::connectToConnection(connection);
 
-    connect(connection->getDiscoveryNotificationManager(),
+    connect(connection->discoveryNotificationManager(),
         &ec2::AbstractDiscoveryNotificationManager::gotInitialDiscoveredServers,
         this,
         &QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers);
@@ -45,7 +45,7 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
 {
     base_type::disconnectFromConnection(connection);
 
-    connection->getDiscoveryNotificationManager()->disconnect(this);
+    connection->discoveryNotificationManager()->disconnect(this);
 }
 
 void QnDesktopClientMessageProcessor::onGotInitialNotification(
@@ -64,4 +64,3 @@ void QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers(
 {
     m_incompatibleServerWatcher->createInitialServers(discoveredServers);
 }
-

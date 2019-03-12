@@ -131,7 +131,7 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         {
             // Enjoy cross cast - it actually works!
             if (dynamic_cast<QIODevice*>(storage)->openMode() & QIODevice::WriteOnly)
-                NX_ASSERT(false, Q_FUNC_INFO, "Can't open several files for writing");
+                NX_ASSERT(false, "Can't open several files for writing");
         }
     }
 #endif

@@ -20,9 +20,13 @@
 
 namespace detail {
 
-// TODO: this class doesn't take into account channelNumber. It cause bugs for multichannel devices.
 class MediaStreamCache
 {
+public:
+    // If the duration between requested timestamp and the one found in findByTimestamp is bigger
+    // than that value -- the frame is considered as not found.
+    static constexpr std::chrono::seconds kMaxTimestampDeviation{10};
+
 public:
     /*!
         \param desiredCacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis 
@@ -62,9 +66,13 @@ public:
     QnAbstractDataPacketPtr findByTimestamp(
         quint64 desiredTimestamp,
         bool findKeyFrameOnly,
-        quint64* const foundTimestamp ) const;
+        quint64* const foundTimestamp,
+        int channelNumber) const;
     //!Returns packet with min timestamp greater than \a timestamp
-    QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
+    QnAbstractDataPacketPtr getNextPacket(
+        quint64 timestamp,
+        quint64* const foundTimestamp,
+        int channelNumber) const;
 
     nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& keyFrameFoundSubscription();
     nx::utils::Subscription<>& streamTimeDiscontinuityFoundSubscription();
@@ -85,27 +93,10 @@ public:
 private:
     struct MediaPacketContext
     {
-        quint64 timestamp;
+        quint64 timestamp = 0;
         QnAbstractDataPacketPtr packet;
-        bool isKeyFrame;
-
-        MediaPacketContext()
-            :
-            timestamp( 0 ),
-            isKeyFrame( false )
-        {
-        }
-
-        MediaPacketContext(
-            quint64 _timestamp,
-            QnAbstractDataPacketPtr _packet,
-            bool _isKeyFrame )
-            :
-            timestamp( _timestamp ),
-            packet( _packet ),
-            isKeyFrame( _isKeyFrame )
-        {
-        }
+        bool isKeyFrame = false;
+        int channelNumber = 0;
     };
 
     //!map<timestamp, pair<packet, key_flag> >
@@ -113,7 +104,7 @@ private:
 
     const qint64 m_cacheSizeUsec;
     const qint64 m_maxCacheSizeUsec;
-    PacketContainerType m_packetsByTimestamp;
+    PacketContainerType m_packetsByTimestamp; // TODO: Should be multiset.
     mutable QnMutex m_mutex;
     //!In micros
     qint64 m_prevPacketSrcTimestamp;

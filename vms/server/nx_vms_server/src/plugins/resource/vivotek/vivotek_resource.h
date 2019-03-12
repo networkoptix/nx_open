@@ -40,8 +40,8 @@ public:
     virtual CameraDiagnostics::Result customStreamConfiguration(
         Qn::ConnectionRole role) override;
 protected:
-    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
-        Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
+        StreamIndex streamIndex) override;
 private:
     bool fetchHevcSupport();
 

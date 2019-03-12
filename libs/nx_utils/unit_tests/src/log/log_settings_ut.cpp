@@ -63,11 +63,11 @@ TEST_F(LogSettings, multiple_loggers)
     logger1Settings.maxBackupCount = 11;
     logger1Settings.maxFileSize = 100 * 1024 * 1024;
     logger1Settings.level.primary = nx::utils::log::Level::none;
-    logger1Settings.level.filters[Tag(QString("nx::network"))] =
+    logger1Settings.level.filters[Filter(QString("nx::network"))] =
         nx::utils::log::Level::warning;
-    logger1Settings.level.filters[Tag(QString("nx::utils"))] =
+    logger1Settings.level.filters[Filter(QString("nx::utils"))] =
         nx::utils::log::Level::warning;
-    logger1Settings.level.filters[Tag(QString("nx::network::http"))] =
+    logger1Settings.level.filters[Filter(QString("nx::network::http"))] =
         nx::utils::log::Level::debug;
     ASSERT_EQ(logger1Settings, logSettings.loggers[1]);
 }

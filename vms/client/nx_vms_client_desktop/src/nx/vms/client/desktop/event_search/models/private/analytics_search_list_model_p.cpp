@@ -3,17 +3,19 @@
 #include <algorithm>
 #include <chrono>
 
-#include <QtGui/QPalette>
+// QMenu is the only widget allowed in Right Panel item models.
+// It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
-#include <analytics/common/object_detection_metadata.h>
 #include <api/server_rest_connection.h>
+#include <analytics/common/object_detection_metadata.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -24,18 +26,17 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/analytics/descriptor_manager.h>
+#include <nx/api/mediaserver/image_request.h>
 #include <nx/client/core/utils/human_readable.h>
-#include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
-
-#include <common/common_module.h>
-#include <nx/analytics/descriptor_list_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -157,18 +158,18 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            const auto descriptorListManager =
-                objectCamera->commonModule()->analyticsDescriptorListManager();
+            nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(
+                objectCamera->commonModule());
 
-            auto objectTypeDescriptor = descriptorListManager
-                ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
+            const auto objectTypeDescriptor = objectTypeDescriptorManager.descriptor(
+                object.objectTypeId);
 
             if (!objectTypeDescriptor)
                 return fallbackTitle();
 
-            return objectTypeDescriptor->item.name.isEmpty()
+            return objectTypeDescriptor->name.isEmpty()
                 ? fallbackTitle()
-                : objectTypeDescriptor->item.name;
+                : objectTypeDescriptor->name;
         }
 
         case Qt::DecorationRole:
@@ -185,6 +186,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(previewParams(object).timestamp);
+
+        case Qn::PreviewStreamSelectionRole:
+            return QVariant::fromValue(
+                nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics);
 
         case Qn::DurationRole:
             return QVariant::fromValue(objectDuration(object));
@@ -446,24 +451,17 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
         auto cameras = q->cameras();
         MetadataReceiverList newMetadataReceivers;
 
-        const auto isOnline =
-            [](const QnVirtualCameraResourcePtr& camera)
-            {
-                const auto status = camera->getStatus();
-                return status == Qn::Online || status == Qn::Recording;
-            };
-
         // Preserve existing receivers that are still relevant.
         for (auto& receiver: m_metadataReceivers)
         {
-            if (cameras.remove(receiver->camera()) && isOnline(receiver->camera()))
+            if (cameras.remove(receiver->camera()) && receiver->camera()->isOnline())
                 newMetadataReceivers.emplace_back(receiver.release());
         }
 
         // Create new receivers if needed.
         for (const auto& camera: cameras)
         {
-            if (isOnline(camera))
+            if (camera->isOnline())
             {
                 newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
 
@@ -547,7 +545,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
             if (!detectionMetadata || detectionMetadata->objects.empty())
                 continue;
 
-            for (auto& item: detectionMetadata->objects)
+            for (const auto& item: detectionMetadata->objects)
             {
                 ObjectPosition pos;
                 pos.deviceId = detectionMetadata->deviceId;
@@ -558,7 +556,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 auto index = newObjectIndices.value(item.objectId, -1);
                 if (index >= 0)
                 {
-                    pos.attributes = std::move(item.labels);
+                    pos.attributes = item.labels;
                     advanceObject(newObjects[index], std::move(pos), false);
                     continue;
                 }
@@ -566,7 +564,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 index = indexOf(item.objectId);
                 if (index >= 0)
                 {
-                    pos.attributes = std::move(item.labels);
+                    pos.attributes = item.labels;
                     advanceObject(m_data[index], std::move(pos));
                     continue;
                 }
@@ -581,13 +579,13 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 DetectedObject newObject;
                 newObject.objectAppearanceId = item.objectId;
                 newObject.objectTypeId = item.objectTypeId;
-                newObject.attributes = std::move(item.labels);
+                newObject.attributes = item.labels;
                 newObject.track.push_back(pos);
                 newObject.firstAppearanceTimeUsec = pos.timestampUsec;
                 newObject.lastAppearanceTimeUsec = pos.timestampUsec;
 
                 newObjectIndices[item.objectId] = int(newObjects.size());
-                newObjects.push_back(std::move(newObject));
+                newObjects.push_back(newObject);
             }
         }
     }
@@ -735,95 +733,33 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     const analytics::storage::DetectedObject& object) const
 {
     using nx::vms::api::analytics::ActionTypeDescriptor;
-
     const auto camera = this->camera(object);
     if (!camera)
         return {};
 
-    // TODO: #vkutin Is this a correct way of choosing servers for analytics actions?
-    auto servers = q->cameraHistoryPool()->getCameraFootageData(camera, true);
-    servers.push_back(camera->getParentServer());
-
-    const auto descriptorListManager = camera
-        ->commonModule()
-        ->analyticsDescriptorListManager();
-
-    const auto allActions = descriptorListManager->descriptors<ActionTypeDescriptor>(servers);
-    if (allActions.empty())
-        return {};
-
-    QMap<QString, QList<ActionTypeDescriptor>> actionsByPlugin;
-    for (const auto& [actionId, descriptor]: allActions)
-    {
-        if (!descriptor.item.supportedObjectTypeIds.contains(object.objectTypeId))
-            continue;
-
-        for (const auto& path: descriptor.paths)
-            actionsByPlugin[path.pluginId].push_back(descriptor);
-    }
-
-    if (actionsByPlugin.isEmpty())
-        return {};
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
+    const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
+        object.objectTypeId,
+        camera);
 
     QSharedPointer<QMenu> menu(new QMenu());
-    for (const auto& [pluginId, descriptors]: nx::utils::keyValueRange(actionsByPlugin))
+    for (const auto& [engineId, actionById]: actionByEngine)
     {
         if (!menu->isEmpty())
             menu->addSeparator();
 
-        for (const auto& actionDescriptor: descriptors)
+        for (const auto& [actionId, actionDescriptor]: actionById)
         {
-            const auto name = actionDescriptor.item.name;
+            const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, actionDescriptor, object, pluginId = pluginId]()
+                [this, engineId = engineId, actionId = actionDescriptor.id, object, camera]()
                 {
-                    executePluginAction(pluginId, actionDescriptor, object);
+                    emit q->pluginActionRequested(engineId, actionId, object, camera, {});
                 }));
         }
     }
 
     return menu;
-}
-
-void AnalyticsSearchListModel::Private::executePluginAction(
-    const QString& pluginId,
-    const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
-    const analytics::storage::DetectedObject& object) const
-{
-    const auto& actionType = actionDescriptor.item;
-    const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(server && server->restConnection());
-    if (!server || !server->restConnection())
-        return;
-
-    const auto resultCallback =
-        [this](bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
-        {
-            if (result.error != QnRestResult::NoError)
-            {
-                QnMessageBox::warning(q->mainWindowWidget(), tr("Failed to execute plugin action"),
-                    result.errorString);
-                return;
-            }
-
-            if (!success)
-                return;
-
-            const auto reply = result.deserialized<AnalyticsActionResult>();
-            if (!reply.messageToUser.isEmpty())
-                QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
-
-            if (!reply.actionUrl.isEmpty())
-                WebViewDialog::showUrl(QUrl(reply.actionUrl));
-        };
-
-    AnalyticsAction actionData;
-    actionData.pluginId = pluginId;
-    actionData.actionId = actionType.id;
-    actionData.objectId = object.objectAppearanceId;
-
-    server->restConnection()->executeAnalyticsAction(
-        actionData, nx::utils::guarded(this, resultCallback), thread());
 }
 
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(

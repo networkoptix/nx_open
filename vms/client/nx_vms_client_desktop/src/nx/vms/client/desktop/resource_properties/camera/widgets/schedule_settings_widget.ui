@@ -463,28 +463,14 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <layout class="QHBoxLayout" name="qualityLabelLayout" stretch="0,1">
-           <item>
-            <widget class="QLabel" name="qualityLabel">
-             <property name="text">
-              <string>Quality</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="nx::vms::client::desktop::HintButton" name="qualityLabelHint" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="nx::vms::client::desktop::LabelWithHint" name="qualityLabel">
+           <property name="text">
+            <string>Quality</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
          </item>
          <item row="1" column="1">
           <widget class="QComboBox" name="qualityComboBox">
@@ -585,9 +571,9 @@
    <header location="global">nx/vms/client/desktop/common/widgets/selectable_button.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::HintButton</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
+   <class>nx::vms::client::desktop::LabelWithHint</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

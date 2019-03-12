@@ -173,9 +173,8 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
     if (dstId == uidToId)
         return;
 
-    QString message = lit("Malformed camera id: id = %1; uniqueId = %2; uniqueIdToId = %3")
-        .arg(dstId.toString()).arg(dstUid).arg(uidToId.toString());
-    NX_ASSERT(false, "fromApiToResource()", message);
+    NX_ASSERT(false, lit("Malformed camera id: id = %1; uniqueId = %2; uniqueIdToId = %3")
+        .arg(dstId.toString()).arg(dstUid).arg(uidToId.toString()));
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, CameraData& dst)
@@ -768,7 +767,7 @@ QnUserResourcePtr fromApiToResource(const UserData& src, QnCommonModule* commonM
 
 void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
 {
-    NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), Q_FUNC_INFO, "Unexpected user type");
+    NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), "Unexpected user type");
 
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 

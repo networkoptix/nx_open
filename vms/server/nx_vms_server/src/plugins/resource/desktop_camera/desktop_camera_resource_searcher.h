@@ -14,7 +14,7 @@ class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:
@@ -24,14 +24,13 @@ public:
     virtual QnResourcePtr createResource(const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;
 
-    // return the manufacture of the server
-    virtual QString manufacture() const override;
+    virtual QnResourceList findResources() override;
+
+    virtual QString manufacturer() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
-
-    virtual QnResourceList findResources() override;
 
     void registerCamera(std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         const QString& userName,

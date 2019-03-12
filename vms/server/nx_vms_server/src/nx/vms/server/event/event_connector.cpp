@@ -25,8 +25,9 @@ EventConnector::EventConnector(QnMediaServerModule* serverModule):
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &EventConnector::onNewResource);
 
     m_thread = new QThread(this);
-    m_thread->start();
+    m_thread->setObjectName("EventConnectorThread");
     moveToThread(m_thread);
+    m_thread->start();
 }
 
 EventConnector::~EventConnector()
@@ -547,7 +548,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
             vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
                 resource->toSharedPointer(),
-                params.getAnalyticsPluginId(),
+                params.getAnalyticsEngineId(),
                 params.getAnalyticsEventTypeId(),
                 eventState,
                 params.caption,

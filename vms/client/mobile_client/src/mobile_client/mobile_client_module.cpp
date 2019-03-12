@@ -11,6 +11,7 @@
 
 #include <client_core/client_core_module.h>
 
+#include <nx/network/cloud/tunnel/connector_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/mobile_client_camera_factory.h>
 #include <api/session_manager.h>
@@ -98,6 +99,11 @@ QnMobileClientModule::QnMobileClientModule(
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
+
+    // Work around crash on Android.
+    nx::network::cloud::ConnectorFactory::setEnabledCloudConnectMask(
+        nx::network::cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+        (~(int)nx::network::cloud::ConnectType::udpHp));
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);

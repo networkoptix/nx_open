@@ -16,7 +16,9 @@ Rectangle
         ? hoveredColor
         : pressed
             ? pressedColor
-            : backgroundColor
+            : flat
+                ? "transparent"
+                : backgroundColor
 
     radius: 2
 
@@ -25,7 +27,7 @@ Rectangle
         width: parent.width
         height: 1
         color: ColorTheme.darker(outlineColor, 1)
-        visible: !flat && pressed
+        visible: pressed
     }
 
     Rectangle
@@ -35,6 +37,6 @@ Rectangle
         x: 1
         y: parent.height - 1
         color: ColorTheme.lighter(outlineColor, hovered ? 1 : 0)
-        visible: !flat && !pressed
+        visible: !pressed && (!flat || hovered)
     }
 }

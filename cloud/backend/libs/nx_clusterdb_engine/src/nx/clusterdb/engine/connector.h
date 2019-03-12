@@ -32,6 +32,10 @@ public:
         const std::string& systemId,
         const nx::utils::Url& url);
 
+    void removeNodeUrl(
+        const::std::string& systemId,
+        const nx::utils::Url& url);
+
 protected:
     virtual void stopWhileInAioThread() override;
 
@@ -50,12 +54,12 @@ private:
     std::atomic<int> m_connectionSequence{0};
 
     void connectToNodeAsync(const nx::utils::Url& url);
-    
+
     void onConnectCompletion(
         const nx::utils::Url& url,
         transport::ConnectResultDescriptor result,
         std::unique_ptr<transport::AbstractConnection> connection);
-    
+
     void registerConnection(
         const nx::utils::Url& url,
         const NodeContext& nodeContext,

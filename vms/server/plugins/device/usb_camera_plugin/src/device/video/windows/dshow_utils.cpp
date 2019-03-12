@@ -45,9 +45,10 @@ DShowCompressionTypeDescriptor::~DShowCompressionTypeDescriptor()
 
 nxcip::CompressionType DShowCompressionTypeDescriptor::toNxCompressionType() const
 {
+
         auto viHeader = videoInfoHeader();
-        return viHeader 
-            ? toNxCodecID(viHeader->bmiHeader.biCompression) 
+        return viHeader
+            ? toNxCodecID(viHeader->bmiHeader.biCompression)
             : nxcip::AV_CODEC_ID_NONE;
 }
 
@@ -103,9 +104,9 @@ std::vector<DeviceData> getDeviceList()
 
         std::string path = getDevicePath(pMoniker);
 
-        std::string uniqueId = getDeviceUniqueId(path);
-        if (uniqueId.empty())
-            uniqueId = std::to_string(nameIndex) + "-" + name;
+        // Do not use device serial number, due to some cameras return serial number in enabled
+        // state only.
+        std::string uniqueId = std::to_string(nameIndex) + "-" + name;
 
         devices.push_back(DeviceData(name, path, uniqueId));
         pMoniker->Release();

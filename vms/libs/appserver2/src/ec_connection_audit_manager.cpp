@@ -24,14 +24,14 @@ ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConne
     m_connection(ecConnection)
 {
     connect(
-        ecConnection->getMediaServerNotificationManager().get(),
+        ecConnection->mediaServerNotificationManager().get(),
         &ec2::AbstractMediaServerNotificationManager::userAttributesRemoved,
         this,
         &ECConnectionAuditManager::at_resourceAboutToRemoved,
         Qt::DirectConnection);
 
     connect(
-        ecConnection->getCameraNotificationManager().get(),
+        ecConnection->cameraNotificationManager().get(),
         &ec2::AbstractCameraNotificationManager::userAttributesRemoved,
         this,
         &ECConnectionAuditManager::at_resourceAboutToRemoved,
@@ -40,8 +40,8 @@ ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConne
 
 ECConnectionAuditManager::~ECConnectionAuditManager()
 {
-    m_connection->getMediaServerNotificationManager()->disconnect(this);
-    m_connection->getCameraNotificationManager()->disconnect(this);
+    m_connection->mediaServerNotificationManager()->disconnect(this);
+    m_connection->cameraNotificationManager()->disconnect(this);
 }
 
 void ECConnectionAuditManager::at_resourceAboutToRemoved(const QnUuid& id)

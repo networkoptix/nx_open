@@ -27,7 +27,7 @@ class QnMulticodecRtpReader:
     public QnResourceConsumer,
     public QnAbstractMediaStreamProvider,
     public QnStoppable,
-    public Qn::EnableSafeDirectConnection
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

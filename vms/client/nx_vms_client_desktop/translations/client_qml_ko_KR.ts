@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
   <context>
+    <name>AnalyticsSettings</name>
+    <message>
+      <source>Enable</source>
+      <translation>사용</translation>
+    </message>
+    <message>
+      <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+    </message>
+  </context>
+  <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
@@ -57,10 +68,6 @@
   <context>
     <name>SystemTile</name>
     <message>
-      <source>SAFE MODE</source>
-      <translation>안전 모드</translation>
-    </message>
-    <message>
       <source>INCOMPATIBLE</source>
       <translation>호환 되지 않는</translation>
     </message>
@@ -71,6 +78,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>연결할 수 없는</translation>
+    </message>
+    <message>
+      <source>SAFE MODE</source>
+      <translation>안전 모드</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -84,20 +95,21 @@
       <translation>결과 없음</translation>
     </message>
     <message>
-      <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>당신은 %1에 액세스할 수 없습니다. 일부 기능은 사용할 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>읽는 중...</translation>
-    </message>
-    <message>
       <source>Connect to Another Server...</source>
       <translation>다른 서버에 연결...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
       <translation>서버에 연결...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>읽는 중...</translation>
+    </message>
+    <message>
+      <source>You have no access to %1. Some features could be unavailable.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>당신은 %1에 액세스할 수 없습니다. 일부 기능은 사용할 수 있습니다.</translation>
     </message>
   </context>
 </TS>

@@ -1673,7 +1673,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     lk.unlock();
 
 #if defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD) && !defined(DISABLE_FRAME_UPLOAD)
-    //if needed, uploading aggregation surface to ogl texture(s)
+    //if needed, uploading aggregation surface to ogl textures
     pic->aggregationSurfaceRect()->ensureUploadedToOGL( opacity() );
 #endif
 

@@ -32,13 +32,15 @@ void Codec::close()
         avcodec_free_context(&m_codecContext);
 }
 
-int Codec::sendPacket(const AVPacket *packet) const
+int Codec::sendPacket(const AVPacket *packet)
 {
+    m_needFlush = packet != nullptr;
     return avcodec_send_packet(m_codecContext, packet);
 }
 
-int Codec::sendFrame(const AVFrame * frame) const
+int Codec::sendFrame(const AVFrame * frame)
 {
+    m_needFlush = frame != nullptr;
     return avcodec_send_frame(m_codecContext, frame);
 }
 
@@ -46,7 +48,7 @@ int Codec::receivePacket(AVPacket * outPacket) const
 {
     return avcodec_receive_packet(m_codecContext, outPacket);
 }
-    
+
 int Codec::receiveFrame(AVFrame * outFrame) const
 {
     return avcodec_receive_frame(m_codecContext, outFrame);
@@ -72,7 +74,7 @@ int Codec::initializeEncoder(const char * codecName)
     m_codec = avcodec_find_encoder_by_name(codecName);
     if (!m_codec)
         return AVERROR_ENCODER_NOT_FOUND;
-        
+
     m_codecContext = avcodec_alloc_context3(m_codec);
     if (!m_codecContext)
         return AVERROR(ENOMEM);
@@ -88,7 +90,7 @@ int Codec::initializeDecoder(AVCodecID codecId)
         return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
-    if(!m_codecContext)
+    if (!m_codecContext)
         return AVERROR(ENOMEM);
 
     return 0;
@@ -99,11 +101,11 @@ int Codec::initializeDecoder(const AVCodecParameters * codecParameters)
     int result = initializeDecoder(codecParameters->codec_id);
     if (result < 0)
         return result;
-    
+
     result = avcodec_parameters_to_context(m_codecContext, codecParameters);
     if (result < 0)
         avcodec_free_context(&m_codecContext);
-    
+
     return result;
 }
 
@@ -111,11 +113,11 @@ int Codec::initializeDecoder(const char * codecName)
 {
     close();
     m_codec = avcodec_find_decoder_by_name(codecName);
-    if(!m_codec)
+    if (!m_codec)
         return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
-    if(!m_codecContext)
+    if (!m_codecContext)
         return AVERROR(ENOMEM);
 
     return 0;
@@ -192,10 +194,10 @@ int Codec::frameSize() const
 
 void Codec::flush()
 {
-    if (!avcodec_is_open(m_codecContext))
+    if (!avcodec_is_open(m_codecContext) || !m_needFlush)
         return;
 
-    if(av_codec_is_decoder(m_codec))
+    if (av_codec_is_decoder(m_codec))
     {
         Frame frame;
         int returnCode = sendPacket(nullptr);
@@ -209,6 +211,7 @@ void Codec::flush()
         while (returnCode != AVERROR_EOF)
             returnCode = receivePacket(packet.packet());
     }
+    m_needFlush = false;
 }
 
 } // namespace ffmpeg

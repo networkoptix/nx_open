@@ -24,14 +24,8 @@ static const QString dontRecordPrimaryStreamKey("dontRecordPrimaryStream");
 static const QString dontRecordSecondaryStreamKey("dontRecordSecondaryStream");
 static const QString rtpTransportKey("rtpTransport");
 static const QString dynamicVideoLayoutKey("dynamicVideoLayout");
-static const QString motionStreamKey("motionStream");
 static const QString rotationKey("rotation");
 static const QString panicRecordingKey("panic_mode");
-
-using nx::vms::api::MotionStreamType;
-static const QString primaryStreamValue = QnLexical::serialized(MotionStreamType::primary);
-static const QString secondaryStreamValue = QnLexical::serialized(MotionStreamType::secondary);
-static const QString edgeStreamValue = QnLexical::serialized(MotionStreamType::edge);
 
 } // namespace
 
@@ -220,9 +214,16 @@ void QnMediaResource::setPtzCapability(
 
 bool QnMediaResource::canSwitchPtzPresetTypes() const
 {
-    const auto caps = getPtzCapabilities();
-    return caps.testFlag(Ptz::NativePresetsPtzCapability)
-        && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
+    const auto capabilities = getPtzCapabilities();
+    if (!(capabilities & Ptz::NativePresetsPtzCapability))
+        return false;
+
+    if (capabilities & Ptz::NoNxPresetsPtzCapability)
+        return false;
+
+    // Check if our server can emulate presets.
+    return (capabilities & Ptz::AbsolutePtrzCapabilities)
+        && (capabilities & Ptz::PositioningPtzCapabilities);
 }
 
 QString QnMediaResource::customAspectRatioKey()
@@ -253,26 +254,6 @@ QString QnMediaResource::panicRecordingKey()
 QString QnMediaResource::dynamicVideoLayoutKey()
 {
     return ::dynamicVideoLayoutKey;
-}
-
-QString QnMediaResource::motionStreamKey()
-{
-    return ::motionStreamKey;
-}
-
-QString QnMediaResource::primaryStreamValue()
-{
-    return ::primaryStreamValue;
-}
-
-QString QnMediaResource::secondaryStreamValue()
-{
-    return ::secondaryStreamValue;
-}
-
-QString QnMediaResource::edgeStreamValue()
-{
-    return ::edgeStreamValue;
 }
 
 QString QnMediaResource::rotationKey()

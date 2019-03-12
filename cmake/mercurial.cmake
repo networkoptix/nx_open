@@ -1,6 +1,6 @@
 function(hg_changeset dir var)
     execute_process(
-        COMMAND hg --repository "${dir}" log --rev . --template "{node|short}"     
+        COMMAND hg --repository "${dir}" log --rev . --template "{node|short}"
         OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )

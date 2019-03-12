@@ -5,7 +5,6 @@
 #include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_constants.h>
 #include <nx/core/ptz/override.h>
-#include <core/onvif/onvif_config_data.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/credentials.h>
 #include <core/dataprovider/stream_mixer_data.h>
@@ -18,7 +17,6 @@ public:
         QnJsonSerializer(qMetaTypeId<QnResourceData>())
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
-        registerKey<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));

@@ -50,8 +50,6 @@ set(ios.group_identifier "group.ru.ipera.FlyView")
 set(ios.old_app_appstore_id "id839589331")
 
 set(mac.sign.identity "Developer ID Application: IPera (32NH529F85)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: IPera (32NH529F85)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: IPera (32NH529F85)")
 set(mac.bundle.identifier "ru.ipera.flyview2")
 set(mac.protocol_handler_bundle.identifier "ru.ipera.protocol_handler")
 

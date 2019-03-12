@@ -57,8 +57,8 @@
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
-namespace
-{
+namespace {
+
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
@@ -94,10 +94,106 @@ struct TasksQueueInfo {
 
 const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
-} // namespace <anonymous>
+namespace empty_dirs {
 
+namespace detail {
 
-class ArchiveScanPosition: public nx::vms::server::ServerModuleAware
+using FileInfo = QnAbstractStorageResource::FileInfo;
+using FileInfoList = QnAbstractStorageResource::FileInfoList;
+
+static std::pair<FileInfoList, FileInfoList> filesDirsFromList(const FileInfoList& fileInfoList)
+{
+    FileInfoList files;
+    FileInfoList dirs;
+    for (const auto& fileInfo : fileInfoList)
+    {
+        if (fileInfo.isDir())
+            dirs.push_back(fileInfo);
+        else
+            files.push_back(fileInfo);
+    }
+    return std::make_pair(files, dirs);
+}
+
+struct FileInfoEx
+{
+    bool visited = false;
+    FileInfoList nodes;
+    const int depth = 0;
+    FileInfoEx(const FileInfoList& fileInfoList, int depth):
+        nodes(fileInfoList),
+        depth(depth)
+    {}
+};
+
+static const int kMaxDepth = 10;
+
+} // namespace detail
+
+static void remove(const QnStorageResourcePtr &storage)
+{
+    using namespace detail;
+
+    std::stack<FileInfoEx> fileInfoStack;
+    fileInfoStack.push(FileInfoEx({FileInfo(storage->getUrl(), /*size*/0, /*isDir*/true)}, 1));
+
+    while (!fileInfoStack.empty())
+    {
+        auto& currentFileInfo = fileInfoStack.top();
+        if (currentFileInfo.depth > kMaxDepth)
+        {
+            NX_WARNING(
+                typeid(QnStorageManager),
+                "Unexpectd file system tree depth detected while removing empty directories. " \
+                "Bailing out");
+            return;
+        }
+
+        if (currentFileInfo.visited)
+        {
+            for (const auto& node: currentFileInfo.nodes)
+            {
+                const auto dirContents = storage->getFileList(node.absoluteFilePath());
+                if (dirContents.isEmpty())
+                    storage->removeDir(node.absoluteFilePath());
+            }
+
+            fileInfoStack.pop();
+            continue;
+        }
+
+        currentFileInfo.visited = true;
+        for (auto it = currentFileInfo.nodes.begin(); it != currentFileInfo.nodes.end(); )
+        {
+            const auto dirContents = storage->getFileList(it->absoluteFilePath());
+            const auto [files, dirs] = filesDirsFromList(dirContents);
+
+            if (dirContents.isEmpty())
+            {
+                storage->removeDir(it->absoluteFilePath());
+                it = currentFileInfo.nodes.erase(it);
+                continue;
+            }
+
+            if (!dirs.isEmpty())
+                fileInfoStack.push(FileInfoEx(dirs, currentFileInfo.depth + 1));
+
+            if (!files.isEmpty())
+            {
+                it = currentFileInfo.nodes.erase(it);
+                continue;
+            }
+
+            ++it;
+        }
+    }
+}
+
+} // namespace empty_dirs
+
+} // namespace
+
+class ArchiveScanPosition: public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ArchiveScanPosition(
@@ -193,8 +289,11 @@ private:
     std::atomic<bool> m_fullScanCanceled;
 
 public:
-    ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
+    ScanMediaFilesTask(QnStorageManager* owner, const char* threadName = nullptr):
+        QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
     {
+        if (threadName)
+            setObjectName(threadName);
     }
 
     virtual ~ScanMediaFilesTask()
@@ -410,10 +509,17 @@ public:
 class TestStorageThread: public QnLongRunnable
 {
 public:
-    TestStorageThread(QnStorageManager* owner, const nx::vms::server::Settings* settings):
+    TestStorageThread(
+        QnStorageManager* owner,
+        const nx::vms::server::Settings* settings,
+        const char* threadName = nullptr)
+        :
         m_owner(owner),
         m_settings(settings)
-    {}
+    {
+        if (threadName)
+            setObjectName(threadName);
+    }
     virtual void run() override
     {
         for (const auto& storage: storagesToTest())
@@ -442,7 +548,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(ResourceDataKey::kSpace, space))
-                    m_owner->propertyDictionary()->saveParams(storage->getId());
+                    m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
             }
         }
 
@@ -486,7 +592,8 @@ private:
 QnStorageManager::QnStorageManager(
     QnMediaServerModule* serverModule,
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
-    QnServer::StoragePool role)
+    QnServer::StoragePool role,
+    const char* threadName)
 :
     nx::vms::server::ServerModuleAware(serverModule),
     m_analyticsEventsStorage(analyticsEventsStorage),
@@ -499,11 +606,20 @@ QnStorageManager::QnStorageManager(
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(serverModule->settings().disableRename()),
     m_camInfoWriterHandler(this, serverModule->resourcePool()),
-    m_camInfoWriter(&m_camInfoWriterHandler)
+    m_camInfoWriter(&m_camInfoWriterHandler),
+    m_auxTasksTimerManager(
+        threadName
+        ? (std::string(threadName) + std::string("::auxTasksTimerManager")).c_str()
+        : nullptr)
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
-    m_testStorageThread = new TestStorageThread(this, &serverModule->settings());
+    m_testStorageThread = new TestStorageThread(
+        this,
+        &serverModule->settings(),
+        threadName
+        ? (std::string(threadName) + std::string("::TestStorageThread")).c_str()
+        : nullptr);
 
     m_oldStorageIndexes = deserializeStorageFile();
 
@@ -534,10 +650,14 @@ QnStorageManager::QnStorageManager(
     if (m_role == QnServer::StoragePool::Backup)
     {
         m_scheduleSync.reset(new QnScheduleSync(serverModule));
-        connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+        connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished,
+            this, &QnStorageManager::backupFinished, Qt::DirectConnection);
     }
 
-    m_rebuildArchiveThread = new ScanMediaFilesTask(this);
+    m_rebuildArchiveThread = new ScanMediaFilesTask(this,
+        threadName
+        ? (std::string(threadName) + std::string("::ScanMediaFilesTask")).c_str()
+        : nullptr);
     m_rebuildArchiveThread->start();
 
     m_clearMotionTimer.restart();
@@ -641,8 +761,6 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
     }
-    if (sdb)
-        sdb->flushRecords();
     // merge chunks
     {
         QnMutexLocker lk(&m_mutexStorages);
@@ -986,7 +1104,7 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    NX_ASSERT(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
+    NX_ASSERT(data.totalProgress < 1.01, "invalid progress");
     QnMutexLocker lock( &m_rebuildStateMtx );
     m_archiveRebuildInfo = data;
 }
@@ -1055,7 +1173,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         if (m_rebuildCancelled)
             return; // cancel rebuild
 
-        auto getFileDataFunc= [&storage](const QString& filePath)
+        auto getFileDataFunc =
+            [&storage](const QString& filePath)
             {
                 auto file = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::ReadOnly));
                 if (!file)
@@ -1063,9 +1182,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
                 return file->readAll();
             };
 
-        nx::caminfo::ServerReaderHandler readerHandler(
-            moduleGUID(),
-            resourcePool());
+        nx::caminfo::ServerReaderHandler readerHandler(moduleGUID(), resourcePool());
         nx::caminfo::Reader(&readerHandler, fi, getFileDataFunc)(&archiveCameraList);
 
         QString cameraUniqueId = fi.fileName();
@@ -1587,58 +1704,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     return result;
 }
 
-void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
-{
-    const std::function<bool(const QnAbstractStorageResource::FileInfoList&, size_t)> removeEmptyDir =
-        [&](const QnAbstractStorageResource::FileInfoList& fl, size_t depthLimit)
-        {
-            for (const auto& entry: fl)
-            {
-                if (serverModule()->commonModule()->isNeedToStop())
-                    return false;
-
-                if (entry.isDir())
-                {
-                    if (depthLimit == 0)
-                    {
-                        NX_ERROR(this, lm("Directory depth is above the limit, corrupted file system? %1")
-                            .arg(entry.absoluteFilePath()));
-
-                        return false;
-                    }
-
-                    const auto dirFileList = storage->getFileList(entry.absoluteFilePath());
-                    if (!dirFileList.isEmpty() && !removeEmptyDir(dirFileList, depthLimit - 1))
-                        return false;
-
-                    // Ignore error here, trying to clean as much as we can.
-                    storage->removeDir(entry.absoluteFilePath());
-                }
-                else
-                {
-                    // We've met file. Solid reason to stop.
-                    return false;
-                }
-            }
-
-            return true;
-        };
-
-    auto qualityFileList = storage->getFileList(storage->getUrl());
-    for (const auto &qualityEntry : qualityFileList)
-    {
-        if (qualityEntry.isDir()) //< Quality.
-        {
-            auto cameraFileList = storage->getFileList(qualityEntry.absoluteFilePath());
-            for (const auto &cameraEntry : cameraFileList) //< For every year folder.
-            {
-                static const size_t kDepthLimit = 10; //< Little more depth, than required.
-                removeEmptyDir(storage->getFileList(cameraEntry.absoluteFilePath()), kDepthLimit);
-            }
-        }
-    }
-}
-
 void QnStorageManager::updateCameraHistory() const
 {
     auto archivedListNew = getCamerasWithArchive(serverModule());
@@ -1783,9 +1848,6 @@ void QnStorageManager::clearSpace(bool forced)
                             << endl;
         NX_VERBOSE(this, clearSpaceLogMessage);
     }
-
-    // 4. DB cleanup
-    storageDbPool()->flush();
 
     if (m_role != QnServer::StoragePool::Normal)
         return;
@@ -2202,7 +2264,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         qint64 oldToDelete = toDelete;
         toDelete = targetFreeSpace - freeSpace;
         if (oldToDelete == toDelete && deletedChunk.startTimeMs != -1)
-        {	// Non-empty chunk's been found and delete attempt's been made.
+        {    // Non-empty chunk's been found and delete attempt's been made.
             // But ToDelete is still the same. This might mean that storage went offline.
             // Let's check it.
             if (storage->getStatus() == Qn::ResourceStatus::Offline)
@@ -2389,6 +2451,8 @@ void QnStorageManager::testStoragesDone()
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
+    NX_VERBOSE(this, "Changing storage [%1] status to [%2]...", fileStorage, status);
+
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
         NX_INFO(this,
@@ -2509,11 +2573,11 @@ void QnStorageManager::startAuxTimerTasks()
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
-            for (const auto& storage : getUsedWritableStorages())
+            for (const auto& storage: getUsedWritableStorages())
             {
                 if (storage->hasFlags(Qn::storage_fastscan))
                     continue;
-                removeEmptyDirs(storage);
+                empty_dirs::remove(storage);
             }
         },
         kRemoveEmptyDirsInterval,
@@ -2978,7 +3042,6 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                     notMigratedChunks << chunk;
                 }
             }
-            storageDbPool()->flush();
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
                 writeCSVCatalog(catalogName, notMigratedChunks);
@@ -3116,4 +3179,3 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     return result | storage->statusFlag();
 }
-

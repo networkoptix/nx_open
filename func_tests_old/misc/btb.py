@@ -11,6 +11,7 @@ import random
 import requests
 import sys
 import traceback
+import argparse
 
 sys.path.append('..')  # FIXME create an abs path
 from generator import BasicGenerator, MediaServerGenerator, CameraDataGenerator, UserDataGenerator
@@ -44,10 +45,10 @@ ToStore = (
     {'path': 'wallpapers/image%02d.png', 'file': 'bgimage.png'},
 )
 
-NUM_SERVERS = 20
+# NUM_SERVERS = 20
 CAMERAS_PER_SERVER = 10
-NUM_USERS = 100
-NUM_SHARED_LAYOUTS = 50
+# NUM_USERS = 100
+# NUM_SHARED_LAYOUTS = 50
 SHARED_PER_USER = 10  # and per role too
 RES_PER_USER = 20
 LAYOUTS_PER_USER =  10 # private layouts
@@ -323,31 +324,56 @@ def storeFiles(number):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--server", help="IP address of the mediaserver", default="127.0.0.1")
+    parser.add_argument("--port", help="IP port of the mediaserver", type=int, default=7001)
+    parser.add_argument("--user", help="username", default="admin")
+    parser.add_argument("--password", help="password", default="")
+    parser.add_argument("--num_servers", help="number of servers to be added", type=int, default=0)
+    parser.add_argument("--num_users", help="number of users to be added", type=int, default=0)
+    parser.add_argument("--num_layouts", help="number of layouts to be added", type=int, default=0)
+
+    args = parser.parse_args()
+    global ADDR, AUTH
+
+    ADDR = "%s:%d" % (args.server, args.port)
+    password = args.password
+    #if password == "":
+    #    password = str(input("Enter password for user '%s' at %s: " % (ADDR, args.user)))
+    
+    AUTH = (args.user, password)
+
     loadRealServers()
-    storeFiles(NUM_BGIMAGES)
-    ServerGenerator().createServers(NUM_SERVERS)
+    if NUM_BGIMAGES > 0:
+        storeFiles(NUM_BGIMAGES)
+    if args.num_servers > 0:
+        ServerGenerator().createServers(args.num_servers)
     CameraGenerator().createCameras()
     WebPageGenerator().createWebPages()
 
-    uGen = UserGenerator()
-    uGen.createUsers(NUM_USERS)
-    lGen = LayoutGenerator()
-    lGen.createLayouts(NUM_SHARED_LAYOUTS)
+    if args.num_layouts > 0:
+        lGen = LayoutGenerator()
+        lGen.createLayouts(args.num_layouts)
 
-    for userId in Users.iterkeys():
-        available = random.sample(AllResIds, RES_PER_USER)
-        # layouts
-        lGen.createLayouts(LAYOUTS_PER_USER, userId, available)
-        sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
-        print("User %s, shared layouts %s" % (userId, sh))
-        setAccessRights(userId, available + sh)
+    if args.num_users > 0:
+        uGen = UserGenerator()
+        uGen.createUsers(num_users)
+        if RES_PER_USER > 0:
+            for userId in Users.iterkeys():
+                available = random.sample(AllResIds, RES_PER_USER)
+                # layouts
+                lGen.createLayouts(LAYOUTS_PER_USER, userId, available)
+                sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
+                print("User %s, shared layouts %s" % (userId, sh))
+                setAccessRights(userId, available + sh)
 
-    UserRoleGenerator().createUserRoles(uGen, lGen)
-    for roleId, roleData in UserRoles.iteritems():
-        #print "Granting layouts for role %s" % (roleId,)
-        sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
-        print("Role %s, shared layouts %s" % (roleId, sh))
-        setAccessRights(roleId, roleData[1] + sh)
+        if SHARED_PER_USER > 0:
+            UserRoleGenerator().createUserRoles(uGen, lGen)
+            for roleId, roleData in UserRoles.iteritems():
+                #print "Granting layouts for role %s" % (roleId,)
+                sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
+                print("Role %s, shared layouts %s" % (roleId, sh))
+                setAccessRights(roleId, roleData[1] + sh)
 
 if __name__ == "__main__":
     main()

@@ -5,9 +5,9 @@
 
 class QnProxyDesktopDataProvider;
 
-class QnAudioTransmissionRestHandler: 
+class QnAudioTransmissionRestHandler:
     public QnJsonRestHandler,
-    public nx::vms::server::ServerModuleAware
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnAudioTransmissionRestHandler(QnMediaServerModule* serverModule);
@@ -20,4 +20,3 @@ public:
 
     static bool validateParams(const QnRequestParams& params, QString& error);
 };
-

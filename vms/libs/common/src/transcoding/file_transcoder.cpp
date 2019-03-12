@@ -1,8 +1,3 @@
-/**********************************************************
-* 29 apr 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "file_transcoder.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -10,21 +5,23 @@
 #include <memory>
 
 #include <QtCore/QDir>
-#include <nx/utils/thread/mutex.h>
-#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
+#include <common/common_module.h>
 #include <core/resource/dummy_resource.h>
 #include <utils/fs/file.h>
+
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/random.h>
 
-FileTranscoder::FileTranscoder(nx::metrics::Storage* metrics):
-    m_transcoder(DecoderConfig(), metrics),
+FileTranscoder::FileTranscoder(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
+    m_transcoder(DecoderConfig(), commonModule->metrics()),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),
     m_transcodedDataDuration( 0 ),
-    m_metrics(metrics)
+    m_metrics(commonModule->metrics())
 {
 }
 
@@ -87,6 +84,7 @@ int FileTranscoder::resultCode() const
 }
 
 bool FileTranscoder::setTagValue(
+    QnCommonModule* commonModule,
     const QString& srcFilePath,
     const QString& name,
     const QString& value )
@@ -111,7 +109,7 @@ bool FileTranscoder::setTagValue(
             formatCtx->video_codec_id = formatCtx->streams[i]->codec->codec_id;
     }
 
-    auto transcoder = std::make_unique<FileTranscoder>();
+    auto transcoder = std::make_unique<FileTranscoder>(commonModule);
     if( !transcoder->setSourceFile( srcFilePath ) ||
         !transcoder->setDestFile( tempFilePath ) ||
         !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||
@@ -284,25 +282,26 @@ void FileTranscoder::setDest( QIODevice* dest )
 
 bool FileTranscoder::openFiles()
 {
-    std::unique_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
+    std::unique_ptr<QnAviArchiveDelegate> mediaFileReader(new QnAviArchiveDelegate());
 
-    QnResourcePtr res( new DummyResource() );
-    res->setUrl( m_srcFilePath );
+    QnResourcePtr res(new DummyResource());
+    res->setCommonModule(commonModule());
+    res->setUrl(m_srcFilePath);
     if (!mediaFileReader->open(res))
         return false;
 
-    if( !m_dest->open( QIODevice::WriteOnly ) )
+    if (!m_dest->open(QIODevice::WriteOnly))
         return false;
 
     m_mediaFileReader = std::move(mediaFileReader);
-    m_mediaFileReader->setAudioChannel( 0 );
+    m_mediaFileReader->setAudioChannel(0);
     return true;
 }
 
 void FileTranscoder::closeFiles()
 {
     m_dest->close();
-    m_mediaFileReader.reset( NULL );
+    m_mediaFileReader.reset();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

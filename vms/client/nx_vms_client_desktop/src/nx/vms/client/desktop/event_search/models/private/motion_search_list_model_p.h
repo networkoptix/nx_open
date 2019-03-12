@@ -6,6 +6,7 @@
 #include <bitset>
 #include <vector>
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
 

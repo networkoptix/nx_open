@@ -33,11 +33,6 @@ int getMmalMaxBitrate();
  */
 bool isMmalCamera(const std::string& deviceName);
 
-/**
- * Returns true if the mediaserver is running on the rpi.
- */
-bool isRpi();
-
 } // namespace rpi
 } // namespace video
 } // namespace device

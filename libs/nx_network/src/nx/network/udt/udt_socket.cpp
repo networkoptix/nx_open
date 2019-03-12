@@ -85,7 +85,7 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
 {
     NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
 
-    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::m_impl.get());
+    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::impl());
 }
 
 template<typename InterfaceToImplement>
@@ -371,6 +371,13 @@ bool UdtSocket<InterfaceToImplement>::setIpv6Only(bool /*val*/)
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::getProtocol(int* protocol) const
+{
+    *protocol = Protocol::udt;
+    return true;
+}
+
+template<typename InterfaceToImplement>
 AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 {
     NX_ASSERT(!isClosed());
@@ -521,9 +528,10 @@ bool UdtStreamSocket::setRendezvous(bool val)
 void UdtStreamSocket::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
-
+    // Calling m_aioHelper->bindToAioThread first so that it is able to detect aio thread change.
     m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 bool UdtStreamSocket::connect(
@@ -850,7 +858,7 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
 
 UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
     base_type(ipVersion),
-    m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
+    m_aioHelper(std::make_unique<aio::AsyncServerSocketHelper<UdtStreamServerSocket>>(this))
 {
     open();
 }
@@ -859,6 +867,13 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
+}
+
+void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 bool UdtStreamServerSocket::listen(int backlog)

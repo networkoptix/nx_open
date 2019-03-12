@@ -1,4 +1,3 @@
-// Copyright 2018-present Network Optix, Inc.
 #include "disabled_ini_config_ut.h"
 
 #include <nx/kit/test.h>

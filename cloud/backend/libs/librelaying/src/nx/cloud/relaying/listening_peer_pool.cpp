@@ -1,6 +1,5 @@
 #include "listening_peer_pool.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
@@ -36,15 +35,19 @@ ListeningPeerPool::~ListeningPeerPool()
     for (auto& peerContext: m_peers)
     {
         for (auto& connectionContext: peerContext.second.connections)
-            connectionContext->connection->pleaseStopSync();
+            connectionContext->connectionWatcher->pleaseStopSync();
     }
 }
 
 void ListeningPeerPool::addConnection(
     const std::string& originalPeerName,
+    const std::string& peerProtocolVersion,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     auto peerName = convertHostnameToInternalFormat(originalPeerName);
+
+    NX_VERBOSE(this, "Added connection from %1, protocol version %2",
+        originalPeerName, peerProtocolVersion);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -68,7 +71,12 @@ void ListeningPeerPool::addConnection(
     }
 
     auto connectionContext = std::make_unique<ConnectionContext>();
-    connectionContext->connection = std::move(connection);
+    connectionContext->peerEndpoint = connection->getForeignAddress();
+    connectionContext->connectionWatcher =
+        std::make_unique<ListeningPeerConnectionWatcher>(
+            std::move(connection),
+            peerProtocolVersion,
+            m_settings.tcpKeepAlive.probeSendPeriod);
 
     m_statisticsCalculator.connectionAccepted();
 
@@ -278,39 +286,31 @@ void ListeningPeerPool::giveAwayConnection(
     std::unique_ptr<ConnectionContext> connectionContext,
     TakeIdleConnectionHandler completionHandler)
 {
-    relay::api::OpenTunnelNotification notification;
-    notification.setClientEndpoint(clientInfo.endpoint);
-    notification.setClientPeerName(clientInfo.peerName.c_str());
-    auto openTunnelNotificationBuffer =
-        std::make_shared<nx::network::http::StringType>(notification.toHttpMessage().toString());
-    auto connectionPtr = connectionContext->connection.get();
+    auto connectionWatcherPtr = connectionContext->connectionWatcher.get();
 
-    connectionPtr->sendAsync(
-        *openTunnelNotificationBuffer,
+    connectionWatcherPtr->startTunnel(
+        clientInfo,
         [this,
             clientInfo,
             peerName,
-            openTunnelNotificationBuffer,
             connectionContext = std::move(connectionContext),
             completionHandler = std::move(completionHandler),
             scopedCallGuard = m_apiCallCounter.getScopedIncrement()](
                 SystemError::ErrorCode sysErrorCode,
-                std::size_t /*bytesSent*/) mutable
+                std::unique_ptr<network::AbstractStreamSocket> connection) mutable
         {
             if (sysErrorCode != SystemError::noError)
             {
-                NX_DEBUG(this, lm("Session %1. Failed to send open tunnel notification to %2. %3")
-                    .args(clientInfo.relaySessionId,
-                        connectionContext->connection->getForeignAddress(),
-                        SystemError::toString(sysErrorCode)));
+                NX_DEBUG(this, "Session %1. Failed to send open tunnel notification to %2. %3",
+                    clientInfo.relaySessionId, connectionContext->peerEndpoint,
+                        SystemError::toString(sysErrorCode));
                 return completionHandler(
                     relay::api::ResultCode::networkError, nullptr, std::string());
             }
 
-            connectionContext->connection->cancelIOSync(network::aio::etNone);
             completionHandler(
                 relay::api::ResultCode::ok,
-                std::move(connectionContext->connection),
+                std::move(connection),
                 nx::utils::reverseWords(peerName, "."));
         });
 }
@@ -319,37 +319,11 @@ void ListeningPeerPool::monitoringConnectionForClosure(
     const std::string& peerName,
     ConnectionContext* connectionContext)
 {
-    using namespace std::placeholders;
-
-    constexpr int readBufferSize = 1; //< We need only detect connection closure.
-
-    connectionContext->readBuffer.clear();
-    connectionContext->readBuffer.reserve(readBufferSize);
-    connectionContext->connection->readSomeAsync(
-        &connectionContext->readBuffer,
-        std::bind(&ListeningPeerPool::onConnectionReadCompletion, this,
-            peerName, connectionContext, _1, _2));
-}
-
-void ListeningPeerPool::onConnectionReadCompletion(
-    const std::string& peerName,
-    ConnectionContext* connectionContext,
-    SystemError::ErrorCode sysErrorCode,
-    std::size_t bytesRead)
-{
-    const bool isConnectionClosed =
-        sysErrorCode == SystemError::noError && bytesRead == 0;
-
-    if (isConnectionClosed ||
-        (sysErrorCode != SystemError::noError &&
-         nx::network::socketCannotRecoverFromError(sysErrorCode)))
-    {
-        return closeConnection(peerName, connectionContext, sysErrorCode);
-    }
-
-    // TODO: What if some data has been received?
-
-    monitoringConnectionForClosure(peerName, connectionContext);
+    connectionContext->connectionWatcher->start(
+        [this, peerName, connectionContext](SystemError::ErrorCode errorCode)
+        {
+            return closeConnection(peerName, connectionContext, errorCode);
+        });
 }
 
 void ListeningPeerPool::closeConnection(
@@ -375,7 +349,7 @@ void ListeningPeerPool::closeConnection(
         });
     if (connectionContextIter != peerContext.connections.end())
     {
-        NX_ASSERT((*connectionContextIter)->connection->isInSelfAioThread());
+        NX_ASSERT((*connectionContextIter)->connectionWatcher->isInSelfAioThread());
         peerContext.connections.erase(connectionContextIter);
 
         m_statisticsCalculator.connectionClosed();

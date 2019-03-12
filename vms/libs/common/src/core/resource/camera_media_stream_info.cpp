@@ -36,9 +36,9 @@ QSize CameraMediaStreamInfo::getResolution() const
         return QSize();
 }
 
-Qn::StreamIndex CameraMediaStreamInfo::getEncoderIndex() const
+nx::vms::api::StreamIndex CameraMediaStreamInfo::getEncoderIndex() const
 {
-    return (Qn::StreamIndex) encoderIndex;
+    return static_cast<nx::vms::api::StreamIndex>(encoderIndex);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

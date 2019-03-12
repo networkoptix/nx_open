@@ -42,7 +42,6 @@ std::vector<QString> Parser::parseSupportedEventsMessage(const QByteArray& conte
 std::optional<Event> Parser::parseEventMessage(const QByteArray& content,
     const EngineManifest& engineManifest)
 {
-    using namespace nx::sdk::analytics;
     using std::nullopt;
 
     QString contentAsString(content);

@@ -3,6 +3,7 @@
 #include <nx/vms/applauncher/api/applauncher_api.h>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace applauncher {
 namespace api {
@@ -12,7 +13,7 @@ namespace api {
     \note Application may be installed for all users and for current user only, so checking existance of directory with name equal to version is not enough
 */
 ResultType::Value isVersionInstalled(
-    nx::utils::SoftwareVersion version,
+    const nx::utils::SoftwareVersion& version,
     bool* const installed);
 
 //!Retrieves a list of the installed versions

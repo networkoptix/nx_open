@@ -19,8 +19,8 @@ public:
     virtual ~Plugin();
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
+    virtual int addRef() const override;
+    virtual int releaseRef() const override;
 
     virtual const char* name() const override;
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
@@ -36,5 +36,5 @@ private:
     nxpl::TimeProvider *m_timeProvider;
 };
 
-} // namespace nx 
-} // namespace usb_cam 
+} // namespace nx
+} // namespace usb_cam

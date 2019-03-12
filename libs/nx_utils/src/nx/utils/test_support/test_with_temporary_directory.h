@@ -14,7 +14,7 @@ public:
      * home folder will be used. In these cases module name will be used as a distinction subfolder.
      */
     TestWithTemporaryDirectory(const QString& moduleName, const QString& tmpDir = QString());
-    ~TestWithTemporaryDirectory();
+    virtual ~TestWithTemporaryDirectory();
 
     QString testDataDir() const;
 

@@ -30,6 +30,7 @@
 #include <ui/help/help_topics.h>
 #include <utils/media/sse_helper.h>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
 #include "resource_widget.h"
@@ -65,9 +66,6 @@ class QnMediaResourceWidget: public Customized<QnResourceWidget>
     Q_OBJECT
     typedef Customized<QnResourceWidget> base_type;
 
-    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors
-        WRITE setMotionSensitivityColors);
-
 public:
     QnMediaResourceWidget(
         QnWorkbenchContext* context,
@@ -86,6 +84,12 @@ public:
     QnResourceDisplayPtr display() const;
 
     QnResourceWidgetRenderer* renderer() const;
+
+    /** Returns default camera rotation angle or 0 if does not exist or invalid. */
+    int defaultRotation() const;
+
+    /** Returns default camera rotation plus fisheye rotation if needed. */
+    int defaultFullRotation() const;
 
     /**
      * @param itemPos Point in item coordinates to map to grid coordinates.
@@ -121,14 +125,6 @@ public:
      */
     const QList<QRegion>& motionSelection() const;
 
-    bool addToMotionSensitivity(const QRect& gridRect, int sensitivity);
-
-    bool setMotionSensitivityFilled(const QPoint& gridPos, int sensitivity);
-
-    void clearMotionSensitivity();
-
-    const QList<QnMotionRegion>& motionSensitivity() const;
-
     nx::vms::api::ImageCorrectionData imageEnhancement() const;
     void setImageEnhancement(const nx::vms::api::ImageCorrectionData& imageEnhancement);
 
@@ -151,18 +147,18 @@ public:
         const QString& text,
         const QnHtmlTextItemOptions& options);
 
-    QVector<QColor> motionSensitivityColors() const;
-    void setMotionSensitivityColors(const QVector<QColor>& value);
-
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
     bool isMotionSearchModeEnabled() const;
+
+    void setPtzMode(bool value);
 
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
 
     bool isLicenseUsed() const;
 
+    bool isAnalyticsSupported() const;
     bool isAnalyticsEnabled() const;
     void setAnalyticsEnabled(bool analyticsEnabled);
 
@@ -236,15 +232,12 @@ protected:
         int channel,
         const QRectF& rect) override;
 
-    void paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect);
-
     void paintMotionGrid(
         QPainter* painter,
         int channel,
         const QRectF& rect,
         const QnMetaDataV1Ptr& motion);
 
-    void paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect);
     void paintWatermark(QPainter* painter, const QRectF& rect);
 
     void paintFilledRegionPath(
@@ -265,9 +258,6 @@ protected:
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
 
-    void ensureMotionLabelPositions() const;
-    void invalidateMotionLabelPositions() const;
-
     QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
 
@@ -279,7 +269,7 @@ protected:
     virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
-    void ensureTwoWayAudioWidget();
+    void updateTwoWayAudioWidget();
     bool animationAllowed() const;
 
     rest::Handle invokeTrigger(
@@ -290,7 +280,6 @@ protected:
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_screenshotButton_clicked();
-    void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
     void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
@@ -302,7 +291,6 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
-    void at_analyticsButton_toggled(bool checked);
 
     void at_entropixEnhancementButton_clicked();
     void at_entropixImageLoaded(const QImage& image);
@@ -430,7 +418,7 @@ private:
     void handleSelectedAreaChanged();
 
 private:
-    QScopedPointer<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
+    nx::utils::ImplPtr<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
@@ -458,16 +446,6 @@ private:
     /** Whether motion selection cached paths are valid. */
     mutable bool m_motionSelectionCacheValid = false;
 
-    /** Position for text labels for all motion sensitivity regions. */
-    /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
-    mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>>
-    m_motionLabelPositions;
-
-    /** Whether motion label positions data is valid. */
-    mutable bool m_motionLabelPositionsValid = false;
-
-    QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
-
     nx::vms::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
 
     QnPtzControllerPtr m_ptzController;
@@ -480,13 +458,10 @@ private:
 
     qint64 m_posUtcMs;
 
-    QVector<QColor> m_motionSensitivityColors;
-
     QnScrollableItemsWidget* m_triggersContainer = nullptr;
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
-    QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     QScopedPointer<nx::vms::client::desktop::WatermarkPainter> m_watermarkPainter;
 

@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <recording/time_period.h>
 #include <ui/common/read_only.h>
-#include <ui/dialogs/resource_selection_dialog.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
 #include <ui/style/skin.h>
@@ -352,20 +352,19 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 
 void QnSearchBookmarksDialogPrivate::chooseCamera()
 {
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, m_owner);
-    QSet<QnUuid> ids;
+    QnUuidSet cameraIds;
     if (!m_allCamerasChoosen)
     {
         for (auto camera: m_model->cameras())
-            ids << camera->getId();
+            cameraIds << camera->getId();
     }
-    dialog.setSelectedResources(ids);
 
-    if (dialog.exec() == QDialog::Accepted)
+    auto dialogAccepted = CameraSelectionDialog::selectCameras
+        <CameraSelectionDialog::DummyPolicy>(cameraIds, m_owner);
+
+    if (dialogAccepted)
     {
-        auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            dialog.selectedResources());
-        setCameras(selectedCameras);
+        setCameras(resourcePool()->getResourcesByIds<QnVirtualCameraResource>(cameraIds));
         m_model->applyFilter();
     }
 }

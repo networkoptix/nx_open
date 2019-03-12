@@ -45,8 +45,8 @@ PortMapper::~PortMapper()
         m_timerId = 0;
     }
 
-    m_upnpClient.reset();
     nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
+    m_upnpClient.reset();
 }
 
 const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 1 * 60 * 1000; // 10 min

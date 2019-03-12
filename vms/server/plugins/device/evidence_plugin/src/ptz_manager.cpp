@@ -40,12 +40,12 @@ void* PtzManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int PtzManager::addRef()
+int PtzManager::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int PtzManager::releaseRef()
+int PtzManager::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

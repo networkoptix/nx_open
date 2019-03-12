@@ -20,7 +20,7 @@ ExportTimelapseRecorder::ExportTimelapseRecorder(
     base_type(resource),
     m_timeStepUsec(timeStepUsec)
 {
-
+    setTranscoderQuality(Qn::StreamQuality::high);
 }
 
 ExportTimelapseRecorder::~ExportTimelapseRecorder()

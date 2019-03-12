@@ -6,10 +6,7 @@
 #include "linux/alsa_utils.h"
 #endif
 
-namespace nx {
-namespace usb_cam {
-namespace device {
-namespace audio {
+namespace nx::usb_cam::device::audio {
 
 void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
 {
@@ -21,7 +18,4 @@ bool pluggedIn(const std::string& devicePath)
     return detail::pluggedIn(devicePath);
 }
 
-} // namespace audio
-} // namespace device
-} // namespace usb_cam
-} // namespace nx
+} // namespace nx::usb_cam::device::audio

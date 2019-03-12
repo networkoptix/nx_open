@@ -126,7 +126,8 @@
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
-        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -190,5 +191,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} interfaccia web"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pausa",
+            "help": "help | show commands",
+            "collapse all servers": "comprimi tutti i server",
+            "collapse server": "collapse server + [server name]",
+            "play": "riproduci",
+            "clear search": "cancella ricerca",
+            "live": "go to live | show me live",
+            "expand all servers": "espandere tutti i server",
+            "stop listening": "interrompere l'ascolto",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "Il sistema è offline",
+        "cameraLinks": {
+            "copyToClipboard": "copia negli appunti",
+            "highStream": "Flusso Primario",
+            "copyDefaultText": "copia",
+            "unknown": "Sconosciuto",
+            "lowStream": "Flusso secondario",
+            "transcoding": "Transcodifica",
+            "copyActiveText": "copiato negli appunti"
+        },
+        "searchCamPlaceholder": "Ricerca",
+        "cameraStates": {
+            "noFormat": "Questo browser non supporta la riproduzione di video da questa telecamera.",
+            "ieWin10": "Si prega di utilizzare i browser Microsoft Edge o Google Chrome.",
+            "iosVideoTooLarge": "iOS non supporta video più grandi di FullHD (2MP: 1920x1080).",
+            "unauthorized": "Autenticazione richiesta",
+            "ubuntuNX": "Questo browser non supporta i video da server basati su ARM. Per favore, utilizzare il browser Chromium.",
+            "ieNoWebm": "Si prega di installare <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>il codec WebM </a> per Internet Explorer.",
+            "flashOrWebmRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> o<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> per la riproduzione di video in Internet Explorer.",
+            "noArmSupport": "Questo browser o dispositivo non supporta la riproduzione di video da server basati su ARM.",
+            "error": "Errore",
+            "offline": "Offiline",
+            "noData": "Nessun dato",
+            "flashRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> per la riproduzione di video."
+        },
+        "chromeCastWarning": "Chromecast richiede molte risorse e potrebbe causare problemi al suo server.",
+        "resolution": {
+            "high": "Alta",
+            "auto": "Automatico",
+            "low": "Basso"
+        }
     }
 }

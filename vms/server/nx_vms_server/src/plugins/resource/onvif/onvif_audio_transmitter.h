@@ -19,7 +19,7 @@ public:
 
     virtual bool processAudioData(const QnConstCompressedAudioDataPtr& data) override;
     virtual bool isCompatible(const QnAudioFormat& format) const override;
-    virtual void setOutputFormat(const QnAudioFormat& format) override {}
+    virtual void setOutputFormat(const QnAudioFormat& /*format*/) override {}
     virtual void prepare() override;
     virtual void setBitrateKbps(int value) override;
 protected:

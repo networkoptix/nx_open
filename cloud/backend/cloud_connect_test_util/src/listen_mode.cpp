@@ -25,9 +25,9 @@ namespace cctu {
 
 struct Settings
 {
-    nx::network::test::TestTransmissionMode transmissionMode = 
+    nx::network::test::TestTransmissionMode transmissionMode =
         nx::network::test::TestTransmissionMode::spam;
-    
+
     std::chrono::milliseconds rwTimeout =
         nx::network::test::TestConnection::kDefaultRwTimeout;
 
@@ -136,7 +136,7 @@ public:
                     {
                         if (code != hpm::api::ResultCode::ok)
                         {
-                            failedListening << lm("%1(registeration: %2)")
+                            failedListening << lm("%1(registration: %2)")
                                 .arg(context.listeningAddress)
                                 .arg(QnLexical::serialized(code));
 
@@ -274,11 +274,7 @@ static void emulateCloudServerSockets(
         }
     }
 
-    if (!cloudServerSocketGenerator->registerOnMediatorSync())
-    {
-        throw std::runtime_error(
-            "Error: All sockets failed to listen on mediator");
-    }
+    cloudServerSocketGenerator->registerOnMediatorSync();
 }
 
 static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslServer(
@@ -311,7 +307,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     Settings settings;
     loadSettings(args, &settings);
 
-    std::cout << "Server mode settigns: " << settings.toString() << std::endl;
+    std::cout << "Server mode settings: " << settings.toString() << std::endl;
 
     CloudServerSocketGenerator cloudServerSocketGenerator;
 

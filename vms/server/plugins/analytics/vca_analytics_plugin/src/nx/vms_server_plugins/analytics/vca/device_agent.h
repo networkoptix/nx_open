@@ -11,7 +11,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/socket_global.h>
 
-#include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_device_agent.h>
@@ -40,19 +40,17 @@ public:
 };
 using ElapsedEvents = std::list<ElapsedEvent>;
 
-class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::IDeviceAgent>
+class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
     DeviceAgent(
         Engine* engine,
-        const nx::sdk::DeviceInfo& deviceInfo,
+        const nx::sdk::IDeviceInfo* deviceInfo,
         const EngineManifest& typedManifest);
 
     virtual ~DeviceAgent();
 
     virtual Engine* engine() const override { return m_engine; }
-
-    virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     void treatMessage(int size);
 

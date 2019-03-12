@@ -1,14 +1,8 @@
 #pragma once
 
-#include <string>
-
-#include <plugins/plugin_api.h>
-
 extern "C" {
-
 #include <glib.h>
 #include <glib-object.h>
-
 } // extern "C"
 
 namespace nx {

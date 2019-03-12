@@ -334,7 +334,7 @@ void ConnectionProcessor::run()
 
     serializePeerData(d->response, localPeer(remotePeer), remotePeer.dataFormat);
     sendResponse(
-        useWebSocket ? http::StatusCode::switchingProtocols : http::StatusCode::ok,
+        useWebSocket ? http::StatusCode::switchingProtocols : http::StatusCode::badRequest,
         nx::network::http::StringType());
 
     std::function<void()> onConnectionClosedCallback;

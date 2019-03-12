@@ -104,6 +104,7 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
         return -1;
 
     auto httpClient = std::make_shared<nx::network::http::AsyncClient>();
+    httpClient->bindToAioThread(m_aioTimer.getAioThread());
     httpClient->setResponseReadTimeout(kDownloadRequestTimeout);
     httpClient->setSendTimeout(kDownloadRequestTimeout);
     httpClient->setMessageBodyReadTimeout(kDownloadRequestTimeout);
@@ -122,25 +123,29 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     ++d->nextRequestId;
 
     httpClient->doGet(url,
-        [this, callback, requestId, httpClient, thread = thread()]()
-        {
-            executeInThread(thread, nx::utils::guarded(this,
-                [this, callback, requestId, httpClient]()
-                {
+        nx::utils::guarded(this,
+            [this, callback, requestId, thread = thread()]()
+            {
+                executeInThread(thread, nx::utils::guarded(this,
+                    [this, callback, requestId]()
                     {
                         NX_MUTEX_LOCKER lock(&d->mutex);
-                        d->requestClients.remove(requestId);
-                    }
+                        const auto httpClient = d->requestClients.take(requestId);
+                        lock.unlock();
 
-                    const bool success = httpClient->hasRequestSucceeded();
+                        if (!httpClient)
+                            return;
 
-                    QByteArray result;
-                    if (success)
-                        result = httpClient->fetchMessageBodyBuffer();
+                        const bool success = httpClient->hasRequestSucceeded();
 
-                    callback(success, requestId, result);
-                }));
-        });
+                        QByteArray result;
+                        if (success)
+                            result = httpClient->fetchMessageBodyBuffer();
+
+                        httpClient->pleaseStopSync();
+                        callback(success, requestId, result);
+                    }));
+            }));
 
     return requestId;
 }
@@ -151,7 +156,8 @@ void InternetOnlyPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle h
         return;
 
     NX_MUTEX_LOCKER lock(&d->mutex);
-    d->requestClients.remove(handle);
+    auto httpClient = d->requestClients.take(handle);
+    httpClient->pleaseStopSync();
 }
 
 bool InternetOnlyPeerManager::hasAccessToTheUrl(const QString& url) const

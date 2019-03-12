@@ -55,6 +55,11 @@ utils::Url NxGlobalsObject::url(const QUrl& url) const
     return utils::Url::fromQUrl(url);
 }
 
+nx::utils::Url NxGlobalsObject::emptyUrl() const
+{
+    return utils::Url();
+}
+
 nx::vms::api::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& version) const
 {
     return nx::vms::api::SoftwareVersion(version);
@@ -67,6 +72,11 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
 
     auto flickable = findFlickable(item);
     if (!flickable)
+        return;
+
+    static const auto kDenyPositionCorrectionPropertyName = "denyFlickableVisibleAreaCorrection";
+    const auto denyCorrection = flickable->property(kDenyPositionCorrectionPropertyName);
+    if (denyCorrection.isValid() && denyCorrection.toBool())
         return;
 
     const auto contentItem = flickable->contentItem();

@@ -89,7 +89,7 @@ void CommonHttpAcceptor::createConnection(
     const auto systemId = extractSystemIdFromHttpRequest(requestContext);
     if (systemId.empty())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Ignoring createTransactionConnection request without systemId from %1")
             .args(httpConnection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
@@ -98,7 +98,7 @@ void CommonHttpAcceptor::createConnection(
     ConnectionRequestAttributes connectionRequestAttributes;
     if (!fetchDataFromConnectRequest(requestContext.request, &connectionRequestAttributes))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
                 httpConnection->socket()->getForeignAddress()));
@@ -108,7 +108,7 @@ void CommonHttpAcceptor::createConnection(
     if (!m_protocolVersionRange.isCompatible(
             connectionRequestAttributes.remotePeerProtocolVersion))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
                 httpConnection->socket()->getForeignAddress(),
@@ -116,11 +116,14 @@ void CommonHttpAcceptor::createConnection(
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+    NX_DEBUG(this,
         lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
         .args(connectionRequestAttributes.remotePeer.id, systemId,
             httpConnection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
+
+    auto localPeer = m_localPeerData;
+    localPeer.persistentId = QnUuid::fromArbitraryData(systemId);
 
     auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
@@ -128,7 +131,7 @@ void CommonHttpAcceptor::createConnection(
         m_connectionGuardSharedState,
         connectionRequestAttributes,
         systemId,
-        m_localPeerData,
+        localPeer,
         httpConnection->socket()->getForeignAddress(),
         requestContext.request);
     auto commandPipelinePtr = commandPipeline.get();
@@ -139,7 +142,7 @@ void CommonHttpAcceptor::createConnection(
         m_outgoingCommandFilter,
         systemId,
         connectionRequestAttributes,
-        m_localPeerData,
+        localPeer,
         std::move(commandPipeline));
 
     const int connectionSeq = ++m_connectionSeq;
@@ -154,7 +157,7 @@ void CommonHttpAcceptor::createConnection(
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
                 httpConnection->socket()->getForeignAddress(),
@@ -165,6 +168,7 @@ void CommonHttpAcceptor::createConnection(
     auto requestResult =
         prepareOkResponseToCreateTransactionConnection(
             connectionRequestAttributes,
+            localPeer,
             requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
@@ -192,7 +196,7 @@ void CommonHttpAcceptor::pushTransaction(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 without required header %3")
+        NX_DEBUG(this, lm("Received %1 request from %2 without required header %3")
             .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
         return completionHandler(nx::network::http::StatusCode::badRequest);
@@ -213,7 +217,7 @@ void CommonHttpAcceptor::pushTransaction(
 
     if (!connectionFound)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Received %1 request from %2 for unknown connection %3")
             .args(request.requestLine.url.path(),
                 connection->socket()->getForeignAddress(), connectionId));
@@ -222,14 +226,14 @@ void CommonHttpAcceptor::pushTransaction(
 
     if (!foundConnectionOfExpectedType)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Received %1 request from %2 for connection %3 of unexpected type")
             .args(request.requestLine.url.path(),
                 connection->socket()->getForeignAddress(), connectionId));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+    NX_VERBOSE(this,
         lm("Received %1 request from %2 for connection %3")
         .args(request.requestLine.url.path(),
             connection->socket()->getForeignAddress(), connectionId));
@@ -240,6 +244,7 @@ void CommonHttpAcceptor::pushTransaction(
 nx::network::http::RequestResult
     CommonHttpAcceptor::prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
+        const vms::api::PeerData& localPeerData,
         nx::network::http::Response* const response)
 {
     response->headers.emplace(
@@ -250,10 +255,10 @@ nx::network::http::RequestResult
         connectionRequestAttributes.contentEncoding.c_str());
     response->headers.emplace(
         Qn::EC2_GUID_HEADER_NAME,
-        m_localPeerData.id.toByteArray());
+        localPeerData.id.toByteArray());
     response->headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        m_localPeerData.instanceId.toByteArray());
+        localPeerData.instanceId.toByteArray());
 
     NX_ASSERT(m_protocolVersionRange.isCompatible(
         connectionRequestAttributes.remotePeerProtocolVersion));
@@ -287,7 +292,7 @@ void CommonHttpAcceptor::startOutgoingChannel(
         {
             auto acceptedTransportConnection =
                 dynamic_cast<AcceptedCommonHttpConnection*>(transportConnection);
-            if (!acceptedTransportConnection || 
+            if (!acceptedTransportConnection ||
                 acceptedTransportConnection->data() != connectionSeq)
             {
                 // connectionId is not globally unique.

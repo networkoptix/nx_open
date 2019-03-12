@@ -122,7 +122,7 @@ int QnCameraManager<QueryProcessorType>::save(
     {
         if (camera.id.isNull())
         {
-            NX_ASSERT(0, "Only update operation is supported", Q_FUNC_INFO);
+            NX_ASSERT(0, "Only update operation is supported");
             return INVALID_REQ_ID;
         }
     }

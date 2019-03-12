@@ -126,7 +126,8 @@
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
-        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter."
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -190,5 +191,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} webové rozhraní"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pozastavit",
+            "help": "help | show commands",
+            "collapse all servers": "sbalit všechny servery",
+            "collapse server": "collapse server + [server name]",
+            "play": "přehrát",
+            "clear search": "smazat hledání",
+            "live": "go to live | show me live",
+            "expand all servers": "rozbalit všechny servery",
+            "stop listening": "zastavení poslech",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "Systém je offline",
+        "cameraLinks": {
+            "copyToClipboard": "kopírovat do schránky",
+            "highStream": "Hlavní stream",
+            "copyDefaultText": "kopírovat",
+            "unknown": "Neznámý",
+            "lowStream": "Vedlejší stream",
+            "transcoding": "Překódování",
+            "copyActiveText": "zkopírováno do schránky"
+        },
+        "searchCamPlaceholder": "Hledat",
+        "cameraStates": {
+            "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
+            "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
+            "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+            "unauthorized": "Ověření je vyžadováno",
+            "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium.",
+            "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+            "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
+            "noArmSupport": "Tento prohlížeč nebo zařízení nepodporuje přehrávání videa ze serverů se systémem ARM.",
+            "error": "Chyba",
+            "offline": "Offline",
+            "noData": "Žádná data",
+            "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>."
+        },
+        "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
+        "resolution": {
+            "high": "Hlavní",
+            "auto": "Auto",
+            "low": "Vedlejší"
+        }
     }
 }

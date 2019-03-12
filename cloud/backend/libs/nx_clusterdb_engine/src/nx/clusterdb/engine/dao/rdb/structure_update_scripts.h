@@ -32,4 +32,24 @@ CREATE INDEX idx_transaction_time
 
 )sql";
 
+
+/**
+ * CLOUD-2633. Persistently save sequence of the last command.
+ */
+static constexpr char kSavePeerSequence[] = R"sql(
+
+CREATE TABLE node_command_sequence (
+    system_id VARCHAR(64) NOT NULL,
+    peer_id VARCHAR(64) NOT NULL,
+    sequence BIGINT NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_node_command_sequence_key
+    ON node_command_sequence(system_id, peer_id);
+
+CREATE UNIQUE INDEX idx_node_command_sequence_peer
+    ON node_command_sequence(peer_id);
+
+)sql";
+
 } // namespace nx::clusterdb::engine::dao::rdb

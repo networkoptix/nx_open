@@ -710,6 +710,9 @@ bool QnOnvifPtzController::removePreset(const QString &presetId)
         return false;
     }
 
+    m_presetNameByToken.remove(presetToken(presetId));
+    m_presetTokenById.remove(presetId);
+
     return true;
 }
 

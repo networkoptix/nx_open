@@ -87,7 +87,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         }
 
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
+            NX_ASSERT(false, "All enum values must be handled");
             return Value::NoNotification;
     }
 }
@@ -116,7 +116,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::SystemIsReadOnly:
-        case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::DefaultCameraPasswords:
         case QnSystemHealth::NoInternetForTimeSync:
@@ -126,6 +125,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         // Red notifications.
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::ArchiveIntegrityFailed:
+        case QnSystemHealth::StoragesNotConfigured:
             return QnNotificationLevel::Value::CriticalNotification;
 
         default:
@@ -146,7 +146,7 @@ QColor QnNotificationLevel::notificationColor(Value level)
         case Value::CriticalNotification:  return qnGlobals->notificationColorCritical();
         case Value::SuccessNotification:   return qnGlobals->notificationColorCommon();
         default:
-            NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
+            NX_ASSERT(false, "All enum values must be handled");
             break;
     }
     return QColor();

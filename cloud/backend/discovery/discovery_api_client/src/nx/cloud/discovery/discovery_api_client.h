@@ -1,0 +1,138 @@
+#pragma once
+
+#include <nx/network/aio/basic_pollable.h>
+
+#include <set>
+#include <vector>
+#include <string>
+
+#include <nx/utils/url.h>
+#include <nx/utils/move_only_func.h>
+#include <nx/network/http/http_async_client.h>
+
+#include <nx/network/aio/timer.h>
+
+#include "node.h"
+#include "settings.h"
+
+namespace nx::cloud::discovery {
+
+using NodeDiscoveredHandler = nx::utils::MoveOnlyFunc<void(Node)>;
+
+using NodeLostHandler = nx::utils::MoveOnlyFunc<void(Node)>;
+
+/**
+  * Updating node registration based on expiration timer is handled by this class.
+  * Situations, where we can't reach the discovery service, are handled by this class too.
+  * NOTE: Every method is non-blocking.
+  */
+class NX_DISCOVERY_CLIENT_API DiscoveryClient:
+    public nx::network::aio::BasicPollable
+{
+    using base_type = nx::network::aio::BasicPollable;
+
+public:
+    DiscoveryClient(
+        const Settings& discoverySettings,
+        const std::string& clusterId,
+        const NodeInfo& nodeInfo);
+    ~DiscoveryClient();
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
+    /** Starts the process of registering node in the discovery service. */
+    void start();
+
+    /**
+     * This information is sent to the discovery node ASAP.
+     */
+    void updateInformation(const std::string& infoJson);
+
+    /**
+     * Get the list of nodes registered with the server, including the Node returned by node()
+     */
+    std::vector<Node> onlineNodes() const;
+
+    /**
+     * Get the Node representing this DiscoveryClient.
+     */
+    Node node() const;
+
+    void setOnNodeDiscovered(NodeDiscoveredHandler handler);
+    void setOnNodeLost(NodeLostHandler handler);
+
+private:
+    virtual void stopWhileInAioThread() override;
+
+    void setupDiscoveryServiceUrl(const std::string& clusterId);
+    const nx::utils::Url& discoveryServiceUrl() const;
+
+    void setupRegisterNodeRequest();
+    void setupOnlineNodesRequest();
+
+    void startRegisterNodeRequest(const std::chrono::milliseconds& delay);
+    void startOnlineNodesRequest(const std::chrono::milliseconds& delay);
+
+    void updateOnlineNodes(std::vector<Node> discoveredNodes);
+
+    void emitNodeDiscovered(const Node& node);
+    void emitNodeLost(const Node& nodeId);
+
+    void updateRequestSentTime(const nx::network::http::Request& request);
+    std::optional<QDateTime> getServerResponseTime(
+        const nx::network::http::Response* response) const;
+
+    std::optional<std::chrono::milliseconds> calculateRegistrationDelay(const nx::network::http::Response* response);
+
+private:
+    using ResponseReceivedHandler =
+        nx::utils::MoveOnlyFunc<void(nx::network::http::BufferType messageBody)>;
+    class RequestContext
+    {
+    public:
+        RequestContext(ResponseReceivedHandler responseReceived);
+
+        void bindToAioThread(
+            nx::network::aio::AbstractAioThread* aioThread);
+        void pleaseStopSync();
+
+        void startTimer(
+            const std::chrono::milliseconds& timeout,
+            nx::network::aio::TimerEventHandler timerEvent);
+
+        void cancelSync();
+
+        void doGet(const nx::utils::Url& url);
+        void doPost(const nx::utils::Url& url, const nx::network::http::BufferType& messagBody);
+
+        bool failed() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
+
+        const nx::network::http::Request& request() const;
+        const nx::network::http::Response* response() const;
+
+    private:
+        nx::network::http::AsyncClient m_httpClient;
+        nx::network::aio::Timer m_timer;
+    };
+
+private:
+    const Settings& m_settings;
+    NodeInfo m_thisNodeInfo;
+    nx::utils::Url m_discoveryServiceUrl;
+
+    NodeDiscoveredHandler m_nodeDiscoveredHandler;
+    NodeLostHandler m_nodeLostHandler;
+
+    std::unique_ptr<RequestContext> m_registerNodeRequest;
+    std::unique_ptr<RequestContext> m_onlineNodesRequest;
+
+    std::set<Node> m_onlineNodes;
+    Node m_thisNode;
+
+    mutable QnMutex m_mutex;
+
+    QDateTime m_requestSent;
+};
+
+} // namespace nx::cloud::discovery

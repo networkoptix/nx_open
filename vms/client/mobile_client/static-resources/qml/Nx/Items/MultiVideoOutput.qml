@@ -97,7 +97,14 @@ Item
             Connections
             {
                 target: multiVideoOutput
-                onMediaPlayerChanged: setPlayer(target.mediaPlayer, index)
+                onMediaPlayerChanged: updateMediaPlayer()
+            }
+
+            Component.onCompleted: updateMediaPlayer()
+
+            function updateMediaPlayer()
+            {
+                setPlayer(multiVideoOutput.mediaPlayer, index)
             }
         }
     }

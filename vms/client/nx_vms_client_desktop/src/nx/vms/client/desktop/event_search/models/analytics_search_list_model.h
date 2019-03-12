@@ -4,6 +4,8 @@
 
 #include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
 
+namespace nx::analytics::storage { struct DetectedObject; }
+
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchListModel: public AbstractAsyncSearchListModel
@@ -26,6 +28,11 @@ public:
 
     virtual bool isConstrained() const override;
     virtual bool hasAccessRights() const override;
+
+signals:
+    void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
+        const analytics::storage::DetectedObject& object, const QnVirtualCameraResourcePtr& camera,
+        QPrivateSignal);
 
 protected:
     virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const override;

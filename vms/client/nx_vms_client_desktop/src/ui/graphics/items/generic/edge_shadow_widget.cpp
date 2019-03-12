@@ -16,7 +16,7 @@ QnEdgeShadowWidget::QnEdgeShadowWidget(
     m_thickness(thickness),
     m_location(location)
 {
-    NX_ASSERT(m_shadowCaster, Q_FUNC_INFO, "Caster should not be null");
+    NX_ASSERT(m_shadowCaster, "Caster should not be null");
     if (!m_shadowCaster)
         return;
 

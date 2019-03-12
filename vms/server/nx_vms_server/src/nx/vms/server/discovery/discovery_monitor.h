@@ -10,7 +10,7 @@ namespace discovery {
 
 nx::vms::api::DiscoveredServerDataList getServers(nx::vms::discovery::Manager* manager);
 
-class DiscoveryMonitor: public QObject, public QnCommonModuleAware
+class DiscoveryMonitor: public QObject, public /*mixin*/ QnCommonModuleAware
 {
 public:
     DiscoveryMonitor(ec2::TransactionMessageBusAdapter* messageBus);

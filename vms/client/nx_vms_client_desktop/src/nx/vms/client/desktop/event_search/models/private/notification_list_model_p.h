@@ -3,8 +3,8 @@
 #include "../notification_list_model.h"
 
 #include <QtCore/QHash>
-#include <QtCore/QSharedPointer>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
 
 #include <nx/vms/event/event_fwd.h>
 

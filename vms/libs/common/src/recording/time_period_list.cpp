@@ -341,6 +341,38 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(
     return aggregateTimePeriodsUnconstrained(periods, detailLevel);
 }
 
+QnTimePeriodList QnTimePeriodList::intersection(
+    const QnTimePeriodList& first, const QnTimePeriodList& second)
+{
+    QnTimePeriodList result;
+    auto firstIt = first.begin();
+    auto secondIt = second.begin();
+    while (true)
+    {
+        if (firstIt == first.end() || secondIt == second.end())
+            return result;
+
+        const auto intersected = firstIt->intersected(*secondIt);
+        if (intersected.isEmpty())
+        {
+            if (firstIt->startTime() < secondIt->startTime())
+                ++firstIt;
+            else
+                ++secondIt;
+        }
+        else
+        {
+            result << intersected;
+            if (firstIt->endTime() < secondIt->endTime())
+                ++firstIt;
+            else
+                ++secondIt;
+        }
+    }
+
+    return result;
+}
+
 void QnTimePeriodList::includeTimePeriod(const QnTimePeriod &period)
 {
     if (period.isEmpty())
@@ -512,7 +544,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     {
         auto eraseIter = std::lower_bound(periods.begin(), periods.end(), erasePoint);
 
-        NX_ASSERT(eraseIter != periods.begin(), Q_FUNC_INFO, "Invalid semantics");
+        NX_ASSERT(eraseIter != periods.begin(), "Invalid semantics");
 
         if (eraseIter != periods.begin() &&
             (eraseIter == periods.end() || eraseIter->startTimeMs > erasePoint)
@@ -532,7 +564,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     }
 
 
-    //NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    //NX_ASSERT(!periods.isEmpty(), "Empty list should be worked out earlier");
     if (periods.isEmpty())
     {
         periods = tail;
@@ -542,7 +574,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     auto last = periods.end() - 1;
     if (!tail.isEmpty() && tail.first().startTimeMs < last->endTimeMs())
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Should not get here, security fallback");
+        NX_ASSERT(false, "Should not get here, security fallback");
         unionTimePeriods(periods, tail);
     }
     else if (!tail.isEmpty())
@@ -667,10 +699,10 @@ QnTimePeriodList mergeTimePeriodsInternal(
             else
             {
                 QnTimePeriod &last = result.last();
-                NX_ASSERT(last.startTimeMs <= startPeriod.startTimeMs, Q_FUNC_INFO, "Algorithm semantics failure, order failed");
+                NX_ASSERT(last.startTimeMs <= startPeriod.startTimeMs, "Algorithm semantics failure, order failed");
                 if (startPeriod.isInfinite())
                 {
-                    NX_ASSERT(!last.isInfinite(), Q_FUNC_INFO, "This should never happen");
+                    NX_ASSERT(!last.isInfinite(), "This should never happen");
                     if (last.isInfinite())
                         last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
                     else if (startPeriod.startTimeMs > last.startTimeMs + last.durationMs)

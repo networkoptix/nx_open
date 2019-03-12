@@ -32,8 +32,6 @@ set(customization.fullBundleUpgradeCode "{0fc1d29f-10f7-4109-aa23-6664865b967d}"
 set(deb.customization.company.name "digitalwatchdog")
 
 set(mac.sign.identity "Developer ID Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Kaltec Electronics, INC (HW58JB7FUF)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Kaltec Electronics, INC (HW58JB7FUF)")
 set(mac.bundle.identifier "tv.dwcc.vmsdemo")
 set(mac.protocol_handler_bundle.identifier "tv.dwcc.protocol_handler")
 

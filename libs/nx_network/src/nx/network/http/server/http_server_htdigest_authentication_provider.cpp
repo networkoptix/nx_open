@@ -1,15 +1,29 @@
 #include "http_server_htdigest_authentication_provider.h"
 
+#include <string>
+#include <vector>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
+#include <nx/utils/system_error.h>
+
 namespace nx::network::http::server {
 
 HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(const std::string& filePath)
 {
     std::ifstream file(filePath);
-    if (file.is_open())
+    if (!file.is_open())
     {
-        load(file);
-        file.close();
+        NX_ERROR(this, lm("Failed to open htdigest file: %1. Reason: %2. Authentication will fail.")
+            .arg(filePath).arg(SystemError::getLastOSErrorText()));
+        return;
     }
+
+    NX_INFO(this, lm("Loading htdigest credentials from file: %1").arg(filePath));
+
+    load(file);
+    file.close();
 }
 
 HtdigestAuthenticationProvider::HtdigestAuthenticationProvider(std::istream& input)
@@ -39,29 +53,38 @@ void HtdigestAuthenticationProvider::getPasswordByUserName(
 void HtdigestAuthenticationProvider::load(std::istream& input)
 {
     std::string line;
-    while (std::getline(input, line))
+    for (int lineNumber = 1; std::getline(input, line); ++lineNumber)
     {
         // Each line is expected to be of the form:
         // someuser:realm:c30b86d219198b1ada5b63fbfa0818e3
         // where userName == "someuser", password == "c30b86d219198b1ada5b63fbfa0818e3"
         // and "realm" is the user's role that we ignore.
 
-        std::size_t colon = line.find(':');
-        if (colon == std::string::npos)
+        std::vector<std::string> tokens;
+        boost::split(tokens, line, boost::is_any_of(":"));
+        if (tokens.size() != 3)
+        {
+            NX_WARNING(
+                this,
+                lm("Skipping malformed line number %1. Expecting line to have form <user>:<realm>:<digest>")
+                    .arg(lineNumber));
             continue;
+        }
 
-        std::string userName = line.substr(0, colon);
-
-        colon = line.find(':', colon + 1);
-        if (colon == std::string::npos || colon >= line.size() - 1)
-            continue;
-
-        std::string digest = line.substr(colon + 1);
+        std::string userName = tokens.front();
+        std::string digest = tokens.back();
 
         {
             QnMutexLocker lock(&m_mutex);
             m_credentials.emplace(userName.c_str(), digest.c_str());
         }
+    }
+
+    if (m_credentials.empty())
+    {
+        NX_WARNING(
+            this,
+            lm("Unable to parse any htdigest credentials. Authentication will fail."));
     }
 }
 

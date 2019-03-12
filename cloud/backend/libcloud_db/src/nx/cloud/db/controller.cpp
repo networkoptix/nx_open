@@ -16,8 +16,6 @@ namespace nx::cloud::db {
 const int kMinSupportedProtocolVersion = 3024;
 const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
-static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
-
 Controller::Controller(
     const conf::Settings& settings,
     Model* model)
@@ -38,18 +36,17 @@ Controller::Controller(
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get()),
     m_eventManager(settings),
-    m_ec2SyncronizationEngine(
+    m_ec2SynchronizationEngine(
         std::string(), //< No application id.
-        kCdbGuid,
         settings.p2pDb(),
         nx::clusterdb::engine::ProtocolVersionRange(
             kMinSupportedProtocolVersion,
             kMaxSupportedProtocolVersion),
         &m_dbInstanceController.queryExecutor()),
-    m_vmsP2pCommandBus(&m_ec2SyncronizationEngine),
+    m_vmsP2pCommandBus(&m_ec2SynchronizationEngine),
     m_systemHealthInfoProvider(
         SystemHealthInfoProviderFactory::instance().create(
-            &m_ec2SyncronizationEngine.connectionManager(),
+            &m_ec2SynchronizationEngine.connectionManager(),
             &m_dbInstanceController.queryExecutor())),
     m_systemManager(
         settings,
@@ -58,10 +55,10 @@ Controller::Controller(
         *m_systemHealthInfoProvider,
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
-        &m_ec2SyncronizationEngine),
+        &m_ec2SynchronizationEngine),
     m_systemCapabilitiesProvider(
         &m_systemManager,
-        &m_ec2SyncronizationEngine.connectionManager()),
+        &m_ec2SynchronizationEngine.connectionManager()),
     m_vmsGateway(settings, m_accountManager),
     m_systemMergeManager(
         &m_systemManager,
@@ -76,8 +73,7 @@ Controller::Controller(
         m_tempPasswordManager,
         &m_vmsP2pCommandBus),
     m_maintenanceManager(
-        kCdbGuid,
-        &m_ec2SyncronizationEngine,
+        &m_ec2SynchronizationEngine,
         m_dbInstanceController),
     m_cloudModuleUrlProviderDeprecated(
         settings.moduleFinder().cloudModulesXmlTemplatePath),
@@ -95,10 +91,10 @@ Controller::Controller(
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingCommandDispatcher().removeHandler
+    m_ec2SynchronizationEngine.incomingCommandDispatcher().removeHandler
         <ec2::command::SaveSystemMergeHistoryRecord>();
 
-    m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
+    m_ec2SynchronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 }
 
@@ -122,9 +118,9 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-clusterdb::engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+clusterdb::engine::SynchronizationEngine& Controller::ec2SynchronizationEngine()
 {
-    return m_ec2SyncronizationEngine;
+    return m_ec2SynchronizationEngine;
 }
 
 AbstractSystemHealthInfoProvider& Controller::systemHealthInfoProvider()
@@ -212,6 +208,11 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
 
+    // Temporary fix allowing maintenance/log/* and maintenance/malloc_info to
+    // be authenticated by htdigest authenticator.
+    m_authRestrictionList->allow({std::nullopt, std::nullopt, "/cdb/maintenance/log/.*"}, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow({std::nullopt, std::nullopt, "/cdb/maintenance/malloc_info"}, nx::network::http::AuthMethod::noAuth);
+
     m_transportSecurityManager =
         std::make_unique<AccessBlocker>(m_settings);
 
@@ -244,12 +245,12 @@ void Controller::initializeDataSynchronizationEngine()
     nx::clusterdb::engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
     outgoingCommandFilter.sendOnlyOwnCommands = true;
 
-    m_ec2SyncronizationEngine.setOutgoingCommandFilter(outgoingCommandFilter);
+    m_ec2SynchronizationEngine.setOutgoingCommandFilter(outgoingCommandFilter);
 
-    m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
+    m_ec2SynchronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 
-    m_ec2SyncronizationEngine.incomingCommandDispatcher().registerCommandHandler
+    m_ec2SynchronizationEngine.incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
@@ -262,7 +263,7 @@ void Controller::initializeDataSynchronizationEngine()
 
     // Copying every remote transaction as our own to avoid
     // broken synchronization between mediaservers.
-    m_ec2SyncronizationEngine.transactionLog().setOnTransactionReceived(
+    m_ec2SynchronizationEngine.transactionLog().setOnTransactionReceived(
         std::bind(&Controller::copyExternalTransaction, this, _1, _2, _3));
 }
 
@@ -271,18 +272,18 @@ nx::sql::DBResult Controller::copyExternalTransaction(
     const std::string& systemId,
     const nx::clusterdb::engine::EditableSerializableCommand& transaction)
 {
-    if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
+    if (transaction.header().peerID == m_ec2SynchronizationEngine.peerId())
         return nx::sql::DBResult::ok;
 
     // Copying transaction.
     auto ownTransaction = transaction.clone();
     ownTransaction->setHeader(
-        m_ec2SyncronizationEngine.transactionLog().prepareLocalTransactionHeader(
+        m_ec2SynchronizationEngine.transactionLog().prepareLocalTransactionHeader(
             queryContext,
             systemId,
             ownTransaction->header().command));
 
-    return m_ec2SyncronizationEngine.transactionLog().saveLocalTransaction(
+    return m_ec2SynchronizationEngine.transactionLog().saveLocalTransaction(
         queryContext,
         systemId,
         std::move(ownTransaction));

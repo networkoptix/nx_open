@@ -18,8 +18,6 @@ namespace ite
         MediaEncoder( CameraManager* cameraManager, int encoderNumber );
         virtual ~MediaEncoder();
 
-        // nxcip::PluginInterface
-
         virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::CameraMediaEncoder

@@ -17,7 +17,7 @@ TEST(LogLogger, Levels)
     const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
     Logger logger(
-        std::set<Tag>(),
+        std::set<Filter>(),
         Level::info,
         std::unique_ptr<AbstractWriter>(buffer));
     logger.setOnLevelChanged(onLevelChanged);
@@ -60,6 +60,7 @@ TEST(LogLogger, Levels)
 }
 
 static Tag makeTag(const char* tag) { return Tag(QString::fromUtf8(tag)); }
+static Filter makeFilter(const char* filter) { return Filter(QString::fromUtf8(filter)); }
 
 TEST(LogLogger, Filters)
 {
@@ -68,7 +69,7 @@ TEST(LogLogger, Filters)
     const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
     Logger logger(
-        std::set<Tag>(),
+        std::set<Filter>(),
         Level::info,
         std::unique_ptr<AbstractWriter>(buffer));
     logger.setOnLevelChanged(onLevelChanged);
@@ -87,11 +88,11 @@ TEST(LogLogger, Filters)
     logger.log(Level::debug, makeTag("nx::second::className4"), "ddd");
     ASSERT_EQ((size_t) 2, buffer->takeMessages().size());
 
-    logger.setLevelFilters(LevelFilters{{makeTag("nx::third"), Level::debug}});
+    logger.setLevelFilters(LevelFilters{{makeFilter("nx::third"), Level::debug}});
     ASSERT_EQ((size_t) 1, logger.levelFilters().size());
     EXPECT_EQ(logger.maxLevel(), Level::debug);
 
-    logger.setLevelFilters(LevelFilters{{makeTag("nx::first"), Level::verbose}});
+    logger.setLevelFilters(LevelFilters{{makeFilter("nx::first"), Level::verbose}});
     ASSERT_EQ((size_t) 1, logger.levelFilters().size());
     EXPECT_EQ(logger.maxLevel(), Level::verbose);
 
@@ -107,7 +108,7 @@ TEST(LogLogger, Filters)
     ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 
     logger.setLevelFilters(LevelFilters{
-        {makeTag("nx::second"), Level::verbose}, {makeTag("nx::third"), Level::none}});
+        {makeFilter("nx::second"), Level::verbose}, {makeFilter("nx::third"), Level::none}});
     ASSERT_EQ((size_t) 2, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, makeTag("nx::first::className1")));
@@ -135,7 +136,7 @@ TEST(LogLogger, Format)
     const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
     Logger logger(
-        std::set<Tag>(),
+        std::set<Filter>(),
         Level::verbose,
         std::unique_ptr<AbstractWriter>(buffer));
     logger.setOnLevelChanged(onLevelChanged);
@@ -145,7 +146,7 @@ TEST(LogLogger, Format)
     logger.log(Level::error, makeTag("nx::bbb::Object(2)"), "Second message");
     logger.log(Level::warning, makeTag("nx::ccc::Object(3)"), "Third message");
     logger.log(Level::info, makeTag("nx::ddd::Object(4)"), "Forth message");
-    logger.log(Level::debug, makeTag("nx::eee::Object(5)"), "Fivth message");
+    logger.log(Level::debug, makeTag("nx::eee::Object(5)"), "Fifth message");
     logger.log(Level::verbose, makeTag("nx::fff::Object(6)"), "Sixth message");
     logger.log(Level::verbose, Tag(), "Message without tag");
 
@@ -165,7 +166,7 @@ TEST(LogLogger, Format)
     verifyMessage(1, QLatin1String("ERROR nx::bbb::Object(2): Second message"));
     verifyMessage(2, QLatin1String("WARNING nx::ccc::Object(3): Third message"));
     verifyMessage(3, QLatin1String("INFO nx::ddd::Object(4): Forth message"));
-    verifyMessage(4, QLatin1String("DEBUG nx::eee::Object(5): Fivth message"));
+    verifyMessage(4, QLatin1String("DEBUG nx::eee::Object(5): Fifth message"));
     verifyMessage(5, QLatin1String("VERBOSE nx::fff::Object(6): Sixth message"));
     verifyMessage(6, QLatin1String("VERBOSE : Message without tag"));
 

@@ -4,6 +4,7 @@
 
 #include <deque>
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
 #include <QtWidgets/QAction>
 

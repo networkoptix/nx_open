@@ -338,7 +338,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     if (QnFile::baseName(fileName).indexOf(lit("_")) == -1)
     {
-        QnAviResourcePtr res(new QnAviResource(fileName));
+        QnAviResourcePtr res(new QnAviResource(fileName, serverModule()->commonModule()));
         QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
         avi->setStorage(storage);
         avi->setFastStreamFind(true);
@@ -367,9 +367,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
         delete avi;
         return chunk;
     }
-
-    if (!storage->isFileExists(fileName))
-        return chunk;
 
     auto    nameParts   = QnFile::baseName(fileName).split(lit("_"));
     int64_t startTimeMs = nameParts[0].toLongLong();
@@ -480,7 +477,7 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
     QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
-    NX_VERBOSE(this, "%1 Processing directory %2", Q_FUNC_INFO, nx::utils::url::hidePassword(folder));
+    NX_VERBOSE(this, "%1 Processing directory %2", __func__, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;
 
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))

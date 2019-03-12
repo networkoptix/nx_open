@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -6,9 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/vms_server_plugins/utils/uuid.h>
-
-#include <nx/sdk/common/string.h>
+#include <nx/sdk/helpers/string.h>
 
 #include "device_agent.h"
 #include "log.h"
@@ -27,7 +25,7 @@ static const QString kVcaVendor("cap");
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     static const char* const kResourceName = ":/vca/manifest.json";
     static const char* const kFileName = "plugins/vca/manifest.json";
@@ -49,45 +47,33 @@ Engine::Engine(nx::sdk::analytics::common::Plugin* plugin): m_plugin(plugin)
     m_typedManifest = QJson::deserialized<EngineManifest>(m_manifest);
 }
 
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
 {
-    if (interfaceId == IID_Engine)
-    {
-        addRef();
-        return static_cast<Engine*>(this);
-    }
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
+    // Do nothing.
 }
 
-void Engine::setSettings(const nx::sdk::IStringMap* settings)
+void Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::analytics::IDeviceAgent* Engine::obtainDeviceAgent(
-    const DeviceInfo* deviceInfo, Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
 {
-    const auto vendor = QString(deviceInfo->vendor).toLower();
-    if (vendor.startsWith(kVcaVendor))
-        return new DeviceAgent(this, *deviceInfo, m_typedManifest);
-    else
-        return nullptr;
+    if (isCompatible(deviceInfo))
+        return new DeviceAgent(this, deviceInfo, m_typedManifest);
+
+    return nullptr;
 }
 
-const nx::sdk::IString* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return new nx::sdk::common::String(m_manifest);
+    return new nx::sdk::String(m_manifest);
 }
 
 const EventType* Engine::eventTypeById(const QString& id) const noexcept
@@ -100,14 +86,20 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
     return (it != m_typedManifest.eventTypes.cend()) ? &(*it) : nullptr;
 }
 
-void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
 {
 }
 
-nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handler*/)
+Error Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return nx::sdk::Error::noError;
+    return Error::noError;
+}
+
+bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
+{
+    const auto vendor = QString(deviceInfo->vendor()).toLower();
+    return vendor.startsWith(kVcaVendor);
 }
 
 } // namespace vca
@@ -118,6 +110,7 @@ nx::sdk::Error Engine::setHandler(nx::sdk::analytics::IEngine::IHandler* /*handl
 namespace {
 
 static const std::string kLibName = "vca_analytics_plugin";
+
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.vca",
@@ -130,15 +123,15 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
-    return new nx::sdk::analytics::common::Plugin(
+    return new nx::sdk::analytics::Plugin(
         kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::vca::Engine(
-                dynamic_cast<nx::sdk::analytics::common::Plugin*>(plugin));
+                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
         });
 }
 

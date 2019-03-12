@@ -3,6 +3,8 @@
 #include <string>
 #include <functional>
 #include <cstdint>
+
+#include <common.h>
 #include "detail/fs_stub.h"
 
 namespace utils {
@@ -30,13 +32,13 @@ Json object should have the following structure:
                     "durationMs": "429626247",
                     "startTimeMs": "1453550461075"
                 },
-                ... 
+                ...
             ],
             "low": [
                 {
                     "durationMs": "429626247",
                     "startTimeMs": "1453550461075"
-                }, 
+                },
                 ...
             ]
         }
@@ -44,5 +46,5 @@ Json object should have the following structure:
 }
 */
 
-bool buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPair* outVfsPair);
+NX_TEST_STORAGE_PLUGIN_API bool buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPair* outVfsPair);
 }

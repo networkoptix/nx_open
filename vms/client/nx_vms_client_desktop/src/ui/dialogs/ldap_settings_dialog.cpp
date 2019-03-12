@@ -24,9 +24,6 @@
 using namespace nx;
 
 namespace {
-    // TODO: #GDM move timeout constant to more common module
-    const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
-
     /** Special value, used when the user has pressed "Test" button. */
     const int kTestPrepareHandle = 0;
 
@@ -67,40 +64,27 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
     connect(timeoutTimer, &QTimer::timeout, this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
 }
 
-void QnLdapSettingsDialogPrivate::testSettings() {
-    /* Make sure stopTesting() will work well. */
+void QnLdapSettingsDialogPrivate::testSettings()
+{
+    // Make sure stopTesting() will work well.
     testHandle = kTestPrepareHandle;
 
     QnLdapSettings settings = this->settings();
 
-    if (!settings.isValid()) {
-        stopTesting(tr("The provided settings are not valid.") + lit("\n") + tr("Could not perform a test."));
+    if (!settings.isValid())
+    {
+        stopTesting(tr("The provided settings are not valid.")
+			+ '\n'
+			+ tr("Could not perform a test."));
         return;
     }
 
-    // TODO: #dklychkov #3.0 testLdapSettings rest request (on server side) should check all servers.
-    QnMediaServerConnectionPtr serverConnection;
-    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for (const QnMediaServerResourcePtr server: onlineServers)
+    const auto server = commonModule()->currentServer();
+    NX_ASSERT(server);
+    if (!server)
     {
-        if (!server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
-            continue;
-
-        serverConnection = server->apiConnection();
-        break;
-    }
-
-    if (!serverConnection)
-    {
-        QnMediaServerResourcePtr server = commonModule()->currentServer();
-
-        if (!server)
-        {
-            stopTesting(tr("Could not perform a test."));
-            return;
-        }
-
-        serverConnection = server->apiConnection();
+        stopTesting(tr("Could not perform a test."));
+        return;
     }
 
     Q_Q(QnLdapSettingsDialog);
@@ -113,10 +97,13 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     q->ui->testStackWidget->setCurrentWidget(q->ui->testProgressPage);
     q->ui->testStackWidget->show();
 
-    timeoutTimer->setInterval(testLdapTimeoutMSec / q->ui->testProgressBar->maximum());
+    timeoutTimer->setInterval(settings.searchTimeoutS * 1000 / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
+    testHandle = server->apiConnection()->testLdapSettingsAsync(
+        settings,
+        q,
+        SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
@@ -160,6 +147,7 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     result.adminPassword = q->ui->passwordLineEdit->text().trimmed();
     result.searchBase = q->ui->searchBaseLineEdit->text().trimmed();
     result.searchFilter = q->ui->searchFilterLineEdit->text().trimmed();
+    result.searchTimeoutS = q->ui->searchTimeoutSSpinBox->value();
     return result;
 }
 
@@ -179,6 +167,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
     q->ui->searchBaseLineEdit->setText(settings.searchBase.trimmed());
     q->ui->searchFilterLineEdit->setText(settings.searchFilter.trimmed());
+    q->ui->searchTimeoutSSpinBox->setValue(settings.searchTimeoutS);
     q->ui->testStackWidget->setCurrentWidget(q->ui->testResultPage);
     q->ui->testResultLabel->setText(QString());
     q->ui->testStackWidget->hide();

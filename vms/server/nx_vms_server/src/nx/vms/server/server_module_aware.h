@@ -38,7 +38,7 @@ public:
     QnMediaServerModule* serverModule() const;
 
     QnResourcePool* resourcePool() const;
-    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
     const nx::vms::server::Settings& settings() const;
     nx::vms::event::RuleManager* eventRuleManager() const;

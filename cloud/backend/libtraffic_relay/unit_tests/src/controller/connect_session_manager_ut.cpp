@@ -4,7 +4,7 @@
 
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_notifications.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/stream_socket_stub.h>
@@ -44,20 +44,25 @@ public:
         return true;
     }
 
-    virtual cf::future<std::string> findRelayByDomain(
-        const std::string& /*domainName*/) const override
+    virtual void findRelayByDomain(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override
     {
-        return cf::make_ready_future(std::string());
+        return handler(std::string());
     }
 
-    virtual cf::future<bool> addPeer(const std::string& /*domainName*/) override
+    virtual void addPeer(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override
     {
-        return cf::make_ready_future(true);
+        return handler(true);
     }
 
-    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
+    virtual void removePeer(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override
     {
-        return cf::make_ready_future(true);
+        return handler(true);
     }
 
     virtual void setNodeId(const std::string& /*nodeId*/) override {}
@@ -446,7 +451,6 @@ private:
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             m_lastListeningPeerConnection = tcpConnection.get();
             auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
-                nullptr,
                 std::move(tcpConnection),
                 nullptr,
                 nullptr);

@@ -2,6 +2,12 @@
 
 #include <utils/memory/cyclic_allocator.h>
 
+namespace {
+
+constexpr unsigned int MAX_VALID_CAPACITY = 256 * 1024 * 1024;
+
+} // namespace
+
 QnCompressedVideoData::QnCompressedVideoData( QnConstMediaContextPtr ctx )
 :
     QnAbstractMediaData( VIDEO ),
@@ -34,7 +40,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(/*&videoPacketCyclicAllocator,*/ alignment, capacity)
 {
-    NX_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
+    NX_ASSERT(capacity <= MAX_VALID_CAPACITY);
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
@@ -46,7 +52,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(allocator, alignment, capacity)
 {
-    NX_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
+    NX_ASSERT(capacity <= MAX_VALID_CAPACITY);
 }
 
 //!Implementation of QnAbstractMediaData::clone

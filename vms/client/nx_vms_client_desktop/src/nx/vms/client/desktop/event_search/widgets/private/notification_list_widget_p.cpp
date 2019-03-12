@@ -26,6 +26,7 @@
 
 #include <nx/vms/client/desktop/common/models/subset_list_model.h>
 #include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/event_search/models/system_health_list_model.h>
@@ -82,16 +83,13 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     QnWorkbenchContextAware(q),
     q(q),
     m_eventRibbon(new EventRibbon(q)),
+    m_placeholder(new QWidget(q)),
     m_systemHealthModel(new SystemHealthListModel(context(), this)),
     m_notificationsModel(new NotificationListModel(context(), this))
 {
-    m_placeholder = new QWidget(q);
     m_placeholder->setMinimumSize(QSize(0, 100));
-
-    auto layout = new QVBoxLayout(q);
-    layout->setSpacing(0);
-    layout->addWidget(m_placeholder);
-    layout->addWidget(m_eventRibbon);
+    anchorWidgetToParent(m_placeholder);
+    anchorWidgetToParent(m_eventRibbon);
 
     const auto verticalLayout = new QVBoxLayout(m_placeholder);
     verticalLayout->setSpacing(16);
@@ -134,63 +132,21 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     connect(m_eventRibbon, &EventRibbon::unreadCountChanged,
         q, &NotificationListWidget::unreadCountChanged);
 
-    connect(m_eventRibbon, &EventRibbon::countChanged,
-        this, [this](int count)
+    const auto updatePlaceholderVisibility =
+        [this](int count)
         {
             static constexpr int kMinimumCount = 1; //< Separator.
             m_placeholder->setVisible(count <= kMinimumCount);
-        });
+        };
+
+    connect(m_eventRibbon, &EventRibbon::countChanged, this, updatePlaceholderVisibility);
+    updatePlaceholderVisibility(m_eventRibbon->count());
 
     TileInteractionHandler::install(m_eventRibbon);
 }
 
 NotificationListWidget::Private::~Private()
 {
-}
-
-QToolButton* NotificationListWidget::Private::newActionButton(
-    ui::action::IDType actionId,
-    int helpTopicId)
-{
-    const auto paintFunction =
-        [](QPainter* painter, const QStyleOption* /*option*/, const QWidget* widget) -> bool
-        {
-            const auto button = qobject_cast<const QToolButton*>(widget);
-            if (!button)
-                return false;
-
-            auto mode = QIcon::Normal;
-            if (button->isDown())
-                mode = QnIcon::Pressed;
-            else if (button->underMouse())
-                mode = QIcon::Active;
-
-            button->icon().paint(painter, button->rect(), Qt::AlignCenter, mode);
-            return true;
-        };
-
-    auto button = new CustomPainted<QToolButton>();
-    button->setCustomPaintFunction(paintFunction);
-    button->setDefaultAction(action(actionId));
-    button->setIconSize(QnSkin::maximumSize(button->defaultAction()->icon()));
-    button->setFixedSize(button->iconSize());
-
-    if (helpTopicId != Qn::Empty_Help)
-        setHelpTopic(button, helpTopicId);
-
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        [this, button, actionId]()
-        {
-            button->setVisible(menu()->canTrigger(actionId));
-        });
-
-    button->setVisible(menu()->canTrigger(actionId));
-
-    const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"),
-        QnLexical::serialized(actionId));
-
-    context()->statisticsModule()->registerButton(statAlias, button);
-    return button;
 }
 
 } // namespace nx::vms::client::desktop

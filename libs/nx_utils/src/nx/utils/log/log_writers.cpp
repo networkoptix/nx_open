@@ -53,15 +53,21 @@ void File::write(Level /*level*/, const QString& message)
 
 QString File::makeFileName(size_t backupNumber) const
 {
+    static constexpr char kExtensionWithSeparator[] = ".log";
+
+    auto baseFileName = m_settings.name;
+    if (baseFileName.endsWith(kExtensionWithSeparator))
+        baseFileName.chop(strlen(kExtensionWithSeparator));
+
     if (backupNumber == 0)
     {
         static const QLatin1String kTemplate("%1.log");
-        return QString(kTemplate).arg(m_settings.name);
+        return QString(kTemplate).arg(baseFileName);
     }
     else
     {
         static const QLatin1String kTemplate("%1_%2.log");
-        return QString(kTemplate).arg(m_settings.name).arg(
+        return QString(kTemplate).arg(baseFileName).arg(
             (int) backupNumber, 3, 10, QLatin1Char('0'));
     }
 }

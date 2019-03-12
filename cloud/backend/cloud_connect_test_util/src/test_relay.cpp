@@ -1,6 +1,6 @@
 #include "test_relay.h"
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_upgrade.h>
 #include <nx/network/http/http_client.h>
 #include <nx/utils/elapsed_timer.h>
 
@@ -26,7 +26,7 @@ std::tuple<nx::cloud::relay::api::ResultCode, std::unique_ptr<network::AbstractS
 {
     using namespace nx::cloud::relay;
 
-    api::ClientOverHttpUpgrade relayClient(
+    api::detail::ClientOverHttpUpgrade relayClient(
         baseRelayUrl,
         nullptr);
 

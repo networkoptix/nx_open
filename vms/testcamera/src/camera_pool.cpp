@@ -170,11 +170,11 @@ void QnCameraPool::addCameras(
                 camera->setSecondaryFileList(secondaryFileList);
             camera->setOfflineFreq(offlineFreq);
             foreach(QString fileName, primaryFileList)
-                QnFileCache::instance()->getMediaData(fileName);
+                QnFileCache::instance()->getMediaData(fileName, commonModule());
             if (!m_noSecondaryStream)
             {
                 foreach(QString fileName, secondaryFileList)
-                    QnFileCache::instance()->getMediaData(fileName);
+                    QnFileCache::instance()->getMediaData(fileName, commonModule());
             }
             m_cameras.insert(camera->getMac(), camera);
         }
@@ -192,10 +192,10 @@ void QnCameraPool::addCameras(
                 camera->setSecondaryFileList(QStringList() << secondaryFile);
             camera->setOfflineFreq(offlineFreq);
 
-            QnFileCache::instance()->getMediaData(primaryFile);
+            QnFileCache::instance()->getMediaData(primaryFile, commonModule());
             if (!secondaryFile.isEmpty()) // secondary file is optional
             {
-                QnFileCache::instance()->getMediaData(secondaryFile);
+                QnFileCache::instance()->getMediaData(secondaryFile, commonModule());
             }
             m_cameras.insert(camera->getMac(), camera);
         }

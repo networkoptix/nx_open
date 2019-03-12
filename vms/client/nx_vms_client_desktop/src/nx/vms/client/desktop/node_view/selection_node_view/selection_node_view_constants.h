@@ -7,8 +7,7 @@ namespace node_view {
 
 enum SelectionNodeViewProperty
 {
-    checkAllNodeProperty = details::lastNodeViewProperty,
-    selectedChildrenCountProperty,
+    selectedChildrenCountProperty = details::lastNodeViewProperty,
 
     lastSelectionNodeViewProperty = details::lastNodeViewProperty + 128
 };

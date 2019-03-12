@@ -16,7 +16,7 @@ void QnSendStatisticsRequestData::loadFromParams(QnResourcePool* resourcePool,
     if (params.contains(kStatServerUrlTag) )
         statisticsServerUrl = params.value(kStatServerUrlTag);
 
-    NX_ASSERT(!statisticsServerUrl.isEmpty(), Q_FUNC_INFO, "Invalid url of statistics server!");
+    NX_ASSERT(!statisticsServerUrl.isEmpty(), "Invalid url of statistics server!");
 }
 
 QnRequestParamList QnSendStatisticsRequestData::toParams() const

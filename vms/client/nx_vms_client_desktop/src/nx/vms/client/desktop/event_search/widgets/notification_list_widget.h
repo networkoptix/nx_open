@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
+
+#include <nx/utils/impl_ptr.h>
 
 namespace QnNotificationLevel { enum class Value; }
 
@@ -26,7 +27,7 @@ signals:
 
 private:
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

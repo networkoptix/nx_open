@@ -39,9 +39,9 @@ TextInput
             anchors
             {
                 margins: 4
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
+                bottom: parent ? parent.bottom : undefined
+                left: parent ? parent.left : undefined
+                right: parent ? parent.right : undefined
             }
             height: 1
             color: control.activeFocus ? activeColor : inactiveColor
@@ -51,9 +51,9 @@ TextInput
         {
             anchors
             {
-                left: parent.left
+                left: parent ? parent.left : undefined
                 leftMargin: 4
-                bottom: parent.bottom
+                bottom: parent ? parent.bottom : undefined
                 bottomMargin: 4
             }
             border.width: 0
@@ -66,9 +66,9 @@ TextInput
         {
             anchors
             {
-                right: parent.right
+                right: parent ? parent.right : undefined
                 rightMargin: 4
-                bottom: parent.bottom
+                bottom: parent ? parent.bottom : undefined
                 bottomMargin: 4
             }
             border.width: 0

@@ -195,15 +195,19 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             sendInt64(transportFd, (int64_t) result);
             return result == nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         })
-    .reg({"install"}, {"deb_path"},
+    .reg({"install"}, {"deb_path", "force"},
          [systemCommands](const std::string& command, int /*transportFd*/)
          {
              std::string debPath;
-             if (!parseCommand(command, &debPath))
+             boost::optional<std::string> force;
+             if (!parseCommand(command, &debPath, &force))
                  return Result::invalidArg;
 
              std::stringstream commandStream;
-             commandStream << "dpkg -i '" << debPath << "'";
+             commandStream << "dpkg -i";
+             if (force && *force == "force-conflicts")
+                commandStream << " --auto-deconfigure --force-conflicts";
+             commandStream << " '" << debPath << "'";
              int result = ::system(commandStream.str().c_str());
              return result == 0 ? Result::ok : Result::execFailed;
          }, true)

@@ -4,16 +4,16 @@
 
 #include <chrono>
 
-#include <QtCore/QScopedPointer>
 #include <QtGui/QPixmap>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/common/notification_levels.h>
 
+#include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 
@@ -74,7 +74,7 @@ protected:
 
 private:
     class Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

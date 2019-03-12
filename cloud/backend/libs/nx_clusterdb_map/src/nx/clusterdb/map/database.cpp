@@ -1,39 +1,26 @@
 #include "database.h"
 
+#include "dao/key_value_dao.h"
+
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
+
 namespace nx::clusterdb::map {
 
-// TODO: This should be passed to m_syncEngine
-// to allow connections with this guid only.
-static constexpr char kKeyValueDbApplicationId[] = "118e2785-d05c-4ab9-b1e0-6d74324dada3";
-
 Database::Database(
-    const Settings& settings,
-    nx::sql::AsyncSqlQueryExecutor* dbManager)
+    nx::clusterdb::engine::SynchronizationEngine* syncEngine,
+    nx::sql::AsyncSqlQueryExecutor* dbManager,
+    const std::string& clusterId)
     :
-    //m_settings(settings),
-    //m_dbManager(dbManager),
-    m_moduleId(QnUuid::createUuid()), //< TODO: moduleId should be persistent.
-    m_syncEngine(
-        kKeyValueDbApplicationId,
-        m_moduleId,
-        settings.dataSyncEngineSettings,
-        nx::clusterdb::engine::ProtocolVersionRange(1, 1),
-        dbManager),
+    m_syncEngine(syncEngine),
     m_structureUpdater(dbManager),
-    m_dataManager(dbManager),
-    m_eventProvider(dbManager)
+    m_clusterId(clusterId),
+    m_dataManager(m_syncEngine, dbManager, m_clusterId, &m_eventProvider)
 {
-}
-
-Database::~Database()
-{
-}
-
-void Database::registerHttpApi(
-    const std::string& pathPrefix,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    m_syncEngine.registerHttpApi(pathPrefix, dispatcher);
+    if (clusterId.empty())
+        NX_DEBUG(this, "clusterId is empty, cluster db map laoded in standalone mode");
+    else
+        NX_DEBUG(this, "cluster db map loaded with clusterId: %1", clusterId);
 }
 
 DataManager& Database::dataManager()
@@ -44,6 +31,11 @@ DataManager& Database::dataManager()
 EventProvider& Database::eventProvider()
 {
     return m_eventProvider;
+}
+
+std::string Database::clusterId() const
+{
+    return m_clusterId;
 }
 
 } // namespace nx::clusterdb::map

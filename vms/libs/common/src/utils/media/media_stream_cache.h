@@ -2,8 +2,7 @@
 // 14 dec 2012    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifndef MEDIASTREAMCACHE_H
-#define MEDIASTREAMCACHE_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -38,7 +37,7 @@ public:
     public:
         SequentialReadContext(
             MediaStreamCache* cache,
-            quint64 startTimestamp );
+            quint64 startTimestamp);
         ~SequentialReadContext();
 
         //!If no next frame returns NULL
@@ -92,9 +91,13 @@ public:
     QnAbstractDataPacketPtr findByTimestamp(
         quint64 desiredTimestamp,
         bool findKeyFrameOnly,
-        quint64* const foundTimestamp ) const;
+        quint64* const foundTimestamp,
+        int channelNumber = 0) const;
     //!Returns packet with min timestamp greater than \a timestamp
-    QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
+    QnAbstractDataPacketPtr getNextPacket(
+        quint64 timestamp,
+        quint64* const foundTimestamp,
+        int channelNumber = 0) const;
 
     nx::utils::Subscription<quint64 /*frameTimestampUsec*/>& keyFrameFoundSubscription();
     nx::utils::Subscription<>& streamTimeDiscontinuityFoundSubscription();
@@ -118,5 +121,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  //MEDIASTREAMCACHE_H

@@ -108,8 +108,8 @@ struct SocketGlobalsImpl
     std::unique_ptr<UdtInitializer> udtInitializer;
 
     aio::PollSetFactory pollSetFactory;
-    AioServiceGuard aioServiceGuard;
     std::unique_ptr<AddressResolver> addressResolver;
+    AioServiceGuard aioServiceGuard;
     std::unique_ptr<aio::Timer> debugIniReloadTimer;
 
     std::unique_ptr<cloud::CloudConnectController> cloudConnectController;
@@ -179,7 +179,7 @@ void SocketGlobals::init(
 
     if (++s_counter == 1) //< First in.
     {
-        s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
+        s_initState = InitState::inintializing; //< Allow creating Pollables in constructor.
         s_instance = new SocketGlobals(initializationFlags);
 
         s_instance->initializeNetworking();
@@ -202,7 +202,7 @@ void SocketGlobals::deinit()
             QnMutexUnlocker unlock(&lock);
             delete s_instance;
         }
-        s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
+        s_initState = InitState::deinitializing; //< Allow creating Pollables in destructor.
         s_instance = nullptr;
         s_initState = InitState::none;
     }
@@ -284,6 +284,16 @@ SocketGlobals& SocketGlobals::instance()
     return *s_instance;
 }
 
+const DebugCounters& SocketGlobals::debugCounters() const
+{
+    return m_debugCounters;
+}
+
+DebugCounters& SocketGlobals::debugCounters()
+{
+    return m_debugCounters;
+}
+
 void SocketGlobals::reloadIni()
 {
     m_impl->ini.reload();
@@ -340,20 +350,30 @@ void SocketGlobals::deinitializeCloudConnectivity()
 //-------------------------------------------------------------------------------------------------
 
 SocketGlobalsHolder::SocketGlobalsHolder(int initializationFlags):
-    m_initializationFlags(initializationFlags),
-    m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>(initializationFlags))
+    m_initializationFlags(initializationFlags)
 {
+    initialize(/*initializePeerId*/ false);
 }
 
-void SocketGlobalsHolder::reinitialize(bool initializePeerId)
+void SocketGlobalsHolder::initialize(bool initializePeerId)
 {
-    m_socketGlobalsGuard.reset();
     m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>(m_initializationFlags);
 
     // TODO: #ak It is not clear why following call is in reinitialize,
     // but not in initial initialization. Remove it from here.
     if (initializePeerId)
         SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
+}
+
+void SocketGlobalsHolder::uninitialize()
+{
+    m_socketGlobalsGuard.reset();
+}
+
+void SocketGlobalsHolder::reinitialize(bool initializePeerId)
+{
+    uninitialize();
+    initialize(initializePeerId);
 }
 
 } // namespace network

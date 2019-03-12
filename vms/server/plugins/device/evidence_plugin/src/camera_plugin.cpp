@@ -73,12 +73,12 @@ void* CameraPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int CameraPlugin::addRef()
+int CameraPlugin::addRef() const
 {
     return m_refManager.addRef();
 }
 
-unsigned int CameraPlugin::releaseRef()
+int CameraPlugin::releaseRef() const
 {
     return m_refManager.releaseRef();
 }

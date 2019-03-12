@@ -40,6 +40,21 @@ void Connector::addNodeUrl(
         });
 }
 
+void Connector::removeNodeUrl(
+    const::std::string& systemId,
+    const nx::utils::Url& url)
+{
+    post([this, systemId, url]()
+    {
+        auto it = m_nodes.find(url);
+        if (it != m_nodes.end() && it->second.systemId == systemId)
+        {
+            m_connectionManager->removeConnection(it->second.connectionId);
+            m_nodes.erase(it);
+        }
+    });
+}
+
 void Connector::stopWhileInAioThread()
 {
     m_nodes.clear();
@@ -106,7 +121,7 @@ void Connector::registerConnection(
     ConnectionManager::ConnectionContext connectionContext;
     connectionContext.connectionId = nodeContext.connectionId;
     connectionContext.fullPeerName.systemId = nodeContext.systemId;
-    connectionContext.fullPeerName.peerId = 
+    connectionContext.fullPeerName.peerId =
         connection->commonTransportHeaderOfRemoteTransaction().peerId;
     //connectionContext.userAgent = ;
     const auto connectionSequence = ++m_connectionSequence;
@@ -122,7 +137,7 @@ void Connector::registerConnection(
         nodeContext.connectionId,
         [connectionSequence](auto abstractConnection)
         {
-            const auto connection = 
+            const auto connection =
                 dynamic_cast<ConnectionWithSequence*>(abstractConnection);
             if (!connection || connection->data() != connectionSequence)
                 return;

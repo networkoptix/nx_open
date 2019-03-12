@@ -18,16 +18,15 @@ QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     setTypeId(nx::vms::api::LayoutData::kResourceTypeId);
 }
 
-QString QnLayoutResource::getUniqueId() const
-{
-    if (isFile())
-        return getUrl();
-    return base_type::getUniqueId();
-}
-
 Qn::ResourceStatus QnLayoutResource::getStatus() const
 {
     return Qn::Online;
+}
+
+void QnLayoutResource::setStatus(Qn::ResourceStatus newStatus,
+    Qn::StatusChangeReason reason /*= Qn::StatusChangeReason::Local*/)
+{
+    NX_ASSERT(false, "Not implemented");
 }
 
 QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
@@ -366,6 +365,11 @@ QRect QnLayoutResource::backgroundRect(const QSize& backgroundSize)
     return QRect(-left, -top, backgroundSize.width(), backgroundSize.height());
 }
 
+bool QnLayoutResource::hasBackground() const
+{
+    return !backgroundImageFilename().isEmpty();
+}
+
 /********* Background image id property **********/
 QString QnLayoutResource::backgroundImageFilename() const
 {
@@ -457,8 +461,8 @@ void QnLayoutResource::setLocked(bool value)
 
 bool QnLayoutResource::isFile() const
 {
-    NX_ASSERT(hasFlags(Qn::exported_layout) == !getUrl().isEmpty());
-    return hasFlags(Qn::exported_layout);
+    NX_ASSERT(!hasFlags(Qn::exported_layout));
+    return false;
 }
 
 bool QnLayoutResource::isShared() const
@@ -538,11 +542,38 @@ void QnLayoutResource::forgetPasswordForRecordings()
 {
     NX_ASSERT(isFile());
 
+    const auto items = getItems();
+    const auto pool = resourcePool();
+
+    for (const auto& item : items)
+    {
+        if (item.uuid.isNull()) // Check purpose unknown; copied from layoutResources().
+            continue;
+
+        if (auto resource = pool->getResourceByDescriptor(item.resource))
+        {
+            // Remove password from protected video streams.
+            if (auto aviItem = resource.dynamicCast<QnAviResource>())
+                aviItem->forgetPassword();
+
+            // Remove freshly added cameras from the layout.
+            if (auto cameraItem = resource.objectCast<QnVirtualCameraResource>())
+                removeItem(item);
+        }
+    }
+}
+
+// The one who requests to remove this function will become a permanent maintainer of this class.
+void QnLayoutResource::dumpStructure() const
+{
     auto items = layoutResources();
+
+    qDebug() << "Layout Url:" << getUrl() << "ID:" << getId() << "UniqueID:" << getUniqueId();
 
     for(auto &item: items)
     {
-        if (auto aviItem = item.objectCast<QnAviResource>())
-            aviItem->forgetPassword();
+        qDebug() << "  Item Resource URL:" << item->getUrl() << "ID:" << item->getId()
+            << "UniqueId:" << item->getId();
     }
+
 }

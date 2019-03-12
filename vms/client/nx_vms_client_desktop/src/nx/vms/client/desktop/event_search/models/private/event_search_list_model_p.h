@@ -26,12 +26,18 @@ class EventSearchListModel::Private: public AbstractAsyncSearchListModel::Privat
     Q_OBJECT
     using base_type = AbstractAsyncSearchListModel::Private;
 
+    using EventType = nx::vms::api::EventType;
+    using EventParameters = nx::vms::event::EventParameters;
+    using ActionType = nx::vms::api::ActionType;
+    using ActionData = nx::vms::event::ActionData;
+    using ActionDataList = nx::vms::event::ActionDataList;
+
 public:
     explicit Private(EventSearchListModel* q);
     virtual ~Private() override;
 
-    vms::api::EventType selectedEventType() const;
-    void setSelectedEventType(vms::api::EventType value);
+    EventType selectedEventType() const;
+    void setSelectedEventType(EventType value);
 
     QString selectedSubType() const;
     void setSelectedSubType(const QString& value);
@@ -48,7 +54,7 @@ protected:
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
 
 private:
-    using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
+    using GetCallback = std::function<void(bool, rest::Handle, ActionDataList&&)>;
     rest::Handle getEvents(
         const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const;
 
@@ -58,21 +64,21 @@ private:
     bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
         int position, bool handleOverlaps);
 
-    QString title(vms::api::EventType eventType) const;
-    QString description(const vms::event::EventParameters& parameters) const;
-    static QPixmap pixmap(const vms::event::EventParameters& parameters);
-    static QColor color(const vms::event::EventParameters& parameters);
-    static bool hasPreview(vms::api::EventType eventType);
+    QString title(const EventParameters& parameters) const;
+    QString description(const EventParameters& parameters) const;
+    static QPixmap pixmap(const EventParameters& parameters);
+    static QColor color(const EventParameters& parameters);
+    static bool hasPreview(EventType eventType);
 
 private:
     EventSearchListModel* const q;
-    const QScopedPointer<vms::event::StringsHelper> m_helper;
+    const QScopedPointer<nx::vms::event::StringsHelper> m_helper;
 
-    vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
+    EventType m_selectedEventType = EventType::undefinedEvent;
     QString m_selectedSubType;
 
-    vms::event::ActionDataList m_prefetch;
-    std::deque<vms::event::ActionData> m_data;
+    ActionDataList m_prefetch;
+    std::deque<ActionData> m_data;
 
     QScopedPointer<QTimer> m_liveUpdateTimer;
     FetchInformation m_liveFetch;

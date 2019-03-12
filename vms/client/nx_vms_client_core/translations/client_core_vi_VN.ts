@@ -13,12 +13,12 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
@@ -30,7 +30,7 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
@@ -42,7 +42,7 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
@@ -54,7 +54,7 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
@@ -66,14 +66,14 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
   </context>
   <context>
@@ -102,52 +102,12 @@
       <translation>Tài khoản này chưa được kích hoạt. Vui lòng kiểm tra email của bạn.</translation>
     </message>
     <message>
-      <source>This account is blocked.</source>
-      <translation>Tài khoản này đã bị khóa.</translation>
-    </message>
-    <message>
-      <source>Requested feature is not implemented.</source>
-      <translation>Yêu cầu tính năng không được thực thi.</translation>
-    </message>
-    <message>
-      <source>Unknown realm.</source>
-      <translation>Lĩnh vực không rõ.</translation>
-    </message>
-    <message>
-      <source>Bad request.</source>
-      <translation>Yêu cầu xấu.</translation>
-    </message>
-    <message>
-      <source>Invalid nonce.</source>
-      <translation>Không hợp lệ.</translation>
-    </message>
-    <message>
       <source>Credentials are no longer valid.</source>
       <translation>Thông tin xác thực không hợp lệ.</translation>
     </message>
     <message>
-      <source>Invalid data received.</source>
-      <translation>Đã nhận dữ liệu không hợp lệ.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Lỗi không xác định.</translation>
-    </message>
-    <message>
-      <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Lỗi mạng không mong muốn Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
-    </message>
-    <message>
       <source>Invalid login.</source>
       <translation>Đăng nhập không hợp lệ.</translation>
-    </message>
-    <message>
-      <source>Requested object is not found.</source>
-      <translation>Yêu cầu đối tượng không được tìm thấy.</translation>
-    </message>
-    <message>
-      <source>Object already exists.</source>
-      <translation>Đối tượng đã tồn tại.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -155,14 +115,17 @@
       <translation>Lỗi nội bộ %1. Vui lòng liên hệ với nhóm hỗ trợ.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Xin lỗi, %1 Dịch vụ tạm thời không khả dụng. Chúng tôi đang cố gắng hết sức để khôi phục nó. Vui lòng thử lại sau.</translation>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
     </message>
     <message>
-      <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+      <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Xin lỗi, %1 dịch vụ không thể xử lý yêu cầu của bạn. Xin vui lòng thử lại sau ít phút.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Network error. Please check your Internet connection and try again.</source>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
   </context>
   <context>

@@ -10,7 +10,7 @@ namespace nx::vms::common::p2p::downloader {
 /**
  * Peer manager to be used in Downloader class. It is intended for client-only usage.
  */
-class SingleConnectionPeerManager: public AbstractPeerManager, public QnCommonModuleAware
+class SingleConnectionPeerManager: public AbstractPeerManager, public /*mixin*/ QnCommonModuleAware
 {
 public:
     SingleConnectionPeerManager(

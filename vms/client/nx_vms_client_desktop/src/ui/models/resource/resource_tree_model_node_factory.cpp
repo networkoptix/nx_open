@@ -26,8 +26,7 @@ bool isAcceptableForModelCamera(
     const QnResourcePtr& resource)
 {
     const auto context = model->context();
-    return model->scope() != QnResourceTreeModel::UsersScope
-        && QnResourceAccessFilter::isShareableMedia(resource)
+    return QnResourceAccessFilter::isShareableMedia(resource)
         && context->resourceAccessProvider()->hasAccess(context->user(), resource)
         && resource->hasFlags(Qn::live_cam);
 }

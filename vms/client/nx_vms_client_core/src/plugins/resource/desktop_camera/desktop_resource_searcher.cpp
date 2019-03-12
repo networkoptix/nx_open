@@ -4,7 +4,7 @@
 
 namespace {
 
-const QString kManufacture = lit("Network Optix");
+const QString kManufacturer = lit("Network Optix");
 
 } // namespace
 
@@ -22,9 +22,9 @@ QnDesktopResourceSearcher::~QnDesktopResourceSearcher()
 {
 }
 
-QString QnDesktopResourceSearcher::manufacture() const
+QString QnDesktopResourceSearcher::manufacturer() const
 {
-    return kManufacture;
+    return kManufacturer;
 }
 
 QnResourceList QnDesktopResourceSearcher::findResources()
@@ -43,5 +43,3 @@ QnResourcePtr QnDesktopResourceSearcher::createResource(
 {
     return QnResourcePtr();
 }
-
-

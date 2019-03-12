@@ -103,18 +103,18 @@ public:
             if( dirQueue.empty() )
                 return false;   //already at end
 
-	        const string& currentDir = dirQueue.front();
+            const string& currentDir = dirQueue.front();
 
-	        WIN32_FIND_DATAA fileData;   // Data structure describes the file found
+            WIN32_FIND_DATAA fileData;   // Data structure describes the file found
             memset( &fileData, 0, sizeof(fileData) );
 
             if( hSearch == INVALID_HANDLE_VALUE )
             {
                 hSearch = FindFirstFileA( (dir+"/"+currentDir+"/*").c_str(), &fileData );
-	            if( hSearch == INVALID_HANDLE_VALUE )
+                if( hSearch == INVALID_HANDLE_VALUE )
                 {
                     dirQueue.clear();
-		            return false;
+                    return false;
                 }
             }
             else if( !FindNextFileA(hSearch, &fileData) )
@@ -136,45 +136,45 @@ public:
                 return false;
             }
 
-		    if( strcmp( fileData.cFileName, "." ) == 0 )
-			    continue;
-		    if( strcmp( fileData.cFileName, ".." ) == 0 )
-			    continue;
+            if( strcmp( fileData.cFileName, "." ) == 0 )
+                continue;
+            if( strcmp( fileData.cFileName, ".." ) == 0 )
+                continue;
 
             entryName = string(fileData.cFileName);
-		    entryPath = currentDir.empty()
+            entryPath = currentDir.empty()
                 ? string(fileData.cFileName)
                 : currentDir + "/" + fileData.cFileName;
             if( fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-		    {
-    		    entryType = FsEntryType::etDirectory;
-			    //found inline dir
-			    if( recursive )
-				    dirQueue.push_back( entryPath );
-		    }
+            {
+                entryType = FsEntryType::etDirectory;
+                //found inline dir
+                if( recursive )
+                    dirQueue.push_back( entryPath );
+            }
             else if( (fileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) || 
                      (fileData.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) )
             {
-		        entryType = FsEntryType::etRegularFile;
+                entryType = FsEntryType::etRegularFile;
             }
             else
             {
-		        entryType = FsEntryType::etOther;
+                entryType = FsEntryType::etOther;
             }
 
             entrySize = ((uint64_t)fileData.nFileSizeHigh << 32) | fileData.nFileSizeLow;
-		    //SYSTEMTIME systemTime;
-		    //if( !FileTimeToSystemTime( &fileData.ftCreationTime, &systemTime ) )
-		    //	return false;
+            //SYSTEMTIME systemTime;
+            //if( !FileTimeToSystemTime( &fileData.ftCreationTime, &systemTime ) )
+            //    return false;
 
       //      struct tm tm1;
-		    //tm1.tm_year = systemTime.wYear - 1900;
-		    //tm1.tm_mon = systemTime.wMonth-1;
-		    //tm1.tm_mday = systemTime.wDay;
-		    //tm1.tm_hour = systemTime.wHour;
-		    //tm1.tm_min = systemTime.wMinute;
-		    //tm1.tm_sec = systemTime.wSecond;
-		    //dirEntry.creationTimestamp.m_val = mtime::utcTime( tm1 );
+            //tm1.tm_year = systemTime.wYear - 1900;
+            //tm1.tm_mon = systemTime.wMonth-1;
+            //tm1.tm_mday = systemTime.wDay;
+            //tm1.tm_hour = systemTime.wHour;
+            //tm1.tm_min = systemTime.wMinute;
+            //tm1.tm_sec = systemTime.wSecond;
+            //dirEntry.creationTimestamp.m_val = mtime::utcTime( tm1 );
 
             return true;
         }
@@ -189,18 +189,18 @@ public:
             if( dirQueue.empty() )
                 return false;   //already at end
 
-	        const string& currentDir = dirQueue.front();
+            const string& currentDir = dirQueue.front();
 
             if( dp == NULL )
             {
                 dp = opendir( (dir+"/"+currentDir).c_str() );
                 if( dp == NULL )
-			        return false;
+                    return false;
             }
 
             struct dirent entry;
-		    struct dirent* result;
-		    if( readdir_r( dp, &entry, &result ) != 0 )
+            struct dirent* result;
+            if( readdir_r( dp, &entry, &result ) != 0 )
             {
                 //error occured
                 const int findErrBak = errno;
@@ -212,7 +212,7 @@ public:
                 return false;
             }
 
-            if( result == NULL )	//no more entries
+            if( result == NULL )    //no more entries
             {
                 //next directory
                 closedir( dp );
@@ -251,7 +251,7 @@ public:
                     return true;
             }
 #endif
-            struct stat st;	//linux uses most recent API (stat64 since 2.4.x)
+            struct stat st;    //linux uses most recent API (stat64 since 2.4.x)
             const string fullName = dir+"/"+currentDir+"/"+string(result->d_name);
             if( stat( fullName.c_str(), &st ) )
                 continue;
@@ -285,7 +285,7 @@ DirIterator::DirIterator( const std::string& dirPath )
     m_impl( new DirIteratorImpl() )
 {
     m_impl->dir = dirPath;
-	m_impl->dirQueue.push_back( string() );
+    m_impl->dirQueue.push_back( string() );
 }
 
 DirIterator::~DirIterator()

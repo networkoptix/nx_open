@@ -183,7 +183,7 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(
 {
     QAuthenticator result;
 
-    QnResourceData resourceData = commonModule->dataPool()->data(manufacturer, model);
+    QnResourceData resourceData = commonModule->resourceDataPool()->data(manufacturer, model);
     QString credentials = resourceData.value<QString>(lit("defaultCredentials"));
     QStringList parts = credentials.split(L':');
     if (parts.size() == 2) {
@@ -199,7 +199,7 @@ std::list<nx::vms::common::Credentials> DeviceSoapWrapper::getPossibleCredential
     const QString& manufacturer,
     const QString& model) const
 {
-    QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
+    QnResourceData resData = commonModule->resourceDataPool()->data(manufacturer, model);
     auto credentials = resData.value<QList<nx::vms::common::Credentials>>(
         ResourceDataKey::kPossibleDefaultCredentials);
 
@@ -211,7 +211,7 @@ nx::vms::common::Credentials DeviceSoapWrapper::getForcedCredentials(
     const QString& manufacturer,
     const QString& model)
 {
-    QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
+    QnResourceData resData = commonModule->resourceDataPool()->data(manufacturer, model);
     auto credentials = resData.value<nx::vms::common::Credentials>(
         ResourceDataKey::kForcedDefaultCredentials);
 
@@ -243,7 +243,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(
             possibleCredentials.append(credentials);
     }
 
-    QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
+    QnResourceData resData = commonModule->resourceDataPool()->data(manufacturer, model);
     auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     if (timeoutSec > 0 && possibleCredentials.size() > 1)
     {

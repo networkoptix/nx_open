@@ -185,7 +185,6 @@ public:
         m_systemName.resetToDefault();
     }
 
-
     virtual bool isDefault() const override
     {
         return m_systemName.isDefault();
@@ -205,7 +204,7 @@ SystemNameProxyPtr createServerSystemNameProxy(QnMediaServerModule* serverModule
     return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy(serverModule));
 }
 
-class ServerSettingsProxy: public SettingsProxy, public nx::vms::server::ServerModuleAware
+class ServerSettingsProxy: public SettingsProxy, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     ServerSettingsProxy(QnMediaServerModule* serverModule):
@@ -455,5 +454,3 @@ void makeFakeData(const QString& fakeDataString,
 
 } // namespace mserver_aux
 } // namespace nx
-
-

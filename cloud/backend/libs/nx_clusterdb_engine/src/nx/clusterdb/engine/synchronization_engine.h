@@ -16,6 +16,7 @@
 #include "outgoing_command_filter.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
+#include "discovery_manager.h"
 #include "transport/common_http/acceptor.h"
 #include "transport/p2p_http/acceptor.h"
 #include "transport/p2p_websocket/acceptor.h"
@@ -25,20 +26,19 @@ namespace nx::clusterdb::engine {
 
 class SynchronizationSettings;
 
-class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
+class NX_DATA_SYNC_ENGINE_API SynchronizationEngine
 {
 public:
     /**
      * @param supportedProtocolRange Only nodes with compatible protocol
      *     can connect to each other.
      */
-    SyncronizationEngine(
+    SynchronizationEngine(
         const std::string& applicationId,
-        const QnUuid& peerId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
-    ~SyncronizationEngine();
+    ~SynchronizationEngine();
 
     OutgoingCommandDispatcher& outgoingTransactionDispatcher();
     const OutgoingCommandDispatcher& outgoingTransactionDispatcher() const;
@@ -56,6 +56,10 @@ public:
 
     const statistics::Provider& statisticsProvider() const;
 
+    /**
+     * NOTE: Using this filter can lead to hard-to-find problems.
+     * Make sure you fully understand what you are doing.
+     */
     void setOutgoingCommandFilter(
         const OutgoingCommandFilterConfiguration& configuration);
 
@@ -70,8 +74,10 @@ public:
         const std::string& pathPrefix,
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
+    DiscoveryManager& discoveryManager();
+
 private:
-    QnUuid m_peerId;
+    const QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingCommandDispatcher m_outgoingTransactionDispatcher;
@@ -88,6 +94,7 @@ private:
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
     HttpServer m_httpServer;
+    DiscoveryManager m_discoveryManager;
 
     void onSystemDeleted(const std::string& systemId);
 };

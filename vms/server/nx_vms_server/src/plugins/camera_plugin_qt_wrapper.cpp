@@ -1,14 +1,12 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
-
 #include "camera_plugin_qt_wrapper.h"
 
 #include <nx/utils/thread/mutex.h>
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/helpers/ptr.h>
+
+#include <nx/utils/log/log.h>
 
 namespace nxcip_qt
 {
@@ -48,21 +46,24 @@ namespace nxcip_qt
 
         const QByteArray& localInterfaceIPAddrUtf8 = localInterfaceIPAddr.toUtf8();
 
-        nxpt::ScopedRef<nxcip::CameraDiscoveryManager2> discoveryManager2(
-            (nxcip::CameraDiscoveryManager2*)m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2),
-            false);
+        auto discoveryManager2 = nx::sdk::queryInterfacePtr<nxcip::CameraDiscoveryManager2>(
+            m_intf, nxcip::IID_CameraDiscoveryManager2);
         int result = 0;
         if (discoveryManager2.get())
         {
+            NX_VERBOSE(this, "Using %1 to find cameras (2)", discoveryManager2);
             result = discoveryManager2->findCameras2(cameras->data(), localInterfaceIPAddrUtf8.data());
         }
         else
         {
+            NX_VERBOSE(this, "Using %1 to find cameras", m_intf);
             result = m_intf->findCameras(cameraInfo1.data(), localInterfaceIPAddrUtf8.data());
             for (int i = 0; i < result; ++i)
                 (*cameras)[i] = cameraInfo1[i];
         }
         cameras->resize(result > 0 ? result : 0);
+
+        NX_VERBOSE(this, "Find cameras result: %1", result);
         return result;
     }
 
@@ -81,9 +82,8 @@ namespace nxcip_qt
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 
-        nxpt::ScopedRef<nxcip::CameraDiscoveryManager2> discoveryManager2(
-            (nxcip::CameraDiscoveryManager2*)m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2),
-            false);
+        auto discoveryManager2 = nx::sdk::queryInterfacePtr<nxcip::CameraDiscoveryManager2>(
+            m_intf, nxcip::IID_CameraDiscoveryManager2);
 
         int result = 0;
         if (discoveryManager2.get())
@@ -269,6 +269,9 @@ namespace nxcip_qt
     //!See nxcip::BaseCameraManager::setCredentials
     void BaseCameraManager::setCredentials( const QString& username, const QString& password )
     {
+        NX_VERBOSE(this, "Setting credentials to %1:%2", username,
+            nx::utils::log::showPasswords() ? password : QString("******"));
+
         QnMutexLocker lk( &m_mutex );
         const QByteArray& usernameUtf8 = username.toUtf8();
         const QByteArray& passwordUtf8 = password.toUtf8();

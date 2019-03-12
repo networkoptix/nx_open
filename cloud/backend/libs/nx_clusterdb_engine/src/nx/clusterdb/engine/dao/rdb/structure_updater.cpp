@@ -13,6 +13,7 @@ StructureUpdater::StructureUpdater(
 {
     // Registering update scripts.
     m_updater.addUpdateScript(kInitialDbStructure);
+    m_updater.addUpdateScript(kSavePeerSequence);
 
     // Performing update.
     if (!m_updater.updateStructSync())

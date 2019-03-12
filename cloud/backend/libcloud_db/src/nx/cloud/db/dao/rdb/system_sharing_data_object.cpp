@@ -141,7 +141,7 @@ nx::sql::DBResult SystemSharingDataObject::deleteSharing(
     nx::sql::bindFields(&removeSharingQuery, filterFields);
     if (!removeSharingQuery.exec())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        NX_DEBUG(this,
             lm("Failed to remove sharing. system %1, filter \"%2\". %3")
                 .args(systemId, filterStr, removeSharingQuery.lastError().text()));
         return nx::sql::DBResult::ioError;

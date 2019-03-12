@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abstract_peer_manager.h"
+#include <nx/network/aio/timer.h>
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -46,6 +47,8 @@ public:
 private:
     class Private;
     const QScopedPointer<Private> d;
+    bool m_cancelled = false;
+    network::aio::Timer m_aioTimer;
 };
 
 class InternetOnlyPeerManagerFactory: public AbstractPeerManagerFactory

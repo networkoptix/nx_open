@@ -6,7 +6,9 @@
 
 class QnAbstractResourceSearcher;
 
-class QnMediaServerResourceSearchers: public QObject, public nx::vms::server::ServerModuleAware
+class QnMediaServerResourceSearchers:
+    public QObject,
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
     QnMediaServerResourceSearchers(QnMediaServerModule* serverModule);
@@ -20,10 +22,12 @@ public:
         return result;
     }
 
-    void start();
-    void stop();
+    void initialize();
+    void clear();
+
 private:
     template <typename T> void registerSearcher(T* instance);
+
 private:
     QMap<std::type_index, QnAbstractResourceSearcher*> m_searchers;
 };

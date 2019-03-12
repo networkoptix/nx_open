@@ -20,6 +20,11 @@ Builder::Builder(Action* action):
     action->setShortcutContext(Qt::WindowShortcut);
 }
 
+Action* Builder::action() const
+{
+    return m_action;
+}
+
 Builder Builder::shortcut(
     const QKeySequence& keySequence,
     Platform platform,

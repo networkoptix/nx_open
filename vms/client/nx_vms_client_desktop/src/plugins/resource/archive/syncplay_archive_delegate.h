@@ -45,6 +45,7 @@ public:
     virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
     virtual nx::vms::api::StreamDataFilters streamDataFilter() const override;
 
+    virtual int protocol() const override;
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
     virtual bool hasVideo() const override;
     virtual void pleaseStop() override;

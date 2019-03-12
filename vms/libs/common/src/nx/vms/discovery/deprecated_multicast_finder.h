@@ -34,7 +34,7 @@ namespace discovery {
 
     \note DEPRECATED: old name QnMulticastModuleFinder
 */
-class DeprecatedMulticastFinder: public QnLongRunnable, public QnCommonModuleAware
+class DeprecatedMulticastFinder: public QnLongRunnable, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
 

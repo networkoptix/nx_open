@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QRadioButton>
 #include "private/widget_with_hint_p.h"
 
 #include <type_traits>
@@ -57,5 +59,7 @@ private:
 };
 
 using LabelWithHint = WidgetWithHint<QLabel>;
+using CheckBoxWithHint = WidgetWithHint<QCheckBox>;
+using RadioButtonWithHint = WidgetWithHint<QRadioButton>;
 
 } // namespace nx::vms::client::desktop
