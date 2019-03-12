@@ -13,6 +13,8 @@
 #include <client/client_message_processor.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/resource/layout_reader.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -213,21 +215,21 @@ void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()
 {
     using namespace nx::vms::client::desktop;
 
-    auto layout = menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>();
+    auto layout = menu()->currentParameters(sender()).resource().dynamicCast<QnFileLayoutResource>();
     NX_ASSERT(layout && layout::isEncrypted(layout));
 
-    if (!layout || !layout::isEncrypted(layout) || layout::requiresPassword(layout))
+    if (!layout || !layout->isEncrypted() || layout->requiresPassword())
         return;
 
     // This should be done before layout updates, because QnWorkbenchLayout overwrites
     // all data in the layout.
-    if (auto workbenchLayout = QnWorkbenchLayout::instance(layout))
+    if (auto workbenchLayout = QnWorkbenchLayout::instance(layout.dynamicCast<QnLayoutResource>()))
     {
         workbench()->removeLayout(workbenchLayout);
         delete workbenchLayout;
     }
 
-    layout::forgetPassword(layout);
+    layout::reloadFromFile(layout); //< Actually reload the file without a password.
 
     // Clear "modified" flag from layout.
     snapshotManager()->store(layout);

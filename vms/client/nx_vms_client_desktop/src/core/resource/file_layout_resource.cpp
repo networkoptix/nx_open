@@ -6,8 +6,7 @@
 #include <core/resource/camera_resource.h>
 
 QnFileLayoutResource::QnFileLayoutResource(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_localStatus(Qn::Online)
+    base_type(commonModule)
 {
     addFlags(Qn::exported_layout);
 }
@@ -28,6 +27,32 @@ bool QnFileLayoutResource::isFile() const
     return true;
 }
 
+void QnFileLayoutResource::setIsEncrypted(bool encrypted)
+{
+    m_isEncrypted = encrypted;
+}
+
+bool QnFileLayoutResource::isEncrypted() const
+{
+    return m_isEncrypted;
+}
+
+bool QnFileLayoutResource::usePasswordToRead(const QString& password)
+{
+    if (m_password == password)
+        return true;
+
+    m_password = password;
+    emit passwordChanged(toSharedPointer(this));
+
+    return true; //< Won't check the password here. Check before calling this function.
+}
+
+QString QnFileLayoutResource::password() const
+{
+    return m_password;
+}
+
 void QnFileLayoutResource::setStatus(Qn::ResourceStatus newStatus,
     Qn::StatusChangeReason reason)
 {
@@ -36,10 +61,48 @@ void QnFileLayoutResource::setStatus(Qn::ResourceStatus newStatus,
 
     m_localStatus = newStatus;
 
-    // Null pointer if we are changing status in constructor. Signal is not needed in this case.
-    if (auto sharedThis = toSharedPointer(this))
+    NX_VERBOSE(this, "Signal status change for %1", newStatus);
+    emit statusChanged(toSharedPointer(this), reason);
+}
+
+void QnFileLayoutResource::setReadOnly(bool readOnly)
+{
+    if (m_isReadOnly == readOnly)
+        return;
+
+    m_isReadOnly = readOnly;
+    emit readOnlyChanged(toSharedPointer(this));
+}
+
+bool QnFileLayoutResource::isReadOnly() const
+{
+    return m_isReadOnly;
+}
+
+void QnFileLayoutResource::updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers)
+{
+    base_type::updateInternal(other, notifiers);
+
+    const auto localOther = other.dynamicCast<QnFileLayoutResource>();
+    if (localOther)
     {
-        NX_VERBOSE(this, "Signal status change for %1", newStatus);
-        emit statusChanged(sharedThis, reason);
+        m_isEncrypted = localOther->isEncrypted();
+        if (m_password != localOther->password())
+        {
+            m_password = localOther->password();
+            notifiers << [r = toSharedPointer(this)]{ emit r->passwordChanged(r); };
+        }
+        if (m_localStatus != localOther->getStatus())
+        {
+            m_localStatus = localOther->getStatus();
+            notifiers <<
+                [r = toSharedPointer(this)]{ emit r->statusChanged(r, Qn::StatusChangeReason::Local); };
+        }
+        if (m_isReadOnly != localOther->m_isReadOnly)
+        {
+            m_isReadOnly = localOther->m_isReadOnly;
+            notifiers <<
+                [r = toSharedPointer(this)]{ emit r->readOnlyChanged(r); };
+        }
     }
 }
