@@ -177,11 +177,11 @@ void RemoteRelayPeerPool::findRelayByDomain(
                         return std::string();
                     }
 
-                    if (*relayHost == m_nodeId)
+                    if (*relayHost == m_publicUrl)
                     {
                         NX_VERBOSE(this,
                             lm("find relay: selected host string is equal to this host string (%1)")
-                                .arg(m_nodeId));
+                                .arg(m_publicUrl));
                         continue;
                     }
 
@@ -207,8 +207,8 @@ void RemoteRelayPeerPool::addPeer(
     if (!m_dbReady)
         return handler(false);
 
-    NX_ASSERT(!m_nodeId.empty());
-    if (m_nodeId.empty())
+    NX_ASSERT(!m_publicUrl.empty());
+    if (m_publicUrl.empty())
     {
         NX_ERROR(this, "Node id must be set before adding peers");
         return handler(false);
@@ -310,9 +310,9 @@ void RemoteRelayPeerPool::removePeer(
             });
 }
 
-void RemoteRelayPeerPool::setNodeId(const std::string& nodeId)
+void RemoteRelayPeerPool::setPublicUrl(const nx::utils::Url& publicUrl)
 {
-    m_nodeId = nodeId;
+    m_publicUrl = publicUrl.toStdString();
 }
 
 bool RemoteRelayPeerPool::bindUpdateParameters(
@@ -329,7 +329,7 @@ bool RemoteRelayPeerPool::bindUpdateParameters(
     bool bindResult = true;
 
     if (updateType == UpdateType::add)
-        bindResult &= query->bind("node_id", m_nodeId);
+        bindResult &= query->bind("node_id", m_publicUrl);
 
     bindResult &= query->bind("domain_suffix_1", domainParts[0]);
     bindResult &= query->bind("domain_suffix_2", domainParts.size() > 1 ? domainParts[1] : "");

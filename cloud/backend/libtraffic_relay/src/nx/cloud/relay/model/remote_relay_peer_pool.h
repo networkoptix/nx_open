@@ -49,7 +49,7 @@ public:
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
 
-    virtual void setNodeId(const std::string& nodeId) override;
+    virtual void setPublicUrl(const nx::utils::Url& publicUrl) override;
 
 protected:
     cassandra::AbstractAsyncConnection* getConnection();
@@ -65,7 +65,7 @@ private:
     std::unique_ptr<cassandra::AbstractAsyncConnection> m_cassConnection;
     bool m_dbReady = false;
     mutable QnMutex m_mutex;
-    std::string m_nodeId;
+    std::string m_publicUrl;
 
     void prepareDbStructure();
     std::string whereStringForFind(const std::string& domainName) const;

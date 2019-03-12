@@ -65,7 +65,7 @@ public:
         return handler(true);
     }
 
-    virtual void setNodeId(const std::string& /*nodeId*/) override {}
+    virtual void setPublicUrl(const nx::utils::Url& /*publicUrl*/) override {}
 };
 
 class TrafficRelayStub:

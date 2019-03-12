@@ -80,9 +80,11 @@ void RemoteRelayPeerPool::removePeer(
     return handler(true);
 }
 
-void RemoteRelayPeerPool::setNodeId(const std::string& nodeId)
+void RemoteRelayPeerPool::setPublicUrl(const nx::utils::Url& publicUrl)
 {
-    m_endpoint = nodeId;
+    m_endpoint = publicUrl.port() < 0
+        ? publicUrl.host().toStdString()
+        : nx::network::SocketAddress(publicUrl.host(), publicUrl.port()).toStdString();
 }
 
 } // namespace test

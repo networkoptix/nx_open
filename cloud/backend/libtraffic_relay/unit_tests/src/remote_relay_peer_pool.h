@@ -48,7 +48,7 @@ public:
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
 
-    virtual void setNodeId(const std::string& nodeId) override;
+    virtual void setPublicUrl(const nx::utils::Url& publicUrl) override;
 
 private:
     mutable nx::network::aio::BasicPollable m_asyncCallProvider;
