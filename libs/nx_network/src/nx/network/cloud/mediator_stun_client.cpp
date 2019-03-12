@@ -11,7 +11,7 @@ namespace nx::hpm::api {
 
 MediatorStunClient::MediatorStunClient(
     AbstractAsyncClient::Settings settings,
-    MediatorEndpointProvider* endpointProvider)
+    AbstractMediatorEndpointProvider* endpointProvider)
     :
     base_type(
         [settings]() mutable
@@ -28,9 +28,6 @@ MediatorStunClient::MediatorStunClient(
     m_reconnectTimer(settings.reconnectPolicy)
 {
     bindToAioThread(m_endpointProvider ? m_endpointProvider->getAioThread() : getAioThread());
-
-    base_type::setOnConnectionClosedHandler(
-        [this](auto&&... args) { handleConnectionClosure(std::forward<decltype(args)>(args)...); });
 }
 
 void MediatorStunClient::bindToAioThread(
@@ -102,10 +99,10 @@ void MediatorStunClient::setKeepAliveOptions(
 
 void MediatorStunClient::stopWhileInAioThread()
 {
-    base_type::stopWhileInAioThread();
-
     m_reconnectTimer.pleaseStopSync();
     m_alivenessTester.reset();
+
+    base_type::stopWhileInAioThread();
 }
 
 void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)
@@ -120,6 +117,18 @@ void MediatorStunClient::handleConnectionClosure(SystemError::ErrorCode reason)
 
 void MediatorStunClient::connectInternal(ConnectHandler handler)
 {
+    NX_ASSERT(isInSelfAioThread());
+
+    if (!m_connectionClosureHandlerInstalled)
+    {
+        base_type::setOnConnectionClosedHandler(
+            [this](auto&&... args)
+            {
+                handleConnectionClosure(std::forward<decltype(args)>(args)...);
+            });
+        m_connectionClosureHandlerInstalled = true;
+    }
+
     cancelReconnectTimer();
 
     base_type::connect(
@@ -179,7 +188,11 @@ void MediatorStunClient::onFetchEndpointCompletion(
     nx::network::http::StatusCode::Value resultCode)
 {
     if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+    {
+        NX_ASSERT(isInSelfAioThread());
+        scheduleReconnect();
         return failPendingRequests(SystemError::hostUnreachable);
+    }
 
     m_url = nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
         .appendPath(api::kStunOverHttpTunnelPath).toUrl();

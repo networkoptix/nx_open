@@ -213,6 +213,12 @@ bool Engine::useOrCreateCertificate(
 
 bool Engine::loadCertificateFromFile(const QString& filePath)
 {
+    if (filePath.isEmpty())
+    {
+        NX_INFO(typeid(Engine), lm("Certificate path is empty"));
+        return false;
+    }
+
     String certData;
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))

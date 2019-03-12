@@ -32,6 +32,7 @@ public:
         p2p::P2pTransportPtr p2pTransport,
         vms::api::PeerDataEx localPeerData,
         vms::api::PeerDataEx remotePeerData);
+    virtual ~WebsocketCommandTransport();
 
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
@@ -43,7 +44,7 @@ public:
         const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) override;
     virtual void start() override;
 
-    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
 protected:

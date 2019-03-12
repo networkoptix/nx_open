@@ -61,6 +61,9 @@ public:
 
     virtual QnAspectRatio customAspectRatio() const override;
 
+    /** Returns true if the entity is contained inside a layout file. */
+    bool isEmbedded() const;
+
     // All these functions actually propagate to m_storage if possible.
     /** Returns true if the entity is actually encrypted. */
     virtual bool isEncrypted() const override;

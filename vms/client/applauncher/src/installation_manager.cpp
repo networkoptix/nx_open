@@ -426,8 +426,8 @@ InstallationManager::ResultType InstallationManager::installZip(
     auto errorCode = extractor.extractZip();
     if (errorCode != QnZipExtractor::Ok)
     {
-        NX_ERROR(this, lm("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3")
-            .args(fileName, targetDir.absolutePath(), extractor.errorToString(errorCode)));
+        NX_ERROR(this, "InstallationManager: Cannot extract zip %1 to %2, errorCode = %3",
+            fileName, targetDir.absolutePath(), extractor.errorToString(errorCode));
         return ResultType::ioError;
     }
 

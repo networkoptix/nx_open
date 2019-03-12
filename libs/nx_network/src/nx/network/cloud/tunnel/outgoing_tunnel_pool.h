@@ -61,6 +61,8 @@ public:
     void setOwnPeerId(const String& peerId);
     void clearOwnPeerIdIfEqual(const String& name, const QnUuid& uuid);
 
+    void removeAllTunnelsSync();
+
     OnTunnelClosedSubscription& onTunnelClosedSubscription();
 
     // TODO: Remove this function when SocketGlobals are not dependent on cloud any more.

@@ -185,35 +185,37 @@ public:
 class NX_NETWORK_API AioTaskQueue
 {
 public:
-    // TODO: #ak too many mutexes here. Refactoring required
+    // TODO: #ak Leave a single mutex in this class.
 
     std::unique_ptr<AbstractPollSet> pollSet;
-    unsigned int newReadMonitorTaskCount;
-    unsigned int newWriteMonitorTaskCount;
-    /** Used to make AIOThread public API thread-safe (to serialize access to internal structures). */
+    unsigned int newReadMonitorTaskCount = 0;
+    unsigned int newWriteMonitorTaskCount = 0;
+    /**
+     * Used to make AIOThread public API thread-safe (to serialize access to internal structures).
+     * TODO: #ak Move this mutex to private section or to the AIOThread class.
+     */
     mutable QnMutex mutex;
-    mutable QnMutex socketEventProcessingMutex;
-    // TODO" #ak get rid of map here to avoid undesired allocations
-    std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
-    std::atomic<int> processingPostedCalls;
 
     AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSet);
 
     /**
      * Used as a clock for periodic events. Function introduced since implementation can be changed.
      */
-    qint64 getSystemTimerVal() const;
+    qint64 getMonotonicTime() const;
 
     void addTask(SocketAddRemoveTask task);
+
     bool taskExists(
         Pollable* const sock,
         aio::EventType eventType,
         TaskType taskType) const;
+
     void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
 
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
+
     /**
      * This method introduced for optimization: if we fast call startMonitoring then removeSocket
      * (socket has not been added to pollset yet), then removeSocket can just cancel
@@ -227,13 +229,17 @@ public:
         TaskType taskType,
         AIOEventHandler* const eventHandler,
         unsigned int newTimeoutMS);
+
     /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
+
     /**
      * @return true, if at least one task has been processed.
      */
     bool processPeriodicTasks(const qint64 curClock);
+
     void processPostedCalls();
+
     /**
      * Moves elements to remove to a temporary container and returns it.
      * Elements may contain functor which may contain aio objects (sockets) which will be removed
@@ -241,11 +247,20 @@ public:
      */
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         SocketSequenceType socketSequence);
+
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);
 
     std::size_t postedCallCount() const;
+
+    qint64 nextPeriodicEventClock() const;
+
+    void waitForCurrentEventProcessingToFinish();
+
+    void clear();
+
+    bool empty() const;
 
 private:
     // TODO #ak: use cyclic array here to minimize allocations
@@ -254,6 +269,8 @@ private:
      */
     std::deque<SocketAddRemoveTask> m_postedCalls;
     std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;
+    std::multimap<qint64, PeriodicTaskData> m_periodicTasksByClock;
+    mutable QnMutex m_socketEventProcessingMutex;
 
     void addSocketToPollset(
         Pollable* socket,

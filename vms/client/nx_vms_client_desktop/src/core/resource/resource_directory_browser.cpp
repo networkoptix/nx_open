@@ -6,6 +6,7 @@
 
 #include <common/common_module.h>
 
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/file_layout_resource.h>
@@ -18,9 +19,6 @@
 #include <nx/utils/log/log.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
-
-#include <plugins/resource/avi/avi_dvd_resource.h>
-#include <plugins/resource/avi/avi_bluray_resource.h>
 
 namespace {
 
@@ -257,12 +255,6 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
 {
     const QString path = fixSeparators(filename);
     NX_ASSERT(path == filename);
-
-    if (QnAviDvdResource::isAcceptedUrl(path))
-        return QnResourcePtr(new QnAviDvdResource(path));
-
-    if (QnAviBlurayResource::isAcceptedUrl(path))
-        return QnResourcePtr(new QnAviBlurayResource(path));
 
     if (FileTypeSupport::isMovieFileExt(path))
         return QnResourcePtr(new QnAviResource(path, qnClientCoreModule->commonModule()));

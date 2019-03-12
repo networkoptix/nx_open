@@ -547,12 +547,16 @@ private:
         onvifSimpleItem(const char* name, const char* value): name(name), value(value) {}
     };
 
+    // TODO: The following static functions should be moved to a separate class in 4.1.
     static const char* attributeTextByName(const soap_dom_element* element, const char* attributeName);
     static onvifSimpleItem parseSimpleItem(const soap_dom_element* element);
     static onvifSimpleItem parseChildSimpleItem(const soap_dom_element* element);
     static std::vector<onvifSimpleItem> parseChildSimpleItems(const soap_dom_element* element);
     static void parseSourceAndData(const soap_dom_element* element,
         std::vector<onvifSimpleItem>* source, onvifSimpleItem* data);
+    static QString parseEventTopic(const char* text);
+    static QDateTime parseDateTime(const soap_dom_attribute* att, QTimeZone timeZone);
+    static std::string makeItemNameList(const std::vector<onvifSimpleItem>& items);
 
     struct TriggerOutputTask
     {

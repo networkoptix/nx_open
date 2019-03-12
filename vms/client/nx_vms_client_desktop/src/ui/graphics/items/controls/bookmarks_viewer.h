@@ -22,9 +22,9 @@ public:
     typedef std::function<QnCameraBookmarkList (qint64 location)> GetBookmarksFunc;
     typedef std::function<PosAndBoundsPair (qint64 location)> GetPosOnTimelineFunc;
 
-    QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
-        , const GetPosOnTimelineFunc &getPosFunc
-        , QGraphicsItem *parent);
+    QnBookmarksViewer(const GetBookmarksFunc& getBookmarksFunc,
+        const GetPosOnTimelineFunc& getPosFunc,
+        QGraphicsItem* parent);
 
     virtual ~QnBookmarksViewer();
 
@@ -34,28 +34,30 @@ public:
 
     void setAllowExport(bool allowExport);
 
-    virtual int helpTopicAt(const QPointF &pos) const override;
+    virtual int helpTopicAt(const QPointF& pos) const override;
+
+    QnCameraBookmarkList getDisplayedBookmarks() const;
 
 signals:
     /// @brief Edit action callback
     /// Closes tooltip after emittance
-    void editBookmarkClicked(const QnCameraBookmark &bookmark);
+    void editBookmarkClicked(const QnCameraBookmark& bookmark);
 
     /// @brief Remove action callback
     /// Closes tooltip after emittance
-    void removeBookmarkClicked(const QnCameraBookmark &bookmark);
+    void removeBookmarkClicked(const QnCameraBookmark& bookmark);
 
     /// @brief Tag-clicked action
     /// Closes tooltip after emittance
-    void tagClicked(const QString &tag);
+    void tagClicked(const QString& tag);
 
     /// @brief Play bookmark action
     /// Closes tooltip after emittance
-    void playBookmark(const QnCameraBookmark &bookmark);
+    void playBookmark(const QnCameraBookmark& bookmark);
 
     /// @brief Export bookmark action
     /// Closes tooltip after emittance
-    void exportBookmarkClicked(const QnCameraBookmark &bookmark);
+    void exportBookmarkClicked(const QnCameraBookmark& bookmark);
 
 public slots:
     /// @brief Set abstract location for bookmarks extraction
@@ -70,16 +72,16 @@ public slots:
     void resetBookmarks();
 
 public slots:
-    void setHoverProcessor(HoverFocusProcessor *processor);
+    void setHoverProcessor(HoverFocusProcessor* processor);
 
     bool isHovered() const;
 
 public:
-    const QnBookmarkColors &colors() const;
+    const QnBookmarkColors& colors() const;
 
-    void setColors(const QnBookmarkColors &colors);
+    void setColors(const QnBookmarkColors& colors);
 
 private:
     class Impl;
-    Impl * const m_impl;
+    Impl* const m_impl;
 };

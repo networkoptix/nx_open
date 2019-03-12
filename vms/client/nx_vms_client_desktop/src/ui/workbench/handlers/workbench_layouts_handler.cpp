@@ -182,32 +182,31 @@ LayoutsHandler::~LayoutsHandler()
 {
 }
 
-void LayoutsHandler::at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction)
+void LayoutsHandler::at_openLayoutAction_triggered(
+    const vms::event::AbstractActionPtr& businessAction)
 {
     if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
         return;
-    const auto& actionParams = businessAction->getParams();
 
-    QnResourcePool* pool = this->resourcePool();
-    QnLayoutResourcePtr layout =
-        pool->getResourceById<QnLayoutResource>(actionParams.actionResourceId);
+    const auto& actionParams = businessAction->getParams();
+    const auto layout = resourcePool()->getResourceById<QnLayoutResource>(
+        actionParams.actionResourceId);
     if (!layout)
         return;
 
-    auto currentUser = context()->user();
-    NX_ASSERT(currentUser);
+    // We can get here while connecting if there are a lot of resources on the server.
+    const auto currentUser = context()->user();
+    if (!currentUser)
+        return;
 
-    // This user should be mentioned in actionParams.additionalResources
-    // to be able to run this action
+    // User should be mentioned in actionParams.additionalResources to be able to handle this action.
     auto permittedUsers = actionParams.additionalResources;
-    auto it = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
+    const auto it = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
     if (it == permittedUsers.end() && !actionParams.allUsers)
         return;
 
     if (accessController()->hasPermissions(layout, Qn::ReadPermission))
         menu()->trigger(action::OpenInNewTabAction, layout);
-    else
-        NX_WARNING(this) << "User does " << currentUser->getName() << " does not have permission to view layout " << layout->getName();
 }
 
 void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()

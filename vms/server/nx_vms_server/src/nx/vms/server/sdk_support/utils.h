@@ -66,7 +66,7 @@ std::optional<Manifest> loadManifestFromFile(const QString& filename)
                 .args(message, filename);
         };
 
-    if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
+    if (!NX_ASSERT(pluginsIni().analyticsManifestSubstitutePath[0]))
         return std::nullopt;
 
     const QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(

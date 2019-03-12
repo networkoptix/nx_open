@@ -71,14 +71,14 @@ public:
         Message request,
         RequestCompletionHandler completionHandler);
 
-    const std::unique_ptr<network::UDPSocket>& socket();
+    const std::unique_ptr<AbstractDatagramSocket>& socket();
     /**
      * Move ownership of socket to the caller.
      * UdpClient is in undefined state after this call and MUST be freed
      * NOTE: Can be called within send/recv completion handler
      *     (more specifically, within socket's aio thread) only!
      */
-    std::unique_ptr<network::UDPSocket> takeSocket();
+    std::unique_ptr<AbstractDatagramSocket> takeSocket();
     /**
      * If not called, any vacant local port will be used.
      */

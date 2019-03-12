@@ -4,8 +4,8 @@
 #include <list>
 #include <map>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/network/address_resolver.h>
-#include <nx/network/system_socket.h>
 #include <nx/utils/basic_factory.h>
 
 #include "abstract_cross_nat_connector.h"
@@ -29,7 +29,7 @@ typedef CloudConnectors (ConnectorFactoryFunc)(
     const AddressEntry& /*targetAddress*/,
     const std::string& /*connectSessionId*/,
     const hpm::api::ConnectResponse& /*response*/,
-    std::unique_ptr<UDPSocket> /*udpSocket*/);
+    std::unique_ptr<AbstractDatagramSocket> /*udpSocket*/);
 
 class NX_NETWORK_API ConnectorFactory:
     public nx::utils::BasicFactory<ConnectorFactoryFunc>
@@ -43,10 +43,11 @@ public:
 
     /**
      * Enable/disable cloud connectors. Debug only!
-     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::ConnectType enum.
      * By default, everything is enabled.
+     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::ConnectType enum.
+     * @return The initial value.
      */
-    static void setEnabledCloudConnectMask(int cloudConnectTypeMask);
+    static int setEnabledCloudConnectMask(int cloudConnectTypeMask);
     static int getEnabledCloudConnectMask();
 
 private:
@@ -54,7 +55,7 @@ private:
         const AddressEntry& targetAddress,
         const std::string& connectSessionId,
         const hpm::api::ConnectResponse& response,
-        std::unique_ptr<UDPSocket> udpSocket);
+        std::unique_ptr<AbstractDatagramSocket> udpSocket);
 };
 
 //-------------------------------------------------------------------------------------------------

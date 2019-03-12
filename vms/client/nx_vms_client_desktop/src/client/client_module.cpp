@@ -103,6 +103,7 @@
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
@@ -481,6 +482,7 @@ void QnClientModule::initSingletons()
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 
     registerResourceDataProviders();
+    integrations::initialize(this);
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -513,63 +515,91 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
             ? QUrl(qmlRoot)
             : QUrl::fromLocalFile(qmlRoot));
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
+
+    for (const QString& path: m_startupParameters.qmlImportPaths)
+        m_clientCoreModule->mainQmlEngine()->addImportPath(path);
 }
 
 void QnClientModule::initLog()
 {
+    nx::utils::enableQtMessageAsserts();
+
     using namespace nx::utils::log;
 
     const auto logFileNameSuffix = calculateLogNameSuffix(m_startupParameters);
 
-    static const QString kLogConfig("desktop_client_log.ini");
-    const QDir iniFilesDir(nx::kit::IniConfig::iniFilesDir());
-    const QString logConfigFile(iniFilesDir.absoluteFilePath(kLogConfig));
-    if (QFileInfo(logConfigFile).exists())
-    {
-        NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
-        NX_ALWAYS(this, "Log options from settings are ignored!");
-        QSettings logConfig(logConfigFile, QSettings::IniFormat);
-        Settings logSettings(&logConfig);
-        logSettings.updateDirectoryIfEmpty(
-            QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-        for (auto& logger: logSettings.loggers)
-        {
-            if (const auto target = logger.logBaseName; target != '-')
-                logger.logBaseName = target + logFileNameSuffix;
-        }
+    static const QString kLogConfig("desktop_client_log");
 
-        setMainLogger(
-            buildLogger(logSettings, qApp->applicationName(),qApp->applicationFilePath()));
+    if (initLogFromFile(kLogConfig + logFileNameSuffix))
+        return;
+
+    if (initLogFromFile(kLogConfig, logFileNameSuffix))
+        return;
+
+    NX_ALWAYS(this, "Log is initialized from the settings");
+    QSettings rawSettings;
+    const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
+    const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
+
+    auto logLevel = m_startupParameters.logLevel;
+    auto logFile = m_startupParameters.logFile;
+
+    if (logLevel.isEmpty())
+    {
+        logLevel = qnSettings->logLevel();
+        NX_ALWAYS(this, "Log level is initialized from the settings");
     }
     else
     {
-        QSettings rawSettings;
-        const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
-        const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
-
-        auto logLevel = m_startupParameters.logLevel;
-        auto logFile = m_startupParameters.logFile;
-
-        if (logLevel.isEmpty())
-            logLevel = qnSettings->logLevel();
-
-        Settings logSettings;
-        logSettings.loggers.resize(1);
-        auto& logger = logSettings.loggers.front();
-        logger.maxBackupCount = maxBackupCount;
-        logger.maxFileSize = maxFileSize;
-        logger.level.parse(logLevel);
-        logger.logBaseName = logFile.isEmpty()
-            ? ("client_log" + logFileNameSuffix)
-            : logFile;
-        logSettings.updateDirectoryIfEmpty(
-            QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-
-        setMainLogger(
-            buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
+        NX_ALWAYS(this, "Log level is initialized from the command line");
     }
 
-    nx::utils::enableQtMessageAsserts();
+    Settings logSettings;
+    logSettings.loggers.resize(1);
+    auto& logger = logSettings.loggers.front();
+    logger.maxBackupCount = maxBackupCount;
+    logger.maxFileSize = maxFileSize;
+    logger.level.parse(logLevel);
+    logger.logBaseName = logFile.isEmpty()
+        ? ("client_log" + logFileNameSuffix)
+        : logFile;
+    logSettings.updateDirectoryIfEmpty(
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+
+    setMainLogger(
+        buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
+}
+
+bool QnClientModule::initLogFromFile(const QString& filename, const QString& suffix)
+{
+    const QDir iniFilesDir(nx::kit::IniConfig::iniFilesDir());
+    const QString logConfigFile(iniFilesDir.absoluteFilePath(filename + ".ini"));
+
+    if (!QFileInfo(logConfigFile).exists())
+        return false;
+
+    using namespace nx::utils::log;
+
+    NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
+    NX_ALWAYS(this, "Log options from settings are ignored!");
+    QSettings logConfig(logConfigFile, QSettings::IniFormat);
+    Settings logSettings(&logConfig);
+    logSettings.updateDirectoryIfEmpty(
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+
+    if (!suffix.isEmpty())
+    {
+        for (auto& logger: logSettings.loggers)
+        {
+            if (const auto target = logger.logBaseName; target != '-')
+                logger.logBaseName = target + suffix;
+        }
+    }
+
+    setMainLogger(
+        buildLogger(logSettings, qApp->applicationName(),qApp->applicationFilePath()));
+
+    return true;
 }
 
 void QnClientModule::initNetwork()

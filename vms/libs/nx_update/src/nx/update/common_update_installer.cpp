@@ -152,6 +152,9 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     authRecord.addParam("version", m_version.toLatin1());
     commonModule()->auditManager()->addAuditRecord(authRecord);
 
+    if (commonModule()->runningInTestMode())
+        return true;
+
     QString installerPath = QDir(installerWorkDir()).absoluteFilePath(m_executable);
     SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments, installerDir);
     if (error == SystemError::noError)

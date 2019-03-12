@@ -41,18 +41,42 @@ copyLibs()
     mkdir -p "$STAGE_LIB"
     local LIB
     local LIB_BASENAME
+    local BLACKLIST_ITEM
+    local SKIP_LIBRARY
+
+    local -r LIB_BLACKLIST=(
+        'libQt5*'
+        'libEnginio.so*'
+        'libqgsttools_p.*'
+        'libtegra_video.*'
+        'libnx_vms_client*'
+        'libcloud_db.*'
+        'libnx_cassandra*'
+        'libconnection_mediator*'
+        'libnx_clusterdb*'
+        'libnx_discovery_api_client*'
+        'libnx_relaying*'
+        'libtraffic_relay*'
+        'libvms_gateway_core*'
+    )
+
     for LIB in "$BUILD_DIR/lib"/*.so*
     do
         LIB_BASENAME=$(basename "$LIB")
-        if [[ "$LIB_BASENAME" != libQt5* \
-            && "$LIB_BASENAME" != libEnginio.so* \
-            && "$LIB_BASENAME" != libqgsttools_p.* \
-            && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_vms_client* ]]
-        then
-            echo "  Copying $LIB_BASENAME"
-            cp -P "$LIB" "$STAGE_LIB/"
-        fi
+
+        SKIP_LIBRARY=0
+
+        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"; do
+            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]; then
+                SKIP_LIBRARY=1
+                break
+            fi
+        done
+
+        (( $SKIP_LIBRARY == 1 )) && continue
+
+        echo "  Copying $LIB_BASENAME"
+        cp -P "$LIB" "$STAGE_LIB/"
     done
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
@@ -176,11 +200,8 @@ copyStartupScripts()
     install -m 644 "init/networkoptix-mediaserver.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
 
-    install -m 755 -d "$STAGE/etc/init.d"
     install -m 755 -d "$STAGE/etc/systemd/system"
 
-    install -m 755 "init.d/networkoptix-mediaserver" \
-        "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
     install -m 644 "systemd/networkoptix-mediaserver.service" \
         "$STAGE/etc/systemd/system/$CUSTOMIZATION-mediaserver.service"
 

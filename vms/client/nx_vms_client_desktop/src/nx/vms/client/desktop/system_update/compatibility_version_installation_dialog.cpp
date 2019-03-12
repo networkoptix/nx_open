@@ -1,16 +1,15 @@
+#include "compatibility_version_installation_dialog.h"
+#include "ui_compatibility_version_installation_dialog.h"
+
 #include <chrono>
 
 #include <QtWidgets/QPushButton>
-
-#include "compatibility_version_installation_dialog.h"
-#include "ui_compatibility_version_installation_dialog.h"
 
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <client/client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/guarded_callback.h>
-#include "update/media_server_update_tool.h"
 #include "ui/workbench/handlers/workbench_connect_handler.h"
 
 using namespace std::chrono_literals;
@@ -30,6 +29,7 @@ struct CompatibilityVersionInstallationDialog::Private
     // Update info from the internet.
     std::future<UpdateContents> updateInfoInternet;
     int requestsLeft = 0;
+    bool checkingUpdates = false;
 
     std::shared_ptr<ClientUpdateTool> clientUpdateTool;
 
@@ -86,7 +86,7 @@ void CompatibilityVersionInstallationDialog::reject()
 int CompatibilityVersionInstallationDialog::exec()
 {
     // Will do exec there
-    return installUpdate();
+    return startUpdate();
 }
 
 void CompatibilityVersionInstallationDialog::processUpdateContents(
@@ -115,8 +115,8 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
 
 void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int progress)
 {
-    qDebug() << "CompatibilityVersionInstallationDialog::atUpdateStateChanged("
-        << ClientUpdateTool::toString(ClientUpdateTool::State(state)) << "," << progress << ")";
+    NX_DEBUG(this, "CompatibilityVersionInstallationDialog::atUpdateStateChanged(%1, %2)",
+        ClientUpdateTool::toString(ClientUpdateTool::State(state)), progress);
     // Progress:
     // [0-20] - Requesting update info
     // [20-90] - Downloading
@@ -134,8 +134,6 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         {
             finalProgress = 20;
             setMessage(tr("Downloading update package"));
-            auto contents = m_private->clientUpdateTool->getRemoteUpdateInfo();
-            m_private->clientUpdateTool->setUpdateTarget(contents);
             break;
         }
         case ClientUpdateTool::State::downloading:
@@ -187,41 +185,45 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
 
 void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 {
-    if (m_private->updateInfoInternet.valid()
-        && m_private->updateInfoInternet.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
+    if (m_private->checkingUpdates)
     {
-        NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoInternet");
-        processUpdateContents(m_private->updateInfoInternet.get());
-        --m_private->requestsLeft;
-    }
-
-    if (m_private->updateInfoMediaserver.valid()
-        && m_private->updateInfoMediaserver.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
-    {
-        NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
-        processUpdateContents(m_private->updateInfoMediaserver.get());
-        --m_private->requestsLeft;
-    }
-
-    // Done waiting for update information
-    if (m_private->requestsLeft == 0)
-    {
-        m_statusCheckTimer->stop();
-
-        if (m_private->updateContents.isValidToInstall())
+        if (m_private->updateInfoInternet.valid()
+            && m_private->updateInfoInternet.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
         {
-            m_private->clientUpdateTool->setUpdateTarget(m_private->updateContents);
+            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoInternet");
+            processUpdateContents(m_private->updateInfoInternet.get());
+            --m_private->requestsLeft;
         }
-        else
+
+        if (m_private->updateInfoMediaserver.valid()
+            && m_private->updateInfoMediaserver.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
         {
-            m_installationResult = InstallResult::failedDownload;
-            setMessage(tr("Installation failed"));
-            done(QDialogButtonBox::StandardButton::Ok);
+            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
+            processUpdateContents(m_private->updateInfoMediaserver.get());
+            --m_private->requestsLeft;
+        }
+
+        // Done waiting for update information
+        if (m_private->requestsLeft == 0)
+        {
+            if (m_private->updateContents.isValidToInstall())
+            {
+                m_private->clientUpdateTool->setUpdateTarget(m_private->updateContents);
+            }
+            else
+            {
+                m_installationResult = InstallResult::failedDownload;
+                setMessage(tr("Installation failed"));
+                done(QDialogButtonBox::StandardButton::Ok);
+            }
+            m_private->checkingUpdates = false;
         }
     }
+
+    m_private->clientUpdateTool->checkInternalState();
 }
 
-int CompatibilityVersionInstallationDialog::installUpdate()
+int CompatibilityVersionInstallationDialog::startUpdate()
 {
     connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
@@ -229,6 +231,8 @@ int CompatibilityVersionInstallationDialog::installUpdate()
     // Should request specific build from the internet.
     QString updateUrl = qnSettings->updateFeedUrl();
     QString build = QString::number(m_versionToInstall.build());
+
+    m_private->checkingUpdates = true;
     m_private->updateInfoInternet = nx::update::checkSpecificChangeset(
         updateUrl, m_engineVersion, build);
     if (m_private->updateInfoInternet.valid())

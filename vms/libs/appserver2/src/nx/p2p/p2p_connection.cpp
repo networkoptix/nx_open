@@ -63,7 +63,7 @@ Connection::Connection(
     const vms::api::PeerDataEx& localPeer,
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
-    const Qn::UserAccessData& /*userAccessData*/,
+    const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
     :
@@ -74,7 +74,8 @@ Connection::Connection(
         requestUrlQuery,
         std::move(opaqueObject),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
-    QnCommonModuleAware(commonModule)
+    QnCommonModuleAware(commonModule),
+    m_userAccessData(userAccessData)
 {
     commonModule->metrics()->tcpConnections().p2p()++;
 }
@@ -83,16 +84,17 @@ Connection::~Connection()
 {
     if (m_direction == Direction::incoming)
         commonModule()->metrics()->tcpConnections().p2p()--;
+    pleaseStopSync();
 }
 
-void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)
+bool Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)
 {
     if (!commonModule()->videowallGuid().isNull())
     {
         httpClient->addAdditionalHeader(
             Qn::VIDEOWALL_GUID_HEADER_NAME,
             commonModule()->videowallGuid().toString().toUtf8());
-        return;
+        return true;
     }
 
     const auto& resPool = commonModule()->resourcePool();
@@ -102,6 +104,8 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
         server = resPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (server && authByKey)
     {
+        if (server->getAuthKey().isEmpty())
+            return false;
         httpClient->setUserName(server->getId().toString().toLower());
         httpClient->setUserPassword(server->getAuthKey());
     }
@@ -127,6 +131,7 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
             httpClient->setUserPassword(url.password());
         }
     }
+    return true;
 }
 
 bool Connection::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) const

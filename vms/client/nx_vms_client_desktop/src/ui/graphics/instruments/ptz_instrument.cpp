@@ -100,8 +100,8 @@ private:
     void onTimeout();
 
 private:
-    PtzInstrument* const m_parent = nullptr;
-    QnMediaResourceWidget* const m_widget = nullptr;
+    QPointer<PtzInstrument> const m_parent;
+    QPointer<QnMediaResourceWidget> const m_widget;
     QTimer m_filteringTimer;
     nx::core::ptz::Vector m_targetSpeed;
     nx::core::ptz::Vector m_filteringSpeed;
@@ -151,6 +151,9 @@ void PtzInstrument::MovementFilter::updateFilteringSpeed(const nx::core::ptz::Ve
 void PtzInstrument::MovementFilter::setMovementSpeed(const nx::core::ptz::Vector& speed)
 {
     if (speed == m_targetSpeed)
+        return;
+
+    if (!m_widget || !m_parent)
         return;
 
     m_targetSpeed = speed;
@@ -626,6 +629,14 @@ void PtzInstrument::processPtzDoubleClick()
     m_isDoubleClick = false; //do not repeat double-click
     if (!target() || m_skipNextAction)
         return;
+
+    // Ptz unzoom is not supported on redirected ptz.
+    const auto camera = target()->resource().dynamicCast<QnClientCameraResource>();
+    if (camera && camera->isPtzRedirected())
+    {
+        emit doubleClicked(target());
+        return;
+    }
 
     auto splashItem = newSplashItem(target());
     splashItem->setSplashType(QnSplashItem::Rectangular);

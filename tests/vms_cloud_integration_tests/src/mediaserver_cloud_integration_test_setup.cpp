@@ -21,6 +21,8 @@ using nx::vms::api::UserDataList;
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
     m_defaultOwnerCredentials({ "admin", "admin" })
 {
+    m_mediaServerLauncher.addSetting("delayBeforeSettingMasterFlag", "100ms");
+    m_mediaServerLauncher.addSetting("p2pMode", GetParam().p2pMode);
 }
 
 MediaServerCloudIntegrationTest::~MediaServerCloudIntegrationTest()
@@ -35,8 +37,6 @@ bool MediaServerCloudIntegrationTest::startCloudDB()
 bool MediaServerCloudIntegrationTest::startMediaServer()
 {
     m_mediaServerLauncher.addSetting("cdbEndpoint", m_cdb.endpoint().toString());
-    m_mediaServerLauncher.addSetting("delayBeforeSettingMasterFlag", "100ms");
-    m_mediaServerLauncher.addSetting("p2pMode", GetParam().p2pMode);
 
     if (!m_mediaServerLauncher.start())
         return false;

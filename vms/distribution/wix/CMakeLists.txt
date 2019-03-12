@@ -10,7 +10,6 @@ set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
 set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
-set(VC14RedistPath "${vcredist_directory}")
 
 # These folders are configured, and are required for update packages only.
 set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
@@ -26,7 +25,6 @@ else()
 endif()
 
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
-file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
 add_subdirectory(custom_actions)
 
@@ -88,12 +86,13 @@ if(withNxTool)
             nxtool
             wix_custom_actions
         COMMENT "Collecting NxTool QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-            "--config" ${config_file}
-            "--source" ${nxtool_executable}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
+        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
             "--qml-root" ${nxtool_qml_root}
+            "--qt-root" ${qt.dir}
             "--output" ${nxtool_qml_dir}
+            "--prefer-compiled"
+            "--skip-styles"
         )
 
     add_custom_target(create_nxtool_installer ALL
@@ -117,12 +116,13 @@ if(withDesktopClient)
         DEPENDS
             desktop_client
         COMMENT "Collecting QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-            "--config" ${config_file}
-            "--source" ${desktop_client_executable}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
+        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
             "--qml-root" ${desktop_client_qml_root}
+            "--qt-root" ${qt.dir}
             "--output" ${client_qml_dir}
+            "--prefer-compiled"
+            "--skip-styles"
         )
     add_dependencies(distribution_wix collect_qml_dependencies applauncher minilauncher)
 

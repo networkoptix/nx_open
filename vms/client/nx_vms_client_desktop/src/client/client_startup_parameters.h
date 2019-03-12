@@ -78,6 +78,7 @@ struct QnStartupParameters
     QStringList files; //< File paths passed to the client.
 
     QString qmlRoot;
+    QStringList qmlImportPaths;
 };
 
 Q_DECLARE_METATYPE(QnStartupParameters)

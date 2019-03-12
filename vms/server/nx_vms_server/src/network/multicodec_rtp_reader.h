@@ -168,6 +168,7 @@ private:
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     CameraDiagnostics::Result m_openStreamResult;
+    std::optional<std::chrono::steady_clock::time_point> m_packetLossReportTime;
 
     static nx::utils::Mutex s_defaultTransportMutex;
     static RtspTransport s_defaultTransportToUse;

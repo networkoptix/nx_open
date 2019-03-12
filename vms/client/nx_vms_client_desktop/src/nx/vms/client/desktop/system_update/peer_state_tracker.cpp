@@ -197,10 +197,24 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 item->installing = false;
+            if (item->statusUnknown)
+            {
+                NX_DEBUG(this, "clearing unknown status for peer %1", item->id);
+                item->statusUnknown = false;
+            }
             // Ignoring 'offline' status from /ec2/updateStatus.
             //item->offline = (status.second.code == StatusCode::offline);
             emit itemChanged(item);
         }
+    }
+}
+
+void PeerStateTracker::markStatusUnknown(const QSet<QnUuid>& targets)
+{
+    for (const auto& uid: targets)
+    {
+        if (auto item = findItemById(uid))
+            item->statusUnknown = true;
     }
 }
 

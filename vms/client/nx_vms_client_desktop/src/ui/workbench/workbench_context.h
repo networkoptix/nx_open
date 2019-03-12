@@ -63,8 +63,6 @@ public:
     QnUserResourcePtr user() const;
     void setUserName(const QString &userName);
 
-    bool showEulaMessage(QString eulaPath = "") const;
-
     /** Check if application is closing down. Replaces QApplication::closingDown(). */
     bool closingDown() const;
     void setClosingDown(bool value);

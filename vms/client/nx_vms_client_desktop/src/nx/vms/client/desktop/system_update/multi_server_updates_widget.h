@@ -14,12 +14,9 @@
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/common_update_manager.h>
-#include <update/updates_common.h>
 
 #include "server_update_tool.h"
 #include "client_update_tool.h"
-
-struct QnLowFreeSpaceWarning;
 
 namespace Ui { class MultiServerUpdatesWidget; }
 
@@ -176,7 +173,7 @@ private:
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
-    bool processRemoteChanges(bool force = false);
+    bool processRemoteChanges();
     /** Part of processRemoteChanges FSM processor. */
     void processRemoteInitialState();
     void processRemoteUpdateInformation();
@@ -218,7 +215,7 @@ private:
 
     nx::update::UpdateSourceType m_updateSourceMode = nx::update::UpdateSourceType::internet;
 
-    std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
+    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::shared_ptr<PeerStateTracker> m_stateTracker;

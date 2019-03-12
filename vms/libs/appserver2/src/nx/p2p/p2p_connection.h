@@ -38,7 +38,7 @@ public:
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
 
 protected:
-    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
 
 private:
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;

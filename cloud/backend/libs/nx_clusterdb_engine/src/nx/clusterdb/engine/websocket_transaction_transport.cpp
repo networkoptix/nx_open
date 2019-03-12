@@ -64,6 +64,11 @@ WebsocketCommandTransport::WebsocketCommandTransport(
     startReading();
 }
 
+WebsocketCommandTransport::~WebsocketCommandTransport()
+{
+    nx::p2p::ConnectionBase::pleaseStopSync();
+}
+
 void WebsocketCommandTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractConnection::bindToAioThread(aioThread);
@@ -251,11 +256,12 @@ int WebsocketCommandTransport::highestProtocolVersionCompatibleWithRemotePeer() 
         : remotePeer().protoVersion;
 }
 
-void WebsocketCommandTransport::fillAuthInfo(
+bool WebsocketCommandTransport::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
+    return false;
 }
 
 } // namespace nx::clusterdb::engine::transport

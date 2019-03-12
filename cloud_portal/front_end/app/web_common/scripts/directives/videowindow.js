@@ -130,22 +130,6 @@ import * as Hls from 'hls.js';
                             });
                             var jsHlsSupported = Hls.isSupported();
                             
-                            //Should Catch MS edge, Safari, Mobile Devices
-                            if (weHaveHls && (canPlayNatively('hls') || $window.jscd.mobile)) {
-                                return 'native-hls';
-                            }
-                            
-                            // Hardcode native support
-                            if ($window.jscd.os === 'Android') {
-                                if (weHaveWebm) {
-                                    return 'webm';
-                                    // TODO: Try removing this line.
-                                } else {
-                                    scope.videoFlags.noArmSupport = true;
-                                    return false;
-                                }
-                            }
-                            
                             // No native support
                             //Presume we are on desktop:
                             switch ($window.jscd.browser) {
@@ -182,18 +166,24 @@ import * as Hls from 'hls.js';
                                 case 'Opera':
                                 case 'Webkit':
                                 default:
-                                    if (jsHlsSupported && weHaveHls) {
-                                        return 'jshls';// We are hoping that we have some good browser
+                                    if (weHaveHls) {
+                                        if ($window.jscd.os === 'iOS' && canPlayNatively('hls')) {
+                                            return 'native-hls';
+                                        }
+                                        if (jsHlsSupported) {
+                                            return 'jshls';// We are hoping that we have some good browser
+                                        }
+                                        if ($window.jscd.flashVersion) { // We have flash - try to play using flash
+                                            return 'flashls';
+                                        }
+                                        if ($window.jscd.os === 'Linux') {
+                                            scope.videoFlags.ubuntuNX = true;
+                                            return false;
+                                        }
                                     }
-                                    if ($window.jscd.flashVersion && weHaveHls) { // We have flash - try to play using flash
-                                        return 'flashls';
-                                    }
+                                    
                                     if (weHaveWebm && canPlayNatively('webm')) {
                                         return 'webm';
-                                    }
-                                    if (weHaveHls && $window.jscd.os === 'Linux') {
-                                        scope.videoFlags.ubuntuNX = true;
-                                        return false;
                                     }
                             }
                             
@@ -260,7 +250,7 @@ import * as Hls from 'hls.js';
                                     
                                     if (scope.videoFlags.errorLoading) {
                                         $http
-                                            .get(error.url)
+                                            .get(error.url || error.frag.url)
                                             .then(function (response) {
                                                 scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                                 scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';

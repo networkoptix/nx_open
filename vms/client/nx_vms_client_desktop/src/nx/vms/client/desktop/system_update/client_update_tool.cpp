@@ -57,6 +57,9 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     connect(m_downloader.get(), &Downloader::fileInformationChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
+    connect(m_downloader.get(), &Downloader::downloadFinished,
+        this, &ClientUpdateTool::atDownloadFinished);
+
     connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
         this, &ClientUpdateTool::atChunkDownloadFailed);
 
@@ -82,8 +85,11 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 ClientUpdateTool::~ClientUpdateTool()
 {
     m_downloader->disconnect(this);
-    m_serverConnection.reset();
+    // Forcing downloader to be destroyed before peerManager and serverConnection.
+    m_downloader.reset();
+    // And peer manager should die before serverConnection.
     m_peerManager.reset();
+    m_serverConnection.reset();
 }
 
 void ClientUpdateTool::setState(State newState)
@@ -123,11 +129,23 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     if (m_serverConnection)
     {
         // Requesting remote update info.
-        m_serverConnection->getUpdateInfo(
-            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
+        m_serverConnection->getInstalledUpdateInfo(
+            [this, tool=QPointer<ClientUpdateTool>(this)](
+                bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
             {
-                if (tool && success)
-                    tool->atRemoteUpdateInformation(response);
+                nx::update::InformationError error = nx::update::InformationError::noError;
+                if (!success || response.error != QnRestResult::NoError)
+                {
+                    NX_DEBUG(
+                        this,
+                        lm("requestRemoteUpdateInfo: Error in response for /updateInformation request: %1")
+                            .args(response.errorString));
+                    if (!QnLexical::deserialize(response.errorString, &error))
+                        error = nx::update::InformationError::httpError;
+                }
+
+                if (tool)
+                    tool->atRemoteUpdateInformation(error, response.data);
             }, thread());
     }
     else
@@ -146,38 +164,37 @@ void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
     m_peerManager->setServerUrl(serverUrl, serverId);
 }
 
-void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& updateInformation)
+void ClientUpdateTool::atRemoteUpdateInformation(
+    nx::update::InformationError error,
+    const nx::update::Information& updateInformation)
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
     // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
-    bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::Package clientPackage;
     nx::update::findPackage(*commonModule(), updateInformation, &clientPackage, &errorMessage);
 
-    if (getState() == State::initial)
-    {
-        UpdateContents contents;
-        contents.sourceType = nx::update::UpdateSourceType::mediaservers;
-        contents.source = "mediaserver";
-        contents.info = updateInformation;
-        contents.clientPackage = clientPackage;
-        m_remoteUpdateContents = contents;
+    UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
+    contents.source = "mediaserver";
+    contents.info = updateInformation;
+    contents.clientPackage = clientPackage;
+    contents.error = error;
+    m_remoteUpdateContents = contents;
 
-        if (clientPackage.isValid())
-        {
-            setState(State::readyDownload);
-        }
-        else if (updateInformation.isValid())
-        {
-            NX_WARNING(this) << "atRemoteUpdateInformation have valid update info but no client package";
-            setError("Missing client package inside UpdateInfo");
-        }
-        m_remoteUpdateInfoRequest.set_value(contents);
+    if (clientPackage.isValid())
+    {
+        setState(State::readyDownload);
     }
+    else if (updateInformation.isValid())
+    {
+        NX_WARNING(this) << "atRemoteUpdateInformation have valid update info but no client package";
+        setError("Missing client package inside UpdateInfo");
+    }
+    m_remoteUpdateInfoRequest.set_value(contents);
 }
 
 nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
@@ -226,7 +243,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         if (shouldRestartTo(m_updateVersion))
         {
             NX_INFO(this)
-                << "downloadUpdate(" << contents.info.version
+                << "setUpdateTarget(" << contents.info.version
                 << ") client already has this version installed"
                 << m_clientPackage.file;
             setState(State::readyRestart);
@@ -234,7 +251,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         else
         {
             NX_INFO(this)
-                << "downloadUpdate(" << contents.info.version
+                << "setUpdateTarget(" << contents.info.version
                 << ") client is already at this version"
                 << m_clientPackage.file;
             setState(State::complete);
@@ -244,13 +261,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
     {
         // Expecting that file is stored at:
         NX_INFO(this)
-            << "downloadUpdate(" << contents.info.version << ") this is offline update from the file"
+            << "setUpdateTarget(" << contents.info.version << ") this is offline update from the file"
             << m_clientPackage.localFile;
         QString path = contents.storageDir.filePath(m_clientPackage.localFile);
         if (!QFileInfo::exists(path))
         {
             NX_ERROR(this)
-                << "downloadUpdate(" << contents.info.version << ") the file"
+                << "setUpdateTarget(" << contents.info.version << ") the file"
                 << path << "does not exist!";
             setError(QString("File %1 does not exist").arg(path));
         }
@@ -262,8 +279,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
     }
     else
     {
-        NX_INFO(this)
-            << "downloadUpdate(" << contents.info.version << ") this is an internet update";;
+        NX_INFO(this, "setUpdateTarget(%1) this is an internet update", contents.info.version);
 
         FileInformation info;
         info.md5 = QByteArray::fromHex(m_clientPackage.md5.toLatin1());
@@ -276,60 +292,19 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             setError("There is no valid client package to download");
             return;
         }
-        auto code = m_downloader->addFile(info);
-        m_downloader->startDownloads();
-        using Code = vms::common::p2p::downloader::ResultCode;
-        QString file =  m_downloader->filePath(m_clientPackage.file);
 
-        m_updateFile = file;
+        setState(State::downloading);
 
-        switch (code)
+        const auto code = m_downloader->addFile(info);
+        m_updateFile = m_downloader->filePath(m_clientPackage.file);
+
+        if (code != common::p2p::downloader::ResultCode::ok)
         {
-            case Code::ok:
-                NX_VERBOSE(this) << "requestStartUpdate() - downloading client package"
-                    << info.name << " from url=" << m_clientPackage.url;
-                setState(State::downloading);
-                break;
-            case Code::fileAlreadyDownloaded:
-                NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
-                    << file;
-                setState(State::readyInstall);
-                break;
-            case Code::fileAlreadyExists:
-            {
-                auto fileInfo = m_downloader->fileInformation(m_clientPackage.file);
-                if (fileInfo.status == FileInformation::Status::downloaded)
-                {
-                    NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
-                        << file;
-                    setState(State::readyInstall);
-                }
-                else if (fileInfo.status == FileInformation::Status::downloading)
-                {
-                    NX_VERBOSE(this)
-                        << "requestStartUpdate() - file"
-                        << info.name << "exists but not fully downloaded"
-                        << "from url="<< m_clientPackage.url;
-                    setState(State::downloading);
-                }
-                else
-                {
-                    NX_VERBOSE(this)
-                        << "requestStartUpdate() - file" << info.name << "exists and something wrong with it"
-                        << "from url=" << m_clientPackage.url;
-                    setState(State::downloading);
-                }
-                break;
-            }
-            default:
-            // Some sort of an error here.
-            {
-                QString error = vms::common::p2p::downloader::toString(code);
-                NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
-                    << info.name << error;
-                setError(error);
-                break;
-            }
+            const QString error = common::p2p::downloader::toString(code);
+            NX_ERROR(this, "setUpdateTarget() - failed to add client package %1 %2",
+                info.name, error);
+            setError(error);
+            return;
         }
     }
 }
@@ -353,9 +328,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
-            NX_VERBOSE(this) << "atDownloaderStatusChanged(" << fileInformation.name
-                << ") - finally downloaded file to" << m_downloader->filePath(fileInformation.name);
-            setState(State::readyInstall);
+            atDownloadFinished(fileInformation.name);
             break;
         case FileInformation::Status::corrupted:
             setError(tr("Update package is corrupted"));
@@ -368,6 +341,16 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             // Nothing to do here
             break;
     }
+}
+
+void ClientUpdateTool::atDownloadFinished(const QString& fileName)
+{
+    if (fileName != m_clientPackage.file)
+        return;
+
+    NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
+        fileName, m_downloader->filePath(fileName));
+    setState(State::readyInstall);
 }
 
 void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
@@ -464,7 +447,11 @@ bool ClientUpdateTool::installUpdateAsync()
     if (m_state != readyInstall)
         return false;
 
+    NX_INFO(this, "installUpdateAsync() from file %1", m_updateFile);
+
     NX_ASSERT(!m_updateFile.isEmpty());
+
+    setState(installing);
 
     m_applauncherTask = std::async(std::launch::async,
         [tool = QPointer(this)](
@@ -587,6 +574,7 @@ bool ClientUpdateTool::restartClient(QString authString)
 
 void ClientUpdateTool::resetState()
 {
+    NX_DEBUG(this, "resetState() from state %1", toString(m_state));
     switch (m_state)
     {
         case State::downloading:
@@ -667,7 +655,7 @@ QString ClientUpdateTool::toString(State state)
 QString ClientUpdateTool::applauncherErrorToString(int value)
 {
     using Result = applauncher::api::ResultType::Value;
-    switch ((Result)value)
+    switch ((Result) value)
     {
         case Result::alreadyInstalled:
             return tr("This update is already installed.");
@@ -680,13 +668,13 @@ QString ClientUpdateTool::applauncherErrorToString(int value)
         case Result::brokenPackage:
             return tr("Broken update package.");
         case Result::notEnoughSpace:
-            return tr("Not enough space on disk to install client update.");
+            return tr("Not enough space on disk to install the client update.");
         case Result::notFound:
-            // Install package does not exists. Either we have broke the code and asking
+            // Installed package does not exists. Either we have broken the code and asking
             // for a wrong file, or this file had been removed somehow.
-            return tr("Install package has been lost.");
+            return tr("Installation package has been lost.");
         default:
-            return applauncher::api::ResultType::toString((Result)value);
+            return applauncher::api::ResultType::toString((Result) value);
     }
 }
 

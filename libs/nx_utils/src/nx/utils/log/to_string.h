@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+#include <bitset>
 #include <memory>
 #include <chrono>
 #include <optional>
@@ -150,6 +152,14 @@ QString toString(
     result += toString(pair.second);
     result += suffix;
     return result;
+}
+
+template<std::size_t N>
+QString toString(const std::bitset<N>& value)
+{
+    std::ostringstream result;
+    result << "0b" << value;
+    return QString::fromStdString(result.str());
 }
 
 template<typename Container>

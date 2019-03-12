@@ -22,6 +22,7 @@ public:
 private:
     qint64 freeSpaceForUpdate() const;
     int checkInternetForUpdate(
+        const QnRequestParamList& params,
         const QString& publicationKey,
         QByteArray* result,
         QByteArray* contentType,

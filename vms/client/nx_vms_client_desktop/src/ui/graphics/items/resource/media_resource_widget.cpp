@@ -58,22 +58,22 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
+#include <nx/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/client/core/motion/motion_grid.h>
-#include <nx/vms/client/desktop/utils/entropix_image_enhancer.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/core/utils/geometry.h>
+
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
-#include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
-#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
+#include <nx/vms/client/desktop/utils/entropix_image_enhancer.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
 
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
-#include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
-#include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
-#include <nx/client/core/utils/geometry.h>
-#include <nx/client/core/media/consuming_motion_metadata_provider.h>
-#include <nx/client/core/media/consuming_analytics_metadata_provider.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -1572,8 +1572,15 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
             scaleStripper.mapRect(paintRect));
     }
 
-    if (result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
+    const bool videoFramePresent = result == Qn::NewFrameRendered || result == Qn::OldFrameRendered;
+    if (videoFramePresent)
+    {
+        integrations::paintVideoOverlays(this, painter);
+    }
+    else
+    {
         base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
+    }
 
     return result;
 }
@@ -1589,8 +1596,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         paintMotionGrid(painter, channel, rect,
             d->motionMetadataProvider->metadata(timestamp, channel));
 
-        /* Motion selection. */
-        if (!m_motionSelection[channel].isEmpty())
+        // Motion search region.
+        const bool isActiveWidget = navigator()->currentMediaWidget() == this;
+        if (isActiveWidget && !m_motionSelection[channel].isEmpty())
         {
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);

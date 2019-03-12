@@ -13,8 +13,6 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
 
-//#define REDUCE_NET_ISSUE_HACK
-
 namespace nx {
 namespace vms::server {
 namespace event {
@@ -140,11 +138,6 @@ void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
 void EventConnector::at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,
     vms::api::EventReason reasonCode, const QString &reasonParamsEncoded)
 {
-#ifdef REDUCE_NET_ISSUE_HACK
-    static int netIssueCounter;
-    if (++netIssueCounter % 10)
-        return; // mutex is not nessessary here
-#endif
     vms::event::NetworkIssueEventPtr event(new vms::event::NetworkIssueEvent(
         resource, timeStamp, reasonCode, reasonParamsEncoded));
 

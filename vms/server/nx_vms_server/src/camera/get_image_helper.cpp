@@ -2,9 +2,10 @@
 
 #include <camera/camera_pool.h>
 #include <camera/video_camera.h>
-
 #include <core/resource/camera_resource.h>
 
+#include <nx/streaming/config.h>
+#include <nx/utils/log/log_main.h>
 #include <mediaserver_ini.h>
 
 #include "utils/media/frame_info.h"
@@ -13,11 +14,9 @@
 #include "transcoding/filters/scale_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
 
-
 #include "plugins/resource/server_archive/server_archive_delegate.h"
-#include <decoders/video/ffmpeg_video_decoder.h>
-#include <nx/utils/log/log_main.h>
 #include "media_server/media_server_module.h"
+#include <decoders/video/ffmpeg_video_decoder.h>
 
 using StreamIndex = nx::vms::api::StreamIndex;
 
@@ -58,22 +57,18 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
 
 CLVideoDecoderOutputPtr handleChannelFrame(
     const QList<QnAbstractImageFilterPtr>& filterChain,
-    std::deque<int>& channelMask,
+    std::bitset<CL_MAX_CHANNELS>& channelMask,
     CLVideoDecoderOutputPtr&& frame)
 {
-    // Move the last requested channel to the back of queue.
-    const auto channelRequested = channelMask.front();
-    channelMask.pop_front();
-    channelMask.push_back(channelRequested);
-
     if (!frame)
     {
         NX_VERBOSE(typeid(QnGetImageHelper), "%1(): Got null frame", __func__);
         return nullptr;
     }
 
+
     NX_VERBOSE(typeid(QnGetImageHelper), "Got frame for [%1] channel, size %2, channels left %3",
-        frame->channel, frame->size(), containerString(channelMask));
+        frame->channel, frame->size(), channelMask);
     for (auto& filter: filterChain)
     {
         frame = filter->updateImage(frame);
@@ -84,9 +79,7 @@ CLVideoDecoderOutputPtr handleChannelFrame(
         }
     }
 
-    auto it = std::find(channelMask.begin(), channelMask.end(), frame->channel);
-    if (it != channelMask.end())
-        channelMask.erase(it);
+    channelMask.reset(frame->channel);
     return frame;
 }
 
@@ -595,8 +588,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     QnConstResourceVideoLayoutPtr layout = camera->getVideoLayout();
     const int channelCount = layout->channelCount();
-    std::deque<int> channelMask(channelCount); // Queue for round-robin.
-    std::iota(channelMask.begin(), channelMask.end(), 0);
+    std::bitset<CL_MAX_CHANNELS> channelMask((1 << channelCount) - 1);
 
     QList<QnAbstractImageFilterPtr> filterChain;
     const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
@@ -613,11 +605,11 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     // Getting frames for other channels of camera.
     // NOTE: We can't get frame for exact channel from archive, so we are trying several times until
-    // we get all frames.
-    for (int i = 1; i < channelCount * kGetFrameExtraTriesPerChannel && !channelMask.empty(); ++i)
+    // we get all frames. We are doing (i % channelCount)
+    for (int i = 1; i < channelCount * kGetFrameExtraTriesPerChannel && channelMask.any(); ++i)
     {
         frame = handleChannelFrame(filterChain, channelMask,
-            readFrame(request, streamIndex, archiveDelegate.get(), channelMask.front(), isOpened));
+            readFrame(request, streamIndex, archiveDelegate.get(), i % channelCount, isOpened));
         if (!frame)
         {
             NX_VERBOSE(this, "%1(): Got null frame", __func__);
@@ -628,7 +620,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     NX_ASSERT(outFrame);
     NX_VERBOSE(this, "%1() END -> frame %2, mask %3",
-        __func__, outFrame->size(), containerString(channelMask));
+        __func__, outFrame->size(), channelMask);
     return outFrame;
 }
 

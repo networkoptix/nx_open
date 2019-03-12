@@ -95,7 +95,7 @@ def determine_package_versions(
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
 
-    if not "festival-vox" in v:
+    if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
 
     if platform == "windows" and debug:
@@ -159,8 +159,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform == "windows":
         sync("icu", path_variable="icu_directory")
         sync("directx")
-        sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")
+        sync("ucrt-10-redist", path_variable="ucrt_directory")
+        sync("msvc-2017-redist", path_variable="vcrt_directory")
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/ilmerge", path_variable="ilmerge_directory")
 

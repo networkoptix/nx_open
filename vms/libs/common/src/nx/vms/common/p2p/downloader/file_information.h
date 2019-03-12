@@ -56,6 +56,8 @@ public:
     qint64 touchTime = 0;
     qint64 ttl = 0;
     QList<QnUuid> additionalPeers;
+    // If empty, default path is used.
+    QString absoluteDirectoryPath;
 
     // Calculates a progress for download, [0..100].
     float calculateDownloadProgress() const;
@@ -65,7 +67,7 @@ public:
 
 #define FileInformation_Fields \
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)(touchTime)(ttl) \
-    (additionalPeers)
+    (additionalPeers)(absoluteDirectoryPath)
 
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))

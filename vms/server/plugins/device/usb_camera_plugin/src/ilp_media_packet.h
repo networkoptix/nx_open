@@ -8,7 +8,7 @@ class CyclicAllocator;
 namespace nx {
 namespace usb_cam {
 
-class ILPMediaPacket: public nxcip::VideoDataPacket{
+class ILPMediaPacket: public nxcip::VideoDataPacket {
 public:
     ILPMediaPacket(
         CyclicAllocator* const allocator,

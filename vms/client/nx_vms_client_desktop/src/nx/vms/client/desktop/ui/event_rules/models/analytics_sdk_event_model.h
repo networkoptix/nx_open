@@ -17,6 +17,7 @@ public:
     {
         EventTypeIdRole = Qt::UserRole + 1,
         DriverIdRole,
+        ValidEventRole,
     };
 
     AnalyticsSdkEventModel(QObject* parent = nullptr);

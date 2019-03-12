@@ -180,7 +180,6 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 void QnResourceDiscoveryManager::stop()
 {
     pleaseStop();
-    quit();
     wait();
 }
 
@@ -193,6 +192,7 @@ void QnResourceDiscoveryManager::pleaseStop()
             searcher->pleaseStop();
     }
     base_type::pleaseStop();
+    quit(); //telling thread's event loop to return
 }
 
 void QnResourceDiscoveryManager::run()

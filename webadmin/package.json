@@ -13,7 +13,9 @@
     "bootstrap-sass": "3.3.7",
     "chartjs": "0.3",
     "es5-shim": "4.5.9",
+    "es6-promise": "4.2.6",
     "hint.css": "2.5.0",
+    "hls.js": "0.12.2",
     "jquery": "1.12",
     "jquery-mousewheel": "3.1.13",
     "json3": "3.3.2",
@@ -21,7 +23,7 @@
     "ngstorage": "0.3.11",
     "qwebchannel": "5.9.0",
     "rangeslider.js": "2.3.0",
-    "screenfull": "3.3.2",
+    "screenfull": "4.0.1",
     "tc-angular-chartjs": "2.1.4",
     "underscore": "1.8.3"
   },

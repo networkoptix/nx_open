@@ -97,7 +97,7 @@ public:
     QObject* opaqueObject();
 
     virtual utils::Url remoteAddr() const override;
-    void stopWhileInAioThread();
+    void pleaseStopSync();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
 
@@ -111,10 +111,11 @@ signals:
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 
 protected:
-    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
     const P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
     virtual void setState(State state);
+    void stopWhileInAioThread();
   private:
     void cancelConnecting(State state, const QString& reason);
 
@@ -129,9 +130,8 @@ protected:
 private:
     enum class CredentialsSource
     {
-        remoteUrl,
+        userNameAndPassword,
         serverKey,
-        appserverConnectionFactory,
         none,
     };
 protected:
@@ -142,7 +142,7 @@ private:
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
 
-    CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
+    CredentialsSource m_credentialsSource = CredentialsSource::userNameAndPassword;
 
     vms::api::PeerDataEx m_remotePeer;
     vms::api::PeerDataEx m_localPeer;
@@ -169,6 +169,7 @@ private:
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
     QByteArray m_connectionGuid;
+    size_t m_startedClassId = 0;
 };
 
 QString toString(ConnectionBase::State value);
