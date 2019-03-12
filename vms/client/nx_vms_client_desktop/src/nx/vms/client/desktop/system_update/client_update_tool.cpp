@@ -298,6 +298,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         const auto code = m_downloader->addFile(info);
         m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
+        if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
+            || code == common::p2p::downloader::ResultCode::fileAlreadyDownloaded)
+        {
+            // Forcing downloader to start processing this file.
+            // It should call all the events and ClientUpdateTool will process its state.
+            m_downloader->startDownloads();
+        }
         if (code != common::p2p::downloader::ResultCode::ok)
         {
             const QString error = common::p2p::downloader::toString(code);

@@ -1406,109 +1406,70 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         }
     }
 
+    if (!m_peersActive.empty())
+        return;
+
     // No peers are doing anything. So we consider current state transition is complete
-    if (m_peersActive.empty())
+    NX_INFO(this) << "processRemoteDownloading() - download is complete";
+
+    // Need to sync UI before showing modal dialogs.
+    // Or we will get inconsistent UI state in the background.
+    loadDataToUi();
+
+    if (m_peersComplete.size() >= m_peersIssued.size())
     {
-        NX_INFO(this) << "processRemoteDownloading() - download is complete";
+        // All servers have completed downloading process.
+        auto complete = m_peersComplete;
+        QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+        // 1. Everything is complete
+        messageBox->setIcon(QnMessageBoxIcon::Success);
+        messageBox->setText(tr("Updates downloaded"));
+        // S|Install now| |Later|
+        setTargetState(WidgetUpdateState::readyInstall, complete);
+        auto installNow = messageBox->addButton(tr("Install now"),
+            QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+        auto installLater = messageBox->addButton(tr("Later"), QDialogButtonBox::RejectRole);
+        messageBox->setEscapeButton(installLater);
+        messageBox->exec();
 
-        // Need to sync UI before showing modal dialogs.
-        // Or we will get inconsistent UI state in the background.
-        loadDataToUi();
+        auto clicked = messageBox->clickedButton();
+        if (clicked == installNow)
+            setTargetState(WidgetUpdateState::installing, complete);
+    }
+    else
+    {
+        QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+        // 3. All other cases. Some servers have failed
+        messageBox->setIcon(QnMessageBoxIcon::Critical);
+        messageBox->setText(tr("Failed to download update packages to some servers"));
 
-        if (m_peersComplete.size() >= m_peersIssued.size())
+        QString text;
+        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
+        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+        messageBox->setInformativeText(text);
+
+        auto tryAgain = messageBox->addButton(tr("Try again"),
+            QDialogButtonBox::AcceptRole);
+        auto cancelUpdate = messageBox->addButton(tr("Cancel Update"),
+            QDialogButtonBox::RejectRole);
+        messageBox->setEscapeButton(cancelUpdate);
+        messageBox->exec();
+
+        auto clicked = messageBox->clickedButton();
+        if (clicked == tryAgain)
         {
-            auto complete = m_peersComplete;
-            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-            // 1. Everything is complete
-            messageBox->setIcon(QnMessageBoxIcon::Success);
-            messageBox->setText(tr("Updates downloaded"));
-            // S|Install now| |Later|
-            setTargetState(WidgetUpdateState::readyInstall, complete);
-            auto installNow = messageBox->addButton(tr("Install now"),
-                QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-            auto installLater = messageBox->addButton(tr("Later"), QDialogButtonBox::RejectRole);
-            messageBox->setEscapeButton(installLater);
-            messageBox->exec();
-
-            auto clicked = messageBox->clickedButton();
-            if (clicked == installNow)
-                setTargetState(WidgetUpdateState::installing, complete);
+            auto serversToRetry = m_peersFailed;
+            m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, serversToRetry);
+            m_clientUpdateTool->setUpdateTarget(m_updateInfo);
+            setTargetState(WidgetUpdateState::downloading, serversToRetry);
         }
-        else if (m_peersComplete.empty())
+        else if (clicked == cancelUpdate)
         {
-            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-            // 2. All servers have failed. Or no servers have succeded
-            messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to download update packages"));
-
-            QString text;
-            text += htmlParagraph(tr("Please make sure there is enough free storage space and network connection is stable."));
-            text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-            messageBox->setInformativeText(text);
-
-            auto tryAgain = messageBox->addButton(tr("Try again"),
-                QDialogButtonBox::AcceptRole);
-            auto cancelUpdate = messageBox->addButton(tr("Cancel Update"),
-                QDialogButtonBox::RejectRole);
-            messageBox->setEscapeButton(cancelUpdate);
-            messageBox->exec();
-
-            auto clicked = messageBox->clickedButton();
-            if (clicked == tryAgain)
-            {
-                auto serversToRetry = m_peersFailed;
-                m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, m_peersComplete);
-                m_clientUpdateTool->setUpdateTarget(m_updateInfo);
-                setTargetState(WidgetUpdateState::downloading, serversToRetry);
-            }
-            else if (clicked == cancelUpdate)
-            {
-                auto serversToStop = m_peersIssued;
-                m_serverUpdateTool->requestStopAction();
-                setTargetState(WidgetUpdateState::ready, {});
-            }
+            m_serverUpdateTool->requestStopAction();
+            setTargetState(WidgetUpdateState::ready, {});
         }
-        else
-        {
-            QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-            // 3. All other cases. Some servers have failed
-            messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to download update packages to some servers"));
 
-            QString text;
-            text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-            text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-            messageBox->setInformativeText(text);
-
-            auto tryAgain = messageBox->addButton(tr("Try again"),
-                QDialogButtonBox::AcceptRole);
-            auto cancelUpdate = messageBox->addButton(tr("Cancel Update"),
-                QDialogButtonBox::RejectRole);
-            messageBox->setEscapeButton(cancelUpdate);
-            messageBox->exec();
-
-            auto clicked = messageBox->clickedButton();
-            if (clicked == tryAgain)
-            {
-                auto serversToRetry = m_peersFailed;
-                m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, serversToRetry);
-                m_clientUpdateTool->setUpdateTarget(m_updateInfo);
-                setTargetState(WidgetUpdateState::downloading, serversToRetry);
-            }
-            else if (clicked == cancelUpdate)
-            {
-                m_serverUpdateTool->requestStopAction();
-                setTargetState(WidgetUpdateState::ready, {});
-            }
-
-            setTargetState(WidgetUpdateState::readyInstall, m_peersComplete);
-        }
-        // TODO: Check servers that are online, but skipped + m_serversCanceled
-        // TODO: Show dialog "Some servers were skipped."
-        {
-            //messageBox->setText(tr("Only servers which have update packages downloaded will be updated."));
-            //messageBox->setInformativeText(tr("Not updated servers may be unavailable if you are connected to the updated server, and vice versa."));
-        }
+        setTargetState(WidgetUpdateState::readyInstall, m_peersComplete);
     }
 }
 
