@@ -47,33 +47,40 @@ namespace detail {
 class LevelReducer
 {
 public:
-    LevelReducer(Level level):
-        m_level(level)
-    {}
+    LevelReducer(Level level): m_level(level) {}
+    Level baseLevel() const { return m_level; }
 
-    Level level()
+    std::pair<Level, bool /*isOnLimit*/> nextLevel()
     {
         if (m_level > Level::warning)
-            return m_level;
+            return {m_level, /*isOnLimit*/ false};
 
-        const auto now = monotonicTime();
-        if (m_passCount == 0 || m_windowEnd < now)
+        const auto limit = (uint32_t) ini().logLevelReducerPassLimit;
+        const auto windowSizeS = (uint32_t) ini().logLevelReducerWindowSizeS;
+
+        const auto nowS = (uint32_t) std::chrono::duration_cast<std::chrono::seconds>(
+            monotonicTime().time_since_epoch()).count();
+
+        const auto windowStartS = m_windowStartS.load();
+        if (m_passCount == 0 || windowStartS + windowSizeS <= nowS || windowStartS > nowS)
         {
-            m_windowEnd = now + std::chrono::seconds(ini().logLevelReducerWindowSizeS);
+            // It is possible to have a rase on these 2 atomics and actual log writing, but it would
+            // only affect the number of records on each level and their order.
+            m_windowStartS = nowS;
             m_passCount = 0;
         }
 
-        ++m_passCount;
-        return (m_passCount <= ini().logLevelReducerPassLimit) ? m_level : Level::debug;
+        const auto newCount = ++m_passCount;
+        return {
+            (newCount <= limit) ? m_level : Level::debug,
+            /*isOnLimit*/ (newCount == limit)
+        };
     }
-
-    bool isOnLimit() { return m_passCount == ini().logLevelReducerPassLimit; }
-    Level baseLevel() const { return m_level; }
 
 private:
     const Level m_level;
-    std::atomic<int> m_passCount = 0;
-    std::chrono::steady_clock::time_point m_windowEnd;
+    std::atomic<uint32_t> m_passCount{0};
+    std::atomic<uint32_t> m_windowStartS{0};
 };
 
 class Helper
@@ -92,11 +99,8 @@ public:
 
     void log(const QString& message)
     {
-        const auto level = m_levelReducer->level();
-        if (m_levelReducer->isOnLimit())
-            m_logger->logForced(level, m_tag, "TOO MANY MESSAGES: " + message);
-        else
-            m_logger->log(level, m_tag, message);
+        const auto [level, isOnLimit] = m_levelReducer->nextLevel();
+        m_logger->log(level, m_tag, isOnLimit ? "TOO MANY SIMILAR MESSAGES: " + message : message);
     }
 
     explicit operator bool() const { return m_logger.get(); }

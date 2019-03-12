@@ -74,7 +74,7 @@ public:
                  Qt::CaseSensitive, QRegExp::Wildcard);
 
              EXPECT_TRUE(regExp.exactMatch(messages[i]))
-                 << "Line [" << messages[i].toStdString() << "]" << std::endl
+                 << "    Line [" << messages[i].toStdString() << "]" << std::endl
                  << "    does not match pattern [" << patterns[i] << "]";
         }
     }
@@ -172,7 +172,7 @@ TEST_F(LogMainTest, LevelReducer)
 
     expectMessages({
         "* WARNING *: Warning",
-        "* WARNING *: TOO MANY MESSAGES: Warning",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warning",
         "* DEBUG *: Warning",
         "* DEBUG *: Warning"
     });
@@ -195,7 +195,7 @@ TEST_F(LogMainTest, LevelReducer)
     expectMessages({
         "* ERROR *: Error",
         "* INFO *: Info",
-        "* ERROR *: TOO MANY MESSAGES: Error",
+        "* ERROR *: TOO MANY SIMILAR MESSAGES: Error",
         "* INFO *: Info",
         "* DEBUG *: Error",
         "* INFO *: Info",
@@ -214,7 +214,7 @@ TEST_F(LogMainTest, LevelReducerWithStream)
     logWarning();
 
     expectMessages({
-        "* WARNING *: TOO MANY MESSAGES: Warn",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warn",
         "* DEBUG *: Warn",
     });
 
@@ -224,7 +224,7 @@ TEST_F(LogMainTest, LevelReducerWithStream)
 
     expectMessages({
         "* DEBUG *: Warn",
-        "* WARNING *: TOO MANY MESSAGES: Warn",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warn",
     });
 }
 
