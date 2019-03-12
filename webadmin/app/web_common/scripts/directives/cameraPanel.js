@@ -88,7 +88,7 @@ angular.module('nxCommon')
                                     has(camera.url, scope.searchCams);
                             camsVisible = camsVisible || camera.visible;
                         });
-                        debugger;
+                        
                         var ip = getIP(server.networkAddresses);
                         server.ip = ip.ip;
                         server.ipFull = ip.ipFull;
