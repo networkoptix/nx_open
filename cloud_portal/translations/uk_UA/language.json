@@ -10,7 +10,15 @@
     "loginButton": "Вхід",
     "logoutAuthorisedTitle": "Ви вже увійшли",
     "logoutAuthorisedContinueButton": "Продовжити",
-    "logoutAuthorisedLogoutButton": "Вийти"
+    "logoutAuthorisedLogoutButton": "Вийти",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Сторінку не знайдено"
   },
   "systemStatuses": {
-    "notActivated": "не активовано",
     "activated": "активовано",
+    "merging": "merging",
+    "notActivated": "не активовано",
     "online": "oнлайн",
     "offline": "поза мережею",
     "unavailable": "недоступний"
@@ -138,8 +147,9 @@
     "lostConnection": "Підключення до {{systemName}} втрачено",
     "thisSystem": "система",
     "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "На одній з систем знайдено дублікати серверів.<br>Видаліть старі сервери з кожної системи, яку ви намагаєтеся об'єднати, і повторіть спробу.",
+    "mergedSystemIsOffline": "Одна з об'єднаних систем перебуває по за мережею. Переконайтеся, що вони перебувають у мережі та спробуйте ще раз.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "хороший",
@@ -185,8 +195,9 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "{{email}} був позбавлений повноважень"
+    "successMerge": "Злиття системи завершено",
+    "permissionsRemoved": "{{email}} був позбавлений повноважень",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Ваш обліковий запис успішно збережено",

@@ -1,4 +1,4 @@
-import yaml
+import json
 from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -125,7 +125,8 @@ class CustomContextForm(forms.Form):
                 queryset = data_structure.meta_settings['options'] if 'options' in data_structure.meta_settings else []
                 queryset = [(choice, choice) for choice in queryset]
                 if 'multi' in data_structure.meta_settings and data_structure.meta_settings['multi']:
-                    record_value = yaml.safe_load(record_value)
+                    if record_value:
+                        record_value = json.loads(record_value)
                     self.fields[data_structure.name] = forms.MultipleChoiceField(label=ds_label,
                                                                                  help_text=ds_description,
                                                                                  initial=record_value,
@@ -155,9 +156,6 @@ class CustomContextForm(forms.Form):
             validator = RegexValidator('')
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
                 validator = RegexValidator(data_structure.meta_settings['regex'])
-
-            if data_structure.type in [DataStructure.DATA_TYPES.object, DataStructure.DATA_TYPES.array]:
-                record_value = yaml.safe_load(record_value)
 
             self.fields[data_structure.name] = forms.CharField(required=False,
                                                                label=ds_label,

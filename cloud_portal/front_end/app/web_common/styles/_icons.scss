@@ -60,6 +60,13 @@
   background-position: -61px -49px;
 }
 
+.glyphicon-close {
+  @include kill-glyphicon;
+  width               : 10px !important;
+  height              : 10px !important;
+  background-position : -73px -49px;
+}
+
 .glyphicon-cog{
   @include kill-glyphicon;
   background-position: -50px -99px;

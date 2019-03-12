@@ -10,7 +10,15 @@
     "loginButton": "Logga in",
     "logoutAuthorisedTitle": "Du är redan inloggad",
     "logoutAuthorisedContinueButton": "Fortsätt",
-    "logoutAuthorisedLogoutButton": "Logga ut"
+    "logoutAuthorisedLogoutButton": "Logga ut",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Det gick inte att hitta sidan"
   },
   "systemStatuses": {
-    "notActivated": "inte aktiverad",
     "activated": "aktiverad",
+    "merging": "merging",
+    "notActivated": "inte aktiverad",
     "online": "uppkopplad",
     "offline": "frånkopplade",
     "unavailable": "inte tillgänglig"
@@ -139,7 +148,8 @@
     "thisSystem": "systemet",
     "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "good",
@@ -186,7 +196,8 @@
     "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Rättigheterna togs bort från {{email}}"
+    "permissionsRemoved": "Rättigheterna togs bort från {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Ditt konto har sparats",

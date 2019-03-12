@@ -44,7 +44,6 @@ has system name, owner and OpenInNx button visible on systems page
     [tags]    C41893    Threaded
     Log In    ${EMAIL OWNER}    ${password}
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
 
 should show Open in NX client button for online system
     [tags]    C41893    Threaded
@@ -78,6 +77,10 @@ should show system name in header with no dropdown if user has only one system
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120    status=UNSEEN
+    Delete All Emails
+    Close Mailbox
     Log Out
     Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
@@ -90,12 +93,17 @@ should show system name in header with no dropdown if user has only one system
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Remove User Permissions    ${EMAIL NOPERM}
 
+
 should show the system page instead of all systems when user only has one
     [tags]    C41878
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120    status=UNSEEN
+    Delete All Emails
+    Close Mailbox
     Log Out
     Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
@@ -159,6 +167,41 @@ Search can be cleared by x button
     Wait Until Element Is Visible    ${SYSTEM SEARCH X BUTTON}
     Click Link    ${SYSTEM SEARCH X BUTTON}
     Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
+
+Search should only be visible with 9 or more systems
+
+    [tags]    C41890
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Remove User Permissions    ${EMAIL VIEWER}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Elements Should Not Be Visible    ${SYSTEMS SEARCH INPUT}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Share To    ${EMAIL VIEWER}    ${VIEWER TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL VIEWER}    timeout=120    status=UNSEEN
+    Delete All Emails
+    Close Mailbox
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL VIEWER}    ${password}
+    Validate Log In
+    Wait Until Element Is Visible    ${SYSTEMS SEARCH INPUT}
 
 should update owner name in systems list, if it's changed
     Go To    ${url}/account

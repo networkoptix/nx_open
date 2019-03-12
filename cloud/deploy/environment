@@ -2,7 +2,7 @@ BUILD_CONFIGURATION=release
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-NX_VMS_DIR=${NX_VMS_DIR:-$(dirname $DIR)}
+NX_VMS_DIR=${NX_VMS_DIR:-$(dirname $(dirname $DIR))}
 
 NX_PORTAL_DIR=$NX_VMS_DIR/cloud_portal
 

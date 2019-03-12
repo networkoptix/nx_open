@@ -10,7 +10,15 @@
     "loginButton": "Přihlásit se",
     "logoutAuthorisedTitle": "Již jste přihlášen",
     "logoutAuthorisedContinueButton": "Pokračovat",
-    "logoutAuthorisedLogoutButton": "Odhlásit se"
+    "logoutAuthorisedLogoutButton": "Odhlásit se",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Stránka nenalezna"
   },
   "systemStatuses": {
-    "notActivated": "neaktivováno",
     "activated": "aktivováno",
+    "merging": "merging",
+    "notActivated": "neaktivováno",
     "online": "online",
     "offline": "offline",
     "unavailable": "nedostupný"
@@ -139,7 +148,8 @@
     "thisSystem": "systém",
     "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "dobré",
@@ -186,7 +196,8 @@
     "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
+    "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Váš účet byl úspěšně uložen",
