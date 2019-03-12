@@ -26,13 +26,14 @@ CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
-    Qn::directConnect(
-        globalSettings(), &QnGlobalSettings::cloudCredentialsChanged,
-        this, &CloudConnectionManager::cloudSettingsChanged);
 }
 
 void CloudConnectionManager::init()
 {
+    Qn::directConnect(
+        globalSettings(), &QnGlobalSettings::cloudCredentialsChanged,
+        this, &CloudConnectionManager::cloudSettingsChanged);
+
     cloudSettingsChanged();
 }
 
