@@ -133,6 +133,9 @@ void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& v
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
+    if (!m_formatCtx)
+        setContainer(m_container);
+
     if (video && m_videoCodec != AV_CODEC_ID_NONE)
     {
         AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
@@ -413,7 +416,7 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
 
     //finalizing container stream
     av_write_trailer(m_formatCtx);
-
+    closeFfmpegContext();
     return 0;
 }
 
