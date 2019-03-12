@@ -187,8 +187,7 @@ private:
  * </code></pre>
  */
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \
-    for (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG)); stream; stream.flush()) \
-        stream.setDelimiter(QString()) /* <<... */
+    NX_UTILS_LOG_STREAM(LEVEL, TAG).setDelimiter(QString()) /* <<... */
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_15TH_ARG(__VA_ARGS__, \
