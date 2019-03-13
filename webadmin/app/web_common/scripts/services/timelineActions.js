@@ -107,7 +107,6 @@ TimelineActions.prototype.setClickedCoordinate = function (mouseX) {
     self.scaleManager.clickedCoordinate(mouseX);
     
     var position = self.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
-    console.log('position ->', position);
     self.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
     
     self.stopAnimatingMove(); // Instantly jump to new position
