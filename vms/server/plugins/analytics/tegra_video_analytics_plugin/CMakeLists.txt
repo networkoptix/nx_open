@@ -4,5 +4,5 @@ nx_add_server_plugin(tegra_video_analytics_plugin NO_MOC OPTIONAL
         boost #< for optional
         nx_sdk
         tegra_video
-    ADD_TO_DISTRIBUTION_IF targetDevice STREQUAL "tx1"
+    ADD_TO_DISTRIBUTION_IF targetDevice STREQUAL "linux-arm64"
 )

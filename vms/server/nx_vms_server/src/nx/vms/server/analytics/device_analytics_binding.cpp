@@ -195,16 +195,17 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
             m_device->getId(),
             m_engine->getName(),
             m_engine->getId());
+    }
+    else
+    {
+        QVariantMap result;
+        const auto count = pluginSideSettings->count();
+        for (auto i = 0; i < count; ++i)
+            result.insert(pluginSideSettings->key(i), pluginSideSettings->value(i));
 
-        return QVariantMap();
+        jsonEngine.applyValues(result);
     }
 
-    QVariantMap result;
-    const auto count = pluginSideSettings->count();
-    for (auto i = 0; i < count; ++i)
-        result.insert(pluginSideSettings->key(i), pluginSideSettings->value(i));
-
-    jsonEngine.applyValues(result);
     return jsonEngine.values();
 }
 

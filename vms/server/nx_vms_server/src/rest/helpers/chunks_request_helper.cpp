@@ -108,5 +108,11 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
             QnTimePeriodList::unionTimePeriods(totalPeriodList, timePeriodList);
     }
 
+    for (auto& timePeriod: totalPeriodList)
+    {
+        if (timePeriod.isEmpty())
+            timePeriod.setEndTime(timePeriod.startTime() + milliseconds(1));
+    }
+
     return totalPeriodList;
 }

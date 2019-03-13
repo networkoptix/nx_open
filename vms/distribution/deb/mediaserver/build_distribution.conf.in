@@ -20,6 +20,7 @@ LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 ARCH="@arch@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
 ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
+TARGET="@rdep_target@"
 BOX="@box@"
 
 DISTRIBUTION_NAME="@server_distribution_name@"
