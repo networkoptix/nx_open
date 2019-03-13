@@ -31,8 +31,8 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
 
 TimelineActions.prototype.updatePlayingState = function(playingPosition){
     this.scaleManager.updatePlayingState(playingPosition, this.positionProvider.liveMode, this.positionProvider.playing);
+};
 
-}
 TimelineActions.prototype.playPause = function() {
     this.updatePlayingState(null);
 
@@ -64,7 +64,7 @@ TimelineActions.prototype.updatePosition = function(){
     var self = this;
     if(self.positionProvider) {
         if(self.nextPlayedPosition){
-            if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
+            if(self.positionProvider.liveMode || self.nextPlayedPosition <= self.positionProvider.playedPosition){
                 self.nextPlayedPosition = false;
             }
             // Update live position anyways
@@ -76,20 +76,22 @@ TimelineActions.prototype.updatePosition = function(){
         var duration = Math.min(self.timelineConfig.animationDuration, intervalMs);
         var largeJump = intervalMs > 2 * self.timelineConfig.animationDuration;
 
-        if(intervalMs == 0){
+        if(intervalMs === 0){
             self.updatePlayingState(null); // No need to animate, update position
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
             // this animation makes scaleManager move smoothly while playing
-            self.animateScope.animate(self.scope, 'lastPlayedPosition', self.positionProvider.playedPosition,
-                largeJump ? 'smooth' : 'linear', duration).then(
+            self.animateScope
+                .animate(self.scope, 'lastPlayedPosition', self.positionProvider.playedPosition,
+                         largeJump ? 'smooth' : 'linear', duration)
+                .then(
                 function () {},
                 function () {},
                 function (value) {
                     if(self.nextPlayedPosition){
                         self.scope.lastPlayedPosition = self.nextPlayedPosition;
-                        console.error("problem with playing position",value,self.nextPlayedPosition);
+                        console.error('problem with playing position',value,self.nextPlayedPosition);
                         return;
                     }
                     self.updatePlayingState(value); // animate played position
@@ -99,16 +101,17 @@ TimelineActions.prototype.updatePosition = function(){
 };
 
 TimelineActions.prototype.setClickedCoordinate = function(mouseX){
-    this.scaleManager.clickedCoordinate(mouseX);
+    var self = this;
+    self.scaleManager.clickedCoordinate(mouseX);
 
-    var position = this.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
-
-    this.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
-
-    this.stopAnimatingMove(); // Instantly jump to new position
-    this.scope.lastPlayedPosition = position;
-
-    this.updatePlayingState(position); // Force set clicked position as playing
+    var position = self.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
+    console.log('position ->', position);
+    self.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
+    
+    self.stopAnimatingMove(); // Instantly jump to new position
+    self.scope.lastPlayedPosition = position;
+    
+    self.updatePlayingState(position); // Force set clicked position as playing
 
     return position;
 };
@@ -117,6 +120,7 @@ TimelineActions.prototype.setClickedCoordinate = function(mouseX){
 
 // linear is for holding function
 TimelineActions.prototype.animateScroll = function(targetPosition, linear){
+    debugger;
     var self = this;
     self.delayWatchingPlayingPosition();
     if(typeof(self.scope.scrollTarget) == 'undefined'){
@@ -306,6 +310,7 @@ TimelineActions.prototype.updateZoomLevels = function(zoomTarget){
 
 // Relative zoom (incremental)
 TimelineActions.prototype.zoom = function(zoomIn){
+    debugger;
     var markerDate = this.scaleManager.playedPosition;
 
     //By default - use point under time marker
@@ -409,6 +414,7 @@ TimelineActions.prototype.scrollingToCursorStop = function(){
     }
 };
 TimelineActions.prototype.scrollingToCursorStart = function(){
+    debugger;
     var self = this;
 
     self.scaleManager.stopWatching();

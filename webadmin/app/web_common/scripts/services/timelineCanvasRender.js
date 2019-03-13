@@ -10,17 +10,17 @@
  * @param debugEventsMode
  */
 window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings, pixelAspectRatio){
-
-    this.canvas = canvas;
-    this.recordsProvider = recordsProvider;
-    this.scaleManager = scaleManager;
-    this.animationState = animationState;
-    this.debugEventsMode = debugSettings.debugEventsMode;
-    this.allowDebug = debugSettings.allowDebug;
-    this.hasHighDpi = pixelAspectRatio > 1;
-    this.pixelAspectRatio = pixelAspectRatio || 1;
-
+    
     var self = this;
+    
+    self.canvas = canvas;
+    self.recordsProvider = recordsProvider;
+    self.scaleManager = scaleManager;
+    self.animationState = animationState;
+    self.debugEventsMode = debugSettings.debugEventsMode;
+    self.allowDebug = debugSettings.allowDebug;
+    self.hasHighDpi = pixelAspectRatio > 1;
+    self.pixelAspectRatio = pixelAspectRatio || 1;
 
     function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
 
@@ -509,7 +509,7 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
                     img.onload = function () {
                         chunkLoadingTexture = context.createPattern(img, 'repeat');
                         context.fillStyle = chunkLoadingTexture;
-                        chunkLoadingTextureSize = this.width;
+                        chunkLoadingTextureSize = self.width;
                     };
                     var imagePath = self.hasHighDpi ? 'images/timeline-loading-filled@2x.png' : 'images/timeline-loading-filled.png';
                     img.src = Config.webclient.staticResources + imagePath;
@@ -561,7 +561,7 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
                 img.onload = function () {
                     lastMinuteTexture = context.createPattern(img, 'repeat');
                     context.fillStyle = lastMinuteTexture;
-                    lastMinuteTextureSize = this.width;
+                    lastMinuteTextureSize = self.width;
                 };
                 var imagePath = self.hasHighDpi ? 'images/timeline-loading@2x.png' : 'images/timeline-loading.png';
                 img.src = Config.webclient.staticResources + imagePath;
@@ -702,7 +702,7 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
             var markerColor = cursorIn.leftMarker || cursorIn.rightMarker
                             ? timelineConfig.timeMarkerActiveColor
                             : timelineConfig.timeMarkerColor;
-
+            
             drawMarker( context,
                         self.scaleManager.playedPosition,
                         markerColor,
@@ -970,10 +970,11 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
         context.fillText(fps, 5, timelineConfig.markerDateFont.size);
 
     }
-    this.setRecordsProvider = function(recordsProvider){
-        this.recordsProvider = recordsProvider;
+    
+    self.setRecordsProvider = function(recordsProvider){
+        self.recordsProvider = recordsProvider;
     };
-    this.Draw = function(mouseX, mouseY, isScrolling, catchScrollBarSlider){
+    self.Draw = function(mouseX, mouseY, isScrolling, catchScrollBarSlider){
 
         var context = clearTimeline();
 
@@ -1017,8 +1018,8 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
             }
         }
     };
-
-    this.checkElementsUnderCursor = function(mouseX, mouseY){
+    
+    self.checkElementsUnderCursor = function(mouseX, mouseY){
         var result = {
             scrollbar: false,
             scrollbarSlider: false,
