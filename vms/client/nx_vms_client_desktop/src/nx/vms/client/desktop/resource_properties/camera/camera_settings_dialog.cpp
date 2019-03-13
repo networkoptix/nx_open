@@ -422,6 +422,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
     d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
+    d->analyticsEnginesWatcher->setCamera(singleCamera);
 
     d->handleCamerasWithDefaultPasswordChanged();
     d->handleCamerasChanged();
@@ -541,7 +542,8 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
 
     setPageVisible(int(CameraSettingsTab::advanced), state.isSingleCamera());
 
-    setPageVisible(int(CameraSettingsTab::analytics), state.isSingleCamera());
+    setPageVisible(int(CameraSettingsTab::analytics),
+        state.isSingleCamera() && !state.analytics.engines.empty());
 
     // Always displaying for single camera as it contains Logical Id setup.
     setPageVisible(int(CameraSettingsTab::expert),
