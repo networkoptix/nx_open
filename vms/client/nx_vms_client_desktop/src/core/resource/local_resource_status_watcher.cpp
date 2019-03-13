@@ -40,8 +40,9 @@ void setResourceStatus(const QnResourcePtr resource, Qn::ResourceStatus status)
     }
 }
 
-
 } // namespace
+
+using namespace std::literals::chrono_literals;
 
 QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= nullptr*/):
     QObject(parent)
@@ -50,7 +51,7 @@ QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= n
     connect(resourcePool, &QnResourcePool::resourceAdded,
         this, &QnLocalResourceStatusWatcher::onResourceAdded);
 
-    static const std::chrono::seconds kUpdatePeriod(1);
+    static const auto kUpdatePeriod = 3s;
     m_timerId = startTimer(kUpdatePeriod);
 }
 

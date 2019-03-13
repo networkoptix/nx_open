@@ -9,7 +9,6 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
-#include <utils/crypt/encryptable.h>
 #include <common/common_globals.h>
 
 #include <nx/vms/api/data/layout_data.h>
@@ -24,7 +23,6 @@
 */
 class QnLayoutResource:
     public QnResource,
-    public nx::utils::Encryptable,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
@@ -41,6 +39,8 @@ public:
     virtual Qn::ResourceStatus getStatus() const override;
     virtual void setStatus(Qn::ResourceStatus newStatus,
         Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
+
+    void cloneItems(QnLayoutResourcePtr target, QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
 
     QnLayoutResourcePtr clone(QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
 
@@ -140,18 +140,6 @@ public:
 
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
     static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
-
-    /**
-     * Propagate password to child AviResource storages.
-     * No checking because data roles are inaccessible here.
-     */
-    void usePasswordForRecordings(const QString& password);
-
-    /**
-     * Makes layout children to forget its password AND removes freshly added cameras.
-     * Layout password is kept because it in data roles that are inaccessible here
-     */
-    void forgetPasswordForRecordings();
 
     /**
      * Used to dump some layout content to qDebug().
