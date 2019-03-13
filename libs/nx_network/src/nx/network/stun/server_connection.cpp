@@ -17,8 +17,6 @@ ServerConnection::ServerConnection(
     m_dispatcher(dispatcher)
 {
     ++SocketGlobals::instance().debugCounters().stunConnectionCount;
-
-    NX_VERBOSE(this, "Constructor");
 }
 
 ServerConnection::~ServerConnection()
@@ -30,8 +28,6 @@ ServerConnection::~ServerConnection()
         m_destructHandler();
 
     --SocketGlobals::instance().debugCounters().stunConnectionCount;
-
-    NX_VERBOSE(this, "Destroying");
 }
 
 void ServerConnection::sendMessage(
