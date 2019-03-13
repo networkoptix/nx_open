@@ -1,5 +1,7 @@
 #include "message_dispatcher.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace network {
 namespace stun {
@@ -25,6 +27,10 @@ bool MessageDispatcher::dispatchRequest(
         it == m_processors.end()
         ? m_defaultProcessor
         : it->second;
+
+    NX_VERBOSE(this, "ServerConnection %1. Dispatching request %2",
+        connection.get(), message.header.method);
+
     if (!processor)
         return false;
 

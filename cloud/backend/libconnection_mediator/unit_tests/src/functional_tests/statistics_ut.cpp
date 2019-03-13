@@ -30,6 +30,9 @@ public:
     {
         if (m_clientConnection)
             m_clientConnection->pleaseStopSync();
+
+        if (m_stunClient)
+            m_stunClient->pleaseStopSync();
     }
 
 protected:
@@ -38,7 +41,10 @@ protected:
         base_type::SetUp();
 
         ASSERT_TRUE(startAndWaitUntilStarted());
+    }
 
+    void givenListeningPeer()
+    {
         m_system = addRandomSystem();
         m_server = addServer(m_system, QnUuid::createUuid().toSimpleString().toUtf8());
     }
@@ -82,6 +88,19 @@ protected:
         bindPromise.get_future().wait();
     }
 
+    void establishStunOverHttpConnection()
+    {
+        m_stunClient = std::make_unique<nx::network::stun::AsyncClientWithHttpTunneling>();
+        std::promise<SystemError::ErrorCode> connected;
+        m_stunClient->connect(
+            nx::network::url::Builder(httpUrl()).appendPath(api::kStunOverHttpTunnelPath),
+            [this, &connected](SystemError::ErrorCode resultCode)
+            {
+                connected.set_value(resultCode);
+            });
+        ASSERT_EQ(SystemError::noError, connected.get_future().get());
+    }
+
     void thenExpectedConnectionsHaveBeenReported()
     {
         ASSERT_EQ(1U, m_prevListeningPeersResponse.systems.size());
@@ -114,9 +133,19 @@ protected:
     void andStatisticsContainsExpectedValues()
     {
         // There was at least one connection at the request moment (connection of the request itself).
-        ASSERT_GT(m_serverStatistics.http.connectionCount, 0);
-        ASSERT_GT(m_serverStatistics.stun.connectionCount, 0);
-        ASSERT_GT(m_serverStatistics.cloudConnect.serverCount, 0);
+        ASSERT_EQ(1, m_serverStatistics.http.connectionCount);
+
+        int expectedStunConnectionCount = 1;
+        if (m_server)
+            ++expectedStunConnectionCount;
+        if (m_clientConnection)
+            ++expectedStunConnectionCount;
+        if (m_stunClient)
+            ++expectedStunConnectionCount;
+        ASSERT_EQ(expectedStunConnectionCount, m_serverStatistics.stun.connectionCount);
+
+        int expectedServerCount = m_server ? 1 : 0;
+        ASSERT_EQ(expectedServerCount, m_serverStatistics.cloudConnect.serverCount);
     }
 
 private:
@@ -126,17 +155,33 @@ private:
     AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_server;
     std::unique_ptr<api::MediatorClientTcpConnection> m_clientConnection;
+    std::unique_ptr<nx::network::stun::AsyncClientWithHttpTunneling> m_stunClient;
 };
 
 TEST_F(StatisticsApi, listening_peer_list)
 {
+    givenListeningPeer();
     establishClientConnection();
+
     whenRequestListeningPeerList();
+
     thenExpectedConnectionsHaveBeenReported();
 }
 
 TEST_F(StatisticsApi, http_and_stun_server_statistics)
 {
+    givenListeningPeer();
+
+    whenRequestServerStatistics();
+
+    thenServerStatisticsIsProvided();
+    andStatisticsContainsExpectedValues();
+}
+
+TEST_F(StatisticsApi, tunnelled_stun_connections_are_reflected_in_statistics)
+{
+    establishStunOverHttpConnection();
+
     whenRequestServerStatistics();
 
     thenServerStatisticsIsProvided();

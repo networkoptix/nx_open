@@ -23,7 +23,7 @@
                     </h6>
                     <p class="card-text offset-1 mt-1">
                         {{ item.timestamp | timeChecked }} {{ item.timestamp | timeAgo:serverTime }}<br>
-                        Uptime for 30 days – <strong>{{ item.stats[30] | sla }}%</strong>, for 180 days – <strong>{{ item.stats[180] | sla }}%</strong>, for 365 days – <strong>{{ item.stats[365] | sla }}%</strong>
+                        Uptime for 90 days – <strong>{{ item.stats[90] | sla }}%</strong>, for 180 days – <strong>{{ item.stats[180] | sla }}%</strong>, for 365 days – <strong>{{ item.stats[365] | sla }}%</strong>
                     </p>
                 </div>
                 <div class="row subsections" *ngIf="item.subsections">
