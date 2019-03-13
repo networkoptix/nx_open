@@ -1,4 +1,3 @@
-lmi
 #include "media_server_resource.h"
 
 #include <QtCore/QUrl>
@@ -132,7 +131,7 @@ QString QnMediaServerResource::getName() const
         const QnMediaServerUserAttributesPtr userAttributes = *lk;
 
         if (!userAttributes->name.isEmpty())
-            return attributes->name;
+            return userAttributes->name;
     }
     return QnResource::getName();
 }
