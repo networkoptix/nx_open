@@ -2476,7 +2476,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /ec2/updateInformation
      * Retrieves the currently set or specified via a parameter update information manifest.
      * %param[opt]:string version If present, Media Server makes an attempt to retrieve an update
-     *      manifest for the specified version id.
+     *      manifest for the specified version id from the dedicated updates server.
      * %return:object JSON with the update manifest.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
