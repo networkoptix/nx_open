@@ -2476,8 +2476,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /ec2/updateInformation
      * Retrieves a currently present or specified via a parameter update information manifest.
      * %param[opt]:string version If present, Media Server makes an attempt to retrieve an update
-     *      manifest for the specified version id from the dedicated updates server instead of the
-     *      one currently present for the system.
+     *      manifest for the specified version id from the dedicated updates server and return it
+     *      as a result.
      * %return:object JSON with the update manifest.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
@@ -2513,7 +2513,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /ec2/cancelUpdate
      * Puts a system in the 'Idle' state update-wise. This means that the current update
-     * information is cleared and all downloads are cancelled.
+     * manifest is cleared and all downloads are cancelled.
      */
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
