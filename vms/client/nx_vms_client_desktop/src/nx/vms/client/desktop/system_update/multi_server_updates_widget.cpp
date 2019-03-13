@@ -1354,10 +1354,6 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
     // No peers are doing anything. So we consider current state transition is complete
     NX_INFO(this) << "processRemoteDownloading() - download is complete";
 
-    // Need to sync UI before showing modal dialogs.
-    // Or we will get inconsistent UI state in the background.
-    loadDataToUi();
-
     if (peersComplete.size() >= peersIssued.size())
     {
         // All servers have completed downloading process.
@@ -1375,6 +1371,11 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
         text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
         messageBox->setInformativeText(text);
+
+        // TODO: Client can be here as well, but it would not be displayed.
+        // Should we display it somehow?
+        auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
+        injectResourceList(*messageBox, resourcesFailed);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
             QDialogButtonBox::AcceptRole);
@@ -1589,10 +1590,8 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
 {
     if (state != m_widgetState)
     {
-        NX_VERBOSE(this) << "setTargetState() from"
-            << toString(m_widgetState)
-            << "to"
-            << toString(state);
+        NX_VERBOSE(this, "setTargetState() from %1 to %2", toString(m_widgetState),
+            toString(state));
         bool stopProcess = false;
         switch (state)
         {
