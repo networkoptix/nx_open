@@ -2474,9 +2474,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
     /**%apidoc GET /ec2/updateInformation
-     * Retrieves the currently set or specified via a parameter update information manifest.
+     * Retrieves a currently present or specified via a parameter update information manifest.
      * %param[opt]:string version If present, Media Server makes an attempt to retrieve an update
-     *      manifest for the specified version id from the dedicated updates server.
+     *      manifest for the specified version id from the dedicated updates server instead of the
+     *      one currently present for the system.
      * %return:object JSON with the update manifest.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
