@@ -1,8 +1,9 @@
 function(set_distribution_names)
     set(prefix ${installer.name})
 
-    # Allowed values are: win64, win86, linux64, linux86, mac, android, ios,
-    #  bpi, rpi, bananapi, tx1, isd, isd_s2
+    # Allowed values are: win64, win86, linux64, linux86, linux-arm64, mac, android, ios,
+    # bpi, rpi, bananapi, isd, isd_s2.
+    # linux64 and linux86 are planned to be renamed to linux-x64 and linux-x86 accordingly.
     set(distribution_platform "${targetDevice}")
     if(platform STREQUAL "windows")
         if(arch STREQUAL "x64")
@@ -15,6 +16,8 @@ function(set_distribution_names)
             set(distribution_platform "linux64")
         elseif(arch STREQUAL "x86")
             set(distribution_platform "linux86")
+        elseif(arch STREQUAL "arm64")
+            set(distribution_platform "linux-arm64")
         else()
             set(distribution_platform "${box}")
         endif()

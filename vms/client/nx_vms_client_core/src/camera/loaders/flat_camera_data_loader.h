@@ -45,7 +45,7 @@ private slots:
     void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
 
 private:
-    int sendRequest(qint64 startTimeMs);
+    int sendRequest(qint64 startTimeMs, qint64 resolutionMs);
     void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
 
     void trace(const QString& message);

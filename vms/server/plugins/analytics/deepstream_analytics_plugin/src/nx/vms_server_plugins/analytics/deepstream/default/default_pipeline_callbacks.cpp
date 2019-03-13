@@ -96,7 +96,8 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
 
     auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
     packet->setTimestampUs(GST_BUFFER_PTS(buffer));
-    packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
+    // TODO: #dmishin calculate duration or take it from buffer.
+    packet->setDurationUs(ini().deepstreamDefaultMetadataDurationMs * 1000);
 
     auto pipeline = (deepstream::DefaultPipeline*) userData;
     auto trackingMapper = pipeline->trackingMapper();

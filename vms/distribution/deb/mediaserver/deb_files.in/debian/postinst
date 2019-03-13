@@ -182,17 +182,31 @@ service apport stop >/dev/null 2>&1 || true
 if is_systemd_used
 then
     # Systemd requires explicit enabling of the service to start it on boot.
-    systemctl enable $COMPANY_NAME-root-tool || exit $?
+    if [[ '@withRootTool@' == 'true' ]]
+    then
+        systemctl enable $COMPANY_NAME-root-tool || exit $?
+    fi
+
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-if service $COMPANY_NAME-root-tool start && service $COMPANY_NAME-mediaserver start
+startServer()
+{
+    if [[ '@withRootTool@' = 'true' ]]
+    then
+        service $COMPANY_NAME-root-tool start || return $?
+    fi
+
+    service $COMPANY_NAME-mediaserver start
+}
+
+if startServer
 then
     sleep 1
-    echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
+    echo Started service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 else
     # We do not fail installation process because in this case dpkg makes a package hard to remove.
-    echo WARNING: Unable to start service 1>&2
+    echo "WARNING: Unable to start service" 1>&2
 fi
 
 display_complete_setup_hint $PORT

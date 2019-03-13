@@ -232,8 +232,9 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
 
         case Qn::AnalyticsContent:
         {
+            const qint64 analyticsDetailLevelMs = 200; //< Minimum required value to provide continuous display on the timeline
             const auto filter = QString::fromUtf8(QJson::serialized(m_analyticsFilter));
-            handle = loader->load(filter);
+            handle = loader->load(filter, analyticsDetailLevelMs);
             break;
         }
 
