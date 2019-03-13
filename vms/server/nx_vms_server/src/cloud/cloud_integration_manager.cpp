@@ -37,6 +37,11 @@ CloudIntegrationManager::CloudIntegrationManager(
         &CloudIntegrationManager::onCloudBindingStatusChanged);
 }
 
+void CloudIntegrationManager::init()
+{
+    m_cloudManagerGroup.init();
+}
+
 nx::vms::cloud_integration::CloudManagerGroup& CloudIntegrationManager::cloudManagerGroup()
 {
     return m_cloudManagerGroup;

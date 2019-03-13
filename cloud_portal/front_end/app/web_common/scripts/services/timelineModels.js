@@ -130,7 +130,7 @@
     }
     
     function NumberToDate(date) {
-        if (typeof(date) == 'number' || typeof(date) == 'Number') {
+        if (typeof(date) === 'number' || typeof(date) === 'Number') {
             date = Math.round(date);
             date = new Date(date);
         }
@@ -668,7 +668,7 @@
                     continue; // Chunk is from future - do not add
                 }
                 
-                var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
+                var addchunk = new window.Chunk(null, chunks[i].startTimeMs, endChunk, level);
                 self.addChunk(addchunk, null);
             }
             
@@ -1011,7 +1011,7 @@
             self.setPlayingPosition(self.played);
         },function(error){
             if(!makeRequest.abortReason){ // If the request was aborted - no handling is needed
-                console.error("Was not able to get records from server", error);
+                console.error('Was not able to get records from server', error);
             }
         });
     };

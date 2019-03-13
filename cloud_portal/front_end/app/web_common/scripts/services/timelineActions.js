@@ -67,7 +67,7 @@
         var self = this;
         if (self.positionProvider) {
             if (self.nextPlayedPosition) {
-                if (self.positionProvider.liveMode || self.nextPlayedPosition === self.positionProvider.playedPosition) {
+                if (self.positionProvider.liveMode || self.nextPlayedPosition <= self.positionProvider.playedPosition) {
                     self.nextPlayedPosition = false;
                 }
                 // Update live position anyways
@@ -117,12 +117,12 @@
         
         return position;
     };
-
+    
     // linear is for holding function
     window.TimelineActions.prototype.animateScroll = function (targetPosition, linear) {
         var self = this;
         self.delayWatchingPlayingPosition();
-        if (typeof(self.scope.scrollTarget) === 'undefined') {
+        if (typeof (self.scope.scrollTarget) === 'undefined') {
             self.scope.scrollTarget = self.scaleManager.scroll();
         }
         self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear ? 'linear' : 'dryResistance',
@@ -137,7 +137,7 @@
             }
         );
     };
-
+    
     // Constant scrolling process
     window.TimelineActions.prototype.scrollingRenew = function (stopping) {
         if (this.scrollingNow) {
@@ -175,7 +175,7 @@
     };
     
     /* Zoom logic */
-
+    
     // Main zoom function - handle zoom logic, animations, etc
     // gets absolute zoom value - to target level from 0 to 1
     window.TimelineActions.prototype.zoomTo = function (zoomTarget, zoomCoordinate, instant) {
@@ -183,7 +183,7 @@
         var originalZoomTarget = zoomTarget;
         zoomTarget = this.scaleManager.boundZoom(zoomTarget);
         
-        if (typeof(zoomCoordinate) === 'undefined') {
+        if (typeof (zoomCoordinate) === 'undefined') {
             zoomCoordinate = this.scaleManager.viewportWidth / 2;
         }
         
@@ -256,7 +256,7 @@
             self.zoomByWheelTarget = 0;
         }
     };
-
+    
     // Update zoom levels - run animation if needed
     window.TimelineActions.prototype.updateZoomLevels = function (zoomTarget) {
         var self = this;
@@ -309,7 +309,7 @@
         }
         
     };
-
+    
     // Relative zoom (incremental)
     window.TimelineActions.prototype.zoom = function (zoomIn) {
         var markerDate = this.scaleManager.playedPosition;
@@ -332,14 +332,14 @@
         var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * this.timelineConfig.slowZoomSpeed;
         this.zoomTo(zoomTarget, zoomCoordinate, false);
     };
-
+    
     // Continuus zooming - every render
     window.TimelineActions.prototype.zoomingRenew = function () { // renew zooming
         if (this.zoomingNow) { // If continuous zooming is on
             this.zoom(this.zoomingIn); // Repeat incremental zoom
         }
     };
-
+    
     // Release zoom button - stop continuus zooming
     window.TimelineActions.prototype.zoomingStop = function () {
         var self = this;
@@ -351,7 +351,7 @@
             this.scaleManager.checkZoomAsync(this.scaleManager.zoom());
         }
     };
-
+    
     // Press zoom button - start continuus zooming
     window.TimelineActions.prototype.zoomingStart = function (zoomIn) {
         // check if we can start zooming in that direction:
@@ -399,8 +399,8 @@
     };
     
     /* / End of Zoom logic */
-
-
+    
+    
     // Update timeline state - process animations every render
     window.TimelineActions.prototype.updateState = function (mouseXOverTimeline) {
         this.updatePosition();
