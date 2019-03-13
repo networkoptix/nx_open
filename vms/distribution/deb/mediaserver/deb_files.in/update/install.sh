@@ -21,9 +21,9 @@ installDeb()
     then
         local -r ROOT_TOOL_BINARY="/opt/$COMPANY_NAME/mediaserver/bin/root-tool-bin"
         if [ -f "${ROOT_TOOL_BINARY}" ]
-        then #< It must be 4.0+ update.
+        then #< It must be (4.0+) update.
             ${ROOT_TOOL_BINARY} install "$DEB" "$FORCE"
-        else #< It must be 3.2 --> 4.0 update.
+        else #< It must be (<=3.2)  --> (4.0+) update.
             dpkg $ARGS "$DEB"
         fi
     else
