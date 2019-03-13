@@ -2491,14 +2491,16 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /ec2/finishUpdate
      * Puts a system in the 'Update Finished' state.
-     * %param[opt]:option ignorePendingPeers Force an update process completion.
+     * %param[opt]:option ignorePendingPeers Force an update process completion regardless actual
+     * peers state.
      */
     reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/updateStatus
      * Retrieves a current update processing system-wide state.
-     * %return:object JSON array with the current update per-server state. Possible values are
-     *      idle, downloading, preparing, readyToInstall, latestUpdateInstalled, offline, error.
+     * %return:object A JSON array with the current update per-server state. Possible values for a
+     *     specific server are: idle, downloading, preparing, readyToInstall,
+     *     latestUpdateInstalled, offline, error.
      */
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
 
