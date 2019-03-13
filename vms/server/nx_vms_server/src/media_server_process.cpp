@@ -2474,9 +2474,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
     /**%apidoc GET /ec2/updateInformation
-     * Retrieves currently set or specific update information manifest.
+     * Retrieves the currently set or specified via a parameter update information manifest.
      * %param[opt]:string version If present, Media Server makes an attempt to retrieve an update
-     *      manifest for the specified version.
+     *      manifest for the specified version id.
      * %return:object JSON with the update manifest.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
@@ -2491,12 +2491,12 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /ec2/finishUpdate
      * Puts a system in the 'Update Finished' state.
-     * %param[opt]:option ignorePendingPeers Force update process completion.
+     * %param[opt]:option ignorePendingPeers Force an update process completion.
      */
     reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/updateStatus
-     * Retrieves current update system state.
+     * Retrieves a current update processing system-wide state.
      * %return:object JSON array with the current update per-server state. Possible values are
      *      idle, downloading, preparing, readyToInstall, latestUpdateInstalled, offline, error.
      */
