@@ -67,7 +67,8 @@ QString password(const QnLayoutResourcePtr& layout)
 QString askPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
     auto fileLayout = layout.dynamicCast<QnFileLayoutResource>();
-    NX_ASSERT(fileLayout);
+    if (!NX_ASSERT(fileLayout))
+        return QString();
 
     auto dialog = createPasswordDialog(
         EncryptedLayoutStrings::tr("The file %1 is encrypted. Please enter the password:").
