@@ -42,7 +42,7 @@ public:
     /** Returns true if the layout file is actually encrypted. */
     virtual bool isEncrypted() const override;
     /** Returns true if the layout file is encrypted and no valid password is provided. */
-    virtual bool requiresPassword() const override;
+    using Encryptable::requiresPassword;
     /** Attempts to set a password for opening existing layout file. */
     virtual bool usePasswordToRead(const QString& password) override;
     /** Sets a password for writing new layout. */
@@ -50,7 +50,7 @@ public:
     /** Drops password. */
     virtual void forgetPassword() override;
     /** Returns password */
-    virtual QString password() override;
+    virtual QString password() const override;
 
     virtual void setUrl(const QString& value) override; // URL for Layout File is always plain file path!
 
