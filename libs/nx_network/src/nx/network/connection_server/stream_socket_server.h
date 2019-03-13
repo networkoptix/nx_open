@@ -37,6 +37,8 @@ public:
         ConnectionType* connection) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 template<class ConnectionType>
 class StreamServerConnectionHolder:
     public StreamConnectionHolder<ConnectionType>,
@@ -58,10 +60,6 @@ public:
         SystemError::ErrorCode /*closeReason*/,
         ConnectionType* connection) override
     {
-        m_statisticsCalculator.saveConnectionStatistics(
-            connection->lifeDuration(),
-            connection->messagesReceivedCount());
-
         QnMutexLocker lk(&m_mutex);
 
         auto connectionIter = m_connections.find(connection);
@@ -125,6 +123,12 @@ public:
             m_cond.wait(lk.mutex());
     }
 
+protected:
+    detail::StatisticsCalculator& statisticsCalculator()
+    {
+        return m_statisticsCalculator;
+    }
+
 private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
@@ -133,6 +137,29 @@ private:
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
     detail::StatisticsCalculator m_statisticsCalculator;
 };
+
+//-------------------------------------------------------------------------------------------------
+
+template<class ConnectionType>
+class MessageStreamServerConnectionHolder:
+    public StreamServerConnectionHolder<ConnectionType>
+{
+    using base_type = StreamServerConnectionHolder<ConnectionType>;
+
+public:
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        ConnectionType* connection) override
+    {
+        this->statisticsCalculator().saveConnectionStatistics(
+            connection->lifeDuration(),
+            connection->messagesReceivedCount());
+
+        base_type::closeConnection(closeReason, connection);
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
 
 template<typename Connection>
 struct MessageSender
@@ -157,6 +184,8 @@ private:
     typename Connection::MessageType m_message;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 // TODO: #ak It seems to make sense to decouple
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 
@@ -166,10 +195,10 @@ private:
  */
 template<class CustomServerType, class ConnectionType>
 class StreamSocketServer:
-    public StreamServerConnectionHolder<ConnectionType>,
+    public MessageStreamServerConnectionHolder<ConnectionType>,
     public aio::BasicPollable
 {
-    using base_type = StreamServerConnectionHolder<ConnectionType>;
+    using base_type = MessageStreamServerConnectionHolder<ConnectionType>;
     using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
 
 public:
