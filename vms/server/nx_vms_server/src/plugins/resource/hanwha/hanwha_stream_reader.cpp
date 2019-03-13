@@ -32,7 +32,7 @@ static const QString kHanwhaUdp("UDP");
 QString toHanwhaStreamingType(nx::vms::api::RtpTransportType rtpTransport)
 {
     using namespace nx::vms::api;
-    if (rtpTransport == nx::vms::api::RtpTransportType::udpMulticast)
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
         return kHanwhaRtpMulticast;
 
     return kHanwhaRtpUnicast;
@@ -47,7 +47,7 @@ QString toHanwhaTransportProtocol(nx::vms::api::RtpTransportType rtpTransport)
         case RtpTransportType::tcp:
             return kHanwhaTcp;
         case RtpTransportType::udp:
-        case RtpTransportType::udpMulticast:
+        case RtpTransportType::multicast:
             return kHanwhaUdp;
         default:
             NX_ASSERT(false, "Invalid RTP transport");

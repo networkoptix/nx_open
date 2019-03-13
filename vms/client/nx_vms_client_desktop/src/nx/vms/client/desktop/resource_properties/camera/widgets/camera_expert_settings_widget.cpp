@@ -339,19 +339,19 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     if (state.devicesDescription.isUdpMulticastTransportAllowed == CombinedValue::All)
     {
         const auto index = ui->comboBoxTransport->findData(
-            QVariant::fromValue(vms::api::RtpTransportType::udpMulticast));
+            QVariant::fromValue(vms::api::RtpTransportType::multicast));
 
         if (index < 0)
         {
             ui->comboBoxTransport->addItem(
                 tr("UDP Multicast"),
-                QVariant::fromValue(vms::api::RtpTransportType::udpMulticast));
+                QVariant::fromValue(vms::api::RtpTransportType::multicast));
         }
     }
     else
     {
         const auto index = ui->comboBoxTransport->findData(
-            QVariant::fromValue(vms::api::RtpTransportType::udpMulticast));
+            QVariant::fromValue(vms::api::RtpTransportType::multicast));
 
         const auto currentIndex = ui->comboBoxTransport->currentIndex();
         if (index >= 0)

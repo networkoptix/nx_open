@@ -32,7 +32,7 @@ static const int MAX_CAHCE_URL_TIME = 1000 * 15;
 
 static onvifXsd__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
 {
-    if (rtpTransport == nx::vms::api::RtpTransportType::udpMulticast)
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
         return onvifXsd__StreamType::RTP_Multicast;
 
     return onvifXsd__StreamType::RTP_Unicast;

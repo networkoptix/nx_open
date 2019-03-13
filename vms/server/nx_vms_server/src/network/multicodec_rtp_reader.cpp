@@ -81,29 +81,11 @@ nx::streaming::rtp::TimePolicy getTimePolicy(const QnResourcePtr& res)
     return nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime;
 }
 
-RtspTransport fromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
-{
-    // TODO: #dmishin figure out why we have two absolutely identical enums for RTP transport.
-    using namespace nx::vms::api;
-    switch (rtpTransport)
-    {
-        case RtpTransportType::automatic:
-            return RtspTransport::notDefined;
-        case RtpTransportType::tcp:
-            return RtspTransport::tcp;
-        case RtpTransportType::udp:
-            return RtspTransport::udp;
-        case RtpTransportType::udpMulticast:
-            return RtspTransport::multicast;
-        default:
-            return RtspTransport::notDefined;
-    }
-}
-
 } // namespace
 
 nx::utils::Mutex QnMulticodecRtpReader::s_defaultTransportMutex;
-RtspTransport QnMulticodecRtpReader::s_defaultTransportToUse = RtspTransport::tcp;
+nx::vms::api::RtpTransportType QnMulticodecRtpReader::s_defaultTransportToUse =
+    nx::vms::api::RtpTransportType::tcp;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
@@ -119,7 +101,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotData(false),
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx::network::http::header::AuthScheme::digest),
-    m_rtpTransport(RtspTransport::notDefined)
+    m_rtpTransport(nx::vms::api::RtpTransportType::automatic)
 {
     const auto& globalSettings = res->commonModule()->globalSettings();
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
@@ -186,7 +168,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     QnAbstractMediaDataPtr result;
     do {
-        if (m_RtpSession.getPreferedTransport() == RtspTransport::tcp)
+        if (m_RtpSession.getPreferedTransport() == nx::vms::api::RtpTransportType::tcp)
             result = getNextDataTCP();
         else
             result = getNextDataUDP();
@@ -587,7 +569,7 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
         vms::api::EventReason::networkRtpPacketLoss, QString());
 }
 
-RtspTransport QnMulticodecRtpReader::getRtpTransport() const
+nx::vms::api::RtpTransportType QnMulticodecRtpReader::getRtpTransport() const
 {
     NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
     if (m_resource)
@@ -595,24 +577,20 @@ RtspTransport QnMulticodecRtpReader::getRtpTransport() const
         const auto rtpTransportString =
             m_resource->getProperty(QnMediaResource::rtpTransportKey());
 
-        const auto transport =
-            fromRtpTransport(QnLexical::deserialized<nx::vms::api::RtpTransportType>(
-                rtpTransportString,
-                nx::vms::api::RtpTransportType::automatic));
+        const auto transport = QnLexical::deserialized<nx::vms::api::RtpTransportType>(
+            rtpTransportString,
+            nx::vms::api::RtpTransportType::automatic);
 
-        if (transport != RtspTransport::notDefined)
+        if (transport != nx::vms::api::RtpTransportType::automatic)
             return transport; //< User defined settings for resource.
-        if (m_rtpTransport != RtspTransport::notDefined)
+        if (m_rtpTransport != nx::vms::api::RtpTransportType::automatic)
             return m_rtpTransport; //< Server side setting for resource.
     }
 
-    if (s_defaultTransportToUse != RtspTransport::notDefined)
-        return s_defaultTransportToUse;  //< System wide default setting
-
-    return RtspTransport::tcp;
+    return s_defaultTransportToUse;
 }
 
-void QnMulticodecRtpReader::setRtpTransport(RtspTransport value )
+void QnMulticodecRtpReader::setRtpTransport(nx::vms::api::RtpTransportType value )
 {
     m_rtpTransport = value;
 }
@@ -626,7 +604,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     m_RtpSession.setTransport(getRtpTransport());
-    if (m_RtpSession.getTransport() == RtspTransport::tcp)
+    if (m_RtpSession.getTransport() == nx::vms::api::RtpTransportType::tcp)
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
 
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
@@ -644,7 +622,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
 
-    if (m_RtpSession.getTransport() == RtspTransport::tcp)
+    if (m_RtpSession.getTransport() == nx::vms::api::RtpTransportType::tcp)
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
@@ -749,13 +727,13 @@ void QnMulticodecRtpReader::createTrackParsers()
             else
                 trackParser.logicalChannelNum = m_numberOfVideoChannels;
 
-            if (m_RtpSession.getTransport() != RtspTransport::tcp)
+            if (m_RtpSession.getTransport() != nx::vms::api::RtpTransportType::tcp)
             {
                 trackParser.ioDevice->getMediaSocket()->setRecvBufferSize(SOCKET_READ_BUFFER_SIZE);
                 trackParser.ioDevice->getMediaSocket()->setNonBlockingMode(true);
             }
 
-            if (m_RtpSession.getTransport() == RtspTransport::tcp)
+            if (m_RtpSession.getTransport() == nx::vms::api::RtpTransportType::tcp)
                 m_trackIndices[track.interleaved.first] = m_tracks.size();
 
             m_tracks.push_back(trackParser);
@@ -802,13 +780,12 @@ void QnMulticodecRtpReader::pleaseStop()
     m_RtpSession.shutdown();
 }
 
-void QnMulticodecRtpReader::setDefaultTransport(const QString& value)
+void QnMulticodecRtpReader::setDefaultTransport(nx::vms::api::RtpTransportType rtpTransport)
 {
-    const auto transport = rtspTransportFromString(value);
-    NX_INFO(typeid(QnMulticodecRtpReader), "Set default transport: %1", transport);
+    NX_INFO(typeid(QnMulticodecRtpReader), "Set default transport: %1", rtpTransport);
 
     NX_MUTEX_LOCKER lock(&s_defaultTransportMutex);
-    s_defaultTransportToUse = transport;
+    s_defaultTransportToUse = rtpTransport;
 }
 
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)

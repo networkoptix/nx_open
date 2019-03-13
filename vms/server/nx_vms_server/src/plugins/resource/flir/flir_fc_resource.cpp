@@ -173,7 +173,7 @@ void FcResource::stopInputPortStatesMonitoring()
 QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
 {
     auto reader = new QnRtpStreamReader(toSharedPointer(this), "ch0");
-    reader->setRtpTransport(RtspTransport::udp);
+    reader->setRtpTransport(nx::vms::api::RtpTransportType::udp);
 
     return reader;
 }
