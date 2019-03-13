@@ -177,7 +177,6 @@
                     default_value ="30"/>
             </params>       
         </resource>
-        <resource name = "AXISQ3709" public = "AXISQ3708"/>
         <resource name = "AXISP5624" public = "AXISP5635"/>
         <resource name = "AXISP1365" public = "AXIS_COMMON">
             <params>
@@ -259,6 +258,7 @@
                 default_value = "4"/>
             </params>
         </resource>
+        <resource name = "AXISQ3709" public = "AXISQ3708"/>        
         <resource name = "AXISP1244" public = "AXISM3104"/>
         <resource name = "AXISQ3615" public = "AXISQ3505"/>
         <resource name = "AXISC2005" public = "AXISC3003E"/>
