@@ -964,14 +964,9 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
             // 3. All other cases. Some servers have failed
             messageBox->setIcon(QnMessageBoxIcon::Question);
             messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
-            // Layout: R|Yes| |No|
-            auto ok = messageBox->addButton(tr("Yes"),
-                QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-            auto no = messageBox->addButton(tr("No"),
-                QDialogButtonBox::RejectRole);
-            messageBox->setEscapeButton(no);
-            messageBox->exec();
-            return messageBox->clickedButton() == ok;
+            messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+            messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
+            return messageBox->exec() == QDialogButtonBox::Yes;
         };
     // Cancel all the downloading.
     if (m_widgetState == WidgetUpdateState::downloading)
@@ -995,15 +990,10 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Question);
         messageBox->setText(tr("Cancel update and delete all downloaded data?"));
-        // Layout: R|Yes| |No|
-        auto ok = messageBox->addButton(tr("Yes"),
-            QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-        auto no = messageBox->addButton(tr("No"),
-            QDialogButtonBox::RejectRole);
-        messageBox->setEscapeButton(no);
-        messageBox->exec();
+        messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
 
-        if (messageBox->clickedButton() == ok)
+        if (messageBox->exec() == QDialogButtonBox::Yes)
         {
             m_serverUpdateTool->requestFinishUpdate(true);
             m_clientUpdateTool->resetState();
