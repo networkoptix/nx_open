@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/http/server/handler/http_server_handler_create_tunnel.h>
@@ -52,10 +53,13 @@ public:
     StunConnectionPool& stunConnectionPool();
     const StunConnectionPool& stunConnectionPool() const;
 
+    void setInactivityTimeout(std::optional<std::chrono::milliseconds> timeout);
+
 private:
     StunConnectionPool m_stunConnectionPool;
-    nx::network::stun::MessageDispatcher* m_dispatcher;
+    nx::network::stun::MessageDispatcher* m_dispatcher = nullptr;
     nx::network::http::tunneling::Server<> m_httpTunnelingServer;
+    std::optional<std::chrono::milliseconds> m_inactivityTimeout;
 
     void createStunConnection(std::unique_ptr<AbstractStreamSocket> connection);
 };

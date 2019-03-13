@@ -7,19 +7,23 @@
 
 #include <nx/cloud/mediator/mediator_service.h>
 
-#include "mediator_functional_test.h"
+#include "api_test_fixture.h"
 
 namespace nx::hpm::test {
 
 class Https:
-    public MediatorFunctionalTest
+    public ApiTestFixture<nx::network::stun::AsyncClientWithHttpTunneling>
 {
-protected:
-    virtual void SetUp() override
+public:
+    Https()
     {
         addArg("--https/listenOn=127.0.0.1:0");
+    }
 
-        ASSERT_TRUE(startAndWaitUntilStarted());
+protected:
+    virtual nx::utils::Url stunApiUrl() const override
+    {
+        return baseHttpsUrl();
     }
 
     void assertRequestOverHttpsWorks()
@@ -53,21 +57,22 @@ TEST_F(Https, mediator_accepts_https)
 //-------------------------------------------------------------------------------------------------
 
 class Http:
-    public MediatorFunctionalTest
+    public ApiTestFixture<nx::network::stun::AsyncClientWithHttpTunneling>
 {
 public:
     Http()
     {
+        addArg("--http/connectionInactivityTimeout=100ms");
+        addArg("--stun/connectionInactivityTimeout=100ms");
+
         if (m_connection)
             m_connection->pleaseStopSync();
     }
 
 protected:
-    virtual void SetUp() override
+    virtual nx::utils::Url stunApiUrl() const override
     {
-        addArg("--http/connectionInactivityTimeout=1ms");
-
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        return nx::network::url::Builder(httpUrl()).appendPath(api::kStunOverHttpTunnelPath);
     }
 
     void establishTcpConnection()
@@ -90,6 +95,22 @@ TEST_F(Http, connection_is_closed_by_inactivity_timer)
 {
     establishTcpConnection();
     assertConnectionIsClosedByMediator();
+}
+
+TEST_F(Http, malformed_request_is_properly_handled)
+{
+    whenSendMalformedRequest();
+
+    thenReponseIsReceived();
+    andResponseCodeIs(api::ResultCode::badRequest);
+}
+
+TEST_F(Http, inactive_upgraded_connection_is_closed_by_timeout)
+{
+    whenOpenConnectionToMediator();
+    thenConnectSucceeded();
+
+    waitForConnectionIsClosedByMediator();
 }
 
 } // namespace nx::hpm::test

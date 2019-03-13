@@ -24,12 +24,12 @@ HttpServerConnection::HttpServerConnection(
     m_authenticationManager(authenticationManager),
     m_httpMessageDispatcher(httpMessageDispatcher)
 {
-    ++SocketGlobals::instance().debugCounters().httpConnectionCount;
+    ++SocketGlobals::instance().debugCounters().httpServerConnectionCount;
 }
 
 HttpServerConnection::~HttpServerConnection()
 {
-    --SocketGlobals::instance().debugCounters().httpConnectionCount;
+    --SocketGlobals::instance().debugCounters().httpServerConnectionCount;
 }
 
 SocketAddress HttpServerConnection::clientEndpoint() const

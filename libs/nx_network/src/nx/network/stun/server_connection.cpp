@@ -21,9 +21,9 @@ ServerConnection::ServerConnection(
 
 ServerConnection::~ServerConnection()
 {
-    // notify, that connection is being destruct
-    // NOTE: this is needed only by weak_ptr holders to know, that this
-    //       weak_ptr is not valid any more
+    // Notifying that connection is being destroyed
+    // NOTE: This is needed only by weak_ptr holders to know, that this
+    // weak_ptr is not valid any more.
     if (m_destructHandler)
         m_destructHandler();
 
