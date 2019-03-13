@@ -249,18 +249,6 @@ private:
 
     /** Id of the progress notification at the right panel. */
     QnUuid m_rightPanelDownloadProgress;
-
-    /**
-     * This sets are changed every time we are initiating some update action.
-     * Set of servers that are currently active.
-     */
-    QSet<QnUuid> m_peersActive;
-    /** Set of servers that are used for the current task. */
-    QSet<QnUuid> m_peersIssued;
-    /** A set of servers that have completed current task. */
-    QSet<QnUuid> m_peersComplete;
-    /** A set of servers that have failed current task. */
-    QSet<QnUuid> m_peersFailed;
 };
 
 } // namespace nx::vms::client::desktop

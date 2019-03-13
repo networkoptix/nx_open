@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory> // for shared_ptr
+#include <memory>
+#include <chrono>
 
 #include <QtCore/QAbstractTableModel>
 
@@ -20,6 +21,9 @@ using StatusCode = nx::update::Status::Code;
  */
 struct UpdateItem
 {
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<Clock>;
+
     enum class Component
     {
         server,
@@ -52,6 +56,8 @@ struct UpdateItem
      * another response from /ec2/updateStatus to get relevant state.
      */
     bool statusUnknown = false;
+    /** The last time we've seen this peer online. */
+    TimePoint lastTimeOnline;
     /** Row in the table. */
     int row = -1;
 };
@@ -127,12 +133,36 @@ public:
 
     QList<UpdateItemPtr> getAllItems() const;
     QSet<QnUuid> getAllPeers() const;
-    QSet<QnUuid> getServersInState(StatusCode state) const;
+    QSet<QnUuid> getPeersInState(StatusCode state) const;
     QSet<QnUuid> getLegacyServers() const;
     QSet<QnUuid> getOfflineServers() const;
     QSet<QnUuid> getPeersInstalling() const;
     QSet<QnUuid> getPeersCompleteInstall() const;
     QSet<QnUuid> getServersWithChangedProtocol() const;
+    QSet<QnUuid> getPeersWithUnknownStatus() const;
+
+    /**
+     * Processing for task sets. These functions are called every 1sec from
+     * MultiServerUpdatesWidget.
+     */
+    void processDownloadTaskSet();
+    void processInstallTaskSet();
+
+    /**
+     * Getters for task sets.
+     */
+    QSet<QnUuid> getPeersComplete() const;
+    QSet<QnUuid> getPeersActive() const;
+    QSet<QnUuid> getPeersIssued() const;
+    QSet<QnUuid> getPeersFailed() const;
+
+    /**
+     * We call it every time we start or stop next task, like ready->downloading,
+     * readyToInstall->installing or when we cancel current action.
+     */
+    void setTaskSet(const QSet<QnUuid>& targets);
+
+    void setTaskError(const QSet<QnUuid>& targets, const QString& error);
 
 public:
     /**
@@ -174,6 +204,24 @@ private:
     std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
 
     mutable QnMutex m_dataLock;
+
+    /**
+     * This sets are changed every time we are initiating some update action.
+     * Set of servers that are currently active.
+     */
+    QSet<QnUuid> m_peersActive;
+    /** Set of servers that are used for the current task. */
+    QSet<QnUuid> m_peersIssued;
+    /** A set of servers that have completed current task. */
+    QSet<QnUuid> m_peersComplete;
+    /** A set of servers that have failed current task. */
+    QSet<QnUuid> m_peersFailed;
+
+    /**
+     * Time for server to become online. We will remove this server from the task set after
+     * this time expires.
+     */
+    UpdateItem::Clock::duration m_waitForServerReturn;
 };
 
 } // namespace nx::vms::client::desktop
