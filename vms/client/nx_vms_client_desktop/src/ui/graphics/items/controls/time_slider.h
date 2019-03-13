@@ -203,6 +203,7 @@ public:
     void setLiveSupported(bool value);
 
     bool isLive() const;
+    void updateLive();
 
     Q_SLOT void finishAnimations();
     Q_SLOT void hurryKineticAnimations();
@@ -564,6 +565,8 @@ private:
 
     const QScopedPointer<KineticZoomHandler> m_kineticZoomHandler;
     const QScopedPointer<KineticScrollHandler> m_kineticScrollHandler;
+
+    bool m_isLive;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

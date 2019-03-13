@@ -163,14 +163,16 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    if(NOT "${arch}" MATCHES "arm|aarch64")
+    if("${arch}" STREQUAL "x86" OR "${arch}" STREQUAL "x64")
         add_compile_options(-msse2)
     endif()
+
     add_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
         -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
     )
+
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")

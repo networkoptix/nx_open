@@ -69,12 +69,13 @@ static InformationError makeHttpRequest(
         url,
         [&]()
         {
-            if (httpClient->state() != nx::network::http::AsyncClient::State::sDone)
+            auto state = httpClient->state();
+            if (state != nx::network::http::AsyncClient::State::sDone)
             {
                 error = InformationError::networkError;
-                NX_WARNING(
-                    typeid(Information),
-                    lm("Failed to get update info from the internet, url: %1").args(url));
+                auto code = SystemError::toString(httpClient->lastSysErrorCode());
+                NX_WARNING(typeid(Information),
+                    "Failed to get update info from the internet, url: %1, code=%2", url, code);
                 readyPomise.set_value();
                 return;
             }

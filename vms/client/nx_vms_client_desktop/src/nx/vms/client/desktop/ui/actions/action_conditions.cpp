@@ -19,6 +19,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -612,6 +613,9 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
 
         if (resource->hasFlags(Qn::remote_server))
             return resource->getStatus() == Qn::Offline;
+
+        if (resource.dynamicCast<QnFileLayoutResource>()) //< Cannot remove local layout from server.
+            return false;
 
         /* All other resources can be safely deleted if we have correct permissions. */
         return true;
@@ -1964,8 +1968,8 @@ ConditionWrapper canForgetPassword()
     return new CustomBoolCondition(
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
-            const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
-            return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
+            const auto layout = parameters.resource().dynamicCast<QnFileLayoutResource>();
+            return layout && layout->isEncrypted() && !layout->requiresPassword();
     });
 }
 

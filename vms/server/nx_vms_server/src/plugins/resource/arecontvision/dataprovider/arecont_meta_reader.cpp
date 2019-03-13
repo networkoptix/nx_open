@@ -50,7 +50,11 @@ QnMetaDataV1Ptr ArecontMetaReader::parseMotionMetadata(
 }
 
 ArecontMetaReader::ArecontMetaReader(
-        int channelCount, std::chrono::milliseconds minRepeatInterval, int minFrameInterval):
+    int channelCount,
+    std::chrono::milliseconds minRepeatInterval,
+    int minFrameInterval)
+    :
+    m_metaDataClient(nx::network::http::AsyncHttpClient::create()),
     m_channelCount(channelCount),
     m_minRepeatInterval(minRepeatInterval),
     m_minFrameInterval(minFrameInterval)
@@ -59,7 +63,7 @@ ArecontMetaReader::ArecontMetaReader(
 
 ArecontMetaReader::~ArecontMetaReader()
 {
-    m_metaDataClient.pleaseStopSync();
+    m_metaDataClient->pleaseStopSync();
 }
 
 bool ArecontMetaReader::hasData()
@@ -110,7 +114,7 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
         resource->getProperty(lit("MaxSensorHeight")).toInt()
     };
     m_metaDataClientBusy = true;
-    m_metaDataClient.doGet(url,
+    m_metaDataClient->doGet(url,
         [this, info](nx::network::http::AsyncHttpClientPtr)
         {
             onMetaData(info);
@@ -123,27 +127,27 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
 
 void ArecontMetaReader::onMetaData(const ParsingInfo& info)
 {
-    if (m_metaDataClient.state() == nx::network::http::AsyncClient::State::sFailed)
+    if (m_metaDataClient->state() == nx::network::http::AsyncClient::State::sFailed)
     {
         NX_WARNING(this, lm("Failed to get motion meta data, error: %1").arg(
-            SystemError::toString(m_metaDataClient.lastSysErrorCode())));
+            SystemError::toString(m_metaDataClient->lastSysErrorCode())));
         return;
     }
 
-    if (!m_metaDataClient.response())
+    if (!m_metaDataClient->response())
     {
         NX_WARNING(this, lm("Failed to get motion meta data, invalid response"));
         return;
     }
 
-    const int statusCode = m_metaDataClient.response()->statusLine.statusCode;
+    const int statusCode = m_metaDataClient->response()->statusLine.statusCode;
     if (statusCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(this, lm("Failed to get motion meta data. Http error code %1")
             .arg(statusCode));
         return;
     }
-    QString result = QString::fromLatin1(m_metaDataClient.fetchMessageBodyBuffer());
+    QString result = QString::fromLatin1(m_metaDataClient->fetchMessageBodyBuffer());
     QnMutexLocker lock(&m_metaDataMutex);
     m_metaData = parseMotionMetadata(m_currentChannel, result, info);
     if (!m_metaData)

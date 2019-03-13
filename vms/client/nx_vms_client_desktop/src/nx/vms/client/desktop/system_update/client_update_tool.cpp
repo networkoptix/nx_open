@@ -298,6 +298,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         const auto code = m_downloader->addFile(info);
         m_updateFile = m_downloader->filePath(m_clientPackage.file);
 
+        if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
+            || code == common::p2p::downloader::ResultCode::fileAlreadyDownloaded)
+        {
+            // Forcing downloader to start processing this file.
+            // It should call all the events and ClientUpdateTool will process its state.
+            m_downloader->startDownloads();
+        }
         if (code != common::p2p::downloader::ResultCode::ok)
         {
             const QString error = common::p2p::downloader::toString(code);
@@ -655,7 +662,7 @@ QString ClientUpdateTool::toString(State state)
 QString ClientUpdateTool::applauncherErrorToString(int value)
 {
     using Result = applauncher::api::ResultType::Value;
-    switch ((Result)value)
+    switch ((Result) value)
     {
         case Result::alreadyInstalled:
             return tr("This update is already installed.");
@@ -668,13 +675,13 @@ QString ClientUpdateTool::applauncherErrorToString(int value)
         case Result::brokenPackage:
             return tr("Broken update package.");
         case Result::notEnoughSpace:
-            return tr("Not enough space on disk to install client update.");
+            return tr("Not enough space on disk to install the client update.");
         case Result::notFound:
-            // Install package does not exists. Either we have broke the code and asking
+            // Installed package does not exists. Either we have broken the code and asking
             // for a wrong file, or this file had been removed somehow.
-            return tr("Install package has been lost.");
+            return tr("Installation package has been lost.");
         default:
-            return applauncher::api::ResultType::toString((Result)value);
+            return applauncher::api::ResultType::toString((Result) value);
     }
 }
 

@@ -30,7 +30,7 @@ set(common_depends
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 
-if(NOT "${box}" STREQUAL "tx1")
+if(NOT "${targetDevice}" STREQUAL "linux-arm64")
     set(arch.depends ", syslinux")
 endif()
 

@@ -23,7 +23,7 @@ public:
     virtual ~FisheyeSettingsWidget();
 
     void updateFromParams(const QnMediaDewarpingParams& params, ImageProvider* imageProvider);
-    void submitToParams(QnMediaDewarpingParams& params);
+    QnMediaDewarpingParams parameters() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool value);

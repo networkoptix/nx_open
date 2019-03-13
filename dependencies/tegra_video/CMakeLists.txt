@@ -1,4 +1,4 @@
-if(NOT targetDevice STREQUAL "tx1")
+if(NOT targetDevice STREQUAL "linux-arm64")
     # Use a multi-platform stub for lib tegra_video.
 
     set(tegraVideoWithTests ${withTests} CACHE STRING "" FORCE)

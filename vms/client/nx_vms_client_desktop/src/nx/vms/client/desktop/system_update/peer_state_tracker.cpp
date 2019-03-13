@@ -8,6 +8,7 @@
 #include <network/system_helpers.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
@@ -139,6 +140,22 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
 {
     NX_ASSERT(!version.isNull());
     m_targetVersion = version;
+
+    for (auto& item: m_items)
+    {
+        if (version != item->version)
+        {
+            bool installed = (item->version == m_targetVersion)
+                || item->state == StatusCode::latestUpdateInstalled;
+
+            if (installed != item->installed)
+            {
+                item->installed = true;
+                NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
+            }
+            emit itemChanged(item);
+        }
+    }
 }
 
 void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const QString& message)
@@ -197,9 +214,27 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 item->installing = false;
+            if (item->statusUnknown)
+            {
+                NX_DEBUG(this, "clearing unknown status for peer %1", item->id);
+                item->statusUnknown = false;
+            }
             // Ignoring 'offline' status from /ec2/updateStatus.
             //item->offline = (status.second.code == StatusCode::offline);
             emit itemChanged(item);
+        }
+    }
+}
+
+void PeerStateTracker::markStatusUnknown(const QSet<QnUuid>& targets)
+{
+    for (const auto& uid: targets)
+    {
+        if (auto item = findItemById(uid))
+        {
+            // Only server's state can be 'unknown'.
+            if (item->component == UpdateItem::Component::server)
+                item->statusUnknown = true;
         }
     }
 }
@@ -381,6 +416,12 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
+    if (status == Qn::Incompatible)
+    {
+        NX_VERBOSE(this, "atResourceAdded(%1) - incompatible", server->getName());
+        return;
+    }
+
     UpdateItemPtr item;
     {
         QnMutexLocker locker(&m_dataLock);
@@ -523,7 +564,12 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
 UpdateItemPtr PeerStateTracker::addItemForClient()
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
-    item->id = commonModule()->globalSettings()->localSystemId();
+
+    // This ID is much more easy to distinguish.
+    if (ini().massSystemUpdateDebugInfo)
+        item->id = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    else
+        item->id = commonModule()->globalSettings()->localSystemId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
