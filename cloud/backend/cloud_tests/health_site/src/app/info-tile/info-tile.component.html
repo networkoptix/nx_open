@@ -1,7 +1,7 @@
 <div class="content mt-4" *ngFor="let tile of tiles">
     <div class="row">
         <div class="card col-10 offset-1 col-lg-6 offset-lg-3 p-0">
-            <div class="card-header">
+            <div class="card-header" *ngIf="tile.title">
                 <h6 class="mb-0 float-left" [innerHTML]="tile.title"></h6>
                 <div class="float-right" [ngClass]="{ 'preloader' : !items}">
                     <div class="circleG circleG_1"></div>
@@ -22,8 +22,17 @@
                         [innerHTML]="getClassFor(item).alert">
                     </h6>
                     <p class="card-text offset-1 mt-1">
-                        {{ item.timestamp | timeChecked }} {{ item.timestamp | timeAgo:serverTime }}<br>
-                        Uptime for 90 days – <strong>{{ item.stats[90] | sla }}%</strong>, for 180 days – <strong>{{ item.stats[180] | sla }}%</strong>, for 365 days – <strong>{{ item.stats[365] | sla }}%</strong>
+                        <span *ngIf="item.timestamp">
+                        {{ item.timestamp | timeChecked }} {{ item.timestamp | timeAgo:serverTime }}
+                            </span>
+                        <span *ngIf="item.timestamp && item.stats">
+                            <br>
+                        </span>
+                        <span *ngIf="item.stats">
+                        Uptime for 90 days – <strong>{{ item.stats[90] | sla }}%</strong>,
+                        for 180 days – <strong>{{ item.stats[180] | sla }}%</strong>,
+                        for 365 days – <strong>{{ item.stats[365] | sla }}%</strong>
+                        </span>
                     </p>
                 </div>
                 <div class="row subsections" *ngIf="item.subsections">
@@ -38,6 +47,13 @@
                         <h6 class="card-title error-msg d-none col-9 offset-2 mt-0 mb-0 p-0"
                             [innerHTML]="section.messages.error">
                         </h6>
+                        <p class="card-text offset-2 mt-1">
+                        <span *ngIf="section.stats">
+                        Uptime for 90 days – <strong>{{ section.stats[90] | sla }}%</strong>,
+                        for 180 days – <strong>{{ section.stats[180] | sla }}%</strong>,
+                        for 365 days – <strong>{{ section.stats[365] | sla }}%</strong>
+                        </span>
+                        </p>
                     </div>
                 </div>
             </div>
