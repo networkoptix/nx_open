@@ -19,16 +19,19 @@ QnReconnectHelper::QnReconnectHelper(QObject* parent):
     m_userName = commonModule()->currentUrl().userName();
     m_password = commonModule()->currentUrl().password();
 
-    // List of all known servers. Should not be updated as we are disconnected.
-    for (const auto &server: resourcePool()->getAllServers(Qn::AnyStatus))
-        m_servers.append(server);
+    const auto currentServer = commonModule()->currentServer();
+    if (currentServer && qnSettings->stickReconnectToServer())
+        m_servers.append(currentServer);
+    else  // List of all known servers. Should not be updated as we are disconnected.
+        m_servers.append(resourcePool()->getAllServers(Qn::AnyStatus));
 
     // Check if there are no servers in the system.
     NX_ASSERT(!m_servers.empty());
     if (m_servers.empty())
         return;
 
-    auto serverName = [this](const QnMediaServerResourcePtr& server)
+    auto serverName =
+        [](const QnMediaServerResourcePtr& server)
         {
             return QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
         };
@@ -39,11 +42,7 @@ QnReconnectHelper::QnReconnectHelper(QObject* parent):
             return nx::utils::naturalStringLess(serverName(left), serverName(right));
         });
 
-    m_currentIndex = m_servers.indexOf(commonModule()->currentServer());
-
-    if (m_currentIndex < 0)
-        m_currentIndex = 0;
-
+    m_currentIndex = std::max(m_servers.indexOf(currentServer), 0);
     const auto discoverManager = commonModule()->moduleDiscoveryManager();
 }
 
@@ -54,7 +53,7 @@ QnMediaServerResourceList QnReconnectHelper::servers() const
 
 QnMediaServerResourcePtr QnReconnectHelper::currentServer() const
 {
-    if (m_currentIndex < 0)
+    if (m_currentIndex < 0 || m_currentIndex >= m_servers.size())
         return QnMediaServerResourcePtr();
 
     return m_servers[m_currentIndex];
@@ -81,7 +80,7 @@ QUrl QnReconnectHelper::currentUrl() const
 
 void QnReconnectHelper::next()
 {
-    if (m_servers.isEmpty())
+    if (m_servers.empty())
         return;
 
     m_currentIndex = (m_currentIndex + 1) % m_servers.size();
