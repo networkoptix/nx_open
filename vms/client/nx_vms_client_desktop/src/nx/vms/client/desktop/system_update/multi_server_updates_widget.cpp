@@ -1236,8 +1236,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
         return;
     }
 
-    if (
-        m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready
+    if (m_serverUpdateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready
         && m_serverStatusCheck.valid()
         && m_serverStatusCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
     {
@@ -1363,21 +1362,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
     {
         // All servers have completed downloading process.
         auto complete = peersComplete;
-        QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-        // 1. Everything is complete
-        messageBox->setIcon(QnMessageBoxIcon::Success);
-        messageBox->setText(tr("Updates downloaded"));
-        // S|Install now| |Later|
         setTargetState(WidgetUpdateState::readyInstall, complete);
-        auto installNow = messageBox->addButton(tr("Install now"),
-            QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-        auto installLater = messageBox->addButton(tr("Later"), QDialogButtonBox::RejectRole);
-        messageBox->setEscapeButton(installLater);
-        messageBox->exec();
-
-        auto clicked = messageBox->clickedButton();
-        if (clicked == installNow)
-            setTargetState(WidgetUpdateState::installing, complete);
     }
     else
     {
