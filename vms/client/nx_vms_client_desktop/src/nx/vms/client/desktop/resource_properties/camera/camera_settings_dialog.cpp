@@ -429,6 +429,12 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     return true;
 }
 
+void CameraSettingsDialog::reject()
+{
+    d->resetChanges();
+    base_type::reject();
+}
+
 void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
 {
     base_type::buttonBoxClicked(button);
@@ -438,9 +444,6 @@ void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton but
         case QDialogButtonBox::Apply:
             if (d->hasChanges())
                 d->applyChanges();
-            break;
-        case QDialogButtonBox::Cancel:
-            d->resetChanges();
             break;
         default:
             break;
