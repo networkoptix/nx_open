@@ -8,7 +8,7 @@
         </resource>
         <resource name = "AXISP7216Group2" public = "AXISP7216Group1"/>
         <resource name = "AXISP7216Group3" public = "AXISP7216Group1"/>
-        <resource name = "AXISP7216Group4" public = "AXISP7216Group1"/>        
+        <resource name = "AXISP7216Group4" public = "AXISP7216Group1"/>
         <resource name = "AXISP1428E" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
@@ -177,7 +177,7 @@
                     default_value ="30"/>
             </params>       
         </resource>
-        <resource name = "AXISQ3709" public = "AXIS_COMMON"/>
+        <resource name = "AXISQ3709" public = "AXISQ3708"/>
         <resource name = "AXISP5624" public = "AXISP5635"/>
         <resource name = "AXISP1365" public = "AXIS_COMMON">
             <params>
@@ -211,19 +211,19 @@
                     default_value = "12"/>
             </params>
         </resource>                
-        <resource name = "AXISM7011" public = "AXIS_ENCODER"/>      
-        <resource name = "AXISP1435" public = "AXISP1365"/>        
-        <resource name = "AXISQ8665" public = "AXISM1124"/>       
+        <resource name = "AXISM7011" public = "AXIS_ENCODER"/>
+        <resource name = "AXISP1435" public = "AXISP1365"/>
+        <resource name = "AXISQ8665" public = "AXISM1124"/>
         <resource name = "AXISQ2901" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
                     default_value = "8"/>
             </params>
         </resource>        
-        <resource name = "AXISQ6128" public = "AXISP1365"/>      
-        <resource name = "AXISP5515" public = "AXISM1124"/>          
-        <resource name = "AXISQ8632" public = "AXISM1124"/>    
-        <resource name = "AXISQ8631" public = "AXISM1124"/>        
+        <resource name = "AXISQ6128" public = "AXISP1365"/>
+        <resource name = "AXISP5515" public = "AXISM1124"/>
+        <resource name = "AXISQ8632" public = "AXISM1124"/>
+        <resource name = "AXISQ8631" public = "AXISM1124"/>
         <resource name = "AXISP12/M20" public = "AXISP1224"/>
         <resource name = "AXISC3003E" public = "AXIS_COMMON">
             <params>
@@ -251,7 +251,14 @@
         <resource name = "AXISP1264" public = "AXISM3104"/>
         <resource name = "AXISP1254" public = "AXISM3104"/>
         <resource name = "AXISM1065" public = "AXISM3104"/>
-        <resource name = "AXISP3707" public = "AXISF44"/>
+        <resource name = "AXISP3707" public = "AXISQ3708">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="15"/>
+                <param name = "channelsAmount"
+                default_value = "4"/>
+            </params>
+        </resource>
         <resource name = "AXISP1244" public = "AXISM3104"/>
         <resource name = "AXISQ3615" public = "AXISQ3505"/>
         <resource name = "AXISC2005" public = "AXISC3003E"/>
@@ -345,22 +352,22 @@
         <resource name = "AXISD2050" public = "AXISQ1942"/>
         <resource name = "AXISP12MkII" public = "AXISP1428E"/>
         <resource name = "AXISP1447" public = "AXISM3104"/>
-        <resource name = "AXISQ3515" public = "AXISP1365"/>        
+        <resource name = "AXISQ3515" public = "AXISP1365"/>
         <resource name = "AXISM5065" public = "AXISM3104"/>
         <resource name = "AXISM3058" public = "AXISM3104"/>
         <resource name = "AXISM3015" public = "AXISM3104"/>
         <resource name = "AXISP1290" public = "AXISQ1659"/>
-        <resource name = "AXISQ6125" public = "AXISP1365"/>    
+        <resource name = "AXISQ6125" public = "AXISP1365"/>
         <resource name = "AXISM3057" public = "AXISP1365"/> 
         <resource name = "AXISQ1645" public = "AXISP1365"/> 
         <resource name = "AXISQ1647" public = "AXISP1365"/> 
         <resource name = "AXISM5055" public = "AXISM3104"/>
         <resource name = "AXISM3016" public = "AXISM3104"/>
-        <resource name = "AXISP1280" public = "AXISQ1659"/>                
+        <resource name = "AXISP1280" public = "AXISQ1659"/>
         <resource name = "AXISA9161" public = "AXIS_COMMON">
             <params>
                 <param name = "ioConfigCapability" default_value ="1"/>
-                <param name = "ioDisplayName" default_value ="I/O 1,I/O 2,I/O 3,I/O 4,I/O 5,I/O 6,Relay 1"/>  
+                <param name = "ioDisplayName" default_value ="I/O 1,I/O 2,I/O 3,I/O 4,I/O 5,I/O 6,Relay 1"/>
                 <param name = "noVideoSupport" default_value ="1"/>
                 <param name = "hasDualStreaming" default_value ="0"/>
             </params>
@@ -372,7 +379,12 @@
         <resource name = "AXISP3518" public = "AXISP1365"/>
         <resource name = "AXISQ1785" public = "AXISQ3505"/>
         <resource name = "AXISQ1786" public = "AXISQ3505"/>
-        <resource name = "AXISP3717" public = "AXISM1124"/>
+        <resource name = "AXISP3717" public = "AXISP3707">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="30"/>
+            </params>
+        </resource>
         <resource name = "AXISQ3518" public = "AXISM1124"/>
         <resource name = "AXISQ9106" public = "AXISM1124"/>
         <resource name = "AXISD201-S" public = "AXISQ1775"/>
