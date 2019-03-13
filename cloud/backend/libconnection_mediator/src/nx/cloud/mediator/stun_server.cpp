@@ -20,7 +20,8 @@ StunServer::StunServer(
     m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
-        nx::network::NatTraversalSupport::disabled))
+        nx::network::NatTraversalSupport::disabled)),
+    m_stunServerStatisticsProvider({m_tcpStunServer.get(), &m_stunOverHttpServer.stunConnectionPool()})
 {
     if (!bind())
         throw std::runtime_error("Error binding to specified STUN address");
@@ -74,6 +75,11 @@ network::stun::MessageDispatcher& StunServer::dispatcher()
 const StunServer::MultiAddressStunServer& StunServer::server() const
 {
     return *m_tcpStunServer;
+}
+
+const nx::network::server::AbstractStatisticsProvider& StunServer::statisticsProvider() const
+{
+    return m_stunServerStatisticsProvider;
 }
 
 void StunServer::initializeHttpTunnelling(http::Server* httpServer)
