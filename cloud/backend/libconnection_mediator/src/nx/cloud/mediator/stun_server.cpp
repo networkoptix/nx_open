@@ -78,6 +78,8 @@ const StunServer::MultiAddressStunServer& StunServer::server() const
 
 void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
+    m_stunOverHttpServer.setInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
+
     m_stunOverHttpServer.setupHttpTunneling(
         &httpServer->messageDispatcher(),
         network::url::joinPath(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath).c_str());
