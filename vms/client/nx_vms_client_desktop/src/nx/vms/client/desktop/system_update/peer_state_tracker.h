@@ -172,8 +172,22 @@ public:
     void atClientupdateStateChanged(int state, int percentComplete);
 
 signals:
+    /**
+     * Called after UpdateItem is already added to the list.
+     */
     void itemAdded(UpdateItemPtr item);
     void itemChanged(UpdateItemPtr item);
+
+    /**
+     * Called right before UpdateItem is removed from the list.
+     * Such order is necessary for any QAbstractItemModel: it should complete its actions before
+     * actual number of items changes.
+     */
+    void itemToBeRemoved(UpdateItemPtr item);
+
+    /**
+     * Called after UpdateItem has been removed from the list.
+     */
     void itemRemoved(UpdateItemPtr item);
 
 protected:

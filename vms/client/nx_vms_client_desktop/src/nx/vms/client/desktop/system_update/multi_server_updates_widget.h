@@ -65,7 +65,6 @@ protected:
     bool atCancelCurrentAction();
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
-    void atCloudSettingsChanged();
 
     void clearUpdateInfo();
     void pickLocalFile();
@@ -118,6 +117,10 @@ private:
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
     void checkForInternetUpdates(bool initial = false);
+    /**
+     * Repeat validation process for current update information. Will work only in 'Ready' state.
+     */
+    void repeatUpdateValidation();
 
     /**
      * Describes all possible display modes for update version.

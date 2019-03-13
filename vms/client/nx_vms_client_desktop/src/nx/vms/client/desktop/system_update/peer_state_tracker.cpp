@@ -33,17 +33,21 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
 
+    auto itemsCache = m_items;
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
-        emit itemRemoved(*it);
+        emit itemToBeRemoved(*it);
     if (m_clientItem)
     {
-        emit itemRemoved(m_clientItem);
+        emit itemToBeRemoved(m_clientItem);
         m_clientItem.reset();
     }
 
     m_items.clear();
     m_activeServers.clear();
+
+    for (auto it = itemsCache.rbegin(); it != itemsCache.rend(); ++it)
+        emit itemRemoved(*it);
 
     if (!pool)
     {
@@ -689,7 +693,7 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
         return;
 
     // We should emit this event before m_items size is changed
-    emit itemRemoved(item);
+    emit itemToBeRemoved(item);
     {
         QnMutexLocker locker(&m_dataLock);
         m_activeServers.erase(id);
@@ -699,6 +703,7 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
         m_items.removeAt(item->row);
         updateContentsIndex();
     }
+    emit itemRemoved(item);
 }
 
 void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)

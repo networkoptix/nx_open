@@ -253,8 +253,37 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             setAutoUpdateCheckMode(qnGlobalSettings->isUpdateNotificationsEnabled());
         });
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
-        this, &MultiServerUpdatesWidget::atCloudSettingsChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this,
+        [this]()
+        {
+            if (m_widgetState != WidgetUpdateState::ready)
+                return;
+
+            NX_VERBOSE(this, "Cloud settings has been changed. We should repeat validation.");
+            repeatUpdateValidation();
+        });
+
+    connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved, this,
+        [this](UpdateItemPtr item)
+        {
+            if (m_widgetState != WidgetUpdateState::ready)
+                return;
+
+            NX_VERBOSE(this,
+               "peer %1 is going to be removed. We should repeat validation.", item->id);
+            repeatUpdateValidation();
+        });
+
+    connect(m_stateTracker.get(), &PeerStateTracker::itemAdded, this,
+        [this](UpdateItemPtr item)
+        {
+            if (m_widgetState != WidgetUpdateState::ready)
+                return;
+
+            NX_VERBOSE(this,
+               "peer %1 is going to be added. We should repeat validation.", item->id);
+            repeatUpdateValidation();
+        });
 
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
@@ -1028,13 +1057,13 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     return true;
 }
 
-void MultiServerUpdatesWidget::atCloudSettingsChanged()
+void MultiServerUpdatesWidget::repeatUpdateValidation()
 {
     if (m_widgetState == WidgetUpdateState::ready)
     {
         if (!m_updateInfo.isEmpty())
         {
-            NX_INFO(this, "atCloudSettingsChanged() - recalculating update report");
+            NX_INFO(this, "repeatUpdateValidation() - recalculating update report");
             auto installedVersions = m_clientUpdateTool->getInstalledVersions();
             if (m_updateInfo.error != nx::update::InformationError::httpError
                 || m_updateInfo.error != nx::update::InformationError::networkError)
@@ -1047,12 +1076,12 @@ void MultiServerUpdatesWidget::atCloudSettingsChanged()
         }
         else
         {
-            NX_INFO(this, "atCloudSettingsChanged() - update info is completely empty. No reason to recalculate it");
+            NX_INFO(this, "repeatUpdateValidation() - update info is completely empty. No reason to recalculate it");
         }
     }
     else
     {
-        NX_INFO(this, "atCloudSettingsChanged() - no need to recalculate update info in the state %1", toString(m_widgetState));
+        NX_INFO(this, "repeatUpdateValidation() - no need to recalculate update info in the state %1", toString(m_widgetState));
     }
 
     if (m_updateLocalStateChanged)
@@ -1107,7 +1136,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     else if (m_widgetState == WidgetUpdateState::downloading)
     {
         auto peersIssued = m_stateTracker->getPeersIssued();
-        auto peersActive = m_stateTracker->getPeersInState(nx::update::Status::Code::downloading);
+        auto peersActive = m_stateTracker->getPeersActive();
         // Note: we can get here right after we clicked 'download' but before
         // we got an update from /ec2/updateStatus. Most servers will be in 'idle' state.
         // We even can get a stale callback from /ec2/updateStatus, with data actual to
