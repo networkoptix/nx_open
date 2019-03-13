@@ -312,7 +312,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (oldStatus == newStatus)
         return;
 
-    NX_INFO(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
+    NX_DEBUG(this, "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
         oldStatus, newStatus, reason, getName(), getUrl());
 
     commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
@@ -649,7 +649,7 @@ bool QnResource::init()
 
     NX_DEBUG(this, "Initiatialize...");
     CameraDiagnostics::Result initResult = initInternal();
-    NX_INFO(this, "Initialization result: %1",
+    NX_DEBUG(this, "Initialization result: %1",
         initResult.toString(commonModule->resourcePool()));
 
     bool isInitialized = false;

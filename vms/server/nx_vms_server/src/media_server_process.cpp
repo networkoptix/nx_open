@@ -3572,12 +3572,12 @@ void MediaServerProcess::stopObjects()
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
+    m_ec2ConnectionFactory->shutdown();
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
     serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
 
-    m_ec2ConnectionFactory->shutdown();
 
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
@@ -4433,6 +4433,7 @@ void MediaServerProcess::run()
 
     serverModule->sdkObjectFactory()->init();
     serverModule->analyticsManager()->init();
+    m_cloudIntegrationManager->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 

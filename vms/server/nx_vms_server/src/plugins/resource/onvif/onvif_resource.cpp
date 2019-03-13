@@ -1247,7 +1247,6 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
 void QnPlOnvifResource::handleOneNotification(
     const oasisWsnB2__NotificationMessageHolderType& notification, time_t minNotificationTime)
 {
-    std::cout << "Event " << std::endl;
     /*
         TODO: #szaitsev: This function should be completely rewritten in 4.1.
         In does not correspond onvif specification.
@@ -1399,10 +1398,6 @@ void QnPlOnvifResource::handleOneNotification(
         portSourceIter->name, portSourceIter->value, data.name, data.value);
 
     static int e = 0;
-    std::cout << "Event " << ++e << " Topic=" << eventTopic.toStdString() << ", "
-        << dateTime.toString("yyyy-MM-dd hh:mm:ss").toStdString() << ", "
-        << "Source: " << portSourceIter->name << "=" << portSourceIter->value << ", "
-        << "Data: " << data.name << "=" << data.value << std::endl;
 
     // saving port state
     const bool newValue = (data.value == "true")
@@ -1416,7 +1411,6 @@ void QnPlOnvifResource::handleOneNotification(
     {
         state.value = newValue;
         onRelayInputStateChange(portSourceValue, state);
-        std::cout << "    >>>>>>>>>>>>>Signal" << std::endl;
     }
 }
 

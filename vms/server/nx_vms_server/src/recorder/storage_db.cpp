@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/guarded_callback.h>
 #include "utils/common/util.h"
 #include "storage_db.h"
 #include <nx/utils/elapsed_timer.h>
@@ -72,7 +73,7 @@ void QnStorageDb::startVacuum(
     VacuumCompletionHandler completionHandler,
     QVector<DeviceFileCatalogPtr> *data)
 {
-    serverModule()->storageDbPool()->addTask(
+    serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
         [this, completionHandler = std::move(completionHandler), data]()
         {
             m_dbWriter.reset(new nx::media_db::MediaDbWriter());
@@ -81,7 +82,7 @@ void QnStorageDb::startVacuum(
 
             m_dbWriter->setDevice(m_ioDevice.get());
             completionHandler(vacuumResult);
-        });
+        }));
 }
 
 QnStorageDb::~QnStorageDb()
@@ -148,11 +149,11 @@ void QnStorageDb::deleteRecords(
     QnServer::ChunksCatalog catalog,
     qint64 startTimeMs)
 {
-    serverModule()->storageDbPool()->addTask(
+    serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
         [this,
         cameraUniqueId,
         catalog,
-        startTimeMs]() mutable
+        startTimeMs]()
         {
             const int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
             if (cameraId == -1)
@@ -170,7 +171,7 @@ void QnStorageDb::deleteRecords(
             mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
             m_dbWriter->writeRecord(mediaFileOp);
-        });
+        }));
 }
 
 void QnStorageDb::addRecord(
@@ -178,8 +179,8 @@ void QnStorageDb::addRecord(
     QnServer::ChunksCatalog catalog,
     const DeviceFileCatalog::Chunk& chunk)
 {
-    serverModule()->storageDbPool()->addTask(
-        [this, cameraUniqueId, catalog, chunk]() mutable
+    serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
+        [this, cameraUniqueId, catalog, chunk]()
         {
             nx::media_db::MediaFileOperation mediaFileOp;
             int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
@@ -201,7 +202,7 @@ void QnStorageDb::addRecord(
             mediaFileOp.setTimeZone(chunk.timeZone);
 
             m_dbWriter->writeRecord(mediaFileOp);
-        });
+        }));
 }
 
 void QnStorageDb::replaceChunks(
