@@ -766,6 +766,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
         return result;
 
     fillFullUrlInfo(*outCapabilitiesResponse);
+    detectCapabilities(*outCapabilitiesResponse);
 
     if (getMediaUrl().isEmpty())
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
@@ -782,10 +783,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
 CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     const _onvifDevice__GetCapabilitiesResponse& /*onvifCapabilities*/)
 {
-    // TODO: Now we think that all Onvif cameras has ability to multicast media.
-    // Investigate if there is some API to figure out if it's true.
-    setCameraCapability(Qn::CameraCapability::MulticastStreamCapability, true);
-
     auto result = fetchAndSetVideoSource();
     if (!result)
         return result;
@@ -4585,6 +4582,26 @@ void QnPlOnvifResource::fillFullUrlInfo(const _onvifDevice__GetCapabilitiesRespo
     {
         setDeviceIOUrl(getDeviceOnvifUrl());
     }
+}
+
+void QnPlOnvifResource::detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response)
+{
+    bool multicastIsSupported = false;
+    const QnResourceData resData = resourceData();
+    if (resData.contains(ResourceDataKey::kMulticastIsSupported))
+    {
+        multicastIsSupported = resData.value<bool>(ResourceDataKey::kMulticastIsSupported);
+    }
+    else
+    {
+        multicastIsSupported = response.Capabilities
+            && response.Capabilities->Media
+            && response.Capabilities->Media->StreamingCapabilities
+            && response.Capabilities->Media->StreamingCapabilities->RTPMulticast
+            && *response.Capabilities->Media->StreamingCapabilities->RTPMulticast;
+    }
+
+    setCameraCapability(Qn::MulticastStreamCapability, multicastIsSupported);
 }
 
 /**

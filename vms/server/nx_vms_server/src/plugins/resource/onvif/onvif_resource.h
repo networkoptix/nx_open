@@ -674,6 +674,7 @@ private:
         _onvifDevice__GetCapabilitiesResponse* response);
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
+    void detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response);
     bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
         QStringList* tokenList);
