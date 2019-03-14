@@ -13,6 +13,6 @@ public:
     QnTimePeriodList load(const QnChunksRequestData& request) const;
 
 private:
-    // All intervals in the list this function returns has non-zero duration.
+    // All intervals in the list this function returns have non-zero duration.
     QnTimePeriodList loadAnalyticsTimePeriods(const QnChunksRequestData& request) const;
 };
