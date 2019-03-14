@@ -15,6 +15,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
+#include <nx/vms/client/core/common/utils/ordered_requests_manager.h>
 
 namespace nx {
 namespace client {
@@ -22,6 +23,7 @@ namespace mobile {
 
 SoftwareTriggersController::SoftwareTriggersController(QObject* parent):
     base_type(parent),
+    m_requestsManager(new nx::vms::client::core::OrderedRequestsManager()),
     m_commonModule(qnClientCoreModule->commonModule()),
     m_userWatcher(m_commonModule->instance<nx::vms::client::core::UserWatcher>()),
     m_accessManager(m_commonModule->resourceAccessManager()),
@@ -157,8 +159,8 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
         };
 
     const auto connection = m_commonModule->currentServer()->restConnection();
-    connection->softwareTriggerCommand(
-        m_resourceId, rule->eventParams().inputPortId, state,
+    m_requestsManager->sendSoftwareTriggerCommand(
+        connection, m_resourceId, rule->eventParams().inputPortId, state,
         nx::utils::guarded(this, callback), QThread::currentThread());
 
     return true;

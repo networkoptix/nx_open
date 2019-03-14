@@ -12,6 +12,7 @@ class QnSingleCamLicenseStatusHelper;
 namespace nx::vms::client::core {
 
 class TwoWayAudioAvailabilityWatcher;
+class OrderedRequestsManager;
 
 class TwoWayAudioController: public Connective<QObject>, public QnConnectionContextAware
 {
@@ -54,9 +55,9 @@ private:
     void setStarted(bool value);
 
 private:
+    const QScopedPointer<OrderedRequestsManager> m_requestsManager;
     bool m_started = false;
     bool m_available = false;
-    rest::Handle m_startHandle = 0;
     QString m_sourceId;
     QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<TwoWayAudioAvailabilityWatcher> m_availabilityWatcher;
