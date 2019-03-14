@@ -107,6 +107,13 @@ Item
             onPositionChanged: d.updateTimelinePosition()
         }
 
+        function goToPosition(position, savePosition)
+        {
+            resumePosition = -1
+            timeline.timelineView.position = position
+            videoScreenController.setPosition(position, savePosition)
+        }
+
         function updateTimelinePosition()
         {
             if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
@@ -368,12 +375,9 @@ Item
                     timeline.autoReturnToBounds = true
                 }
             }
-            onPositionTapped:
-            {
-                d.resumePosition = -1
-                timeline.timelineView.setPositionImmediately(position)
-                videoScreenController.setPosition(position, true)
-            }
+
+            onPositionTapped: d.goToPosition(position, true)
+
             onPositionChanged:
             {
                 if (!dragging)
@@ -510,6 +514,12 @@ Item
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
                 visible: videoNavigation.hasArchive
+                onCheckedChanged:
+                {
+                    videoScreenController.mediaPlayer.autoJumpPolicy = checked
+                        ? MediaPlayer.DisableAutoJump
+                        : MediaPlayer.DisableAutoJumpOnPreviewing
+                }
             }
 
             Row
@@ -640,11 +650,11 @@ Item
             {
                 interval: 100
                 repeat: true
-                running: zoomInButton.pressed || zoomOutButton.pressed
+                running: zoomInButton.down || zoomOutButton.down
                 triggeredOnStart: true
                 onTriggered:
                 {
-                    if (zoomInButton.pressed)
+                    if (zoomInButton.down)
                         timeline.zoomIn()
                     else
                         timeline.zoomOut()
@@ -757,10 +767,7 @@ Item
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
 
-                onClicked:
-                {
-                    videoScreenController.setPosition(chunkPositionWatcher.prevChunkStartTimeMs())
-                }
+                onClicked: d.goToPosition(chunkPositionWatcher.prevChunkStartTimeMs(), false)
             }
 
             PlaybackJumpButton
@@ -773,7 +780,7 @@ Item
                 onClicked:
                 {
                     var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
-                    videoScreenController.setPosition(nextChunkStartTime)
+                    d.goToPosition(nextChunkStartTime, false)
                     if (nextChunkStartTime == -1)
                         videoScreenController.play()
                 }

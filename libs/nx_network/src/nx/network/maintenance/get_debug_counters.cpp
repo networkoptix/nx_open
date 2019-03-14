@@ -14,9 +14,9 @@ void GetDebugCounters::processRequest(
     const auto json = lm("{"
         "\"tcpSocketCount\": %1, "
         "\"stunConnectionCount\": %2, "
-        "\"httpConnectionCount\": %3}")
+        "\"httpServerConnectionCount\": %3}")
         .args(counters.tcpSocketCount, counters.stunConnectionCount,
-            counters.httpConnectionCount).toUtf8();
+            counters.httpServerConnectionCount).toUtf8();
 
     http::RequestResult result(http::StatusCode::ok);
     result.dataSource = std::make_unique<http::BufferSource>(

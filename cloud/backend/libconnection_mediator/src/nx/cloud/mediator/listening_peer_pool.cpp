@@ -135,6 +135,8 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
 {
     QnMutexLocker lock(&m_mutex);
 
+    NX_VERBOSE(this, "Saving new connection (%1) from peer %2", (void*) connection.get(), peerData);
+
     const auto peerIterAndInsertionFlag = m_peers.emplace(peerData, ListeningPeerData());
     const auto peerIter = peerIterAndInsertionFlag.first;
     if (peerIterAndInsertionFlag.second)
@@ -146,6 +148,9 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
 
     if (peerIter->second.peerConnection != connection)
     {
+        NX_VERBOSE(this, "Replacing old connection (%1) from peer %2 with a new one (%3)",
+            (void*) peerIter->second.peerConnection.get(), peerData, (void*) connection.get());
+
         if (peerIter->second.peerConnection)
             closeConnectionAsync(std::move(peerIter->second.peerConnection));
         // Binding to a new connection.
@@ -271,13 +276,18 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
 
     if (peerIter->second.peerConnection.get() != connection)
         return; //< Peer has been bound to another connection.
-    NX_DEBUG(this, lm("Peer %1 has disconnected").args(peerIter->first.hostName()));
+
+    NX_DEBUG(this, "Peer %1 has disconnected. Connection (%2)",
+        peerIter->first.hostName(), (void*) connection);
+
     m_peers.erase(peerIter);
 }
 
 void ListeningPeerPool::closeConnectionAsync(
     std::shared_ptr<nx::network::stun::ServerConnection> peerConnection)
 {
+    NX_VERBOSE(this, "Closing connection (%1)", (void*) peerConnection.get());
+
     auto peerConnectionPtr = peerConnection.get();
     peerConnectionPtr->pleaseStop(
         [peerConnection = std::move(peerConnection),

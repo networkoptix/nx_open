@@ -50,7 +50,7 @@ public:
 
     /**
      * Use it to make restart reliable.
-     * Without using proxy mediator is not able to automatically attach to the same port after 
+     * Without using proxy mediator is not able to automatically attach to the same port after
      * restart.
      * false by default.
      */

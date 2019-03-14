@@ -227,8 +227,12 @@ class CloudSession(object):
 
     def _dynamodb_item(self):
         metric_items = []
+        failed = 0
 
         for (metric, host, timestamp), value in self.collected_metrics.items():
+            if value:
+                failed = 1
+
             metric_item = {
                 'name': metric,
                 'timestamp': timestamp.isoformat(),
@@ -246,7 +250,8 @@ class CloudSession(object):
         return {
             'year': timestamp.year,
             'timestamp': timestamp.isoformat(),
-            'metrics': metric_items
+            'metrics': metric_items,
+            'failed': failed
         }
 
     def report_metrics(self):

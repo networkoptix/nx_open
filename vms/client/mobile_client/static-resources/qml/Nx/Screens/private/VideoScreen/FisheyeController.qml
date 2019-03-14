@@ -134,13 +134,14 @@ Object
             {
                 delayedClickTimer.stop()
                 doubleClickFilterTimer.restart()
-                var distance = Qt.vector2d(
-                    mouseAreaHandler.lastClickPosition.x - mouse.x,
-                    mouseAreaHandler.lastClickPosition.y - mouse.y).length()
 
-                if (distance > mouseArea.drag.threshold)
+                if (!Utils.nearPositions(mouseAreaHandler.lastClickPosition,
+                    Qt.point(mouse.x, mouse.y), mouseArea.drag.threshold))
+                {
                     return
+                }
 
+                interactor.enableAnimation = true
                 const kPowerThreshold = 0.8
                 if (interactor.scalePower > kPowerThreshold)
                 {
@@ -151,6 +152,7 @@ Object
                     interactor.centerAtPixel(mouse.x, mouse.y)
                     interactor.scalePower = 1.0
                 }
+                interactor.enableAnimation = false
             }
 
             onReleased:
@@ -210,6 +212,5 @@ Object
                     interactor.startRotation()
             }
         }
-
     }
 }
