@@ -214,9 +214,6 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel);
 
-resource::AnalyticsEngineResourceList toServerEngineList(
-    const nx::vms::common::AnalyticsEngineResourceList engineList);
-
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 
 } // namespace nx::vms::server::sdk_support

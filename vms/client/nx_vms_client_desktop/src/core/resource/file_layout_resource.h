@@ -38,8 +38,8 @@ public:
     virtual QString password() const override;
 
 signals:
-    void passwordChanged(const QnResourcePtr &resource);
-    void readOnlyChanged(const QnResourcePtr &resource);
+    void passwordChanged(const QnResourcePtr& resource);
+    void readOnlyChanged(const QnResourcePtr& resource);
 
 protected:
     void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;

@@ -224,7 +224,8 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
 bool nx::vms::client::desktop::layout::reloadFromFile(
     QnFileLayoutResourcePtr layout, const QString& password)
 {
-    NX_ASSERT(layout);
+    if (!NX_ASSERT(layout))
+        return false;
 
     // Remove all layout AVI streams from resource pool.
     auto resources = layout->layoutResources();

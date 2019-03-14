@@ -9,6 +9,7 @@
 #include <api/global_settings.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
+#include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource/storage_resource.h>
@@ -107,6 +108,20 @@ void QnMediaServerResource::beforeDestroy()
 {
     QnMutexLocker lock(&m_mutex);
     m_firstCamera.clear();
+}
+
+QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngines() const
+{
+    const auto commonModule = this->commonModule();
+    if (!NX_ASSERT(commonModule))
+        return {};
+
+    const auto runtimeInfoManager = commonModule->runtimeInfoManager();
+    if (!NX_ASSERT(runtimeInfoManager))
+        return {};
+
+    const auto runtimeInfo = runtimeInfoManager->item(getId());
+    return runtimeInfo.data.activeAnalyticsEngines;
 }
 
 QString QnMediaServerResource::getUniqueId() const

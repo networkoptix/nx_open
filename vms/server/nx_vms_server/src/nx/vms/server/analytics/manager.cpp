@@ -245,7 +245,7 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
 
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(
-        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
+        device->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
     context->setMetadataSink(metadataSink(device));
 
     if (auto source = mediaSource(device).toStrongRef())
@@ -517,7 +517,7 @@ void Manager::updateEnabledAnalyticsEngines(const QnVirtualCameraResourcePtr& de
     }
 
     analyticsContext->setEnabledAnalyticsEngines(
-        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
+        device->enabledAnalyticsEngineResources().filtered<resource::AnalyticsEngineResource>());
 }
 
 } // namespace nx::vms::server::analytics
