@@ -76,14 +76,6 @@ public:
       }
 };
 
-class TestConnectionHolder
-    : public nx::network::server::StreamConnectionHolder<HttpServerConnection>
-{
-    virtual void closeConnection(SystemError::ErrorCode, ConnectionType*) override
-    {
-    }
-};
-
 } // namespace
 
 class AuthenticationDispatcher:
@@ -159,11 +151,10 @@ private:
         }
     }
 
-    std::shared_ptr<HttpServerConnection> createHttpServerConnection(
+    std::unique_ptr<HttpServerConnection> createHttpServerConnection(
         AbstractAuthenticationManager* authenticator)
     {
-        return std::make_shared<HttpServerConnection>(
-            &m_connectionHolder,
+        return std::make_unique<HttpServerConnection>(
             std::make_unique<TestSocket>(),
             authenticator,
             &m_messageDispatcher);
@@ -179,9 +170,6 @@ private:
 private:
     server::AuthenticationDispatcher m_dispatcher;
     std::map<QString, std::unique_ptr<TestAuthenticator>> m_authenticators;
-
-    //Needed to create HttpServerConnection object passed into authenticate()
-    TestConnectionHolder m_connectionHolder;
     MessageDispatcher m_messageDispatcher;
 };
 

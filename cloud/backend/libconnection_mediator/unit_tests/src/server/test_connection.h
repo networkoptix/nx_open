@@ -49,7 +49,7 @@ public:
     }
 
     virtual void addOnConnectionCloseHandler(
-        nx::utils::MoveOnlyFunc<void()> handler) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         m_connectionCloseHandler.swap(handler);
     }
@@ -80,14 +80,14 @@ public:
             [this]()
             {
                 if (m_connectionCloseHandler)
-                    nx::utils::swapAndCall(m_connectionCloseHandler);
+                    nx::utils::swapAndCall(m_connectionCloseHandler, SystemError::connectionReset);
             });
     }
 
 private:
     Socket m_socket;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
-    nx::utils::MoveOnlyFunc<void()> m_connectionCloseHandler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionCloseHandler;
 };
 
 //-------------------------------------------------------------------------------------------------

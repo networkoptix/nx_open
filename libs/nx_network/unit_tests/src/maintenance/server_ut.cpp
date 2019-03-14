@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/maintenance/request_path.h>
@@ -7,6 +9,22 @@
 #include <nx/network/url/url_builder.h>
 
 namespace nx::network::maintenance::test {
+
+struct DebugCounters
+{
+    int tcpSocketCount = 0;
+    int stunConnectionCount = 0;
+    int httpServerConnectionCount = 0;
+};
+
+#define DebugCounters_Fields (tcpSocketCount)(stunConnectionCount)(httpServerConnectionCount)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (DebugCounters),
+    (json),
+    _Fields)
+
+//-------------------------------------------------------------------------------------------------
 
 class MaintenanceServer:
     public ::testing::Test
@@ -29,6 +47,11 @@ protected:
         ASSERT_TRUE(m_httpClient.doGet(requestUrl(kMallocInfo)));
     }
 
+    void whenFetchDebugCounters()
+    {
+        ASSERT_TRUE(m_httpClient.doGet(requestUrl(kDebugCounters)));
+    }
+
     void thenRequestSucceeded()
     {
         ASSERT_NE(nullptr, m_httpClient.response());
@@ -42,6 +65,17 @@ protected:
         ASSERT_FALSE(msgBody->isEmpty());
 
         // TODO: #ak Add stronger validation.
+    }
+
+    void andDebugCountersReceived()
+    {
+        const auto msgBody = m_httpClient.fetchEntireMessageBody();
+        ASSERT_TRUE(msgBody);
+
+        const auto debugCounters = QJson::deserialized<DebugCounters>(*msgBody);
+        ASSERT_EQ(1U, debugCounters.httpServerConnectionCount);
+        ASSERT_EQ(2U, debugCounters.tcpSocketCount);
+        ASSERT_EQ(0U, debugCounters.stunConnectionCount);
     }
 
 private:
@@ -63,6 +97,14 @@ TEST_F(MaintenanceServer, malloc_info)
 
     thenRequestSucceeded();
     andMallocInfoIsProvided();
+}
+
+TEST_F(MaintenanceServer, debug_counters)
+{
+    whenFetchDebugCounters();
+
+    thenRequestSucceeded();
+    andDebugCountersReceived();
 }
 
 } // namespace nx::network::maintenance::test

@@ -156,12 +156,12 @@ void OutgoingTunnelConnection::onConnectionOpened(
     completionHandler.swap(requestContext->completionHandler);
     requestContext.reset();
 
-    utils::ObjectDestructionFlag::Watcher watcher(&m_objectDestructionFlag);
+    utils::InterruptionFlag::Watcher watcher(&m_objectDestructionFlag);
     completionHandler(
         errorCodeToReport,
         std::move(connection),
         resultCode == nx::cloud::relay::api::ResultCode::ok);
-    if (watcher.objectDestroyed())
+    if (watcher.interrupted())
         return;
 
     if (resultCode != nx::cloud::relay::api::ResultCode::ok)

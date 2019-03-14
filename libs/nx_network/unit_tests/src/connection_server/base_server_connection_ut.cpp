@@ -32,6 +32,33 @@ public:
     }
 };
 
+class TCPSocketWithInstanceCounter:
+    public nx::network::StreamSocketDelegate
+{
+    using base_type = nx::network::StreamSocketDelegate;
+
+public:
+    TCPSocketWithInstanceCounter(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        std::atomic<int>* counter)
+        :
+        base_type(socket.get()),
+        m_socket(std::move(socket)),
+        m_counter(counter)
+    {
+        ++(*m_counter);
+    }
+
+    ~TCPSocketWithInstanceCounter()
+    {
+        --(*m_counter);
+    }
+
+private:
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
+    std::atomic<int>* m_counter = nullptr;
+};
+
 class TestConnection:
     public nx::network::server::BaseServerConnection<TestConnection>
 {
@@ -39,12 +66,9 @@ class TestConnection:
 
 public:
     TestConnection(
-        StreamConnectionHolder<TestConnection>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(
-            [connectionManager](auto... args) { connectionManager->closeConnection(args...); },
-            std::move(streamSocket))
+        base_type(std::move(streamSocket))
     {
     }
 
@@ -62,9 +86,15 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 class ConnectionServerBaseServerConnection:
-    public ::testing::Test,
-    public nx::network::server::StreamConnectionHolder<TestConnection>
+    public ::testing::Test
 {
+public:
+    ~ConnectionServerBaseServerConnection()
+    {
+        if (m_connection)
+            m_connection->pleaseStopSync();
+    }
+
 protected:
     void setInactivityTimeout(std::chrono::milliseconds timeout)
     {
@@ -74,23 +104,23 @@ protected:
     void givenConnection()
     {
         auto clientConnection = std::make_unique<TCPSocket>(AF_INET);
-        ASSERT_TRUE(clientConnection->connect(m_serverSocket.getLocalAddress(), nx::network::kNoTimeout));
+        ASSERT_TRUE(clientConnection->connect(
+            m_serverSocket.getLocalAddress(), nx::network::kNoTimeout));
         m_clientConnections.push_back(std::move(clientConnection));
 
         auto acceptedConnection = m_serverSocket.accept();
         ASSERT_NE(nullptr, acceptedConnection);
         ASSERT_TRUE(acceptedConnection->setNonBlockingMode(true));
 
-        m_connection = std::make_unique<TestConnection>(
-            this,
-            std::move(acceptedConnection));
+        initializeConnection(
+            std::make_unique<TCPSocketWithInstanceCounter>(
+                std::move(acceptedConnection),
+                &m_socketCounter));
     }
 
     void givenConnectionWithBrokenSocket()
     {
-        m_connection = std::make_unique<TestConnection>(
-            this,
-            std::make_unique<BrokenStreamSocket>());
+        initializeConnection(std::make_unique<BrokenStreamSocket>());
     }
 
     void givenStartedConnection()
@@ -120,6 +150,11 @@ protected:
             [this, timeout]() { m_connection->setInactivityTimeout(timeout); });
     }
 
+    void whenCloseConnection()
+    {
+        m_connection->closeConnection(SystemError::connectionReset);
+    }
+
     void thenFailureIsReportedDelayed()
     {
         m_connectionCloseEvents.pop();
@@ -131,6 +166,19 @@ protected:
         ASSERT_EQ(SystemError::timedOut, m_connectionCloseEvents.pop());
     }
 
+    void thenTcpConnectionIsClosed()
+    {
+        // Waiting for the connection to process all its asynchronous calls.
+        m_connection->executeInAioThreadSync([this]() {});
+
+        ASSERT_EQ(0, m_socketCounter);
+    }
+
+    void andConnectionCloseEventIsReported()
+    {
+        ASSERT_NE(SystemError::noError, m_connectionCloseEvents.pop());
+    }
+
 private:
     std::unique_ptr<TestConnection> m_connection;
     bool m_invokingConnectionMethod = false;
@@ -139,6 +187,7 @@ private:
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     TCPServerSocket m_serverSocket;
     std::vector<std::unique_ptr<TCPSocket>> m_clientConnections;
+    std::atomic<int> m_socketCounter{0};
 
     virtual void SetUp() override
     {
@@ -146,14 +195,16 @@ private:
         ASSERT_TRUE(m_serverSocket.listen());
     }
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        ConnectionType* connection) override
+    void initializeConnection(std::unique_ptr<AbstractStreamSocket> socket)
     {
-        ASSERT_EQ(m_connection.get(), connection);
-        m_connection.reset();
-        m_connectionClosedReportedDirectly = m_invokingConnectionMethod;
+        m_connection = std::make_unique<TestConnection>(std::move(socket));
+        m_connection->registerCloseHandler(
+            [this](auto... args) { saveConnectionClosedEvent(args...); });
+    }
 
+    void saveConnectionClosedEvent(SystemError::ErrorCode closeReason)
+    {
+        m_connectionClosedReportedDirectly = m_invokingConnectionMethod;
         m_connectionCloseEvents.push(closeReason);
     }
 };
@@ -181,6 +232,16 @@ TEST_F(ConnectionServerBaseServerConnection, changing_inactivity_timeout)
     givenStartedConnection();
     whenChangeConnectionInactivityTimeoutTo(std::chrono::milliseconds(1));
     thenConnectionIsClosedByTimeout();
+}
+
+TEST_F(ConnectionServerBaseServerConnection, connection_close_works_properly)
+{
+    givenStartedConnection();
+
+    whenCloseConnection();
+
+    thenTcpConnectionIsClosed();
+    andConnectionCloseEventIsReported();
 }
 
 } // namespace test

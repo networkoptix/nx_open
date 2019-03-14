@@ -35,12 +35,12 @@ public:
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
-        std::unique_ptr<AbstractStreamSocket> _socket) override
+        std::unique_ptr<AbstractStreamSocket> socket) override
     {
-        return std::make_shared<ServerConnection>(
-            this,
-            std::move(_socket),
+        auto connection = std::make_shared<ServerConnection>(
+            std::move(socket),
             *m_dispatcher);
+        return connection;
     }
 
 private:

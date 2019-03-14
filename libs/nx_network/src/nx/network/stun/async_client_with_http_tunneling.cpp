@@ -76,7 +76,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
     ReconnectHandler handler,
     void* client)
 {
-    post(
+    dispatch(
         [this, client, handler = std::move(handler)]() mutable
         {
             m_reconnectHandlers.emplace(client, std::move(handler));
@@ -86,7 +86,7 @@ void AsyncClientWithHttpTunneling::addOnReconnectedHandler(
 void AsyncClientWithHttpTunneling::setOnConnectionClosedHandler(
     OnConnectionClosedHandler handler)
 {
-    post(
+    dispatch(
         [this, handler = std::move(handler)]() mutable
         {
             m_connectionClosedHandler.swap(handler);
@@ -466,9 +466,9 @@ void AsyncClientWithHttpTunneling::reportReconnect()
     for (const auto& handlerContext: m_reconnectHandlers)
     {
         // TODO: #ak Add support for m_reconnectHandlers being modified within handler.
-        nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_destructionFlag);
         handlerContext.second();
-        if (objectDestructionWatcher.objectDestroyed())
+        if (objectDestructionWatcher.interrupted())
             return;
     }
 }

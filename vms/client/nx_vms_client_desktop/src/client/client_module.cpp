@@ -103,6 +103,7 @@
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
@@ -481,6 +482,7 @@ void QnClientModule::initSingletons()
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 
     registerResourceDataProviders();
+    integrations::initialize(this);
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

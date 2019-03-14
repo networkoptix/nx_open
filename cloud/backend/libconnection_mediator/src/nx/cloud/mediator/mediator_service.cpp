@@ -87,7 +87,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     stats::Provider statisticsProvider(
         controller.statisticsManager(),
         view.httpServer().server(),
-        view.stunServer().server());
+        view.stunServer().statisticsProvider());
     view.httpServer().registerStatisticsApiHandlers(statisticsProvider);
 
     NX_INFO(this, lm("Initializating view"));

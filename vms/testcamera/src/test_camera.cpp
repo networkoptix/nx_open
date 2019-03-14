@@ -28,8 +28,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(
     if (itr != m_cache.end())
         return *itr;
 
-    QnAviResourcePtr file(new QnAviResource(fileName));
-    file->setCommonModule(commonModule);
+    QnAviResourcePtr file(new QnAviResource(fileName, commonModule));
     QnAviArchiveDelegate aviDelegate;
     if (!aviDelegate.open(file, nullptr))
     {

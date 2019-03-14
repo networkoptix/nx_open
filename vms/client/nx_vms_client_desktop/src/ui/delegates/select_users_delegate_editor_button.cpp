@@ -13,14 +13,13 @@ QnSelectUsersDialogButton::QnSelectUsersDialogButton(QWidget* parent):
     base_type(parent),
     m_dialogDelegate(nullptr)
 {
-    connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
 QnSelectUsersDialogButton::~QnSelectUsersDialogButton()
 {
 }
 
-QnResourceSelectionDialogDelegate* QnSelectUsersDialogButton::dialogDelegate() const
+QnResourceSelectionDialogDelegate* QnSelectUsersDialogButton::getDialogDelegate() const
 {
     return m_dialogDelegate;
 }
@@ -35,7 +34,7 @@ void QnSelectUsersDialogButton::setSubjectValidationPolicy(QnSubjectValidationPo
     m_subjectValidation.reset(policy);
 }
 
-void QnSelectUsersDialogButton::at_clicked()
+void QnSelectUsersDialogButton::handleButtonClicked()
 {
     // Dialog will be destroyed by delegate editor.
     auto dialog = new SubjectSelectionDialog(this);

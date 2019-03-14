@@ -2,6 +2,7 @@
 #include <nx/update/update_information.h>
 #include <media_server/media_server_module.h>
 #include <common/common_module.h>
+#include <rest/server/json_rest_result.h>
 
 namespace detail {
 
@@ -14,35 +15,35 @@ void checkUpdateStatusRemotely(
 {
     static const QString kOfflineMessage = "peer is offline";
     auto mergeFunction =
-        [serverModule](
+        [serverModule, reply](
             const QnUuid& serverId,
             bool success,
-            QList<nx::update::Status>& reply,
-            QList<nx::update::Status>& outputReply)
+            QnJsonRestResult& result,
+            QnJsonRestResult&)
         {
             if (success)
             {
-                NX_ASSERT(reply.size() == 1);
-                outputReply.append(reply[0]);
+                reply->append(result.deserialized<QList<nx::update::Status>>()[0]);
             }
             else
             {
                 if (serverId != serverModule->commonModule()->moduleGUID())
                 {
-                    outputReply.append(nx::update::Status(
+                    reply->append(nx::update::Status(
                         serverId,
                         nx::update::Status::Code::offline,
                         kOfflineMessage));
                 }
                 else
                 {
-                    outputReply.append(serverModule->updateManager()->status());
+                    reply->append(serverModule->updateManager()->status());
                 }
             }
         };
 
+    QnJsonRestResult result;
     requestRemotePeers(
-        serverModule->commonModule(), path, *reply, context, mergeFunction,
+        serverModule->commonModule(), path, result, context, mergeFunction,
         ifParticipantPredicate);
     auto offlineServers = QSet<QnMediaServerResourcePtr>::fromList(
         serverModule->commonModule()->resourcePool()->getAllServers(Qn::Offline));

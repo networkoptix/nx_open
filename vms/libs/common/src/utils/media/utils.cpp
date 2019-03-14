@@ -2,6 +2,7 @@
 #include <array>
 
 #include <utils/media/jpeg_utils.h>
+#include <utils/media/h263_utils.h>
 #include <utils/media/h264_utils.h>
 #include <utils/media/hevc_sps.h>
 
@@ -34,6 +35,15 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
             nx_jpg::ImageInfo imgInfo;
             nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
             return QSize(imgInfo.width, imgInfo.height);
+        }
+        case AV_CODEC_ID_H263:
+        case AV_CODEC_ID_H263P:
+        {
+            nx::media_utils::h263::PictureHeader header;
+            if (header.decode((uint8_t*)frame->data(), frame->dataSize()))
+                return QSize(header.width, header.height);
+
+            return QSize();
         }
         default:
             return QSize();

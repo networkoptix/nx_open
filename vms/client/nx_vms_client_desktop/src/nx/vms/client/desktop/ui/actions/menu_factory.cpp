@@ -38,7 +38,7 @@ void MenuFactory::endGroup()
     m_currentGroup = nullptr;
 }
 
-Builder MenuFactory::operator()(IDType id)
+Builder MenuFactory::registerAction(IDType id)
 {
     auto action = m_manager->action(id);
     if (!action)
@@ -58,9 +58,19 @@ Builder MenuFactory::operator()(IDType id)
     return Builder(action);
 }
 
+Builder MenuFactory::registerAction()
+{
+    return registerAction(static_cast<IDType>(m_lastFreeActionId++));
+}
+
+Builder MenuFactory::operator()(IDType id)
+{
+    return registerAction(id);
+}
+
 Builder MenuFactory::operator()()
 {
-    return operator()(static_cast<IDType>(m_lastFreeActionId++));
+    return registerAction();
 }
 
 } // namespace action

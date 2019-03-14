@@ -28,7 +28,11 @@ bool ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
     const vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     auto itr = remoteSubscription.values.find(peerId);
     if (itr == remoteSubscription.values.end())
-        return false;
+    {
+        if (!isRemoteSubscribedToAll)
+            return false;
+        itr = remoteSubscription.values.insert(peerId, 0);
+    }
     if (tran.persistentInfo.sequence > itr.value())
     {
         itr.value() = tran.persistentInfo.sequence;

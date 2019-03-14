@@ -14,6 +14,8 @@
 
 namespace nx::vms::server::analytics::debug_helpers {
 
+QString debugFilesDirectoryPath(const QString& path);
+
 /** @return Null if the file does not exist, or on error. */
 nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
@@ -26,13 +28,13 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
 nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
 
-QString nameOfFileToDumpDataTo(
+QString nameOfFileToDumpOrLoadData(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
     const QString& postfix);
 
-QString nameOfFileToDumpDataTo(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix);
+QString nameOfFileToDumpOrLoadData(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix);
 
 /** If the string is not empty and does not end with `\n`, `\n` will be added. */
 void dumpStringToFile(
@@ -40,5 +42,9 @@ void dumpStringToFile(
     const QString& stringToDump,
     const QString& directoryPath,
     const QString& filename);
+
+QString loadStringFromFile(
+    const QString& filename,
+    std::function<void(nx::utils::log::Level, const QString&)> logger);
 
 } // namespace nx::vms::server::analytics::debug_helpers

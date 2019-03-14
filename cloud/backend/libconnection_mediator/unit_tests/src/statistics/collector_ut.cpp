@@ -100,11 +100,10 @@ protected:
 
     void verifyThatRecordHasBeenSaved()
     {
+        QnMutexLocker lock(&m_mutex);
+
         while (m_testDataObject->records().empty())
-        {
-            QnMutexLocker lock(&m_mutex);
             m_cond.wait(lock.mutex());
-        }
     }
 
     void havingDeadlockedStatsDataObject()
@@ -154,6 +153,7 @@ private:
 
     void onRecordSaved()
     {
+        QnMutexLocker lock(&m_mutex);
         m_cond.wakeAll();
     }
 };

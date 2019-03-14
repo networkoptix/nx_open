@@ -164,9 +164,9 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         tcpSocket.reset();
     }
 
-    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+    nx::utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
     context.handler(sysErrorCode, std::move(tcpSocket), stillValid);
-    if (watcher.objectDestroyed())
+    if (watcher.interrupted())
         return;
 
     if (!stillValid && m_connectionClosedHandler)

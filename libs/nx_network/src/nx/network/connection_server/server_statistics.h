@@ -16,6 +16,8 @@ struct NX_NETWORK_API Statistics
      */
     int requestsAveragePerConnection = 0;
 
+    void add(const Statistics& right);
+
     bool operator==(const Statistics& right) const;
 };
 
@@ -33,6 +35,20 @@ public:
     virtual ~AbstractStatisticsProvider() = default;
 
     virtual Statistics statistics() const = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API AggregateStatisticsProvider:
+    public AbstractStatisticsProvider
+{
+public:
+    AggregateStatisticsProvider(const std::vector<const AbstractStatisticsProvider*>& providers);
+
+    virtual Statistics statistics() const;
+
+private:
+    const std::vector<const AbstractStatisticsProvider*> m_providers;
 };
 
 } // namespace server

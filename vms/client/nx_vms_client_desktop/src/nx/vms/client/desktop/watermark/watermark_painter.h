@@ -18,6 +18,7 @@ public:
     void drawWatermark(QPainter* painter, const QRectF& rect);
 
     void setWatermark(nx::core::Watermark watermark);
+    const nx::core::Watermark& watermark() const;
 
 private:
     void updateWatermarkImage(const QSize& size);

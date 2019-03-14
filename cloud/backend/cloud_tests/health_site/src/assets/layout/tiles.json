@@ -1,6 +1,16 @@
 {
     "tiles": [
         {
+            "title": "",
+            "sections": [
+                {
+                    "key": "total",
+                    "caption": "Total",
+                    "messages": {}
+                }
+            ]
+        },
+        {
             "title"   : "Cloud Services",
             "sections": [
                 {

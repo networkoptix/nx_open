@@ -1125,7 +1125,7 @@ void Player::setSource(const QUrl& url)
     d->isLocalFile = d->url.scheme() == "file";
     if (d->isLocalFile)
     {
-        d->resource.reset(new QnAviResource(path));
+        d->resource.reset(new QnAviResource(path, commonModule()));
         d->resource->setStatus(Qn::Online);
     }
     else

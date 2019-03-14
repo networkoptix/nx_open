@@ -1,14 +1,14 @@
-Network Optix Analytics SDK
+# Network Optix Analytics SDK
 
 ---------------------------------------------------------------------------------------------------
-# License
+## License
 
 The whole contents of this package, including all C/C++ source code, is licensed strictly under the
 terms negotiated in written with the party that has officially received this package from Network
 Optix, Inc.
 
 ---------------------------------------------------------------------------------------------------
-# Introduction
+## Introduction
 
 This package provides an SDK to create so-called Analytics Plugins for Nx Witness VMS.
 
@@ -35,7 +35,7 @@ The SDK C++ files have extensive documentation comments in Doxygen format, from 
 are generated and included into the SDK: see `docs/html/index.html`.
 
 ---------------------------------------------------------------------------------------------------
-# Helper tools
+## Helper tools
 
 To simplify implementation of a Plugin, a number of helper classes are provided with this SDK that
 implement the SDK interfaces and handle such complexities as reference counting and interface
@@ -57,7 +57,7 @@ required to be used by a Plugin:
     rudimentary framework for simple unit tests (used by the SDK itself, and Plugin samples).
 
 ---------------------------------------------------------------------------------------------------
-# Sample: building and installing
+## Sample: building and installing
 
 This package includes a sample Analytics Plugin written in C++: `Stub Analytics Plugin`, located at
 `samples/stub_analytics_plugin/`. It receives video frames from a camera, ignores them, and
@@ -108,9 +108,9 @@ To install the plugin, just copy its library file to the dedicated folder in the
 Server installation directory:
 ```
 # Windows:
-C:\Program Files\Network Optix\Nx Witness\MediaServer\plugins\
+C:\Program Files\Network Optix\Nx MetaVMS\MediaServer\plugins\
 
 # Linux:
-/opt/networkoptix/mediaserver/bin/plugins/
+/opt/networkoptix-metavms/mediaserver/bin/plugins/
 ```
 ATTENTION: After copying the plugin library, the Server has to be restarted.

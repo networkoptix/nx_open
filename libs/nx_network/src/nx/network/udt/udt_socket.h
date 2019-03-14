@@ -182,6 +182,8 @@ public:
     UdtStreamServerSocket(const UdtStreamServerSocket&) = delete;
     UdtStreamServerSocket& operator=(const UdtStreamServerSocket&) = delete;
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 

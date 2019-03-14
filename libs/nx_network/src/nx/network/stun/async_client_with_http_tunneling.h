@@ -9,7 +9,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/retry_timer.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "async_client.h"
@@ -94,7 +94,7 @@ private:
     nx::utils::Url m_url;
     std::map<void*, ReconnectHandler> m_reconnectHandlers;
     nx::network::RetryTimer m_reconnectTimer;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
     int m_requestIdSequence = 0;
     /** map<request id, request context>. */

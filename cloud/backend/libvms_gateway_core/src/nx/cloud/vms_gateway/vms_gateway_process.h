@@ -10,11 +10,11 @@
 #include <nx/network/public_ip_discovery.h>
 #include <nx/utils/service.h>
 
-#include <nx/cloud/relaying/relay_engine.h>
 #include <nx/network/aio/async_channel_bridge.h>
 
-#include "settings.h"
+#include "http/channel_bridge_to_server_connection_adaptor.h"
 #include "run_time_options.h"
+#include "settings.h"
 
 namespace nx {
 namespace cloud {
@@ -36,9 +36,6 @@ public:
 
     const std::vector<network::SocketAddress>& httpEndpoints() const;
 
-    relaying::RelayEngine& relayEngine();
-    const relaying::RelayEngine& relayEngine() const;
-
     void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
 
 protected:
@@ -47,12 +44,11 @@ protected:
 
 private:
     using HttpConnectTunnelPool =
-        network::server::StreamServerConnectionHolder<network::aio::AsyncChannelBridge>;
+        network::server::StreamServerConnectionHolder<BridgeToServerConnectionAdaptor>;
 
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<network::SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
-    relaying::RelayEngine* m_relayEngine = nullptr;
 
     void initializeCloudConnect(const conf::Settings& settings);
 
@@ -64,9 +60,8 @@ private:
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
-        relaying::RelayEngine* relayEngine,
         nx::network::http::server::rest::MessageDispatcher* const msgDispatcher,
-            HttpConnectTunnelPool* httpConnectTunnelPool);
+        HttpConnectTunnelPool* httpConnectTunnelPool);
 };
 
 } // namespace gateway

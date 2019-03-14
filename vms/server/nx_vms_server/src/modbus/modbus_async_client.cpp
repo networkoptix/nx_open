@@ -76,7 +76,7 @@ namespace nx
 
             m_modbusConnection.reset(
                 new ModbusProtocolConnection(std::move(connectionSocket)));
-            m_modbusConnection->setOnConnectionClosed(
+            m_modbusConnection->registerCloseHandler(
                 [this](auto closeReason) { onConnectionClosed(closeReason); });
 
             m_modbusConnection->setMessageHandler(

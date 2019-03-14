@@ -8,7 +8,7 @@
 
 #include <QtCore/QThread>
 
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
@@ -36,7 +36,17 @@ public:
     {
     }
 
-    virtual ~BaseAsyncSocketImplHelper() {}
+    virtual ~BaseAsyncSocketImplHelper() = default;
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        NX_ASSERT(
+            this->m_socket->impl()->aioThread.load() == aioThread ||
+            !m_aioService->isSocketBeingMonitored(this->m_socket));
+
+        if (this->m_socket->impl()->aioThread.load() != aioThread)
+            m_socketInterruptionFlag.interrupt();
+    }
 
     void post(nx::utils::MoveOnlyFunc<void()> handler)
     {
@@ -63,8 +73,9 @@ public:
     }
 
 protected:
-    SocketType* m_socket;
-    nx::network::aio::AIOService* m_aioService;
+    SocketType* m_socket = nullptr;
+    nx::network::aio::AIOService* m_aioService = nullptr;
+    nx::utils::InterruptionFlag m_socketInterruptionFlag;
 };
 
 /**
@@ -140,8 +151,10 @@ public:
         }
     }
 
-    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
+        base_type::bindToAioThread(aioThread);
+
         m_resolveResultScheduler.bindToAioThread(aioThread);
     }
 
@@ -394,9 +407,6 @@ private:
     std::atomic<bool> m_addressResolverIsInUse;
     const int m_ipVersion;
 
-    nx::utils::ObjectDestructionFlag m_socketDestroyedDuringEventHandlingFlag;
-    nx::utils::ObjectDestructionFlag m_socketDestroyedInUserHandlerFlag;
-
     BasicPollable m_resolveResultScheduler;
 
     bool isNonBlockingMode() const
@@ -500,12 +510,12 @@ private:
 
         // Timer on socket (not read/write timeout, but some timer).
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
             {
-                if (watcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
 
                 if (registerTimerCallCounterBak == m_registerTimerCallCounter)
@@ -568,12 +578,12 @@ private:
     {
         m_recvBuffer = nullptr;
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
             {
-                if (watcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
 
                 if (recvAsyncCallCounterBak == m_recvAsyncCallCounter)
@@ -664,12 +674,12 @@ private:
     {
         m_asyncSendIssued = false;
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
             {
-                if (watcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
 
                 if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
@@ -691,27 +701,26 @@ private:
         else if (sockErrorCode == SystemError::noError)
             sockErrorCode = SystemError::notConnected;  //< MUST report some error.
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(
-            &m_socketDestroyedDuringEventHandlingFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         if (m_connectHandler)
         {
             reportConnectCompletion(sockErrorCode);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
 
         if (m_recvHandler)
         {
             reportReadCompletion(sockErrorCode, (size_t)-1);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
 
         if (m_sendHandler)
         {
             reportSendCompletion(sockErrorCode, (size_t)-1);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return;
         }
     }
@@ -722,6 +731,14 @@ private:
     void stopPollingSocket(const aio::EventType eventType)
     {
         m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
+
+        if (eventType == aio::EventType::etNone)
+        {
+            // TODO: #ak For now doing this only in case of cancellation of every event type
+            // to support popular use case: cancel socket operation, pass socket to another thread.
+            // But, same should be done separately for every event type.
+            this->m_socketInterruptionFlag.interrupt();
+        }
 
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
@@ -747,6 +764,7 @@ private:
     }
 };
 
+// TODO: #ak Part of code of this class should be shared with AsyncSocketImplHelper.
 template <class SocketType>
 class AsyncServerSocketHelper:
     public BaseAsyncSocketImplHelper<SocketType>,
@@ -863,10 +881,12 @@ public:
 private:
     AcceptCompletionHandler m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
 
+    // TODO: #ak Merge this method with stopPolling().
     void cancelIoWhileInAioThread()
     {
+        this->m_socketInterruptionFlag.interrupt();
+
         this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
         ++m_acceptAsyncCallCount;
     }
@@ -875,12 +895,12 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> newConnection)
     {
-        nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&this->m_socketInterruptionFlag);
 
         auto execFinally = nx::utils::makeScopeGuard(
-            [this, &thisWatcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
+            [this, &watcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
             {
-                if (thisWatcher.objectDestroyed())
+                if (watcher.interrupted())
                     return;
 
                 // If asyncAccept has been called from onNewConnection, no need to call stopMonitoring.

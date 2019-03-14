@@ -860,6 +860,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder = new QnFfmpegVideoTranscoder(
                         DecoderConfig::fromResource(m_resource), commonModule()->metrics(), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
+                    m_videoTranscoder->setQuality(m_transcodeQuality);
 
                     m_videoTranscoder->open(videoData);
                     m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
@@ -1268,6 +1269,11 @@ void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterCh
 bool QnStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& /*mediaData*/) const
 {
     return false;
+}
+
+void QnStreamRecorder::setTranscoderQuality(Qn::StreamQuality quality)
+{
+    m_transcodeQuality = quality;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

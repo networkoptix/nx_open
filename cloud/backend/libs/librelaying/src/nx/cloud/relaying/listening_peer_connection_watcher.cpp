@@ -24,7 +24,7 @@ void ListeningPeerConnectionWatcher::bindToAioThread(
 
     if (m_connection)
         m_connection->bindToAioThread(aioThread);
-    m_timer.bindToAioThread(aioThread);
+    m_keepAliveProbeTimer.bindToAioThread(aioThread);
 }
 
 void ListeningPeerConnectionWatcher::start(
@@ -75,7 +75,7 @@ void ListeningPeerConnectionWatcher::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_connection.reset();
-    m_timer.pleaseStopSync();
+    m_keepAliveProbeTimer.pleaseStopSync();
 }
 
 void ListeningPeerConnectionWatcher::monitoringConnectionForClosure()
@@ -171,7 +171,7 @@ void ListeningPeerConnectionWatcher::sendNotification(
 
 void ListeningPeerConnectionWatcher::scheduleKeepAliveProbeTimer()
 {
-    m_timer.start(
+    m_keepAliveProbeTimer.start(
         m_keepAliveProbePeriod,
         [this]() { sendKeepAliveProbe(); });
 }
@@ -180,7 +180,7 @@ void ListeningPeerConnectionWatcher::cancelKeepAlive()
 {
     if (m_connection)
         m_connection->cancelIOSync(network::aio::etWrite);
-    m_timer.pleaseStopSync();
+    m_keepAliveProbeTimer.pleaseStopSync();
 }
 
 void ListeningPeerConnectionWatcher::onReadCompletion(

@@ -285,16 +285,16 @@ void PeerRegistrator::clientBind(
         info.connection = connection;
         info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
-        NX_DEBUG(this, lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
-            .arg(peerId).container(info.tcpReverseEndpoints)
-            .arg(connection->getSourceAddress()));
+        NX_DEBUG(this, "Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)",
+            peerId, containerString(info.tcpReverseEndpoints), connection->getSourceAddress());
 
         indication = makeIndication(peerId, info);
         listeningPeerConnections = m_listeningPeerPool->getAllConnections();
     }
 
     connection->addOnConnectionCloseHandler(
-        [this, peerId, connection, guard = m_asyncOperationGuard.sharedGuard()]()
+        [this, peerId, connection, guard = m_asyncOperationGuard.sharedGuard()](
+            SystemError::ErrorCode /*closeReason*/)
         {
             // TODO: #ak Logic here seems to duplicate ListeningPeerPool.
             // The only difference is here we have client connection, there - server connection.
@@ -308,7 +308,7 @@ void PeerRegistrator::clientBind(
             if (it == m_boundClients.end() || it->second.connection.lock() != connection)
                 return;
 
-            NX_DEBUG(this, lm("Client %1 has disconnected").arg(peerId));
+            NX_DEBUG(this, "Client %1 has disconnected", peerId);
             m_boundClients.erase(it);
         });
 
@@ -365,7 +365,7 @@ void PeerRegistrator::reportClientBind(
 std::vector<network::stun::Message> PeerRegistrator::prepareClientBindIndications()
 {
     QnMutexLocker lk(&m_mutex);
- 
+
     std::vector<network::stun::Message> clientBindIndications;
     for (const auto& client: m_boundClients)
         clientBindIndications.push_back(makeIndication(client.first, client.second));

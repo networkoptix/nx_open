@@ -98,12 +98,8 @@ int AudioStream::initializeInput()
     static constexpr int64_t kAudioBufferSizeValue = 80; // < milliseconds
     inputFormat->setEntry(kAudioBufferSizeKey, kAudioBufferSizeValue);
 
-    // Dshow audio input format does not recognize io errors, so we set this flag to treat a
-    // long timeout as an io error.
 
 #endif // _WIN32
-
-    //inputFormat->formatContext()->flags |= AVFMT_FLAG_NONBLOCK;
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;

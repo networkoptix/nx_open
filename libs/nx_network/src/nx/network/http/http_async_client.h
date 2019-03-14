@@ -11,7 +11,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"
@@ -366,7 +366,7 @@ private:
     bool m_forcedEof;
     bool m_precalculatedAuthorizationDisabled;
     int m_numberOfRedirectsTried;
-    nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
+    nx::utils::InterruptionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;

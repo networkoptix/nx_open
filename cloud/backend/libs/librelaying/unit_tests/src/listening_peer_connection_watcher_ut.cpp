@@ -4,6 +4,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/scope_guard.h>
 
 #include <nx/cloud/relaying/listening_peer_connection_watcher.h>
 
@@ -90,9 +91,11 @@ protected:
 
     void thenTunnelConnectionIsProvided()
     {
-        auto result = m_startTunnelResults.pop();
-        ASSERT_EQ(SystemError::noError, std::get<0>(result));
-        ASSERT_NE(nullptr, std::get<1>(result));
+        auto [resultCode, socket] = m_startTunnelResults.pop();
+        auto socketGuard = nx::utils::makeScopeGuard(
+            [socket = socket.get()]() { if (socket) socket->pleaseStopSync(); });
+        ASSERT_EQ(SystemError::noError, resultCode);
+        ASSERT_NE(nullptr, socket);
     }
 
     void thenKeepAliveNotificationIsReceived()

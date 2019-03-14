@@ -9,6 +9,7 @@
 #include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
+#include <helpers/system_helpers.h>
 
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
@@ -217,11 +218,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
     // TODO: #GDM Store temporary credentials?
     const bool stayLoggedIn = q->ui->stayLoggedInCheckBox->isChecked();
-    nx::vms::client::core::settings()->cloudCredentials = {
-        q->ui->loginInputField->text().trimmed(),
-        stayLoggedIn
-            ? q->ui->passwordInputField->text().trimmed()
-            : QString()};
+    nx::vms::client::core::helpers::saveCloudCredentials({q->ui->loginInputField->text().trimmed(),
+        stayLoggedIn ? q->ui->passwordInputField->text().trimmed() : QString()});
 
     q->accept();
 }

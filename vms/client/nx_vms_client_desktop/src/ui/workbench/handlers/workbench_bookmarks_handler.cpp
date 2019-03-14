@@ -205,10 +205,11 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     }
 
     QnCameraBookmark bookmark;
+    // This should be assigned before loading data to the dialog.
     bookmark.guid = QnUuid::createUuid();
     bookmark.name = tr("Bookmark");
-    bookmark.startTimeMs = milliseconds(period.startTimeMs);  //this should be assigned before loading data to the dialog
-    bookmark.durationMs = milliseconds(period.durationMs);
+    bookmark.startTimeMs = period.startTime();
+    bookmark.durationMs = period.duration();
     bookmark.cameraId = camera->getId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
