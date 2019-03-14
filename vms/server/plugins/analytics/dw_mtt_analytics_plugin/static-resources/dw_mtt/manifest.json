@@ -21,15 +21,6 @@
             "alarmName": "motionAlarm"
         },
         {
-            "id": "nx.dw_mtt.SENSOR",
-            "name": "Sensor Alarm",
-            "flags": "stateDependent",
-            "internalName": "SENSOR",
-            "alarmName": "sensorAlarmIn",
-            "_comment": "Notification from camera external sensor",
-            "unsupported": true
-        },
-        {
             "id": "nx.dw_mtt.PEA",
             "name": "Perimeter Intrusion [exclusive]",
             "flags": "stateDependent",
@@ -48,7 +39,7 @@
             "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
         },
         {
-            "id": "nx.dw_mtt.AVD",
+            "id": "nx.dw_mtt.AVD.sceneChange",
             "name": "Scene Change",
             "flags": "stateDependent",
             "internalName": "AVD",
@@ -56,7 +47,7 @@
             "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
         },
         {
-            "id": "nx.dw_mtt.AVD",
+            "id": "nx.dw_mtt.AVD.clarityAbnormal",
             "name": "Video Blur Detection",
             "flags": "stateDependent",
             "internalName": "AVD",
@@ -64,12 +55,22 @@
             "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
         },
         {
-            "id": "nx.dw_mtt.AVD",
+            "id": "nx.dw_mtt.AVD.colorAbnormal",
             "name": "Abnormal color detection",
             "flags": "stateDependent",
             "internalName": "AVD",
             "alarmName": "colorAbnormal",
             "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
+        }
+    ],
+    "ignoredEventTypes": [
+        {
+            "id": "nx.dw_mtt.SENSOR",
+            "name": "Sensor Alarm",
+            "flags": "stateDependent",
+            "internalName": "SENSOR",
+            "alarmName": "sensorAlarmIn",
+            "_comment": "Notification from camera external sensor"
         },
         {
             "id": "nx.dw_mtt.VFD",
@@ -77,11 +78,8 @@
             "flags": "stateDependent",
             "internalName": "VFD",
             "alarmName": "vfdAlarm",
-            "group": 1,
-            "unsupported": true
-        }
-    ],
-    "ignoredEventTypes": [
+            "group": 1
+        },
         {
             "id": "nx.dw_mtt.CDD",
             "name": "Crowd Density [exclusive]",
