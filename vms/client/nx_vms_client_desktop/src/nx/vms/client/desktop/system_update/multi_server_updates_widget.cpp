@@ -1061,6 +1061,17 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
                 m_updateInfo.error = nx::update::InformationError::noError;
             }
             m_haveValidUpdate = m_serverUpdateTool->verifyUpdateManifest(m_updateInfo, installedVersions);
+
+            m_stateTracker->clearVerificationErrors();
+            if (!m_updateInfo.unsuportedSystemsReport.empty())
+                m_stateTracker->setVerificationError(m_updateInfo.unsuportedSystemsReport);
+
+            if (!m_updateInfo.missingUpdate.empty())
+            {
+                m_stateTracker->setVerificationError(
+                    m_updateInfo.missingUpdate, tr("No update package available"));
+            }
+
             m_updateReport = calculateUpdateVersionReport(m_updateInfo);
             m_updateLocalStateChanged = true;
         }
