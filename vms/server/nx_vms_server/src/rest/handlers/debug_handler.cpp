@@ -9,26 +9,30 @@
 
 namespace {
 
-enum class Action { invalid, crash, exit };
+enum class Action { invalid, crash, exit, delayS };
 
-static Action actionFromParams(const QnRequestParamList& params)
+static std::pair<Action, QString> actionFromParams(const QnRequestParamList& params)
 {
     Action action = Action::invalid;
-    for (const auto& param: params)
+    QString value;
+    for (const auto& [stringAction, paramValue]: params)
     {
-        const Action paramAction = nx::utils::switch_(param.first,
+        const Action paramAction = nx::utils::switch_(stringAction,
             "crash", [](){ return Action::crash; },
             "exit", [](){ return Action::exit; },
+            "delayS", [](){ return Action::delayS; },
             nx::utils::default_, [](){ return Action::invalid; });
 
         if (paramAction != Action::invalid)
         {
             if (action != Action::invalid) //< More than one action param is specified.
-                return Action::invalid;
+                return {Action::invalid, ""};
+
             action = paramAction;
+            value = paramValue;
         }
     }
-    return action;
+    return {action, value};
 }
 
 struct CrashActionOptions
@@ -65,7 +69,7 @@ int QnDebugHandler::executeGet(
     if (!ini().enableApiDebug)
         return result(StatusCode::forbidden, "Ignoring - not enabled via mediaserver.ini");
 
-    const auto action = actionFromParams(params);
+    const auto [action, value] = actionFromParams(params);
     switch (action)
     {
         case Action::crash:
@@ -76,7 +80,19 @@ int QnDebugHandler::executeGet(
             return result(StatusCode::ok, "Exiting the Server via `exit(64)`");
 
         case Action::invalid:
-            return result(StatusCode::forbidden, "Ignoring - unsupported params");
+            return result(
+                StatusCode::forbidden,
+                "Ignoring - unsupported params " + containerString(params));
+
+        case Action::delayS:
+            {
+                const auto delayS = value.toInt();
+                if (!delayS)
+                    return result(StatusCode::forbidden, "Ignoring - uinvalud delay " + value);
+
+                std::this_thread::sleep_for(std::chrono::seconds(delayS));
+                return result(StatusCode::ok, "Dalayed replay");
+            }
     }
     const QString message = lm("Unexpected enum value: %1").arg(static_cast<int>(action));
     NX_ASSERT(false, message);
@@ -108,7 +124,7 @@ void QnDebugHandler::afterExecute(
     // Params have to be parsed again in this method, because currently there is no way to pass
     // data from executeGet() to afterExecute() - the instance of this handler is shared between
     // all requests of this API method.
-    const auto action = actionFromParams(params);
+    const auto [action, value] = actionFromParams(params);
     switch (action)
     {
         case Action::crash:
@@ -129,6 +145,7 @@ void QnDebugHandler::afterExecute(
             exit(64);
 
         case Action::invalid:
+        case Action::delayS:
             return;
     }
     NX_ASSERT(false, lm("Unexpected enum value: %1").arg(static_cast<int>(action)));
