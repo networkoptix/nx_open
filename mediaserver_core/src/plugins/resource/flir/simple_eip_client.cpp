@@ -3,6 +3,7 @@
 
 #include "eip_cip.h"
 #include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
 
 SimpleEIPClient::SimpleEIPClient(QString addr) :
     m_hostAddress(addr),
@@ -28,6 +29,12 @@ bool SimpleEIPClient::initSocket()
 
 bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
 {
+    if (!socket)
+    {
+        NX_ASSERT(false, "sendAll(): socket is nullptr");
+        return false;
+    }
+
     int totalBytesSent = 0;
     int dataSize = data.size();
     auto rawData = data.data();
@@ -46,7 +53,7 @@ bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
         }
 
         totalBytesSent += bytesSent;
-        dataSize -= bytesSent; 
+        dataSize -= bytesSent;
     }
 
     return true;
@@ -54,8 +61,19 @@ bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
 
 bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const buffer)
 {
-    int totalBytesRead = 0;
+    if (!socket)
+    {
+        NX_ASSERT(false, "receiveMessage(): socket is nullptr");
+        return false;
+    }
 
+    if (!buffer)
+    {
+        NX_ASSERT(false, "receiveMessage(): buffer is nullptr");
+        return false;
+    }
+
+    int totalBytesRead = 0;
     while (totalBytesRead < EIPEncapsulationHeader::SIZE)
     {
         auto bytesRead = m_eipSocket->recv(
@@ -69,7 +87,7 @@ bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const b
     }
 
     auto header = EIPPacket::parseHeader(QByteArray(buffer, EIPEncapsulationHeader::SIZE));
-    
+
     auto totalMesssageLength = header.dataLength + EIPEncapsulationHeader::SIZE;
 
     while (totalBytesRead < totalMesssageLength)
@@ -80,7 +98,7 @@ bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const b
 
         if (bytesRead <= 0)
             return false;
-        
+
         totalBytesRead += bytesRead;
     }
 
@@ -183,7 +201,7 @@ MessageRouterResponse SimpleEIPClient::getServiceResponseData(const QByteArray& 
         header.dataLength);
 
     auto cpf = CPFPacket::decode(data.mid(
-        sizeof(decltype(EIPEncapsulationData::handle)) + 
+        sizeof(decltype(EIPEncapsulationData::handle)) +
         sizeof(decltype(EIPEncapsulationData::timeout))));
 
     for(const auto& item: cpf.items)
@@ -219,7 +237,7 @@ bool SimpleEIPClient::tryGetResponse(const MessageRouterRequest &request, QByteA
         *outStatus = header.status;
 
     return true;
-    
+
 }
 
 MessageRouterResponse SimpleEIPClient::doServiceRequest(
@@ -248,14 +266,16 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
     if (!connectIfNeeded())
         return MessageRouterResponse();
 
-    bool success = tryGetResponse(request, response, &status);
-    if (!success)
+    if (!tryGetResponse(request, response, &status))
         return MessageRouterResponse();
 
     if(status == EIPStatus::kEipStatusInvalidSessionHandle)
     {
-        registerSessionUnsafe();
-        tryGetResponse(request, response, &status);
+        if (!registerSessionUnsafe())
+            return MessageRouterResponse();
+
+        if (!tryGetResponse(request, response, &status))
+            return MessageRouterResponse();
     }
 
     return getServiceResponseData(response);
