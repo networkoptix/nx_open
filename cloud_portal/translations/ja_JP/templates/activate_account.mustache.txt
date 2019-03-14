@@ -1,8 +1,8 @@
-こんにちは
+こんにちは{{message.userFullName}},
 
   下のリンクを開いてメールアドレスを確認し、アカウントを有効にしてください
 
 {{config.portal_url}}/activate/{{message.code}}
 
-{{PRODUCT_NAME}} で登録していない場合はこのメールを無視してください
+%PRODUCT_NAME%で登録していない場合は、このメールを無視してください
 メッセージやリンクを他の人と共有しないでください

@@ -1,0 +1,327 @@
+{
+  "language": "uk_UA",
+  "language_name": "Українська",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
+  "dialogs": {
+    "okButton": "Ок",
+    "cancelButton": "Відміна",
+    "loginTitle": "Увійдіть до %PRODUCT_NAME%",
+    "loginButton": "Вхід",
+    "logoutAuthorisedTitle": "Ви вже увійшли",
+    "logoutAuthorisedContinueButton": "Продовжити",
+    "logoutAuthorisedLogoutButton": "Вийти"
+  },
+  "pageTitles": {
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Ласкаво просимо на",
+    "register": "Створити обліковий запис",
+    "changePassword": "Змінити пароль -",
+    "account": "Параметри облікового запису",
+    "systems": "Системи -",
+    "system": "Система -",
+    "systemShare": "Загальний доступ -",
+    "activate": "Активувати обліковий запис -",
+    "activateSent": "Активувати обліковий запис -",
+    "activateSuccess": "Обліковий запис активований",
+    "activateCode": "Активувати обліковий запис -",
+    "restorePassword": "Відновити пароль -",
+    "restorePasswordSuccess": "Пароль збережений -",
+    "restorePasswordCode": "Відновити пароль -",
+    "view": "Переглянути камери - ",
+    "debug": "Відладка",
+    "login": "Вхід -",
+    "download": "Завантажити %VMS_NAME%",
+    "downloadPlatform": "Завантажити %VMS_NAME% для ",
+    "pageNotFound": "Сторінку не знайдено"
+  },
+  "systemStatuses": {
+    "notActivated": "не активовано",
+    "activated": "активовано",
+    "online": "oнлайн",
+    "offline": "поза мережею",
+    "unavailable": "недоступний"
+  },
+  "accessRoles": {
+    "disabled": {
+      "label": "Вимкнено",
+      "description": "Користувач вимкнений і не може ввійти в систему"
+    },
+    "Owner": {
+      "label": "Власник",
+      "description": "Необмежений доступ, включаючи управління спільним доступом та підключенням/відключення системи до/від хмари"
+    },
+    "Viewer": {
+      "label": "Відео з камер і архів",
+      "description": "Можна переглядати відео в реальному часі та переглядати архів"
+    },
+    "Live Viewer": {
+      "label": "Відео в реальному часі",
+      "description": "Можна переглядати лише відео в реальному часі"
+    },
+    "Advanced Viewer": {
+      "label": "Перегляд і налаштування",
+      "description": "Може дивитися живе відео, архів, управляти PTZ і т. Д"
+    },
+    "Administrator": {
+      "label": "Адміністратор",
+      "description": "Необмежений доступ, включаючи можливість керування спільним доступом"
+    },
+    "Custom": {
+      "label": "Особливі",
+      "description": "Використовуйте додаток %VMS_NAME% для налаштування особливих повноважень"
+    },
+    "cloudAdmin": {
+      "label": "Адміністратор",
+      "description": "Може налаштувати систему та загальний доступ"
+    },
+    "customRole": {
+      "label": "Особлива роль",
+      "description": "Особлива роль, налаштована в системі"
+    },
+    "owner": {
+      "label": "Власник",
+      "description": "Необмежений доступ, включаючи управління спільним доступом та підключенням/відключення системи до/від хмари"
+    },
+    "viewer": {
+      "label": "Відео з камер і архів",
+      "description": "Можна переглядати відео в реальному часі та переглядати архів"
+    },
+    "liveViewer": {
+      "label": "Відео в реальному часі",
+      "description": "Можна переглядати лише відео в реальному часі"
+    },
+    "advancedViewer": {
+      "label": "Перегляд і налаштування",
+      "description": "Може дивитися відео в реальному часі, архів, змінювати налаштування камер, керувари RTZ і т. д"
+    },
+    "custom": {
+      "label": "Особливі",
+      "description": "Використовуйте додаток %VMS_NAME% для налаштування особливих повноважень"
+    }
+  },
+  "errorCodes": {
+    "ok": "ок",
+    "cantSendActivationPrefix": "Не вдається надіслати підтвердження електронною поштою",
+    "cantDisconnectSystemPrefix": "Невдається видалити систему",
+    "cantUnshareWithMeSystemPrefix": "Невдається видалити систему",
+    "cantSharePrefix": "Неможливо об’єднати систему",
+    "cantGetUsersListPrefix": "Список користувачів недоступний",
+    "cantGetSystemsListPrefix": "Список систем недоступний",
+    "cantRegisterPrefix": "Виникла помилка",
+    "cantGetSystemInfoPrefix": "Інформація про систему недоступна",
+    "cantChangeAccountPrefix": "Не вдається зберегти зміни",
+    "cantChangePasswordPrefix": "Не вдається зберегти пароль",
+    "cantActivatePrefix": "Не вдається активувати ваш обліковий запис",
+    "cantSendConfirmationPrefix": "Не вдається надіслати підтвердження електронною поштою",
+    "cloudInvalidResponse": "Хмарна DB повернула неочікувану відповідь",
+    "notAuthorized": "Невірний пароль",
+    "brokenAccount": "Неочікувана проблема з обліковим записом. <a href=\"/restore_password\">Відновити обліковий запис</a>",
+    "wrongParameters": "Деякі параметри у формі невірні",
+    "wrongCode": "Обліковий запис вже активовано або код підтвердження невірний",
+    "wrongCodeRestore": "Код підтвердження вже використовується або невірний",
+    "forbidden": "У вас немає дозволів для виконання цієї дії",
+    "accountNotActivated": "Цей акаунт ще не активовано. <a href=\"/activate\">Надіслати посилання для активації ще раз</a>",
+    "accountBlocked": "Цей обліковий запис тимчасово заблоковано. Будь ласка, спробуйте ще раз через декілька хвилин.",
+    "notFound": "Не знайдено",
+    "alreadyExists": "Такий акаунт вже існує",
+    "unknownError": "Сталася неочікувана помилка",
+    "accountAlreadyActivated": "Цей обліковий запис вже активовано",
+    "emailNotFound": "Обліковий запис не існує.",
+    "EmailAlreadyExists": "Ця електронна пошта вже зареєстрована",
+    "oldPasswordMistmatch": "Введений пароль невірний.",
+    "passwordMismatch": "Невірний пароль",
+    "cantEditYourself": "Зміна власних дозволів не допускається",
+    "cantEditAdmin": "Цей користувач має права адміністратора",
+    "cantOpenClient": "Додаток %VMS_NAME% не виявлено. <a href=\"/download\">Завантажити</a>",
+    "lostConnection": "Підключення до {{systemName}} втрачено",
+    "thisSystem": "система",
+    "oldSafariNotSupported": "Версії Safari старше 10 не підтримуються",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+  },
+  "passwordRequirements": {
+    "good": "хороший",
+    "fair": "середній",
+    "minLength": "занадто короткий",
+    "minLengthMessage": "Пароль повинен містити принаймні 8 символів",
+    "required": "некоректний",
+    "requiredMessage": "Використовуйте тільки латинські букви, цифри і символи клавіатури, уникайте початкових та кінцевих пробілів",
+    "weak": "слабкий",
+    "weakMessage": "Для надійності паролю використовуйте цифри, букви верхнього та нижнього регістру та спеціальні символи",
+    "strongMessage": "Сильний пароль!",
+    "common": "занадто поширений",
+    "commonMessage": "Цей пароль входить у список найпопулярніших паролів у світі",
+    "missingMessage": "Необхідно вказати пароль"
+  },
+  "sharing": {
+    "confirmOwner": "Якщо змінити власника системи, вона більше не буде належати до поточного облікового запису. Ця дія є незворотньою. Ви впевнені?",
+    "shareTitle": "Загальний доступ",
+    "shareConfirmButton": "Загальний доступ",
+    "editShareTitle": "Редагувати права доступу",
+    "editShareConfirmButton": "Зберегти",
+    "permissionsSaved": "Нові права доступу збережені"
+  },
+  "system": {
+    "yourSystem": "Ваша система",
+    "mySystemSearch": "ЯМійМоя",
+    "unavailable": "Система недоступна",
+    "offline": "Система знаходиться поза мережею",
+    "openClient": "Відкрити в %VMS_NAME%",
+    "openClientNoSystem": "Відкрити %VMS_NAME%",
+    "confirmMergeAction": "Об'єднати",
+    "mergeSystemTitle": "Об'єднати системи",
+    "confirmRenameTitle": "Назва системи",
+    "confirmRenameAction": "Зберегти",
+    "successRename": "Ім'я системи збережено",
+    "confirmDisconnectTitle": "Відключити систему від %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Відключити",
+    "confirmUnshareFromMe": "Ви збираєтеся відключити цю систему від свого облікового запису. Ви більше не зможете отримати доступ до цієї системи. Ти впевнений?",
+    "confirmUnshareFromMeTitle": "Відключити систему?",
+    "confirmUnshareFromMeAction": "Відключити",
+    "confirmUnshare": "Цей користувач не зможе отримати доступ до системи. Ти впевнений?",
+    "confirmUnshareTitle": "Видалити користувача?",
+    "confirmUnshareAction": "Видалити",
+    "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
+    "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
+    "successMerge": "System merge completed",
+    "permissionsRemoved": "{{email}} був позбавлений повноважень"
+  },
+  "account": {
+    "accountSavedSuccess": "Ваш обліковий запис успішно збережено",
+    "activationLinkSent": "Посилання для активації відправлене",
+    "passwordChangedSuccess": "Ваш обліковий запис успішно збережено",
+    "changePassword": "Змінити пароль",
+    "newPasswordLabel": "Новий пароль",
+    "saveChanges": "Зберегти"
+  },
+  "downloads": {
+    "noClientDetectedTitle": "Встановіть %VMS_NAME% для роботи з системою",
+    "action": "Завантажити %VMS_NAME%",
+    "mobile": {
+      "ios": {
+        "link": "%IOS_APPLICATION_LINK%"
+      },
+      "android": {
+        "link": "%ANDROID_APPLICATION_LINK%"
+      }
+    },
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+      },
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+      },
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+      },
+      "ios": {
+        "label": "iOS",
+        "shortLabel": "iOS"
+      },
+      "android": {
+        "label": "Android",
+        "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      }
+    },
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
+    },
+    "appTypes": {
+      "client": "Тільки клієнт",
+      "server": "Тільки сервер",
+      "bundle": "Клієнт і сервер",
+      "servertool": "Інструмент налаштування"
+    },
+    "releasesTypes": {
+      "beta": "Beta",
+      "betas": "Betas",
+      "rc": "Release Candidate",
+      "release": "Release",
+      "releases": "Releases",
+      "patch": "Patch",
+      "patches": "Patches"
+    }
+  },
+  "activeActions": {
+    "sendConfirm": "Відправити посилання активації ще раз",
+    "resetPassword": "Відновити пароль",
+    "setNewPassword": "Зберегти пароль",
+    "setNewPasswordLabel": "Новий пароль"
+  },
+  "regActions": {
+    "passwordLabel": "Пароль",
+    "createAccount": "Створити обліковий запис"
+  },
+  "header": {
+    "allSystems": "Всі системи",
+    "systems": "Системи"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Висока якість",
+      "lowStream": "Низька якість",
+      "transcoding": "Перекодування",
+      "unknown": "Невідомо",
+      "copyToClipboard": "копіювати в буфер обміну",
+      "copyDefaultText": "копіювати",
+      "copyActiveText": "скопійовано до буфера обміну"
+    },
+    "systemOffline": "Система знаходиться поза мережею",
+    "systemHasNoCameras": "НЕМАЄ КАМЕР",
+    "cameraStates": {
+      "offline": "Поза мережею",
+      "error": "Помилка",
+      "unauthorized": "Потрібна авторизація",
+      "noData": "Немає даних",
+      "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
+      "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео.",
+      "flashOrWebmRequired": "Відео не може бути відтворено. Можливо, потрібно <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановитиAdobe Flash</a> або<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для відтворення відео в Internet Explorer.",
+      "noArmSupport": "Цей браузер або пристрій не підтримує відтворення відео з серверів на базі ARM.",
+      "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
+      "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+      "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
+      "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium."
+    },
+    "searchCamPlaceholder": "Пошук",
+    "resolution": {
+      "auto": "Авто",
+      "high": "Високий",
+      "low": "Низький"
+    },
+    "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
+    "voiceCommands": {
+      "play": "відтворити",
+      "pause": "пауза",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "очистити вікно пошуку",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "розгорнути всі сервери",
+      "collapse all servers": "згорнути всі сервери",
+      "stop listening": "припинити прослуховування",
+      "help": "help | show commands"
+    }
+  }
+}

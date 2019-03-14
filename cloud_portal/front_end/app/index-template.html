@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" ng-app="cloudApp">
+<html class="no-js">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,17 +8,16 @@
 
     <base href="/">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://cameras.networkoptix.com/api/v1/cacameras/">
 
     <link rel="icon" href="static/images/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
-    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
-    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
-    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/fonts.css"/>
+
     <% for (key in htmlWebpackPlugin.files.css) { %>
     <link rel="stylesheet" href="/static<%= htmlWebpackPlugin.files.css[key] %>" />
     <% } %>
@@ -34,16 +33,27 @@
     Please, turn on JavaScript in your browser
 </noscript>
 
-<header></header>
+<nx-ribbon></nx-ribbon>
+<nx-header ng-cloak></nx-header>
 
-<div ng-view="">
-</div>
+<nx-app>
+    <div class="placeholder">
+        <div class="placeholder-content">
+            <div class="placeholder-preloader">
+                <div class="circleG circleG_1"></div>
+                <div class="circleG circleG_2"></div>
+                <div class="circleG circleG_3"></div>
+            </div>
+        </div>
+    </div>
+</nx-app>
 
-<footer></footer>
+<nx-footer ng-cloak></nx-footer>
 
 <% for (key in htmlWebpackPlugin.files.chunks) { %>
 <script type="text/javascript" src="/static<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
 <% } %>
+
 <!-- Google Tag Manager -->
 <script async>(function (w, d, s, l, i) {
     w[l] = w[l] || [];

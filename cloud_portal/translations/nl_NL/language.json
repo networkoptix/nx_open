@@ -1,19 +1,20 @@
 {
+  "language": "nl_NL",
   "language_name": "Nederlands",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Oké",
     "cancelButton": "Annuleren",
-    "loginTitle": "Log in op {{PRODUCT_NAME}}",
+    "loginTitle": "Log in op %PRODUCT_NAME%",
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
     "logoutAuthorisedLogoutButton": "Uitloggen"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Welkom bij",
     "register": "Maak een account aan in",
     "changePassword": "Wachtwoord wijzigen -",
@@ -31,8 +32,8 @@
     "view": "Bekijk camera's - ",
     "debug": "Debug",
     "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} voor ",
+    "download": "Download %VMS_NAME%",
+    "downloadPlatform": "Download %VMS_NAME% voor ",
     "pageNotFound": "Pagina niet gevonden"
   },
   "systemStatuses": {
@@ -52,16 +53,16 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "Viewer": {
-      "label": "Kijker",
+      "label": "Gebruiker 'Basis'",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "Live Viewer": {
-      "label": "Live kijker",
+      "label": "Gebruiker 'Live'",
       "description": "Kan alleen live video bekijken"
     },
     "Advanced Viewer": {
-      "label": "Geavanceerde Kijker",
-      "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
+      "label": "Gebruiker 'Geavanceerd'",
+      "description": "Kan live video bekijken, bladeren in het archief, camera's configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
       "label": "Administrator",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Aangepast",
-      "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
+      "description": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -84,20 +85,20 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "viewer": {
-      "label": "Kijker",
+      "label": "Gebruiker 'Basis'",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "liveViewer": {
-      "label": "Live kijker",
+      "label": "Gebruiker 'Live'",
       "description": "Kan alleen live video bekijken"
     },
     "advancedViewer": {
-      "label": "Geavanceerde Kijker",
+      "label": "Gebruiker 'Geavanceerd'",
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "custom": {
       "label": "Aangepast",
-      "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
+      "description": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen"
     }
   },
   "errorCodes": {
@@ -116,33 +117,43 @@
     "cantSendConfirmationPrefix": "Kan geen bevestigingsmail versturen",
     "cloudInvalidResponse": "Cloud DB heeft een onverwacht antwoord teruggezonden",
     "notAuthorized": "Wachtwoord onjuist",
-    "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
     "brokenAccount": "Onverwacht probleem met account. <a href=\"/restore_password\">Account herstellen</a>",
+    "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
     "wrongCode": "Account is al geactiveerd of de bevestigingscode is onjuist",
     "wrongCodeRestore": "Bevestigingscode is al gebruikt of niet correct",
     "forbidden": "U hebt geen rechten om deze actie uit te voeren",
     "accountNotActivated": "Dit account is nog niet geactiveerd. <a href=\"/activate\">Stuur de activeringslink opnieuw</a>",
-    "accountBlocked": "Dit account is geblokkeerd",
+    "accountBlocked": "Account is tijdelijk niet bereikbaar. Probeer het over een paar minuten nogmaals.",
     "notFound": "Niet gevonden",
     "alreadyExists": "Deze account bestaat al",
     "unknownError": "Er is een onverwachte fout opgetreden",
     "accountAlreadyActivated": "Deze account is al geactiveerd",
     "emailNotFound": "Dit account bestaat niet.",
-    "EmailAlreadyExists": "Dit e-mailadres is al geregistreerd",
+    "EmailAlreadyExists": "Dit Email is al geregistreerd",
     "oldPasswordMistmatch": "Dit wachtwoord is onjuist.",
     "passwordMismatch": "Wachtwoord onjuist",
     "cantEditYourself": "Het wijzigen van eigen machtigingen is niet toegestaan",
     "cantEditAdmin": "Deze gebruiker heeft beheerdersrechten",
-    "cantOpenClient": "{{VMS_NAME}} applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "%VMS_NAME% applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbinding met {{systemName}} verloren",
-    "thisSystem": "het systeem"
+    "thisSystem": "het systeem",
+    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "goed",
+    "fair": "redelijk",
+    "minLength": "te kort",
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",
+    "required": "incorrect",
     "requiredMessage": "Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
+    "weak": "zwak",
     "weakMessage": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "strongMessage": "Sterk wachtwoord!",
-    "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld"
+    "common": "te algemeen",
+    "commonMessage": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
+    "missingMessage": "Wachtwoord is vereist"
   },
   "sharing": {
     "confirmOwner": "Als u de eigenaar van het systeem wijzigt, trekt u het eigendom in van het uw account voor dit systeem. Deze actie is onomkeerbaar. Weet je het zeker?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Systeem is onbereikbaar",
     "offline": "Systeem is offline",
-    "openClient": "Open in {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "Open in %VMS_NAME%",
+    "openClientNoSystem": "Open %VMS_NAME%",
+    "confirmMergeAction": "Samenvoegen",
+    "mergeSystemTitle": "Samenvoegen",
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
     "successRename": "Systeemnaam opgeslagen",
-    "confirmDisconnectTitle": "Verbinding verbreken met systeem {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Verbinding verbreken met systeem %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Verbinding verbreken",
     "confirmUnshareFromMe": "U staat op het punt om dit systeem uit uw account te verbreken. U kunt dit systeem niet meer gebruiken. Weet u het zeker?",
     "confirmUnshareFromMeTitle": "Systeem loskoppelen?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "Deze gebruiker heeft geen toegang tot het systeem. Weet je het zeker?",
     "confirmUnshareTitle": "Gebruiker verwijderen?",
     "confirmUnshareAction": "Verwijder",
-    "successDisconnected": "Systeem is succesvol afgesloten van {{PRODUCT_NAME}}",
+    "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "Opslaan"
   },
   "downloads": {
-    "noClientDetectedTitle": "Installeer {{VMS_NAME}} om uw systeem te bekijken",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installeer %VMS_NAME% om uw systeem te bekijken",
+    "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -255,11 +269,59 @@
     "setNewPasswordLabel": "Nieuw wachtwoord"
   },
   "regActions": {
-    "passwordLabel": "Password",
+    "passwordLabel": "Wachtwoord",
     "createAccount": "Account aanmaken"
   },
   "header": {
     "allSystems": "Alle systemen",
     "systems": "Systemen"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Primaire stream",
+      "lowStream": "Secundaire stream",
+      "transcoding": "Transcoding",
+      "unknown": "Unknown",
+      "copyToClipboard": "kopiëren naar klembord",
+      "copyDefaultText": "kopiëren",
+      "copyActiveText": "gekopieerd naar het klembord"
+    },
+    "systemOffline": "Systeem Offline",
+    "systemHasNoCameras": "GEEN CAMERA'S",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Error",
+      "unauthorized": "Authenticatie vereist",
+      "noData": "Geen data",
+      "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
+      "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's.",
+      "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
+      "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
+      "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
+      "ieNoWebm": "Installeer alstublieft de <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+      "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
+      "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser."
+    },
+    "searchCamPlaceholder": "Zoeken",
+    "resolution": {
+      "auto": "Automatisch",
+      "high": "Hoog",
+      "low": "Lage"
+    },
+    "chromeCastWarning": "Een Chromecast vraagt veel resources en kan tot prestatieproblemen lijden op uw server.",
+    "voiceCommands": {
+      "play": "afspelen",
+      "pause": "pauze",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "wis zoekopdracht",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "toon alle servers",
+      "collapse all servers": "vouw alle servers samen",
+      "stop listening": "stop met luisteren",
+      "help": "help | show commands"
+    }
   }
 }

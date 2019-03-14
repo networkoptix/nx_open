@@ -2,7 +2,7 @@
 
 Kattintson a linkre {{ message.product }} {{ message.id }} vázlatának megtekintéséhez
 
-Link a felülvizsgálatjhoz: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Link a felülvizsgálatjhoz: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 Ezen az oldalon
 1) Készíthet egy előnézetet a legutóbbi változtatások megtekintéséhez.

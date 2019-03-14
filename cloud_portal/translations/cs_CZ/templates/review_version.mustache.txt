@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+K dispozici je nová verze pro {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+Kliknutím na odkaz zobrazíte koncept revize {{ message.id }} pro {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Odkaz k zobrazení revize: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+Na této stránce můžete
+1) Vytvořit náhled pro zobrazení nejnovějších změn.
+2) Oznámit tuto verzi, která bude aktualizovat veškerý obsah.
+3) Upravit kontexty kliknutím na tlačítko Upravit záznam. Chcete-li zobrazit tyto změny, musíte vytvořit novou verzi.

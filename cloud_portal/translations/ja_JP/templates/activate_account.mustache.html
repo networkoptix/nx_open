@@ -1,9 +1,9 @@
-<h1>こんにちは、{{message.fullName}}</h1>
+<h1>こんにちは{{message.userFullName}}</h1>
 
 <p>下のボタンをクリックしてメールアドレスを確認し、アカウントを有効にしてください</p>
 
 <a class="btn" href="{{config.portal_url}}/activate/{{message.code}}">アカウントの有効</a>
 
 <p class='disclaimer'>
-{{PRODUCT_NAME}} で登録していない場合は、このメールを無視してください<br>メッセージまたはリンクを第三者と共有しないでください
+%PRODUCT_NAME%に登録していない場合は、このメールを無視してください <br>メッセージやリンクを第三者に知らせないでください
 </p>

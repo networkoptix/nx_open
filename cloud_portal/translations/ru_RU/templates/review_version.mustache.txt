@@ -2,7 +2,7 @@
 
 Щелкните по ссылке чтобы просмотреть черновик {{ message.id }} для {{ message.product }}
 
-Ссылка для проверки: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Ссылка для проверки: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 На этой странице можно
 1) Просмотреть последние изменения.

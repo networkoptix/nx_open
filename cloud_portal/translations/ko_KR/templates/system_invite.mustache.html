@@ -1,15 +1,15 @@
-<h1>반갑습니다., {{message.fullName}}</h1>
+<h1>안녕하세요, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a>님이 동영상 관리 시스템"{{message.system_name}}"에 대한 접근 권한을 공유했습니다.
 
-운영관리를 위하여 추가지시사항에 따라 사용중인 이메일로 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> 의 계정을 생성하세요.</p>
+운영관리를 위하여 추가지시사항에 따라 사용중인 이메일로 <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>의 계정을 생성하세요.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>당신은 비디오 관리 시스템 "{{message.system_name}}"에 대한 접근 권한이 부여되었습니다.
 
-운영관리를 위하여 추가지시사항에 따라 사용중인 이메일로 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>의 계정을 생성하세요.</p>
+운영관리를 위하여 추가지시사항에 따라 사용중인 이메일로 <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>의 계정을 생성하세요.</p>
 {{/message.sharer_name}}
 
 <a class="btn" href="{{config.portal_url}}/register/{{message.code}}">계정 생성</a>

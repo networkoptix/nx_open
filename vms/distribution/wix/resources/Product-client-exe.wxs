@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <?include BuildVars.wxi ?>
+
+    <Bundle
+            Name="$(var.productName) Client"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="$(var.installerIcon)"
+            UpgradeCode="$(var.clientBundleUpgradeCode)"
+            DisableModify="yes">
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ClientMsiVersion' />
+        <util:ProductSearchRef Id='ServerMsiVersion2' />
+
+        <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
+
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="$(var.CustomizationDir)/license.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
+
+            <bal:WixStandardBootstrapperApplication
+                SuppressOptionsUI="yes"
+                LicenseUrl="license.html"
+                ShowFilesInUse="yes"
+                SuppressRepair="yes"
+                ThemeFile="OptixTheme.xml"
+                LocalizationFile="theme_$(var.installerLanguage).wxl"
+                SuppressDowngradeFailure="yes"
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
+        </BootstrapperApplicationRef>
+
+        <Variable Name="InstallerTitle" Value="!(loc.ClientOnly)" />
+
+        <Chain DisableSystemRestore="no">
+            <PackageGroupRef Id="ClientPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

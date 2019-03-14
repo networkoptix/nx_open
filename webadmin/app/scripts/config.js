@@ -14,6 +14,7 @@
 
         defaultLogin: 'admin',
         defaultPassword: 'admin',
+        defaultPort: 7001,
         newServerFlag: 'SF_NewSystem',
         publicIpFlag: 'SF_HasPublicIP',
         iflistFlag: 'SF_IfListCtrl',
@@ -86,7 +87,7 @@
             smtpPort: {type: 'number'},
             smtpSimple: {type: 'checkbox'},
             smtpTimeout: {type: 'number'},
-            smptPassword: {type: 'password'},
+            smtpPassword: {type: 'password'},
             smtpUser: {type: 'text'},
             updateNotificationsEnabled: {type: 'checkbox'},
             arecontRtspEnabled: {type: 'checkbox'},
@@ -115,11 +116,30 @@
             systemId: {type: 'static'},
             systemNameForId: {type: 'text'},
             takeCameraOwnershipWithoutLock: {type: 'checkbox'},
-            timeSynchronizationEnabled: {type: 'checkbox'},
             upnpPortMappingEnabled: {type: 'checkbox'},
+
+            trafficEncryptionForced:  {type: 'checkbox'},
+            videoTrafficEncryptionForced: {type: 'checkbox'},
+            updateStatus: {type: 'static'},
+            watermarkSettings: {type: 'static'},
+
+            timeSynchronizationEnabled: {type: 'checkbox'},
+            primaryTimeServer: {type: 'static'},
+            osTimeChangeCheckPeriodMs: {type: 'number'},
+            syncTimeExchangePeriod: {type: 'number'},
+
+            maxWearableArchiveSynchronizationThreads: {type: 'number'},
+
+            hanwhaDeleteProfilesOnInitIfNeeded: {type: 'checkbox'},
+            hanwhaChunkReaderMessageBodyTimeoutSeconds: {type: 'number'},
+            hanwhaChunkReaderResponseTimeoutSeconds: {type: 'number'},
+            showHanwhaAlternativePtzControlsOnTile: {type: 'checkbox'},
+
+            maxEventLogRecords: {type: 'number'}
         },
         webclient: {
             useServerTime: true,
+            useSystemTime: true,
             disableVolume: true,
             reloadInterval: 5 * 1000,
             leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
@@ -183,6 +203,26 @@
             slowPollingTimeout: 5000,
             pollingTimeout: 1000,
             retriesForMergeCredentialsToApply: 15
+        },
+
+        metrics:{
+            hide:{
+                p2pCounters: true,
+                transactions: true,
+                tcpConnections: true,
+                offlineStatus: true
+            },
+            statusOrder:{
+                Offline: 1,
+                Unauthorized: 2,
+                Recording: 8,
+                Online: 9
+            },
+            percentValues:{
+                danger: 70, // Danger level of anything - more that 70% usage
+                warning: 50 // Warning level - more that 50% usage
+            },
+            liveMetricsUpdate: 10000 // Every 10 seconds
         }
     };
 })();

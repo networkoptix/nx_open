@@ -11,11 +11,15 @@ import 'hint.css/hint.min.css';
 import 'rangeslider.js/dist/rangeslider.css';
 import '../styles/main.scss';
 
+require('es6-promise/auto');
 require('./config.js');
 require('./bootstrap.js');
 
 //App
 require('./app.js');
+
+//Vendor
+require('./vendor/vkbeautify.js');
 
 //Services
 require('./services/cloudAPI.js');
@@ -42,6 +46,7 @@ require('./controllers/dialogs/cloudDialog.js');
 require('./controllers/dialogs/setup.js');
 
 require('./controllers/advanced.js');
+require('./controllers/metrics.js');
 require('./controllers/apitool.js');
 require('./controllers/client.js');
 require('./controllers/debug.js');
@@ -56,3 +61,4 @@ require('./controllers/offline.js');
 require('./controllers/restart.js');
 require('./controllers/sdkeula.js');
 require('./controllers/settings.js');
+require('./controllers/serverdoc.js');

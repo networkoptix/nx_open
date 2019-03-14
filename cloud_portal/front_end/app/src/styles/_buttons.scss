@@ -1,0 +1,190 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+#button {
+    height        : 2rem;
+    border-radius : $border-radius-base;
+    font-family   : $font-family-medium;
+    font-size     : 14px;
+    font-weight   : inherit;
+    padding       : 0 1rem;
+    border        : none;
+    display       : flex;
+    align-items   : center;
+    transition    : none;
+    max-width     : 278px;
+    text-overflow : ellipsis;
+    overflow      : hidden;
+    line-height   : 1rem;
+    
+    &:hover,
+    &:active,
+    &.active,
+    &:focus,
+    &.focus {
+        box-shadow : none;
+    }
+    
+    &:disabled {
+        opacity : 0.3;
+        
+        & * {
+            pointer-events : none;
+        }
+    }
+}
+
+// Overwrite Boostrap section ************
+button, .btn {
+    @extend #button;
+}
+
+.btn.btn-default, .btn.btn-dropdown-toggle {
+    color            : $dark9;
+    background-color : $light4;
+    box-shadow       : inset 0 -1px 0 0 $light7;
+    
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $light5;
+        box-shadow       : inset 0 -1px 0 0 $light8;
+    }
+    
+    &:active,
+    &.active {
+        background-color : $light6 !important;
+        box-shadow       : inset 0 1px 0 0 $light8 !important;
+    }
+}
+
+.btn.btn-primary {
+    color            : $light1 !important;
+    background-color : $brand_core;
+    border-color     : transparent;
+    box-shadow       : inset 0 -1px 0 0 $brand_d2;
+    
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $brand_d1;
+        box-shadow       : inset 0 -1px 0 0 $brand_d3;
+    }
+    
+    &:focus,
+    &.focus {
+    
+    }
+    
+    &:active,
+    &.active {
+        background-color : $brand_d2 !important;
+        box-shadow       : inset 0 1px 0 0 $brand_d4 !important;
+    }
+}
+
+.btn.btn-lg {
+    padding       : 10px 16px;
+    font-size     : 15px;
+    line-height   : 1.3333333;
+    border-radius : 4px;
+}
+
+.btn.btn-toggle {
+    color            : $dark9;
+    background-color : $light4;
+    max-width        : 180px;
+    display          : flex;
+    align-content    : center;
+    justify-content  : center;
+    
+    input {
+        position : absolute;
+        opacity  : 0;
+    }
+    
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $light5;
+    }
+    
+    &:active,
+    &.active {
+        background-color : $light6 !important;
+    }
+    
+    &.selected {
+        color            : $light1;
+        background-color : $light16 !important;
+    }
+}
+
+// (END) Overwrite Boostrap section ******
+
+.btn-back {
+    padding-left : 0;
+    
+    .back-arrow {
+        width               : 40px;
+        height              : 32px;
+        background-image    : url('/static/images/tutorial_arrow.png') !important;
+        background-repeat   : no-repeat;
+        background-size     : 20px 20px;
+        background-position : center;
+        transform           : scaleX(-1);
+        
+        @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+            background-image : url('/static/images/tutorial_arrow@2x.png') !important;
+        }
+    }
+}
+
+.btn-dropdown-toggle {
+    background-color : transparent;
+}
+
+.btn-text {
+    height          : 20px;
+    font-size       : 13px;
+    color           : $light16;
+    text-decoration : none;
+    
+    .nav-arrow {
+        height       : 20px;
+        float        : left;
+        right        : 0;
+        margin-right : 2px;
+        
+        span {
+            background-color : $light16;
+        }
+    }
+    
+    &.has-icon {
+        padding-left : 20px;
+    }
+    
+    span {
+        line-height: 20px;
+        
+        &.close {
+            left : 10px;
+            top  : 1px;
+    
+            &:before, &:after {
+                background-color: $light16;
+            }
+        }
+    }
+    
+    &:hover {
+        color           : $dark15;
+        text-decoration : none;
+    
+        span.close {
+            &:before, &:after {
+                background-color : $dark15;
+            }
+        }
+    }
+    
+    &:active, &:focus {
+        color : $light16;
+    }
+}

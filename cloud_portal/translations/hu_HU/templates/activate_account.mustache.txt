@@ -1,8 +1,8 @@
-Üdvözöljük!
+Hello {{message.userFullName}},
 
   E-mail címe visszaigazolásához és fiókja aktiválásához kattintson az alábbi linkre.
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Ha nem regisztrált {{PRODUCT_NAME}} alkalmazásban ne foglalkozzon ezzel az e-maillel.
+Ha nem regisztrált %PRODUCT_NAME% alkalmazásban ne foglalkozzon ezzel az e-maillel.
 Ne ossza meg az üzenetet vagy a klinket senkivel.

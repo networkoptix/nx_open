@@ -1,1 +1,0 @@
-nx_add_test(teststorageplugin_ut NO_MOC PUBLIC_LIBS GTest teststorageplugin)

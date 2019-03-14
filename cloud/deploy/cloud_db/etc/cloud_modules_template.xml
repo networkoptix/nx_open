@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sequence>
+    <set resName="cdb" resValue="https://%host%:443"/>
+    <set resName="hpm" resValue="stun://$MEDIATOR_HOST:$MEDIATOR_STUN_PORT"/>
+    <set resName="notification_module" resValue="https://%host%:443"/>
+</sequence>

@@ -1,196 +1,210 @@
 {
-  "language_name": "LANGUAGE_NAME",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "language": "cs_CZ",
+  "language_name": "Čeština",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
-    "cancelButton": "Cancel",
-    "loginTitle": "Log in to {{PRODUCT_NAME}}",
-    "loginButton": "Log in",
-    "logoutAuthorisedTitle": "You are already logged in",
-    "logoutAuthorisedContinueButton": "Continue",
-    "logoutAuthorisedLogoutButton": "Log Out"
+    "cancelButton": "Zrušit",
+    "loginTitle": "Přihlaste se k %PRODUCT_NAME%",
+    "loginButton": "Přihlásit se",
+    "logoutAuthorisedTitle": "Již jste přihlášen",
+    "logoutAuthorisedContinueButton": "Pokračovat",
+    "logoutAuthorisedLogoutButton": "Odhlásit se"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
-    "registerSuccess": "Welcome to",
-    "register": "Create account in",
-    "changePassword": "Change password -",
-    "account": "Account settings -",
-    "systems": "Systems -",
-    "system": "System -",
-    "systemShare": "Share System -",
-    "activate": "Activate account -",
-    "activateSent": "Activate account -",
-    "activateSuccess": "Account activated -",
-    "activateCode": "Activate account -",
-    "restorePassword": "Reset password -",
-    "restorePasswordSuccess": "Password saved -",
-    "restorePasswordCode": "Reset password -",
-    "view": "View cameras - ",
-    "debug": "Debug",
-    "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} for ",
-    "pageNotFound": "Page not found"
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Vítejte v",
+    "register": "Vytvořit účet v",
+    "changePassword": "Změnit heslo -",
+    "account": "Nastavení účtu -",
+    "systems": "Systémy -",
+    "system": "Systém -",
+    "systemShare": "Sdílet systém -",
+    "activate": "Aktivovat účet -",
+    "activateSent": "Aktivovat účet -",
+    "activateSuccess": "Účet aktivován -",
+    "activateCode": "Aktivovat účet -",
+    "restorePassword": "Obnovit heslo -",
+    "restorePasswordSuccess": "Heslo uloženo -",
+    "restorePasswordCode": "Obnovit heslo -",
+    "view": "Zobrazit kamery - ",
+    "debug": "Ladění",
+    "login": "Přihlásit -",
+    "download": "Stáhnout %VMS_NAME%",
+    "downloadPlatform": "Stáhnout %VMS_NAME% pro ",
+    "pageNotFound": "Stránka nenalezna"
   },
   "systemStatuses": {
-    "notActivated": "not activated",
-    "activated": "activated",
+    "notActivated": "neaktivováno",
+    "activated": "aktivováno",
     "online": "online",
     "offline": "offline",
-    "unavailable": "unavailable"
+    "unavailable": "nedostupný"
   },
   "accessRoles": {
     "disabled": {
-      "label": "Disabled",
-      "description": "User is disabled and cannot log in to System"
+      "label": "Zakázáno",
+      "description": "Uživatel je zakázán a nemůže se přihlásit do systému"
     },
     "Owner": {
-      "label": "Owner",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label": "Vlastník",
+      "description": "Neomezený přístup, včetně možnosti sdílení a připojení/odpojení systému z cloudu"
     },
     "Viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Prohlížeč",
+      "description": "Můžete zobrazit živé video a procházet archiv"
     },
     "Live Viewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Živé video",
+      "description": "Můžete zobrazit pouze živé video"
     },
     "Advanced Viewer": {
-      "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label": "Pokročilý prohlížeč",
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
-      "label": "Administrator",
-      "description": "Unrestricted access including the ability to share"
+      "label": "Administrátor",
+      "description": "Neomezený přístup včetně možnosti sdílení"
     },
     "Custom": {
-      "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label": "Vlastní",
+      "description": "Pro nastavení uživatelských oprávnění použijte aplikaci %VMS_NAME% Client"
     },
     "cloudAdmin": {
-      "label": "Administrator",
-      "description": "Can configure System and share it"
+      "label": "Administrátor",
+      "description": "Můžete nastavit systém a sdílet jej"
     },
     "customRole": {
-      "label": "Custom role",
-      "description": "Custom user role specified in System"
+      "label": "Vlastní role",
+      "description": "Vlastní role uživatele zadaná v systému"
     },
     "owner": {
-      "label": "Owner",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label": "Vlastník",
+      "description": "Neomezený přístup, včetně možnosti sdílení a připojení/odpojení systému z cloudu"
     },
     "viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Prohlížeč",
+      "description": "Můžete zobrazit živé video a procházet archiv"
     },
     "liveViewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Živé video",
+      "description": "Můžete zobrazit pouze živé video"
     },
     "advancedViewer": {
-      "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label": "Pokročilý prohlížeč",
+      "description": "Můžete sledovat živé video, prohlížet archiv, konfigurovat kamery, ovládat PTZ atd"
     },
     "custom": {
-      "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label": "Vlastní",
+      "description": "Pro nastavení uživatelských oprávnění použijte aplikaci %VMS_NAME% Client"
     }
   },
   "errorCodes": {
     "ok": "ok",
-    "cantSendActivationPrefix": "Cannot send confirmation Email",
-    "cantDisconnectSystemPrefix": "Cannot delete System",
-    "cantUnshareWithMeSystemPrefix": "Cannot delete System",
-    "cantSharePrefix": "Cannot share System",
-    "cantGetUsersListPrefix": "Users list is unavailable",
-    "cantGetSystemsListPrefix": "System list is unavailable",
-    "cantRegisterPrefix": "Error occurred",
-    "cantGetSystemInfoPrefix": "System info is unavailable",
-    "cantChangeAccountPrefix": "Cannot save changes",
-    "cantChangePasswordPrefix": "Cannot save password",
-    "cantActivatePrefix": "Cannot activate your account",
-    "cantSendConfirmationPrefix": "Cannot send confirmation Email",
-    "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Wrong password",
-    "wrongParameters": "Some parameters on the form are incorrect",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
-    "wrongCode": "Account is already activated or confirmation code is incorrect",
-    "wrongCodeRestore": "Confirmation code is already used or incorrect",
-    "forbidden": "You do not have permissions to perform this action",
-    "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account is blocked",
-    "notFound": "Not found",
-    "alreadyExists": "This account already exists",
-    "unknownError": "Unexpected error occured",
-    "accountAlreadyActivated": "This account is already activated",
-    "emailNotFound": "Account does not exist.",
-    "EmailAlreadyExists": "This Email is already registered",
-    "oldPasswordMistmatch": "Current password is incorrect.",
-    "passwordMismatch": "Wrong password",
-    "cantEditYourself": "Changing own permissions is not allowed",
-    "cantEditAdmin": "This user has administrator permissions",
-    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection": "Connection to {{systemName}} lost",
-    "thisSystem": "the system"
+    "cantSendActivationPrefix": "Nelze odeslat potvrzovací email",
+    "cantDisconnectSystemPrefix": "Systém nelze smazat",
+    "cantUnshareWithMeSystemPrefix": "Systém nelze smazat",
+    "cantSharePrefix": "Systém nelze sdílet",
+    "cantGetUsersListPrefix": "Seznam uživatelů není dostupný",
+    "cantGetSystemsListPrefix": "Seznam systému není dostupný",
+    "cantRegisterPrefix": "Došlo k chybě",
+    "cantGetSystemInfoPrefix": "Informace o systému jsou nedostupné",
+    "cantChangeAccountPrefix": "Změny nelze uložit",
+    "cantChangePasswordPrefix": "Heslo nelze uložit",
+    "cantActivatePrefix": "Váš účet nelze aktivovat",
+    "cantSendConfirmationPrefix": "Nelze odeslat potvrzovací email",
+    "cloudInvalidResponse": "Databáze cloudu vrátila neočekávanou odpověď",
+    "notAuthorized": "Chybné heslo",
+    "brokenAccount": "Neočekávaný problém s účtem. <a href=\"/restore_password\">Obnovení účtu</a>",
+    "wrongParameters": "Některé parametry ve formuláři jsou nesprávné",
+    "wrongCode": "Účet je již aktivován, nebo potvrzovací kód je nesprávný",
+    "wrongCodeRestore": "Potvrzovací kód je již použit nebo nesprávný",
+    "forbidden": "K provedení této akce nemáte oprávnění",
+    "accountNotActivated": "Tento účet není ještě aktivován. <a href=\"/activate\">Odeslat znovu aktivační odkaz</a>",
+    "accountBlocked": "Tento účet je dočasně zablokován. Zkuste to prosím znovu za pár minut.",
+    "notFound": "Nenalezeno",
+    "alreadyExists": "Tento účet již existuje",
+    "unknownError": "Došlo k neočekávané chybě",
+    "accountAlreadyActivated": "Tento účet byl již aktivován",
+    "emailNotFound": "Účet neexistuje.",
+    "EmailAlreadyExists": "Tento email je již registrován",
+    "oldPasswordMistmatch": "Aktuální heslo je nesprávné.",
+    "passwordMismatch": "Chybné heslo",
+    "cantEditYourself": "Změna vlastních oprávnění není povolena",
+    "cantEditAdmin": "Tento uživatel má oprávnění správce",
+    "cantOpenClient": "Aplikace %VMS_NAME% není nalezena. <a href=\"/download\">Stáhnout</a>",
+    "lostConnection": "Připojení k {{systemName}} se ztratilo",
+    "thisSystem": "systém",
+    "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
-    "minLengthMessage": "Password must contain at least 8 characters",
-    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
-    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage": "Strong password!",
-    "commonMessage": "This password is in top most popular passwords in the world"
+    "good": "dobré",
+    "fair": "dostatečné",
+    "minLength": "too short",
+    "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
+    "required": "nesprávné",
+    "requiredMessage": "Používejte pouze latinskou abecedu, číslice a symboly na klávesnici, vyhněte se použití mezery na počátku a konci",
+    "weak": "slabé",
+    "weakMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
+    "strongMessage": "Silné heslo!",
+    "common": "too common",
+    "commonMessage": "Toto heslo je v seznamu nejoblíbenějších heslech na světě",
+    "missingMessage": "Heslo je vyžadováno"
   },
   "sharing": {
-    "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
-    "shareTitle": "Share",
-    "shareConfirmButton": "Share",
-    "editShareTitle": "Edit Permissions",
-    "editShareConfirmButton": "Save",
-    "permissionsSaved": "New permissions saved"
+    "confirmOwner": "Pokud změníte vlastníka systému, zrušíte vlastnictví aktuálního účtu. Tato akce je nevratná. Přejete si pokračovat?",
+    "shareTitle": "Sdílet",
+    "shareConfirmButton": "Sdílet",
+    "editShareTitle": "Upravit oprávnění",
+    "editShareConfirmButton": "Uložit",
+    "permissionsSaved": "Nová oprávnění byla uložena"
   },
   "system": {
-    "yourSystem": "Your System",
+    "yourSystem": "Váš systém",
     "mySystemSearch": "IMeMyMine",
-    "unavailable": "System is unreachable",
-    "offline": "System is offline",
-    "openClient": "Open in {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
-    "confirmRenameTitle": "System name",
-    "confirmRenameAction": "Save",
-    "successRename": "System name saved",
-    "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction": "Disconnect",
-    "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
-    "confirmUnshareFromMeTitle": "Disconnect System?",
-    "confirmUnshareFromMeAction": "Disconnect",
-    "confirmUnshare": "This user will not be able to access System. Are you sure?",
-    "confirmUnshareTitle": "Delete user?",
-    "confirmUnshareAction": "Delete",
-    "successDisconnected": "System is successfully disconnected from {{PRODUCT_NAME}}",
-    "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved": "Permissions were removed from {{email}}"
+    "unavailable": "Systém je nedostupný",
+    "offline": "Systém je offline",
+    "openClient": "Otevřít v %VMS_NAME%",
+    "openClientNoSystem": "Otevřít %VMS_NAME%",
+    "confirmMergeAction": "Sloučit",
+    "mergeSystemTitle": "Sloučení systémů",
+    "confirmRenameTitle": "Název systému",
+    "confirmRenameAction": "Uložit",
+    "successRename": "Název systému byl uložen",
+    "confirmDisconnectTitle": "Odpojit systém od %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Odpojit",
+    "confirmUnshareFromMe": "Chystáte se odpojit systém od Vašeho účtu. K tomuto systému již nebudete mít přístup. Přejete si pokračovat?",
+    "confirmUnshareFromMeTitle": "Odpojit systém?",
+    "confirmUnshareFromMeAction": "Odpojit",
+    "confirmUnshare": "Tento uživatel nebude mít přístup k systému. Přejete si pokračovat?",
+    "confirmUnshareTitle": "Smazat uživatele?",
+    "confirmUnshareAction": "Smazat",
+    "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
+    "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
+    "successMerge": "System merge completed",
+    "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
   },
   "account": {
-    "accountSavedSuccess": "Your account is successfully saved",
-    "activationLinkSent": "Activation Link Sent",
-    "passwordChangedSuccess": "Your account is successfully saved",
-    "changePassword": "Change Password",
-    "newPasswordLabel": "New password",
-    "saveChanges": "Save"
+    "accountSavedSuccess": "Váš účet byl úspěšně uložen",
+    "activationLinkSent": "Aktivní odkaz byl odeslán",
+    "passwordChangedSuccess": "Váš účet byl úspěšně uložen",
+    "changePassword": "Změnit heslo",
+    "newPasswordLabel": "Nové heslo",
+    "saveChanges": "Uložit"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Pro zobrazení Vašeho systému nainstalujte %VMS_NAME%",
+    "action": "Stáhnout %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -233,10 +247,10 @@
       "mac": "X"
     },
     "appTypes": {
-      "client": "Client only",
-      "server": "Server only",
-      "bundle": "Client and Server",
-      "servertool": "Configuration tool"
+      "client": "Pouze klient",
+      "server": "Pouze server",
+      "bundle": "Klient a server",
+      "servertool": "Nástroj konfigurace"
     },
     "releasesTypes": {
       "beta": "Beta",
@@ -249,17 +263,65 @@
     }
   },
   "activeActions": {
-    "sendConfirm": "Resend activation link",
-    "resetPassword": "Reset Password",
-    "setNewPassword": "Save password",
-    "setNewPasswordLabel": "New password"
+    "sendConfirm": "Znovu poslat aktivační odkaz",
+    "resetPassword": "Obnovení hesla",
+    "setNewPassword": "Uložit heslo",
+    "setNewPasswordLabel": "Nové heslo"
   },
   "regActions": {
-    "passwordLabel": "Password",
-    "createAccount": "Create Account"
+    "passwordLabel": "Heslo",
+    "createAccount": "Vytvořit účet"
   },
   "header": {
-    "allSystems": "All Systems",
-    "systems": "Systems"
+    "allSystems": "Všechny systémy",
+    "systems": "Systémy"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Hlavní stream",
+      "lowStream": "Vedlejší stream",
+      "transcoding": "Překódování",
+      "unknown": "Neznámý",
+      "copyToClipboard": "kopírovat do schránky",
+      "copyDefaultText": "kopírovat",
+      "copyActiveText": "zkopírováno do schránky"
+    },
+    "systemOffline": "Systém je offline",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Chyba",
+      "unauthorized": "Ověření je vyžadováno",
+      "noData": "Žádná data",
+      "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+      "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>.",
+      "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
+      "noArmSupport": "Tento prohlížeč nebo zařízení nepodporuje přehrávání videa ze serverů se systémem ARM.",
+      "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
+      "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+      "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
+      "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium."
+    },
+    "searchCamPlaceholder": "Hledat",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Vysoká",
+      "low": "Nízká"
+    },
+    "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
+    "voiceCommands": {
+      "play": "přehrát",
+      "pause": "pauza",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "smazat hledání",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "rozbalit všechny servery",
+      "collapse all servers": "sbalit všechny servery",
+      "stop listening": "zastavení poslech",
+      "help": "help | show commands"
+    }
   }
 }

@@ -1,0 +1,39 @@
+<form #disconnectForm="ngForm" name="disconnectForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title" translate>Disconnect System from %PRODUCT_NAME%?</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="activeModal.close()" *ngIf="closable">
+            <div class="close-content"><span class="close-icon"></span></div>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <p class="warning-label" translate>All cloud users will be deleted.</p>
+        <p translate>System will be accessible through local network with local administrator account.</p>
+        <p translate class="mb-3">Enter password to continue.</p>
+
+        <div class="form-group">
+            <label for="password" translate>Password</label>
+            <input class="form-control"
+                   [(ngModel)]="auth.password" #password="ngModel"
+                   id="password" autocomplete="new-password"
+                   name="password" type="password"
+                   required nxFocusMe>
+            <div *ngIf="password.invalid && password.touched && !nx_wrong_password">
+                <label class="input-error" translate>Password is required</label>
+            </div>
+            <div *ngIf="password.invalid && nx_wrong_password">
+                <label class="input-error" translate>Wrong password</label>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <nx-process-button [process]="disconnect"
+                           [form]="disconnectForm"
+                           action-type="'btn-danger'"
+                           buttonText="{{ 'Disconnect' | translate }}"></nx-process-button>
+
+        <button type="button" class="btn btn-default" (click)="close()" translate>Cancel</button>
+    </div>
+</form>

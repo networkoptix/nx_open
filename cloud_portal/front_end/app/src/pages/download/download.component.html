@@ -1,0 +1,74 @@
+<div class="container" *ngIf="canViewDownloads">
+    <h1 translate>Download</h1>
+
+    <div class="p-0">
+        <ngb-tabset (tabChange)="beforeChange($event)" #tabs [style.visibility]="tabsVisible ? 'visible' : 'hidden'">
+
+            <ngb-tab *ngFor="let platform of downloads.groups"
+                     [id]="platform.os || platform.name" >
+
+                <ng-template ngbTabTitle>
+                    <span class="tab-heading">{{language.lang.downloads.groups[platform.name].label}}</span>
+                </ng-template>
+                <ng-template ngbTabContent>
+                    <div class="card card-default">
+                        <div class="card-body flex-md">
+                            <div class="col-md-4 pl-md-4 order-2 order-md-2 border-left-md">
+                                <b translate>Latest version</b>
+                                <h2 class="version-number"><b>{{downloadsData.version}}</b></h2>
+                                <p>
+                                    <a [href]="downloadsData.releaseNotes" target="_blank" translate>What's new?</a>
+                                    <br>&nbsp;
+                                </p>
+                            </div>
+
+                            <div class="col-md-8 order-1 order-md-1 p-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a class="media btn btn-default download-button"
+                                           [href]="platform.installers[0].url">
+                                            <div class="media-left">
+                                                <span class="download-link"></span>
+                                            </div>
+                                            <div class="media-body text-left">
+                                                <h3 translate>Download %VMS_NAME%</h3>
+                                                <div class="h7 installer-name">{{language.lang.downloads.groups[platform.name].shortLabel ||
+                    language.lang.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</div>
+                                            </div>
+                                        </a>
+                                        <p *ngIf="language.lang.downloads.groups[platform.name].supported"
+                                           [innerHTML]="language.lang.downloads.groups[platform.name].supported">
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="installers" *ngIf="platform.installers.length > 0">
+                                    <h5><b translate>Other packages:</b></h5>
+                                    <div class="links mb-1"
+                                         *ngFor="let link of platform.installers; let i = index"
+                                         [ngClass]="{'a-link': (i % 3) != 2}">
+                                            <a [href]="link.url">{{link.formatName}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+
+        <div class="clearfix">
+            <div class="mobile-badge" *ngFor="let platform of downloads.mobile">
+                <a *ngIf="language.lang.downloads.mobile[platform.name].link != 'disabled'"
+                   class="mobile-link"
+                   [ngClass]="platform.os"
+                   [href]="language.lang.downloads.mobile[platform.name].link">
+                </a>
+            </div>
+            <div class="mobile-badge float-right" *ngIf="canSeeHistory">
+                <a href="/downloads/history" translate>Other releases, patches and beta versions</a>
+            </div>
+        </div>
+    </div>
+</div>
+

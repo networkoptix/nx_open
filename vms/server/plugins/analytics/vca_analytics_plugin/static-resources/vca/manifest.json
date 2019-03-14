@@ -1,0 +1,23 @@
+{
+    "capabilities": "deviceDependent",
+    "eventTypes": [
+        {
+            "id": "nx.vca.md", 
+            "name": "motion detected",
+            "flags": "stateDependent", 
+            "internalName": "md"
+        }, 
+        {
+            "id": "nx.vca.vca", 
+            "name": "vca event",
+            "flags": "stateDependent", 
+            "internalName": "vca"
+        }, 
+        {
+            "id": "nx.vca.fd", 
+            "name": "face detected",
+            "flags": "stateDependent", 
+            "internalName": "fd"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+project_identifier: nx-witness
+api_key: 42f3cd326fea96b19ad3bf2eb9009b45
+base_path: ..
+preserve_hierarchy: true
+
+files:
+  -
+    source: '/distribution/wix/translations/strings_en_US.wxl'
+    dest: '/Installer/OptixTheme.wxl'
+    translation: '/distribution/wix/translations/strings_%locale_with_underscore%.wxl'

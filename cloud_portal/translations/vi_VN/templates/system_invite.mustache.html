@@ -1,16 +1,14 @@
-<h1>Xin chào, {{message.fullName}}</h1>
+<h1>Xin chào, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> đã chia sẻ quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}" với bạn.
 
-Để xem và quản lý nó, vui lòng tạo tài khoản trên <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn khác.</p>
+Để xem và quản lý nó, vui lòng tạo tài khoản trên <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn khác.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>Bạn đã được cấp quyền truy cập vào hệ thống quản lý hình ảnh "{{message.system_name}}".
+<p>Bạn đã được cấp quyền truy cập vào hệ thống quản lý video "{{message.system_name}}".
 
-Để xem và quản lý nó, vui lòng tạo tài khoản trên <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn khác.</p>
-{{/message.sharer_name}}
-
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+Để xem và quản lý nó, vui lòng tạo tài khoản trên <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn khác.</p>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> Tạo Tài khoản </a>
 

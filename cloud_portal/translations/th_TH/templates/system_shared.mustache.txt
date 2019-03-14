@@ -1,4 +1,4 @@
-สวัสดี {{message.fullName}}
+สวัสดี {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) แชร์การเข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}" กับคุณ
@@ -8,4 +8,4 @@
 คุณได้รับสิทธิ์เข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}"
 {{/message.sharer_name}}
 
-ดูใน {{PRODUCT_NAME}} พอร์ทัล: {{config.portal_url}} / ระบบ / {{message.system_id}}
+ดูใน %PRODUCT_NAME% พอร์ทัล: {{config.portal_url}} / ระบบ / {{message.system_id}}

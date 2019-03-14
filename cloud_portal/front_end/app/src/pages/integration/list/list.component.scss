@@ -1,0 +1,59 @@
+@import '../../../../styles/native-theme/theme_palette';
+@import '../../../../styles/custom/custom_palette';
+@import '../../../../styles/theme_variables';
+
+.plugin {
+    text-decoration : none;
+    color           : inherit;
+}
+
+.card {
+    &--header {
+        &-info {
+            float      : right;
+            text-align : right;
+            
+            > div {
+                color       : $light12;
+                font-size   : $font-size-sm;
+                line-height : 1rem;
+            }
+            
+            .release_date {
+                margin-top : rem(2px);
+            }
+            
+            .platforms {
+                margin-top      : rem(6px);
+                display         : flex;
+                justify-content : flex-end;
+                
+                img {
+                    height      : 1rem;
+                    width       : 1rem;
+                    margin-left : .25rem;
+                }
+            }
+        }
+    }
+    
+    &--body {
+        &-name {
+            h3 {
+                margin      : 0;
+                line-height : 24px;
+            }
+        }
+        
+        &-by {
+            color     : $light16;
+            font-size : $font-size-ssm;
+        }
+        
+        &-descr {
+            font-family : $font-family-regular;
+            font-size   : $font-size-base;
+            margin-top  : .5rem;
+        }
+    }
+}

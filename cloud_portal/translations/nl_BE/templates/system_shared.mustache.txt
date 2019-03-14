@@ -1,4 +1,4 @@
-Hallo, {{message.fullName}}
+Hallo, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) deelde het systeem {{message.system_name}} met u.
@@ -8,4 +8,4 @@ Hallo, {{message.fullName}}
 U hebt toegang gekregen tot het videobeheersysteem "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Bekijken in {{PRODUCT_NAME}} Portal: {{config.portal_url}} / systems / {{message.system_id}}
+Weergave in het %PRODUCT_NAME% portal: {{config.portal_url}}/systems/{{message.system_id}}

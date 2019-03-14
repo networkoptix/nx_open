@@ -1,0 +1,88 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+@import '../../../../styles/mixins';
+
+.camview {
+  padding          : 0;
+  background-color : $light4;
+  
+  .card {
+    margin : 0 !important;
+  }
+  
+  h2 {
+    font-size: 0.9375rem;
+    color: $dark9;
+  }
+  
+  a {
+    padding-bottom: 8px;
+    text-decoration: underline;
+  }
+  
+  .no-linewrap {
+    overflow: hidden;
+  }
+  
+  table th, table td {
+    padding: 0;
+    height: 24px;
+    width: 50%;
+  }
+  
+  .active-camera-info, .firmware-info {
+    .row {
+      height : 24px;
+      & > div {
+        line-height : 24px;
+      }
+    }
+  }
+  
+  header {
+    position : relative;
+    
+    .camera-vendor-model {
+      @include ellipsis;
+      width : 90%;
+    }
+    
+    .detailsClose {
+      position     : absolute;
+      top          : 4px;
+      right        : 0;
+      cursor       : pointer;
+      margin-right : 0;
+    }
+  }
+  
+  .blue {
+    color: $blue1;
+  }
+  
+  .firmware-line {
+    stroke: $brand-primary;
+    stroke-width: 2
+  }
+  
+  .icon {
+    display: inline-block;
+    height: 1em; /* default icon height */
+    position: relative;
+    user-select: none;
+
+    .icon-canvas {
+      display: block;
+      height: 100%;
+      visibility: hidden;
+    }
+
+    .icon-svg {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 點擊連接以查看{{ message.product }}的{{ message.id }}草稿
 
-連接到: {{ config.portal_url }} /admin/cms/review_version{{ message.id }}
+連接到: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 你可以在此頁:
 1) 建立預覽以查看最新的變更.

@@ -1,8 +1,8 @@
-Hola,
+Hola {{message.userFullName}},
 
   Haga clic en el botón para confirmar su dirección de correo electrónico y activar la cuenta.
 
 {{config.portal_url}}/activar/{{message.code}}
 
-Si no se registró en {{PRODUCT_NAME}}, solo ignore este correo electrónico.
+Si no se registrO en %PRODUCT_NAME%, solo ignore este correo electrónico.
 No comparta el mensaje o el enlace con nadie.

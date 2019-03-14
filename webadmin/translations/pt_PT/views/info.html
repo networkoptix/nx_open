@@ -12,7 +12,7 @@
                 </uib-tab>
                 <uib-tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>
-                    <p>Below is a list of storage locations available on this server</p>
+                    <p>Abaixo está uma lista de locais de armazenamento disponíveis neste servidor</p>
                     <table class="table">
                         <thead>
                         <tr>
@@ -42,9 +42,18 @@
                 </uib-tab>
                 <uib-tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
-                    <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
-                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+                    <div class="form-inline">
+                        <label class="my-1 mr-2" for="loggerSelect">Logger actual:</label>
+                        <select class="custom-select my-1 mr-sm-2" id="loggerSelect"
+                                ng-model="currentLogger" ng-options="logger for logger in loggers"
+                                ng-change="getLogger(currentLogger)"></select>
+                    </div>
+                    <br>
+                    <iframe class="log-frame" name="log-frame" ng-src="{{logUrl}}"></iframe>
+                    <a ng-href="{{logUrl}}"  target="log-frame"
+                       id="refresh-log" class="btn btn-primary">Actualizar</a>
+                    <a ng-if="!mode.liteClient" ng-href="{{logUrl}}"
+                       target="_blank" id="open-log" class="btn btn-default">Abrir numa nova janela</a>
                 </uib-tab>
             </uib-tabset>
         </div>

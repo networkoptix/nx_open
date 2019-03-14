@@ -1,0 +1,19 @@
+module Nx.Controls
+
+Button 1.0 Button.qml
+FlatButton 1.0 FlatButton.qml
+SwitchButton 1.0 SwitchButton.qml
+AutoScalableItem 1.0 AutoScalableItem.qml
+TextField 1.0 TextField.qml
+SpinBox 1.0 SpinBox.qml
+ComboBox 1.0 ComboBox.qml
+CheckBox 1.0 CheckBox.qml
+GroupBox 1.0 GroupBox.qml
+Panel 1.0 Panel.qml
+ScrollView 1.0 ScrollView.qml
+ScrollBar 1.0 ScrollBar.qml
+AlertBar 1.0 AlertBar.qml
+ToolTip 1.0 ToolTip.qml
+
+ArrowIcon 1.0 ArrowIcon.qml
+SwitchIcon 1.0 SwitchIcon.qml

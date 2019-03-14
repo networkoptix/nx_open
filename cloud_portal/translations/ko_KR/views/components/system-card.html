@@ -1,17 +1,19 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>귀하의 시스템</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">귀하의 시스템</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">{{PRODUCT_NAME}} </span>에서 연결 해제</button>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">다른 시스템과 병합</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()"><span class="product-name">&nbsp;%PRODUCT_NAME% 에서 연결 해제</span></button>
     </div>
 </div>
-
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>소유자</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -25,5 +27,30 @@
             <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">내 계정에서 분리</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            이 현재 시스템에 병합됩니다</div>
+        <hr />
+        <div class="merge-info-text">데이터베이스 크기에 따라 최대 몇 시간이 소요될 수 있습니다.</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>이 시스템은             <strong>{{mergeTargetSystem.name}}에 병합됩니다</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>데이터베이스 크기에 따라 최대 몇 시간이 소요될 수 있습니다.</p>
+            <p>병합이 완료 될 때까지 현재 시스템에 접속하여 비디오를 볼 수는 있지만 설정을 변경할 수는 없습니다.</p>
+            <p>머지가 완료되면 현재 시스템의 모든 사용자와 카메라를                 <span class="merge-system-name">{{mergeTargetSystem.name}}에서 사용할 수있게됩니다</span>. 그리고 이 시스템은 삭제됩니다.</p>
+        </div>
     </div>
 </div>

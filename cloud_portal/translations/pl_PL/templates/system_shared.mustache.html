@@ -1,4 +1,4 @@
-<h1>Witaj {{message.fullName}}</h1>
+<h1>Witaj {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> udostępnia Ci system zarządzania wideo "{{message.system_name}}".</p>
@@ -8,4 +8,4 @@
 <p>Masz dostęp do systemu zarządzania wideo "{{message.system_name}}".</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Wyświetl w portalu %PRODUCT_NAME%</a>

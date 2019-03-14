@@ -1,6 +1,6 @@
-New message
+Nová zpráva
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+Typ: {{message.type}}
+Informace: {{{message.data}}}
 
-There is no specific template for this type of message
+Pro tento typ zprávy neexistuje žádná konkrétní šablona

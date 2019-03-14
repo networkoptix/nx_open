@@ -2,7 +2,7 @@
 
 {{ message.id }}링크를 선택하여 {{ message.product }}에 대한 내용을 검토를 하세요.
 
-연결확인: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+연결확인: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 상기내용은 아래와 같습니다.
 1) 최근변경사항 확인하기

@@ -5,7 +5,9 @@
         {% csrf_token %}
         <input type="hidden" name="id" value="{{original.id}}">
         {% for fieldset in adminform %}
-            {% include "admin/includes/fieldset.html" %}
+            {% if fieldset.name != 'Target Customizations' or original and perms.notifications.send_cloud_notification%}
+                {% include "admin/includes/fieldset.html" %}
+            {% endif %}
         {% endfor %}
         {% block submit_buttons_bottom %}{% endblock %}
         {% if not original.sent_date %}
@@ -19,16 +21,17 @@
         <div class="submit-row">
             {% if perms.notifications.delete_cloudnotification %}
             {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-            <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}" class="deletelink">{% trans "Delete" %}</a></p>
+            <a class="btn btn-sm btn-danger pull-left" href="{% add_preserved_filters delete_url %}">Delete</a>
+            </a>
             {% endif %}
             <label for="ignoreSubscriptions">Ignore Subscriptions:</label>
             <input class="float-left" id="ignoreSubscriptions" name="ignore_subscriptions" type="checkbox">
-            <button class="button" type="submit" name="Save">Save Draft</button>
-            <button class="button" type="submit" name="Preview">Save and Preview Draft</button>
+            <button class="btn btn-sm btn-primary" type="submit" name="Save">Save Draft</button>
+            <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview Draft</button>
             {% if perms.notifications.send_cloud_notification %}
-            <button class="button" type="submit" name="Send" {%if not original %} disabled {% endif %}>Save and Send Notification</button>
+            <button class="btn btn-sm btn-success" type="submit" name="Send" {%if not original %} disabled {% endif %}>Save and Send Notification</button>
             {% endif %}
-            <button class="button" type="reset"  name="Reset">Reset</button>
+            <button class="btn btn-sm btn-danger" type="reset"  name="Reset">Reset</button>
         </div>
         {% endif %}
     </form>

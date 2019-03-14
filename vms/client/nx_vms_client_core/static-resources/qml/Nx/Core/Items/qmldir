@@ -1,0 +1,8 @@
+module Nx.Core.Items
+
+UniformGrid 1.0 UniformGrid.qml
+MaskedUniformGrid 1.0 MaskedUniformGrid.qml
+RoundedMask 1.0 RoundedMask.qml
+Circle 1.0 Circle.qml
+ShadedCircle 1.0 ShadedCircle.qml
+RoiSelectionPreloader 1.0 RoiSelectionPreloader.qml

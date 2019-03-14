@@ -4,7 +4,7 @@
         <h3 class="modal-title">Złącz systemy</h3>
     </div>
 
-    <div class="col-sm-12">
+    <div class="modal-body">
         <ng-form name="findSystemForm">
             <div class="form-group">
                 <label for="otherSystemUrl" class="control-label">Adres URL innego systemu</label>
@@ -12,7 +12,7 @@
                     <div class="input-group" uib-dropdown>
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
 
-                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                        <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Nie znaleziono systemów</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
@@ -20,7 +20,7 @@
                             </li>
                         </ul>
 
-                        <span type="button" class="input-group-addon dropdown-toggle">
+                        <span type="button" class="input-group-addon dropdown-toggle" uib-dropdown-toggle>
                             <span class="caret"></span>
                         </span>
                     </div>

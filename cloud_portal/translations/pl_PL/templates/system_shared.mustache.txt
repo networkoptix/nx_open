@@ -1,4 +1,4 @@
-Witaj {{message.fullName}}
+Witaj {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) udostępnia Ci system zarządzania wideo "{{message.system_name}}".
@@ -8,4 +8,4 @@ Witaj {{message.fullName}}
 Masz dostęp do systemu zarządzania wideo "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Wyświetl w portalu {{PRODUCT_NAME}}: {{config.portal_url}}/systems/{{message.system_id}}
+Wyświetl w portalu %PRODUCT_NAME%: {{config.portal_url}}/systems/{{message.system_id}}

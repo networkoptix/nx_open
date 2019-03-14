@@ -1,16 +1,14 @@
-<h1>Hello, {{message.fullName}}</h1>
+<h1>Dobrý den, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> has shared access to video management system "{{message.system_name}}" with you.
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> Vám nasdílel přístup k video management systému "{{message.system_name}}".
 
-To view and manage it, please create account on <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> using your current email address and follow further instructions.</p>
+Chcete-li systém zobrazit a spravovat, vytvořte si účet na <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> pomocí své aktuální emailové adresy a poté postupujte podle dalších pokynů.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>You have been granted access to video management system "{{message.system_name}}".
+<p>Byl Vám udělen přístup k video management systému "{{message.system_name}}".
 
-To view and manage it, please create account on <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> using your current email address and follow further instructions.</p>
-{{/message.sharer_name}}
-
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+Chcete-li systém zobrazit a spravovat, vytvořte si účet na <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> pomocí své aktuální emailové adresy a poté postupujte podle dalších pokynů.</p>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> Vytvořit účet </a>
 

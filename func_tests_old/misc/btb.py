@@ -11,13 +11,13 @@ import random
 import requests
 import sys
 import traceback
-import urllib2
+import argparse
 
 sys.path.append('..')  # FIXME create an abs path
 from generator import BasicGenerator, MediaServerGenerator, CameraDataGenerator, UserDataGenerator
 
-ADDR = "192.168.109.8:7001"
-AUTH = ('admin', 'admin')
+ADDR = "127.0.0.1:7003"
+AUTH = ('admin', 'qweasd123')
 
 WEB_PAGES = (  # several pages used as a part of layouts content
     ('http://grib-info.ru/syedobnie/berezovyj.html', "Berezovyj"),
@@ -45,10 +45,10 @@ ToStore = (
     {'path': 'wallpapers/image%02d.png', 'file': 'bgimage.png'},
 )
 
-NUM_SERVERS = 20
+# NUM_SERVERS = 20
 CAMERAS_PER_SERVER = 10
-NUM_USERS = 100
-NUM_SHARED_LAYOUTS = 50
+# NUM_USERS = 100
+# NUM_SHARED_LAYOUTS = 50
 SHARED_PER_USER = 10  # and per role too
 RES_PER_USER = 20
 LAYOUTS_PER_USER =  10 # private layouts
@@ -72,14 +72,12 @@ Images = []
 
 
 def sendRequest(url, data, notify=False, noparsae=False, allowEmpty=False):
-    #req = urllib2.Request(url, data=data, headers={'Content-Type': 'application/json'})
     response = None
     try:
         if notify:
-            print "Requesting " + url
+            print("Requesting " + url)
             if data:
-                print "data = " + data
-#        response = urllib2.urlopen(req)
+                print("data = " + data)
         if data is None:
             response = requests.get(url, auth=AUTH)
         else:
@@ -99,14 +97,11 @@ def sendRequest(url, data, notify=False, noparsae=False, allowEmpty=False):
         # ok, let it raise in case of bad json
         respData = json.loads(response.text)
         if type(respData) == dict and respData.get('error', 0):
-            print "Failed on data: %s" % (data,)
+            print("Failed on data: %s" % (data,))
             raise Exception("%s returned error: %s" % (url, respData))
         return respData
-    except urllib2.HTTPError as err:
-        print "HTTP Error %s at %s with data %s" % (err, url, data)
-        raise
     except Exception as err:
-        print "Failed at %s with data %s" % (url, data)
+        print("Failed at %s with data %s" % (url, data))
         raise
 
 
@@ -142,7 +137,7 @@ class ServerGenerator(MediaServerGenerator, UniqGenerator):
         servList = self.generateMediaServerData(number)
         for data, id in servList:
             ec2Request("saveMediaServer", data)
-            print "Created server %s" % (id,)
+            print("Created server %s" % (id,))
             Servers[id] = data
         AllResIds.update(Servers.keys())
 
@@ -170,11 +165,11 @@ class CameraGenerator(CameraDataGenerator, UniqGenerator):
         for sId,sData in Servers.iteritems():
             alldata = []
             for data, cId in self.generateCameraData(CAMERAS_PER_SERVER, sId):
-                #print "Generated camera: %s: %s" % (cId, data)
+                #print("Generated camera: %s: %s" % (cId, data))
                 alldata.append(data)
                 Cameras[cId] = data
             ec2Request("saveCameras", "[%s]" % (','.join(alldata),))
-            print "%s cameras created" % (len(alldata),)
+            print("%s cameras created" % (len(alldata),))
         AllResIds.update(Cameras.keys())
 
 
@@ -187,8 +182,8 @@ class UserGenerator(UserDataGenerator, UniqGenerator):
             ec2Request("saveUser", data)
             Users[uId] = data
             created.append(uId)
-#            print "User created: %s: %s" % (uId, data)
-            print "User created: %s" % (uId,)
+#            print("User created: %s: %s" % (uId, data))
+            print("User created: %s" % (uId,))
         return created
 
 
@@ -207,7 +202,7 @@ class WebPageGenerator(UniqGenerator):
             data = self._template % (uid, url, name)
             ec2Request("saveWebPage", data)
             WebPages[uid] = data
-        print "%s web pages created" % (len(WEB_PAGES),)
+        print("%s web pages created" % (len(WEB_PAGES),))
         AllResIds.update(WebPages.keys())
 
 
@@ -253,7 +248,7 @@ class LayoutGenerator(UniqGenerator):
 
     def createLayouts(self, number, owner=None, resPool=AllResIds):
         if owner:
-            print "createLayouts for %s" % (owner,)
+            print("createLayouts for %s" % (owner,))
         #resIds = set()
         for _ in xrange(number):
             content = set(random.sample(resPool, RES_PER_LAYOUT))
@@ -273,7 +268,7 @@ class LayoutGenerator(UniqGenerator):
             else:
                 PvtLayouts.setdefault(owner, dict())[uid] = data
                 #resIds.update(content)
-        print "%s %slayouts created" % (number, 'shared ' if not owner else '')
+        print("%s %slayouts created" % (number, 'shared ' if not owner else ''))
         #return resIds
 
 
@@ -292,7 +287,7 @@ class UserRoleGenerator(UniqGenerator):
             resp = ec2Request("saveUserRole", data)
             available = random.sample(AllResIds, RES_PER_ROLE)
             UserRoles[uid] = (data, available)
-            print "Role %s created" % (uid,)
+            print("Role %s created" % (uid,))
             users = uGen.createUsers(USERS_PER_ROLE, uid)  # it add each user to the Users list, may be it's not good
             for userId in users:
                 lGen.createLayouts(LAYOUTS_PER_USER, userId, available)
@@ -301,7 +296,7 @@ class UserRoleGenerator(UniqGenerator):
 def loadRealServers():
     data = ec2Request('getMediaServersEx', None)
     for server in data:
-        print "Found real server %s" % server['id']
+        print("Found real server %s" % server['id'])
         Servers[server['id']] = json.dumps(server)
 
 
@@ -325,35 +320,60 @@ def storeFiles(number):
             ec2Request('addStoredFile', json.dumps(data))
             data['path'] = data['path'].split('/',1)[1]
             Images.append(data['path'])
-        print "%s %s images loaded" % (number, fdesk['path'].split('.')[-1])
+        print("%s %s images loaded" % (number, fdesk['path'].split('.')[-1]))
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--server", help="IP address of the mediaserver", default="127.0.0.1")
+    parser.add_argument("--port", help="IP port of the mediaserver", type=int, default=7001)
+    parser.add_argument("--user", help="username", default="admin")
+    parser.add_argument("--password", help="password", default="")
+    parser.add_argument("--num_servers", help="number of servers to be added", type=int, default=0)
+    parser.add_argument("--num_users", help="number of users to be added", type=int, default=0)
+    parser.add_argument("--num_layouts", help="number of layouts to be added", type=int, default=0)
+
+    args = parser.parse_args()
+    global ADDR, AUTH
+
+    ADDR = "%s:%d" % (args.server, args.port)
+    password = args.password
+    #if password == "":
+    #    password = str(input("Enter password for user '%s' at %s: " % (ADDR, args.user)))
+    
+    AUTH = (args.user, password)
+
     loadRealServers()
-    storeFiles(NUM_BGIMAGES)
-    ServerGenerator().createServers(NUM_SERVERS)
+    if NUM_BGIMAGES > 0:
+        storeFiles(NUM_BGIMAGES)
+    if args.num_servers > 0:
+        ServerGenerator().createServers(args.num_servers)
     CameraGenerator().createCameras()
     WebPageGenerator().createWebPages()
 
-    uGen = UserGenerator()
-    uGen.createUsers(NUM_USERS)
-    lGen = LayoutGenerator()
-    lGen.createLayouts(NUM_SHARED_LAYOUTS)
+    if args.num_layouts > 0:
+        lGen = LayoutGenerator()
+        lGen.createLayouts(args.num_layouts)
 
-    for userId in Users.iterkeys():
-        available = random.sample(AllResIds, RES_PER_USER)
-        # layouts
-        lGen.createLayouts(LAYOUTS_PER_USER, userId, available)
-        sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
-        print "User %s, shared layouts %s" % (userId, sh)
-        setAccessRights(userId, available + sh)
+    if args.num_users > 0:
+        uGen = UserGenerator()
+        uGen.createUsers(num_users)
+        if RES_PER_USER > 0:
+            for userId in Users.iterkeys():
+                available = random.sample(AllResIds, RES_PER_USER)
+                # layouts
+                lGen.createLayouts(LAYOUTS_PER_USER, userId, available)
+                sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
+                print("User %s, shared layouts %s" % (userId, sh))
+                setAccessRights(userId, available + sh)
 
-    UserRoleGenerator().createUserRoles(uGen, lGen)
-    for roleId, roleData in UserRoles.iteritems():
-        #print "Granting layouts for role %s" % (roleId,)
-        sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
-        print "Role %s, shared layouts %s" % (roleId, sh)
-        setAccessRights(roleId, roleData[1] + sh)
+        if SHARED_PER_USER > 0:
+            UserRoleGenerator().createUserRoles(uGen, lGen)
+            for roleId, roleData in UserRoles.iteritems():
+                #print "Granting layouts for role %s" % (roleId,)
+                sh = random.sample(SharedLayouts.keys(), SHARED_PER_USER)
+                print("Role %s, shared layouts %s" % (roleId, sh))
+                setAccessRights(roleId, roleData[1] + sh)
 
 if __name__ == "__main__":
     main()

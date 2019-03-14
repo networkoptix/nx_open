@@ -70,6 +70,7 @@ function(setup_ios_application target)
         "-framework UIKit"
         "-framework CoreText"
         "-framework CoreGraphics"
+        "-framework ImageIO"
         "-framework MobileCoreServices"
         "-framework Foundation"
         "-framework UIKit"
@@ -80,11 +81,15 @@ function(setup_ios_application target)
         "-framework QuartzCore"
         "-framework AssetsLibrary"
         "-L${QT_DIR}/lib"
-        qtharfbuzzng qtpcre qtfreetype
-        Qt5PlatformSupport
-        Qt5LabsControls Qt5LabsTemplates
+        qtharfbuzz qtpcre2 qtfreetype qtlibpng
+        Qt5FontDatabaseSupport Qt5GraphicsSupport Qt5ClipboardSupport
+        Qt5QuickControls2 Qt5QuickTemplates2
         z
     )
+
+    if(qml_debug)
+        target_link_libraries(${target} PRIVATE Qt5PacketProtocol)
+    endif()
 
     set(plugins_import_cpp "${CMAKE_CURRENT_BINARY_DIR}/${target}_qt_plugins_import.cpp")
     execute_process(
@@ -103,6 +108,9 @@ function(setup_ios_application target)
 
     set(app_dir "$<TARGET_FILE_DIR:${target}>")
 
+    add_custom_command(TARGET ${target} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${app_dir}
+    )
     add_custom_command(TARGET ${target} PRE_LINK
         COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
             --qt-root ${QT_DIR} --qml-root "${APP_QML_ROOT}"

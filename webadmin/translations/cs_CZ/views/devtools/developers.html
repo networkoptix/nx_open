@@ -1,27 +1,27 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Vývojářské nástroje</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Máte představu o tom, jak vylepšit naše nástroje pro vývojáře nebo chcete jen začít konverzaci?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Zašlete nám svůj názor</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Generátor všeobecných událostí</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System,
+            A Generic Event is a method of sending events from 3rd party Systems to a System,
             which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+            Generátor všeobecných událostí je nástroj, který pomáhá vytvářet volání všeobecných HTTP událostí.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Generátor všeobecných událostí</a></p>
     </div>
     <div>
         <h3>Server API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
+            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
+            access almost every System feature available in the regular client: query/manage System resources (servers,
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
         </p>
@@ -30,45 +30,45 @@
             - interactive documentation with tools for testing API calls<br>
             <a href="#/developers/changelog">API Changelog</a>
             - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a><br>
+            <a href="#/developers/serverDocumentation">Server Settings Documentation</a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Panel podrobností o kameře</h3>
         <p>
-            Displays additional developer-friendly information for cameras in the Web Admin interface:
+            Zobrazí další vývojářský důležité informace o kamerách ve webovém rozhraní administrátora:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>ID kamery</li>
+            <li>Odkazy pro všechny dostupné video streamy</li>
+            <li>Přímý export videa z prohlížeče</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            Chcete-li otevřít panel Podrobnosti o kameře - přejděte do webového rozhraní administrátora, zvolte <a href="#/view"> Zobrazit </a>,
+            vyberte požadovanou kameru, klikněte na ikonu nastavení (ozubené kolo) a poté zvolte "Detaily kamery"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">otevřít panel detaily o kameře</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>Sada SDK pro integraci zdroje videa</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            Sada SDK pro integraci zdroje videa umožňuje prakticky do systému integrovat jakýkoli zdroj živého videa nebo záznamu
+            (IP kamery, NVR, DVR atd.). SDK umožňuje vytvářet metody pro vyhledávání,
+            zobrazení, analýzu a záznam videa. Umožňuje také integraci I/O portů zařízení a informací o detekci pohybu.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >získat SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>SDK pro úložiště</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            SDK pro úložiště umožňuje integrovat potenciální úložiště do systému. Umožňuje vývojářům
+            číst nebo zapisovat do jakéhokoli úložiště: lokální, vzdálené a nebo cloud. Vytvoření pluginu pro úložiště
+            vyžaduje implementaci standardních funkcí, jako je například: I/O stream, pokud soubor existuje, odstranit soubor, seznam
+            souborů ve složce atd. SDK pro úložiště obsahuje také příklad použití FTP serveru jako místa pro úložiště.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >získat SDK</a></p>
     </div>
 </div>

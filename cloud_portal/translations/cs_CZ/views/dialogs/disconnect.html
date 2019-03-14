@@ -2,22 +2,22 @@
     <form name="disconnectForm" novalidate>
         <div class="modal-body">
             <p class="warning-label">
-                All cloud users will be deleted.
+                Všichni uživatelé cloudu budou smazáni.
             </p>
             <p>
-                System will be accessible through local network with local administrator account.
+                Systém bude přístupný prostřednictvím místní sítě s účtem místního správce.
             </p>
             <p>
-                Enter password to continue.
+                Zadejte heslo pro pokračování.
             </p>
 
             <div class="form-group" validate-field>
-                <label for="password">Password</label>
+                <label for="password">Heslo</label>
                 <input class="form-control" ng-model="model.password" id="password" autocomplete="new-password"
                        name="password" type="password" required autofocus>
                 <p class="help-block" >
                     <span ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
-                        Password is required
+                        Heslo je vyžadováno
                     </span>
                 </p>
             </div>
@@ -28,7 +28,7 @@
                             action-type="'danger'"
                             button-text="$root.L.system.confirmDisconnectAction"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" >Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="close()" > Zrušit </button>
         </div>
     </form>
 </div>

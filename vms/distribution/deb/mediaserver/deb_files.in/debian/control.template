@@ -1,0 +1,14 @@
+Package: @deb.customization.company.name@-mediaserver@cloud_group_suffix@
+Version: VERSION
+Installed-Size: INSTALLED_SIZE
+Architecture: @target.arch@
+Maintainer: @company.name@ <@supportEmail@>
+Pre-Depends: debconf
+Depends: @common.depends@@arch.depends@
+Conflicts: @conflicting_packages@
+Replaces: @conflicting_packages@
+Provides: @deb.customization.company.name@-mediaserver
+Section: database
+Priority: optional
+Homepage: @companyUrl@
+Description: @company.name@ @mediaserver.display.name@

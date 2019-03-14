@@ -1,10 +1,10 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><;0>;&;times;<;/0>; <;1>; סגור <;/1>;</button>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">סגור</span></button>
         <h3 class="modal-title">מיזוג מערכות</h3>
     </div>
 
-    <div class="col-sm-12">
+    <div class="modal-body">
         <ng-form name="findSystemForm">
             <div class="form-group">
                 <label for="otherSystemUrl" class="control-label">כתובת מערכת אחרת</label>
@@ -12,7 +12,7 @@
                     <div class="input-group" uib-dropdown>
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="מארח: פורט" required />
 
-                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                        <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>לא נמצאו מערכות</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
@@ -20,7 +20,7 @@
                             </li>
                         </ul>
 
-                        <span type="button" class="input-group-addon dropdown-toggle">
+                        <span type="button" class="input-group-addon dropdown-toggle" uib-dropdown-toggle>
                             <span class="caret"></span>
                         </span>
                     </div>
@@ -48,16 +48,18 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">הסיסמא הנוכחית (של המערכת הנוכחית)</label>
+            <label for="currentSystemPassword" class="control-label"> הסיסמה הנוכחית (עבור מערכת זו) </label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="סיסמא" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>המערכת הנוכחית עומדת להיות ממוזגת<b>{{systems.systemName}}</b> עם מערכת <b>{{systems.joinSystemName}}</b></p>
+            <p>המערכת הנוכחית עומדת להיות ממוזגת <b>{{systems.systemName}}</b> עם מערכת <b>{{systems.joinSystemName}}</b></p>
             <p>
-                למערכת החדשה תהיה סיסמא ושם משתמש מן המערכת הבאה: <br/> <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (נוכחי)</label> <br/> <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+                למערכת החדשה תהיה סיסמה ושם מהמערכת הבאה: <0 />
+                <label> <2 /> {{systems.systemName}} (נוכחי) </label> <0 />
+                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

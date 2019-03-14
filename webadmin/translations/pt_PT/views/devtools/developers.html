@@ -1,27 +1,27 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Ferramentas de Programador</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Tem uma ideia de como melhorar nossas ferramentas para desenvolvedores ou apenas deseja iniciar uma conversa?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Deixar sugestões</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Gerador de Eventos Genericos</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System,
+            A Generic Event is a method of sending events from 3rd party Systems to a System,
             which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+            O gerador de eventos genéricos é uma ferramenta que ajuda a construir chamadas de eventos HTTP genéricos.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Gerador de Eventos Genericos</a></p>
     </div>
     <div>
         <h3>API do Servidor</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
+            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
+            access almost every System feature available in the regular client: query/manage System resources (servers,
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
         </p>
@@ -30,7 +30,8 @@
             - interactive documentation with tools for testing API calls<br>
             <a href="#/developers/changelog">API Changelog</a>
             - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a><br>
+            <a href="#/developers/serverDocumentation">Server Settings Documentation</a>
         </p>
 
     </div>
@@ -48,7 +49,7 @@
             To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
             select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">abrir Painel de Detalhes da Câmara</a></p>
     </div>
     <div>
         <h3>Video Source Integration SDK</h3>

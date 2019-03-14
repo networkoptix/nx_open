@@ -1,0 +1,27 @@
+<div class="container auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>Не вдається отримати доступ до системи</h1>
+        <h3>Це посилання не працює, <br>Система може бути відключена від %PRODUCT_NAME%,<br>
+            Доступ до цієї системи може бути скасований <br>
+            або ви можете входити в інший обліковий запис
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Список доступних систем</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-lg-4 order-1 order-lg-2">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    Ви не маєте доступу до Системної інформації.
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>

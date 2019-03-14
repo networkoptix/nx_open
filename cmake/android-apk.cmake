@@ -32,7 +32,24 @@ function(add_android_apk target)
 
     string(REPLACE ";" "," extra_libs "${APK_EXTRA_LIBS}")
 
-    find_buildtools("${ANDROID_SDK}" buildtools_version)
+    find_buildtools("${android_sdk_directory}" buildtools_version)
+
+    if(APK_QML_IMPORT_PATHS)
+        set(qml_import_paths "    \"qml-import-paths\": \"${APK_QML_IMPORT_PATHS}\",\n")
+    else()
+        set(qml_import_paths)
+    endif()
+
+    string(STRIP ${CMAKE_CXX_STANDARD_LIBRARIES} cpp_libs)
+    string(REPLACE "\"" "" cpp_libs ${cpp_libs})
+    string(REPLACE " " ";" cpp_libs ${cpp_libs})
+    if(NOT cpp_libs)
+        message(FATAL_ERROR "Cannot determine path to C++ standard library.")
+    endif()
+    list(GET cpp_libs 0 stdcpp_path)
+    if(stdcpp_path MATCHES "\.so$")
+        set(stdcpp_path  "    \"stdcpp-path\": \"${stdcpp_path}\",\n")
+    endif()
 
     set(PACKAGE_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/${target}_apk_template)
 
@@ -40,7 +57,7 @@ function(add_android_apk target)
         "{\n"
         "    \"description\": \"This file is generated and should not be modified by hand.\",\n"
         "    \"qt\": \"${QT_DIR}\",\n"
-        "    \"sdk\": \"${ANDROID_SDK}\",\n"
+        "    \"sdk\": \"${android_sdk_directory}\",\n"
         "    \"sdkBuildToolsRevision\": \"${buildtools_version}\",\n"
         "    \"ndk\": \"${CMAKE_ANDROID_NDK}\",\n"
         "    \"toolchain-prefix\": \"${CMAKE_CXX_ANDROID_TOOLCHAIN_MACHINE}\",\n"
@@ -50,8 +67,9 @@ function(add_android_apk target)
         "    \"target-architecture\": \"${CMAKE_ANDROID_ARCH_ABI}\",\n"
         "    \"android-package-source-directory\": \"${PACKAGE_SOURCE}\",\n"
         "    \"android-extra-libs\": \"${extra_libs}\",\n"
-        "    \"qml-import-paths\": \"${APK_QML_IMPORT_PATHS}\",\n"
+        ${stdcpp_path}
         "    \"qml-root-path\": \"${APK_QML_ROOT_PATH}\",\n"
+        ${qml_import_paths}
         "    \"application-binary\": \"$<TARGET_FILE:${APK_TARGET}>\"\n"
         "}\n"
     )

@@ -8,7 +8,7 @@
     "setup":{
         "createAccount": "create account",
         "errorNoHDD": "This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements":
     {
@@ -34,25 +34,27 @@
         "error": "Error: ",
         "restartNeeded": "Changes saved. Restart server to apply new settings?",
         "settingsSaved": "Settings saved",
-        "confirmHardwareRestart": "Restart server operation system?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "Restore all server settings? Archive will be saved, but network settings will be reset.",
         "confirmRestoreSettingsNotNetwork": "Reset server configuration? Archive and network settings will be saved.",
         "unavailable": "Unavailable",
         "unsafePortConfirm": "It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
 
-        "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloud":"Disconnect System from {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
         "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedFromCloudSuccess": "System was disconnected from {{CLOUD_NAME}} successfully",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
 
-        "confirmDisconnectFromSystem":"Detach server from current system",
+        "confirmDisconnectFromSystem":"Detach server from current System",
         "confirmDisconnectFromSystemAction": "Detach",
-        "disconnectedFromSystemSuccess": "Server was detached from the system successfully",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
 
         "connectedSuccess": "System was connected successfully",
         "createLocalOwnerTitle":"Create local administrator",
         "confirmChangePassword": "Change admin password",
-        "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
+        "confirmChangePasswordTitle":"Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Save new password",
         "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
 
@@ -71,7 +73,7 @@
         "cloudConnectRelayingEnabled": "Enable relaying for cloud connect",
         "cloudConnectUdpHolePunchingEnabled": "Enable UDP hole punching for cloud connect",
         "cloudHost": "Cloud host",
-        "cloudSystemID": "Cloud system id",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Disabled vendors",
         "ec2AliveUpdateIntervalSec": "System alive update interval (seconds)",
         "ec2ConnectionKeepAliveTimeoutSec": "Connection keep alive timeout (seconds)",
@@ -81,7 +83,6 @@
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Enable edge recording",
         "eventLogPeriodDays": "Event log period (days)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
         "ldapSearchFilter": "LDAP search filter",
@@ -112,12 +113,32 @@
         "statisticsReportTimeCycle": "Statistics report interval",
         "statisticsReportUpdateDelay": "Statistics report - update delay",
         "synchronizeTimeWithInternet": "Synchronize time with Internet",
-        "systemName": "System name",
+        "SystemName": "System name",
         "takeCameraOwnershipWithoutLock": "Take cameras ownership without lock",
         "timeSynchronizationEnabled": "Time synchronization enabled",
+
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod":  "Sync time exchange period",
+
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+
         "updateNotificationsEnabled": "Update notifications enabled",
         "upnpPortMappingEnabled": "UPNP port mapping enabled",
-        "useTextEmailFormat": "Send plain-text emails"
+        "useTextEmailFormat": "Send plain-text emails",
+
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds":  "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds":  "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile":  "Hanwha: Show alternative PTZ controls on tile",
+
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info":{
         "tabs":{
@@ -127,29 +148,31 @@
         }
     },
     "join":{
-        "systemIsUnreacheble": "System is unreachable or does not exist.",
+        "SystemIsUnreacheble": "System is unreachable or does not exist.",
         "incorrectCurrentPassword": "Incorrect current password.",
         "incorrectRemotePassword": "Login or password are incorrect.",
         "incompatibleVersion": "System is unreachable, does not exist or has incompatible version.",
         "wrongUrl": "Unable to connect to the specified server.",
-        "newSystemError": "Cannot merge systems. Remote system is not configured.",
-        "safeMode": "Cannot merge systems. Remote system is in safe mode.",
-        "configError": "Cannot merge systems. Maybe one of Systems is in safe mode.",
-        "cloudError": "Cannot merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
-        "cloudBothError": "Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
-        "cloudHostConflict": "Cannot merge systems, because servers are built with different cloud hosts",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Connection failed: ",
         "unknownError": "Unknown error",
-        "mergeFailed": "Merge failed: ",
+        "mergeFailed": "Merge failed",
         "mergeSucceed": "Merge succeed.",
-        "newSystemDisplayName": "New system",
+        "newSystemDisplayName": "New System",
         "incompatibleProtocol":"incompatible version",
         "incompatibleCloudHost": "cloud conflict",
         "incompatibleCloudState":"cloud connected"
     },
     "login":{
-        "incorrectPassword": "Login or password is incorrect"
+        "incorrectPassword": "Login or password is incorrect",
+        "authLockout": "Too many attempts. Try again in a minute."
     },
     "navigaion":{
         "cannotGetUser": "Server failure: cannot retrieve current user data"
@@ -166,7 +189,7 @@
         "started": "Update successfully started. It will take several minutes",
         "upToDate": "Update failed. The provided version is already installed.",
         "invalidFile": "Update failed. Provided file is not a valid update archive.",
-        "incompatibleSystem": "Update failed. Provided file is targeted for another system.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "Update failed. Insufficient space to extract archive, check available storage.",
         "installationError": "Updating failed. Cannot execute installation script.",
         "selectFiles": "Select files"

@@ -123,6 +123,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
                                     "playToClient": True,
                                     "recordAfter": 0,
                                     "recordBeforeMs": 1000,
+                                    "requestType": "R0VU",
                                     "streamQuality": "highest",
                                     "url": zapier_trigger,
                                     "useSource": False
@@ -233,6 +234,8 @@ def zapier_send_generic_event(request):
 @permission_classes((AllowAny, ))
 @zapier_exceptions
 def nx_http_action(request):
+    if 'caption' not in request.query_params or 'system_id' not in request.query_params:
+        return Response({ 'message': "Caption or System Id are missing from query parameters"}, status=400)
     caption = request.query_params['caption']
     system_id = request.query_params['system_id']
     event = system_id + ' ' + caption

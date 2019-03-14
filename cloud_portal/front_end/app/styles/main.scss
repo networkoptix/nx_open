@@ -1,24 +1,89 @@
+@import "~sass-rem";
 
+@import 'native-theme/_theme_palette';
 @import '_theme_palette';
 @import 'custom/_custom_palette';
 @import '_theme_variables';
-@import '~bootstrap-sass/assets/stylesheets/bootstrap';
+
+@import '~bootstrap/scss/bootstrap';
+
 @import '_theme_override';
+// Components
 @import '_header';
+@import '_arrows';
+@import '_checkbox';
+@import '_option';
+// Pages
+@import '_faq';
 
-@import '_big_brother';
-
-@import '../../../../webadmin/app/web_common/styles/common';
+@import '../web_common/styles/common';
 
 html {
-  position: relative;
-  min-height: 100%;
-  overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
+    @include rem-baseline;
+    position: relative;
+    min-height: 100%;
+    overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
 }
+
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 80px;
-  min-width: 360px;
+    @include media-breakpoint-up(lg) {
+        margin-bottom : 80px;
+    }
+
+    min-width : 360px;
+    padding   : 0 !important;
+}
+
+[data-whatintent='mouse'] *:focus {
+    outline : none !important;
+}
+
+[data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
+[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
+    outline : none !important;
+    @extend #outline;
+
+    &.inset {
+        @extend #inset-outline;
+    }
+}
+
+[data-whatinput='keyboard'] input:focus,
+[data-whatinput='keyboard'] input:active {
+    outline : none !important;
+    @extend #outline;
+
+    &.inset {
+        @extend #inset-outline;
+    }
+}
+
+[data-whatinput='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+
+    & + .check {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatinput='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+
+    & + .check {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatintent='keyboard'] .nav-tabs .nav-item a:focus {
+    @extend #inset-outline;
 }
 
 html.webclient-page{
@@ -31,46 +96,95 @@ html.webclient-page{
         box-shadow: none;
         margin-bottom: 0;
     }
-    footer{
-        display:none;
+}
+
+nx-app {
+    .placeholder {
+        position: absolute;
+        background-color: transparent;
+
+        &.page {
+            @include media-breakpoint-up(lg) {
+                position : fixed;
+            }
+            top       : 50%;
+            left      : 50%;
+            transform : translate(-50%, -50%);
+            z-index   : -1;
+        }
     }
 }
 
-
 footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 48px;
-  border-top: 1px solid $common-border-color;
-  padding-bottom: 2px;
+    position         : absolute;
+    bottom           : 0;
+    width            : 100%;
+    border-top       : 1px solid $common-border-color;
+    padding-bottom   : 2px;
+    background-color : $body-bg;
+    z-index          : 9;
 
-
-  .nav > li > span{
-    line-height:24px;
-    display:block;
-  }
-
-  .nav > li > a,
-  .nav > li > span{
-    font-size: $font-size-small;
-    padding: 10px;
-    color:  $light12;
-    &:hover{
-      color:$light16;
+    @include media-breakpoint-down(md) {
+        position   : relative;
+        margin-top : 1rem;
     }
 
-    &.dropdown{
-      padding:6px;
+    .row {
+        margin-left : 0;
     }
-  }
-  .navbar-right > li > a, .navbar-right > li > span > a{
-    color:$light8;
-    &:hover{
-      color:$light12;
+
+    .nav > li {
+        position : relative;
+        display  : block;
+
+        & > span {
+            line-height : 24px;
+            display     : block;
+        }
+
+        nx-language-select {
+            padding : 10px 5px 7px 0;
+            display : block;
+        }
     }
-  }
+
+    .nav > li > a,
+    .nav > li > span {
+        position  : relative;
+        display   : block;
+        font-size : $font-size-sm;
+        padding   : 15px 10px;
+        color     : $light12;
+
+        &:hover, &:focus {
+            box-shadow       : none;
+            text-decoration  : none !important;
+            background-color : transparent;
+            color            : $light16;
+        }
+    }
+
+    @include media-breakpoint-down(md) {
+        .nav > li > a:not(.company) {
+            padding : 5px 0;
+        }
+    }
+
+    .navbar-nav {
+        flex-direction : row;
+        float          : left;
+    }
+
+    .navbar-right {
+        float : right;
+    }
+
+    .navbar-right > li > a, .navbar-right > li > span > a {
+        color : $light8;
+        &:hover {
+            color : $light12;
+        }
+    }
 }
 
 
@@ -131,19 +245,23 @@ footer {
 	padding-right: 0;
 	padding-left: 0;
 
-    span{
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        margin: auto 3px;
-        background: $brand_contrast;
-        border-radius: 8px;
-        animation: bubblingG 650ms infinite alternate;
-            -o-animation: bubblingG 650ms infinite alternate;
-            -ms-animation: bubblingG 650ms infinite alternate;
-            -webkit-animation: bubblingG 650ms infinite alternate;
-            -moz-animation: bubblingG 650ms infinite alternate;
-    }
+      div {
+          margin: 0 auto;
+
+          span {
+              display: inline-block;
+              width: 8px;
+              height: 8px;
+              margin: auto 3px;
+              background: $brand_contrast;
+              border-radius: 8px;
+              animation: bubblingG 650ms infinite alternate;
+              -o-animation: bubblingG 650ms infinite alternate;
+              -ms-animation: bubblingG 650ms infinite alternate;
+              -webkit-animation: bubblingG 650ms infinite alternate;
+              -moz-animation: bubblingG 650ms infinite alternate;
+          }
+      }
 
     &.btn-default span{
         background: $light16;
@@ -200,12 +318,21 @@ a.disabled {
     display: none !important;
 }
 
+.card {
+    &.hoverable {
+        margin-bottom: 10px;
 
-.panel.hoverable:hover{
-    box-shadow: 0px 2px 2px 0px transparentize(dark(15),0.8);
+        &:hover {
+            box-shadow: 0 2px 5px 0 transparentize(dark(15), 0.8);
+        }
+    }
+
+    table {
+        margin : 0;
+    }
 }
 
-@media (min-width: $screen-sm-min) {
+@include media-breakpoint-up(sm) {
   .hoverable .hover-visible {
     visibility: hidden;
   }
@@ -214,8 +341,6 @@ a.disabled {
     visibility: visible;
   }
 }
-
-
 
 .process-loading{
   border:none;
@@ -238,23 +363,23 @@ a.disabled {
 .light-color{
   color:    $gray-light;
 }
-.no-data-panel
-{
-  width:100%;
-  z-index:100;
 
-  height: 100px;
+.no-data-panel {
+    width            : 100%;
+    z-index          : 100;
+    text-align       : center;
+    background-color : $body-bg;
+    padding          : 2rem 0;
 
-  text-align: center;
+    &-body {
+        font-size   : $h3-font-size;
+        font-family : $font-family-light;
+    }
+}
 
-  background-color: $body-bg;
-  font-weight: lighter;
-  font-size: $font-size-h2;
-  display: table;
-
-    .no-data-panel-body{
-      display: table-cell;
-      vertical-align: middle;
+@include media-breakpoint-down(sm) {
+    .no-data-panel .right-arrow {
+        transform: rotate(90deg);
     }
 }
 
@@ -266,7 +391,7 @@ a.disabled {
     background-image: url('/static/images/tutorial_arrow.png') !important;
     background-repeat: no-repeat;
     background-size: 40px 40px;
-    background-position: right 8px center;
+    background-position: right 0 center;
 
     @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
         background-image: url('/static/images/tutorial_arrow@2x.png') !important;
@@ -276,13 +401,14 @@ a.disabled {
 .preloader{
     display: none;
 }
+
 .process-loading{
     position: relative;
 }
+
 .process-loading>*{
     visibility:hidden;
 }
-
 
 .process-loading>.preloader {
 
@@ -354,7 +480,7 @@ a.disabled {
 }
 td{
     &.user-name{
-      max-width: 200px;
+      max-width: 175px;
     }
     &.user-email{
       @include ellipsis;
@@ -382,24 +508,19 @@ td{
     margin-bottom: 2px;
   }
   .user-name{
-    font-size: $font-size-h6;
+    font-size: $h6-font-size;
     line-height:16px;
-    font-weight: bold;
     display: block;
     margin-bottom:12px;
   }
 
-  .label {
+  .badge {
     display: inline-block;
-    vertical-align: bottom;
-
     height: 20px;
     margin-top: 12px;
-    line-height: 14px;
     border-radius: $border-radius-small;
-
-    font-weight: normal;
-    font-size: $font-size-h6;
+    font-family: $font-family-medium;
+    font-size: $font-size-sm;
   }
 }
 
@@ -412,11 +533,17 @@ td{
 
 .buttons-panel {
     padding-bottom: 15px;
+
+    & > .btn {
+        margin-right: 0.5rem;
+    }
 }
-@media (min-width: $screen-sm-min) {
+
+@include media-breakpoint-up(sm) {
   .buttons-panel {
     float: right;
     padding-top: 15px;
+    display: flex;
   }
 }
 
@@ -441,11 +568,11 @@ td{
   .alert {
     margin-bottom: 8px;
 
-    @media (max-width: $screen-sm-max) {
+      @include media-breakpoint-down(sm) {
       min-width: 100%;
     }
 
-    @media (min-width: $screen-sm-min) {
+      @include media-breakpoint-up(sm) {
       min-width: 600px;
     }
 
@@ -477,13 +604,11 @@ td{
   transform: translateX(-50%);
   z-index:1100;
 
-
-
-  @media (max-width: $screen-sm-max) {
+    @include media-breakpoint-down(sm) {
     min-width: 100%;
   }
 
-  @media (min-width: $screen-sm-min) {
+    @include media-breakpoint-up(sm) {
     min-width: 600px;
   }
 
@@ -507,47 +632,116 @@ td{
   }
 }
 
-@media (min-width: $screen-sm-min) {
+@include media-breakpoint-up(sm) {
   // Automatically set modal's width for larger viewports
   .modal-dialog .alert-top {
     top: -74px;
   }
 }
 
-.image-link,
-.image-link:hover{
-  @include ellipsis;
-  text-decoration: none !important;
+.image-link {
+    @include ellipsis;
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        .glyphicon {
+            background-position-y: -16px;
+        }
+    }
 }
 
-.jumbotron .promo-block{
-  color: $jumbotron-color;
-}
 .promo-block {
-  padding: 32px 74px;
-  text-align: center;
-  color: $light15;
+    padding    : 32px 74px;
+    text-align : center;
+    
+    h2, h4 {
+        color           : $light15;
+        font-family     : $font-family-bold;
+        justify-content : center;
+    }
+    
+    h4 {
+        margin : 0.5rem !important;
+    }
+    
+    .welcome-caption {
+        justify-content : center;
+        color           : $brand_core;
+    }
+}
 
-  h2 {
-    font-weight: bold;
-  }
+@include media-breakpoint-up(sm) {
+    .promo-block {
+        padding: 32px 30px;
+    }
+}
 
-  .promo-block {
-    padding-bottom: 0;
-  }
-
+@include media-breakpoint-up(lg) {
+    .promo-block {
+        padding: 32px 74px;
+    }
 }
 
 .error-page{
     color:$dark10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     h1{
-        font-size:40px;
+        font-size   : 40px;
+        line-height : 40px;
+        text-align  : center;
     }
     p{
-        font-size:24px;
+        font-size  : 24px;
+        text-align : center;
     }
     a{
         text-decoration: underline;
+        font-weight: 200;
+    }
+    img:hover {
+        animation: shake 0.5s;
+        animation-iteration-count: infinite;
+    }
+
+    @keyframes shake {
+        0% {
+            transform: translate(1px, 1px) rotate(0deg);
+        }
+        10% {
+            transform: translate(-1px, -2px) rotate(-1deg);
+        }
+        20% {
+            transform: translate(-3px, 0px) rotate(1deg);
+        }
+        30% {
+            transform: translate(3px, 2px) rotate(0deg);
+        }
+        40% {
+            transform: translate(1px, -1px) rotate(1deg);
+        }
+        50% {
+            transform: translate(-1px, 2px) rotate(-1deg);
+        }
+        60% {
+            transform: translate(-3px, 1px) rotate(0deg);
+        }
+        70% {
+            transform: translate(3px, 1px) rotate(-1deg);
+        }
+        80% {
+            transform: translate(-1px, -1px) rotate(1deg);
+        }
+        90% {
+            transform: translate(1px, 2px) rotate(0deg);
+        }
+        100% {
+            transform: translate(1px, -2px) rotate(-1deg);
+        }
     }
 }
 
@@ -555,18 +749,45 @@ td{
   height: 60px;
 }
 
-.jumbotron .cloud-icon img{
-  height: 100px;
+.jumbotron {
+    .cloud-icon img {
+        height : 100px;
+    }
+
+    .welcome-caption {
+        font-size       : 63px;
+        color           : $brand-primary !important;
+        justify-content : center;
+        line-height     : 1;
+    }
+
+    .lead {
+        margin-bottom : 15px;
+        font-size     : $h2-font-size;
+        font-family   : $font-family-light;
+    }
+
+    .promo-block {
+        h2 {
+            font-family : $font-family-medium;
+        }
+
+        h4 {
+            margin      : 0.5rem 0;
+            font-family : $font-family-light;
+            font-size   : $h4-font-size;
+        }
+    }
 }
 
-.welcome-caption{
-  font-size: 36px;
-  color: $brand-primary !important;
+h1.process-success {
+    line-height: 1.5;
+    display: flex;
+    justify-content: center;
 }
 
-h1.process-success{
-  text-align: center;
-  line-height: 1.5;
+h1 .badge {
+    margin-left: 8px;
 }
 
 .search-block{
@@ -621,31 +842,11 @@ h1.process-success{
     }
 }
 
-.download-button{
-    max-width: 100%;
-    margin-bottom:8px;
-    margin-top:0;
-    .installer-name{
-        display:block;
-        font-weight: normal;
-    }
-    .media-body{
-        width:auto;
-    }
-    h2{
-        max-width: 320px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-h2.version-number{
-    font-weight: bold;
-    font-size: 32px;
+.disabled{
+    color  : $light10;
+    cursor : default !important;
 }
 
-.disabled{
-    color: $light10;
-}
 .input-overlay{
     input{
         padding-right:30px;
@@ -655,16 +856,19 @@ h2.version-number{
         position:absolute;
         color:$light8;
         left:17px;
+        display     : flex;
+        align-items : center;
     }
     .input-overlay-right{
         position:absolute;
         color:$light8;
         right:17px;
+        display     : flex;
+        align-items : center;
     }
 }
 
-
-@media (min-width: $screen-md-min) {
+@include media-breakpoint-up(md) {
     .flex-md{
         display:flex;
         align-items:stretch;
@@ -675,24 +879,10 @@ h2.version-number{
     }
 }
 
-.conditions-note{
-    display:inline-block;
-    padding-left: 10px;
-    line-height:16px;
-    color:$dark16;
-}
-
 .help-topic{
     margin-top:10px;
 }
 
-.dropdown-wide{
-    display:inline-block;
-    width:100%;
-}
-.dropdown .lang-sm{
-    margin-right: $padding-input-horizontal/2;
-}
 .two-columns{
     -moz-column-count: 2;
     /* Firefox */
@@ -703,10 +893,10 @@ h2.version-number{
 
 @mixin icon{
   display: inline-block;
-  background-size: 112px 56px;
+  background-size: 112px 80px;
   width: 16px;
   height: 16px;
-  display: inline-block;
+  margin-right: 5px;
   background-image: url('/static/images/portal_icons.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('/static/images/portal_icons@2x.png');
@@ -714,7 +904,6 @@ h2.version-number{
 }
 
 @mixin kill-glyphicon{
-  top:2px;
   @include icon;
   &:before{
     content:none;
@@ -723,53 +912,57 @@ h2.version-number{
 
 .glyphicon-home{
     @include kill-glyphicon;
-    width: 20px;
-    height: 18px;
-    background-position: -26px -34px;
+    width: 24px;
+    height: 24px;
+    background-position: -24px -32px;
 }
 
 .glyphicon-user{
     @include kill-glyphicon;
-    width: 20px;
-    height: 18px;
-    background-position: -2px -34px;
+    width: 24px;
+    height: 24px;
+    background-position: 0 -32px;
 }
+
 .glyphicon-menu-hamburger{
     @include kill-glyphicon;
     width: 20px;
     height: 18px;
     background-position: -50px -34px;
 }
+
 .glyphicon-share{
     @include kill-glyphicon;
     background-position: -16px 0;
 }
+
 .glyphicon-eye-open{
     @include kill-glyphicon;
     background-position: -80px 0;
 }
+
 .glyphicon-eye-close{
     @include kill-glyphicon;
     background-position: -80px -16px;
 }
-button .icon-caret{
-  float:right;
-}
-.icon-caret{
-  @include icon;
-  display: inline-block;
-  width: 12px;
-  background-position: -2px 0px;
 
-  margin-left:$padding-input-horizontal/2;
-  margin-top: 2px;
+.glyphicon-pencil {
+    @include kill-glyphicon;
+    background-position: -47px 0;
 }
-.open .icon-caret{
-  background-position: -2px -14px ;
+
+.glyphicon-remove {
+    @include kill-glyphicon;
+    background-position: -64px 0;
 }
+
 .close-icon{
   @include icon;
   background-position: -32px 0;
+}
+.tag-close-icon {
+    @include icon;
+    background-position: -96px 0;
 }
 
 .wide-button{
@@ -783,4 +976,8 @@ button .icon-caret{
 .light-label{
   font-weight: initial;
   padding-left: 4px;
+}
+
+span.marked {
+    background-color: $light4;
 }

@@ -1,0 +1,11 @@
+Привіт, {{message.userFullName}}
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) надав вам доступ до системи "{{message.system_name}}".
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Ви отримали доступ до системи відеоспостереження "{{message.system_name}}".
+{{/message.sharer_name}}
+
+Переглянути в %PRODUCT_NAME% порталі: {{config.portal_url}}/systems/{{message.system_id}}

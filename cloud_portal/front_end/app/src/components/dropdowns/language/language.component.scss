@@ -1,0 +1,11 @@
+nx-language-select {
+    width: 100%;
+
+    .dropdown-menu {
+        position: absolute !important;
+
+        .dropdown-item {
+            cursor : pointer;
+        }
+    }
+}

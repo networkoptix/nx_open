@@ -1,4 +1,4 @@
-你好，{{message.fullName}}
+你好，{{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}}（{{message.sharer_email}}）与您共享视频管理系统“{{message.system_name}}”。
@@ -8,4 +8,4 @@
 您已被授予访问视频管理系统“{{message.system_name}}”的权限。
 {{/message.sharer_name}}
 
-在{{PRODUCT_NAME}} Portal中查看：{{config.portal_url}}/systems/{{message.system_id}}
+在%PRODUCT_NAME% Portal中查看：{{config.portal_url}}/systems/{{message.system_id}}

@@ -1,4 +1,4 @@
-<h1>Merhaba, {{message.fullName}}</h1>
+<h1>Merhaba, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a>sizle video yönetim sistemini paylaştı{{message.system_name}}.</p>
@@ -6,6 +6,4 @@
 
 {{^message.sharer_name}}
 <p>"{{message.system_name}}" Video yönetim sistemine erişim izni verildi.</p>
-{{/message.sharer_name}}
-
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">%PRODUCT_NAME% Portal'da görüntüleyin </a>

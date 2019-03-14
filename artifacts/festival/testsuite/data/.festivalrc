@@ -1,8 +1,0 @@
-;;;
-;;;  A festivalrc to ensure the tests can be run in the same environment
-;;;
-
-(if (boundp 'voice_rab_diphone)
-    (set! voice_default 'voice_rab_diphone))
-
-

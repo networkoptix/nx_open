@@ -1,8 +1,8 @@
-您好,
+您好 {{message.userFullName}},
 
   請點擊下面的按鈕以確認您的電子郵件地址並啟動帳號.
 
 {{config.portal_url}}/activate/{{message.code}}
 
-若您並未在 {{PRODUCT_NAME}} 中註冊, 請忽略這封電子郵件.
+若您並未在 %PRODUCT_NAME% 中註冊, 請忽略這封電子郵件.
 不要與任何人分享此訊息或連結.

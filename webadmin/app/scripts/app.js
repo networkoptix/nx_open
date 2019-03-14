@@ -11,8 +11,8 @@ angular.module('webadminApp', [
     'ngStorage',
     'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
-    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+    $httpProvider.defaults.xsrfCookieName = 'x-runtime-guid';
+    $httpProvider.defaults.xsrfHeaderName = 'X-Runtime-Guid';
 }]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {
@@ -72,6 +72,10 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'advanced.html',
             controller: 'AdvancedCtrl'
         })
+        .when('/metrics', {
+            templateUrl: Config.viewsDir + 'metrics.html',
+            controller: 'MetricsCtrl'
+        })
         .when('/debug', {
             templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'
@@ -101,6 +105,10 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'devtools/api_changelog.html',
             controller: 'DevtoolsCtrl'
         })
+        .when('/developers/serverDocumentation', {
+            templateUrl: Config.viewsDir + 'devtools/server_documentation.html',
+            controller: 'ServerDocCtrl'
+        })
         .when('/client', {
             templateUrl: Config.viewsDir + 'client.html',
             controller: 'ClientCtrl',
@@ -108,11 +116,21 @@ angular.module('webadminApp', [
         })
         .when('/view', {
             templateUrl: Config.viewsDir + 'view.html',
-            reloadOnSearch: false
+            reloadOnSearch: false,
+            resolve: {
+                test: ['mediaserver', function (mediaserver) {
+                    mediaserver.getUser(true);
+                }]
+            }
         })
         .when('/view/:cameraId', {
             templateUrl: Config.viewsDir + 'view.html',
-            reloadOnSearch: false
+            reloadOnSearch: false,
+            resolve: {
+                test: ['mediaserver', function (mediaserver) {
+                    mediaserver.getUser(true);
+                }]
+            }
         })
         .when('/sdkeula', {
             templateUrl: Config.viewsDir + 'sdkeula.html',

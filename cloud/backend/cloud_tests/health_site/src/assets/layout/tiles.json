@@ -1,0 +1,132 @@
+{
+    "tiles": [
+        {
+            "title": "",
+            "sections": [
+                {
+                    "key": "total",
+                    "caption": "Total",
+                    "messages": {}
+                }
+            ]
+        },
+        {
+            "title"   : "Cloud Services",
+            "sections": [
+                {
+                    "key"      : "cloud_portal_failure",
+                    "caption"  : "Cloud Portal",
+                    "messages" : {
+                        "error": "Cloud Portal doesn't work."
+                    },
+                    "aggregate": [
+                        {
+                            "key"    : "email_failure",
+                            "message": "Registration e-mail on cloud portal are delayed."
+                        },
+                        {
+                            "key"    : "view_and_settings_failure",
+                            "message": "View and settings interface may not work for some users."
+                        },
+                        {
+                            "key"    : "cloud_authentication_failure",
+                            "message": "Users may experience problems with accessing their systems via web."
+                        }
+                    ]
+                },
+                {
+                    "key"     : "view_and_settings_failure",
+                    "caption" : "View and settings interfaces",
+                    "messages": {
+                        "error": "View And Settings page on cloud portal doesn't work."
+                    }
+                },
+                {
+                    "key"     : "cloud_authentication_failure",
+                    "caption" : "Cloud Authentication",
+                    "messages": {
+                        "error": "Users may experience problems logging in to their systems with desktop, mobile or web clients."
+                    }
+                },
+                {
+                    "key"     : "email_failure",
+                    "caption" : "Email Server",
+                    "messages": {
+                        "error": "E-mail notifications are delayed until the issue is resolved."
+                    }
+                }
+            ]
+        },
+        {
+            "title"   : "Cloud Systems Connectivity",
+            "sections": [
+                {
+                    "key"     : "p2p_connections_failure",
+                    "caption" : "PTP Connections",
+                    "messages": {
+                        "error": "Direct connections between clients and media servers don't work."
+                    }
+                },
+                {
+                    "key"        : "traffic_relay_failure",
+                    "caption"    : "Proxied Connections",
+                    "messages"   : {
+                        "error": "All proxy servers are offline. Users may experience troubles connecting to their systems. (Depending on the internet provider, ~80% likelihood connection will still work.)"
+                    },
+                    "subsections": [
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-fr",
+                            "caption"  : "Frankfurt",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Europe and Africa."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-ny",
+                            "caption"  : "New York",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in the Americas."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-la",
+                            "caption"  : "Los Angeles",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Asia and Antarctica."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-sy",
+                            "caption"  : "Sydney",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Oceania."
+                            }
+                        }
+                    ],
+                    "aggregate"  : [
+                        {
+                            "key"    : "relay-ny",
+                            "message": "Connect to remote systems may not work for clients in the Americas."
+                        },
+                        {
+                            "key"    : "relay-fr",
+                            "message": "Connect to remote systems may not work for clients in Europe and Africa."
+                        },
+                        {
+                            "key"    : "relay-la",
+                            "message": "Connect to remote systems may not work for clients in Asia and Antarctica."
+                        },
+                        {
+                            "key"    : "relay-sy",
+                            "message": "Connect to remote systems may not work for clients in Oceania."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

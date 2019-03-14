@@ -4,23 +4,23 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 This device is intended to work with hard disk drive installed.<br>
                 Please turn off the device and install a hard disk drive.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 This device needs network connection to work.<br>
-                Please connect it to the local network ot Internet
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+                Please connect it to the local network or Internet
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 This device has wrong network configuration.<br>
                 Please connect it to the network or set a correct IP address.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -40,14 +40,14 @@
                     <div>
                         <h3>Reset server</h3>
                         <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
+                            The server will be detached from the current System. Video archive will remain intact.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
                             Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Restart</h3>
@@ -80,14 +80,14 @@
                             </div>
 
                             <div class="col-md-6">
-                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Rename system</button>
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Rename System</button>
                             </div>
                         </div>
                     </div>
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge systems</h3>
+                            <h3>Merge Systems</h3>
                             <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
                         </form>
                     </div>
@@ -96,7 +96,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>This system is linked to {{Config.cloud.productName}}, system owner: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnect from {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -104,12 +104,12 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">This system is not linked to {{Config.cloud.productName}}
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Connect the server to the Internet to perform setup {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connection required to connect System to {{Config.cloud.productName}}</alert>
+                                   target="_blank">Learn more</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">Connect the server to the Internet to perform setup {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connection required to connect System to {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
@@ -117,6 +117,28 @@
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
                                    target="_blank">Create {{Config.cloud.productName}} Account</a></p>
                         </div>
+                    </div>
+
+
+                    <div>
+                        <h3>Traffic encryption</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    Force Video Traffic Encryption
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                        </form>
                     </div>
                 </uib-tab>
 

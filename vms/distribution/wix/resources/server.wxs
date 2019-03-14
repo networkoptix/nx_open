@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <Fragment Id='FragmentServer'>
+        <?include BuildVars.wxi ?>
+
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="InstallDirRoot" Name="MediaServer">
+                <Component Id="ServerExecutable">
+                    <File Id="mediaserver.exe"
+                        Name="mediaserver.exe"
+                        Source="$(var.SourceDir)/mediaserver.exe"
+                        KeyPath="yes">
+                        <fire:FirewallException Id="FirewallExceptionMediaServer"
+                            Name="$(var.mediaserverName)"
+                            Scope="any"
+                            IgnoreFailure="yes"/>
+                    </File>
+
+                    <ServiceInstall Id="$(var.customization)MediaServerService"
+                                                Name="$(var.customization)MediaServer"
+                                                DisplayName="$(var.mediaserverName)"
+                                                Type="ownProcess"
+                                                Start="auto"
+                                                ErrorControl="normal"
+                                                Description="$(var.mediaserverName)">
+                        <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
+                    </ServiceInstall>
+
+                    <ServiceControl
+                        Id="Start$(var.customization)ServerService"
+                        Name="$(var.customization)MediaServer"
+                        Start="install"
+                        Wait="no" />
+                    <ServiceControl
+                        Id="Stop$(var.customization)ServerService"
+                        Name="$(var.customization)MediaServer"
+                        Stop="both"
+                        Wait="yes"
+                        Remove="uninstall" />
+                </Component>
+
+                <Component Id="ServerVersion">
+                    <RegistryValue
+                        Root='HKLM'
+                        Key='Software\[Manufacturer]\version'
+                        Type='string'
+                        Value='$(var.releaseVersionFull)'/>
+                </Component>
+
+                <Component Id="ServerConfiguration">
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\$(var.mediaserverName)">
+                        <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
+                        <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
+                        <RegistryValue Type="string" Name="cameraSettingsOptimization" Value="[ALLOW_CAMERA_CHANGES]"/>
+                    </RegistryKey>
+                </Component>
+
+                <Component Id="ServerConfigurationStatisticsFlag">
+                    <Condition>STATISTICS_REPORT_ALLOWED</Condition>
+
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\$(var.mediaserverName)">
+                        <RegistryValue Type="string" Name="statisticsReportAllowed" Value="[STATISTICS_REPORT_ALLOWED]"/>
+                    </RegistryKey>
+                </Component>
+
+                <Component Id="ServerConfigurationPassword">
+                    <Condition>SERVER_PASSWORD</Condition>
+
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\$(var.mediaserverName)">
+                        <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
+                        <RegistryValue Type="string" Name="lowPriorityPassword" Value="1"/>
+                    </RegistryKey>
+                </Component>
+
+                <Directory Id="plugins" Name="plugins"/>
+                <Directory Id="plugins_optional" Name="plugins_optional"/>
+                <Directory Id="platforms" Name="platforms"/>
+                <Directory Id="vox" Name="vox"/>
+                <Directory Id="sqldrivers" Name="sqldrivers"/>
+
+                <?if $(var.vmax) = true?>
+                <Directory Id="$(var.customization)VmaxDir" Name="VmaxProxy">
+                    <Component Id="vmaxproxy.exe">
+                        <File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="$(var.SourceDir)/vmaxproxy/vmaxproxy.exe" KeyPath="yes">
+                            <fire:FirewallException Id="FirewallException$(var.customization)VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
+                        </File>
+                    </Component>
+
+                    <Component Id="VmaxProxyQTLibraries">
+                        <File Id="qtcore4.dll" Name="qtcore4.dll" Source="$(var.SourceDir)/vmaxproxy/qtcore4.dll"/>
+                    </Component>
+                </Directory>
+                <?endif?>
+
+            </Directory>
+        </DirectoryRef>
+
+        <ComponentGroup Id="ServerWeb" Directory="InstallDirRoot">
+            <Component>
+                <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat"/>
+            </Component>
+        </ComponentGroup>
+
+        <?if $(var.vmax) = true?>
+        <ComponentGroup Id="VmaxProxySDK" Directory="$(var.customization)VmaxDir">
+            <Component>
+                <File Id="acs_stream_source_mr.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
+            </Component>
+            <Component>
+                <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="$(var.SourceDir)/vmaxproxy/pid.dat"/>
+            </Component>
+        </ComponentGroup>
+        <?endif?>
+
+        <ComponentGroup Id="server_txt_files" Directory="InstallDirRoot" Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="specific_features.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
+                 ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+            <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
+
+            <ComponentGroupRef Id="shared_nx_libraries"/>
+            <ComponentGroupRef Id="shared_misc_libraries"/>
+            <ComponentGroupRef Id="shared_qt_libraries"/>
+            <ComponentGroupRef Id="shared_qt_platforms"/>
+            <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="shared_ucrt_libraries"/>
+            <ComponentGroupRef Id="shared_vcrt_libraries"/>
+            <ComponentGroupRef Id="server_qt_libraries"/>
+            <ComponentGroupRef Id="server_qt_sqldrivers"/>
+            <ComponentGroupRef Id="server_misc_libraries"/>
+            <ComponentGroupRef Id="server_plugins"/>
+            <ComponentGroupRef Id="server_plugins_optional"/>
+
+            <ComponentGroupRef Id="vox"/>
+            <ComponentGroupRef Id="traytool"/>
+
+            <ComponentRef Id='ServerVersion'/>
+            <ComponentGroupRef Id='server_txt_files'/>
+            <ComponentRef Id='ServerConfiguration'/>
+            <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
+            <ComponentRef Id='ServerConfigurationPassword'/>
+            <ComponentGroupRef Id="ServerWeb"/>
+            <ComponentRef Id="ServerExecutable" />
+
+            <?if $(var.vmax) = true?>
+            <ComponentRef Id="vmaxproxy.exe"/>
+            <ComponentRef Id="VmaxProxyQTLibraries"/>
+            <ComponentGroupRef Id="VmaxProxySDK"/>
+            <?endif?>
+        </Feature>
+
+    </Fragment>
+</Wix>

@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">Перезавантаження системи...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="modal-body">
+        <p>Перезавантаження системи може зайняти деякий час. Після цього сторінка буде оновлена автоматично.</p>
+        <uib-progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</uib-progressbar>
+
+        <p>Якщо нічого не відбувається протягом деякого часу, необхідно оновити сторінку вручну</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Оновити</button>
+    </div>
+
+</form>

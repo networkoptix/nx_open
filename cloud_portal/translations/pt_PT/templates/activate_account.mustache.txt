@@ -1,8 +1,8 @@
-Hello,
+Olá {{message.userFullName}},
 
-  Please open the link below to confirm your email address and activate the account.
+  Por favor, clique no botão abaixo para confirmar o seu endereço de e-mail e activar a conta.
 
-{{config.portal_url}}/activate/{{message.code}}
+{{config.portal_url}}/activar/{{message.code}}
 
-If you didn't register in {{PRODUCT_NAME}}, just ignore this email.
-Do not share the message or the link with anyone.
+Se você não se registou em %PRODUCT_NAME%, ignore este e-mail.
+Não partilhe esta mensagem ou o link com ninguém.

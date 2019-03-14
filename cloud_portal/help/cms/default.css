@@ -1,0 +1,397 @@
+/* Text Styles */
+hr { color: #000000}
+body, table, tr, th /* Normal */
+{
+ font-size: 10pt;
+ font-family: Arial;
+ font-style: normal;
+ font-weight: normal;
+ color: #000000;
+ text-decoration: none;
+}
+span.f_BodyText /* Body Text */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_BodyTextFirstIndent /* Body Text First Indent */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_BodyTextFirstIndent2 /* Body Text First Indent 2 */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_BodyTextFirstIndent2Char /* Body Text First Indent 2 Char */
+{
+ font-size: 12pt;
+ font-family: 'Times New Roman';
+}
+span.f_BodyTextIndent /* Body Text Indent */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_BodyTextIndentChar /* Body Text Indent Char */
+{
+ font-size: 12pt;
+ font-family: 'Times New Roman';
+}
+span.f_CodeExample /* Code Example */
+{
+ font-family: 'Courier New';
+ font-weight: bold;
+}
+span.f_Comment /* Comment */
+{
+}
+span.f_DefaultParagraphFont /* Default Paragraph Font */
+{
+ font-size: 12pt;
+ font-family: 'Times New Roman';
+}
+span.f_heading1 /* heading 1 */
+{
+ font-size: 26pt;
+ font-family: Cambria;
+ font-weight: bold;
+}
+span.f_heading2 /* heading 2 */
+{
+ font-size: 24pt;
+ font-family: Cambria;
+}
+span.f_heading3 /* heading 3 */
+{
+ font-size: 20pt;
+ font-family: Cambria;
+ font-weight: bold;
+}
+span.f_Heading3Char /* Heading 3 Char */
+{
+ font-size: 13pt;
+ font-family: Cambria;
+ font-weight: bold;
+}
+span.f_heading4 /* heading 4 */
+{
+ font-size: 13pt;
+ font-family: Cambria;
+ font-weight: bold;
+}
+span.f_heading5 /* heading 5 */
+{
+ font-size: 11pt;
+ font-family: Cambria;
+ color: #6e6e6e;
+}
+span.f_Heading1 /* Heading1 */
+{
+ font-size: 16pt;
+ font-weight: bold;
+}
+span.f_Hyperlink /* Hyperlink */
+{
+ font-size: 12pt;
+ font-family: 'Times New Roman';
+ color: #5f5f5f;
+ text-decoration: underline;
+}
+span.f_ImageCaption /* Image Caption */
+{
+ font-size: 8pt;
+ font-weight: bold;
+}
+span.f_ListBullet /* List Bullet */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_ListBullet2 /* List Bullet 2 */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_ListNumber /* List Number */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_ListNumber2 /* List Number 2 */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_NormalRed /* Normal Red */
+{
+ color: #ff0000;
+}
+span.f_Notes /* Notes */
+{
+}
+span.f_Strong /* Strong */
+{
+ font-size: 12pt;
+ font-family: 'Times New Roman';
+ font-weight: bold;
+}
+span.f_T_Hotkey /* T_Hotkey */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+ font-style: italic;
+ font-weight: bold;
+}
+span.f_T_Interface_Elements /* T_Interface_Elements */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+ font-style: italic;
+}
+span.f_T_Value /* T_Value */
+{
+ font-family: 'Courier New';
+ font-weight: bold;
+}
+span.f_Title /* Title */
+{
+ font-size: 26pt;
+ font-family: Cambria;
+}
+span.f_toc1 /* toc 1 */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_toc2 /* toc 2 */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_toc3 /* toc 3 */
+{
+ font-size: 11pt;
+ font-family: Calibri;
+}
+span.f_translation /* translation */
+{
+ font-size: 12pt;
+ font-family: 'Times New Roman';
+}
+/* Paragraph styles */
+p /* Normal */
+{
+ text-align: left;
+ text-indent: 0px;
+ padding: 0px 0px 0px 0px;
+ margin: 0px 0px 0px 0px;
+}
+.p_BodyText /* Body Text */
+{
+ line-height: 1.15;
+ margin: 6px 0px 6px 0px;
+}
+.p_BodyTextFirstIndent /* Body Text First Indent */
+{
+ text-indent: 1px;
+ line-height: 1.15;
+ margin: 6px 0px 4px 23px;
+}
+.p_BodyTextFirstIndent2 /* Body Text First Indent 2 */
+{
+ line-height: 1.15;
+ margin: 2px 0px 2px 34px;
+}
+.p_BodyTextFirstIndent2Char /* Body Text First Indent 2 Char */
+{
+}
+.p_BodyTextIndent /* Body Text Indent */
+{
+ line-height: 1.15;
+ margin: 2px 0px 2px 14px;
+}
+.p_BodyTextIndentChar /* Body Text Indent Char */
+{
+}
+.p_CodeExample /* Code Example */
+{
+ white-space: nowrap;
+}
+.p_Comment /* Comment */
+{
+}
+.p_DefaultParagraphFont /* Default Paragraph Font */
+{
+}
+.p_heading1 /* heading 1 */
+{
+ border-color: #dddddd;
+ border-style: solid;
+ border-width: 1px;
+ border-top: none;
+ border-right: none;
+ border-left: none;
+ margin: 32px 0px 5px 0px;
+}
+.p_heading2 /* heading 2 */
+{
+ border-color: #dddddd;
+ border-style: solid;
+ border-width: 1px;
+ border-top: none;
+ border-right: none;
+ border-left: none;
+ margin: 13px 0px 8px 0px;
+}
+.p_heading3 /* heading 3 */
+{
+ border-color: #dddddd;
+ border-style: solid;
+ border-width: 1px;
+ border-top: none;
+ border-right: none;
+ border-left: none;
+ margin: 13px 0px 8px 0px;
+}
+.p_Heading3Char /* Heading 3 Char */
+{
+}
+.p_heading4 /* heading 4 */
+{
+ border-color: #dddddd;
+ border-style: solid;
+ border-width: 1px;
+ border-top: none;
+ border-right: none;
+ border-left: none;
+ margin: 13px 0px 13px 0px;
+}
+.p_heading5 /* heading 5 */
+{
+ line-height: 1.15;
+ margin: 13px 0px 0px -19px;
+}
+.p_Heading1 /* Heading1 */
+{
+ font-size: 100%;
+ font-weight: normal;
+ text-align: left;
+ text-indent: 0px;
+ padding: 0px 0px 0px 0px;
+ margin: 0px 0px 0px 0px;
+}
+.p_Hyperlink /* Hyperlink */
+{
+}
+.p_ImageCaption /* Image Caption */
+{
+}
+.p_ListBullet /* List Bullet */
+{
+ text-indent: -24px;
+ line-height: 1.15;
+ margin: 7px 0px 7px 31px;
+}
+.p_ListBullet2 /* List Bullet 2 */
+{
+ text-indent: -24px;
+ line-height: 1.15;
+ margin: 7px 0px 7px 43px;
+}
+.p_ListNumber /* List Number */
+{
+ text-indent: -24px;
+ line-height: 1.15;
+ margin: 4px 0px 4px 24px;
+}
+.p_ListNumber2 /* List Number 2 */
+{
+ text-indent: -24px;
+ line-height: 1.15;
+ margin: 4px 0px 4px 43px;
+}
+.p_NormalRed /* Normal Red */
+{
+}
+.p_Notes /* Notes */
+{
+}
+.p_Strong /* Strong */
+{
+}
+.p_T_Hotkey /* T_Hotkey */
+{
+}
+.p_T_Interface_Elements /* T_Interface_Elements */
+{
+}
+.p_T_Value /* T_Value */
+{
+}
+.p_Title /* Title */
+{
+ border-color: #dddddd;
+ border-style: solid;
+ border-width: 1px;
+ border-top: none;
+ border-right: none;
+ border-left: none;
+ margin: 4px 0px 20px 0px;
+}
+.p_toc1 /* toc 1 */
+{
+ line-height: 1.15;
+ margin: 4px 0px 7px -19px;
+}
+.p_toc2 /* toc 2 */
+{
+ line-height: 1.15;
+ margin: 4px 0px 7px 15px;
+}
+.p_toc3 /* toc 3 */
+{
+ line-height: 1.15;
+ margin: 4px 0px 7px 29px;
+}
+.p_translation /* translation */
+{
+}
+
+
+#hmpopupdiv /* used for javascript text popups */
+{
+  display: none;
+  position: absolute;
+  z-index: 1000;
+  background-color: #FFFFFF;
+  padding: 6px;
+  border:1px solid #000000;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px #888;
+}
+
+#hmlightbox /* image lightbox */
+{
+  border: none;
+  padding: 8px;
+  background: #FFF;
+  font-size: 110%;
+  font-weight: bold;
+  color: #777;
+  box-shadow: 5px 5px 5px #888;
+}
+
+a.dropdown-toggle /* dropdown toggle caption */
+{
+  cursor: pointer;
+}
+a.inline-toggle /* inline toggle caption */
+{
+  cursor: pointer;
+}
+img.dropdown-toggle-icon /* toggle icon */
+{
+  cursor: pointer;
+}

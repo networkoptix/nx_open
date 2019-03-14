@@ -1,11 +1,11 @@
-שלום, {{message.fullName}}
+שלום, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) שיתף גישה למערכת ניהול הוידאו "{{message.system_name}}".
-{{#message.sharer_name}}
+{{/message.sharer_name}}
 
 {{^message.sharer_name}}
 ניתנה לך גישה למערכת ניהול וידאו "{{message.system_name}}".
-{{#message.sharer_name}}
+{{/message.sharer_name}}
 
-הצג ב {{PRODUCT_NAME}} פורטל: {{config.portal_url}}/systems/{{message.system_id}}
+הצג ב %PRODUCT_NAME% פורטל: {{config.portal_url}}/systems/{{message.system_id}}

@@ -1,0 +1,163 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+nx-checkbox {
+    &[disabled] {
+        .nx-checkbox {
+            opacity : .3;
+
+            .tick {
+                cursor : default;
+            }
+
+            input:hover ~ .tick {
+                svg polygon.box,
+                svg polyline.box {
+                    stroke : $dark9 !important;
+                }
+            }
+        }
+    }
+
+    & + label {
+        cursor : pointer;
+        
+        & + div.input-error {
+            display : none;
+        }
+    }
+
+    &.ng-invalid:not(.ng-untouched) {
+        & + label + div.input-error {
+            display : block;
+        }
+    }
+
+    .nx-checkbox {
+        display : flex;
+        float   : left;
+        margin  : 0;
+
+        input[type="checkbox"] {
+            position : absolute;
+            opacity  : 0;
+        }
+
+        input:hover ~ .tick {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark1;
+            }
+        }
+
+        input:active ~ .tick {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark9 !important;
+            }
+        }
+
+        input:hover ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
+            }
+        }
+    }
+}
+
+.tick {
+    cursor                      : pointer;
+    position                    : relative;
+    margin                      : -1px 0 0 0;
+    width                       : 24px;
+    height                      : 20px;
+    -webkit-tap-highlight-color : transparent;
+
+    &.checked {
+        svg {
+            polyline.box,
+            polyline.tick {
+                display : block;
+            }
+
+            polygon.box {
+                display : none;
+            }
+        }
+    }
+
+    &.tristate {
+        svg {
+            polyline.box,
+            line.tristate {
+                display : block;
+            }
+
+            polyline.tick {
+                display : none;
+            }
+        }
+    }
+
+    svg {
+        height : 16px;
+        width  : 20px;
+
+        & polygon.box {
+            fill              : none;
+            stroke            : $dark9;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+        }
+
+        & polyline.box {
+            fill              : none;
+            stroke            : $dark9;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+            stroke-width      : 1px;
+            display           : none;
+        }
+
+        & polyline.tick {
+            fill              : none;
+            stroke            : $brand_core;
+            stroke-width      : 2px;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+            display           : none;
+        }
+
+        & line.tristate {
+            fill              : none;
+            stroke            : $brand_core;
+            stroke-width      : 2px;
+            stroke-linecap    : round;
+            stroke-linejoin   : round;
+            stroke-miterlimit : 10;
+            display           : none;
+        }
+    }
+}
+
+
+

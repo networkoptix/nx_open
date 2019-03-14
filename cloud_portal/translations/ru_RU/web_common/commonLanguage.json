@@ -4,7 +4,7 @@
     "lowStream": "Низ. кач-во",
     "transcoding": "Перекодирование",
     "unknown": "Неизвестный",
-    "copyToClipboard": "копировать в буфер",
+    "copyToClipboard": "скопировать в буфер обмена",
     "copyDefaultText": "копировать",
     "copyActiveText": "скопировано в буфер обмена"
   },
@@ -15,7 +15,7 @@
     "unauthorized": "Требуется аутентификация",
     "noData": "Нет данных",
     "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео.",
     "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
     "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
     "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
@@ -36,12 +36,12 @@
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "очистить поиск",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "развернуть все серверы",
+    "collapse all servers": "свернуть все серверы",
+    "stop listening": "прекратить прослушивание",
     "help": "help | show commands"
   }
 }

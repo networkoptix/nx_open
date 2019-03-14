@@ -1,9 +1,9 @@
 {% load i18n admin_urls %}
-
+{% if not READONLY %}
 <div class="submit-row">
 {% if show_delete_link %}
     {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-    <button class="btn btn-danger pull-left"><a href="{% add_preserved_filters delete_url %}">{% trans "Delete" %}</a></button>
+    <a class="btn btn-danger pull-left" href="{% add_preserved_filters delete_url %}">Delete</a>
 {% endif %}
 {% if show_save_as_new %}
     <button class="btn" type="submit" value="{% trans 'Save as new' %}" name="_saveasnew">Save as new</button>
@@ -18,3 +18,4 @@
     <button type="submit" class="btn btn-primary" value="{% trans 'Save' %}" name="_save">Save</button>
     {% endif %}
 </div>
+{% endif %}

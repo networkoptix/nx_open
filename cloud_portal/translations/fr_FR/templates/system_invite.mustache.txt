@@ -1,11 +1,11 @@
-Bienvenue sur {{PRODUCT_NAME}}
+Bienvenue sur %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) vous invite à joindre {{PRODUCT_NAME}} et partage son système {{message.system_name}} avec vous.
+{{message.sharer_name}} ({{message.sharer_email}}) vous invite à joindre %PRODUCT_NAME% et partage son système {{message.system_name}} avec vous.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Vous êtes invités à vous joindre à {{PRODUCT_NAME}}.
+Vous êtes invités à vous joindre à %PRODUCT_NAME%.
 Vous avez reçu l'accès à {{message.system_name}}.
 {{/message.sharer_name}}
 

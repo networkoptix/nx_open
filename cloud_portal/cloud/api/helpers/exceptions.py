@@ -1,3 +1,8 @@
+import django
+import logging
+import json
+import traceback
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
@@ -5,12 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 from enum import Enum
-import logging
-import json
-import traceback
 
 logger = logging.getLogger(__name__)
-
 
 class ErrorCodes(Enum):
     ok = 'ok'
@@ -28,6 +29,7 @@ class ErrorCodes(Enum):
     wrong_parameters = 'wrongParameters'
     wrong_code = 'wrongCode'
     wrong_old_password = 'wrongOldPassword'
+    wrong_password = 'wrongPassword'
 
     # CLOUD DB specific errors
     forbidden = 'forbidden'
@@ -57,8 +59,12 @@ class ErrorCodes(Enum):
                     ErrorCodes.wrong_old_password,
                     ErrorCodes.account_not_activated):
             return logging.INFO
-        if self in (ErrorCodes.forbidden,
-                    ErrorCodes.wrong_code):
+        if self in (ErrorCodes.account_blocked,
+                    ErrorCodes.bad_username,
+                    ErrorCodes.forbidden,
+                    ErrorCodes.invalid_nonce,
+                    ErrorCodes.wrong_code,
+                    ErrorCodes.wrong_parameters):
             return logging.WARNING
         return logging.ERROR
 
@@ -339,6 +345,13 @@ def log_error(request, error, log_level):
     return error_formatted
 
 
+def kill_session(request):
+    request.session.pop('login', None)
+    request.session.pop('password', None)
+    request.session.pop('timezone', None)
+    django.contrib.auth.logout(request)
+
+
 def handle_exceptions(func):
     """
     Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
@@ -353,6 +366,16 @@ def handle_exceptions(func):
             if not isinstance(data, Response):
                 return Response(data, status=status.HTTP_200_OK)
             return data
+
+        except APINotAuthorisedException as error:
+            log_error(args[0], error, error.log_level())
+            # check if user session exist
+            # and kill it if user is not authorized
+            if 'login' in args[0].session:
+                kill_session(args[0])
+
+            return error.response()
+
         except APIException as error:
             # Do not log not_authorized errors
             log_error(args[0], error, error.log_level())

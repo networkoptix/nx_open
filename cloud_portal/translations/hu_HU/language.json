@@ -1,19 +1,20 @@
 {
+  "language": "hu_HU",
   "language_name": "Magyar",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Mégse",
-    "loginTitle": "Bejelentkezés ide: {{PRODUCT_NAME}}",
+    "loginTitle": "Bejelentkezés ide: %PRODUCT_NAME%",
     "loginButton": "Bejelentkezés",
     "logoutAuthorisedTitle": "Már bejelentkezett",
     "logoutAuthorisedContinueButton": "Folyatatás",
     "logoutAuthorisedLogoutButton": "Kijelentkezés"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Üdvözöljük",
     "register": "Fiók létrehozása itt",
     "changePassword": "Jelszó módosítása -",
@@ -31,8 +32,8 @@
     "view": "Kamerák megtekintése - ",
     "debug": "Hibakeresés",
     "login": "Bejelentkezés -",
-    "download": "{{VMS_NAME}} letöltése",
-    "downloadPlatform": "{{VMS_NAME}} letöltése ",
+    "download": "%VMS_NAME% letöltése",
+    "downloadPlatform": "%VMS_NAME% letöltése ",
     "pageNotFound": "Az oldal nem található"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+      "description": "Élőkép megtekintése, keresés archívban, PTZ vezérlés, stb"
     },
     "Administrator": {
       "label": "Adminisztrátor",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a %VMS_NAME% klienst"
     },
     "cloudAdmin": {
       "label": "Adminisztrátor",
@@ -93,11 +94,11 @@
     },
     "advancedViewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb"
     },
     "custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a %VMS_NAME% klienst"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "Megerősítő e-mailt nem lehet elküldeni",
     "cloudInvalidResponse": "Felhő DB ismeretlen választ jelzett vissza",
     "notAuthorized": "Hibás jelszó",
-    "wrongParameters": "Néhány paraméter hibás",
     "brokenAccount": "Váratlan probléma a fiókkal. <a href=\"/restore_password\">Fiók visszaállítása</a>",
+    "wrongParameters": "Néhány paraméter hibás",
     "wrongCode": "A fiók van már aktiválva van, vagy a megerősítési kód hibás",
     "wrongCodeRestore": "Megerősítési kód már használt, vagy hibás",
     "forbidden": "Nincs engedélye erre a műveletre",
     "accountNotActivated": "Ez a fiók még nincs aktiválva. <a href=\"/activate\">Küldje újra az aktiváló linket</a>",
-    "accountBlocked": "A fiók zárolva van",
+    "accountBlocked": "A fiók zárolva van. Próbálja újra pár perc múlva.",
     "notFound": "Nem található",
     "alreadyExists": "Ez a fiük már létezik",
     "unknownError": "Váratlan hiba történt",
@@ -133,16 +134,26 @@
     "passwordMismatch": "Hibás jelszó",
     "cantEditYourself": "Saját engedélyek módosítása nem engedélyezett",
     "cantEditAdmin": "Ez a felhasználó rendszergazdai jogokkal rendelkezik",
-    "cantOpenClient": "{{VMS_NAME}} nincs törölve. <a href=\"/download\">Letöltés</a>",
+    "cantOpenClient": "%VMS_NAME% nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
-    "thisSystem": "a rendszer"
+    "thisSystem": "a rendszer",
+    "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "jó",
+    "fair": "elegendő",
+    "minLength": "túl rövid",
     "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
+    "required": "nem megfelelő",
     "requiredMessage": "Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
+    "weak": "gyenge",
     "weakMessage": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
     "strongMessage": "Erős jelszó!",
-    "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike"
+    "common": "túl gyakori",
+    "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike",
+    "missingMessage": "Jelszó megadása szükséges"
   },
   "sharing": {
     "confirmOwner": "Ha megváltoztatja a rendszertulajdonost, érvényteleníti a tulajdonjogot ehhez a fiókhoz. Ez a művelet nem fordítható vissza. Folytatja?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Rendszer nem elérhető",
     "offline": "A rendszer offline",
-    "openClient": "Megnyitás {{VMS_NAME}}",
-    "openClientNoSystem": "{{VMS_NAME}} Megnyitása",
+    "openClient": "%VMS_NAME% Megnyitása",
+    "openClientNoSystem": "%VMS_NAME% Megnyitása",
+    "confirmMergeAction": "Összefésülés",
+    "mergeSystemTitle": "Rendszerek összevonása",
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",
     "successRename": "Rendszer neve mentve",
-    "confirmDisconnectTitle": "Lekapcsolódik innen: {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
     "confirmDisconnectAction": "Szétkapcsolás",
     "confirmUnshareFromMe": "A rendszer leválasztására készül fiókjáról. Többé nem fog tudni kapcsolódni a rendszerhez. Folytatja?",
     "confirmUnshareFromMeTitle": "Leválasztja a rendszert?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "Ez a felhasználó nem fog tudni csatlakozni a rendszerhez. Folytatja?",
     "confirmUnshareTitle": "Törli a felhasználót?",
     "confirmUnshareAction": "Törlés",
-    "successDisconnected": "Rendszer sikeresen bontotta {{PRODUCT_NAME}} kapcsolatát",
+    "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "{{email}} engedélyei vissavonva"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "Mentés"
   },
   "downloads": {
-    "noClientDetectedTitle": "Telepítse a {{VMS_NAME}} alkalmazást a rendszer megtekintéshez",
-    "action": "{{VMS_NAME}} letöltése",
+    "noClientDetectedTitle": "Telepítse a %VMS_NAME% alkalmazást a rendszer megtekintéshez",
+    "action": "%VMS_NAME% letöltése",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "Minden rendszer",
     "systems": "Rendszerek"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Elsődleges stream",
+      "lowStream": "Másodlagos stream",
+      "transcoding": "Transzkódolás",
+      "unknown": "Ismeretlen",
+      "copyToClipboard": "másolás vágólapra",
+      "copyDefaultText": "másolás",
+      "copyActiveText": "vágólapra másolva"
+    },
+    "systemOffline": "A rendszer offline",
+    "systemHasNoCameras": "NINCSENEK KAMERÁK",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Hiba",
+      "unauthorized": "Hitelesítés szükséges",
+      "noData": "Nincs adat",
+      "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+      "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához.",
+      "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
+      "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
+      "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
+      "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+      "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+      "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt."
+    },
+    "searchCamPlaceholder": "Keresés",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Elsődleges",
+      "low": "Alacsony"
+    },
+    "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
+    "voiceCommands": {
+      "play": "letjátszás",
+      "pause": "szünet",
+      "live": "élőbe menni | mutatsd élőben",
+      "view": "nézet + [kamera neve]",
+      "search": "keresés + [szöveg a keresősávhoz]",
+      "clear search": "keresés törlése",
+      "expand server": "szerver kibontása + [szerver neve]",
+      "collapse server": "szerver összecsukása + [szerver neve]",
+      "expand all servers": "összes szerver kibontása",
+      "collapse all servers": "összes szerver összecsukása",
+      "stop listening": "figyelés leállítása",
+      "help": "súgó | parancsok megjelenítése"
+    }
   }
 }

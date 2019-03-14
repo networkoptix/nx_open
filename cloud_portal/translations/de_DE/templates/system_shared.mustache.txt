@@ -1,4 +1,4 @@
-Hello, {{message.fullName}}
+Hallo, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) hat sein Videoverwaltungssystem "{{message.system_name}}" mit Ihnen geteilt.
@@ -8,4 +8,4 @@ Hello, {{message.fullName}}
 Ihnen wurde Zugriff auf das Videoverwaltungssystem "{{message.system_name}}" gewährt.
 {{/message.sharer_name}}
 
-Ansicht im {{PRODUCT_NAME}}-Portal: {{config.portal_url}}/systems/{{message.system_id}}
+Ansicht im %PRODUCT_NAME%-Portal: {{config.portal_url}}/systems/{{message.system_id}}

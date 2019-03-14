@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        サーバードキュメント
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">これらの設定は次の場所からアクセスできます</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                Windows レジストリーキー:
+                Computer\HKEY_LOCAL_MACHINE\SOFTWARE\"{{Config.productName}}"\"{{Config.productName}} Media Server"
+            </p>
+            <p>
+                他プラットフォームの config fileの場所:
+                /opt/{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">サーバー設定</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>名前</th>
+                        <th>説明(&D)</th>
+                        <th>デフォルト値</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,334 +1,341 @@
 /* Here we override some default bootstrap styles and behavior for our purposes */
-
-
 @import '_theme_variables';
+@import '~sass-rem/rem';
 
+$font-size-a-bit-large : ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
 
-$font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
-
+body {
+    color : $text-color;
+}
 
 .container-fluid {
-    padding:0;
+    padding : 0;
 }
 
-.panel{
-  box-shadow: 0 1px 2px transparentize($dark15,0.9);
+.card {
+    border-radius : 2px;
+    box-shadow    : 0 1px 2px transparentize($dark15, 0.9);
+
+    .card-body {
+        padding : rem(16px);
+        h2 {
+            font-size: rem(20px);
+        }
+    }
+
+    .table-responsive {
+        margin-left  : -15px;
+        margin-right : -15px;
+        width        : auto;
+    }
+
+    .table {
+        width : 100%;
+    }
+
+    &-condensed {
+        .card-body {
+            padding : 12px 16px 14px;
+
+            .user-name {
+                font-size     : $font-size-sm;
+                font-family   : $font-family-medium;
+                height        : 16px;
+                margin-bottom : 0;
+            }
+
+            .process-button {
+                margin-top : 12px;
+            }
+        }
+    }
 }
+
 .panel-heading {
-  border-bottom: none;
+    border-bottom : none;
 }
 
+// NG-Bootstrap collapsible element
+.collapse {
+    display    : block;
+    transition : opacity .5s ease-out;
+    opacity    : 0;
+    height     : 0;
+    overflow   : hidden;
 
-h1{
-  margin-bottom: $line-height-computed;
-}
-h2{
-  margin:0;
-}
-
-h3{
-  margin-top: ( $line-height-computed / 2 );
-  margin-bottom: ( $line-height-computed / 4 );
-  font-weight: normal;
-}
-h1>.label{
-  font-size:60%;
-  vertical-align: 33%;
-}
-
-.modal-open {
-  overflow: auto;
-}
-
-.modal {
-  &.fade .modal-dialog {
-    @include translate(0, -20px);
-    @include transition-transform(0.1s ease-out);
-  }
-
-  &.in .modal-dialog { @include translate(0, 0) }
-
-  .modal-body{
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .modal-footer{
-    padding-top: 0;
-    margin-top: 0;
-    text-align: left;
-    white-space: nowrap;
-
-    &>button,
-    & .process-button {
-      margin-right:8px;
+    &.show {
+        opacity    : 1;
+        transition : opacity .5s ease-in;
+        display    : block;
+        height     : auto;
     }
-  }
-  .modal-title{
-    margin-right: 24px;
-  }
-  .modal-header .close{
-    position: absolute;
-    right: 0;
-    top: 2px;
-    width:40px;
-    height:40px;
+}
 
-    &:hover{
-      background-color: $light2;
+table {
+    & > thead > tr > th {
+        color : $brand-core;
+
+        &:first-child {
+            padding-left : 15px;
+        }
     }
-  }
 
-  .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
-    min-height:40px;
-    background-color: $modal-content-bg;
-  }
-}
+    & > tbody > tr {
+        & td:first-child {
+            padding-left : 15px;
+        }
 
-
-@media (min-width: $dialog-sm-float-breakpoint) {
-  .modal-sm {
-    width: $modal-sm;
-    margin: 108px auto;
-  }
-}
-
-@media (min-width: $screen-sm-min) {
-  /* Automatically set modal's width for larger viewports */
-  .modal-dialog {
-    margin: 108px auto;
-  }
-
-  .modal-content {
-    @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
-  }
-}
-
-@media (min-width: $screen-sm-min) {
-  .form-horizontal .help-block { /* Do not jump form when help block changes (help-block is to the right from the input) */
-    position: absolute;
-  }
-}
-
-.panel > .table, .panel > .table-responsive {
-  margin-bottom: 16px;
+        &.hoverable:hover {
+            background-color : $light2;
+        }
+    }
 }
 
 .jumbotron {
-  text-align: center;
+    text-align : center;
 }
-
 
 hr {
-  margin-top:    16px;
-  margin-bottom: 16px;
+    margin-top    : 16px;
+    margin-bottom : 16px;
 }
 
-
-.form-control{
-  box-shadow: none;
-  padding: $padding-base-vertical $padding-input-horizontal;
-
-  &:focus {
-    box-shadow: none;
-  }
-
-  &[disabled],
-  fieldset[disabled] & {
-    opacity:0.3;
-  }
+.buttons-panel {
+    display : flex;
 }
-
-.form-control:read-only:focus {
-  border-color: $input-border;
-}
-
-
-select.form-control{
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: transparent;
-}
-
-
-.btn{
-  outline: none !important;
-  max-width: 278px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  line-height: 1.428571429;
-  &:hover,
-  &:active,
-  &.active,
-  &:focus,
-  &.focus {
-    outline: none !important;
-  }
-}
-
-.btn-default{
-  &:hover,
-  &:focus,
-  &.focus {
-    background-color: transparentize($light5,0.75);
-    border-color: $light8;
-  }
-
-  &:active,
-  &.active{
-    background-color: transparentize($light5,0.5) !important;
-    border-color: transparentize($light5,0.5) !important;
-    @include box-shadow(inset 0px 1px 0px 1px $light9);
-    outline: none;
-  }
-}
-
-.btn-primary{
-  &:hover,
-  &:focus,
-  &.focus {
-    background-color: $brand_l1;
-    border-color: $brand_core;
-  }
-
-  &:active,
-  &.active{
-    background-color: $brand_core !important;
-    border-color: $brand_core !important;
-    @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
-    outline: none;
-  }
-}
-
-
-
 
 .alert {
-  font-size: $font-size-h4;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));
-}
-.alert-dismissable .close, .alert-dismissible .close{
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  outline: none !important;
-  &:hover,
-  &:focus,
-  &:active{
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    outline: none !important;
-  }
-
+    font-size      : $h4-font-size;
+    padding-top    : 8px;
+    padding-bottom : 8px;
+    @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));
 }
 
-
-label {
-  line-height:  16px;
-  margin-bottom: 8px;
+.alert-dismissable .close, .alert-dismissible .close {
+    -webkit-appearance : none !important;
+    -moz-appearance    : none !important;
+    outline            : none !important;
+    &:hover,
+    &:focus,
+    &:active {
+        -webkit-appearance : none !important;
+        -moz-appearance    : none !important;
+        outline            : none !important;
+    }
 }
 
 .radio,
 .checkbox {
-  margin-top: 16px;
-  margin-bottom: 16px;
-  line-height: 16px;
-  label{
-    min-height: 16px;
-  }
+    margin-top    : 5px;
+    margin-bottom : 5px;
+    line-height   : 16px;
 
-  input[type="radio"],
-  input[type="checkbox"] {
-    margin-top: 2px;
-  }
+    label {
+        padding-left  : 20px;
+        margin-bottom : 0;
+        font-weight   : 400;
+        cursor        : pointer;
+    }
 
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin-top : 2px;
+    }
 }
 
-.form-control-static{
-  min-height:32px;
+.table {
+    th {
+        text-transform : uppercase;
+        font-size      : 13px;
+    }
 }
 
-
-.table{
-  th{
-    text-transform: uppercase;
-    font-size: 13px;
-  }
+.help-block {
+    background-color : $body-bg;
 }
 
-.help-block{
-  background-color: $body-bg;
-}
+@mixin kill-glyphicon {
+    background-size  : 112px 80px;
+    background-image : url('/static/images/portal_icons.png') !important;
+    &:before {
+        content : none;
+    }
 
-
-
-@mixin kill-glyphicon{
-  background-size: 112px 32px;
-  background-image: url('/static/images/portal_icons.png') !important;
-  &:before{
-    content:none;
-  }
-
-  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('/static/images/portal_icons@2x.png');
-  }
+    @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+        background-image : url('/static/images/portal_icons@2x.png');
+    }
 }
 
 select {
-  position: relative;
-  background-image: url('/static/images/arrow_down.png') !important;
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
-  background-position: right 8px center;
+    position            : relative;
+    background-image    : url('/static/images/arrow_down.png') !important;
+    background-repeat   : no-repeat;
+    background-size     : 16px 16px;
+    background-position : right 8px center;
 
-  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('/static/images/arrow_down@2x.png') !important;
-  }
-}
-
-.uib-tab.active{
-    .tab-heading-hack{
-        border-bottom:1px solid $nav-tabs-border-color;
-        padding: 10px 0;
+    @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+        background-image : url('/static/images/arrow_down@2x.png') !important;
     }
 }
 
-.tab-pane>.panel{
-    border-top: none;
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-}
-
-.btn:disabled *{
-    pointer-events: none;
-}
-
-.btn.form-control{
-    text-align:left;
-    .caret{
-        float:right;
-        margin-top: 8px;
-    }
-}
-
-
-.nav-tabs > li > a{
-  line-height: 16px;
-}
-.nav-tabs > li > a:hover {
-  background-color: #fff !important;
+.tab-pane > .card {
+    border-top              : none;
+    border-top-right-radius : 0;
+    border-top-left-radius  : 0;
 }
 
 .info-icon.active {
-    color: $brand_core !important;
+    color : $brand_core !important;
 }
 
 .video-settings-button:hover,
-.webclient-panel .dropdown-menu > li > a:hover{
-    background-color: $brand_l2 !important;
+.webclient-panel .dropdown-menu > li > a:hover {
+    background-color : $brand_l2 !important;
 }
 
-.webclient-panel .dropdown-menu > li > a.active{
-    background-color: $brand_l1 !important;
+.webclient-panel .dropdown-menu {
+    box-shadow : none;
+
+    & > li > a.active {
+        background-color : $brand_l1 !important;
+    }
+}
+
+///////////////////////
+// New styling or retrofitting missing styles
+///////////////////////
+
+.input-group {
+    &.has-addon input {
+        padding-right : 45px;
+    }
+
+    &-addon {
+        height           : 32px;
+        padding          : 5px 16px;
+        font-size        : 14px;
+        font-weight      : 400;
+        line-height      : 1;
+        color            : #121517;
+        text-align       : center;
+        background-color : transparent !important;
+        border           : none;
+        display          : flex;
+        align-items      : center;
+        justify-items    : center;
+        position         : absolute;
+        right            : 2px;
+        z-index          : 9;
+
+        .glyphicon {
+            margin : 0;
+        }
+    }
+}
+
+#badge-large {
+    height    : 32px;
+    font-size : rem(13px);
+    padding   : 0 12px;
+}
+
+.badge {
+    
+    & {
+        background-color: $light4;
+        color: $light16;
+        height: 20px;
+        
+        &.large {
+            @extend #badge-large;
+        }
+    }
+    
+    &-brand {
+        @extend .badge;
+        background-color: $brand_core;
+        color: $light1;
+        height: 20px;
+        
+        &.large {
+            @extend #badge-large;
+        }
+    }
+
+    &-default {
+        background-color : $light8;
+        color: $light1;
+    }
+
+    &-primary {
+        background-color : $brand_core;
+        color            : $brand_contrast;
+    }
+
+    &-secondary {
+        background-color : $light6;
+        color            : $dark9;
+    }
+    
+    &-danger {
+        background-color : $red_l2;
+        color            : $light1;
+    }
+
+    &-warning {
+        background-color: $warning;
+        color           : $dark9;
+    }
+    
+    &-success {
+        background-color : $brand-success;
+        color            : $light1;
+    }
+}
+
+.table {
+    & thead {
+        & th {
+            padding-left : 0;
+        }
+    }
+
+    & tbody {
+        & td {
+            padding-left : 0;
+        }
+    }
+}
+
+ngb-tabset {
+    .nav-tabs {
+        .nav-item {
+
+            height: rem(48px);
+
+            .nav-link {
+                border-top-left-radius  : 2px;
+                border-top-right-radius : 2px;
+                color                   : $dark12;
+                font-size               : $h5-font-size;
+                font-family             : $font-family-medium;
+                line-height             : 26px;
+                padding                 : 10px 20px;
+
+                &.active {
+                    background-color : $light1 !important;
+                    border-bottom    : 1px solid transparent;
+
+                    .tab-heading {
+                        border-bottom : 1px solid #d7dfe3;
+                        padding       : 14px 0;
+                    }
+                }
+
+                &:hover {
+                    background-color : transparentize($light5, 0.75);
+                }
+            }
+        }
+    }
 }

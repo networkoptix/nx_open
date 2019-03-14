@@ -6,10 +6,10 @@
     "emailSubject": "Đặt lại mật khẩu của bạn"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} mời bạn {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} mời bạn sử dụng hệ thống %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}hiện hệ thống {{message.system_name}} đã được chia sẻ với bạn{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} mời bạn {{PRODUCT_NAME}}"
+    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
   },
   "review_version": {
     "emailSubject": "Phiên bản {{message.id}} đã sẵn sàng xem"

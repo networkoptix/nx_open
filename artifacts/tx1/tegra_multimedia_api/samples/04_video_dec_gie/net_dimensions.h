@@ -17,19 +17,19 @@ struct NetDimensions
  * If specifiedDimensions are both > 0, return them as is, otherwise, try to parse the values from
  * "deployFile.prototxt" file. Typical examples of the lines of interest in such files:
  *
- * <code><pre>
+ * <pre><code>
  *     dim: 1
  *     dim: 3
  *     dim: 512
  *     dim: 1024
- * </pre></code>
+ * </code></pre>
  *
- * <code><pre>
+ * <pre><code>
  *     input_dim: 1
  *     input_dim: 3
  *     input_dim: 540
  *     input_dim: 960
- * </pre></code>
+ * </code></pre>
  *
  * @return {0, 0} if attempted but unable to parse either width or height.
  */

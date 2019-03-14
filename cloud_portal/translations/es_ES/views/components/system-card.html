@@ -1,18 +1,20 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>Su Sistema</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Su Sistema</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Cambiar Nombre del Sistema</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Cambiar Nombre del Sistema</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Desconectar de
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fusionar con otro sistema</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Desconectar de
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>Dueño</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -26,5 +28,30 @@
             <button class="btn btn-default" ng-click="rename()">Cambiar Nombre del Sistema</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Desconecte de mi cuenta</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong> se fusiona con este sistema</div>
+        <hr />
+        <div class="merge-info-text">Dependiendo del tamaño de la base de datos, puede tomar varias horas</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>Este sistema se está fusionando a <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>Dependiendo del tamaño de la base de datos, puede tomar varias horas.</p>
+            <p>Hasta que finalice la fusión, puede iniciar sesión en este sistema y ver el video, pero no puede cambiar ninguna configuración.</p>
+            <p>Cuando finalice la fusión, todos los usuarios y cámaras de este sistema estarán disponibles
+                en Sistema "<span class="merge-system-name">{{mergeTargetSystem.name}}</span> ", y este sistema será eliminado.</p>
+        </div>
     </div>
 </div>

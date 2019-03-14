@@ -188,7 +188,7 @@ Benötigt eine Internetverbindung
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                Bitte geben Sie eine gültige Email adresse ein
+                Geben Sie bitte eine gültige Email an
             </div>
         </div>
 
@@ -259,9 +259,11 @@ Benötigt eine Internetverbindung
         </div>
 
         <div class="form-group has-error"
-             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+             ng-if="forms.localForm.passwordInput.$valid &&
+                    (forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.localPasswordConfirmation.$touched &&
+                    forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
                 Alle Felder werden benötigt
             </div>
@@ -287,7 +289,13 @@ Benötigt eine Internetverbindung
                    uib-typeahead-input-formatter="getSystemName($model)"
                    uib-typeahead-focus-on-select="false"
                    uib-typeahead-min-length="0"
-                   uib-typeahead-show-hint="true">
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
+ placeholder="System-URL (https://host:port)"
+                   ng-change="clearRemoteError()"
+                   required
+ class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
@@ -410,7 +418,7 @@ Benötigt eine Internetverbindung
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Erneut versuchen</button>
-<button class="btn btn-default" ng-click="skip()">Lokales System einrichten</button>
+        <button class="btn btn-default" ng-click="skip()">Lokales System einrichten</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Netzwerkeinstellungen konfigurieren</a>
@@ -425,7 +433,7 @@ Benötigt eine Internetverbindung
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Erneut versuchen</button>
-<button class="btn btn-default" ng-click="skip()">Lokales System einrichten</button>
+        <button class="btn btn-default" ng-click="skip()">Lokales System einrichten</button>
     </p>
 </div>
 
@@ -437,7 +445,7 @@ Benötigt eine Internetverbindung
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Erneut versuchen</button>
-<button class="btn btn-default" ng-click="skip()">Lokales System einrichten</button>
+        <button class="btn btn-default" ng-click="skip()">Lokales System einrichten</button>
     </p>
 </div>
 

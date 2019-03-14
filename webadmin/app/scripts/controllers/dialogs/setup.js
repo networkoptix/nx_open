@@ -258,7 +258,8 @@ angular.module('webadminApp')
                 'UNCONFIGURED_SYSTEM':'fail',
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
                 'BOTH_SYSTEM_BOUND_TO_CLOUD':'fail',
-                'DIFFERENT_CLOUD_HOST':'fail'
+                'DIFFERENT_CLOUD_HOST': 'fail',
+                'DUPLICATE_MEDIASERVER_FOUND':'fail'
             };
             return errorClasses[error] || 'fail';
         }
@@ -285,6 +286,8 @@ angular.module('webadminApp')
                 'DIFFERENT_CLOUD_HOST':L.join.cloudHostConflict,
 
                 'currentPassword': L.join.incorrectCurrentPassword,
+
+                'DUPLICATE_MEDIASERVER_FOUND': L.join.duplicateServersError,
 
                 // Cloud errors:
                 'notAuthorized': L.join.incorrectRemotePassword,
@@ -346,11 +349,23 @@ angular.module('webadminApp')
             }
         }
 
+        function normalizeUrl(url){
+            var hasPort = url.match(/:\d+/);
+            var hasProtocol= url.indexOf('//')>=0;
+            if(!hasPort){
+                url = url + ':' + Config.defaultPort;
+            }
+            if(!hasProtocol){
+                url = 'http://' + url;
+            }
+            return url;
+        }
         function connectToAnotherSystem(){
             $log.log("Connect to another system");
             $log.log($scope.settings.remoteSystem);
 
             var systemUrl = $scope.settings.remoteSystem.url || $scope.settings.remoteSystem;
+            systemUrl = normalizeUrl(systemUrl);
             $scope.settings.remoteError = false;
 
             $log.log("Request /api/mergeSystems ...");

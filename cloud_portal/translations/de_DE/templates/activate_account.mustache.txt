@@ -1,8 +1,8 @@
-Hallo,
+Hallo {{message.userFullName}},
 
   Klicken Sie bitte unten auf die Schaltfläche, um Ihre Emailadresse zu bestätigen und das Konto zu aktivieren.
 
 {{config.portal_url}}/aktivieren/{{message.code}}
 
-Wenn Sie sich nicht bei {{PRODUCT_NAME}} registriert haben, ignorieren Sie diese Email.
+Wenn Sie sich nicht bei %PRODUCT_NAME% registriert haben, ignorieren Sie diese E-Mail.
 Teilen Sie die Nachricht oder den Link nicht mit anderen Personen.

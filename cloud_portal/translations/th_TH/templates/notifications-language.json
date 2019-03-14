@@ -6,10 +6,10 @@
     "emailSubject": "รีเซ็ตรหัสผ่านของคุณ"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} เชิญคุณมาที่ {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} เชิญคุณไปที่ %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}ระบบวิดีโอ {{message.system_name}} ถูกแชร์กับคุณ{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} เชิญคุณมาที่ {{PRODUCT_NAME}}"
+    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
   },
   "review_version": {
     "emailSubject": "ตรวจสอบความพร้อมของ Version {{message.id}}"

@@ -4,5 +4,5 @@
 
 {{>body}}
 
-{{companyUrl}}
-지원: {{supportLink}}
+%COMPANY_LINK%
+지원: %SUPPORT_LINK%

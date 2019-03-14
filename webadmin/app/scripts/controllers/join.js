@@ -101,15 +101,20 @@ angular.module('webadminApp')
                     errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);
                     return false;
+                case 'DUPLICATE_MEDIASERVER_FOUND':
+                    errorToShow = L.join.duplicateServersError;
+                    break;
             }
             return errorToShow;
         }
         function normalizeUrl(url){
-            if(url.indexOf(":")<0){
-                url = url + ":7001";
+            var hasPort = url.match(/:\d+/);
+            var hasProtocol= url.indexOf('//')>=0;
+            if(!hasPort){
+                url = url + ':' + Config.defaultPort;
             }
-            if(url.indexOf("//")<0){
-                url = "http://" + url;
+            if(!hasProtocol){
+                url = 'http://' + url;
             }
             return url;
         }
@@ -166,23 +171,23 @@ angular.module('webadminApp')
             // TODO: $scope.settings.currentPassword here
 
             var remoteUrl = normalizeUrl($scope.settings.url);
-            mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
+            //mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
                 mediaserver.mergeSystems(remoteUrl, $scope.settings.login, $scope.settings.password || Config.defaultPassword,
-                    $scope.settings.keepMySystem).then(function (r) {
-                        if (r.data.error !== '0') {
+                    $scope.settings.keepMySystem, $scope.settings.currentPassword).then(function (r) {
+                        if (r.data.error !== '0' && r.data.error !== 0) {
                             var errorToShow = errorHandler(r.data.errorString);
                             if (errorToShow) {
-                                dialogs.alert(L.join.mergeFailed + errorToShow);
-                                return;
+                                dialogs.alert(L.join.mergeFailed + ': ' + errorToShow);
                             }
+                            return;
                         }
                         dialogs.alert(L.join.mergeSucceed).finally(function () {
                             window.location.reload();
                         });
                     });
-            },function(){
-                dialogs.alert(L.settings.wrongPassword);
-            });
+            //},function(){
+            //    dialogs.alert(L.settings.wrongPassword);
+            //});
         };
 
         $scope.selectSystem = function (system){

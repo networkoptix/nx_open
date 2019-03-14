@@ -1,9 +1,9 @@
 <div class="container">
-    <ng-include src="'customization/sdkeula.html'"></ng-include>
+    <ng-include src="'license.html'"></ng-include>
     <form role="form">
         <div class="checkbox">
-        <label><input type="checkbox" ng-model="agree">Yes, I accept the agreement</label>
+        <label><input type="checkbox" ng-model="agree">Sim, aceito o acordo</label>
             </div>
-        <button class="btn btn-default" ng-click="next()" ng-disabled="!agree">Next</button>
+        <button class="btn btn-default" ng-click="next()" ng-disabled="!agree">Próximo</button>
     </form>
 </div>

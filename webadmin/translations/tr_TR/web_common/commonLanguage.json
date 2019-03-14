@@ -1,27 +1,47 @@
 {
-  "cameraLinks":{
-    "highStream":"Yüksek akış",
-    "lowStream":"Düşük akış",
-    "transcoding":"Dönüştürme",
-    "unknown":"Belirtilmemiş",
-    "copyToClipboard":"panoya yapıştır",
-    "copyDefaultText":"kopyala",
-    "copyActiveText":"panoya kopyalandı"
+  "cameraLinks": {
+    "highStream": "Yüksek çözünürlük",
+    "lowStream": "Düşük çözünürlük",
+    "transcoding": "Dönüştürme",
+    "unknown": "Belirtilmemiş",
+    "copyToClipboard": "panoya yapıştır",
+    "copyDefaultText": "kopyala",
+    "copyActiveText": "panoya kopyalandı"
   },
-  "systemOffline":"Sistem çevrimdışı",
-  "cameraStates":{
-    "offline":"Çevrimdışı",
-    "error":"Hata",
-    "unauthorized":"Kimlik doğrulaması gerekli",
-    "noData":"Veri bulunamadı",
-    "iosVideoTooLarge":"iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
-    "flashRequired":"ARM tabanlı sunuculardan video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>'i yükleyin.",
-    "flashOrWebmRequired":"Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
-    "noArmSupport":"Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
-    "noFormat":"Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
-    "ieNoWebm":"Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
-    "ieWin10":"Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
-    "ubuntuNX":"Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
+  "systemOffline": "Sistem çevrimdışı",
+  "cameraStates": {
+    "offline": "Çevrimdışı",
+    "error": "Hata",
+    "unauthorized": "Kimlik doğrulaması gerekli",
+    "noData": "Veri bulunamadı",
+    "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+    "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin.",
+    "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
+    "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
+    "noFormat": "Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
+    "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+    "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+    "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
   },
-  "searchCamPlaceholder":"arama"
+  "searchCamPlaceholder": "Arama",
+  "resolution": {
+    "auto": "Oto",
+    "high": "Yüksek",
+    "low": "Düşük"
+  },
+  "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
+  "voiceCommands": {
+    "play": "oynat",
+    "pause": "duraklat",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "aramayı temizle",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "tüm sunucuları genişlet",
+    "collapse all servers": "tüm sunucuları daralt",
+    "stop listening": "dinlemeyi durdur",
+    "help": "help | show commands"
+  }
 }

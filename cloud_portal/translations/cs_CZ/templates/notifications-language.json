@@ -1,18 +1,18 @@
 {
   "activate_account": {
-    "emailSubject": "Activate your account"
+    "emailSubject": "Aktivujte svůj účet"
   },
   "restore_password": {
-    "emailSubject": "Reset your password"
+    "emailSubject": "Resetovat heslo"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} vás zve na %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video systém {{message.system_name}} byl s vámi sdílen{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+    "emailSubject": "Byl s vámi sdílí video systém {{message.system_name}}"
   },
   "review_version": {
-    "emailSubject": "Version {{message.id}} is ready to be reviewed"
+    "emailSubject": "Verze {{message.id}} je připravena ke kontrole"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"

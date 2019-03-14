@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>A rendszer beállítás nem érhető el</h2>
-    <p class="master-description">A rendszert nem lehet konfigurálni. <br>
+    <p class="master-description">The System cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -66,13 +66,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Haladó rendszerbeállítások</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Haladó rendszerbeállítások</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -142,7 +142,7 @@
     </div>
     <h2>{{Config.cloud.productName}} fiók</h2>
     <p class="master-description">
-        A felhőrendszer használatához fiók létrehozása szükséges {{Config.cloud.productName}}
+        An account is required to use the cloud System {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Új fiók létrehozása</button>&nbsp;&nbsp;
@@ -188,7 +188,7 @@
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                Kérjük, hogy valós Email címet adjon meg
+                Kérjük adjon meg valós e-mail címet
             </div>
         </div>
 
@@ -259,9 +259,11 @@
         </div>
 
         <div class="form-group has-error"
-             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+             ng-if="forms.localForm.passwordInput.$valid &&
+                    (forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.localPasswordConfirmation.$touched &&
+                    forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
                 Minden mező kitöltése szükséges
             </div>
@@ -278,7 +280,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Szerver csatlakoztatása meglévő rendszerhez</h2>
+    <h2>Connect the server to the existing System</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -287,7 +289,13 @@
                    uib-typeahead-input-formatter="getSystemName($model)"
                    uib-typeahead-focus-on-select="false"
                    uib-typeahead-min-length="0"
-                   uib-typeahead-show-hint="true">
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
+ placeholder="Existing System URL (https://host:port)"
+                   ng-change="clearRemoteError()"
+                   required
+ class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
@@ -324,26 +332,26 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Rendszerek összevonása...</h2>
+    <h2>Rendszerek összevonása ...</h2>
     <p class="master-description">Néhány percig eltarthat</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Rendszerek összevonása...</h2>
-    <p class="master-description">Kapcsolódás a rendszerhez</p>
+    <h2>Rendszerek összevonása ...</h2>
+    <p class="master-description">Trying to connect to the System</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>A rendszerek összevonása nem lehetséges</h2>
+    <h2>Cannot merge Systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Újrapróbálkozás</button>
-        <button class="btn btn-default" ng-click="skip()">Önálló rendszer beállítása</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
     </p>
 </div>
 
@@ -409,8 +417,8 @@
         Végezze el az internetbeállításokat a szerveren, hogy <br> bárhonnan csatlakozni tudjon {{Config.cloud.productName}} felhőhöz.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Újrapróbálkozás</button>
-        <button class="btn btn-default" ng-click="skip()">Helyi rendszer beállítása</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Hálózati beállítások konfigurálása</a>
@@ -424,8 +432,8 @@
         Ellenőrizze az Internet-kapcsolat.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Újrapróbálkozás</button>
-        <button class="btn btn-default" ng-click="skip()">Helyi rendszer beállítása</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -436,16 +444,16 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Újrapróbálkozás</button>
-        <button class="btn btn-default" ng-click="skip()">Helyi rendszer beállítása</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>A rendszer beállítás nem érhető el</h2>
-    <p class="master-description">Something went totally wrong. <br>
-        Error description: {{settings.localError}}
+    <p class="master-description">Valami nem stimmel. <br>
+        A hiba leírása: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Újrapróbálkozás</button>

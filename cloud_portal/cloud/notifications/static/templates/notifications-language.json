@@ -1,20 +1,32 @@
 {
   "activate_account":{
-    "emailSubject":"Activate your account"
+    "emailSubject": "Activate your account"
   },
   "restore_password":{
-    "emailSubject":"Reset your password"
+    "emailSubject": "Reset your password"
   },
   "system_invite":{
-    "emailSubject":"{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
   },
   "system_shared":{
-    "emailSubject":"{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} is ready to be reviewed"
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"
+  },
+  "cloud_invite": {
+    "emailSubject": "You have been invited to %PRODUCT_NAME%"
+  },
+  "ipvd_feedback": {
+    "emailSubject": "Camera Page Feedback for {{message.product}}"
+  },
+  "sales_inquiry": {
+    "emailSubject": "Sales inquiry for {{message.product}}"
+  },
+  "support_request": {
+    "emailSubject": "Support request for {{message.product}}"
   }
 }

@@ -1,19 +1,20 @@
 {
+  "language": "ru_RU",
   "language_name": "Русский",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Отмена",
-    "loginTitle": "Войти в {{PRODUCT_NAME}}",
+    "loginTitle": "Войти в %PRODUCT_NAME%",
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Добро пожаловать в",
     "register": "Зарегистрироваться в",
     "changePassword": "Изменить пароль -",
@@ -31,8 +32,8 @@
     "view": "Просмотр камер - ",
     "debug": "Отладка",
     "login": "Войти -",
-    "download": "Скачать {{VMS_NAME}}",
-    "downloadPlatform": "Скачать {{VMS_NAME}} для ",
+    "download": "Скачать %VMS_NAME%",
+    "downloadPlatform": "Скачать %VMS_NAME% для ",
     "pageNotFound": "Страница не найдена"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Просмотр и настройка",
-      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description": "Может смотреть живое видео, архив, управлять PTZ и т. д"
     },
     "Administrator": {
       "label": "Администратор",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Особые",
-      "description": "Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
+      "description": "Используйте клиентское приложение %VMS_NAME% для настройки особых полномочий"
     },
     "cloudAdmin": {
       "label": "Администратор",
@@ -88,7 +89,7 @@
       "description": "Может смотреть видео в реальном времени и архив"
     },
     "liveViewer": {
-      "label": "Только видео с камер",
+      "label": "Только видео в реальном времени",
       "description": "Может смотреть только видео в реальном времени"
     },
     "advancedViewer": {
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "Особые",
-      "description": "Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
+      "description": "Используйте клиентское приложение %VMS_NAME% для настройки особых полномочий"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "Не удается отправить подтверждение по Email",
     "cloudInvalidResponse": "Облачная БД вернула неожиданный ответ",
     "notAuthorized": "Неправильный пароль",
-    "wrongParameters": "Некоторые параметры в форме неверны",
     "brokenAccount": "Неожиданная проблема с учетной записью. <a href=\"/restore_password\">Восстановить учетную запись</a>",
+    "wrongParameters": "Некоторые параметры в форме неверны",
     "wrongCode": "Учетная запись уже активирована или неверный код подтверждения",
     "wrongCodeRestore": "Код подтверждения уже используется или неверен",
     "forbidden": "Отсутствуют полномочия на выполнение этого действия",
     "accountNotActivated": "Эта учетная запись еще не активирована. <a href=\"/activate\">Отправить ссылку активации снова</a>",
-    "accountBlocked": "Эта учетная запись заблокирована",
+    "accountBlocked": "Эта учетная запись заблокирована. Пожалуйста, повторите попытку через несколько минут.",
     "notFound": "Не найдено",
     "alreadyExists": "Эта учетная запись уже существует",
     "unknownError": "Произошла непредвиденная ошибка",
@@ -133,16 +134,26 @@
     "passwordMismatch": "Неправильный пароль",
     "cantEditYourself": "Не допускается изменение собственных полномочий",
     "cantEditAdmin": "Этот пользователь имеет полномочия администратора",
-    "cantOpenClient": "Приложение {{VMS_NAME}} не обнаружено. <a href=\"/download\">Скачать</a>",
+    "cantOpenClient": "Приложение %VMS_NAME% не обнаружено. <a href=\"/download\">Скачать</a>",
     "lostConnection": "Подключение к {{systemName}} потеряно",
-    "thisSystem": "система"
+    "thisSystem": "система",
+    "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются",
+    "DUPLICATE_MEDIASERVER_FOUND": "В одной из систем были обнаружены дубликаты серверов.<br>Удалите старые серверы из каждой системы, которую вы пытаетесь объединить, и повторите попытку.",
+    "mergedSystemIsOffline": "Одна из объединяемых систем находится в автономном режиме. Убедитесь, что они в сети, и попробуйте еще раз."
   },
   "passwordRequirements": {
+    "good": "хорошее",
+    "fair": "средний",
+    "minLength": "короткий",
     "minLengthMessage": "Пароль должен содержать не менее 8 символов",
+    "required": "некорректный",
     "requiredMessage": "Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
+    "weak": "слабый",
     "weakMessage": "Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
     "strongMessage": "Надежный пароль!",
-    "commonMessage": "Этот пароль входит в список самых популярных паролей в мире"
+    "common": "часто встречающийся",
+    "commonMessage": "Этот пароль входит в список самых популярных паролей в мире",
+    "missingMessage": "Пароль обязателен для заполнения"
   },
   "sharing": {
     "confirmOwner": "Если изменить владельца системы, она больше не будет принадлежать текущей учетной записи. Это действие необратимо. Вы уверены?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "ЯМойМоя",
     "unavailable": "Система недоступна",
     "offline": "Система не в сети",
-    "openClient": "Открыть в {{VMS_NAME}}",
-    "openClientNoSystem": "Открыть {{VMS_NAME}}",
+    "openClient": "Открыть в %VMS_NAME%",
+    "openClientNoSystem": "Открыть %VMS_NAME%",
+    "confirmMergeAction": "Объединить",
+    "mergeSystemTitle": "Объединить системы",
     "confirmRenameTitle": "Имя системы",
     "confirmRenameAction": "Сохранить",
     "successRename": "Имя системы сохранено",
-    "confirmDisconnectTitle": "Отключить систему от {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Отключить систему от %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Отключить",
     "confirmUnshareFromMe": "Вы собираетесь отключить эту систему от учетной записи. Вы не сможете больше иметь доступ к этой системе. Вы уверены?",
     "confirmUnshareFromMeTitle": "Отключить систему?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "Этот пользователь не сможет получить доступ к системе. Вы уверены?",
     "confirmUnshareTitle": "Удалить пользователя?",
     "confirmUnshareAction": "Удалить",
-    "successDisconnected": "Система успешно отключена от {{PRODUCT_NAME}}",
+    "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
+    "successMerge": "Слияние системы завершено",
     "permissionsRemoved": "{{email}} был лишен полномочий"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "Сохранить"
   },
   "downloads": {
-    "noClientDetectedTitle": "Установите {{VMS_NAME}} для работы с системой",
-    "action": "Скачать {{VMS_NAME}}",
+    "noClientDetectedTitle": "Установите %VMS_NAME% для работы с системой",
+    "action": "Скачать %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -249,7 +263,7 @@
     }
   },
   "activeActions": {
-    "sendConfirm": "Повторно отправить ссылку активации",
+    "sendConfirm": "Отправить ссылку еще раз",
     "resetPassword": "Сброс пароля",
     "setNewPassword": "Сохранить пароль",
     "setNewPasswordLabel": "Новый пароль"
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "Все системы",
     "systems": "Системы"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Выс. кач-во",
+      "lowStream": "Низ. кач-во",
+      "transcoding": "Перекодирование",
+      "unknown": "Неизвестный",
+      "copyToClipboard": "скопировать в буфер обмена",
+      "copyDefaultText": "копировать",
+      "copyActiveText": "скопировано в буфер обмена"
+    },
+    "systemOffline": "Система не в сети",
+    "systemHasNoCameras": "НЕТ КАМЕР",
+    "cameraStates": {
+      "offline": "Не в сети",
+      "error": "Ошибка",
+      "unauthorized": "Требуется аутентификация",
+      "noData": "Нет данных",
+      "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+      "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео.",
+      "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
+      "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+      "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
+      "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+      "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+      "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
+    },
+    "searchCamPlaceholder": "Поиск",
+    "resolution": {
+      "auto": "Авто",
+      "high": "Высокая",
+      "low": "Низкая"
+    },
+    "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
+    "voiceCommands": {
+      "play": "воспроизвести",
+      "pause": "пауза",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "очистить поиск",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "развернуть все серверы",
+      "collapse all servers": "свернуть все серверы",
+      "stop listening": "прекратить прослушивание",
+      "help": "help | show commands"
+    }
   }
 }

@@ -1,0 +1,8 @@
+{{#systemName}}
+Система: {{systemName}} {{systemSignature}}
+{{/systemName}}
+
+{{>body}}
+
+%COMPANY_LINK%
+Підтримка: %SUPPORT_LINK%

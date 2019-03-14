@@ -1,12 +1,15 @@
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
+    <h1>Pokročilé nastavení serveru</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Upozornění! </b> Jakékoli změny na této stránce mohou způsobit nesprávné fungování serveru.
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Úložiště</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -16,10 +19,10 @@
                         URL
                     </th>
                     <th width="200">
-                        Free Space
+                        Volné místo
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Vyhrazený prostor
                     </th>
                     <th >
                     </th>
@@ -40,7 +43,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} z {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -54,7 +57,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Nedostupný
                             </div>
                         </div>
                     </td>
@@ -67,14 +70,14 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
+ placeholder="Vyhrazený prostor"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="Vyhrazený prostor"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -86,7 +89,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="Použit pro zápis"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,57 +106,42 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            Pro zápis nebyl vybrán žádný hlavní disk úložiště - video nebude zaznamenáno na tomto serveru.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Velikost vyhrazeného prostoru je větší než velikost volného místa. Současné videozáznamy mohou být odstraněny, aby se uvolnilo nějaké místo.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Opravte všechna zvýrazněná nastavení a uložte je</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Uložit</button>
+        <button class="btn btn-warning" ng-click="cancel()">Zrušit</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Deník nastavení</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Main log level</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Žádné: Zaznamenávání je zakázáno.</option>
+                    <option value="always">Vždy: Chyby protokolu, varování a nejdůležitější zprávy.</option>
+                    <option value="error">Chyba: Zaznamenat pouze chyby.</option>
+                    <option value="warning">Upozornění: Zaznamenat upozornění a chyby.</option>
+                    <option value="info">Info: Zaznamenat chyby, varování a všechny zprávy.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Transaction log level</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Uložit</button>
         </div>
     </form>
 
-    <h1>Advanced system settings</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Upozornění! </b> Jakékoli změny na této stránce mohou způsobit nesprávné fungování serveru.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -193,15 +181,15 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Uložit</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Upozornění!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >Restartovat aktuální server</button>
         </div>
     </div>
 </div>

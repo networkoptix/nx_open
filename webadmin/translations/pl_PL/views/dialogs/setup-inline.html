@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Nie można skonfigurować systemu</h2>
-    <p class="master-description">Błąd konfiguracji systemu.<br>
+    <p class="master-description">Błąd konfiguracji systemu. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -188,7 +188,7 @@
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                Proszę wprowadzić prawidłowy adres e-mail
+                Proszę wprowadzić prawidłowy e-mail
             </div>
         </div>
 
@@ -259,9 +259,11 @@
         </div>
 
         <div class="form-group has-error"
-             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+             ng-if="forms.localForm.passwordInput.$valid &&
+                    (forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.localPasswordConfirmation.$touched &&
+                    forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
                 Wszystkie pola są wymagane
             </div>
@@ -287,7 +289,13 @@
                    uib-typeahead-input-formatter="getSystemName($model)"
                    uib-typeahead-focus-on-select="false"
                    uib-typeahead-min-length="0"
-                   uib-typeahead-show-hint="true">
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
+ placeholder="Adres URL istniejącego systemu (https://host:port)"
+                   ng-change="clearRemoteError()"
+                   required
+ class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
@@ -324,13 +332,13 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Złączanie systemów...</h2>
+    <h2>Łączenie systemów ...</h2>
     <p class="master-description">Może to potrwać kilka minut</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Złączanie systemów...</h2>
+    <h2>Łączenie systemów ...</h2>
     <p class="master-description">Próba połączenia z systemem</p>
 </div>
 

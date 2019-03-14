@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="api.xsl"?>
+<apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="api.xsd">
+    <groups>
+        <group>
+            <groupName>System API</groupName>
+            <urlPrefix>/ec2</urlPrefix>
+            <groupDescription>This group contains functions related to whole system (all servers).</groupDescription>
+        </group>
+        <group>
+            <groupName>Server API</groupName>
+            <urlPrefix>/api</urlPrefix>
+            <groupDescription>This group contains functions related to a single server.</groupDescription>
+        </group>
+        <group>
+            <groupName>Video API</groupName>
+            <urlPrefix/>
+            <groupDescription>
+                This group contains information about accessing cameras" live video and footage.
+            </groupDescription>
+            <functions>
+                <function>
+                    <name>&lt;cameraId&gt;</name>
+                    <caption>RTSP Streaming</caption>
+                    <description>
+                        Open RTSP video stream from a camera.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        supported for certain cameras).
+                        Example:
+                        rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p</description>
+                    <method>PLAY</method>
+                    <params>
+                        <param>
+                            <name>pos</name>
+                            <description>By default, the server opens a camera at the live position.
+                                This parameter defines position in an archive
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                Position can be passed via standard RTSP attribute as well as via URL parameter</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>resolution</name>
+                            <description>Turn on video transcoding to the specified resolution. Resolution string either may contain width and height (for instance 320x240) or
+                                                        height only (for instance 240p)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If the parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                                         Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>codec</name>
+                            <description>Defines video codec used for transcoding. Default value is H263.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>H263</name>
+                                    <description/>
+                                </value>
+                                <value>
+                                    <name>H263p</name>
+                                    <description>H263 plus format</description>
+                                </value>
+                                <value>
+                                    <name>mpeg2video</name>
+                                    <description/>
+                                </value>
+                                <value>
+                                    <name>mjpeg</name>
+                                    <description>Motion JPEG</description>
+                                </value>
+                                <value>
+                                    <name>mpeg4</name>
+                                    <description>MPEG-4 part 2</description>
+                                </value>
+                                <value>
+                                    <name>libvpx</name>
+                                    <description>VP8 video codec</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>stream</name>
+                            <description>Open high quality stream if parameter is 0 or low quality stream if parameter is 1.
+                                         By default server auto detect preferred stream index based on destination resolution.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>speed</name>
+                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1. The special value 'max' means streaming without delay</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>multiple_payload_types</name>
+                            <description>Generate SDP with two payload types(high and low qualities). Payload type of RTP packets will changed accordingly transmitted stream</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>RTSP video stream.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>media/&lt;cameraId&gt;.&lt;format&gt;</name>
+                    <caption>HTTP Streaming</caption>
+                    <description>
+                        Open HTTP video stream from a camera.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        supported for certain cameras).
+                        Codec and stream format can be specified in URL parameters. Live stream and
+                        archive can be downloaded. If required and possible, media stream
+                        transcoding is performed on-the-fly. Stream format can be one of the
+                        following: webm, mpegts, mpjpeg (motion jpeg).
+                        Example:
+                        http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>resolution</name>
+                            <description>Video stream resolution. Example: 720x576, 1920x1080, 720p, 1080p. By default, 640x480 is used</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>pos</name>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start position
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                Otherwise, LIVE stream is provided</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>endPos</name>
+                            <description>If present, specifies archive stream end position
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                It is used only if "pos" parameter is present.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If the parameter is absent, video will be rotated to default value defined in a camera settings dialog.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>sfd</name>
+                            <description>Stand Frame Duration. If the parameter is present, video speed is limited by real time.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rt</name>
+                            <description>Turn on realtime optimization. It will drop some frames if not enough CPU for realtime transcoding.</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Video stream in the requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>hls/&lt;cameraId&gt;.m3u</name>
+                    <caption>HLS Streaming</caption>
+                    <description>
+                        Open HTTP Live Streaming (HLS) video stream from a camera.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        supported for certain cameras).
+                        This protocol is supported by iOS-based devices (iPhone, iPad).
+                        Example:
+                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.m3u</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>pos</name>
+                            <description>Camera archive position to open
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>hi</name>
+                            <description>If specified, only hi quality is available on streaming session. If neither &lt;hi&gt; nor &lt;lo&gt; is specified than HLS client is allowed to perform dynamic stream switching (to fit in available bandwidth and compensate for traffic congestion)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>lo</name>
+                            <description>If specified, only low quality is available on streaming session. If neither &lt;hi&gt; nor &lt;lo&gt; is specified than HLS client is allowed to perform dynamic stream switching (to fit in available bandwidth and compensate for traffic congestion)</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Video stream in mpeg-2/ts format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>hls/&lt;cameraId&gt;.&lt;format&gt;</name>
+                    <caption>Direct download</caption>
+                    <description>
+                        Download fragment of a camera archive, identified by its start time and
+                        duration.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        supported for certain cameras).
+                        Fragment can be downloaded in mpeg-2/ts (.ts) or Matroska (.mkv) format.
+                        No transcoding is performed. Stream format can be one of following: ts, mkv.
+                        Example:
+                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.mkv?startDatetime=2015-02-05T19:00&amp;duration=10</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>pos</name>
+                            <description>Fragment start time
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>duration</name>
+                            <description>Fragment length in seconds</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>hi</name>
+                            <description>Return high quality stream</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>lo</name>
+                            <description>Return low quality stream</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Video stream in the requested format</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Proxy API</groupName>
+            <urlPrefix>/proxy</urlPrefix>
+            <groupDescription>
+                This group contains information requests proxy from one server to another.
+            </groupDescription>
+            <functions>
+                <function>
+                    <name>&lt;protocol&gt;/&lt;serverGuid&gt;/&lt;apiRequest&gt;</name>
+                    <description>Proxy methods allows to send any request to any server using the existing public connection. Can also be used to get video streams.
+                        Example: rtsp://10.0.2.1/proxy/rtsp/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/12AB42FD5912?pos=1235631&amp;resolution=240p
+                        Example: http://10.0.2.1/proxy/http/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/showLog</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>Result of the target API request.</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>WebSocket API</groupName>
+            <urlPrefix>/ec2</urlPrefix>
+            <groupDescription>
+                This group contains information about an access to the Nx Media Server transaction bus via WebSocket connection endpoint.
+            </groupDescription>
+            <functions>
+                <function>
+                    <name>transactionBus</name>
+                    <description>Allows third-party systems to get an access to the Nx Media Server transaction bus.
+                        A third-party peer should undergo usual (the same as when accessing Server API or System API) authentication process before using WebSocket connection.
+                        Transactions are transferred in JSON format by default.
+                        <br/>
+                        Example: ws://10.0.2.1/ec2/transactionBus
+                    </description>
+                    <method></method>
+                    <params/>
+                    <result>
+                        <caption>A ready-to-use WebSocket connection, read-only as for now</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Authentication</groupName>
+            <urlPrefix/>
+            <groupDescription>
+                Request authentication methods supported by server.
+            </groupDescription>
+            <functions>
+                <function>
+                    <name>HTTP Basic/Digest authentication</name>
+                    <description>
+                        <b>This method is preferable for external applications, most of HTTP libraries support it.</b>
+                        <br/>
+                        Server is fully conformant with the authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617).</description>
+                    <method/>
+                    <params/>
+                    <result/>
+                </function>
+                <function>
+                    <name>Cookie-based authentication</name>
+                    <description>
+                        <b>This method should only be used in browser javascript applications.</b>
+                        <br/>
+                        Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
+                        It provides you a way to replace it with your own dialog.<br/>
+                        It works mostly like sessions, but is a bit more secure because it doesn't send user's password over HTTP.<br/>
+                        <ul>
+                            <li>To check authentication:
+                            <ol>
+                                    <li>Call <code>GET /api/getCurrentUser</code>
+                                    </li>
+                                    <li>You will get 401 (Unauthorised) in case you need authorization</li>
+                                    <li>You will get 200 (OK) and the user object otherwise</li>
+                                </ol>
+                            </li>
+                            <li>To log in:
+                            <ol>
+                                    <li>Call <code>GET /api/getNonce</code>
+                                    </li>
+                                    <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
+                                    <li>Calculate authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                                    <li>Call <code>POST /api/cookieLogin</code> and pass the "auth" parameter in the json request body</li>
+                                    <li>Server will check authentication and set session cookies</li>
+                                </ol>
+                            </li>
+                            <li>Executing requests:
+                            <ol>
+                                    <li>Session cookie should be supplied with every request, browser does it automatically if cookies are enabled</li>
+                                    <li>HTTP header <i>X-Runtime-Guid</i> should contain the key from <i>x-runtime-guid</i> cookie value</li>
+                                </ol>
+                            </li>
+                            <li>To log out:
+                            <ol>
+                                    <li>Call <code>POST /api/cookieLogout</code>
+                                    </li>
+                                    <li>Server will clear the session cookies</li>
+                                </ol>
+                            </li>
+                        </ul>
+                    </description>
+                    <method/>
+                    <params/>
+                    <result/>
+                </function>
+                <function>
+                    <name>URL-based authentication</name>
+                    <description>
+                        <b>This method should only be used if other methods are not applicable, e.g. webm direct link.</b>
+                        <br/>
+                        Add the "auth" parameter to the URL query section of any GET request
+                        <ul>
+                            <li>Call <code>/api/getNonce</code> to get <i>realm</i> and <i>nonce</i> from the server (the current server time is used as a nonce value, and the nonce is valid for about 5 minutes)</li>
+                            <li>Calculate the authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                            <li>Specify the authentication hash in the URL parameter: http://127.0.0.1:7001/<i>method</i>?auth=<i>auth_digest</i>&amp;<i>other_params</i>
+                            </li>
+                        </ul>
+                    </description>
+                    <method/>
+                    <params/>
+                    <result/>
+                </function>
+                <function>
+                    <name>Calculating authentication hash</name>
+                    <description>For URL-based authentication and cookie-based authentication you need to calculate the hash manually, using the following algorithm:
+                        <ul>
+                            <li>Call <code>GET /api/getNonce</code>
+                            </li>
+                            <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i>
+                            </li>
+                            <li>Translate user's <i>username</i> to the lower case</li>
+                            <li>Check the required <i>method</i> ("GET" for HTTP GET requests, "POST" for HTTP POST requests, "PLAY" for RTSP etc)</li>
+                            <li>
+                                <code>digest = md5_hex(user_name + ":" + realm + ":" + password)</code>
+                            </li>
+                            <li>
+                                <code>partial_ha2 = md5_hex(method + ":")</code>
+                            </li>
+                            <li>
+                                <code>simplified_ha2 = md5_hex(digest + ":" + nonce + ":" + partial_ha2)</code>
+                            </li>
+                            <li>
+                                <code>auth_digest = base64(user_name + ":" + nonce + ":" + simplified_ha2)</code>
+                            </li>
+                            <li>Here <i>auth_digest</i> is the required authentication hash</li>
+                        </ul>
+                    </description>
+                    <method/>
+                    <params/>
+                    <result/>
+                </function>
+            </functions>
+        </group>
+   </groups>
+</apidoc>

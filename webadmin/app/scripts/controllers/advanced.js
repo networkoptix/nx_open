@@ -185,12 +185,10 @@ angular.module('webadminApp')
         $scope.cancel = function(){
             window.location.reload();
         };
-
-        mediaserver.logLevel(0).then(function(data){
-            $scope.mainLogLevel = $scope.oldMainLogLevel = data.data.reply;
-        });
-        mediaserver.logLevel(3).then(function(data){
-            $scope.transLogLevel = $scope.oldTransLogLevel = data.data.reply;
+        
+        mediaserver.logLevel().then(function(data) {
+            $scope.oldLoggers = angular.copy(data.data.reply);
+            $scope.loggers = data.data.reply;
         });
 
         function errorLogLevel(/*error*/){
@@ -204,20 +202,15 @@ angular.module('webadminApp')
             });
         }
 
-        function changeTransactionLogLevel(){
-            if($scope.transLogLevel !== $scope.oldTransLogLevel) {
-                mediaserver.logLevel(3, $scope.transLogLevel).then(successLogLevel,errorLogLevel);
-                return;
-            }
-            successLogLevel();
-        }
-
         $scope.changeLogLevels = function(){
-            if($scope.mainLogLevel !== $scope.oldMainLogLevel) {
-                mediaserver.logLevel(0, $scope.mainLogLevel).then(changeTransactionLogLevel,errorLogLevel);
-                return;
+            var promises = [];
+            for(var logger in $scope.loggers){
+                if($scope.oldLoggers[logger] !== $scope.loggers[logger]){
+                    promises.push(mediaserver.logLevel("", logger, $scope.loggers[logger]));
+                }
             }
-            changeTransactionLogLevel();
+            
+            Promise.all(promises).then(successLogLevel).catch(errorLogLevel);
         };
 
         $scope.restartServer = function(passPort){

@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Kan het systeem niet aanmaken</h2>
-    <p class="master-description">Het systeem kan niet worden geconfigureerd. <br>
+    <p class="master-description">The System cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Geavanceerde systeeminstellingen</a>
+        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Geavanceerde systeeminstellingen</h2>
+    <h2>Advanced System settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -138,7 +138,7 @@
     </div>
     <h2>{{Config.cloud.productName}} account</h2>
     <p class="master-description">
-        Een account is vereist voor gebruik van het cloud systeem {{Config.cloud.productName}}
+        An account is required to use the cloud System {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Maak een nieuwe account</button> &nbsp;&nbsp; <button class="btn btn-default" ng-click="next('cloudLogin', true)">bestaande gebruiken</button>
@@ -166,11 +166,11 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="E-mailadres" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="Wachtwoord" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
@@ -191,7 +191,7 @@
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
                     forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
             <div class="help-block">
-                E-mailadres en wachtwoord zijn verplicht
+                Email en wachtwoord zijn verplicht
             </div>
         </div>
 
@@ -254,9 +254,11 @@
         </div>
 
         <div class="form-group has-error"
-             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+             ng-if="forms.localForm.passwordInput.$valid &&
+                    (forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.localPasswordConfirmation.$touched &&
+                    forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
                 Alle velden zijn verplicht
             </div>
@@ -273,7 +275,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>De server verbinden met het bestaande systeem</h2>
+    <h2>Connect the server to the existing System</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -282,7 +284,13 @@
                    uib-typeahead-input-formatter="getSystemName($model)"
                    uib-typeahead-focus-on-select="false"
                    uib-typeahead-min-length="0"
-                   uib-typeahead-show-hint="true">
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
+ placeholder="Existing System URL (https://host:port)"
+                   ng-change="clearRemoteError()"
+                   required
+ class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
@@ -297,7 +305,7 @@
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Password" required>
+                   placeholder="Wachtwoord" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
@@ -319,31 +327,32 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Systemen samenvoegen...</h2>
+    <h2>Systemen samenvoegen ...</h2>
     <p class="master-description">Dit kan enkele minuten duren</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Systemen samenvoegen...</h2>
-    <p class="master-description">Probeert te verbinden met het systeem</p>
+    <h2>Systemen samenvoegen ...</h2>
+    <p class="master-description">Trying to connect to the System</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Kan systemen niet samenvoegen</h2>
+    <h2>Cannot merge Systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Probeer het opnieuw</button>         <button class="btn btn-default" ng-click="skip()">Maak een afzonderlijk systeem aan</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate System</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Systemen zijn succesvol samengevoegd, maar is nog niet helemaal klaar.</h2>
+    <h2>Het ysteem is succesvol samengevoegd, maar is nog niet klaar.</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
@@ -370,7 +379,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>Systeem is klaar voor gebruik</h2>
+    <h2>Het systeem is klaar voor gebruik</h2>
     <p>Serveradres</p>
     <h4>{{serverAddress}}</h4>
     <p>Inloggen (voor beheerders)</p>
@@ -403,7 +412,8 @@
         Instellen van de internetverbinding op de server om <br> overal verbinding te kunnen maken met {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Probeer het opnieuw</button>         <button class="btn btn-default" ng-click="skip()">Maak een lokaal systeem aan</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
         <a href="" ng-click="next('configureNetworkForInternet')">Netwerkinstellingen configureren</a>
@@ -417,7 +427,8 @@
         Controleer uw internetverbinding.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Probeer het opnieuw</button>         <button class="btn btn-default" ng-click="skip()">Maak een lokaal systeem aan</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -428,7 +439,8 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Probeer het opnieuw</button>         <button class="btn btn-default" ng-click="skip()">Maak een lokaal systeem aan</button>
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Setup local System</button>
     </p>
 </div>
 
@@ -445,7 +457,7 @@
 
 <div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
     <p>
-        Het is mogelijk instellingen te wijzigen vanaf een andere computer door het verbinden van <br>aan het apparaat op één van de volgende manieren:
+        Het is mogelijk om het systeem in te stellen via een andere computer door verbinding<br>te maken met dit apparaat via de volgende manieren:
     </p>
     <div class="row">
         <div class="col-xs-6">
@@ -457,7 +469,7 @@
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Poort</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
             <div class="col-xs-6 text-right">Gebruikersnaam</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="col-xs-6 text-right">Wachtwoord</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>

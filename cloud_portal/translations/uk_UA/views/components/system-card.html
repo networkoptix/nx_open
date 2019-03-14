@@ -1,0 +1,54 @@
+
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Ваша система</h2>
+        <p>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Перейменувати систему</button>
+        </p>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Об’єднати з іншою системою</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Від’єднатися від <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+    </div>
+</div>
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
+        <h2>Власник</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Ваші права доступу: <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">Перейменувати систему</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Від'єднатись від мого облікового запису</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong> об'єднатися із цією системою</div>
+        <hr />
+        <div class="merge-info-text">Залежно від розміру бази даних це може зайняти до декількох годин</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>Ця система об'єднується в <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>Залежно від розміру бази даних це може зайняти до декількох годин.</p>
+            <p>Поки не завершиться об’єднання, ви можете увійти до цієї системи та подивитися відео, але не зможете змінити будь-які налаштування.</p>
+            <p>Після завершення об’єднання всі користувачі та камери із цієї системи стануть доступними  в<span class="merge-system-name">{{mergeTargetSystem.name}}</span>, а ця система буде видалена.</p>
+        </div>
+    </div>
+</div>

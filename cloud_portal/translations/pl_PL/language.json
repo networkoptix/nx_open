@@ -1,19 +1,20 @@
 {
+  "language": "pl_PL",
   "language_name": "Polski",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "OK",
     "cancelButton": "Anuluj",
-    "loginTitle": "Zaloguj się do {{PRODUCT_NAME}}",
+    "loginTitle": "Zaloguj się do %PRODUCT_NAME%",
     "loginButton": "Zaloguj",
     "logoutAuthorisedTitle": "Jesteś już zalogowany",
     "logoutAuthorisedContinueButton": "Kontynuuj",
     "logoutAuthorisedLogoutButton": "Wyloguj"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Witamy w",
     "register": "Utwórz konto w",
     "changePassword": "Zmień hasło -",
@@ -31,8 +32,8 @@
     "view": "Podgląd kamer -",
     "debug": "Debugowanie",
     "login": "Zaloguj się -",
-    "download": "Pobierz {{VMS_NAME}}",
-    "downloadPlatform": "Pobierz {{VMS_NAME}} dla",
+    "download": "Pobierz %VMS_NAME%",
+    "downloadPlatform": "Pobierz %VMS_NAME% dla",
     "pageNotFound": "Nie znaleziono strony"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Zaawansowany użytkownik",
-      "description": "Podgląd wideo na żywo, przeglądanie archiwum, konfigurowanie kamer, sterowanie PTZ itp."
+      "description": "Może wyświetlać wideo na żywo, przeglądać archiwum, sterować PTZ itp."
     },
     "Administrator": {
       "label": "Administrator",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Niestandardowa",
-      "description": "Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe"
+      "description": "Użyj aplikacji klienckiej %VMS_NAME% , aby skonfigurować niestandardowe uprawnienia"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "Niestandardowa",
-      "description": "Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe"
+      "description": "Użyj aplikacji klienckiej %VMS_NAME% , aby skonfigurować niestandardowe uprawnienia"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "Nie można wysłać e-maila z potwierdzeniem",
     "cloudInvalidResponse": "Baza danych chmury zwróciła nieoczekiwaną odpowiedź",
     "notAuthorized": "Nieprawidłowe hasło",
-    "wrongParameters": "Niektóre parametry na formularzu są niepoprawne",
     "brokenAccount": "Nieoczekiwany problem z kontem. <a href=\"/restore_password\">Przywróć konto</a>",
+    "wrongParameters": "Niektóre parametry na formularzu są niepoprawne",
     "wrongCode": "Konto jest już aktywne lub kod potwierdzenia jest nieprawidłowy",
     "wrongCodeRestore": "Kod potwierdzenia został już użyty lub jest nieprawidłowy",
     "forbidden": "Nie masz uprawnień do wykonania tej operacji",
     "accountNotActivated": "To konto nie jest jeszcze aktywne. <a href=\"/activate\">Wyślij ponownie link aktywacyjny</a>",
-    "accountBlocked": "To konto jest zablokowane",
+    "accountBlocked": "Konto jest tymczasowo zablokowane. Prosimy spróbować ponownie za kilka minut.",
     "notFound": "Nie znaleziono",
     "alreadyExists": "To konto już istnieje",
     "unknownError": "Wystąpił nieoczekiwany błąd",
@@ -133,16 +134,26 @@
     "passwordMismatch": "Nieprawidłowe hasło",
     "cantEditYourself": "Zmiana własnych uprawnień nie jest dozwolona",
     "cantEditAdmin": "Ten użytkownik ma uprawnienia administratora",
-    "cantOpenClient": "Nie wykryto aplikacji {{VMS_NAME}}. <a href=\"/download\">Pobierz</a>",
+    "cantOpenClient": "Nie wykryto aplikacji %VMS_NAME%. <a href=\"/download\">Pobierz</a>",
     "lostConnection": "Utracono połączenie z {{systemName}}",
-    "thisSystem": "system"
+    "thisSystem": "system",
+    "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "dobre",
+    "fair": "średnie",
+    "minLength": "za krótkie",
     "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",
+    "required": "nieprawidłowe",
     "requiredMessage": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
+    "weak": "słabe",
     "weakMessage": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
     "strongMessage": "Bezpieczne hasło!",
-    "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie"
+    "common": "zbyt popularne",
+    "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
+    "missingMessage": "Hasło jest wymagane"
   },
   "sharing": {
     "confirmOwner": "Jeśli zmienisz właściciela systemu, odbierzesz mu kontrolę nad bieżącym kontem. Ta operacja jest nieodwracalna. Czy na pewno kontynuować?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System jest niedostępny",
     "offline": "Serwer jest odłączony",
-    "openClient": "Otwórz w {{VMS_NAME}}",
-    "openClientNoSystem": "Otwórz {{VMS_NAME}}",
+    "openClient": "Otwórz w %VMS_NAME%",
+    "openClientNoSystem": "Otwórz %VMS_NAME%",
+    "confirmMergeAction": "Złącz",
+    "mergeSystemTitle": "Złącz systemy",
     "confirmRenameTitle": "Nazwa systemu",
     "confirmRenameAction": "Zachowaj",
     "successRename": "Zapisana nazwa systemu",
-    "confirmDisconnectTitle": "Odłączyć system od {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Odłączyć system od %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Rozłącz",
     "confirmUnshareFromMe": "Zamierzasz odłączyć ten system od swojego konta. Nie będziesz już mieć dostępu do tego systemu. Czy na pewno kontynuować?",
     "confirmUnshareFromMeTitle": "Odłączyć system?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "Ten użytkownik nie będzie mógł uzyskać dostępu do systemu. Czy na pewno kontynuować?",
     "confirmUnshareTitle": "Usunąć użytkownika?",
     "confirmUnshareAction": "Usuń",
-    "successDisconnected": "System został pomyślnie odłączony od {{PRODUCT_NAME}}",
+    "successDisconnected": "System został pomyślnie odłączony od %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "Zachowaj"
   },
   "downloads": {
-    "noClientDetectedTitle": "Zainstaluj {{VMS_NAME}}, aby przejrzeć swój system",
-    "action": "Pobierz {{VMS_NAME}}",
+    "noClientDetectedTitle": "Zainstaluj %VMS_NAME%, aby przejrzeć swój system",
+    "action": "Pobierz %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "Wszystkie systemy",
     "systems": "Systemy"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Wysoki strumień",
+      "lowStream": "Niski strumień",
+      "transcoding": "Transkodowanie",
+      "unknown": "Nieznany",
+      "copyToClipboard": "kopiuj do schowka",
+      "copyDefaultText": "kopiuj",
+      "copyActiveText": "skopiowano do schowka"
+    },
+    "systemOffline": "Serwer jest odłączony",
+    "systemHasNoCameras": "BRAK KAMER",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Błąd",
+      "unauthorized": "Wymagane uwierzytelnienie",
+      "noData": "Brak danych",
+      "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
+      "flashRequired": "Aby odtwarzać filmy wideo, proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a>.",
+      "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
+      "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
+      "noFormat": "Ta przeglądarka nie obsługuje odtwarzania wideo z tej kamery.",
+      "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
+      "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
+      "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium."
+    },
+    "searchCamPlaceholder": "Szukaj",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Wysoki",
+      "low": "Niski"
+    },
+    "chromeCastWarning": "Chromecast wymaga dużej ilości zasobów i może powodować problemy na serwerze.",
+    "voiceCommands": {
+      "play": "odtwarzaj",
+      "pause": "pauza",
+      "live": "podgląd na żywo | pokaż na żywo",
+      "view": "pokaż + [nazwa kamery]",
+      "search": "szukaj + [tekst paska wyszukiwania]",
+      "clear search": "wyczyść wyszukiwanie",
+      "expand server": "rozwiń serwer + [nazwa serwera]",
+      "collapse server": "zwiń serwer + [nazwa serwera]",
+      "expand all servers": "rozwiń wszystkie serwery",
+      "collapse all servers": "zwiń wszystkie serwery",
+      "stop listening": "przestań słuchać",
+      "help": "pomoc | pokaż polecenia"
+    }
   }
 }

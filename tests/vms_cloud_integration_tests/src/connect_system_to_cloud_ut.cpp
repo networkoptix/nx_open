@@ -5,7 +5,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 #include <nx/vms/cloud_integration/cdb_nonce_fetcher.h>
 
 #include <api/global_settings.h>
@@ -14,6 +14,8 @@
 #include <test_support/mediaserver_launcher.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
+
+using nx::vms::api::ServerFlag;
 
 namespace {
 
@@ -29,7 +31,7 @@ protected:
     {
         auto mediaServerClient = prepareMediaServerClient();
 
-        ec2::ApiResourceParamWithRefDataList params;
+        nx::vms::api::ResourceParamWithRefDataList params;
         params.resize(1);
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
@@ -44,12 +46,12 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            QnModuleInformation moduleInformation;
+            nx::vms::api::ModuleInformation moduleInformation;
             QnJsonRestResult resultCode =
                 mediaServerClient->getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
-            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+            if (moduleInformation.serverFlags.testFlag(ServerFlag::SF_NewSystem))
                 break;
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
@@ -60,7 +62,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiUserDataList users;
+            nx::vms::api::UserDataList users;
             if (mediaServerClient->ec2GetUsers(&users) == ec2::ErrorCode::ok)
             {
                 bool foundCloudUser = false;
@@ -79,7 +81,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiResourceParamDataList vmsSettings;
+            nx::vms::api::ResourceParamDataList vmsSettings;
             ec2::ErrorCode resultCode = mediaServerClient->ec2GetSettings(&vmsSettings);
             ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
 
@@ -95,7 +97,7 @@ protected:
     }
 
 private:
-    QString getValueByName(const ec2::ApiResourceParamDataList& values, const QString& name)
+    QString getValueByName(const nx::vms::api::ResourceParamDataList& values, const QString& name)
     {
         for (const auto& nameAndValue: values)
         {
@@ -178,7 +180,14 @@ protected:
     void whenInvokedDetachFromCloudRestMethod()
     {
         auto mediaServerClient = prepareMediaServerClient();
+
+        const auto credentials = mediaServerClient->getUserCredentials();
+        ASSERT_TRUE((bool) credentials);
+        ASSERT_EQ(nx::network::http::AuthTokenType::password, credentials->authToken.type);
+
         DetachFromCloudData params;
+        params.currentPassword = credentials->authToken.value;
+
         QnJsonRestResult resultCode = mediaServerClient->detachFromCloud(std::move(params));
         ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
     }
@@ -242,7 +251,7 @@ private:
             std::string hash;
 
             ASSERT_TRUE(parseResult);
-            ASSERT_TRUE(nx::cdb::api::parseCloudNonceBase(
+            ASSERT_TRUE(nx::cloud::db::api::parseCloudNonceBase(
                 nonceWithoutTrailer.toStdString(),
                 &ts,
                 &hash));

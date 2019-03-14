@@ -1,19 +1,20 @@
 {
-  "language_name": "LANGUAGE_NAME",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}",
+  "language": "zh_CN",
+  "language_name": "简体中文",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%",
   "dialogs": {
     "okButton": "确定",
     "cancelButton": "取消",
-    "loginTitle": "登录到 {{PRODUCT_NAME}}",
+    "loginTitle": "登录到 %PRODUCT_NAME%",
     "loginButton": "登录",
     "logoutAuthorisedTitle": "您已经登录",
     "logoutAuthorisedContinueButton": "继续",
     "logoutAuthorisedLogoutButton": "退出登录"
   },
   "pageTitles": {
-    "template": "{{title}}{{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}}%PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "欢迎来到",
     "register": "创建帐户中",
     "changePassword": "更改密码-",
@@ -31,8 +32,8 @@
     "view": "查看相机 - ",
     "debug": "调试",
     "login": "登录-",
-    "download": "下载 {{VMS_NAME}}",
-    "downloadPlatform": "下载的 {{VMS_NAME}} ",
+    "download": "下载 %VMS_NAME%",
+    "downloadPlatform": "下载的 %VMS_NAME% ",
     "pageNotFound": "找不到页面"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "高级操作员",
-      "description": "可以查看实时视频，浏览存档，配置摄像头，控制云台等"
+      "description": "可以查看实时视频，浏览存档，控制云台等"
     },
     "Administrator": {
       "label": "管理员",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
+      "description": "使用 %VMS_NAME% 客户端应用程序可以设置自定义权限"
     },
     "cloudAdmin": {
       "label": "管理员",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
+      "description": "使用 %VMS_NAME% 客户端应用程序可以设置自定义权限"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "不能发送确认电子邮件",
     "cloudInvalidResponse": "云 DB 返回了意外的响应",
     "notAuthorized": "错误的密码。",
+    "brokenAccount": "帐户出现意外问题。 <a href=\"/restore_password\">恢复帐户</a>",
     "wrongParameters": "窗体上的一些参数不正确",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "已经激活帐户或确认码不正确",
     "wrongCodeRestore": "确认代码已使用或不正确",
     "forbidden": "您没有权限执行此操作",
     "accountNotActivated": "此帐户尚未激活。<a href=\"/activate\"> 发送激活链接，再一次</a>",
-    "accountBlocked": "此帐户被阻止。",
+    "accountBlocked": "此帐户被阻止。请在几分钟后再试一次。",
     "notFound": "找不到",
     "alreadyExists": "此帐户已存在",
     "unknownError": "发生意外的错误",
@@ -133,16 +134,26 @@
     "passwordMismatch": "错误的密码。",
     "cantEditYourself": "不允许更改自己的权限",
     "cantEditAdmin": "此用户具有管理员权限",
-    "cantOpenClient": "{{VMS_NAME}} 应用程序未检测到。<a href=\"/download\"> 下载</a>",
+    "cantOpenClient": "%VMS_NAME% 应用程序未检测到。<a href=\"/download\"> 下载</a>",
     "lostConnection": "连接到 {{systemName}} 失去了",
-    "thisSystem": "系统"
+    "thisSystem": "系统",
+    "oldSafariNotSupported": "不支持10岁以上的Safari版本",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "良好",
+    "fair": "一般",
+    "minLength": "太短",
     "minLengthMessage": "密码必须包含至少 8 个字符",
+    "required": "不正确",
     "requiredMessage": "使用只有拉丁文字母、 数字和符号键盘，避免前导和尾随空格",
+    "weak": "弱",
     "weakMessage": "使用数字、 上层和小写字母和特殊字符，使您更强的密码",
     "strongMessage": "强密码 ！",
-    "commonMessage": "此密码是在世界顶级最受欢迎的密码"
+    "common": "太常见",
+    "commonMessage": "此密码是在世界顶级最受欢迎的密码",
+    "missingMessage": "密码为必填项"
   },
   "sharing": {
     "confirmOwner": "如果您更改系统所有者，将撤消从当前帐户的所有权。此操作是不可逆的。是否确定？",
@@ -157,12 +168,14 @@
     "mySystemSearch": "我的",
     "unavailable": "系统无法访问",
     "offline": "系统处于离线状态",
-    "openClient": "在 {{VMS_NAME}} 中打开",
-    "openClientNoSystem": "打开 {{VMS_NAME}}",
+    "openClient": "在 %VMS_NAME% 中打开",
+    "openClientNoSystem": "打开 %VMS_NAME%",
+    "confirmMergeAction": "联网",
+    "mergeSystemTitle": "合并系统",
     "confirmRenameTitle": "系统名称",
     "confirmRenameAction": "保存",
     "successRename": "保存的系统名称",
-    "confirmDisconnectTitle": "系统断开 {{PRODUCT_NAME}} 吗？",
+    "confirmDisconnectTitle": "系统断开 %PRODUCT_NAME%?",
     "confirmDisconnectAction": "断开连接",
     "confirmUnshareFromMe": "您将要断开此系统从您的帐户。你将无法再访问该系统。是否确定？",
     "confirmUnshareFromMeTitle": "断开系统吗？",
@@ -170,8 +183,9 @@
     "confirmUnshare": "此用户不能访问系统。是否确定？",
     "confirmUnshareTitle": "删除用户？",
     "confirmUnshareAction": "删除",
-    "successDisconnected": "系统成功地断开 {{PRODUCT_NAME}}",
+    "successDisconnected": "系统成功地断开 %PRODUCT_NAME%",
     "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "权限从 {{email}} 被刪除"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "保存"
   },
   "downloads": {
-    "noClientDetectedTitle": "安装 {{VMS_NAME}} 来查看您的系统",
-    "action": "下载 {{VMS_NAME}}",
+    "noClientDetectedTitle": "安装 %VMS_NAME% 来查看您的系统",
+    "action": "下载 %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "所有系统",
     "systems": "系统"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "高流",
+      "lowStream": "低流",
+      "transcoding": "转码",
+      "unknown": "未知的",
+      "copyToClipboard": "复制到剪贴板",
+      "copyDefaultText": "复制",
+      "copyActiveText": "已复制到剪贴板"
+    },
+    "systemOffline": "系统处于离线状态",
+    "systemHasNoCameras": "无摄像机",
+    "cameraStates": {
+      "offline": "离线",
+      "error": "错误",
+      "unauthorized": "需要身份验证",
+      "noData": "无数据",
+      "iosVideoTooLarge": "iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
+      "flashRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频。",
+      "flashOrWebmRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
+      "noArmSupport": "此浏览器或设备不支持基于ARM的服务器的视频播放。",
+      "noFormat": "此浏览器不支持本相机的视频播放。",
+      "ieNoWebm": "请为 Ie 安装 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a>。",
+      "ieWin10": "请使用Microsoft Edge或Google Chrome浏览器。",
+      "ubuntuNX": "此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。"
+    },
+    "searchCamPlaceholder": "搜索",
+    "resolution": {
+      "auto": "自动",
+      "high": "高",
+      "low": "低"
+    },
+    "chromeCastWarning": "Chromecast是资源密集型的，可能会导致您的服务器出现问题。",
+    "voiceCommands": {
+      "play": "播放",
+      "pause": "暂停",
+      "live": "go to live | show me live",
+      "view": "查看+ [相机名称]",
+      "search": "find + [text for searchbar]",
+      "clear search": "清除搜索",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "展开所有服务器",
+      "collapse all servers": "隐藏所有服务器",
+      "stop listening": "停止监听",
+      "help": "help | show commands"
+    }
   }
 }

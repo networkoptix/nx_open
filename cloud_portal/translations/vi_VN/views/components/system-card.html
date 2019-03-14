@@ -1,17 +1,20 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>Hệ thống của bạn</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Hệ thống của bạn</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Đổi tên hệ thống</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Đổi tên hệ thống</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Ngắt kết nối khỏi <span class="product-name"> {{PRODUCT_NAME}} </span></button>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Hợp nhất với một hệ thống khác</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Ngắt kết nối với
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>Chủ nhân</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -24,5 +27,32 @@
             <button class="btn btn-default" ng-click="rename()">Đổi tên hệ thống</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Ngắt kết nối khỏi tài khoản của tôi</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong> 
+            được sáp nhập để hệ thống này</div>
+        <hr />
+        <div class="merge-info-text">Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>Hệ thống này được sáp nhập để 
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>Tùy thuộc vào kích thước của cơ sở dữ liệu có thể mất đến vài giờ.</p>
+            <p>Cho đến khi hợp nhất xong bạn có thể đăng nhập vào hệ thống này và xem video, nhưng không thể thay đổi bất kỳ cài đặt.</p>
+            <p>Khi hợp nhất kết thúc, tất cả người dùng và camera từ hệ thống này sẽ có
+                trong hệ thống  "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", và hệ thống này sẽ bị xóa.</p>
+        </div>
     </div>
 </div>

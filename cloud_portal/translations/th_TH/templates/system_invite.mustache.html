@@ -1,16 +1,14 @@
-<h1>สวัสดี {{message.fullName}}</h1>
+<h1>สวัสดี {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> ได้แชร์การเข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}" กับคุณ
 
-หากต้องการดูและจัดการโปรดสร้างบัญชีใน <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> ใช้ที่อยู่อีเมลปัจจุบันของคุณและทำตามคำแนะนำเพิ่มเติม</p>
+หากต้องการดูและจัดการโปรดสร้างบัญชีใน <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> ใช้ที่อยู่อีเมลปัจจุบันของคุณและทำตามคำแนะนำเพิ่มเติม</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>คุณได้รับสิทธิ์เข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}"
 
-หากต้องการดูและจัดการโปรดสร้างบัญชีใน <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> ใช้ที่อยู่อีเมลปัจจุบันของคุณและทำตามคำแนะนำเพิ่มเติม</p>
-{{/message.sharer_name}}
-
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+หากต้องการดูและจัดการโปรดสร้างบัญชีใน <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> ใช้ที่อยู่อีเมลปัจจุบันของคุณและทำตามคำแนะนำเพิ่มเติม</p>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> สร้างบัญชี </a>
 

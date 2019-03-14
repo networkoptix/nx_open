@@ -1,47 +1,47 @@
 {
   "cameraLinks": {
-    "highStream": "High stream",
-    "lowStream": "Low stream",
-    "transcoding": "Transcoding",
-    "unknown": "Unknown",
-    "copyToClipboard": "copy to clipboard",
-    "copyDefaultText": "copy",
-    "copyActiveText": "copied to clipboard"
+    "highStream": "Hlavní stream",
+    "lowStream": "Vedlejší stream",
+    "transcoding": "Překódování",
+    "unknown": "Neznámý",
+    "copyToClipboard": "kopírovat do schránky",
+    "copyDefaultText": "kopírovat",
+    "copyActiveText": "zkopírováno do schránky"
   },
-  "systemOffline": "System Offline",
+  "systemOffline": "Systém je offline",
   "cameraStates": {
     "offline": "Offline",
-    "error": "Error",
-    "unauthorized": "Authentication required",
-    "noData": "No data",
-    "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
-    "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-    "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
-    "noFormat": "This browser does not support video playback from this camera.",
-    "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-    "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
-    "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+    "error": "Chyba",
+    "unauthorized": "Autentifikace je vyžadována",
+    "noData": "Žádná data",
+    "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+    "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>.",
+    "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
+    "noArmSupport": "Tento prohlížeč nebo zařízení nepodporuje přehrávání videa ze serverů se systémem ARM.",
+    "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
+    "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+    "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
+    "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium."
   },
-  "searchCamPlaceholder": "Search",
+  "searchCamPlaceholder": "Hledat",
   "resolution": {
     "auto": "Auto",
-    "high": "High",
-    "low": "Low"
+    "high": "Vysoká",
+    "low": "Nízký"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
   "voiceCommands": {
-    "play": "play",
-    "pause": "pause",
+    "play": "přehrát",
+    "pause": "pozastavit",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "smazat hledání",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "rozbalit všechny servery",
+    "collapse all servers": "sbalit všechny servery",
+    "stop listening": "zastavení poslech",
     "help": "help | show commands"
   }
 }

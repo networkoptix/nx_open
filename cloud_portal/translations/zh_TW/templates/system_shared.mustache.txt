@@ -1,4 +1,4 @@
-您好, {{message.fullName}}
+您好, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) 共用影像管理系統 {{message.system_name}} 給您.
@@ -8,4 +8,4 @@
 您已被授予連線影像管理系統 “{{message.system_name}}” 的權限.
 {{/message.sharer_name}}
 
-在{{PRODUCT_NAME}} 入口中查看: {{config.portal_url}}/systems/{{message.system_id}}
+在%PRODUCT_NAME% 入口中查看: {{config.portal_url}}/systems/{{message.system_id}}

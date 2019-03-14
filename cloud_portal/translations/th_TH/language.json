@@ -1,19 +1,20 @@
 {
+  "language": "th_TH",
   "language_name": "ภาษาไทย",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "ตกลง",
     "cancelButton": "ยกเลิก",
-    "loginTitle": "ยินดีต้อนรับสู่ {{PRODUCT_NAME}}",
+    "loginTitle": "เข้าสู่ระบบ %PRODUCT_NAME%",
     "loginButton": "ลงชื่อเข้าสู่ระบบ",
     "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
     "logoutAuthorisedLogoutButton": "ออกจากระบบ"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "ขอต้อนรับสู่:",
     "register": "สร้างบัญชี",
     "changePassword": "เปลี่ยนรหัสผ่าน -",
@@ -31,8 +32,8 @@
     "view": "ดูกล้อง - ",
     "debug": "การ​แก้ไข​จุด​บกพร่อง",
     "login": "ลงชื่อเข้าสู่ระบบ -",
-    "download": "ดาวน์โหลด {{VMS_NAME}}",
-    "downloadPlatform": "ดาวน์โหลด {{VMS_NAME}} สำหรับ ",
+    "download": "ดาวน์โหลด %VMS_NAME%",
+    "downloadPlatform": "ดาวน์โหลด %VMS_NAME% สำหรับ ",
     "pageNotFound": "ไม่พบหน้านี้"
   },
   "systemStatuses": {
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "แบบกำหนดเอง",
-      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
+      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %VMS_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     },
     "cloudAdmin": {
       "label": "ผู้ดูแลระบบ",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "แบบกำหนดเอง",
-      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
+      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %VMS_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     }
   },
   "errorCodes": {
@@ -116,33 +117,43 @@
     "cantSendConfirmationPrefix": "ไม่สามารถส่งอีเมลยืนยัน",
     "cloudInvalidResponse": "คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
     "notAuthorized": "รหัสผ่านผิด",
+    "brokenAccount": "ปัญหาที่ไม่คาดคิดกับบัญชี <a href=\"/restore_password\">เรียกคืนบัญชี</a>",
     "wrongParameters": "พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
     "wrongCodeRestore": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
     "forbidden": "การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
     "accountNotActivated": "บัญชีนี้ยังไม่เปิดใช้งาน <a href=\"/activate\"> ส่งลิงก์การเปิดใช้งานอีกครั้ง </a>",
-    "accountBlocked": "บัญชีนี้ถูกปิดแล้ว",
+    "accountBlocked": "บัญชีนี้ถูกปิดแล้ว โปรดลองอีกครั้งในไม่กี่นาที.",
     "notFound": "ไม่​พบ",
     "alreadyExists": "มีบัญชีอยู่แล้ว",
     "unknownError": "เกิดข้อผิดพลาดที่ไม่คาดคิด",
     "accountAlreadyActivated": "บัญชีนี้เปิดใช้งานแล้ว",
-    "emailNotFound": "Account does not exist.",
+    "emailNotFound": "ไม่มีบัญชีนี้อยู่",
     "EmailAlreadyExists": "ลงทะเบียนอีเมล์นี้แล้ว",
     "oldPasswordMistmatch": "ต้องระบุรหัสผ่านปัจจุบัน.",
     "passwordMismatch": "รหัสผ่านผิด",
     "cantEditYourself": "ไม่อนุญาตให้เปลี่ยนสิทธิ์ของตัวเอง",
     "cantEditAdmin": "ผู้ใช้มีสิทธิ์ของผู้ดูแลระบบ",
-    "cantOpenClient": "ไม่พบแอ็พพลิเคชัน {{VMS_NAME}} <a href=\"/download\">Download</a>",
+    "cantOpenClient": "ไม่พบแอ็พพลิเคชัน %VMS_NAME% <a href=\"/download\">Download</a>",
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
-    "thisSystem": "ระบบ"
+    "thisSystem": "ระบบ",
+    "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "ดี",
+    "fair": "ยุติธรรม",
+    "minLength": "สั้นเกินไป",
     "minLengthMessage": "รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
+    "required": "ไม่ถูกต้อง",
     "requiredMessage": "ใช้อักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์เท่านั้นหลีกเลี่ยงช่องว่างด้านบนและด้านหลัง",
+    "weak": "อ่อนแอ",
     "weakMessage": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
     "strongMessage": "รหัสผ่านที่แข็งแกร่ง!",
-    "commonMessage": "รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก"
+    "common": "บ่อยเกินไป",
+    "commonMessage": "รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก",
+    "missingMessage": "จำเป็นต้องใช้รหัสผ่าน"
   },
   "sharing": {
     "confirmOwner": "หากคุณเปลี่ยนเจ้าของระบบคุณจะยกเลิกการเป็นเจ้าของจากบัญชีปัจจุบัน การกระทำนี้ไม่สามารถย้อนกลับได้ คุณแน่ใจไหม?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "ระบบไม่สามารถเข้าถึงได้",
     "offline": "ระบบออฟไลน์",
-    "openClient": "เปิดใน {{VMS_NAME}}",
-    "openClientNoSystem": "เปิด {{VMS_NAME}}",
+    "openClient": "เปิดใน %VMS_NAME%",
+    "openClientNoSystem": "เปิด %VMS_NAME%",
+    "confirmMergeAction": "ผสาน",
+    "mergeSystemTitle": "รวมระบบ",
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",
-    "confirmDisconnectTitle": "ตัดการเชื่อมต่อระบบจาก {{PRODUCT_NAME}} หรือไม่?",
+    "confirmDisconnectTitle": "ยกเลิกการเชื่อมต่อระบบจาก %PRODUCT_NAME%?",
     "confirmDisconnectAction": "ตัดการเชื่อมต่อ",
     "confirmUnshareFromMe": "คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
     "confirmUnshareFromMeTitle": "ยกเลิกการเชื่อมต่อระบบหรือไม่?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "ผู้ใช้รายนี้จะไม่สามารถเข้าใช้งานระบบได้ คุณแน่ใจไหม?",
     "confirmUnshareTitle": "ลบผู้ใช้หรือไม่?",
     "confirmUnshareAction": "ลบ",
-    "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก {{PRODUCT_NAME}}",
+    "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
   },
   "account": {
@@ -183,24 +197,24 @@
     "saveChanges": "บันทึก"
   },
   "downloads": {
-    "noClientDetectedTitle": "ติดตั้ง {{VMS_NAME}} เพื่อดูระบบของคุณ",
-    "action": "ดาวน์โหลด {{VMS_NAME}}",
+    "noClientDetectedTitle": "ติดตั้ง %VMS_NAME% เพื่อดูระบบของคุณ",
+    "action": "ดาวน์โหลด %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
       "windows": {
-        "label": "วินโดวส์",
+        "label": "Windows",
         "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "ระบบทั้งหมด",
     "systems": "ระบบ"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "สตรีมสูง",
+      "lowStream": "สตรีมต่ำ",
+      "transcoding": "การแปลงรหัส",
+      "unknown": "ม่รู้จัก",
+      "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
+      "copyDefaultText": "สำเนา",
+      "copyActiveText": "คัดลอกไปยังคลิปบอร์ด"
+    },
+    "systemOffline": "ระบบออฟไลน์",
+    "systemHasNoCameras": "ไม่พบกล้อง",
+    "cameraStates": {
+      "offline": "ออฟไลน์",
+      "error": "ข้อผิดพลาด",
+      "unauthorized": "จำเป็นต้องระบุตัวตนผู้ใช้",
+      "noData": "ไม่มีข้อมูล",
+      "iosVideoTooLarge": "iOS ไม่สนับสนุนวิดีโอที่ใหญ่กว่า fullHD (2MP: 1920x1080)",
+      "flashRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> สำหรับเล่นวิดีโอ",
+      "flashOrWebmRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
+      "noArmSupport": "เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
+      "noFormat": "เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
+      "ieNoWebm": "โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
+      "ieWin10": "โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
+      "ubuntuNX": "เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน"
+    },
+    "searchCamPlaceholder": "ค้นหา",
+    "resolution": {
+      "auto": "อัตโนมัติ",
+      "high": "สูง",
+      "low": "ต่ำ"
+    },
+    "chromeCastWarning": "Chromecast เป็นทรัพยากรที่เข้มข้นและอาจทำให้เกิดปัญหาบนเซิร์ฟเวอร์ของคุณ",
+    "voiceCommands": {
+      "play": "เล่น",
+      "pause": "หยุด",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "ล้างการค้นหา",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "ขยายเซิร์ฟเวอร์ทั้งหมด",
+      "collapse all servers": "ยุบเซิร์ฟเวอร์ทั้งหมด",
+      "stop listening": "หยุดฟัง",
+      "help": "help | show commands"
+    }
   }
 }

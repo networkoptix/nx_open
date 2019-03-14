@@ -1,13 +1,13 @@
-<div class="container" >
+<div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             Your account is successfully activated
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">Log In</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             Account is already activated or confirmation code is incorrect
         </h1>
     </div>
@@ -20,31 +20,36 @@
             <a class="btn btn-default" href="/login">Log In</a>
         </h1>
     </div>
-    
+
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in {{PRODUCT_NAME}}</h1>
+            <h1>You have registered in %PRODUCT_NAME%</h1>
             <p>We've sent you a letter with activation link to {{data.email}}.<br>
-            Please activate your account by visiting this link.</p>
+                Please activate your account by visiting this link.</p>
         </div>
         <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
+                <div class="col-md-4 justify-content-start justify-content-md-end">
+                    <label for="emailReactivate" class="control-label">Email</label>
+                </div>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"  validate-email
+                    <input type="email" class="form-control"
+                           validate-email
  ng-model="data.email"
                            id="emailReactivate"
                            name="email" maxlength="255"
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block input-error"
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                    <span class="help-block input-error"
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-8">
+                <div class="offset-sm-2 col-sm-10" ng-class="{ 'offset-sm-4 col-sm-8' : data.email}" >
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
@@ -63,21 +68,25 @@
         <h1>Reset Password</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">Email</label>
+                <div class="col-md-4 justify-content-start justify-content-md-end">
+                    <label for="email" class="col-sm-4 control-label">Email</label>
+                </div>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"  validate-email
+                    <input type="email" class="form-control" validate-email
  ng-model="data.email"
                            id="email"
                            name="email" maxlength="255"
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block input-error"
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                    <span class="help-block input-error"
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="offset-sm-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
                                     button-text="$root.L.activeActions.resetPassword"></process-button>
@@ -86,19 +95,25 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess">
+        <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
             Password successfully saved
         </h1>
-        <h1 class="process-success" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login">Log In</a>
-        </h1>
+        <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login" translate>Log In</a>
+        </div>
 
-        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>Set New Password</h1>
-            <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
+        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"
+              novalidate>
+            <h1 translate>Set New Password</h1>
+
+            <password-input ng-model="data.newPassword"
+                            id="'newPassword'"
+                            form="restorePasswordWithCode"
+                            label="$root.L.activeActions.setNewPasswordLabel">
+            </password-input>
 
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="offset-sm-4 col-sm-8">
                     <process-button process="change"
                                     form="restorePasswordWithCode"
                                     button-text="$root.L.activeActions.setNewPassword"></process-button>

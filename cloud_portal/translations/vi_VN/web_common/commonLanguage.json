@@ -4,9 +4,9 @@
     "lowStream": "Luồng tốc độ thấp",
     "transcoding": "Đang chuyển mã",
     "unknown": "Không xác định",
-    "copyToClipboard": "sao chép vào clipboard",
-    "copyDefaultText": "bản sao",
-    "copyActiveText": "đã sao chép vào clipboard"
+    "copyToClipboard": "chép vào bảng nháp",
+    "copyDefaultText": "sao chép",
+    "copyActiveText": "sao chép vào clipboard"
   },
   "systemOffline": "Hệ thống offline",
   "cameraStates": {
@@ -15,7 +15,7 @@
     "unauthorized": "Yêu cầu xác thực",
     "noData": "Không có dữ liệu",
     "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video.",
     "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
     "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
     "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
@@ -25,23 +25,23 @@
   },
   "searchCamPlaceholder": "Tìm kiếm",
   "resolution": {
-    "auto": "tự động",
-    "high": "cao (H)",
-    "low": "thấp (L)"
+    "auto": "Tự động",
+    "high": "Cao (H)",
+    "low": "Thấp (L)"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
   "voiceCommands": {
     "play": "broadcast",
     "pause": "giờ nghĩ giảo lao",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "xóa tìm kiếm",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "mở rộng tất cả các máy chủ",
+    "collapse all servers": "tất cả máy chủ mất ổn định",
+    "stop listening": "dừng nghe",
     "help": "help | show commands"
   }
 }

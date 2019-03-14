@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SmtpSimpleSettingsWidget</class>
+ <widget class="QWidget" name="SmtpSimpleSettingsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>276</width>
+    <height>209</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="nx::vms::client::desktop::InputField" name="emailInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::InputField" name="passwordInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::InputField" name="signatureInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::InputField" name="supportInputField" native="true"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::InputField</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

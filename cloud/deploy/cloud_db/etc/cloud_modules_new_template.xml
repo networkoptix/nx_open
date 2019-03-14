@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sequence>
+    <set resName="cdb" resValue="https://%host%:443"/>
+    <sequence>
+        <set resName="hpm.tcpUrl" resValue="http://$MEDIATOR_HOST:$MEDIATOR_HTTP_PORT/mediator"/>
+        <set resName="hpm.udpUrl" resValue="stun://$MEDIATOR_HOST:$MEDIATOR_STUN_PORT"/>
+    </sequence>
+    <set resName="notification_module" resValue="https://%host%:443"/>
+</sequence>

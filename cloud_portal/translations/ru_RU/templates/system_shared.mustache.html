@@ -1,4 +1,4 @@
-<h1>Здравствуйте, {{message.fullName}}</h1>
+<h1>Здравствуйте, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> предоставил вам доступ к системе {{message.system_name}}.</p>
@@ -8,4 +8,4 @@
 <p>Вам предоставлен доступ к системе видеонаблюдения «{{message.system_name}}».</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Просмотр в портале {{PRODUCT_NAME}}</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Просмотр в портале %PRODUCT_NAME%</a>

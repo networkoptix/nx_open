@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+    <?include app_info.wxi ?>
+
+    <Bundle
+            Name="$(var.installerProductName)"
+            Manufacturer="$(var.manufacturer)"
+            Version="$(var.productVersion)"
+            IconSourceFile="$(var.customizationDir)/icons/all/favicon.ico"
+            UpgradeCode="$(var.bundleUpgradeCode)"
+            DisableModify="yes">
+
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="$(var.customizationDir)/license.html" />
+            <Payload SourceFile="$(var.customizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.customizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.customizationDir)/icons/windows/logo-64x64.png" />
+
+            <bal:WixStandardBootstrapperApplication
+                SuppressOptionsUI="yes"
+                LicenseUrl="license.html"
+                ShowFilesInUse="yes"
+                SuppressRepair="yes"
+                ThemeFile="$(var.themeFile)"
+                LocalizationFile="$(var.localizationFile)"
+                SuppressDowngradeFailure="yes"/>
+        </BootstrapperApplicationRef>
+
+        <Variable Name="InstallerTitle" Value="$(var.installerProductName) Installer"/>
+
+        <Chain DisableSystemRestore="no">
+            <MsiPackage Id="MainPackage" SourceFile="$(var.installerMsiFile)" Vital="yes" />
+        </Chain>
+    </Bundle>
+</Wix>

@@ -1,0 +1,52 @@
+<div ng-controller="MergeCtrl">
+    <div ng-if="!showMergeForm">
+        <div class="modal-body">
+            <div>
+                <p class="help-block-no-height">
+                    當您的權限為擁有者時, 就可以合併雲系統
+                </p>
+                <p class="help-block-no-height">
+                    請至 %PRODUCT_NAME% 雲連接您要與此系統合併的另一系統, 或透過 %VMS_NAME%客戶端應用程式於本地合併
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary wide-button" ng-click="close()">確定</button>
+        </div>
+    </div>
+    <form ng-if="showMergeForm" name="mergeForm" novalidate>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="system"> 合併當前系統與 </label>
+                <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
+                        ng-options="system as addStatus(system) for system in systems"></select>
+            </div>
+            <p ng-if="systemMergeable =='offline'"
+               class="help-block-no-height warning-label">系統 {{targetSystem.name}} 處於離線狀態 無法與當前系統合併</p>
+            <p ng-if="systemMergeable =='cannotMerge'"
+               class="help-block-no-height warning-label">System {{targetSystem.name}} is incompatible. 無法與當前系統合併</p>
+            <p ng-if="systemMergeable == ''"
+               class="help-block-no-height">您只能合併當您被授權為擁有者的系統</p>
+            <div>
+                <div ng-class="{'text-muted': systemStatus != ''}">獲取系統名稱和設定</div>
+                <div ng-init="$parent.masterSystemId=system.id">
+                    <div>
+                        <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id"
+                                                             ng-disabled="systemStatus != ''">
+                        <label class="light-label" ng-class="{'text-muted': systemStatus != ''}" for="firstSystem">{{system.info.name}}</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="secondSystem" ng-model="$parent.masterSystemId" ng-value="targetSystem.id"
+                                                              ng-disabled="systemStatus != ''">
+                        <label class="light-label" ng-class="{'text-muted': systemStatus != ''}" for="secondSystem">{{targetSystem.name}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <process-button button-disabled="systemStatus != ''" process="mergingSystems"
+                            form="mergeForm" action-type="'primary'"
+                            button-text="$root.L.system.confirmMergeAction"></process-button>
+        </div>
+    </form>
+</div>

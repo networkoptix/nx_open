@@ -15,8 +15,10 @@ cloud_db:
 cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
-cloud_gateway:
-    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
+trafficRelay:
+    host: 'relay-bur.vmsproxy.hdw.mx'
+
+bucket: 'cloud-portal'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding="utf-8"?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Fragment>
+        <?include BuildVars.wxi ?>
+        <ComponentGroup Id="traytool"
+                Source="$(var.SourceDir)"
+                Directory="InstallDirRoot">
+            <Component>
+                <File Id="traytool.exe" KeyPath="yes">
+                    <Shortcut Id="StartmenuTrayTool"
+                        Directory="ProgramMenuDir"
+                        Name="$(var.trayToolName)"
+                        WorkingDirectory="InstallDirRoot"
+                        Advertise="yes"
+                        Icon="icon_menu.exe">
+                    </Shortcut>
+
+                    <Shortcut Id="StartmenuStartupTrayTool"
+                        Directory="StartupFolder"
+                        Name="$(var.trayToolName)"
+                        WorkingDirectory="InstallDirRoot"
+                        Advertise="yes"
+                        Icon="icon_menu.exe">
+                    </Shortcut>
+                </File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

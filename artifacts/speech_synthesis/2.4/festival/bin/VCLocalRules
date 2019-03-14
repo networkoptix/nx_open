@@ -1,4 +1,0 @@
-# don't make text2wave
-
-text2wave:
-	@echo "no text to wave"

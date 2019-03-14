@@ -17,7 +17,7 @@ window.setLanguage = function(lang){
 
     setCookie("language", lang, 100); // Almost never expiring cookie
 };
-(function LanguageDetect(){
+setTimeout(function LanguageDetect(){
 
     function getCookie(cname) {
         var name = cname + "=";
@@ -48,7 +48,8 @@ window.setLanguage = function(lang){
             return supportedLanguage.indexOf(userLang) == 0;
         });
     }
-    if(!userLang){
+    if(!userLang || Config.supportedLanguages.indexOf(userLang)<0){
+        // We weren't able to detect language or detected language is not supported in this customization
         userLang = Config.defaultLanguage;
     }
 
@@ -112,4 +113,4 @@ window.setLanguage = function(lang){
             });
         }
     });
-})();
+});

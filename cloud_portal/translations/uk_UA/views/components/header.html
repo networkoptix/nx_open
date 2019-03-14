@@ -1,0 +1,62 @@
+<!--suppress ALL -->
+<header ng-if="viewHeader">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="app-header-left">
+                <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible d-block d-sm-none">
+                    <li>
+                        <nx-active-system [active-system]="activeSystem"></nx-active-system>
+                    </li>
+                </ul>
+
+                <div class="navbar-header">
+                    <a class="inset navbar-brand product-name add-version" href="/"
+                       [ngclass]="{'ml-sm-0': true}">
+                        <img ng-src="{{config.previewPath}}/static/images/logo.png">
+                    </a>
+                </div>
+
+                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
+                    <li ng-class="{ 'active' :active.view }">
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">Вигляд</a>
+                    </li>
+                    <li ng-class="{ 'active' :active.settings}">
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}">Налаштування</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="app-header-right">
+                <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
+                    <li>
+                        <span> <a href class="btn btn-default" ng-click="login()"> Вхід </a></span> <span> <a href="/register" class="btn btn-primary"> Створити обліковий запис </a></span>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right auth-visible">
+                    <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
+                        <a href="/systems" class="m-0 border-0">
+                            <span class="glyphicon glyphicon-home"></span>
+                            <span class="ellipsis">{{activeSystem.name}}</span>
+                        </a>
+                    </li>
+
+                    <li ng-if="systemCounter && !singleSystem" class="collapse-second">
+                        <nx-systems
+                                [endpoint]="active"
+                                [systems]="systems"
+                                [active-system]="activeSystem">
+                        </nx-systems>
+                    </li>
+
+                    <li class="vertical-bar"></li>
+
+                    <li class="collapse-first">
+                        <nx-account-settings-select [account]="account"></nx-account-settings-select>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <toast></toast>
+</header>

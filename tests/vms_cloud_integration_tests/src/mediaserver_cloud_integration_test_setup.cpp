@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/connection.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/connection.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/url/url_builder.h>
@@ -14,11 +14,15 @@
 #include <api/app_server_connection.h>
 #include <media_server/settings.h>
 
-using namespace nx::cdb;
+using nx::cloud::db::api::ResultCode;
+using nx::vms::api::UserData;
+using nx::vms::api::UserDataList;
 
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
     m_defaultOwnerCredentials({ "admin", "admin" })
 {
+    m_mediaServerLauncher.addSetting("delayBeforeSettingMasterFlag", "100ms");
+    m_mediaServerLauncher.addSetting("p2pMode", GetParam().p2pMode);
 }
 
 MediaServerCloudIntegrationTest::~MediaServerCloudIntegrationTest()
@@ -32,9 +36,7 @@ bool MediaServerCloudIntegrationTest::startCloudDB()
 
 bool MediaServerCloudIntegrationTest::startMediaServer()
 {
-    m_mediaServerLauncher.addSetting(nx_ms_conf::CDB_ENDPOINT, m_cdb.endpoint().toString());
-    m_mediaServerLauncher.addSetting(nx_ms_conf::DELAY_BEFORE_SETTING_MASTER_FLAG, "100ms");
-    m_mediaServerLauncher.addSetting(nx_ms_conf::P2P_MODE_FLAG, GetParam().p2pMode);
+    m_mediaServerLauncher.addSetting("cdbEndpoint", m_cdb.endpoint().toString());
 
     if (!m_mediaServerLauncher.start())
         return false;
@@ -47,8 +49,7 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
 
 bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 {
-    if (m_cdb.addActivatedAccount(&m_ownerAccount, &m_ownerAccount.password) !=
-            api::ResultCode::ok)
+    if (m_cdb.addActivatedAccount(&m_ownerAccount, &m_ownerAccount.password) != ResultCode::ok)
     {
         return false;
     }
@@ -57,8 +58,8 @@ bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 
 bool MediaServerCloudIntegrationTest::registerCloudSystem()
 {
-    if (m_cdb.bindRandomSystem(m_ownerAccount.email, m_ownerAccount.password, &m_cloudSystem) !=
-            api::ResultCode::ok)
+    if (m_cdb.bindRandomSystem(m_ownerAccount.email, m_ownerAccount.password, &m_cloudSystem)
+        != ResultCode::ok)
     {
         return false;
     }
@@ -68,7 +69,7 @@ bool MediaServerCloudIntegrationTest::registerCloudSystem()
             m_ownerAccount.password,
             m_cloudSystem.id,
             m_ownerAccount.email,
-            &m_systemOwnerInfo) != nx::cdb::api::ResultCode::ok)
+            &m_systemOwnerInfo) != ResultCode::ok)
     {
         return false;
     }
@@ -94,7 +95,7 @@ nx::network::SocketAddress MediaServerCloudIntegrationTest::mediaServerEndpoint(
     return m_mediaServerLauncher.endpoint();
 }
 
-nx::cdb::CdbLauncher* MediaServerCloudIntegrationTest::cdb()
+nx::cloud::db::CdbLauncher* MediaServerCloudIntegrationTest::cdb()
 {
     return &m_cdb;
 }
@@ -169,13 +170,13 @@ void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
 {
     const auto newPassword = nx::utils::generateRandomName(7).toStdString();
 
-    api::AccountUpdateData update;
+    nx::cloud::db::api::AccountUpdateData update;
     update.passwordHa1 = nx::network::http::calcHa1(
         m_ownerAccount.email.c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
         newPassword.c_str()).constData();
     ASSERT_EQ(
-        nx::cdb::api::ResultCode::ok,
+        ResultCode::ok,
         cdb()->updateAccount(m_ownerAccount.email, m_ownerAccount.password, update));
 
     m_ownerAccount.password = newPassword;
@@ -196,17 +197,17 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
         m_ownerAccount,
         m_cloudSystem,
         newAccount.email,
-        nx::cdb::api::SystemAccessRole::viewer);
+        nx::cloud::db::api::SystemAccessRole::viewer);
 
     auto mediaServerClient = prepareMediaServerClient();
 
     for (;;)
     {
-        ::ec2::ApiUserDataList users;
+        UserDataList users;
         ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         const auto userIter = std::find_if(
             users.begin(), users.end(),
-            [&newAccount](const ::ec2::ApiUserData& elem)
+            [&newAccount](const UserData& elem)
             {
                 return elem.name.toStdString() == newAccount.email;
             });
@@ -216,11 +217,11 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     }
 }
 
-::ec2::ApiUserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
+UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
 {
     const auto userEmail =
-        nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
-    ::ec2::ApiUserData userData;
+        nx::cloud::db::test::BusinessDataGenerator::generateRandomEmailAddress();
+    UserData userData;
     userData.id = guidFromArbitraryData(userEmail);
     userData.typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
     userData.isCloud = true;
@@ -229,9 +230,9 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     userData.name = QString::fromStdString(userEmail);
     //userData.userRoleId = QnUuid::createUuid();
     userData.realm = nx::network::AppInfo::realm();
-    userData.hash = "password_is_in_cloud";
-    userData.digest = "password_is_in_cloud";
-    userData.permissions = Qn::GlobalLiveViewerPermissionSet;
+    userData.hash = UserData::kCloudPasswordStub;
+    userData.digest = UserData::kCloudPasswordStub;
+    userData.permissions = GlobalPermission::liveViewerPermissions;
 
     auto mediaServerClient = prepareMediaServerClient();
     NX_GTEST_ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(userData));
@@ -241,7 +242,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
 
 void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::string& email)
 {
-    using namespace nx::cdb::api;
+    using namespace nx::cloud::db::api;
 
     for (;;)
     {
@@ -256,6 +257,19 @@ void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::stri
             break;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+}
+
+std::unique_ptr<QnStaticCommonModule> MediaServerCloudIntegrationTest::s_staticCommonModule;
+
+void MediaServerCloudIntegrationTest::SetUpTestCase()
+{
+    s_staticCommonModule =
+        std::make_unique<QnStaticCommonModule>(nx::vms::api::PeerType::server);
+}
+
+void MediaServerCloudIntegrationTest::TearDownTestCase()
+{
+    s_staticCommonModule.reset();
 }
 
 void MediaServerCloudIntegrationTest::SetUp()

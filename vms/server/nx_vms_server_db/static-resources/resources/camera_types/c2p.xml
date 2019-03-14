@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <oem name = "C2P">
+    	<resource name="C2pCamera" id="87f48b19-7f55-4b7e-99e7-e0ad6419fb09" type="Camera"/>
+    </oem>
+</resources>

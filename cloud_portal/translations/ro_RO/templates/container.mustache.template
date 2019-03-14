@@ -62,18 +62,18 @@
                             </td>
                             <td class="left-border right-border">
                                 <b>Website</b><br>
-                                <a href="{{companyUrl}}">{{companyUrl}}</a>
+                                <a href="%COMPANY_LINK%">%COMPANY_LINK%</a>
                             </td>
                         {{/system}}
                         {{^system}}
                             <td class="right-border">
                                 <b>Website</b><br>
-                                <a href="{{companyUrl}}">{{companyUrl}}</a>
+                                <a href="%COMPANY_LINK%">%COMPANY_LINK%</a>
                             </td>
                         {{/system}}
                         <td class="left-border">
                             <b>Support</b><br>
-                            <a href="{{supportLink}}">{{supportLinkText}}</a>
+                            <a href="%SUPPORT_LINK%">%SUPPORT_LINK_TEXT%</a>
                         </td>
                     </tr>
                     </tbody>

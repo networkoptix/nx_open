@@ -1,48 +1,53 @@
-<div class="container" >
+<div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
-            Your account is successfully activated
+        <h1 class="process-success" ng-if="activate.success && !loading">
+            החשבון שלך נשמר בהצלחה
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
-            <a class="btn btn-default" href="/login">Log In</a>
+        <h1 class="process-success" ng-if="activate.success && !loading">
+            <a class="btn btn-default" href="/login">התחבר</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             החשבון כבר הופעל או שקוד האישור שגוי
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Your account is successfully activated
+            החשבון שלך נשמר בהצלחה
         </h1>
         <h1 class="process-success">
-            <a class="btn btn-default" href="/login">Log In</a>
+            <a class="btn btn-default" href="/login">התחבר</a>
         </h1>
     </div>
-    
+
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in {{PRODUCT_NAME}}</h1>
+            <h1>נרשמת ב- %PRODUCT_NAME%</h1>
             <p>שלחנו לך מייל עם קישור הפעלה אל {{data.email}} <br> אנא הפעל את חשבונך על ידי לחיצה על קישור זה.</p>
         </div>
         <h1 ng-if="!data.email">הפעל את חשבונך</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">דוא"ל</label>
+                <div class="col-md-4 justify-content-start justify-content-md-end">
+                    <label for="emailReactivate" class="control-label">דוא"ל</label>
+                </div>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"  validate-email
+                    <input type="email" class="form-control"
+                           validate-email
  ng-model="data.email"
                            id="emailReactivate"
                            name="email" maxlength="255"
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> נדרש דוא"ל </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> אנא הכנס כתובת דוא"ל חוקית </span>
+                    <span class="help-block input-error"
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> נדרש דוא"ל </span> <span class="help-block input-error"
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> אנא הכנס כתובת דוא"ל חוקית </span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-8">
+                <div class="offset-sm-2 col-sm-10" ng-class="{ 'offset-sm-4 col-sm-8' : data.email}" >
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
@@ -61,20 +66,24 @@
         <h1>איפוס סיסמה</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">דוא"ל</label>
+                <div class="col-md-4 justify-content-start justify-content-md-end">
+                    <label for="email" class="col-sm-4 control-label">דוא"ל</label>
+                </div>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"  validate-email
+                    <input type="email" class="form-control" validate-email
  ng-model="data.email"
                            id="email"
                            name="email" maxlength="255"
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> נדרש דוא"ל </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> אנא הכנס כתובת דוא"ל חוקית </span>
+                    <span class="help-block input-error"
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> נדרש דוא"ל </span> <span class="help-block input-error"
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> אנא הכנס כתובת דוא"ל חוקית </span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="offset-sm-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
                                     button-text="$root.L.activeActions.resetPassword"></process-button>
@@ -83,19 +92,25 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess">
-            Password successfully saved
+        <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
+            הסיסמה נשמרה בהצלחה
         </h1>
-        <h1 class="process-success" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login">Log In</a>
-        </h1>
+        <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login" translate>התחבר</a>
+        </div>
 
-        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1> הגדר סיסמה חדשה </h1>
-            <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
+        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"
+              novalidate>
+            <h1 translate>הגדר סיסמה חדשה</h1>
+
+            <password-input ng-model="data.newPassword"
+                            id="'newPassword'"
+                            form="restorePasswordWithCode"
+                            label="$root.L.activeActions.setNewPasswordLabel">
+            </password-input>
 
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="offset-sm-4 col-sm-8">
                     <process-button process="change"
                                     form="restorePasswordWithCode"
                                     button-text="$root.L.activeActions.setNewPassword"></process-button>

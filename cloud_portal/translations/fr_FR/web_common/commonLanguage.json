@@ -15,13 +15,13 @@
     "unauthorized": "Authentification requise",
     "noData": "Aucune donnée",
     "iosVideoTooLarge": "iOS ne supporte pas une vidéo supérieure à fullHD (2MP : 1920 x 1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "S.V.P.<a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> pour la lecture vidéo.",
     "flashOrWebmRequired": "S.V.P. <a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> ou le <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> codec WebM</a> pour la lecture vidéo dans Internet Explorer.",
     "noArmSupport": "Ce navigateur ou ce périphérique ne supporte pas la lecture vidéo à partir de serveurs basés sur ARM.",
     "noFormat": "Ce navigateur ne supporte pas la lecture vidéo de cette caméra.",
     "ieNoWebm": "Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
     "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
-    "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium."
+    "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P. utilisez un navigateur Chromium."
   },
   "searchCamPlaceholder": "Recherche",
   "resolution": {
@@ -29,19 +29,19 @@
     "high": "Élevée",
     "low": "Basse"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast consommer beaucoup de ressources et peut provoquer des problèmes avec votre serveur.",
   "voiceCommands": {
     "play": "lecture",
     "pause": "pause",
     "live": "go to live | show me live",
-    "view": "view + [camera name]",
+    "view": "vue + [nom de la caméra]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "effacer la recherche",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "développer tous les serveurs",
+    "collapse all servers": "réduire tous les serveurs",
+    "stop listening": "arrêter l’écoute",
     "help": "help | show commands"
   }
 }

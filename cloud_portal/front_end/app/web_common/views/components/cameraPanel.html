@@ -1,0 +1,56 @@
+<div class="cameras-panel" ng-if="showCameraPanel">
+    <div class="cameras-search" ng-class="{active:panel.filter!=''}">
+        <input type="search"
+               placeholder="{{inputPlaceholder}}"
+               ng-class="{active:panel.filter!=''}"
+               ng-model="panel.filter"
+               ng-model-options="{ updateOn: 'default', debounce: 0 }">
+
+        <div class="icon-left" ><span class="glyphicon glyphicon-search"></span></div>
+        <div class="icons-right" ng-class="{'active':toggleInfo}">
+            <div ng-hide="!panel.filter || panel.filter==''" class="clear-button" ng-click="panel.filter=''" >
+                <span class="glyphicon glyphicon-remove"></span>
+            </div>
+            <div class="clear-divider" ng-hide="!panel.filter || panel.filter==''"></div>
+            <div class="info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfoFn()">
+                <span ng-class="{'active':toggleInfo}" class="glyphicon glyphicon-info-sign"></span>
+            </div>
+        </div>
+    </div>
+    <ul class="tree nav" >
+        <li ng-repeat="server in mediaServers track by server.id" ng-if="server.visible">
+            <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
+               title="{{server.url}}"
+               ng-click="toggleServerCollapsed(server)"
+               class="server-link collapse-group d-flex justify-content-between"
+               ng-class="{offline:server.status!='Online'}">
+                <div class="hide-excess-text d-flex align-items-center">
+                    <div ng-if="server.active"
+                         class="glyphicon glyphicon-server-active" ></div>
+                    <div ng-if="server.status == 'Online' && !server.active"
+                         class="glyphicon glyphicon-server-online" ></div>
+                    <div ng-if="server.status != 'Online' && !server.active"
+                         class="glyphicon glyphicon-server-offline" ></div>
+                    <div class="server-name">{{server.name}}</div><div class="ip-info" ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</div>
+                </div>
+                <div >
+                    <span>
+                        <icon for="!server.expanded && cameras[server.id].length>0" on-true="chevron-down" title-true="expand" ></icon>
+                        <icon for="server.expanded && cameras[server.id].length>0" on-true="chevron-up" title-true="collapse" ></icon>
+                    </span>
+                </div>
+            </a>
+
+            <div class="collapse-box">
+                <ul class="nav" nx-collapsible="server.expanded"
+                    ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy, closing:server.expanded}" >
+                    <li ng-repeat="camera in cameras[server.id]"
+                        ng-class="{active:activeCamera.id == camera.id}"
+                        ng-if="camera.visible"
+                        ng-include="Config.viewsDirCommon + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')">
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>

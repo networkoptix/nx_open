@@ -1,17 +1,20 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>您的系统</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">您的系统</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">重命名系统</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">重命名系统</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">断开与 <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">与其他系统合并</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">断开 
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>所有者</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -25,5 +28,32 @@
             <button class="btn btn-default" ng-click="rename()">重命名系统</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">断开连接从我的账户</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            正被合并到此系统中</div>
+        <hr />
+        <div class="merge-info-text">根据录影资料的大小，可能会花费数小时</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>这个系统正被合并到
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>根据录影资料的大小，可能会花费数小时</p>
+            <p>在合并完成前，您可以登录到此系统并观看视频，但无法更改任何配置</p>
+            <p>合并完成后, 此系统中的所有用户和摄像机都将可用于
+                <span class="merge-system-name">{{mergeTargetSystem.name}}</span>, 而且此系统将被删除</p>
+        </div>
     </div>
 </div>

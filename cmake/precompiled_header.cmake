@@ -1,3 +1,6 @@
+option(enablePrecompiledHeaders "Enable precompiled headers support" ON)
+mark_as_advanced(enablePrecompiledHeaders)
+
 function(_generate_pch_parameters target parameters_file)
     set(flags
         "$<TARGET_PROPERTY:${target},COMPILE_OPTIONS>"
@@ -16,6 +19,10 @@ function(_generate_pch_parameters target parameters_file)
 
     if(CMAKE_CXX_COMPILER_TARGET)
         list(INSERT flags 0 ${CMAKE_CXX_COMPILE_OPTIONS_TARGET}${CMAKE_CXX_COMPILER_TARGET})
+    endif()
+
+    if(MACOSX AND CMAKE_OSX_SYSROOT MATCHES "^/.+$")
+        list(APPEND flags "-isysroot ${CMAKE_OSX_SYSROOT}")
     endif()
 
     set(flags "$<$<BOOL:${flags}>:$<JOIN:${flags},\n>\n>")
@@ -138,7 +145,7 @@ function(_add_gcc_clang_precompiled_header target input)
         if(NOT flags)
             set(flags)
         endif()
-        list(APPEND flags ${pch_flags})
+        string(APPEND flags " ${pch_flags}")
 
         get_source_file_property(depends "${source}" OBJECT_DEPENDS)
         if(NOT depends)
@@ -154,6 +161,10 @@ function(_add_gcc_clang_precompiled_header target input)
 endfunction()
 
 function(add_precompiled_header target input)
+    if(NOT enablePrecompiledHeaders)
+        return()
+    endif()
+
     if(MSVC)
         _add_msvc_precompiled_header(${target} ${input})
     elseif(XCODE)

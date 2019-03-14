@@ -1,0 +1,68 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+h1, h2 {
+    margin-top    : $line-height-computed;
+    margin-bottom : $line-height-computed;
+    padding       : 0;
+    font-size     : $h1-font-size;
+    display       : flex;
+    align-items   : center;
+    font-family   : $font-family-light;
+    color         : $dark9;
+}
+
+h2 {
+    margin      : 0;
+    padding     : 0;
+    font-size   : $h2-font-size;
+    font-family : $font-family-light;
+    color       : $dark9;
+}
+
+h3 {
+    margin-top    : ($line-height-computed / 2);
+    margin-bottom : ($line-height-computed / 4);
+    font-size     : $h3-font-size;
+    font-family   : $font-family-regular;
+    color         : $dark9;
+}
+
+h4 {
+    font-size   : $h4-font-size;
+    font-family : $font-family-medium;
+    color       : $dark9;
+}
+
+h5 {
+    font-size   : $h5-font-size;
+    font-family : $font-family-medium;
+    color       : $dark9;
+}
+
+h6 {
+    font-size   : $h6-font-size;
+    font-family : $font-family-medium;
+    color       : $dark9;
+}
+
+.h7 {
+    @extend h6;
+    font-family : $font-family-regular;
+}
+
+h1 > .label {
+    font-size      : 60%;
+    vertical-align : 33%;
+}
+
+.regular14 {
+    @extend h5;
+    font-family : $font-family-regular;
+}
+
+p {
+    margin-bottom : 0.5rem;
+}
+

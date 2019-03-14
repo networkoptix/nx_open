@@ -1,8 +1,8 @@
-Xin chào,
+Xin chào {{message.userFullName}},
 
   Vui lòng truy cập nút bên dưới để xác nhận địa chỉ Email của bạn và kích hoạt tài khoản.
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Nếu bạn không đăng ký ở {{PRODUCT_NAME}}, Hãy bỏ qua email này.
+Nếu bạn không đăng ký ở %PRODUCT_NAME%, Hãy bỏ qua email này.
 Không chia sẻ thông điệp hoặc liên kết với bất cứ ai.

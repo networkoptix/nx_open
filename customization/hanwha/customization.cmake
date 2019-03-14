@@ -1,4 +1,5 @@
 set(defaultSkin "gray_orange")
+set(build_paxton ON)
 set(enable_hanwha true)
 
 # Components Namings
@@ -22,8 +23,6 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
 set(supportUrl "http://wavevms.com/support")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "http://wavevms.com/support")
 
 set(installer.name "wave")
@@ -36,7 +35,6 @@ set(android.keypass "S6rtgPMk")
 # Custom Installer (if needed). If not leave "default"
 set(customization.upgradeCode "{9FC2D14A-A8AA-42E9-A134-F1A3694FAF42}")
 set(customization.clientUpgradeCode "{1CD8F2DD-60B9-4E3E-BDC1-B698C507F1D7}")
-set(customization.serverUpgradeCode "{7A6B77AA-E139-4F23-B8FD-2379E9A69E87}")
 
 set(customization.clientBundleUpgradeCode "{3C05AA84-9E80-418D-9558-0BA6729AB6EA}")
 set(customization.serverBundleUpgradeCode "{110DF587-DBCE-4CEF-ABBF-2C502A4A3723}")
@@ -44,24 +42,17 @@ set(customization.fullBundleUpgradeCode "{E20892D8-1438-478E-94EF-A23380B96A01}"
 
 set(deb.customization.company.name "hanwha")
 
-#set(paxton.className "WisenetWAVE")
-#set(paxton.classId "{4D3237DE-5DB0-4D2A-B41D-0FE6B8F72CC3}")
-#set(paxton.interfaceId "{531B6B85-2121-4838-A20F-659A0B741865}")
-#set(paxton.eventsId "{1652D204-F9C7-4804-A461-5B7B2871F104}")
-#set(paxton.typeLibId "{67662F25-B028-4D35-9334-1CBFAA63CE7B}")
-#set(paxton.appId "{827595F8-E97C-421F-9D8D-9B9ED2135DE4}")
-#set(paxton.upgradeCode "{2BEF566D-CB71-44F5-8A77-CEB10C5DA9FA}")
-#set(paxton.bundleUpgradeCode "13FC4A9F-DBBD-4CAF-B139-93894AE82F74")
+set(paxtonLibraryName "Hanwha.WisenetWAVE")
+set(paxtonProductId "{6248adba-4a8d-4899-98f6-334757f19926}")
+set(paxtonProductUpgradeCode "{2BEF566D-CB71-44F5-8A77-CEB10C5DA9FA}")
+set(paxtonBundleUpgradeCode "13FC4A9F-DBBD-4CAF-B139-93894AE82F74")
 
 set(ios.new_bundle_identifier "com.hanwhasecurity.wisenetwave")
 set(ios.group_identifier "group.com.hanwhasecurity.wisenetwave")
 set(ios.sign.identity "iPhone Distribution: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(ios.old_app_appstore_id "")
 
-set(mac.skip.sign "false")
 set(mac.sign.identity "Developer ID Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(mac.bundle.identifier "com.hanwhasecurity.wisenetwave2")
 set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler")
 
@@ -69,28 +60,3 @@ set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler"
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0028")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

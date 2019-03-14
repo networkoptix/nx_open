@@ -1,44 +1,75 @@
-# Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 cmake_minimum_required(VERSION 3.3.2)
+
+# Needed for proper RPATH in MacOS.
+if(POLICY CMP0068)
+    cmake_policy(SET CMP0068 NEW)
+endif()
+
 project(nx_kit_test)
 
 set(CMAKE_CXX_STANDARD 11)
-
-include_directories(src)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-    -Wall \
-    -pedantic \
-")
+set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
-set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
-include(nx_kit.cmake)
-
-# Test for ini_config disabled via -DNX_INI_CONFIG_DISABLED.
-add_library(disabled_ini_config_ut SHARED
+set (nx_kit_files
+    src/nx/kit/utils.h
+    src/nx/kit/utils.cpp
+    src/nx/kit/debug.h
+    src/nx/kit/debug.cpp
+    src/nx/kit/ini_config.h
     src/nx/kit/ini_config.cpp
+    src/nx/kit/output_redirector.h
+    src/nx/kit/output_redirector.cpp
+    src/nx/kit/test.h
     src/nx/kit/test.cpp
-    unit_tests/ini_config_ut.cpp
-    unit_tests/disabled_ini_config_ut.cpp
-)
-target_compile_definitions(disabled_ini_config_ut
-    PRIVATE NX_INI_CONFIG_DISABLED
-    PRIVATE DISABLED_INI_CONFIG_UT_API=${NX_KIT_API_EXPORT_MACRO}
-    INTERFACE DISABLED_INI_CONFIG_UT_API=${NX_KIT_API_IMPORT_MACRO}
-    PRIVATE NX_KIT_API= #< nx_kit sources are statically linked into lib disabled_ini_config_ut.
+    src/ini_config_c.h
+    src/ini_config_c_impl.h)
+
+if (APPLE)
+    set (nx_kit_files ${nx_kit_files}
+        src/nx/kit/apple_utils.h
+        src/nx/kit/apple_utils.mm)
+endif()
+
+add_library(nx_kit ${nxKitLibraryType} ${nx_kit_files})
+
+if (APPLE)
+    find_library(Foundation_LIBRARY Foundation REQIRED)
+    target_link_libraries(nx_kit ${Foundation_LIBRARY})
+endif()
+
+target_include_directories(nx_kit PUBLIC src)
+
+set(NX_KIT_API_IMPORT_MACRO "")
+set(NX_KIT_API_EXPORT_MACRO "")
+if(WIN32)
+    if (nxKitLibraryType STREQUAL "SHARED")
+        set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
+        set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    endif()
+else()
+    set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+endif()
+
+target_compile_definitions(nx_kit
+    PRIVATE NX_KIT_API=${NX_KIT_API_EXPORT_MACRO}
+    INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
 
-# Executable for all tests.
-add_executable(nx_kit_ut
-    unit_tests/ini_config_ut.cpp
-    unit_tests/debug_ut.cpp
-    unit_tests/ini.cpp
-    unit_tests/ini_config_c_ut.c
-    unit_tests/main.cpp
-)
-target_link_libraries(nx_kit_ut
-    nx_kit
-    disabled_ini_config_ut
-)
+# Set the maximum warning level.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wall -Wextra -Werror)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(/W4 /WX)
+endif()
+
+
+set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
+if(nxKitWithTests)
+    enable_testing()
+    add_subdirectory(unit_tests)
+endif()

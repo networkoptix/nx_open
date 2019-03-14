@@ -1,0 +1,79 @@
+<form #embedForm="ngForm" name="embedForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title" translate>Embed</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="activeModal.close()" *ngIf="closable">
+            <div class="close-content"><span class="close-icon"></span></div>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <p class="warning-label" translate>
+            The credentials of this user will be exposed! You must create a custom "Public User" role with access only
+            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This
+            "Public User" should not have system-wide access of any kind.
+        </p>
+
+        <p translate>Enter "Public User" credentials:</p>
+
+        <div class="form-group">
+            <label for="login_email" translate>Email</label>
+            <input type="email" class="form-control"
+                   id="login_email" name="login_email" #login_email="ngModel"
+                   [(ngModel)]="auth.email"
+                   [ngModelOptions]="{ updateOn: 'blur'}"
+                   pattern="{{ config.emailRegex }}" maxlength="255"
+                   required nxFocusMe>
+        </div>
+        <div class="form-group">
+            <label for="login_password" translate>Password</label>
+            <input type="password" class="form-control"
+                   name="login_password" id="login_password" #login_password="ngModel"
+                   [(ngModel)]="auth.password"
+                   [ngModelOptions]="{ updateOn: 'blur'}"
+                   maxlength="255"
+                   required>
+        </div>
+
+        <p translate>Choose which properties should be visible to customers:</p>
+
+        <div class="form-group">
+            <nx-checkbox
+                    name="nocameras"
+                    componentId="nocameras"
+                    [(ngModel)]="params.nocameras">
+            </nx-checkbox>
+            <label for="nocameras" translate>Cameras menu</label>
+
+            <br/>
+            <nx-checkbox
+                    name="noheader"
+                    componentId="noheader"
+                    [(ngModel)]="params.noheader">
+            </nx-checkbox>
+            <label for="noheader" translate>Camera header</label>
+
+            <br/>
+            <nx-checkbox
+                    name="nocontrols"
+                    componentId="nocontrols"
+                    [(ngModel)]="params.nocontrols">
+            </nx-checkbox>
+            <label for="nocontrols" translate>Camera controls</label>
+        </div>
+
+        <div class="clipboard-block">
+            <div class="clipboard-block--info">
+                <span class="form-control-static" [innerText]="embedUrl"></span>
+            </div>
+            <div>
+                <button class="btn btn-default" ngxClipboard [cbContent]="embedUrl">Copy</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <button type="button" class="btn btn-default" (click)="close()" translate>Close</button>
+    </div>
+</form>

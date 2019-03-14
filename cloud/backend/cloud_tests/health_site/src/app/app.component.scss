@@ -1,0 +1,73 @@
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+
+$preloader_circle_color : $gray-500;
+$preloader_circle_size : 16px;
+$preloader_circle_distance : 12px;
+
+$preloader_small_circle_size : 10px;
+$preloader_small_circle_distance : 8px;
+
+@mixin preloader($circle_color, $circle_size, $circle_distance) {
+    & {
+        width : ($preloader_circle_size + $preloader_circle_distance) *3;
+    }
+
+    .circleG {
+        background-color                  : transparentize($circle_color, 1);
+        float                             : left;
+        height                            : $circle_size;
+        width                             : $circle_size;
+        border-radius                     : $circle_size/2;
+        margin                            : 0 $circle_distance/2;
+        -webkit-transform                 : translate3d(0, 0, 0);
+        -webkit-animation-name            : bounce_circleG;
+        animation-name                    : bounce_circleG;
+        -webkit-animation-duration        : 1.4s;
+        animation-duration                : 1.4s;
+        -webkit-animation-iteration-count : infinite;
+        animation-iteration-count         : infinite;
+        -webkit-animation-direction       : normal;
+        animation-direction               : normal;
+    }
+
+    .circleG_2 {
+        -webkit-animation-delay : 0.15s;
+        animation-delay         : 0.15s;
+    }
+
+    .circleG_3 {
+        -webkit-animation-delay : 0.3s;
+        animation-delay         : 0.3s;
+    }
+
+    @-webkit-keyframes bounce_circleG {
+        0% {
+        }
+        40% {
+            background-color : $circle_color;
+        }
+        80% {
+            background-color : transparentize($circle_color, 1);
+        }
+        100% {
+        }
+    }
+
+    @keyframes bounce_circleG {
+        0% {
+        }
+        40% {
+            background-color : $circle_color;
+        }
+        80% {
+            background-color : transparentize($circle_color, 1);
+        }
+        100% {
+        }
+    }
+}
+
+.preloader {
+    @include preloader($preloader_circle_color, $preloader_circle_size, $preloader_circle_distance);
+}

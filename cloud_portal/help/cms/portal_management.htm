@@ -1,0 +1,179 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+   <title>Portal Management Dashboard</title>
+   <meta name="generator" content="Help & Manual">
+   <meta name="keywords" content="">
+   <meta name="description" content="Portal Management Dashboard">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="custom.css" rel="stylesheet">
+   <script type="text/javascript" src="nsh.js"></script>
+
+<script type="text/javascript">   
+// Toggle Toggler 
+
+var toggleCount=false;
+var switchState;
+
+function toggleToggles() {
+
+    if (!toggleCount) {
+     toggleCount = true;
+     HMToggleExpandAll(true);
+     switchState = true;
+     }
+   
+     else if (switchState) {
+        HMToggleExpandAll(false);
+        switchState = false;
+        }
+        
+     else  {
+        HMToggleExpandAll(true);
+        switchState = true;
+        } 
+    }
+</script>
+   
+<!-- non-scrolling headers for CHM and browser-based help, local styles-->
+<style type="text/css" media="screen"> 
+html, body {    
+      margin:0; 
+      padding:0; 
+      overflow: hidden; 
+      background: #FFFFFF; 
+   }
+ 
+div#printheader { 
+   display: none;
+   }
+   #idheader { 
+      width:100%; 
+      height:auto; 
+      padding: 0; 
+      margin: 0; 
+} 
+    #idheaderbg  {
+    background: #6F6F6F; 
+}
+   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+   #callout-table a {text-decoration: none; color: blue;}
+   #callout-table a:visited {text-decoration: none; color: blue;}
+   #overview-table a {text-decoration: none; color: black;}
+   #overview-table a:visited {text-decoration: none; color: black;}
+   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
+   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+   </style>
+<!--[if lt IE 7]>
+<style type="text/css">
+  #idcontent {padding: 0px;} 
+  #innerdiv {padding: 10px 5px 5px 10px ;} 
+</style> 
+<![endif]-->
+   <noscript>
+   <style type="text/css">
+   html, body { overflow: auto; }
+   </style> 
+   </noscript>
+<style type="text/css" media="print">
+span.f_Heading1 { color: black; }
+#idheader, #printheader img { display:none; }
+#printheader { display: block; margin-top: 20px; }
+#idcontent { margin-top: 10px; }
+</style>   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "portal_management.htm");
+   </script>
+</head>
+<body>
+<!--ZOOMSTOP-->
+
+<div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Portal Management Dashboard</span></h1>
+</div>
+<div id="idheader">
+<div id="idheaderbg">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" 
+       style="margin: 0px; background: url(header_bg.jpg);">
+
+  <tr valign="bottom">
+    <td align="left" valign="bottom" class="topichead">
+   <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
+   &raquo;No topics above this level&laquo;
+   </p>
+   <h1 class="p_Heading1"><span class="f_Heading1">Portal Management Dashboard</span></h1>
+
+    </td>
+    <td align="right" width="120" valign="middle" class="topichead" id="idnav">
+    
+     <a href="logging_in_to_cms.htm"
+        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
+        onmouseout="document.images.prev.src='btn_prev_n.gif'"
+        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        ></a><a href="cms_overview.htm"
+        onmouseover="document.images.main.src='btn_home_h.gif'" 
+        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        ></a><a href="content_management.htm"
+        onmouseover="document.images.next.src='btn_next_h.gif'" 
+        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        ></a>
+    </td>
+  </tr>
+  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+</table>
+</div>
+
+<!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
+  
+
+</div>  
+
+
+
+<div id="idcontent"><div id="innerdiv"> 
+<!--ZOOMRESTART-->
+<p class="p_BodyText"><span class="f_BodyText">The Portal Management link opens to the </span><span class="f_BodyText" style="font-style: italic;">Cloud Administration</span><span class="f_BodyText"> dashboard.  </span></p>
+<p class="p_BodyText"><img src="hmfile_hash_bb35c7e4.jpg" width="850" height="430" alt="Portal Management Dashboard - 1" style="width:850px;height:430px;border:none" /></p>
+<p class="p_BodyText"><span class="f_BodyText">There are three tabs on the </span><span class="f_BodyText" style="font-style: italic;">Cloud Administration</span><span class="f_BodyText"> page:</span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent" style="font-weight: bold;">Dashboard</span><span class="f_BodyTextIndent"> – provides links to editing and user applications. </span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent" style="font-weight: bold;">Bookmarks</span><span class="f_BodyTextIndent"> – (Currently disabled.)</span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent" style="font-weight: bold;">Applications</span><span class="f_BodyTextIndent"> – provides alternate links to Dashboard applications.</span></p>
+<p class="p_BodyText"><span class="f_BodyText">There are two links in the header:</span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent" style="font-weight: bold;">View Site </span><span class="f_BodyTextFirstIndent2"> – click</span><span class="f_BodyTextIndent"> to open the current published Cloud Portal.</span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent" style="font-weight: bold;">Log Out</span><span class="f_BodyTextIndent"> </span><span class="f_BodyTextFirstIndent2"> – click </span><span class="f_BodyTextIndent">to exit CMS. </span></p>
+<p class="p_BodyText"><span class="f_BodyText">There is also a </span><span class="f_BodyText" style="font-weight: bold;">Contact us</span><span class="f_BodyText"> link that opens the Network Optix support page in a new browser tab, where you can submit a request for information or technical support.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="text-decoration: underline;">In the Dashboard</span></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Content Managers</span><span class="f_BodyTextIndent"> have access to the </span><span class="f_BodyTextIndent" style="font-weight: bold;">Content Management</span><span class="f_BodyTextIndent"> application, which includes:</span></td></tr></table></div><p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2" style="font-weight: bold;"><a href="editing_pages.htm" class="topiclink">Pages</a></span><span class="f_BodyTextFirstIndent2"> – lets you edit, preview and submit pages for approval.</span></p>
+<p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2" style="font-weight: bold;"><a href="reviewing_revisions.htm" class="topiclink">Revisions</a></span><span class="f_BodyTextFirstIndent2"> – a log of exactly what content changed, and when and by whom updates were approved.</span></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Portal Managers</span><span class="f_BodyTextIndent"> have access to the Content Management application – plus the additional authority to review and publish revisions, and also to the </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Cloud Users</span><span class="f_BodyTextFirstIndent2"> application, which includes:</span></td></tr></table></div><p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2" style="font-weight: bold;"><a href="accounts.htm" class="topiclink">Accounts</a></span><span class="f_BodyTextFirstIndent2"> – a list of all Cloud account users that can be sorted, searched, and exported.</span></p>
+<p class="p_BodyText"><span class="f_BodyText">&nbsp;</span></p>
+
+<!--ZOOMSTOP-->
+</div></div>
+<script type="text/javascript">
+
+var lastSlashPos = document.URL.lastIndexOf("/") > document.URL.lastIndexOf("\\") ? document.URL.lastIndexOf("/") : document.URL.lastIndexOf("\\");
+if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != "~hh" )
+{
+ if (document.all) setTimeout(function() {nsrInit();},20); 
+    else nsrInit();
+ } 
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

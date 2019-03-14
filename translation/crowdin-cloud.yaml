@@ -8,12 +8,16 @@ files:
     source: '/cloud_portal/front_end/app/language.json'
     translation: '/cloud_portal/translations/%locale_with_underscore%/language.json'
   -
+    source: '/cloud_portal/front_end/app/language_i18n.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/language_i18n.json'
+  -
     source: '/cloud_portal/front_end/app/views/**/*.*'
     translation: '/cloud_portal/translations/%locale_with_underscore%/views/**/%original_file_name%'
     ignore:
       - /cloud_portal/front_end/app/views/debug.html
       - /cloud_portal/front_end/app/views/view.html
       - /cloud_portal/front_end/app/views/static/eula.html
+      - /cloud_portal/front_end/app/views/components/downloadRelease.html
   -
     source: '/cloud_portal/cloud/notifications/static/templates/*.json'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
@@ -33,6 +37,7 @@ files:
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/cloud_portal/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+
   -
     source: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template'
     dest: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template.html'
@@ -48,8 +53,14 @@ files:
       - /webadmin/app/views/debug.html
       - /webadmin/app/views/viewdebug.html
   -
+    source: '/webadmin/app/web_common/views/components/*.*'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/%original_file_name%'
+  -
     source: '/webadmin/app/web_common/commonLanguage.json'
     translation: '/webadmin/translations/%locale_with_underscore%/web_common/commonLanguage.json'
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+  -
+    source: '/cloud_portal/robot_tests/variables_language.json'
+    translation: '/cloud_portal/robot_tests/translations/variables_language_%locale_with_underscore%.json'

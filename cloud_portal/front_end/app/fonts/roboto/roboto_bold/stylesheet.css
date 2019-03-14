@@ -5,19 +5,6 @@
          url('Roboto-Bold-webfont.woff') format('woff'),
          url('Roboto-Bold-webfont.ttf') format('truetype'),
          url('Roboto-Bold-webfont.svg#robotobold') format('svg');
-    font-weight: normal;
+    font-weight: 700 !important;
     font-style: normal;
-
-}
-
-@font-face {
-    font-family: 'Roboto';
-    src: url('Roboto-Bold-webfont.eot');
-    src: url('Roboto-Bold-webfont.eot?#iefix') format('embedded-opentype'),
-    url('Roboto-Bold-webfont.woff') format('woff'),
-    url('Roboto-Bold-webfont.ttf') format('truetype'),
-    url('Roboto-Bold-webfont.svg#robotobold') format('svg');
-    font-weight: 900;
-    font-style: normal;
-
 }

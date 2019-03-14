@@ -1,4 +1,4 @@
-<h1>こんにちは、{{message.fullName}}</h1>
+<h1>こんにちは{{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a>がビデオマネージメントシステム "{{message.system_name}}"へのアクセスを共有しました</p>
@@ -8,4 +8,4 @@
 <p>ビデオマネジメントシステム "{{message.system_name}}"へのアクセスが許可されました</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">%PRODUCT_NAME% ポータル表示</a>

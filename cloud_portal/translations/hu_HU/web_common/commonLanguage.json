@@ -1,6 +1,6 @@
 {
   "cameraLinks": {
-    "highStream": "Nagy stream",
+    "highStream": "Elsődleges stream",
     "lowStream": "Másodlagos stream",
     "transcoding": "Transzkódolás",
     "unknown": "Ismeretlen",
@@ -15,7 +15,7 @@
     "unauthorized": "Hitelesítés szükséges",
     "noData": "Nincs adat",
     "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához.",
     "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
     "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
     "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
@@ -29,7 +29,7 @@
     "high": "Magas",
     "low": "Alacsony"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
   "voiceCommands": {
     "play": "letjátszás",
     "pause": "szünet",

@@ -1,15 +1,15 @@
-<h1>Hallo, {{message.fullName}}</h1>
+<h1>Hallo, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> hat sein System "{{message.system_name}}" mit Ihnen geteilt.
 
-Um es anzusehen und zu verwalten, erstellen Sie ein Konto auf <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. Verwenden Sie dazu Ihre aktuellte Email-Adresse und folgen Sie den weiteren Anweisungen.</p>
+Um es anzusehen und zu verwalten, erstellen Sie ein Konto auf <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>. Verwenden Sie dazu Ihre aktuellte Email-Adresse und folgen Sie den weiteren Anweisungen.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>Ihnen wurde Zugriff auf das Videoverwaltungssystem "{{message.system_name}}" gewährt.
 
-Um es anzusehen und zu verwalten, erstellen Sie ein Konto auf <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. Verwenden Sie dazu Ihre aktuellte Email-Adresse und folgen Sie den weiteren Anweisungen.</p>
+Um es anzusehen und zu verwalten, erstellen Sie ein Konto auf <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>. Verwenden Sie dazu Ihre aktuellte Email-Adresse und folgen Sie den weiteren Anweisungen.</p>
 {{/message.sharer_name}}
 
 <a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Konto erstellen</a>

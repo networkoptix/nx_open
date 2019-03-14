@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <?include app_info.wxi ?>
+
+    <Product
+        Name='$(var.productName)'
+        Manufacturer='$(var.manufacturer)'
+        Id='$(var.productId)'
+        UpgradeCode='$(var.productUpgradeCode)'
+        Language='1033'
+        Codepage='1252'
+        Version='$(var.productVersion)'>
+
+        <Package
+            Id='*'
+            Keywords='Installer'
+            Description="$(var.productName) Installer"
+            Manufacturer='$(var.manufacturer)'
+            InstallerVersion='405'
+            Languages='1033'
+            Compressed='yes'
+            InstallScope='perMachine'
+            SummaryCodepage='1252'/>
+
+        <Property Id="PAXTONDIR">
+            <RegistrySearch
+                Id="PaxtonDirSearch"
+                Root="HKLM"
+                Key="SOFTWARE\Paxton Access\Common"
+                Name="MainPath"
+                Type="directory"
+                Win64="no"/>
+        </Property>
+
+        <Condition Message="You need to have Paxton Net2 Access Control installed">
+            <![CDATA[ PAXTONDIR <> "" ]]>
+        </Condition>
+
+        <Media Id='1' Cabinet='data.cab' EmbedCab='yes'/>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- Paxton looks for drivers in the hardcoded default directory. -->
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="PaxtonAccessDir" Name="Paxton Access">
+                    <Directory Id="AccessControlDir" Name="Access Control">
+                        <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers">
+                            <Component Id="DriverLibrary">
+                                <File
+                                    Source="$(var.binariesDirectory)/$(var.libraryName).dll"
+                                    KeyPath="yes"/>
+                            </Component>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+
+        <Feature Id='Complete' Level='1'>
+            <ComponentRef Id='DriverLibrary'/>
+        </Feature>
+    </Product>
+</Wix>

@@ -1,0 +1,13 @@
+// A5 styles
+
+// Common
+@import 'src/styles/_typography';
+@import 'src/styles/_buttons';
+@import 'src/styles/_forms';
+@import 'src/styles/_inputs';
+@import 'src/styles/_labels';
+@import 'src/styles/_navs';
+
+// Components (common)
+@import './src/dialogs/dialogs';
+@import './src/components/dropdowns/dropdowns';

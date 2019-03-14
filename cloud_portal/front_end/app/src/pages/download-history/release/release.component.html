@@ -1,0 +1,45 @@
+<div class="clearfix d-flex align-baseline mb-1 mt-3">
+    <h1 class="float-left m-0 title">
+        {{release.version}}
+    </h1>
+    <h4 class="m-0 ml-3 subtitle">
+        {{release.productDescription}}
+    </h4>
+</div>
+
+<h4 class="mb-3 subtitle">
+    PUBLISHED {{release.date}}
+</h4>
+
+<div *ngIf="release.releaseNotes">
+    <h4 translate>Release Notes</h4>
+    <div [innerHTML]="release.releaseNotes"></div>
+</div>
+
+<h4 translate>In-Client Upgrade:</h4>
+<table>
+    <tr>
+        <td translate>Build Number:</td>
+        <td>&nbsp;</td>
+        <td><b>{{release.buildNumber}}</b></td>
+    </tr>
+    <tr>
+        <td translate>Password:</td>
+        <td>&nbsp;</td>
+        <td><b>{{release.password}}</b></td>
+    </tr>
+</table>
+
+<h4 class="mt-3" translate>Download Links:</h4>
+<div *ngFor="let platform of release.platforms" #card>
+    <a href class="ml-3" (click)="card.expanded = !card.expanded; false">
+        {{language.lang.downloads.groups[platform.name].label || platform.name}}
+    </a>
+
+    <ul [ngbCollapse]="!card.expanded">
+        <li *ngFor="let file of platform.files">
+            {{file.niceName}}
+            <a href="{{linkbase}}/{{release.buildNumber}}/{{file.path}}">{{file.fileName}}</a>
+        </li>
+    </ul>
+</div>

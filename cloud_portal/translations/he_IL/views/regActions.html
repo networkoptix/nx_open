@@ -1,11 +1,15 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
-    <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+    <h1 class="process-success d-flex align-items-center flex-column mt-5"
+        ng-if="(register.success || registerSuccess) && !activated">
+        <span> החשבון נוצר.</span>
+        <span> הודעת האישור תישלח אל </span>
+          <span><strong>{{account.email}}</strong></span>
     </h1>
 
-    <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        החשבון נוצר בהצלחה.
+    <h1 class="process-success d-flex align-items-center flex-column mt-5"
+        ng-if="(register.success || registerSuccess) && activated">
+        <span>החשבון נוצר בהצלחה.</span>
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
@@ -16,64 +20,89 @@
         <input type="password" style="display:none">
         <!-- /end of special hack -->
 
-        <div class="form-group" validate-field>
-            <label for="firstName" class="col-sm-4 control-label">שם פרטי</label>
-            <div class="col-sm-4">
-                <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
-                       required
- name="firstName" autocomplete="off" autofocus>
+        <div class="form-group row" validate-field>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="firstName" class="text-left text-md-right control-label">שם פרטי</label>
             </div>
-            <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">נדרש שם פרטי</span>
+            <div class="col-md-4">
+                <input type="text" class="form-control"
+                       ng-model="account.firstName" id="firstName" maxlength="255"
+                       required name="firstName" autocomplete="off" autofocus>
             </div>
-        </div>
-        <div class="form-group" validate-field>
-            <label for="lastName"  class="col-sm-4 control-label">שם משפחה</label>
-            <div class="col-sm-4">
-                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
-                       required
- name="lastName" autocomplete="off">
-            </div>
-            <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">נדרש שם משפחה</span>
+            <div class="col-md-4">
+                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">נדרש שם פרטי</span>
             </div>
         </div>
-        <div class="form-group" validate-field>
-            <label for="registerEmail"  class="col-sm-4 control-label">דוא"ל</label>
-            <div class="col-sm-4">
-                <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
+        <div class="form-group row" validate-field>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="lastName"  class="text-left text-md-right control-label">שם משפחה</label>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control"
+                       ng-model="account.lastName" id="lastName" maxlength="255"
+                       required name="lastName" autocomplete="off">
+            </div>
+            <div class="col-md-4">
+                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">נדרש שם משפחה</span>
+            </div>
+        </div>
+        <div class="form-group row" validate-field>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="registerEmail" class="text-left text-md-right control-label">דוא"ל</label>
+            </div>
+            <div class="col-md-4">
+                <input ng-hide="lockEmail" type="email" class="form-control"
+                       ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
  ng-change="hideAlreadyExists()">
 
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
             </div>
-            <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span></div>
-
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email</span></div>
-
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}</span></div>
+            <div class="col-md-4">
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">נדרש דוא"ל</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">אנא הכנס כתובת דוא"ל חוקית</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">האימייל הזה כבר נרשם ב- %PRODUCT_NAME%</span></div>
             </div>
         </div>
-        <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
-                <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> הרשמה לדיוור ישיר</label>
+
+        <password-input ng-model="account.password"
+                        id="'registerPassword'"
+                        form="registerForm"
+                        label="$root.L.regActions.passwordLabel">
+        </password-input>
+
+        <div class="form-group row" validate-field>
+            <div class="offset-md-4 col-md-4">
+                <label class="checkbox mb-0 mb-md-3">
+                    <input type="checkbox"
+                           ng-model="account.accept"
+                           ng-model-options="{ updateOn: 'default', debounce: 0 }"
+                           name="accept" id="accept" required>
+                    <span class="checkmark">
+                        <svg viewbox="0 0 20 16">
+                            <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
+                            <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
+                            <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
+                            <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
+                        </svg>
+                    </span>
+                    <span class="text"> אני מסכים ל <a href="/content/eula" target="_blank"> תנאים וההגבלות </a> ו <a href="%PRIVACY_LINK%" target="_blank"> מדיניות פרטיות </a></span>
+                </label>
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <span class="help-block input-error" ng-if="registerForm.accept.$dirty && registerForm.accept.$error.required">
+                    נא לעיין ולהסכים לתנאים וההגבלות ולפרטיות המדיניות כדי להמשיך</span>
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="offset-md-4 col-md-8 p-0 pl-md-2">
                 <process-button process="register"
                                 form="registerForm"
-                                class="pull-left"
+                                class="float-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    By clicking "Create Account", you agree to
-                    <div><a href="/content/eula" target="_blank">Terms and Conditions</a></div>
-                </div>
             </div>
         </div>
     </form>

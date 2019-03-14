@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Fragment Id='FragmentClientPackage'>
+        <PackageGroup Id="ClientPackageGroup">
+            <MsiPackage
+                Id="ClientPackage"
+                Name="$(var.ClientMsiName)"
+                SourceFile="$(var.ClientStrippedMsiFile)"
+                InstallCondition="InstallClientOnly=1 OR InstallClientAndServer=1"
+                Vital="yes"
+                Compressed="yes">
+                <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
+            </MsiPackage>
+        </PackageGroup>
+    </Fragment>
+
+    <Fragment Id='FragmentClientConditions'>
+        <?include BuildVars.wxi ?>
+
+        <!-- Returns advertised (1), absent (2), or locally installed (5). -->
+        <util:ProductSearch
+            Id="ClientMsiSearch"
+            UpgradeCode="$(var.clientUpgradeCode)"
+            Result="state"
+            Variable="ClientInstalled" />
+
+        <util:ProductSearch
+            Id="ClientMsiVersion"
+            UpgradeCode="$(var.clientUpgradeCode)"
+            Result="version"
+            Variable="InstalledClientVersion" />
+
+        <!-- Returns advertised (1), absent (2), or locally installed (5). -->
+        <util:ProductSearch
+            Id="ServerMsiSearch2"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="state"
+            Variable="ServerInstalled" />
+
+        <util:ProductSearch
+            Id="ServerMsiVersion2"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="version"
+            Variable="InstalledServerVersion" />
+
+        <bal:Condition Message="Update to this version is not allowed. You should first upgrade to version 2.6">
+            <![CDATA[ ((NOT (ClientInstalled = 5)) OR InstalledClientVersion >= "2.3") AND ((NOT (ServerInstalled = 5)) OR InstalledServerVersion >= "2.3")]]>
+        </bal:Condition>
+
+    </Fragment>
+</Wix>

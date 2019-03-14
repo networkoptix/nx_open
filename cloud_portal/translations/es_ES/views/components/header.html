@@ -1,70 +1,67 @@
 <!--suppress ALL -->
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible hidden-expanded">
-            <li uib-dropdown>
-                <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-menu-hamburger"></span></a>
-                <ul uib-dropdown-menu>
-                    <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Configuraciones</a></li>
-                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">Vista</a></li>
-                </ul>
-            </li>
-        </ul>
-
-        <div class="navbar-header">
-            <a class="navbar-brand product-name add-version" href="/"><img ng-src="{{$root.C.previewPath}}/static/images/logo.png"></a>{{$root.C.previewPath}}
-        </div>
-
-        <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
-            <li class="vertical-bar margin-right"></li>
-            <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Configuraciones</a></li>
-            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">Vista</a></li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
-            <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
-                                             ng-click="login();$event.preventDefault();">Iniciar sesión</a></span> <span
-                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Crear Cuenta</a></span></li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right auth-visible margin-right">
-            <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
-                <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem.name}}</span></a>
-            </li>
-            <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
-            <li uib-dropdown ng-if="systemCounter && !singleSystem" class="collapse-second">
-                <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">
-                    <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span><span class="icon-caret"></span>
-                </a>
-                <ul uib-dropdown-menu class="dropdown-menu-left">
-                    <li ng-if="activeSystem" class="hidden-expanded active"><a href="">{{activeSystem.name}}</a></li>
-                    <li ng-if="activeSystem" class="hidden-expanded nav-divider" role="separator"></li>
-
-                    <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"
-                        ng-if="system!=activeSystem">
-                        <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner"> &mdash; {{system.ownerFullName}}</span></a>
+<header ng-if="viewHeader">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="app-header-left">
+                <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible d-block d-sm-none">
+                    <li>
+                        <nx-active-system [active-system]="activeSystem"></nx-active-system>
                     </li>
-                    <li role="separator" class="nav-divider"></li>
-                    <li><a ng-href="/systems">{{$root.L.header.allSystems}}</a></li>
                 </ul>
-            </li>
-            <li class="vertical-bar"></li>
-            <li uib-dropdown class="collapse-first">
-                <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis">{{account.email}}</span><span class="icon-caret"></span></a>
-                <ul uib-dropdown-menu>
-                    <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
-                    <li class="hidden-expanded nav-divider" role="separator"></li>
 
-                    <li><a href="/account/">Configuración de cuenta</a></li>
-                    <li><a href="/account/password/">Cambiar contraseña</a></li>
-                    <li><a href="" ng-click="logout()">Cerrar Sessión</a></li>
+                <div class="navbar-header">
+                    <a class="inset navbar-brand product-name add-version" href="/"
+                       [ngclass]="{'ml-sm-0': true}">
+                        <img ng-src="{{config.previewPath}}/static/images/logo.png">
+                    </a>
+                </div>
 
-                    <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
-                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Gestión de portal</a></li>
+                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
+                    <li ng-class="{ 'active' :active.view }">
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">Vista</a>
+                    </li>
+                    <li ng-class="{ 'active' :active.settings}">
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}">Configuraciones</a>
+                    </li>
                 </ul>
-            </li>
-            <li class="vertical-bar"></li>
-        </ul>
-    </div>
-</nav>
-<toast></toast>
+            </div>
+
+            <div class="app-header-right">
+                <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
+                    <li>
+                        <span>
+                            <a href class="btn btn-default" ng-click="login()">Iniciar sesión</a>
+                        </span>
+                        <span>
+                            <a href="/register" class="btn btn-primary">Crear cuenta</a>
+                        </span>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right auth-visible">
+                    <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
+                        <a href="/systems" class="m-0 border-0">
+                            <span class="glyphicon glyphicon-home"></span>
+                            <span class="ellipsis">{{activeSystem.name}}</span>
+                        </a>
+                    </li>
+
+                    <li ng-if="systemCounter && !singleSystem" class="collapse-second">
+                        <nx-systems
+                                [endpoint]="active"
+                                [systems]="systems"
+                                [active-system]="activeSystem">
+                        </nx-systems>
+                    </li>
+
+                    <li class="vertical-bar"></li>
+
+                    <li class="collapse-first">
+                        <nx-account-settings-select [account]="account"></nx-account-settings-select>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <toast></toast>
+</header>

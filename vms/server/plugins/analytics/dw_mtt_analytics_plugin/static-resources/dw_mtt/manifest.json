@@ -1,0 +1,116 @@
+{
+    "capabilities": "deviceDependent",
+    "supportedCameraModels": [
+        "DWC-MVT4Wi28",
+        "DWC-MVT4Wi36",
+        "DWC-MVT4Wi6",
+        "DWC-MBT4Wi28",
+        "DWC-MBT4Wi36",
+        "DWC-MVT4WiA",
+        "DWC-MTT4Wi28",
+        "DWC-MTT4Wi36",
+        "DWC-MTT4Wi6",
+        "DWC-MTT4WiA"
+    ],
+    "eventTypes": [
+        {
+            "id": "nx.dw_mtt.MOTION",
+            "name": "Motion Detection",
+            "flags": "stateDependent",
+            "internalName": "MOTION",
+            "alarmName": "motionAlarm"
+        },
+        {
+            "id": "nx.dw_mtt.SENSOR",
+            "name": "Sensor Alarm",
+            "flags": "stateDependent",
+            "internalName": "SENSOR",
+            "alarmName": "sensorAlarmIn",
+            "_comment": "Notification from camera external sensor",
+            "unsupported": true
+        },
+        {
+            "id": "nx.dw_mtt.PEA",
+            "name": "Perimeter Intrusion [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "PEA",
+            "alarmName": "perimeterAlarm",
+            "group": 1,
+            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+        },
+        {
+            "id": "nx.dw_mtt.PEA",
+            "name": "Line Crossing [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "PEA",
+            "alarmName": "tripwireAlarm",
+            "group": 1,
+            "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
+        },
+        {
+            "id": "nx.dw_mtt.OSC",
+            "name": "Object Status Changed [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "OSC",
+            "alarmName": "oscAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_mtt.AVD",
+            "name": "Scene Change",
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "sceneChange",
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
+        },
+        {
+            "id": "nx.dw_mtt.AVD",
+            "name": "Video Blur Detection",
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "clarityAbnormal",
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
+        },
+        {
+            "id": "nx.dw_mtt.AVD",
+            "name": "Video Cast Detection",
+            "flags": "stateDependent",
+            "internalName": "AVD",
+            "alarmName": "colorAbnormal",
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
+        },
+        {
+            "id": "nx.dw_mtt.CPC",
+            "name": "Cross-line People Counting [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CPC",
+            "alarmName": "cpcAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_mtt.IPD",
+            "name": "Intruding People Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "IPD",
+            "alarmName": "ipdAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_mtt.CDD",
+            "name": "Crowd Density [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CDD",
+            "alarmName": "cddAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_mtt.VFD",
+            "name": "Video Face Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "VFD",
+            "alarmName": "vfdAlarm",
+            "group": 1,
+            "unsupported": true
+        }
+    ]
+}

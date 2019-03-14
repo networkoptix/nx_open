@@ -2,7 +2,7 @@ Il existe une nouvelle révision pour {{ message.product }}
 
 Cliquez sur le lien pour évaluer le brouillon {{ message.id }} pour {{ message.product }}
 
-Lien pour révision: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Lien pour révision: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 Sur cette page, vous pouvez
 1) Créer un aperçu pour voir les changements récents.

@@ -1,12 +1,12 @@
-{{PRODUCT_NAME}}'e hoş geldiniz
+%PRODUCT_NAME%'e hoş geldiniz
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) sizi {{PRODUCT_NAME}}'e davet etti ve {{message.system_name}} sistemini sizinle paylaştı.
+{{message.sharer_name}} ({{message.sharer_email}}) sizi %PRODUCT_NAME%'e davet etti ve {{message.system_name}} sistemini sizinle paylaştı.
 {{/message.sharer_name}}
 
-{{#message.sharer_name}}
-Sizi {{PRODUCT_NAME}}'e davet ettiniz.
-You have been granted access to {{message.system_name}}.
+{{^message.sharer_name}}
+Sizi %PRODUCT_NAME%'e davet ettiniz.
+{{message.system_name}} adresine erişim izni verildi.
 {{/message.sharer_name}}
 
 Sistemi kaydettirin ve görüntüleyin: {{config.portal_url}} / register / {{message.code}}

@@ -4,6 +4,13 @@
         <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{activeFunction.url}}</p>
+            <h1> Oi{{apiMethod}}</h1>
+        </div>
+    </div>
+    <div ng-if="apiMethod.permissions" class="form-group">
+        <label class="col-sm-2 control-label">Permissões necessárias:</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{apiMethod.permissions}}</p>
         </div>
     </div>
 
@@ -13,6 +20,7 @@
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
+            <small>{{param.type}}</small>
             <small ng-if="param.optional=='false'">(required)</small>
             <small ng-if="param.proprietary">(proprietary)</small>
         </label>
@@ -31,7 +39,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">Solicitando URL</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
         </div>
@@ -45,25 +53,31 @@
             <p class="form-control-static">{{activeFunction.url}}</p>
         </div>
     </div>
+    <div ng-if="apiMethod.permissions" class="form-group">
+        <label class="col-sm-2 control-label">Permissões necessárias:</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{apiMethod.permissions}}</p>
+        </div>
+    </div>
 
     <div class="form-group"
          ng-repeat="param in activeFunction.params | orderBy:['-proprietary','optional']"
          ng-if="!param.proprietary || allowProprietary"
-         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
+         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.formType != 'info'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
-            <small ng-if="param.optional=='false'">(required)</small>
+            <small>{{param.type}}</small>
+            <small ng-if="!param.optional">(required)</small>
             <small ng-if="param.proprietary">(proprietary)</small>
         </label>
         <div class="col-sm-10">
-
-            <div ng-switch on="param.type">
+            <div ng-switch on="param.formType">
 
                 <select class="form-control input-sm"
                         ng-switch-when="enum"
                         ng-options="value.name as value.label for value in param.values"
                         id="{{param.name}}"
-                        ng-required="param.optional=='false'"
+                        ng-required="!param.optional"
                         ng-model="apiMethod.params[param.name]">
                 </select>
 
@@ -72,10 +86,10 @@
                     <input type="text"
                            id="{{param.name}}"
                            class="form-control"
-                           placeholder="YYYY-MM-DDTHH:mm:ss"
+                           placeholder="AAAA-MM-DDTHH:mm:ss"
                            uib-datepicker-popup="{{Config.dateInternalFormat}}"
                            ng-model="apiMethod.params[param.name]"
-                           ng-required="param.optional=='false'"
+                           ng-required="!param.optional"
                            is-open="openDate[param.name]"
                            close-text="Close" />
                     <span class="input-group-btn">
@@ -84,6 +98,13 @@
                                 class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </div>
+
+                <input type="number" class="form-control input-sm"
+                       ng-switch-when="integer"
+                       id="{{param.name}}"
+                       ng-required="!param.optional"
+                       ng-model="apiMethod.params[param.name]">
+
                 <p class="help-block" ng-switch-when="timestamp">
                     <i>Timestamp: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
@@ -101,17 +122,58 @@
                        uib-typeahead-focus
  class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
-                    <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
+                    <i>Câmara selecionada: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
+
+                <input ng-switch-when="option"
+                       type="checkbox"
+                       ng-true-value="'API_TOOL_OPTION_SET'"
+                       ng-false-value="null"
+                       ng-model="apiMethod.params[param.name]">
+
+                <input ng-switch-when="boolean" ng-if="!param.optional"
+                       type="checkbox"
+                       ng-model="apiMethod.params[param.name]">
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_empty"
+                               ng-value="null"
+                               ng-checked="true">
+                        leave empty
+                    </label>
+                </div>
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_true"
+                               ng-value="true">
+                        verdadeiro
+                    </label>
+                </div>
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_false"
+                               ng-value="false">
+                        falso
+                    </label>
+                </div>
+
 
                 <span ng-switch-when="info"></span>
 
                 <input type="text" class="form-control input-sm"
                        ng-switch-default
  id="{{param.name}}"
-                       ng-required="param.optional=='false'"
-                       ng-model="apiMethod.params[param.name]"
-                       placeholder="{{}}">
+                       ng-required="!param.optional"
+                       ng-model="apiMethod.params[param.name]">
             </div>
 
             <p class="help-block" ng-if="param.description.xml"
@@ -124,24 +186,24 @@
         <div class="col-sm-offset-2 col-sm-10">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Use credentials
+                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Usar credenciais
                 </label>
-                <p class="help-block">Add login and password to url</p>
+                <p class="help-block">Adicionar login e senha ao url</p>
             </div>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="useLogin">Login</label>
+        <label class="col-sm-2 control-label" for="useLogin">Entrar</label>
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
-            <p class="help-block">It is recommended to create dedicated user for integrations</p>
+            <p class="help-block">É recomendado criar um utilizar dedicado para integrações</p>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="usePassword">Password</label>
+        <label class="col-sm-2 control-label" for="usePassword">Senha</label>
         <div class="col-sm-10">
             <input id="usePassword" type="text" class="form-control input-sm"
                    ng-model="apiMethod.password">
@@ -150,7 +212,7 @@
 
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">Solicitando URL</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
             <p class="help-block" ng-if="clipboardSupported">
@@ -161,11 +223,11 @@
         </div>
     </div>
     <div class="form-group" ng-if="apiMethod.method=='POST'">
-        <label class="col-sm-2 control-label">POST data</label>
+        <label class="col-sm-2 control-label">Dados POST</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>
@@ -174,14 +236,14 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                    class="btn btn-primary" ng-click="testMethod()">Método de teste</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+               ng-href="{{getDebugUrl()}}" target="_blank">Aberto em uma nova aba</a>
         </div>
     </div>
 
 
-    <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
+    <div class="form-group" ng-if="result.status" ng-class="{'has-error':result.error}">
         <label class="col-sm-2 control-label">Estado</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{result.status}}</p>
@@ -192,7 +254,7 @@
         <div class="col-sm-10">
             <img style="max-width:100%" ng-src="{{result.image}}">
             <div class="col-sm-10">
-                <p class="help-block">Content-type: {{result.contentType}}</p>
+                <p class="help-block">Tipo de conteúdo: {{result.contentType}}</p>
             </div>
         </div>
     </div>
@@ -201,7 +263,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>

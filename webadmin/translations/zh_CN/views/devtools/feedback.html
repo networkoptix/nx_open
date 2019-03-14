@@ -1,4 +1,4 @@
-<alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
+<uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
     <p><b>你是开发人员吗？ 期待您的反馈！</b></p>
     <p>我们的开发团队对开发人员使用我们的SDK和API进行集成的反馈持续感兴趣。
@@ -6,4 +6,4 @@
         请填写我们的反馈表单！
     </p>
     <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">留下您的反馈信息</a></p>
-</alert>
+</uib-alert>

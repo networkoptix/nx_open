@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">Nowość: Raport o kondycji systemu</a></h1>
+</div>
+<div class="container">
     <h1>Zaawansowane ustawienia serwera</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -106,7 +109,7 @@
             Nie wybrano głównego magazynu do nagrywania - dane wideo nie będą nagrywane na tym serwerze.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Zarezerwowana ilość miejsca jest większa niż ilość wolnego miejsca. Aktualny materiał wideo może zostać usunięty, aby zwolnić trochę miejsca.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Skonfiguruj podświetlone ustawienia, aby je zapisać.</div>
 
@@ -116,36 +119,21 @@
 
     <h2>Ustawienia dziennika</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Poziom dziennika głównego</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Brak: rejestrowanie w dzienniku jest wyłączone.</option>
-                    <option value="ALWAYS">Ważne: rejestruj błędy, ostrzeżenia i najważniejsze komunikaty.</option>
-                    <option value="ERROR">Błędy: rejestruj tylko błędy.</option>
-                    <option value="WARNING">Ostrzeżenia: rejestruj ostrzeżenia i błędy.</option>
-                    <option value="INFO">Wszystko: rejestruj błędy, ostrzeżenia i wszystkie komunikaty.</option>
-                    <option value="DEBUG">Debug: rejestruj wszystkie komunikaty systemowe i programistyczne.</option>
-                    <option value="DEBUG2">Debug2: rejestruj wszystkie komunikaty systemowe i rozszerzone programistyczne.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Brak: rejestrowanie w dzienniku jest wyłączone.</option>
+                    <option value="always">Ważne: rejestruj błędy, ostrzeżenia i najważniejsze komunikaty.</option>
+                    <option value="error">Błędy: rejestruj tylko błędy.</option>
+                    <option value="warning">Ostrzeżenia: rejestruj ostrzeżenia i błędy.</option>
+                    <option value="info">Wszystko: rejestruj błędy, ostrzeżenia i wszystkie komunikaty.</option>
+                    <option value="debug">Debug: rejestruj wszystkie komunikaty systemowe i programistyczne.</option>
+                    <option value="debug2">Debug2: rejestruj wszystkie komunikaty systemowe i rozszerzone programistyczne.</option>
+                    <option value="verbose">Verbose: rejestruj wszystkie dostępne informacje.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Poziom dziennika transakcji</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Brak: rejestrowanie w dzienniku jest wyłączone.</option>
-                    <option value="ALWAYS">Ważne: rejestruj błędy, ostrzeżenia i najważniejsze komunikaty.</option>
-                    <option value="ERROR">Błędy: rejestruj tylko błędy.</option>
-                    <option value="WARNING">Ostrzeżenia: rejestruj ostrzeżenia i błędy.</option>
-                    <option value="INFO">Wszystko: rejestruj błędy, ostrzeżenia i wszystkie komunikaty.</option>
-                    <option value="DEBUG">Debug: rejestruj wszystkie komunikaty systemowe i programistyczne.</option>
-                    <option value="DEBUG2">Debug2: rejestruj wszystkie komunikaty systemowe i rozszerzone programistyczne.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Zachowaj</button>
         </div>

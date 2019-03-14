@@ -1,4 +1,4 @@
-Hello {{message.fullName}}
+Hello {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) megosztotta hozzáférését Önnel "{{message.system_name}}" rendszeréhez.
@@ -8,4 +8,4 @@ Hello {{message.fullName}}
 Hozzáférést kapott a "{{message.system_name}}" videómenedzsment rendszerhez.
 {{/message.sharer_name}}
 
-{{PRODUCT_NAME}} megtekintése Portál: {{config.portal_url}}/rendszer/{{message.system_id}}
+%PRODUCT_NAME% megtekintése Portál: {{config.portal_url}}/rendszer/{{message.system_id}}

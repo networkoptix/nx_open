@@ -29,7 +29,7 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/us/app/wave-mobile/id1284037424?ls=1&mt=8",
+            url: "https://itunes.apple.com/us/app/wisenet-wave/id1328354303?ls=1&mt=8",
             button: "iOS Client",
             class:'appstore'
         },

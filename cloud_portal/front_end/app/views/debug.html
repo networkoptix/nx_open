@@ -1,5 +1,71 @@
 <div class="container" >
     <form class="form-horizontal" novalidate >
+        <h1>Debug new proxy</h1>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Proxy URL</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="debugProxySettings.proxyUrl">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">System</label>
+            <div class="col-sm-4">
+                <select class="form-control" ng-model="debugProxySettings.systemId"
+                        ng-options="system.id as system.name for system in systems track by system.id"></select>
+            </div>
+
+            <div class="col-sm-4">
+                <p class="help-block">
+                    {{debugProxySettings.systemId}}
+                </p>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Method</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="debugProxySettings.method">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">API call</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="debugProxySettings.apiCall">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">POST data</label>
+            <div class="col-sm-4">
+                <textarea class="form-control" ng-model="debugProxySettings.data"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Request:</label>
+            <div class="col-sm-4">
+                <p class="form-control-static">{{debugProxyUrl()}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button class="btn btn-default" ng-click="debugProxy()">Test</button>
+            </div>
+        </div>
+        <div class="form-group" ng-if="debugProxySettings.result" ng-class="{'has-error':!debugProxySettings.success}">
+            <label class="col-sm-2 control-label">Result:</label>
+            <div class="col-sm-10">
+                <pre>{{debugProxySettings.result}}</pre>
+            </div>
+        </div>
+
+        <hr>
+
+
         <h1>Debug merge systems</h1>
 
         <div class="form-group">
@@ -33,7 +99,7 @@
 
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button class="btn btn-default" ng-click="mergeSystems()">Merge</button>
             </div>
         </div>
@@ -50,13 +116,13 @@
 
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <open-client-button system="{id:'dummy',isOnline:true}"></open-client-button>
             </div>
         </div>
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-4">
+            <div class="offset-sm-2 col-sm-4">
                 <label><input type="checkbox" ng-model="linkSettings.native"/> Native link</label>
             </div>
         </div>
@@ -129,7 +195,7 @@
 
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button class="btn btn-default" ng-click="openLink()"
                         title="{{system.stateMessage}}">Call url</button>
             </div>
@@ -146,17 +212,17 @@
         <hr>
         <h1>Debug processes and notifications</h1>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <pre>{{formatJSON(debugProcess.process)}}</pre>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <label><input type="checkbox" ng-model="debugProcess.success"/>Success</label>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button class="btn btn-primary" ng-click="debugProcess.process.run()">Run process</button>
                 <button class="btn btn-primary" ng-click="notify()">Call notification</button>
                 <br>
@@ -199,7 +265,7 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+            <div class="offset-sm-2 col-sm-10">
                 <button type="submit" class="btn btn-default" ng-click="testNotification()">Send Notification</button>
             </div>
         </div>

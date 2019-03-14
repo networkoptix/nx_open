@@ -1,47 +1,47 @@
 {
   "cameraLinks": {
-    "highStream": "High stream",
-    "lowStream": "Low stream",
-    "transcoding": "Transcoding",
-    "unknown": "Unknown",
-    "copyToClipboard": "copy to clipboard",
-    "copyDefaultText": "copy",
-    "copyActiveText": "copied to clipboard"
+    "highStream": "Flusso Primario",
+    "lowStream": "Flusso secondario",
+    "transcoding": "Transcodifica",
+    "unknown": "Sconosciuto",
+    "copyToClipboard": "copia negli appunti",
+    "copyDefaultText": "copia",
+    "copyActiveText": "copiato negli appunti"
   },
-  "systemOffline": "System Offline",
+  "systemOffline": "Il sistema è offline",
   "cameraStates": {
-    "offline": "Offline",
+    "offline": "Offiline",
     "error": "Errore",
-    "unauthorized": "Authentication required",
-    "noData": "No data",
-    "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
-    "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-    "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
-    "noFormat": "This browser does not support video playback from this camera.",
-    "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-    "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
-    "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+    "unauthorized": "Autenticazione richiesta",
+    "noData": "Nessun dato",
+    "iosVideoTooLarge": "iOS non supporta video più grandi di FullHD (2MP: 1920x1080).",
+    "flashRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> per la riproduzione di video.",
+    "flashOrWebmRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> o<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> per la riproduzione di video in Internet Explorer.",
+    "noArmSupport": "Questo browser o dispositivo non supporta la riproduzione di video da server basati su ARM.",
+    "noFormat": "Questo browser non supporta la riproduzione di video da questa telecamera.",
+    "ieNoWebm": "Si prega di installare <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>il codec WebM </a> per Internet Explorer.",
+    "ieWin10": "Si prega di utilizzare i browser Microsoft Edge o Google Chrome.",
+    "ubuntuNX": "Questo browser non supporta i video da server basati su ARM. Per favore, utilizzare il browser Chromium."
   },
-  "searchCamPlaceholder": "Search",
+  "searchCamPlaceholder": "Ricerca",
   "resolution": {
-    "auto": "Auto",
-    "high": "High",
-    "low": "Low"
+    "auto": "Automatico",
+    "high": "Alta",
+    "low": "Basso"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast richiede molte risorse e potrebbe causare problemi al suo server.",
   "voiceCommands": {
-    "play": "play",
-    "pause": "pause",
+    "play": "riproduci",
+    "pause": "pausa",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "cancella ricerca",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "espandere tutti i server",
+    "collapse all servers": "comprimi tutti i server",
+    "stop listening": "interrompere l'ascolto",
     "help": "help | show commands"
   }
 }

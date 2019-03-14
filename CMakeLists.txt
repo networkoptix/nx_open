@@ -1,11 +1,13 @@
-cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-set(CMAKE_SUPPRESS_REGENERATION true)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
+
+set(releaseVersion 4.0.0)
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
@@ -14,7 +16,11 @@ nx_option(developerBuild
 if(developerBuild)
     set(default_cmake_build_type "Debug")
 else()
-    set(default_cmake_build_type "Release")
+    if(targetDevice MATCHES "edge1")
+        set(default_cmake_build_type "MinSizeRel")
+    else()
+        set(default_cmake_build_type "Release")
+    endif()
 endif()
 
 set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
@@ -29,27 +35,41 @@ if(targetDevice STREQUAL "none")
     set(targetDevice "")
 endif()
 
+if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake)
+    if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
+        unset(CMAKE_TOOLCHAIN_FILE)
+    endif()
+endif()
+
 # Early loading rdep to download a toolchain if needed.
 include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice AND NOT targetDevice STREQUAL "ios")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
-    include(cmake/sync_toolchain.cmake)
+include(cmake/mercurial.cmake)
+hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
+if(NOT changeSet AND NOT developerBuild)
+    message(FATAL_ERROR "Hg changeset cannot be calculated.")
 endif()
 
-project(vms VERSION 4.0.0)
+hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
+if(NOT branch AND NOT developerBuild)
+    message(FATAL_ERROR "Hg branch cannot be calculated.")
+endif()
+
+include(cmake/dependencies.cmake)
+
+project(vms VERSION ${releaseVersion})
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
 endif()
 
-set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 18.4)
+set(mobileClientVersion 19.1)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -64,10 +84,7 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
+nx_option(codeSigning "Enable code signing" OFF)
 
 include(target_detection)
 include(utils)
@@ -76,7 +93,6 @@ include(moc_utils)
 include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
-include(mercurial)
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
@@ -102,7 +118,7 @@ else()
     set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 endif()
 
-include(dependencies)
+load_dependencies()
 include(maven_compatibility)
 include(generate_current_config)
 
@@ -118,6 +134,7 @@ nx_create_dev_qt_conf()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
+    list(APPEND CMAKE_INSTALL_RPATH ${QT_DIR}/lib)
 endif()
 if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
@@ -148,31 +165,22 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia)
-
-if(targetDevice STREQUAL "bpi")
-    set_property(TARGET Qt5::Gui APPEND PROPERTY
-        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
-endif()
+        Multimedia
+        Qml
+)
 
 if(withDesktopClient OR withMobileClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Qml
-            Quick)
+    find_package(Qt5 COMPONENTS Quick)
 endif()
 
 if(withDesktopClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Widgets
-    )
+    find_package(Qt5 COMPONENTS Widgets)
 endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/client/nx_client_desktop/static-resources/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/mobile_client/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
@@ -185,29 +193,26 @@ if(WINDOWS)
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
 
+list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
+
 add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
-    add_subdirectory(common_libs)
-    add_subdirectory(common)
-    add_subdirectory(appserver2)
-    add_subdirectory(nx_cloud)
-endif()
+    add_subdirectory(libs)
 
-if(withMediaServer)
-    add_subdirectory(mediaserver_core)
-    add_subdirectory(mediaserver)
-    add_subdirectory(plugins)
-    add_subdirectory(storage_plugins)
-    add_subdirectory(nx_system_commands)
-
-    if(withDistributions)
-        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
-        add_subdirectory(nx_metadata_sdk)
+    if(withClouds AND LINUX)
+        add_subdirectory(cloud_portal)
     endif()
 
-    if(LINUX AND box MATCHES "none|tx1")
-        add_subdirectory(root_tool)
+    add_subdirectory(cloud)
+
+    if(withClouds)
+        add_custom_target(cloud DEPENDS cloud-backend)
+
+        if(LINUX)
+            add_custom_target(cloud-frontend DEPENDS cloud_portal)
+            add_dependencies(cloud cloud-frontend)
+        endif()
     endif()
 endif()
 
@@ -215,47 +220,10 @@ endif()
 #add_subdirectory(_dw_vca_controller)
 #add_subdirectory(_dw_mtt_controller)
 
-if(withTestCamera)
-    add_subdirectory(testcamera)
-endif()
-
-if(withTrayTool)
-    add_subdirectory(traytool)
-endif()
-
-if(withDesktopClient OR withMobileClient)
-    add_subdirectory(client)
-endif()
-
-if(withNxTool)
-    add_subdirectory(nxtool)
-endif()
+add_subdirectory(vms)
 
 if(withTests)
-    add_subdirectory(unit_tests)
     add_subdirectory(tests)
-endif()
-
-if(withDistributions)
-    if(WINDOWS)
-        add_subdirectory(wixsetup)
-    endif()
-
-    if(LINUX AND box STREQUAL "none") #< Desktop Linux.
-        add_subdirectory(debsetup)
-    endif()
-
-    if(box STREQUAL "tx1")
-        add_subdirectory(tx1setup)
-    endif()
-
-    if(MACOSX)
-        add_subdirectory(macsetup)
-    endif()
-
-    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-        add_subdirectory(edge_firmware)
-    endif()
 endif()
 
 include(fix_qt_vars)
@@ -265,8 +233,9 @@ if(beta)
 else()
     set(beta_bool "false")
 endif()
-nx_configure_file(
-    build_variables/maven/filter-resources/build_info.txt
-    ${CMAKE_CURRENT_BINARY_DIR})
+
+if(withDocumentation)
+    add_subdirectory(doc)
+endif()
 
 nx_save_known_files()

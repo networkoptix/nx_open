@@ -1,16 +1,16 @@
-<h1>Witaj {{message.fullName}}</h1>
+<h1>Witaj {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> udostępnia Ci system zarządzania wideo "{{message.system_name}}".
 
-Aby wyświetlić i zarządzać nim, utwórz konto w <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> używając aktualnego adresu e-mail i postępuj zgodnie z dalszymi instrukcjami.</p>
+Aby móc wyświetlać i zarządzać, utwórz konto w <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> używając aktualnego adresu e-mail i postępuj zgodnie z dalszymi instrukcjami.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>Masz dostęp do systemu zarządzania wideo "{{message.system_name}}".
 
-Aby wyświetlić i zarządzać nim, utwórz konto w <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> używając aktualnego adresu e-mail i postępuj zgodnie z dalszymi instrukcjami.</p>
+Aby móc wyświetlać i zarządzać, utwórz konto w <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> używając aktualnego adresu e-mail i postępuj zgodnie z dalszymi instrukcjami.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Utwórz konto</a>
 

@@ -1,16 +1,16 @@
-<h1>Здравствуйте, {{message.fullName}}</h1>
+<h1>Здравствуйте, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> предоставил вам доступ к системе {{message.system_name}}.
 
-Чтобы просмотреть и управлять ей, создайте учетную запись в <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>, используя ваш текущий адрес электронной почты, и следуйте дальнейшим инструкциям.</p>
+Чтобы просмотреть и управлять ей, создайте учетную запись в <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>, используя ваш текущий Email, и следуйте дальнейшим инструкциям.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>Вам предоставлен доступ к системе видеонаблюдения «{{message.system_name}}».
 
-Чтобы просмотреть и управлять ей, создайте учетную запись в <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>, используя ваш текущий адрес электронной почты, и следуйте дальнейшим инструкциям.</p>
+Чтобы просмотреть и управлять ей, создайте учетную запись в <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>, используя ваш текущий Email, и следуйте дальнейшим инструкциям.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Создать учетную запись</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Зарегистрироваться</a>
 

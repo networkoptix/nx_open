@@ -4,6 +4,13 @@
         <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{activeFunction.url}}</p>
+            <h1> HI{{apiMethod}}</h1>
+        </div>
+    </div>
+    <div ng-if="apiMethod.permissions" class="form-group">
+        <label class="col-sm-2 control-label">Autorisations requises:</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{apiMethod.permissions}}</p>
         </div>
     </div>
 
@@ -13,8 +20,9 @@
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
-            <small ng-if="param.optional=='false'">(requis)</small>
-            <small ng-if="param.proprietary">(propriétaire)</small>
+            <small>{{param.type}}</small>
+            <small ng-if="param.optional=='false'">(required)</small>
+            <small ng-if="param.proprietary">(proprietary)</small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -45,25 +53,31 @@
             <p class="form-control-static">{{activeFunction.url}}</p>
         </div>
     </div>
+    <div ng-if="apiMethod.permissions" class="form-group">
+        <label class="col-sm-2 control-label">Autorisations requises:</label>
+        <div class="col-sm-10">
+            <p class="form-control-static">{{apiMethod.permissions}}</p>
+        </div>
+    </div>
 
     <div class="form-group"
          ng-repeat="param in activeFunction.params | orderBy:['-proprietary','optional']"
          ng-if="!param.proprietary || allowProprietary"
-         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
+         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.formType != 'info'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
-            <small ng-if="param.optional=='false'">(requis)</small>
-            <small ng-if="param.proprietary">(propriétaire)</small>
+            <small>{{param.type}}</small>
+            <small ng-if="!param.optional">(required)</small>
+            <small ng-if="param.proprietary">(proprietary)</small>
         </label>
         <div class="col-sm-10">
-
-            <div ng-switch on="param.type">
+            <div ng-switch on="param.formType">
 
                 <select class="form-control input-sm"
                         ng-switch-when="enum"
                         ng-options="value.name as value.label for value in param.values"
                         id="{{param.name}}"
-                        ng-required="param.optional=='false'"
+                        ng-required="!param.optional"
                         ng-model="apiMethod.params[param.name]">
                 </select>
 
@@ -75,7 +89,7 @@
                            placeholder="YYYY-MM-DDTHH:mm:ss"
                            uib-datepicker-popup="{{Config.dateInternalFormat}}"
                            ng-model="apiMethod.params[param.name]"
-                           ng-required="param.optional=='false'"
+                           ng-required="!param.optional"
                            is-open="openDate[param.name]"
                            close-text="Close" />
                     <span class="input-group-btn">
@@ -84,6 +98,13 @@
                                 class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </div>
+
+                <input type="number" class="form-control input-sm"
+                       ng-switch-when="integer"
+                       id="{{param.name}}"
+                       ng-required="!param.optional"
+                       ng-model="apiMethod.params[param.name]">
+
                 <p class="help-block" ng-switch-when="timestamp">
                     <i>Horodatage: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
@@ -104,14 +125,55 @@
                     <i>Caméra sélectionnée: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
 
+                <input ng-switch-when="option"
+                       type="checkbox"
+                       ng-true-value="'API_TOOL_OPTION_SET'"
+                       ng-false-value="null"
+                       ng-model="apiMethod.params[param.name]">
+
+                <input ng-switch-when="boolean" ng-if="!param.optional"
+                       type="checkbox"
+                       ng-model="apiMethod.params[param.name]">
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_empty"
+                               ng-value="null"
+                               ng-checked="true">
+                        leave empty
+                    </label>
+                </div>
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_true"
+                               ng-value="true">
+                        vrai
+                    </label>
+                </div>
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_false"
+                               ng-value="false">
+                        faux
+                    </label>
+                </div>
+
+
                 <span ng-switch-when="info"></span>
 
                 <input type="text" class="form-control input-sm"
                        ng-switch-default
  id="{{param.name}}"
-                       ng-required="param.optional=='false'"
-                       ng-model="apiMethod.params[param.name]"
-                       placeholder="{{}}">
+                       ng-required="!param.optional"
+                       ng-model="apiMethod.params[param.name]">
             </div>
 
             <p class="help-block" ng-if="param.description.xml"
@@ -165,7 +227,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>
@@ -181,7 +243,7 @@
     </div>
 
 
-    <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
+    <div class="form-group" ng-if="result.status" ng-class="{'has-error':result.error}">
         <label class="col-sm-2 control-label">État</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{result.status}}</p>
@@ -201,7 +263,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>

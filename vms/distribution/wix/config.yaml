@@ -1,0 +1,52 @@
+arch: '${arch}'
+wix_directory: '${wix_directory}/bin'
+qt_directory: '${qt.dir}'
+icu_directory: '${icu_directory}/bin'
+
+build_configuration: '${build.configuration}'
+installer_cultures: '${installer.cultures}'
+installer_language: '${installerLanguage}'
+distribution_output_dir: '${distribution_output_dir}'
+
+# Source directories
+bin_source_dir: '${bin_source_dir}'
+current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
+cmake_binary_dir: '${CMAKE_BINARY_DIR}'
+vox_source_dir: '${VoxSourceDir}'
+ucrt_directory: '${ucrt_directory}'
+vcrt_directory: '${vcrt_directory}'
+client_qml_dir: '${client_qml_dir}'
+nxtool_qml_dir: '${nxtool_qml_dir}'
+help_directory: '${help_directory}'
+festival_vox_directory: '${festival_vox_directory}'
+fonts_directory: '${fonts_directory}'
+client_update_files_directory: '${client_update_files_directory}'
+server_update_files_directory: '${server_update_files_directory}'
+
+# Source binaries
+client_binary_name: '${product.name}.exe'
+minilauncher_binary_name: '${minilauncher.binary.name}'
+launcher_version_file: '${launcher.version.file}'
+
+# Signing section
+code_signing: {
+  enabled: ${codeSigning},
+  url: '${signingServer}',
+  customization: '${customization}',
+  trusted_timestamping: ${trustedTimestamping},
+  script: '${CMAKE_SOURCE_DIR}/build_utils/sign_binary.py'
+}
+
+# Distrib names
+client_distribution_name: '${client_distribution_name}'
+client_update_distribution_name: '${client_update_distribution_name}'
+client_debug_distribution_name: '${client_debug_distribution_name}'
+server_distribution_name: '${server_distribution_name}'
+server_update_distribution_name: '${server_update_distribution_name}'
+server_debug_distribution_name: '${server_debug_distribution_name}'
+bundle_distribution_name: '${bundle_distribution_name}'
+servertool_distribution_name: '${servertool_distribution_name}'
+libs_debug_distribution_name: '${libs_debug_distribution_name}'
+misc_debug_distribution_name: '${misc_debug_distribution_name}'
+cloud_debug_distribution_name: '${cloud_debug_distribution_name}'
+testcamera_distribution_name: '${testcamera_distribution_name}'

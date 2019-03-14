@@ -1,0 +1,11 @@
+{
+  "auths": {
+    "la.hdw.mx:5000": {
+      "auth": "cmVnaXN0cnk6MjI1NjUz"
+    }
+  },
+  "credHelpers": {
+    "009544449203.dkr.ecr.us-east-1.amazonaws.com": "ecr-login",
+    "009544449203.dkr.ecr.us-west-1.amazonaws.com": "ecr-login"
+  }
+}

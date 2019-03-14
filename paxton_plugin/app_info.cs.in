@@ -1,0 +1,13 @@
+namespace nx {
+
+internal static class AppInfo {
+    public const string companyName = "${company.name}";
+    public const string productName = "${display.product.name}";
+    public const string displayProductName = "${company.name} ${display.product.name}";
+    public const string customization = "${customization}";
+    public const string uriProtocol = "${uri.protocol}";
+    public const string cloudHost = "${cloudHost}";
+    public const string minilauncherBinaryName = "${minilauncher.binary.name}";
+}
+
+} // namespace nx

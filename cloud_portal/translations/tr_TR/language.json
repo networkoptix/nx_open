@@ -1,19 +1,20 @@
 {
-  "language_name": "DİL ADI",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "language": "tr_TR",
+  "language_name": "Türk",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Tamam",
     "cancelButton": "İptal",
-    "loginTitle": "{{PRODUCT_NAME}}'e giriş yapın",
+    "loginTitle": "%PRODUCT_NAME% e giriş yapın",
     "loginButton": "Giriş yap",
     "logoutAuthorisedTitle": "Zaten giriş yapılmış",
     "logoutAuthorisedContinueButton": "Devam et",
     "logoutAuthorisedLogoutButton": "Oturumu Kapat"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Hoş geldiniz",
     "register": "Hesap Oluştur",
     "changePassword": "Parola değiştir -",
@@ -31,8 +32,8 @@
     "view": "Kameraları görüntüle - ",
     "debug": "Hata ayıklama",
     "login": "Giriş yap -",
-    "download": "İndir {{VMS_NAME}}",
-    "downloadPlatform": "İndir {{VMS_NAME}} ",
+    "download": "İndir %VMS_NAME%",
+    "downloadPlatform": "İndir %VMS_NAME% ",
     "pageNotFound": "Sayfa bulunamadı"
   },
   "systemStatuses": {
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
+      "description": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın"
     },
     "cloudAdmin": {
       "label": "Yönetici",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
+      "description": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "Onay e-posta gönderemezsiniz",
     "cloudInvalidResponse": "Cloud DB, beklenmedik bir yanıt verdi",
     "notAuthorized": "Hatalı parola",
+    "brokenAccount": "Hesapla beklenmeyen bir problem. <a href=\"/restore_password\">Hesabı geri yükle</a>",
     "wrongParameters": "Formdaki bazı parametreler yanlış",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "Hesap zaten etkinleştirildi veya onay kodu yanlış",
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
     "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked": "Hesap kilitlenmiş",
+    "accountBlocked": "Bu hesap geçici olarak kilitlendi. Lütfen bir süre sonra tekrar deneyin.",
     "notFound": "Bulunamadı",
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",
@@ -133,16 +134,26 @@
     "passwordMismatch": "Hatalı parola",
     "cantEditYourself": "Kendi izinlerini değiştirmeye izin verilmiyor",
     "cantEditAdmin": "Bu kullanıcının yönetici izinleri var",
-    "cantOpenClient": "{{VMS_NAME}} uygulama algılanmadı. <a href=\"/download\">İndir</a>",
+    "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
-    "thisSystem": "sistem"
+    "thisSystem": "sistem",
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "iyi",
+    "fair": "idare Eder",
+    "minLength": "çok kısa",
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",
+    "required": "yanlış",
     "requiredMessage": "Sadece alfanümerik ve klavye karakterleri kullanın",
+    "weak": "zayıf",
     "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage": "Güçlü parola!",
-    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz"
+    "common": "çok yaygın",
+    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz",
+    "missingMessage": "Parola gerekmektedir"
   },
   "sharing": {
     "confirmOwner": "Sistem sahibini değiştirirseniz, hesabınızdaki yetkileri iptal edersiniz. Bu eylem geri döndürülemez. Emin misiniz?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Sistem erişilebilir değil",
     "offline": "Sistem çevrimdışı",
-    "openClient": "{{VMS_NAME}} içinde aç",
-    "openClientNoSystem": "Aç{{VMS_NAME}}",
+    "openClient": "%VMS_NAME% içinde aç",
+    "openClientNoSystem": "Aç%VMS_NAME%",
+    "confirmMergeAction": "Birleştir",
+    "mergeSystemTitle": "Sistemleri Birleştir",
     "confirmRenameTitle": "Sistem Adı",
     "confirmRenameAction": "Kaydet",
     "successRename": "Sistem ismi kaydedildi",
-    "confirmDisconnectTitle": "{{PRODUCT_NAME}} çıkış yapılsın mı?",
+    "confirmDisconnectTitle": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
     "confirmDisconnectAction": "Bağlantıyı kes",
     "confirmUnshareFromMe": "Hesabınızın bu sistemle bağlantısını kesmek üzeresiniz. Bundan sonra bu sisteme erişim sağlayamayacaksınız. Emin misiniz?",
     "confirmUnshareFromMeTitle": "Sistemle bağlantıyı kes?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "Bu kullanıcı Sistem'e erişemez. Emin misiniz?",
     "confirmUnshareTitle": "Kullanıcıyı sil?",
     "confirmUnshareAction": "Sil",
-    "successDisconnected": "Sistem {{PRODUCT_NAME}}'den başarıyla çıkarıldı",
+    "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "Kaydet"
   },
   "downloads": {
-    "noClientDetectedTitle": "Sisteminizi görüntülemek için {{VMS_NAME}}'i yükleyin",
-    "action": "İndir {{VMS_NAME}}",
+    "noClientDetectedTitle": "Sisteminizi görüntülemek için %VMS_NAME%'i yükleyin",
+    "action": "İndir %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,16 +214,16 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -222,7 +236,7 @@
       "arm": {
         "label": "ARM",
         "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       }
     },
     "platforms": {
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "Tüm sistemler",
     "systems": "Sistemler"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Yüksek çözünürlük",
+      "lowStream": "Düşük çözünürlük",
+      "transcoding": "Dönüştürme",
+      "unknown": "Bilinmeyen",
+      "copyToClipboard": "panoya kopyala",
+      "copyDefaultText": "kopyala",
+      "copyActiveText": "panoya kopyalandı"
+    },
+    "systemOffline": "Sistem çevrimdışı",
+    "systemHasNoCameras": "KAMERA YOK",
+    "cameraStates": {
+      "offline": "Çevrimdışı",
+      "error": "Hata",
+      "unauthorized": "Kimlik doğrulaması gerekli",
+      "noData": "Veri bulunamadı",
+      "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+      "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin.",
+      "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
+      "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
+      "noFormat": "Bu tarayıcı bu kameradan video oynatmayı desteklemiyor.",
+      "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+      "ieWin10": "Lütfen Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+      "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
+    },
+    "searchCamPlaceholder": "Arama",
+    "resolution": {
+      "auto": "Oto",
+      "high": "Yüksek",
+      "low": "Düşük"
+    },
+    "chromeCastWarning": "Chromecast kaynak kullanımını arttırabilir ve sunucunuzda sorunlara neden olabilir.",
+    "voiceCommands": {
+      "play": "oynat",
+      "pause": "duraklat",
+      "live": "go to live | show me live",
+      "view": "görüntüle + [kamera adı]",
+      "search": "find + [text for searchbar]",
+      "clear search": "aramayı temizle",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "tüm sunucuları genişlet",
+      "collapse all servers": "tüm sunucuları daralt",
+      "stop listening": "dinlemeyi durdur",
+      "help": "help | show commands"
+    }
   }
 }

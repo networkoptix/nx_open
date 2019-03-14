@@ -4,20 +4,21 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Ce périphérique sert à travailler avec le disque dur installé.<br> S.V.P éteindre l’appareil et installer un disque dur.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Cet appareil a besoin de connexion réseau pour fonctionner.<br> S.V.P connecter au réseau local ou Internet
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+                Cet appareil a besoin de connexion réseau pour fonctionner.<br>
+                S. V. P connecter au réseau local ou Internet
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Ce périphérique à une configuration réseau incorrect.<br> S.V.P connecter au réseau ou définir une adresse IP correcte.
-            </alert>
+            </uib-alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -37,13 +38,14 @@
                     <div>
                         <h3>Réinitialiser serveur</h3>
                         <p>Cette action remet ce serveur aux valeurs par défaut (efface la base de données et réinitialise la configuration).
-                            Le serveur sera détaché du système actuel. Les archives vidéo resteront intactes.</p>
+                            The server will be detached from the current System. Les archives vidéo resteront intactes.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurer les paramètres par défaut</button></p>
                     </div>
-                    <div>
-                        <h3>Détacher le serveur du système</h3>
-                        <p>Cette action détachera le serveur de la base de données système, des utilisateurs locaux et de la configuration. Les archives vidéo resteront intactes. <b>Les utilisateurs Cloud seront supprimés.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>
+                    <div ng-if="user.isOwner">
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
+                            Les archives vidéo resteront intactes. <b>Usagers de nuages seront supprimés.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Redémarrer</h3>
@@ -64,9 +66,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>Nom</h3>
                         <div class="row">
@@ -91,7 +93,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Ce système est lié à {{Config.cloud.productName}}, Propriétaire du système: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Déconnecté de {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -99,12 +101,12 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Ce système n'est pas lié au{{Config.cloud.productName}}
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">En savoir plus</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Connecter le serveur sur Internet pour exécuter l'installation {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connexion Internet requise pour connecter le système à {{Config.cloud.productName}}</alert>
+                                   target="_blank">Learn more</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">Connecter le serveur sur Internet pour exécuter l'installation {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connexion Internet requise pour connecter le système à {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connecter à {{Config.cloud.productName}}</button>
@@ -113,13 +115,35 @@
                                    target="_blank">Céer compte {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
-                </tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+
+                    <div>
+                        <h3>Cryptage du trafic</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Forcer le cryptage du trafic
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    Forcer le cryptage du trafic vidéo
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Enregistrer</button>
+                        </form>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Paramètres réseau périphérique</h3>
+                        <h3>Paramètres réseau du périphérique</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Enregistrer les paramètres et redémarrer le périphérique</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Enregistrer les paramètres et redémarrer l’appareil</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Date et heure</h3>
@@ -144,7 +168,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -157,7 +181,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -176,8 +200,8 @@
                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Arrêter client</button></p>
                         <p>Utiliser un clavier/souris ou une application mobile pour contrôler.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

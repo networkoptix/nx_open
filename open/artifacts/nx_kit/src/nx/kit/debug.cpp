@@ -1,4 +1,3 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #include "debug.h"
 
 #include <chrono>
@@ -6,7 +5,6 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#include <cstdarg>
 #include <memory>
 #include <map>
 #include <cstring>
@@ -15,39 +13,10 @@ namespace nx {
 namespace kit {
 namespace debug {
 
+using namespace nx::kit::utils;
+
 //-------------------------------------------------------------------------------------------------
 // Tools
-
-uint8_t* unalignedPtr(void* data)
-{
-    static const int kMediaAlignment = 32;
-    return (uint8_t*) (
-        17 + (((uintptr_t) data) + kMediaAlignment - 1) / kMediaAlignment * kMediaAlignment);
-}
-
-std::string format(const std::string formatStr, ...)
-{
-    va_list args;
-    va_start(args, formatStr);
-    int size = vsnprintf(nullptr, 0, formatStr.c_str(), args) + 1; //< Extra space for '\0'.
-    if (size < 0)
-    {
-        va_end(args);
-        return formatStr; //< No better way to handle out-of-memory-like errors.
-    }
-    std::unique_ptr<char[]> buf(new char[size]);
-    va_end(args);
-
-    va_start(args, formatStr);
-    vsnprintf(buf.get(), (size_t) size, formatStr.c_str(), args);
-    va_end(args);
-    return std::string(buf.get(), buf.get() + size - 1); //< Trim trailing '\0'.
-}
-
-bool isAsciiPrintable(int c)
-{
-    return c >= 32 && c <= 126;
-}
 
 char pathSeparator()
 {
@@ -130,55 +99,36 @@ std::string printPrefix(const char* file)
 } // namespace detail
 
 //-------------------------------------------------------------------------------------------------
+// Assertions
+
+namespace detail {
+
+void assertionFailed(
+    PrintFunc printFunc, const char* conditionStr, const std::string& message,
+    const char* file, int line)
+{
+    printFunc((std::string("\n")
+        + ">>> ASSERTION FAILED: "
+        + relativeSrcFilename(file) + ":" + toString(line)
+        + " (" + conditionStr + ") " + message
+    ).c_str());
+
+    #if !defined(NDEBUG)
+        #if defined(_WIN32)
+            // Copy error text to a stack variable so it is present in the mini-dump.
+            char messageOnStack[256] = {0};
+            snprintf(messageOnStack, sizeof(messageOnStack), "%s", message.c_str());
+        #endif
+
+        // Crash the process to let a dump/core be generated.
+        *reinterpret_cast<volatile int*>(0) = 0;
+    #endif
+}
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 // Print info
-
-std::string toString(std::string s)
-{
-    return toString(s.c_str());
-}
-
-std::string toString(char c)
-{
-    if (!isAsciiPrintable(c))
-        return format("'\\x%02X'", (unsigned char) c);
-    if (c == '\'')
-        return "'\\''";
-    return std::string("'") + c + "'";
-}
-
-std::string toString(const char* s)
-{
-    if (s == nullptr)
-        return "null";
-
-    std::string str;
-    for (const char* p = s; *p != '\0'; ++p)
-    {
-        if (*p == '\\' || *p == '"')
-            (str += '\\') += *p;
-        else if (*p == '\n')
-            str += "\\n";
-        else if (*p == '\t')
-            str += "\\t";
-        else if (!isAsciiPrintable(*p))
-            str.append(format("\\x%02X", (unsigned char) *p));
-        else
-            str += *p;
-    }
-    return "\"" + str + "\"";
-}
-
-std::string toString(char* s)
-{
-    return toString(const_cast<const char*>(s));
-}
-
-std::string toString(const void* ptr)
-{
-    if (ptr == nullptr)
-        return "null";
-    return format("%p", ptr);
-}
 
 namespace detail {
 

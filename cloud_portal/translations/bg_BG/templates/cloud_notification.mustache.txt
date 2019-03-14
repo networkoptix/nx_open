@@ -1,3 +1,0 @@
-Hello, {{message.full_name}}
-
-{{message.text_body}}

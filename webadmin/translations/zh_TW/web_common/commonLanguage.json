@@ -1,27 +1,47 @@
 {
-  "cameraLinks":{
-    "highStream":"高解析串流",
-    "lowStream":"低解析串流",
-    "transcoding":"轉碼",
-    "unknown":"未知",
-    "copyToClipboard":"複製到剪貼簿",
-    "copyDefaultText":"複製",
-    "copyActiveText":"已複製到剪貼簿"
+  "cameraLinks": {
+    "highStream": "高解析串流",
+    "lowStream": "低解析串流",
+    "transcoding": "轉碼",
+    "unknown": "未知",
+    "copyToClipboard": "複製到剪貼簿",
+    "copyDefaultText": "複製",
+    "copyActiveText": "已複製到剪貼簿"
   },
-  "systemOffline":"系統處於離線狀態",
-  "cameraStates":{
-    "offline":"離線",
-    "error":"錯誤",
-    "unauthorized":"需要身份驗證",
-    "noData":"無資料",
-    "iosVideoTooLarge":"iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
-    "flashRequired":"要在 ARM 伺服器上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a>.",
-    "flashOrWebmRequired":"要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
-    "noArmSupport":"此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
-    "noFormat":"此瀏覽器或設備不支援從此攝影機回放影像。",
-    "ieNoWebm":"請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
-    "ieWin10":"請使用Microsoft Edge或Google Chrome瀏覽器。",
-    "ubuntuNX":"此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。"
+  "systemOffline": "系統處於離線狀態",
+  "cameraStates": {
+    "offline": "離線",
+    "error": "錯誤",
+    "unauthorized": "需要身份驗證",
+    "noData": "無資料",
+    "iosVideoTooLarge": "iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
+    "flashRequired": "請<a href='https://get.adobe.com/flashplayer/' target='_blank'> 安裝Adobe Flash </a>來播放影像.",
+    "flashOrWebmRequired": "要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
+    "noArmSupport": "此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
+    "noFormat": "此瀏覽器不支援從此攝影機回放影像.",
+    "ieNoWebm": "請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
+    "ieWin10": "請使用Microsoft Edge或Google Chrome瀏覽器。",
+    "ubuntuNX": "此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。"
   },
-  "searchCamPlaceholder":"搜尋"
+  "searchCamPlaceholder": "搜尋",
+  "resolution": {
+    "auto": "自動",
+    "high": "高 (H)",
+    "low": "低 (L)"
+  },
+  "chromeCastWarning": "Chromecast佔用過多資源, 可能會導致您的伺服器出現問題.",
+  "voiceCommands": {
+    "play": "播放",
+    "pause": "暫停",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "清除搜尋",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "展開所有伺服器",
+    "collapse all servers": "隱藏所有伺服器",
+    "stop listening": "停止聽取",
+    "help": "help | show commands"
+  }
 }

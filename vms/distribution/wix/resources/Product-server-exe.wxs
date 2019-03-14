@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <?include BuildVars.wxi ?>
+
+    <Bundle
+            Name="$(var.productName) Server"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="$(var.installerIcon)"
+            UpgradeCode="$(var.serverBundleUpgradeCode)"
+            DisableModify="yes">
+        <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ServerMsiVersion' />
+
+        <Variable Name="InstallServerOnly" Type="numeric" Value="1" />
+
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="$(var.CustomizationDir)/license.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
+
+            <bal:WixStandardBootstrapperApplication
+                SuppressOptionsUI="yes"
+                SuppressRepair="yes"
+                ShowFilesInUse="yes"
+                ThemeFile="OptixTheme.xml"
+                LocalizationFile="theme_$(var.installerLanguage).wxl"
+                SuppressDowngradeFailure="yes"
+                LicenseUrl="license.html" />
+        </BootstrapperApplicationRef>
+
+        <Variable Name="InstallerTitle" Value="!(loc.ServerOnly)" />
+
+        <Chain DisableSystemRestore="no">
+            <PackageGroupRef Id="ServerPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

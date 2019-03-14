@@ -1,8 +1,8 @@
-Hello,
+Hej, {{message.userFullName}},
 
-  Please open the link below to confirm your email address and activate the account.
+  Vänligen klicka på knappen nedan för att bekräfta din e-postadress och aktivera kontot.
 
 {{config.portal_url}}/activate/{{message.code}}
 
-If you didn't register in {{PRODUCT_NAME}}, just ignore this email.
-Do not share the message or the link with anyone.
+Om du inte registrerade dig i %PRODUCT_NAME%, ignorerar du bara det här e-postmeddelandet.
+Dela inte meddelandet eller länken med någon.

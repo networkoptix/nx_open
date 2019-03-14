@@ -3,16 +3,16 @@
     "dialogs": {
         "okButton": "Oké",
         "openLink": "Bezoek deze link",
-        "openLinkWithTitle": "Bezoek deze link naar {{title}}"
+        "openLinkWithTitle": "Om {{title}} te bezoeken, klik op deze link"
     },
     "setup": {
         "createAccount": "account aanmaken",
         "errorNoHDD": "Dit apparaat is bedoeld om te werken met een harde schijf. <br>Gelieve het apparaat uit te schakelen en een harde schijf te installeren.",
-        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n                Sluit het apparaat aan op het  lokale netwerk of het internet"
+        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n Sluit het apparaat aan op het lokale netwerk of het internet"
     },
     "passwordRequirements": {
-        "minLengthMessage": "Wachtwoord moet ten minste 8 karakters hebben",
-        "requiredMessage": "Alleen letters, cijfers en symbolen van het toetsenbord zijn toegestaan",
+        "minLengthMessage": "Het wachtwoord moet tenminste 8 karakters lang zijn",
+        "requiredMessage": "Alleen alfanumerieke letters, cijfers en symbolen van het toetsenbord zijn toegestaan",
         "weakMessage": "Het wachtwoord moet bestaan uit verschillende soorten symbolen",
         "strongMessage": "Sterk wachtwoord!",
         "commonMessage": "Dit wachtwoord staat in de lijst van meest populaire wachtwoorden"
@@ -25,7 +25,7 @@
         },
         "confirmRestart": "Server nu herstarten?",
         "couldntCheckInternet": "Kan de cloudverbinding niet controleren",
-        "confirmRestoreDefault": "Database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
+        "confirmRestoreDefault": "Wilt u de database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
         "confirmRestoreDefaultTitle": "Fabrieksinstellingen herstellen",
         "unexpectedError": "Mislukt: er heeft zich een onverwachte fout voorgedaan",
         "connnetionError": "Netwerkfout",
@@ -33,7 +33,7 @@
         "error": "Fout: ",
         "restartNeeded": "Wijzigingen opgeslagen. Wilt u de server herstarten om de nieuwe instellingen toe te passen?",
         "settingsSaved": "Instellingen opgeslagen",
-        "confirmHardwareRestart": "Wilt u het besturingssysteem opnieuw opstarten?",
+        "confirmHardwareRestart": "Restart server operation System?",
         "confirmRestoreSettings": "Alle serverinstellingen wissen? Het archief wordt bewaard, maar de netwerkinstellingen worden gewist.",
         "confirmRestoreSettingsNotNetwork": "De configuratie van de server wissen? Archief-en netwerkinstellingen worden opgeslagen.",
         "unavailable": "Niet Beschikbaar",
@@ -41,42 +41,43 @@
         "confirmDisconnectFromCloud": "Verbinding verbreken met systeem {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle cloud gebruikersaccounts worden verwijderd.</span><br><br>Het systeem zal toegankelijk zijn via het lokale netwerk middels het lokale administrator account.",
         "confirmDisconnectFromCloudAction": "Verbinding verbreken",
-        "disconnectedFromCloudSuccess": "Systeem is succesvol afgesloten van {{CLOUD_NAME}}",
-        "confirmDisconnectFromSystem": "Maak de server los van het huidige systeem",
-        "confirmDisconnectFromSystemAction": "Losmaken",
-        "disconnectedFromSystemSuccess": "Server is succesvol losgemaakt van het systeem",
+        "disconnectedFromCloudSuccess": "Het systeem is succesvol losgekoppeld van {{CLOUD_NAME}}",
+        "disconnectedFromCloudError": "Cannot disconnect the System",
+        "confirmDisconnectFromSystem": "Detach server from current System",
+        "confirmDisconnectFromSystemAction": "Loskoppelen",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "Verbinding maken met het systeem is mislukt",
         "createLocalOwnerTitle": "Maak een lokaal administrator account aan",
         "confirmChangePassword": "Wijzig admin wachtwoord",
-        "confirmChangePasswordTitle": "Systeemwachtwoord veranderen? Het zal gevolgen hebben voor gebruiker 'admin' en het root-wachtwoord voor sommige servers",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Nieuw wachtwoord opslaan",
-        "nx1ControlHint": "Client applicatie is gestart. Gebruik een toetsenbord en muis of de mobiele applicatie om deze te beheren."
+        "nx1ControlHint": "De client applicatie is gestart. Gebruik een toetsenbord, muis en/of de mobiele applicatie om deze te bedienen."
     },
     "settingsConfig": {
         "arecontRtspEnabled": "Arecont RTSP ingeschakeld",
         "auditTrailEnabled": "Audit trail ingeschakeld",
         "auditTrailPeriodDays": "Aantal dagen voor de systeemrapportage",
-        "autoDiscoveryEnabled": "Schakel automatische detectie van apparaten in",
+        "autoDiscoveryEnabled": "Schakel de automatische detectie van apparaten in",
         "autoUpdateThumbnails": "Miniaturen automatisch bijwerken",
         "backupNewCamerasByDefault": "Maak standaard een back-up van nieuwe camera's",
         "backupQualities": "Backup Kwaliteitsniveaus",
         "cameraSettingsOptimization": "Optimalisatie van apparaatinstellingen toestaan",
         "clientStatisticsSettingsUrl": "Relatieve url van klantstatistieken",
-        "cloudAccountName": "Cloud eigenaar-account",
-        "cloudConnectRelayingEnabled": "Enable relaying for cloud connect",
+        "cloudAccountName": "Cloud eigenaar account",
+        "cloudConnectRelayingEnabled": "Schakel relaying in voor cloud connect",
         "cloudConnectUdpHolePunchingEnabled": "Schakel UDP hole punching in voor de cloud verbinding",
         "cloudHost": "Cloud host",
-        "cloudSystemID": "Cloud systeem id",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Uitgeschakelde leveranciers",
-        "ec2AliveUpdateIntervalSec": "Systeam update interval (seconden)",
-        "ec2ConnectionKeepAliveTimeoutSec": "Verbinding behouden timeout (seconden)",
+        "ec2AliveUpdateIntervalSec": "System alive update interval (seconden)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Verbinding keep alive timeout (seconden)",
         "ec2KeepAliveProbeCount": "Verbinding behouden probes (seconden)",
         "emailFrom": "Email van",
         "emailSignature": "Email handtekening",
         "emailSupportEmail": "Support Email",
         "enableEdgeRecording": "Edge recording inschakelen",
         "eventLogPeriodDays": "Event log periode (dagen)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP-zoekbasis",
         "ldapSearchFilter": "LDAP-zoekfilter",
@@ -84,8 +85,8 @@
         "localSystemId": "Lokaal systeem ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max verschil tussen gesynchroniseerde en internettijd (milliseconden)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max verschil tussen gesynchroniseerde en lokale tijd (milliseconden)",
-        "maxRecordQueueSizeBytes": "Max record queue size (bytes)",
-        "maxRecordQueueSizeElements": "Max record queue size (elements)",
+        "maxRecordQueueSizeBytes": "Max records wachtrijgrootte (bytes)",
+        "maxRecordQueueSizeElements": "Max records wachtrijgrootte (elementen)",
         "maxRemoteArchiveSynchronizationThreads": "Max. externe archief synchronisatie",
         "maxRtspConnectDurationSeconds": "Max. Rtsp connect duur seconden",
         "maxSceneItems": "Max. scene items (0 betekent default)",
@@ -107,12 +108,26 @@
         "statisticsReportTimeCycle": "Statistieken rapport interval",
         "statisticsReportUpdateDelay": "Statistieken verslag - update vertraging",
         "synchronizeTimeWithInternet": "Synchroniseer tijd met internet",
-        "systemName": "Systeemnaam",
+        "SystemName": "Systeemnaam",
         "takeCameraOwnershipWithoutLock": "Neem het eigendom van camera's zonder vergrendeling",
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
+        "primaryTimeServer": "Primaire tijdsynchronisatieserver",
+        "osTimeChangeCheckPeriodMs": "Controle van de tijd van het besturingssysteem",
+        "syncTimeExchangePeriod": "Tijdsychronisatie uitwisselingsperiode",
+        "maxWearableArchiveSynchronizationThreads": "Max. aantal draagbare camera archief synchronisatie verbindingen",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
-        "useTextEmailFormat": "Verstuur e-mails met platte tekst"
+        "useTextEmailFormat": "Verstuur e-mails met platte tekst",
+        "useWindowsEmailLineFeed": "Gebruik Windows line feed in e-mails",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Forceer Dataverkeer Encryptie",
+        "videoTrafficEncryptionForced": "Forceer Video Dataverkeer Encryptie",
+        "updateStatus": "Status bijwerken",
+        "watermarkSettings": "Watermerkinstellingen",
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -122,21 +137,22 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "Systeem is onbereikbaar of bestaat niet.",
+        "SystemIsUnreacheble": "Het systeem is onbereikbaar of bestaat niet.",
         "incorrectCurrentPassword": "Wachtwoord onjuist.",
         "incorrectRemotePassword": "Naam of wachtwoord onjuist.",
         "incompatibleVersion": "Het systeem is onbereikbaar, niet bestaand of is voorzien van een incompatibele versie.",
         "wrongUrl": "Kan geen verbinding maken met de gekozen server.",
-        "newSystemError": "Kan de systemen niet samenvoegen. Het externe systeem is niet juist geconfigureerd.",
-        "safeMode": "Kan de systemen niet samenvoegen. Het externe systeem is in de veilige modus.",
-        "configError": "Kan de systemen niet samenvoegen. Eén van de systemen staat wellicht in de veilige modus.",
-        "cloudError": "De systemen kunnen niet worden samengevoegd. Het gekozen systeem is verbonden met de cloud. Verbreek de cloudverbinding.",
-        "cloudBothError": "De systemen kunnen niet worden samengevoegd. Beide systemen zijn verbonden met de cloud. Verbreek de cloudverbinding.",
-        "cloudHostConflict": "Kan de systemen niet samenvoegen, omdat de server verbonden zijn verschillende clouds hosts",
-        "licenceError": "Waarschuwing! U wilt systemen met samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Doorgaan met samenvoegen?",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
+        "licenceError": "Waarschuwing! U wilt systemen samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Wilt u doorgaan met het samenvoegen?",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Verbinding mislukt: ",
         "unknownError": "Onbekende fout",
-        "mergeFailed": "Samenvoegen mislukt: ",
+        "mergeFailed": "Samenvoegen mislukt",
         "mergeSucceed": "Samenvoegen gelukt.",
         "newSystemDisplayName": "Nieuw systeem",
         "incompatibleProtocol": "incompatibele versie",
@@ -144,7 +160,8 @@
         "incompatibleCloudState": "verbonden met de cloud"
     },
     "login": {
-        "incorrectPassword": "Gebruikersnaam of wachtwoord is onjuist"
+        "incorrectPassword": "Gebruikersnaam of wachtwoord is onjuist",
+        "authLockout": "Te veel pogingen. Probeer het later opnieuw."
     },
     "navigaion": {
         "cannotGetUser": "Serverfout: kan de gebruikersgegevens niet ophalen"
@@ -161,7 +178,7 @@
         "started": "Update succesvol gestart. Dit zal enkele minuten duren",
         "upToDate": "Update is mislukt. De gekozen versie is reeds geïnstalleerd.",
         "invalidFile": "Update is mislukt. Het gekozen bestand is niet geldig.",
-        "incompatibleSystem": "Update is mislukt. Het gekozen bestand is voor een ander systeem.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
         "extractionError": "Update is mislukt. Er is onvoldoende ruimte om de update uit te voeren. Controleer de beschikbare opslagruimte.",
         "installationError": "Update is mislukt. Het installatiescript kan niet worden uitgevoerd.",
         "selectFiles": "Bestand(en) selecteren"
@@ -205,9 +222,9 @@
             "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
             "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
             "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
-            "unauthorized": "Authentication required",
+            "unauthorized": "Authenticatie vereist",
             "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser.",
-            "ieNoWebm": "Installeer alstublieft <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+            "ieNoWebm": "Installeer alstublieft de <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
             "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
             "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
             "error": "Error",
@@ -219,7 +236,7 @@
         "resolution": {
             "high": "Hoog",
             "auto": "Automatisch",
-            "low": "Lage"
+            "low": "Laag"
         }
     }
 }

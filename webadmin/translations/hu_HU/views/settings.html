@@ -4,23 +4,23 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Ezen eszköz beépített merevlemezekkel történő működésre lett kifejlesztve.<br>
 Kapcsolja ki a készüléket és telepítse a merevlemezt.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 A készülék működéséhez Internetkapcsolat szükséges. <br>
 Kérjük csatlakoztassa a rendszerét az Internetre
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 A készülék hálózati konfigurációja hibás. <br>
 Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -40,20 +40,14 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                     <div>
                         <h3>Szerver visszaállítása</h3>
                         <p>Ez a művelet visszaállítja ezt a szervert az alapértelmezett értékekre (törli az adatbázist és visszaállítja a gyári konfigurációt).
-                            A szerver leválik a jelenlegi rendszerről. A videóarchívum sértetlen marad.</p>
+                            The server will be detached from the current System. A videóarchívum sértetlen marad.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Gyári beállítások visszaállítása</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Szerver leválasztása a rendszerről</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            A videóarchívum sértetlen marad. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztása a rendszerről</button></p>
-                    </div>
-                    <div>
-                        <h3>Szerver leválasztása a rendszerről</h3>
-                        <p>Ez a művelet le fogja választani a szervert a rendszerről. Az adatbázis, a helyi felhasználók és a konfiguráció sértetlen marad.
-                            A videóarchívum sértetlen marad. <b> A felhőfelhasználók törlődnek. </b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztása a rendszerről</button></p>
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
+                            A videóarchívum sértetlen marad. <b>felhő felhasználók törlésre kerülnek</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Újraindítás</h3>
@@ -102,7 +96,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Ez a rendszer {{Config.cloud.productName}} felhőre kapcsolódik, tulajdonos: <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">{{Config.cloud.productName}} leválasztása</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -110,12 +104,12 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Ez a rendszer nem kapcsolódik {{Config.cloud.productName}} felhőre
-<a ng-if="!mode.liteClient"
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
+                                <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">további info</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</alert>
+                                   target="_blank">Learn more</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Csatlakozás {{Config.cloud.productName}} felhőhöz</button>
@@ -124,13 +118,35 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                    target="_blank">{{Config.cloud.productName}} fiók létrehozása</a></p>
                         </div>
                     </div>
+
+
+                    <div>
+                        <h3>Traffic encryption</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    Force Video Traffic Encryption
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Mentés</button>
+                        </form>
+                    </div>
                 </uib-tab>
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>Eszköz hálózati beállítások</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Beállítások mentése és a készülék újraindítása</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Dátum és idő</h3>

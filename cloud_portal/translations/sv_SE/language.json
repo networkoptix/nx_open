@@ -1,196 +1,210 @@
 {
-  "language_name": "LANGUAGE_NAME",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "language": "sv_SE",
+  "language_name": "Svenska",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
-    "cancelButton": "Cancel",
-    "loginTitle": "Log in to {{PRODUCT_NAME}}",
-    "loginButton": "Log in",
-    "logoutAuthorisedTitle": "You are already logged in",
-    "logoutAuthorisedContinueButton": "Continue",
-    "logoutAuthorisedLogoutButton": "Log Out"
+    "cancelButton": "Avbryt",
+    "loginTitle": "Logga in på %PRODUCT_NAME%",
+    "loginButton": "Logga in",
+    "logoutAuthorisedTitle": "Du är redan inloggad",
+    "logoutAuthorisedContinueButton": "Fortsätt",
+    "logoutAuthorisedLogoutButton": "Logga ut"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
-    "registerSuccess": "Welcome to",
-    "register": "Create account in",
-    "changePassword": "Change password -",
-    "account": "Account settings -",
-    "systems": "Systems -",
-    "system": "System -",
-    "systemShare": "Share System -",
-    "activate": "Activate account -",
-    "activateSent": "Activate account -",
-    "activateSuccess": "Account activated -",
-    "activateCode": "Activate account -",
-    "restorePassword": "Reset password -",
-    "restorePasswordSuccess": "Password saved -",
-    "restorePasswordCode": "Reset password -",
-    "view": "View cameras - ",
-    "debug": "Debug",
-    "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} for ",
-    "pageNotFound": "Page not found"
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Välkommen till",
+    "register": "Skapa konto i",
+    "changePassword": "Ändra lösenord -",
+    "account": "Kontoinställningar -",
+    "systems": "System -",
+    "system": "Systemet -",
+    "systemShare": "Dela system -",
+    "activate": "Aktivera konto -",
+    "activateSent": "Aktivera konto -",
+    "activateSuccess": "Kontot aktiverat -",
+    "activateCode": "Aktivera konto -",
+    "restorePassword": "Återställ lösenord -",
+    "restorePasswordSuccess": "Lösenordet sparat -",
+    "restorePasswordCode": "Återställ lösenord -",
+    "view": "Visa kameror - ",
+    "debug": "Debugläge",
+    "login": "Logga in -",
+    "download": "Ladda ner %VMS_NAME%",
+    "downloadPlatform": "Hämta %VMS_NAME% för ",
+    "pageNotFound": "Det gick inte att hitta sidan"
   },
   "systemStatuses": {
-    "notActivated": "not activated",
-    "activated": "activated",
-    "online": "online",
-    "offline": "offline",
-    "unavailable": "unavailable"
+    "notActivated": "inte aktiverad",
+    "activated": "aktiverad",
+    "online": "uppkopplad",
+    "offline": "frånkopplade",
+    "unavailable": "inte tillgänglig"
   },
   "accessRoles": {
     "disabled": {
-      "label": "Disabled",
-      "description": "User is disabled and cannot log in to System"
+      "label": "Inaktiverad",
+      "description": "Användaren är inaktiverad och kan inte logga in på System"
     },
     "Owner": {
-      "label": "Owner",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label": "Ägare",
+      "description": "Obegränsad åtkomst, inklusive möjligheten att dela och ansluta/avregistrera systemet från molnet"
     },
     "Viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Användare",
+      "description": "Kan visa live video och bläddra i arkivet"
     },
     "Live Viewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Begränsad användare",
+      "description": "Kan bara visa live video"
     },
     "Advanced Viewer": {
-      "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label": "Avancerad användare",
+      "description": "Kan visa live video, bläddra i arkivet, konfigurera kameror, styra PTZ etc"
     },
     "Administrator": {
-      "label": "Administrator",
-      "description": "Unrestricted access including the ability to share"
+      "label": "Administratör",
+      "description": "Obegränsad tillgång, inklusive möjligheten att dela"
     },
     "Custom": {
-      "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label": "Anpassad",
+      "description": "Använd %VMS_NAME% klientprogrammet för att ställa in anpassade behörigheter"
     },
     "cloudAdmin": {
-      "label": "Administrator",
-      "description": "Can configure System and share it"
+      "label": "Administratör",
+      "description": "Kan konfigurera system och dela det"
     },
     "customRole": {
-      "label": "Custom role",
-      "description": "Custom user role specified in System"
+      "label": "Anpassad roll",
+      "description": "Anpassad användarroll anges i system"
     },
     "owner": {
-      "label": "Owner",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label": "Ägare",
+      "description": "Obegränsad åtkomst, inklusive möjligheten att dela och ansluta/avregistrera systemet från molnet"
     },
     "viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Användare",
+      "description": "Kan visa live video och bläddra i arkivet"
     },
     "liveViewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Begränsad användare",
+      "description": "Kan bara visa live video"
     },
     "advancedViewer": {
-      "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label": "Avancerad användare",
+      "description": "Kan visa live video, bläddra i arkivet, konfigurera kameror, styra PTZ etc"
     },
     "custom": {
-      "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label": "Anpassad",
+      "description": "Använd %VMS_NAME% klientprogrammet för att ställa in anpassade behörigheter"
     }
   },
   "errorCodes": {
     "ok": "ok",
-    "cantSendActivationPrefix": "Cannot send confirmation Email",
-    "cantDisconnectSystemPrefix": "Cannot delete System",
-    "cantUnshareWithMeSystemPrefix": "Cannot delete System",
-    "cantSharePrefix": "Cannot share System",
-    "cantGetUsersListPrefix": "Users list is unavailable",
-    "cantGetSystemsListPrefix": "System list is unavailable",
-    "cantRegisterPrefix": "Error occurred",
-    "cantGetSystemInfoPrefix": "System info is unavailable",
-    "cantChangeAccountPrefix": "Cannot save changes",
-    "cantChangePasswordPrefix": "Cannot save password",
-    "cantActivatePrefix": "Cannot activate your account",
-    "cantSendConfirmationPrefix": "Cannot send confirmation Email",
-    "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Wrong password",
-    "wrongParameters": "Some parameters on the form are incorrect",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
-    "wrongCode": "Account is already activated or confirmation code is incorrect",
-    "wrongCodeRestore": "Confirmation code is already used or incorrect",
-    "forbidden": "You do not have permissions to perform this action",
-    "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account is blocked",
-    "notFound": "Not found",
-    "alreadyExists": "This account already exists",
-    "unknownError": "Unexpected error occured",
-    "accountAlreadyActivated": "This account is already activated",
-    "emailNotFound": "Account does not exist.",
-    "EmailAlreadyExists": "This Email is already registered",
-    "oldPasswordMistmatch": "Current password is incorrect.",
-    "passwordMismatch": "Wrong password",
-    "cantEditYourself": "Changing own permissions is not allowed",
-    "cantEditAdmin": "This user has administrator permissions",
-    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection": "Connection to {{systemName}} lost",
-    "thisSystem": "the system"
+    "cantSendActivationPrefix": "Kan inte skicka bekräftelse-e-post",
+    "cantDisconnectSystemPrefix": "Kan inte ta bort System",
+    "cantUnshareWithMeSystemPrefix": "Kan inte ta bort System",
+    "cantSharePrefix": "Kan inte dela System",
+    "cantGetUsersListPrefix": "Användarlistan är inte tillgänglig",
+    "cantGetSystemsListPrefix": "Systemlistan är inte tillgänglig",
+    "cantRegisterPrefix": "Fel inträffade",
+    "cantGetSystemInfoPrefix": "Systeminfo är inte tillgänglig",
+    "cantChangeAccountPrefix": "Kan inte spara ändringar",
+    "cantChangePasswordPrefix": "Kan inte spara lösenord",
+    "cantActivatePrefix": "Kan inte aktivera ditt konto",
+    "cantSendConfirmationPrefix": "Kan inte skicka bekräftelse-e-post",
+    "cloudInvalidResponse": "Cloud DB returnerade ett oväntat svar",
+    "notAuthorized": "Fel lösenord",
+    "brokenAccount": "Oväntat problem med kontot. <a href=\"/restore_password\">Återställ konto</a>",
+    "wrongParameters": "Vissa parametrar på formuläret är felaktiga",
+    "wrongCode": "Kontot är redan aktiverat eller bekräftelsekoden är felaktig",
+    "wrongCodeRestore": "Bekräftelsekoden är redan använd eller felaktig",
+    "forbidden": "Du har inte behörighet att utföra denna åtgärd",
+    "accountNotActivated": "Det här kontot är inte aktiverat än. <a href=\"/activate\">Skicka aktiveringslänk igen</a>",
+    "accountBlocked": "Det här kontot är tillfälligt blockerat. Vänligen försök igen om några minuter.",
+    "notFound": "Hittades inte",
+    "alreadyExists": "Det här kontot existerar redan",
+    "unknownError": "Ett oväntat fel uppstod",
+    "accountAlreadyActivated": "Detta konto är redan aktiverat",
+    "emailNotFound": "Kontot existerar inte.",
+    "EmailAlreadyExists": "Denna e-postadress är redan registrerad",
+    "oldPasswordMistmatch": "Nuvarande lösenord är inkorrekt.",
+    "passwordMismatch": "Fel lösenord",
+    "cantEditYourself": "Ändring av egna behörigheter är inte tillåtet",
+    "cantEditAdmin": "Detta konto har administratörsrättigheter",
+    "cantOpenClient": "%VMS_NAME% programmet hittades inte. <a href=\"/download\">Ladda ner</a>",
+    "lostConnection": "Anslutning till {{systemName}} förlorad",
+    "thisSystem": "systemet",
+    "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
-    "minLengthMessage": "Password must contain at least 8 characters",
-    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
-    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage": "Strong password!",
-    "commonMessage": "This password is in top most popular passwords in the world"
+    "good": "good",
+    "fair": "fair",
+    "minLength": "too short",
+    "minLengthMessage": "Lösenordet måste innehålla minst 8 tecken",
+    "required": "incorrect",
+    "requiredMessage": "Använd endast latinska bokstäver, siffror och tangentbordssymboler, undvik ledande och efterföljande mellanslag",
+    "weak": "weak",
+    "weakMessage": "Använd siffror, stora bokstäver och specialtecken för att göra ditt lösenord starkare",
+    "strongMessage": "Starkt lösenord!",
+    "common": "too common",
+    "commonMessage": "Detta lösenord är i topp populäraste lösenord i världen",
+    "missingMessage": "Lösenord krävs"
   },
   "sharing": {
-    "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
-    "shareTitle": "Share",
-    "shareConfirmButton": "Share",
-    "editShareTitle": "Edit Permissions",
-    "editShareConfirmButton": "Save",
-    "permissionsSaved": "New permissions saved"
+    "confirmOwner": "Om du ändrar systemägaren återkallar du ägandet från det aktuella kontot. Denna åtgärd är oåterkallelig. Är du säker?",
+    "shareTitle": "Dela",
+    "shareConfirmButton": "Dela",
+    "editShareTitle": "Ändra behörigheter",
+    "editShareConfirmButton": "Spara",
+    "permissionsSaved": "Nya behörigheter sparades"
   },
   "system": {
-    "yourSystem": "Your System",
-    "mySystemSearch": "IMeMyMine",
-    "unavailable": "System is unreachable",
-    "offline": "System is offline",
-    "openClient": "Open in {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
-    "confirmRenameTitle": "System name",
-    "confirmRenameAction": "Save",
-    "successRename": "System name saved",
-    "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction": "Disconnect",
-    "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
-    "confirmUnshareFromMeTitle": "Disconnect System?",
-    "confirmUnshareFromMeAction": "Disconnect",
-    "confirmUnshare": "This user will not be able to access System. Are you sure?",
-    "confirmUnshareTitle": "Delete user?",
-    "confirmUnshareAction": "Delete",
-    "successDisconnected": "System is successfully disconnected from {{PRODUCT_NAME}}",
-    "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved": "Permissions were removed from {{email}}"
+    "yourSystem": "Ditt system",
+    "mySystemSearch": "JagMigMinMin",
+    "unavailable": "Systemet är oåtkomligt",
+    "offline": "Systemet är offline",
+    "openClient": "Öppet i %VMS_NAME%",
+    "openClientNoSystem": "Öppna %VMS_NAME%",
+    "confirmMergeAction": "Sammanfoga",
+    "mergeSystemTitle": "Sammanfoga system",
+    "confirmRenameTitle": "Systemets namn",
+    "confirmRenameAction": "Spara",
+    "successRename": "Systemnamnet sparat",
+    "confirmDisconnectTitle": "Koppla bort systemet från %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Koppla från",
+    "confirmUnshareFromMe": "Du håller på att koppla bort det här systemet från ditt konto. Du kommer inte längre få tillgång till det här systemet. Är du säker?",
+    "confirmUnshareFromMeTitle": "Koppla ifrån systemet?",
+    "confirmUnshareFromMeAction": "Koppla från",
+    "confirmUnshare": "Den här användaren kan inte komma åt System. Är du säker?",
+    "confirmUnshareTitle": "Radera användaren?",
+    "confirmUnshareAction": "Radera",
+    "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
+    "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
+    "successMerge": "System merge completed",
+    "permissionsRemoved": "Rättigheterna togs bort från {{email}}"
   },
   "account": {
-    "accountSavedSuccess": "Your account is successfully saved",
-    "activationLinkSent": "Activation Link Sent",
-    "passwordChangedSuccess": "Your account is successfully saved",
-    "changePassword": "Change Password",
-    "newPasswordLabel": "New password",
-    "saveChanges": "Save"
+    "accountSavedSuccess": "Ditt konto har sparats",
+    "activationLinkSent": "Aktiveringslänk skickad",
+    "passwordChangedSuccess": "Ditt konto har sparats",
+    "changePassword": "Ändra lösenord",
+    "newPasswordLabel": "Nytt lösenord",
+    "saveChanges": "Spara"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installera %VMS_NAME% om du vill visa ditt System",
+    "action": "Ladda ner %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -233,10 +247,10 @@
       "mac": "X"
     },
     "appTypes": {
-      "client": "Client only",
-      "server": "Server only",
-      "bundle": "Client and Server",
-      "servertool": "Configuration tool"
+      "client": "Endast klient",
+      "server": "Endast server",
+      "bundle": "Klient och Server",
+      "servertool": "Konfigurationsverktyg"
     },
     "releasesTypes": {
       "beta": "Beta",
@@ -249,17 +263,65 @@
     }
   },
   "activeActions": {
-    "sendConfirm": "Resend activation link",
-    "resetPassword": "Reset Password",
-    "setNewPassword": "Save password",
-    "setNewPasswordLabel": "New password"
+    "sendConfirm": "Skicka aktiveringslänk igen",
+    "resetPassword": "Återställ lösenord",
+    "setNewPassword": "Spara lösenord",
+    "setNewPasswordLabel": "Nytt lösenord"
   },
   "regActions": {
-    "passwordLabel": "Password",
-    "createAccount": "Create Account"
+    "passwordLabel": "Lösenord",
+    "createAccount": "Skapa konto"
   },
   "header": {
-    "allSystems": "All Systems",
-    "systems": "Systems"
+    "allSystems": "Alla system",
+    "systems": "System"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Högupplöst ström",
+      "lowStream": "Lågupplöst ström",
+      "transcoding": "Omkodning",
+      "unknown": "Okänd",
+      "copyToClipboard": "kopiera till urklipp",
+      "copyDefaultText": "kopiera",
+      "copyActiveText": "kopierat till Urklipp"
+    },
+    "systemOffline": "System Offline",
+    "systemHasNoCameras": "INGA KAMEROR",
+    "cameraStates": {
+      "offline": "Frånkopplade",
+      "error": "Fel",
+      "unauthorized": "Autentisering krävs",
+      "noData": "Data saknas",
+      "iosVideoTooLarge": "iOS stöder inte video större än fullHD (2MP: 1920x1080).",
+      "flashRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> för att spela upp videor.",
+      "flashOrWebmRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> eller<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för att spela video i Internet Explorer.",
+      "noArmSupport": "Denna webbläsare eller enhet stöder inte videouppspelning från ARM-baserade servrar.",
+      "noFormat": "Den här webbläsaren stöder inte videouppspelning från den här kameran.",
+      "ieNoWebm": "Var god installera <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för Internet Explorer.",
+      "ieWin10": "Vänligen använd Microsoft Edge eller Google Chrome-webbläsare.",
+      "ubuntuNX": "Den här webbläsaren stöder inte video från ARM-baserade servrar. Vänligen använd Chrome-webbläsaren istället."
+    },
+    "searchCamPlaceholder": "Sök",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Hög",
+      "low": "Låg"
+    },
+    "chromeCastWarning": "Chromecast är resursintensiv och kan orsaka problem på din server.",
+    "voiceCommands": {
+      "play": "spela",
+      "pause": "pausa",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "rensa sökningen",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "expandera alla servrar",
+      "collapse all servers": "kollapsa alla servrar",
+      "stop listening": "sluta lyssna",
+      "help": "help | show commands"
+    }
   }
 }

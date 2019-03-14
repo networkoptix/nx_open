@@ -7,17 +7,18 @@ angular.module('cloudApp')
     }])
     .controller('RegisterCtrl', [
         '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout', 'dialogs',
-        '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64',
+        '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64', 'authorizationCheckService',
+
         function ($scope, cloudApi, process, $location, $localStorage, $timeout, dialogs,
-                  $sessionStorage, $routeParams, account, urlProtocol, $base64) {
+                  $sessionStorage, $routeParams, account, urlProtocol, $base64, authorizationCheckService) {
 
         $scope.registerSuccess = $routeParams.registerSuccess;
         $scope.activated = $routeParams.activated;
 
         if(!$scope.registerSuccess){
-            account.logoutAuthorised();
+            authorizationCheckService.logoutAuthorised();
         }else if($scope.activated){
-            account.redirectAuthorised();
+            authorizationCheckService.redirectAuthorised();
         }
 
         $scope.session = $localStorage;
@@ -28,14 +29,14 @@ angular.module('cloudApp')
         var registerEmail = null;
         if($routeParams.code){
             var decoded = $base64.decode($routeParams.code);
-            registerEmail = decoded.substring(decoded.indexOf(':') + 1)
+            registerEmail = decoded.substring(decoded.indexOf(':') + 1);
             $scope.lockEmail = true;
         }
 
 
 
         if($scope.registerSuccess &&  $scope.context.process !== 'registerSuccess'){
-            account.redirectToHome();
+            authorizationCheckService.redirectToHome();
         }
 
         $scope.account = {
@@ -55,6 +56,7 @@ angular.module('cloudApp')
         };
 
         $scope.register = process.init(function() {
+            account.setEmail($scope.account.email);
             return cloudApi.register(
                 $scope.account.email,
                 $scope.account.password,
@@ -66,6 +68,7 @@ angular.module('cloudApp')
             errorCodes:{
                 alreadyExists: function(error){
                     $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
+                    $scope.registerForm.registerForm.registerEmail.$setTouched();
                     return false;
                 },
                 portalError: L.errorCodes.brokenAccount
@@ -77,7 +80,7 @@ angular.module('cloudApp')
             if($scope.account.code){
                 $scope.activated = true;
                 $location.path('/register/successActivated',false);
-                account.login($scope.account.email, $scope.account.password);
+                authorizationCheckService.login($scope.account.email, $scope.account.password);
             }else{
                 $location.path('/register/success',false);
                 account.setEmail($scope.account.email);

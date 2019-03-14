@@ -1,3 +1,3 @@
-Hello, {{message.full_name}}
+Buna ziua, {{message.userFullName}}
 
 {{message.text_body}}

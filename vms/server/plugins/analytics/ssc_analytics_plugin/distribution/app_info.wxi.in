@@ -1,0 +1,20 @@
+<Include>
+    <?ifndef includeGuard?>
+        <?define includeGuard="app_info.wxi"?>
+
+        <?define productId = "${productId}"?>
+        <?define productUpgradeCode = "${productUpgradeCode}"?>
+        <?define bundleUpgradeCode = "${bundleUpgradeCode}"?>
+        <?define productName = "${display.product.name}"?>
+        <?define installerProductName = "${display.product.name} SSC Plugin"?>
+        <?define manufacturer = "${company.name}"?>
+        <?define productVersion = "${release.version}.${buildNumber}"?>
+        <?define customizationDir = "${customization.dir}"?>
+        <?define binariesDirectory = "${bin_source_dir}"?>
+        <?define qtDirectory="${qt.dir}/bin"?>
+        <?define installerLanguage = "${installerLanguage}"?>
+        <?define installerMsiFile = "${installerMsiFile}"?>
+        <?define themeFile = "${themeFile}"?>
+        <?define localizationFile = "${localizationFile}"?>
+     <?endif?>
+</Include>

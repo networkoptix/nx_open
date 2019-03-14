@@ -1,0 +1,68 @@
+<form #loginForm="ngForm" name="loginForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title" translate>Log in to %PRODUCT_NAME%</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="close(true)" *ngIf="closable">
+            <div class="close-content"><span class="close-icon"></span></div>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="login_email" translate>Email</label>
+            <input type="email" class="form-control"
+                   id="login_email" name="login_email" #login_email="ngModel"
+                   [(ngModel)]="auth.email"
+                   pattern="{{ config.emailRegex }}" maxlength="255"
+                   required nxFocusMe>
+            <div *ngIf="login_email.invalid && login_email.errors.no_user">
+                <label class="input-error" translate>Account not found</label>
+                <a class="float-right justify-content-end" href (click)="gotoRegister()" translate>Create account</a>
+            </div>
+            <div *ngIf="login_email.invalid && login_email.errors.not_activated">
+                <label class="input-error" translate>Account not activated</label>
+                <a class="float-right" href (click)="resendActivation(login_email.value)" translate>Resend activation email</a>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="login_password" translate>Password</label>
+            <input type="password" class="form-control"
+                   name="login_password" id="login_password" #login_password="ngModel"
+                   [(ngModel)]="password"
+                   (ngModelChange)="resetForm()"
+                   maxlength="255"
+                   required>
+            <div *ngIf="login_password.invalid && wrongPassword">
+                <label class="input-error" translate>Wrong password</label>
+            </div>
+            <div *ngIf="login_password.invalid && accountBlocked">
+                <label class="input-error" translate>Too many attempts. Try again in a minute.</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="checkbox">
+                <input type="checkbox" checked="checked"
+                       [(ngModel)]="remember"
+                       name="remember" id="remember">
+                <span class="checkmark">
+                        <svg viewBox="0 0 20 16">
+                            <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
+                            <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
+                            <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
+                            <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
+                        </svg>
+                    </span>
+                <span class="text" translate>Remember me</span>
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <nx-process-button buttonText="{{ 'Log In' | translate }}"
+                           [form]="loginForm"
+                           [process]="login">
+        </nx-process-button>
+
+        <a href="/restore_password" (click)="activeModal.close()" translate>Forgot password?</a>
+    </div>
+</form>

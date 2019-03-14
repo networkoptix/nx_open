@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Дополнительные настройки сервера</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -106,7 +109,7 @@
             Основной накопитель не был выбран для записи - видео не будет записываться на этом сервере.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Объем зарезервированного пространства больше свободного места. Чтобы освободить место можно удалить текущие записи.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Для сохранения необходимо исправить все отмеченные настройки</div>
 
@@ -116,60 +119,36 @@
 
     <h2>Настройки журнала</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Уровень детализации основного журнала</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} уровень журналирования</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Нет: Журнал отключён.</option>
-                    <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="ERROR">Ошибки: Записывать ошибки.</option>
-                    <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
-                    <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Нет: Журнал отключён.</option>
+                    <option value="always">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
+                    <option value="error">Ошибки: Записывать ошибки.</option>
+                    <option value="warning">Предупреждение: Записывать ошибки и предупреждения.</option>
+                    <option value="info">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Уровень журнала транзакций</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Нет: Журнал отключён.</option>
-                    <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="ERROR">Ошибки: Записывать ошибки.</option>
-                    <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Инфо: Записывать ошибки, предупреждения и все сообщения.</option>
-                    <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Сохранить</button>
         </div>
     </form>
 
-    <h2>Ручное обновление</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Загрузить установщик</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Пожалуйста, убедитесь, в правильности конфигурации.</p>
-            </div>
-        </div>
-    </form>
-
-    <h1>Дополнительные настройки системы</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
         <b>Предупреждение!</b> Любые изменения на этой странице могут привести к неправильной работе сервера.
     </div>
 
-    <form class="form row" role="form" name="systemSettings" novalidate>
+    <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || setting}}
+                    <small ng-if="L.settingsConfig[setting]" class="text-muted">&nbsp;&nbsp;{{setting}}</small>
+            </label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"

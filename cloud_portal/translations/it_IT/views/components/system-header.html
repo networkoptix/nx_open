@@ -1,11 +1,11 @@
 <div class="row">
-    <div class="col-sm-6">
-        <h1 ng-if="gettingSystem.success" class="ellipsis">{{system.info.name}}
-            <span ng-if="!system.isOnline" class="label"
+    <div class="col-sm-6 d-flex">
+        <h1 ng-if="gettingSystem.success" class="ellipsis p-0">{{system.info.name}}
+            <span ng-if="!system.isOnline" class="badge badge-info"
                   ng-class="$root.C.systemStatuses[system.info.stateOfHealth].style || $root.C.systemStatuses.default.style">
                   {{$root.L.systemStatuses[system.info.stateOfHealth]||system.info.stateOfHealth}}</span>
 
-            <span ng-if="system.isOnline&&!system.isAvailable" class="label"
+            <span ng-if="system.isOnline&&!system.isAvailable" class="badge badge-info"
                   ng-class="$root.C.systemStatuses.unavailable.style">
                   {{$root.L.systemStatuses.unavailable}}</span>
         </h1>
@@ -15,8 +15,7 @@
             <button class="btn btn-default"
                     ng-disabled="!system.isAvailable"
                     title="{{system.stateMessage}}"
-                    ng-click="share()" ng-if="system.permissions.editUsers">
-                <span class="glyphicon glyphicon-share"></span> Share</button>
+                    ng-click="share()" ng-if="system.permissions.editUsers"> <span class="glyphicon glyphicon-share"> </span> Condivisione </button>
             &nbsp;
             <open-client-button system="system"></open-client-button>
         </div>

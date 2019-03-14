@@ -1,8 +1,8 @@
 {{#systemName}}
-System: {{systemName}} {{systemSignature}}
+Sistema: {{systemName}} {{systemSignature}}
 {{/systemName}}
 
 {{>body}}
 
-{{companyUrl}}
-Support: {{supportLink}}
+%COMPANY_LINK%
+Suporte: %SUPPORT_LINK%

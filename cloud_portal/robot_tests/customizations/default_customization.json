@@ -1,0 +1,16 @@
+{
+    "PRODUCT_NAME"             :    "Nx Cloud",
+    "VMS_NAME"                 :    "Nx Witness",
+    "PRIVACY POLICY URL"       :    "https://www.networkoptix.com/privacy-policy/",
+    "SUPPORT URL"              :    "https://support.networkoptix.com",
+    "WEBSITE URL"              :    "https://networkoptix.com",
+    "ABOUT URL"                :    "/content/about",
+    "KNOWN LIMITATIONS URL"    :    "/content/faq",
+    "TERMS URL"                :    "/content/eula",
+    "COPYRIGHT URL"            :    "https://www.networkoptix.com/",
+    "COPYRIGHT TEXT"           :    "© 2019 Network Optix",
+    "THEME COLOR"              :    "#2FA2DB",
+    "THEME COLOR RGB"          :    "rgba(47, 162, 219, 1)",
+    "ITUNES STORE LINK"        :    "https://itunes.apple.com/eg/app/hd-witness/id1050899754",
+    "PLAY STORE LINK"          :    "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness"
+}

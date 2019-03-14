@@ -1,8 +1,0 @@
-mergers:
-  first:
-    second:
-      settings: remote
-networks:
-  10.254.0.0/28:
-    first:
-    second:

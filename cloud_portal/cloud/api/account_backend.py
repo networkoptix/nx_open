@@ -1,13 +1,19 @@
-from django.utils import timezone
+import logging
+
 from django import db
-import models
-from api.controllers.cloud_api import Account
+from django.utils import timezone
 from django.contrib.auth.backends import ModelBackend
-from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.dispatch import receiver
+
 from cloud import settings
 
-import logging
+import models
+from api.controllers.cloud_api import Account
+from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes, APINotAuthorisedException
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,8 +32,14 @@ class AccountBackend(ModelBackend):
         return True
 
     @staticmethod
-    def authenticate(username=None, password=None):
-        user = Account.get(username, password)  # first - check cloud_db
+    def authenticate(request=None, username=None, password=None):
+        try:
+            ip = get_ip(request)
+            user = Account.get(username, password, ip)  # first - check cloud_db
+        except APINotAuthorisedException as exception:
+            if request and exception.error_code == ErrorCodes.account_blocked:
+                request.session['account_blocked'] = True
+            return None  # not authorised - return None which tells django that auth failed and it will log it
 
         if user and 'email' in user:
             if username.find('@') > -1:
@@ -70,13 +82,14 @@ class AccountManager(db.models.Manager):
                                       error_data={'email': ['This field is required.']})
         email = email.lower()
 
+        ip = extra_fields.pop("IP", "")
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")
         code = extra_fields.pop("code", None)
 
         # this line will send request to cloud_db and raise an exception if fails:
         try:
-            Account.register(email, password, first_name, last_name, code=code)
+            Account.register(ip, email, password, first_name, last_name, code=code)
         except APIException as a:
             if a.error_code == ErrorCodes.account_exists and not AccountBackend.is_email_in_portal(email):
                 raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
@@ -99,3 +112,48 @@ class AccountManager(db.models.Manager):
 
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, **extra_fields)
+
+    def register_cloud_invite_user(self, email, password, data):
+        ip = data.pop("IP", "")
+        first_name = data.pop("first_name")
+        last_name = data.pop("last_name")
+
+        Account.register(ip, email, password, first_name, last_name)
+        user = models.Account.objects.get(email=email)
+        """
+        When an account is created using cloud invites it is disabled because its registration
+        is different from regular users. Once the user has registered their account it is set to
+        active in this function.
+        """
+        user.is_active = True
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        return user
+
+
+
+
+def get_ip(request):
+    return request.META.get('HTTP_X_FORWARDED_FOR')
+
+
+@receiver(user_logged_in)
+def user_logged_in_callback(sender, request, user, **kwargs):
+    ip = get_ip(request)
+    logger.info('User logged in: {}, IP: {}'.format(user.email, ip))
+    models.AccountLoginHistory.objects.create(action='user_logged_in', ip=ip, email=user.email)
+
+
+@receiver(user_logged_out)
+def user_logged_out_callback(sender, request, user, **kwargs):
+    ip = get_ip(request)
+    logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
+    models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
+
+
+@receiver(user_login_failed)
+def user_login_failed_callback(sender, credentials, **kwargs):
+    logger.info('Failed login attempt: {}'.format(credentials.get('username', None)))
+    models.AccountLoginHistory.objects.create(action='user_login_failed', email=credentials.get('username', None))

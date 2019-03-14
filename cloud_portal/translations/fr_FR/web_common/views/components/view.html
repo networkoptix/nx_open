@@ -28,6 +28,7 @@
                 </div>
             </td>
             <td width="100%">
+                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                     <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
                         <div class="fullscreen-area" ng-class="{'fullscreen': isFullscreen}">
@@ -69,7 +70,7 @@
                                                         <span>
                                                             <span ng-class="{'voice-active': voiceControls.enabled}"
                                                                   class="glyphicon glyphicon-bullhorn"></span>
-                                                            &nbsp;Voice Commands
+                                                            &nbsp;Commandes Vocales
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -100,7 +101,6 @@
                                 <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
                                     <span>Appuyez sur ÉCHAP pour quitter le plein écran</span>
                                 </div>
-                                <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
                                 <camera-links ng-if="cameraLinks.enabled"
                                               system="systemAPI" position="positionProvider.playedPosition"
                                               live-mode="positionProvider.liveMode" active-camera="activeCamera"

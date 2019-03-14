@@ -7,14 +7,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
-#include <nx/kit/debug.h>
 #include <queue>
+
+#define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
+#include <nx/kit/debug.h>
 
 #include "tegra_video_ini.h"
 #include "rects_serialization.h"
-
-#define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
 
 namespace {
 
@@ -116,7 +115,7 @@ public:
             const int64_t ptsModuloUs = *outPtsUs % m_ptsModulusUs;
 
             const std::string filename =
-                ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", ptsModuloUs);
+                ini().rectanglesFilePrefix + nx::kit::utils::format("%lld.txt", ptsModuloUs);
             if (!readRectsFromFile(filename, outRects, maxRectCount, outRectCount))
                 return false; //< Error already logged.
         }
@@ -152,12 +151,9 @@ private:
     void makeRectangles(Rect outRects[], int maxRectCount, int* outRectCount)
     {
         *outRectCount = 0;
-        const auto width = (float) ini().stubRectangleWidth / 100;
-        const auto height = (float) ini().stubRectangleWidth / 100;
         const auto rectangleCount = std::min(ini().stubNumberOfRectangles, maxRectCount);
         const int frequencyCoefficient =
             ini().stubMetadataFrequency ? ini().stubMetadataFrequency : 1;
-
 
         for (int i = 0; i < rectangleCount; ++i)
         {

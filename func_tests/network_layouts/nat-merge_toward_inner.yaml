@@ -1,9 +1,0 @@
-mergers:
-  outer:
-    inner:
-networks:
-  10.254.0.0/28:
-    outer:
-    router:
-      10.254.0.16/28:
-        inner:

@@ -58,8 +58,8 @@ BRANCH=$(cat $BRANCH_FILE)
 deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$BRANCH"
 if [ $DEPLOY_RELEASE_VERSION = 1 ]
 then
-    VMS_VERSION=$(grep 'project(vms VERSION .*)' "$ROOT_DIR/CMakeLists.txt" \
-        | sed -E 's/.*VERSION ([0-9.]+)+\)/\1/')
+    VMS_VERSION=$(grep 'set(releaseVersion .*)' "$ROOT_DIR/CMakeLists.txt" \
+        | sed -E 's/.*releaseVersion ([0-9.]+)+\)/\1/')
 
     deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$VMS_VERSION"
 fi

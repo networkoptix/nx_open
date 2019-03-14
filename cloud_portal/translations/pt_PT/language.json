@@ -1,196 +1,210 @@
 {
-  "language_name": "Português (PT)",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "language": "pt_PT",
+  "language_name": "Português",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Cancelar",
-    "loginTitle": "Log in to {{PRODUCT_NAME}}",
+    "loginTitle": "Log in to %PRODUCT_NAME%",
     "loginButton": "Log in",
-    "logoutAuthorisedTitle": "You are already logged in",
-    "logoutAuthorisedContinueButton": "Continue",
-    "logoutAuthorisedLogoutButton": "Log Out"
+    "logoutAuthorisedTitle": "Já tem sessão iniciada",
+    "logoutAuthorisedContinueButton": "Continuar",
+    "logoutAuthorisedLogoutButton": "Terminar sessão"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Welcome to",
-    "register": "Create account in",
+    "register": "Create account",
     "changePassword": "Change password -",
-    "account": "Account settings -",
-    "systems": "Systems -",
+    "account": "Definições da conta -",
+    "systems": "Sistemas -",
     "system": "System -",
-    "systemShare": "Share System -",
-    "activate": "Activate account -",
-    "activateSent": "Activate account -",
-    "activateSuccess": "Account activated -",
-    "activateCode": "Activate account -",
-    "restorePassword": "Reset password -",
-    "restorePasswordSuccess": "Password saved -",
-    "restorePasswordCode": "Reset password -",
-    "view": "View cameras - ",
+    "systemShare": "Partilha de Sistema -",
+    "activate": "Activar conta -",
+    "activateSent": "Activar conta -",
+    "activateSuccess": "Conta activada -",
+    "activateCode": "Activar conta -",
+    "restorePassword": "Reset de Senha -",
+    "restorePasswordSuccess": "Senha guardada -",
+    "restorePasswordCode": "Reset de Senha -",
+    "view": "Visualizar câmaras - ",
     "debug": "Debug",
     "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} for ",
-    "pageNotFound": "Page not found"
+    "download": "Baixar %VMS_NAME%",
+    "downloadPlatform": "Baixar %VMS_NAME% para ",
+    "pageNotFound": "Página não encontrada"
   },
   "systemStatuses": {
-    "notActivated": "not activated",
-    "activated": "activated",
+    "notActivated": "não activado",
+    "activated": "activado",
     "online": "online",
     "offline": "offline",
-    "unavailable": "unavailable"
+    "unavailable": "indisponível"
   },
   "accessRoles": {
     "disabled": {
       "label": "Desabilitado",
-      "description": "User is disabled and cannot log in to System"
+      "description": "O utilizador está desactivado e não pode efectuar login no sistema"
     },
     "Owner": {
       "label": "Dono",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "description": "Acesso não restrito, incluindo a capacidade de partilhar e conectar/desconectar o sistema da \"Cloud\""
     },
     "Viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Visualizador",
+      "description": "Pode visualizar o vídeo ao vivo e pesquisar o arquivo"
     },
     "Live Viewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Visualizador ao vivo",
+      "description": "Só pode visualizar o vídeo ao vivo"
     },
     "Advanced Viewer": {
-      "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label": "Visualizador Avançado",
+      "description": "Pode visualizar vídeo ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
     },
     "Administrator": {
       "label": "Administrador",
-      "description": "Unrestricted access including the ability to share"
+      "description": "Acesso não restrito incluindo a capacidade de partilhar"
     },
     "Custom": {
-      "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label": "Personalizadas",
+      "description": "Use a aplicação Cliente %VMS_NAME% para configurar permissões personalizadas"
     },
     "cloudAdmin": {
       "label": "Administrador",
-      "description": "Can configure System and share it"
+      "description": "Pode configurar o Sistema e partilhá-lo"
     },
     "customRole": {
-      "label": "Custom role",
-      "description": "Custom user role specified in System"
+      "label": "Perfil Personalizado",
+      "description": "Perfil de utilizador personalizado especificado no Sistema"
     },
     "owner": {
       "label": "Dono",
-      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "description": "Acesso não restrito, incluindo a capacidade de partilhar e conectar/desconectar o sistema da \"Cloud\""
     },
     "viewer": {
-      "label": "Viewer",
-      "description": "Can view live video and browse the archive"
+      "label": "Visualizador",
+      "description": "Pode visualizar o vídeo ao vivo e pesquisar o arquivo"
     },
     "liveViewer": {
-      "label": "Live Viewer",
-      "description": "Can only view live video"
+      "label": "Visualizador ao vivo",
+      "description": "Só pode visualizar o vídeo ao vivo"
     },
     "advancedViewer": {
-      "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label": "Visualizador Avançado",
+      "description": "Pode ver vídeos ao vivo, navegar no arquivo, configurar câmaras, controlar PTZ etc"
     },
     "custom": {
-      "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label": "Personalizadas",
+      "description": "Use a aplicação Cliente %VMS_NAME% para configurar permissões personalizadas"
     }
   },
   "errorCodes": {
     "ok": "ok",
-    "cantSendActivationPrefix": "Cannot send confirmation Email",
-    "cantDisconnectSystemPrefix": "Cannot delete System",
-    "cantUnshareWithMeSystemPrefix": "Cannot delete System",
-    "cantSharePrefix": "Cannot share System",
-    "cantGetUsersListPrefix": "Users list is unavailable",
-    "cantGetSystemsListPrefix": "System list is unavailable",
-    "cantRegisterPrefix": "Error occurred",
-    "cantGetSystemInfoPrefix": "System info is unavailable",
-    "cantChangeAccountPrefix": "Cannot save changes",
-    "cantChangePasswordPrefix": "Cannot save password",
-    "cantActivatePrefix": "Cannot activate your account",
-    "cantSendConfirmationPrefix": "Cannot send confirmation Email",
-    "cloudInvalidResponse": "Cloud DB returned an unexpected response",
-    "notAuthorized": "Wrong password",
-    "wrongParameters": "Some parameters on the form are incorrect",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
-    "wrongCode": "Account is already activated or confirmation code is incorrect",
-    "wrongCodeRestore": "Confirmation code is already used or incorrect",
-    "forbidden": "You do not have permissions to perform this action",
-    "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account is blocked",
-    "notFound": "Not found",
-    "alreadyExists": "This account already exists",
-    "unknownError": "Unexpected error occured",
-    "accountAlreadyActivated": "This account is already activated",
-    "emailNotFound": "Account does not exist.",
-    "EmailAlreadyExists": "This Email is already registered",
-    "oldPasswordMistmatch": "Current password is incorrect.",
-    "passwordMismatch": "Wrong password",
-    "cantEditYourself": "Changing own permissions is not allowed",
-    "cantEditAdmin": "This user has administrator permissions",
-    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection": "Connection to {{systemName}} lost",
-    "thisSystem": "the system"
+    "cantSendActivationPrefix": "Não é possível enviar um email de confirmação",
+    "cantDisconnectSystemPrefix": "Não é possível apagar o Sistema",
+    "cantUnshareWithMeSystemPrefix": "Não é possível apagar o Sistema",
+    "cantSharePrefix": "Não é possível partilhar o Sistema",
+    "cantGetUsersListPrefix": "A lista de utilizadores não está disponível",
+    "cantGetSystemsListPrefix": "A lista de Sistemas não está disponível",
+    "cantRegisterPrefix": "Ocorreu um erro",
+    "cantGetSystemInfoPrefix": "Informações do sistema indisponível",
+    "cantChangeAccountPrefix": "Não é possível guardar as alterações",
+    "cantChangePasswordPrefix": "Não é possível guardar a senha",
+    "cantActivatePrefix": "Não é possível activar a sua conta",
+    "cantSendConfirmationPrefix": "Não é possível enviar o email de confirmação",
+    "cloudInvalidResponse": "A base de dados da Cloud retornou uma resposta inesperada",
+    "notAuthorized": "Senha incorrecta",
+    "brokenAccount": "Problema inesperado com a conta. <a href=\"/restore_password\">Restaurar conta</a>",
+    "wrongParameters": "Alguns parâmetros no formulário estão incorretos",
+    "wrongCode": "A conta já está activada ou o código de confirmação está incorreto",
+    "wrongCodeRestore": "O código de confirmação já foi usado ou está incorreto",
+    "forbidden": "Não tem permissões para efectuar esta acção",
+    "accountNotActivated": "Esta conta ainda não está activada. <a href=\"/activate\">Enviar link de activação novamente</a>",
+    "accountBlocked": "Esta conta está temporariamente bloqueada. Por favor, tente novamente dentro de alguns minutos.",
+    "notFound": "Não encontrado",
+    "alreadyExists": "Esta conta já existe",
+    "unknownError": "Ocorreu um erro inesperado",
+    "accountAlreadyActivated": "Esta conta já está activada",
+    "emailNotFound": "Conta não existe.",
+    "EmailAlreadyExists": "Este Email já está registado",
+    "oldPasswordMistmatch": "A senha actual está incorreta.",
+    "passwordMismatch": "Senha incorrecta",
+    "cantEditYourself": "Não é permitido alterar as permissões próprias",
+    "cantEditAdmin": "Este utilizador tem permissões de administrador",
+    "cantOpenClient": "Aplicação %VMS_NAME% Não está a ser detecteda. <a href=\"/download\">Descarregar</a>",
+    "lostConnection": "Conexão a {{systemName}} perdida",
+    "thisSystem": "o sistema",
+    "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
-    "minLengthMessage": "Password must contain at least 8 characters",
-    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
-    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage": "Strong password!",
-    "commonMessage": "This password is in top most popular passwords in the world"
+    "good": "good",
+    "fair": "fair",
+    "minLength": "demasiado curta",
+    "minLengthMessage": "A senha deve conter pelo menos 8 caracteres",
+    "required": "incorrect",
+    "requiredMessage": "Use apenas letras latinas, números e símbolos do teclado, evite espaços à esquerda e à direita",
+    "weak": "weak",
+    "weakMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
+    "strongMessage": "Senha forte!",
+    "common": "demasiado comum",
+    "commonMessage": "Esta senha está principais senhas mais populares no mundo",
+    "missingMessage": "A senha é necessária"
   },
   "sharing": {
-    "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
-    "shareTitle": "Share",
-    "shareConfirmButton": "Share",
-    "editShareTitle": "Edit Permissions",
+    "confirmOwner": "Se alterar o proprietário do sistema, você revogará a propriedade da conta actual. Esta acção é irreversível. Tem certeza?",
+    "shareTitle": "Partilhar",
+    "shareConfirmButton": "Partilhar",
+    "editShareTitle": "Editar Permissões",
     "editShareConfirmButton": "Gravar",
-    "permissionsSaved": "New permissions saved"
+    "permissionsSaved": "Novas permissões guardadas"
   },
   "system": {
-    "yourSystem": "Your System",
+    "yourSystem": "O seu Sistema",
     "mySystemSearch": "IMeMyMine",
-    "unavailable": "System is unreachable",
-    "offline": "System is offline",
-    "openClient": "Open in {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
-    "confirmRenameTitle": "System name",
+    "unavailable": "O sistema está inacessível",
+    "offline": "O sistema está offline",
+    "openClient": "Abrir em %VMS_NAME%",
+    "openClientNoSystem": "Abrir %VMS_NAME%",
+    "confirmMergeAction": "\"Merge\"",
+    "mergeSystemTitle": "Fundir Sistemas",
+    "confirmRenameTitle": "Nome do Sistema",
     "confirmRenameAction": "Gravar",
-    "successRename": "System name saved",
-    "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
+    "successRename": "Nome do sistema guardado",
+    "confirmDisconnectTitle": "Disconnect System from %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Disconnect",
-    "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
-    "confirmUnshareFromMeTitle": "Disconnect System?",
+    "confirmUnshareFromMe": "Está prestes a desconectar este Sistema da sua conta. Não poderá mais aceder a este Sistema. Tem certeza?",
+    "confirmUnshareFromMeTitle": "Desconectar o Sistema?",
     "confirmUnshareFromMeAction": "Disconnect",
-    "confirmUnshare": "This user will not be able to access System. Are you sure?",
-    "confirmUnshareTitle": "Delete user?",
+    "confirmUnshare": "Este utilizador não será capaz de aceder ao sistema. Tem certeza?",
+    "confirmUnshareTitle": "Apagar utilizador?",
     "confirmUnshareAction": "Apagar",
-    "successDisconnected": "System is successfully disconnected from {{PRODUCT_NAME}}",
-    "successDeleted": "System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved": "Permissions were removed from {{email}}"
+    "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
+    "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
+    "successMerge": "System merge completed",
+    "permissionsRemoved": "As permissões foram removidas de {{email}}"
   },
   "account": {
-    "accountSavedSuccess": "Your account is successfully saved",
-    "activationLinkSent": "Activation Link Sent",
-    "passwordChangedSuccess": "Your account is successfully saved",
+    "accountSavedSuccess": "A sua conta foi gravada com sucesso",
+    "activationLinkSent": "Link de activação enviado",
+    "passwordChangedSuccess": "A sua conta foi gravada com sucesso",
     "changePassword": "Change Password",
-    "newPasswordLabel": "New password",
+    "newPasswordLabel": "Nova senha",
     "saveChanges": "Gravar"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Instalar %VMS_NAME% para visualizar o seu sistema",
+    "action": "Baixar %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -233,10 +247,10 @@
       "mac": "X"
     },
     "appTypes": {
-      "client": "Client only",
-      "server": "Server only",
-      "bundle": "Client and Server",
-      "servertool": "Configuration tool"
+      "client": "Somente cliente",
+      "server": "Somente servidor",
+      "bundle": "Cliente e Servidor",
+      "servertool": "Ferramenta de configuração"
     },
     "releasesTypes": {
       "beta": "Beta",
@@ -249,17 +263,65 @@
     }
   },
   "activeActions": {
-    "sendConfirm": "Resend activation link",
-    "resetPassword": "Reset Password",
+    "sendConfirm": "Reenviar Link de Activação",
+    "resetPassword": "Reset da Senha",
     "setNewPassword": "Guardar password",
-    "setNewPasswordLabel": "New password"
+    "setNewPasswordLabel": "Nova senha"
   },
   "regActions": {
     "passwordLabel": "Password",
     "createAccount": "Create Account"
   },
   "header": {
-    "allSystems": "All Systems",
-    "systems": "Systems"
+    "allSystems": "Todos os sistemas",
+    "systems": "Sistemas"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "High stream",
+      "lowStream": "Low stream",
+      "transcoding": "Transcoding",
+      "unknown": "Desconhecido",
+      "copyToClipboard": "copiar para o Clipboard",
+      "copyDefaultText": "copiar",
+      "copyActiveText": "copiado para o Clipboard"
+    },
+    "systemOffline": "Sistema Offline",
+    "systemHasNoCameras": "SEM CÂMARAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Erro",
+      "unauthorized": "Necessária autenticação",
+      "noData": "Sem dados",
+      "iosVideoTooLarge": "O iOS não suporta vídeos maiores que fullHD (2MP: 1920x1080).",
+      "flashRequired": "Por favor, <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> para reproduzir vídeos.",
+      "flashOrWebmRequired": "Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> ou o <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para reproduzir vídeo no Internet Explorer.",
+      "noArmSupport": "Este navegador ou dispositivo não suporta a reprodução de vídeo a partir de servidores baseados em ARM.",
+      "noFormat": "Este browser não suporta a reprodução de vídeo desta câmara.",
+      "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para o Internet Explorer.",
+      "ieWin10": "Por favor, utilize browsers Microsoft Edge ou Google Chrome.",
+      "ubuntuNX": "Este navegador não suporta vídeo de servidores baseados em ARM. Por favor, use o navegador Chromium."
+    },
+    "searchCamPlaceholder": "Pesquisar",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Alta",
+      "low": "Baixa"
+    },
+    "chromeCastWarning": "O Chromecast consome muitos recursos e pode causar problemas no seu servidor.",
+    "voiceCommands": {
+      "play": "reproduzir",
+      "pause": "pausa",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "limpar pesquisa",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "expandir todos os servidores",
+      "collapse all servers": "recolher todos os servidores",
+      "stop listening": "parar de ouvir",
+      "help": "help | show commands"
+    }
   }
 }

@@ -1,0 +1,35 @@
+@import 'theme/_variables';
+@import '../../styles/theme_variables';
+
+// Placeholder text
+@mixin placeholder($color: $input-color-placeholder) {
+    // Firefox
+    &::-moz-placeholder {
+        color   : $color;
+        font-family: $font-family-regular;
+        opacity : 1; // Override Firefox's unusual default opacity; see https://github.com/twbs/bootstrap/pull/11526
+    }
+    // Internet Explorer 10+
+    &:-ms-input-placeholder {
+        color : $color;
+        font-family: $font-family-regular;
+    }
+    // Microsoft Edge
+    ::-ms-input-placeholder {
+        color : red;
+        font-family: $font-family-regular;
+    }
+    // Safari and Chrome
+    &::-webkit-input-placeholder {
+        color : $color;
+        font-family: $font-family-regular;
+    }
+}
+
+@mixin ellipsis {
+    overflow      : hidden;
+    text-overflow : ellipsis;
+    white-space   : nowrap;
+    max-width     : 100%;
+    line-height   : initial;
+}

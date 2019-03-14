@@ -1,3 +1,6 @@
 {
-	"presets": ["es2015"]
+	"presets": ["es2015"],
+	"ignore": [
+		"app/web_common/scripts/vendor/hls.js"
+	]
 }

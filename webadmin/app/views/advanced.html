@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Advanced server settings</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -116,42 +119,27 @@
 
     <h2>Log settings</h2>
     <form class="form" role="form" name="logLevels" novalidate >
-        <div class="form-group">
-            <label class="col-sm-4">Main log level</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">None: Log disabled.</option>
+                    <option value="always">Always: Log errors, warnings and most important messages.</option>
+                    <option value="error">Error: Log errors only.</option>
+                    <option value="warning">Warning: Log warnings and errors.</option>
+                    <option value="info">Info: Log errors, warnings and all messages.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Transaction log level</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
         </div>
     </form>
 
-    <h1>Advanced system settings</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
         <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
     </div>

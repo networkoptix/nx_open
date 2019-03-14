@@ -1,4 +1,4 @@
-<h1>สวัสดี {{message.fullName}}</h1>
+<h1>สวัสดี {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> ได้แชร์การเข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}" กับคุณ</p>
@@ -6,6 +6,4 @@
 
 {{^message.sharer_name}}
 <p>คุณได้รับสิทธิ์เข้าถึงระบบการจัดการวิดีโอ "{{message.system_name}}"</p>
-{{/message.sharer_name}}
-
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}"> ดูใน %PRODUCT_NAME% พอร์ทัล </a>

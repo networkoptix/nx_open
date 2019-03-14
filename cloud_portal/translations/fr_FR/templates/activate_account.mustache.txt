@@ -1,8 +1,8 @@
-Bonjour,
+Bonjour {{message.userFullName}},
 
   S.V.P ouvrir le lien ci-dessous pour confirmer votre courriel et activer le compte.
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Si vous n'avez pas enregistré sur {{PRODUCT_NAME}}, ignorez ce courriel.
+Si vous n'avez pas enregistré sur %PRODUCT_NAME%, ignorez ce courriel.
 Ne partagez pas le message ou le lien avec qui que ce soit.

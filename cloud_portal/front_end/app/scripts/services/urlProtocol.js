@@ -88,7 +88,7 @@ angular.module('cloudApp')
                     link = link.replace(/&/g,'&&'); // This is a hack,
                     // Google Chrome for mac has a bug - he looses one ampersand which brakes the link parameters
                     // Here we duplicate ampersands to keep one of them
-                    // Dear successor, if you read this - plese, check if the bug was fixed in chrome and remove this
+                    // Dear successor, if you read this - please, check if the bug was fixed in chrome and remove this
                     // ugly thing!
                     // see CLOUD-716 for more information
 
@@ -106,5 +106,5 @@ angular.module('cloudApp')
             },
             getSource: parseSource,
             source: parseSource()
-        }
+        };
     }]);

@@ -1,15 +1,15 @@
-<h1>Hallo, {{message.fullName}}</h1>
+<h1>Hallo, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> heeft met u de toegang tot het video management systeem "{{message.system_name}}" gedeeld.
 
-Om het te kunnen bekijken en/of te beheren, maakt u een account aan op <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> met dit e-mailadres en volg de verdere instructies.</p>
+Om het systeem te kunnen bekijken en/of te beheren, maakt u een account aan op <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> met uw huidige e-mailadres en volgt u de verdere instructies.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>U heeft toegang gekregen tot het video management systeem "{{message.system_name}}".
 
-Om te kunnen bekijken en te beheren, maakt u een account aan op <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> en gebruik uw huidige e-mailadres en volg de verdere instructies.</p>
+Om het systeem te kunnen bekijken en/of te beheren, maakt u een account aan op <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> met uw huidige e-mailadres en volgt u de verdere instructies.</p>
 {{/message.sharer_name}}
 
 <a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Account aanmaken</a>

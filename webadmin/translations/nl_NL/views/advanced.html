@@ -1,12 +1,15 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Geavanceerde serverinstellingen</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Waarschuwing!</b> Door wijzigingen op deze pagina kan de server mogelijk niet correct werken.
+        <b> Waarschuwing! </b> Wijzigingen op deze pagina kunnen ertoe leiden dat de server incorrect werkt.
     </div>
 
 
-    <h2>Opslagruimte</h2>
+    <h2>Opslagcapaciteit</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -106,7 +109,7 @@
             Er is geen opslaglocatie gekozen voor het wegschrijven van data. Video zal niet worden opgenomen op deze server.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            De gereserveerde hoeveelheid ruimte is groter dan de resterende vrije ruimte. De huidige videobeelden kunnen worden verwijderd om ruimte vrij te maken.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Pas de gemarkeerde instellingen aan om deze op te kunnen slaan</div>
 
@@ -116,49 +119,34 @@
 
     <h2>Logboekinstellingen</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Hoofd logboek niveau</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Geen: Log uitgeschakeld.</option>
-                    <option value="ALWAYS">Altijd: Meld fouten, waarschuwingen en de meest belangrijke berichten.</option>
-                    <option value="ERROR">Fout: Alleen logboek fouten.</option>
-                    <option value="WARNING">Waarschuwing: Meld waarschuwingen en fouten.</option>
-                    <option value="INFO">Info: Log fouten, waarschuwingen en alle berichten.</option>
-                    <option value="DEBUG">Foutopsporing: Log elk systeembericht en foutopsporing.</option>
-                    <option value="DEBUG2">Foutopsporing 2: Log elk systeembericht en foutopsporing.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Geen: Log uitgeschakeld.</option>
+                    <option value="always">Altijd: Meld fouten, waarschuwingen en de meest belangrijke berichten.</option>
+                    <option value="error">Fout: Alleen logboek fouten.</option>
+                    <option value="warning">Waarschuwing: Meld waarschuwingen en fouten.</option>
+                    <option value="info">Info: Log fouten, waarschuwingen en alle berichten.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Transactie logboek niveau</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Geen: Log uitgeschakeld.</option>
-                    <option value="ALWAYS">Altijd: Meld fouten, waarschuwingen en de meest belangrijke berichten.</option>
-                    <option value="ERROR">Fout: Alleen logboek fouten.</option>
-                    <option value="WARNING">Waarschuwing: Meld waarschuwingen en fouten.</option>
-                    <option value="INFO">Info: Log fouten, waarschuwingen en alle berichten.</option>
-                    <option value="DEBUG">Foutopsporing: Log elk systeembericht en foutopsporing.</option>
-                    <option value="DEBUG2">Foutopsporing 2: Log elk systeembericht en foutopsporing.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Opslaan</button>
         </div>
     </form>
 
-    <h1>Geavanceerde systeeminstellingen</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Waarschuwing!</b> Door wijzigingen op deze pagina kan de server mogelijk niet correct werken.
+        <b> Waarschuwing! </b> Wijzigingen op deze pagina kunnen ertoe leiden dat de server incorrect werkt.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || instelling}}
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || setting}}
                     <small ng-if="L.settingsConfig[setting]" class="text-muted">&nbsp;&nbsp;{{setting}}</small>
             </label>
             <div class="col-sm-6">
@@ -182,7 +170,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] || " lege '}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -199,7 +187,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Waarschuwing!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Waarschuwing!</b> Sommige wijzigingen vereisen een herstart van <b>alle</b> de servers in het systeem.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Herstart deze server</button>
         </div>

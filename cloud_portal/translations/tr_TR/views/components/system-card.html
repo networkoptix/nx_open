@@ -1,18 +1,20 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>Sistem</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Sistem</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Sistemi yeniden adlandır</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Sistemi yeniden adlandır</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Çıkış yap
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Başka bir sistemle birleştir</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Çıkış yap
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>Sahip</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -25,5 +27,31 @@
             <button class="btn btn-default" ng-click="rename()">Sistemi yeniden adlandır</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Hesabımdan çıkış yap</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            bu sistem birleştirilir</div>
+        <hr />
+        <div class="merge-info-text">Veri tabanının boyutuna bağlı olarak birkaç saat sürebilir</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>Bu sistem ile birleştiriliyor             <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>Veri tabanının boyutuna bağlı olarak birkaç saat sürebilir.</p>
+            <p>Birleştirme tamamlanana kadar bu sisteme giriş yapabilir ve video izleyebilir, ancak herhangi bir ayarı değiştiremezsiniz.</p>
+            <p>Birleştirme işlemi tamamlandığında, bu sistemdeki tüm kullanıcılar ve kameralar kullanılabilir hale gelir
+                <span class="merge-system-name">" Sistem{{mergeTargetSystem.name}}</span> " ve bu sistem silinecektir.</p>
+        </div>
     </div>
 </div>

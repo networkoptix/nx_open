@@ -1,21 +1,22 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Не удалось получить доступ к системе</h1>
-        <p>Эта ссылка не работает,
-            <br>Система могла быть отключена от {{PRODUCT_NAME}},
+        <h3>Эта ссылка не работает,
+            <br>Система могла быть отключена от %PRODUCT_NAME%,
             <br>доступ к этой системе мог быть отозван<br>
-            или вы вошли под другой учетной записью</p>
-        <p>
-            <a href="/systems" class="btn btn-default">Список доступных систем</a>
+            или вы вошли под другой учетной записью
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Список доступных систем</a>
         </p>
     </div>
 
     <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
-        <div class="col-md-4 col-md-push-8">
+        <div class="col-lg-4 order-1 order-lg-2">
             <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
         </div>
-        <div class="col-md-8 col-md-pull-4">
+        <div class="col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
                     Нет доступа к информации о системах.

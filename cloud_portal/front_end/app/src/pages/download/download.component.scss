@@ -1,0 +1,98 @@
+@import '../../../../app/styles/native-theme/theme_palette';
+@import '../../../../app/styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+.installers {
+    .links {
+        &.a-link {
+            width : 160px;
+            float : left;
+        }
+
+        @include media-breakpoint-down(lg) {
+            width : 50% !important;
+            float : left;
+        }
+
+        @include media-breakpoint-down(sm) {
+            width : 100% !important;
+            float : left;
+        }
+    }
+}
+
+.mobile-badge {
+    float      : left;
+    margin-top : 24px;
+
+    .mobile-link {
+        margin-right : 0.5rem;
+    }
+}
+
+.download-button {
+    max-width        : fit-content;
+    margin           : 0 0 8px 0;
+    padding          : 0 12px 0 0;
+    height           : auto;
+    box-shadow       : none;
+    background-color : transparent;
+    border           : 1px solid $light5;
+
+    &:hover {
+        border-color     : $light8;
+        background-color : rgba($light5, .25) !important;
+    }
+
+    &:active {
+        background-color : rgba($light5, .5) !important;
+    }
+
+    .installer-name {
+        font-weight : normal;
+    }
+
+    .media-left {
+        height          : 64px;
+        width           : 64px;
+        display         : flex;
+        align-items     : center;
+        justify-content : center;
+    }
+
+    .media-body {
+        width : auto;
+    
+        h3 {
+            margin : 0;
+        }
+    }
+
+    h2 {
+        max-width     : 320px;
+        overflow      : hidden;
+        text-overflow : ellipsis;
+    }
+
+    h3 {
+        margin-top : 0;
+    }
+
+    & + p {
+        color         : $light16;
+        margin-bottom : 1rem;
+        font-size     : rem(12px);
+    }
+}
+
+h2.version-number {
+    line-height : 34px;
+    font-weight : bold;
+    font-size   : 32px;
+    margin      : 0 0 8px 0;
+    font-family : $font-family-medium;
+}

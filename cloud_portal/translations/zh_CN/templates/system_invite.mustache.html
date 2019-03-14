@@ -1,16 +1,16 @@
-<h1>你好，{{message.fullName}}</h1>
+<h1>你好，{{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a>与您共享视频管理系统“{{message.system_name}}”。
 
-要查看和管理它，请使用您当前的电子邮件地址并按照说明在<a href="{{config.portal_url}}"> {{PRODUCT_NAME}} 上创建帐户</a></p>
+要查看和管理它，请使用您当前的电子邮件地址并按照说明在<a href="{{config.portal_url}}">%PRODUCT_NAME%</a>上创建帐户</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>您已被授予访问视频管理系统“{{message.system_name}}”的权限。
 
-要查看和管理它，请使用您当前的电子邮件地址并按照说明在<a href="{{config.portal_url}}"> {{PRODUCT_NAME}} 上创建帐户</a></p>
-{{/message.sharer_name}}
+要查看和管理它，请使用您当前的电子邮件地址并按照说明在<a href="{{config.portal_url}}">%PRODUCT_NAME%</a>上创建帐户</p>
+{{/message.sharer_name}} 
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">创建帐户</a>
 

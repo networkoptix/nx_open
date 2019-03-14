@@ -1,16 +1,16 @@
-<h1>您好, {{message.fullName}}</h1>
+<h1>您好, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> 想共用影像管理系統 {{message.system_name}} 給您.
 
-要查看和管理它, 請使用這email地址並依指示在 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>上建立帳號.</p>
+要查看和管理它, 請使用這email地址並依指示在 <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>上建立帳號.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>您已被授予連線影像管理系統 “{{message.system_name}}” 的權限.
 
-要查看和管理它, 請使用這email地址並依指示在 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>上建立帳號.</p>
+要查看和管理它, 請使用這email地址並依指示在 <a href="{{config.portal_url}}">%PRODUCT_NAME%</a>上建立帳號.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">新建帳號</a>
 

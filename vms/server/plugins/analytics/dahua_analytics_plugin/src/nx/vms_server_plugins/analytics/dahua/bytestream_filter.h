@@ -1,0 +1,24 @@
+#pragma once
+
+#include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
+
+#include "metadata_monitor.h"
+#include "common.h"
+
+namespace nx::vms_server_plugins::analytics::dahua {
+
+class MetadataMonitor;
+
+class BytestreamFilter: public nx::utils::bstream::AbstractByteStreamFilter
+{
+public:
+    BytestreamFilter(const EngineManifest& engineManifest, MetadataMonitor* metadataMonitor);
+    virtual ~BytestreamFilter() = default;
+    virtual bool processData(const QnByteArrayConstRef& notification) override;
+
+private:
+    const EngineManifest m_engineManifest;
+    MetadataMonitor* m_metadataMonitor = nullptr;
+};
+
+} // namespace nx::vms_server_plugins::analytics::dahua

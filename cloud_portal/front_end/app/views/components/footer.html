@@ -1,14 +1,21 @@
-
+<footer ng-if="viewFooter">
     <div class="container">
-        <ul class="nav navbar-nav">
-            <li language-select></li>
-            <li><a href="/content/about">About <span class="product-name">%PRODUCT_NAME%</span></a></li>
-            <li><a href="/download">Download %VMS_NAME%</a></li>
-            <li><a href="/content/faq">Known limitations</a></li>
-            <li><a href="%SUPPORT_LINK%" target="_blank">Support</a></li>
-            <li><a href="/content/eula">Terms</a></li>
-        </ul>
-        <ul  class="nav navbar-nav navbar-right">
-            <li><a href="%COMPANY_LINK%" target="_blank">&copy; 2017 %COMPANY_NAME%</a></li>
-        </ul>
+        <div class="row">
+            <ul class="nav navbar-nav col-6 col-md-8 flex-column flex-lg-row">
+                <li>
+                    <nx-language-select dropup="true" short="true" instant-reload="true"></nx-language-select>
+                </li>
+                <li><a href="/content/about">About <span class="product-name">%PRODUCT_NAME%</span></a></li>
+                <li><a href="/download">Download %VMS_NAME%</a></li>
+                <li><a href="/integrations">Integrations</a></li>
+                <li><a href="%SUPPORT_LINK%" target="_blank">Support</a></li>
+                <li><a href="/content/eula">Terms</a></li>
+                <li><a href="%PRIVACY_LINK%">Privacy</a></li>
+                <li><a href="/campage">Supported devices</a></li>
+            </ul>
+            <ul class="nav navbar-nav col-6 col-md-4 justify-content-end">
+                <li><a href="%COMPANY_LINK%" target="_blank" class="company">&copy; %COPYRIGHT_YEAR% %COMPANY_NAME%</a></li>
+            </ul>
+        </div>
     </div>
+</footer>

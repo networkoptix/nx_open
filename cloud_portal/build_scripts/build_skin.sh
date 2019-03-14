@@ -23,22 +23,23 @@ dir=../skins/$SKIN
 
 
     echo "Build statics"
-        pushd ../front_end
+    pushd ../front_end
         npm run setSkin $SKIN
         npm run build
         # Save the repository info.
         echo "Create version.txt"
-        hg log -r . --repository "$DIR/../.." > dist/version.txt
+        hg log -r . --repository "$2" | head -n 7 > dist/version.txt
         cat dist/version.txt
     popd
 
 
     if [ "$SKIN" = "blue" ]
     then
-        echo "Move fonts  - only for blue"
+        echo "Move fonts and help  - only for blue"
         rm -rf $TARGET_DIR/../common || true
         mkdir -p $TARGET_DIR/../common/static
         mv ../front_end/dist/fonts $TARGET_DIR/../common/static/fonts
+        cp -R ../help $TARGET_DIR/../common/static/help
     fi
     rm -rf ../front_end/dist/fonts || true
 

@@ -24,18 +24,22 @@ angular.module('nxCommon')
             restrict: 'A',
             scope: {
                 ngSrc: '@',
+                loaded: '=',
                 errorLoading: '='
             },
 
             link: function (scope, element/*, attrs*/) {
+                scope.loaded = false;
                 scope.$watch('ngSrc',function(){
                     element.addClass("hidden");
                 });
 
                 element.on('load', function (event) {
+                    scope.loaded = true;
                     element.removeClass("hidden");
                 });
                 element.on('error', function (event) {
+                    scope.loaded = true;
                     scope.errorLoading = true;
                     element.addClass("hidden");
                 });

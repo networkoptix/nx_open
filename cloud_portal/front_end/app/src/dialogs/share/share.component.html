@@ -1,0 +1,49 @@
+<form #shareForm="ngForm" name="shareForm" novalidate>
+    <div class="modal-header">
+        <h1 class="modal-title" translate>Share</h1>
+        <button type="button" class="close"
+                data-dismiss="modal" aria-label="Close"
+                (click)="close()" *ngIf="closable">
+            <div class="close-content"><span class="close-icon"></span></div>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group" validate-field>
+            <label *ngIf="!isNewShare" for="lockedEmail" translate>User</label>
+            <label *ngIf="isNewShare" for="email" translate>Email</label>
+
+            <input [hidden]="!isNewShare" type="email"
+                   class="form-control"
+                   [(ngModel)]="user.email"
+                   id="email"
+                   name="email"
+                   pattern="{{ config.emailRegex }}" maxlength="255"
+                   required nxFocusMe>
+
+            <input type="text" *ngIf="!isNewShare" name="email" id="lockedEmail"
+                   class="form-control" [value]="formatUserName()" readonly>
+        </div>
+        <div class="form-group">
+            <label for="permissionsSelect" translate>Permissions</label>
+
+            <nx-permissions-select
+                    [user]="user"
+                    [system]="system"
+                    [roles]="system.accessRoles"
+                    [selected]="user.role"
+                    (onSelected)="setPermission($event)">
+            </nx-permissions-select>
+
+            <span class="help-block" [innerHtml]="accessDescription"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <nx-process-button [process]="sharing"
+                           [form]="shareForm"
+                           [buttonText]="buttonText"></nx-process-button>
+
+        <button type="button" class="btn btn-default" (click)="close()" translate>Cancel</button>
+    </div>
+</form>

@@ -1,0 +1,14 @@
+<h1>Привіт, {{message.userFullName}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> надав вам доступ до системи {{message.system_name}}.
+
+Щоб переглянути та керувати нею, створіть обліковий запис на сторінці <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> використовуючи Ваш Email та дотримуйтесь подальших інструкцій.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Ви отримали доступ до системи відеоспостереження "{{message.system_name}}".
+
+Щоб переглянути та керувати нею, створіть обліковий запис на сторінці <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> використовуючи Ваш Email та дотримуйтесь подальших інструкцій.</p>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> Створити обліковий запис </a>
+

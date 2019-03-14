@@ -1,7 +1,0 @@
-mergers:
-  first:
-    second:
-networks:
-  10.254.0.0/28:
-    first:
-    second:

@@ -1,17 +1,17 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage',
-        '$sessionStorage', 'account', '$location', 'urlProtocol', 'dialogs',
-        function ($scope, cloudApi, $routeParams, process, $localStorage,
-                  $sessionStorage, account, $location, urlProtocol, dialogs) {
+    .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage', '$timeout',
+        '$sessionStorage', 'account', 'authorizationCheckService', '$location', 'urlProtocol', 'dialogs',
+        function ($scope, cloudApi, $routeParams, process, $localStorage, $timeout,
+                  $sessionStorage, account, authorizationCheckService, $location, urlProtocol, dialogs) {
 
             $scope.session = $localStorage;
             $scope.context = $sessionStorage;
 
             $scope.data = {
                 newPassword: '',
-                email: account.getEmail(),
+                email: '', // moved to init()
                 restoreCode: $routeParams.restoreCode,
                 activateCode: $routeParams.activateCode
             };
@@ -23,9 +23,10 @@ angular.module('cloudApp')
             $scope.restoringSuccess = $routeParams.restoringSuccess;
             $scope.changeSuccess = $routeParams.changeSuccess;
 
+            $scope.loading = true;
 
             if($scope.reactivating){
-                account.redirectAuthorised();
+                authorizationCheckService.redirectAuthorised();
             }
             function checkActivate(){
                 if($scope.data.activateCode){
@@ -34,8 +35,10 @@ angular.module('cloudApp')
                 }
             }
             function init(){
+                $scope.data.email = account.getEmail();
+
                 if($scope.data.restoreCode || $scope.data.activateCode){
-                    account.logoutAuthorised();
+                    authorizationCheckService.logoutAuthorised();
                     var code = $scope.data.restoreCode || $scope.data.activateCode;
                     account.checkCode(code).then(function(registered){
                         if(!registered){
@@ -60,7 +63,7 @@ angular.module('cloudApp')
                     return false;
                 }
                 if( $scope.context.process !== name ){
-                    account.redirectToHome();
+                    authorizationCheckService.redirectToHome();
                 }
                 return true;
             }
@@ -114,15 +117,18 @@ angular.module('cloudApp')
             };
 
             $scope.activate = process.init(function(){
+                $scope.loading = true;
                 return cloudApi.activate($scope.data.activateCode);
             },{
                 errorCodes:{
                     notFound: function(){
                         $scope.activationSuccess = false;
+                        $scope.loading = false;
                         return false;
                     },
                     notAuthorized: function(){
                         $scope.activationSuccess = false;
+                        $scope.loading = false;
                         return false;
                     },
                 },
@@ -130,6 +136,7 @@ angular.module('cloudApp')
             }).then(function(){
                 setContext('activateSuccess');
                 $scope.activationSuccess = true;
+                $scope.loading = false;
                 dialogs.dismissNotifications();
                 $location.path('/activate/success', false); // Change url, do not reload
             });

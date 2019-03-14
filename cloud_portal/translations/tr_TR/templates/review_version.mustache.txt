@@ -2,7 +2,7 @@
 
 Taslak {{ message.id }} için {{ message.product }} incelemek için bağlantıyı tıklayın
 
-Gözden geçirmek için link: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Gözden geçirmek için link: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 Bu sayfada şunları yapabilirsiniz
 1) En son değişiklikleri görmek için bir önizleme oluşturun.

@@ -1,9 +1,9 @@
-<alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
+<uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Fejlesztő vagy? Give us your feedback!</b></p>
+    <p><b>Fejlesztő vagy? Küldjön visszajelzést!</b></p>
     <p>Fejlesztő csapatunk folyamatosan várja a visszajelzéseket a SDK és API alkalmazásaink használatát követően az integrációt végző fejlesztőktől.
         Ha bármilyen javaslata van a fejlesztői élmény javítására - vagy csak azt szeretné üdvözölni a csapatot -
         kérjük, töltse ki a visszajelzési űrlapunkat!
     </p>
     <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Várjuk visszajezését</a></p>
-</alert>
+</uib-alert>

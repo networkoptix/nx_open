@@ -2,7 +2,7 @@
 
 点击链接查看{{ message.product }}的{{ message.id }}草案
 
-链接来查看： {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+链接来查看：{{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 你可以在此页
 1) 创建预览以查看最近的更改。

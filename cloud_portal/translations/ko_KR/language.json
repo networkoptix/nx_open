@@ -1,19 +1,20 @@
 {
+  "language": "ko_KR",
   "language_name": "한국어",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "승인",
     "cancelButton": "취소",
-    "loginTitle": "{{PRODUCT_NAME}} 에 로그인",
+    "loginTitle": "%PRODUCT_NAME%에 로그인",
     "loginButton": "로그인",
     "logoutAuthorisedTitle": "이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton": "계속",
     "logoutAuthorisedLogoutButton": "로그 아웃"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "에 오신 것을 환영합니다",
     "register": "에 계정 만들기",
     "changePassword": "패스워드 변경 -",
@@ -31,8 +32,8 @@
     "view": "카메라 보기 - ",
     "debug": "디버그",
     "login": "로그인 -",
-    "download": "{{VMS_NAME}} 다운로드",
-    "downloadPlatform": "에 대한 {{VMS_NAME}} 다운로드 ",
+    "download": "%VMS_NAME% 다운로드",
+    "downloadPlatform": "에 대한 %VMS_NAME% 다운로드 ",
     "pageNotFound": "페이지를 찾을 수 없음"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "고급 뷰어",
-      "description": "라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다."
+      "description": "라이브 비디오를보고, 아카이브를 검색하고, PTZ 등을 제어 할 수 있습니다."
     },
     "Administrator": {
       "label": "관리자",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "사용자 정의",
-      "description": "{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
+      "description": "%VMS_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     },
     "cloudAdmin": {
       "label": "관리자",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "사용자 정의",
-      "description": "{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
+      "description": "%VMS_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     }
   },
   "errorCodes": {
@@ -116,33 +117,43 @@
     "cantSendConfirmationPrefix": "확인 이메일을 보낼 수 없습니다.",
     "cloudInvalidResponse": "Cloud DB에서 예기치 않은 응답을 반환했습니다.",
     "notAuthorized": "잘못된 암호",
-    "wrongParameters": "양식의 일부 매개 변수가 잘못되었습니다.",
     "brokenAccount": "계정에 예기치 않은 문제가 있습니다. <a href=\"/restore_password\">계정 복원</a>",
+    "wrongParameters": "양식의 일부 매개 변수가 잘못되었습니다.",
     "wrongCode": "계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.",
     "wrongCodeRestore": "확인 코드가 이미 사용되었거나 잘못되었습니다.",
     "forbidden": "이 작업을 수행 할 수있는 권한이 없습니다.",
     "accountNotActivated": "이 계정은 아직 활성화되지 않았습니다. <a href=\"/activate\"> 활성화 링크 다시 보내기 </a>",
-    "accountBlocked": "이 계정은 차단되었습니다.",
+    "accountBlocked": "계정은 차단되었습니다. 몇 분 후에 다시 시도하십시오.",
     "notFound": "찾을 수 없습니다",
     "alreadyExists": "이 계정이 이미 존재합니다.",
     "unknownError": "예기치 않은 오류가 발생했습니다.",
     "accountAlreadyActivated": "이 계정은 이미 활성화되었습니다.",
-    "emailNotFound": "Account does not exist.",
+    "emailNotFound": "계정이 존재하지 않습니다.",
     "EmailAlreadyExists": "이 전자 메일은 이미 등록되었습니다.",
     "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다.",
     "passwordMismatch": "패스워드가 틀립니다.",
     "cantEditYourself": "자신의 사용 권한 변경은 허용 되지 않습니다.",
     "cantEditAdmin": "이 사용자는 관리자 권한이 있습니다.",
-    "cantOpenClient": "{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
+    "cantOpenClient": "%VMS_NAME% 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
     "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
-    "thisSystem": "시스템"
+    "thisSystem": "시스템",
+    "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다.",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "좋음",
+    "fair": "보통",
+    "minLength": "너무 짧음",
     "minLengthMessage": "비밀번호는 최소 8자 이상 포함되어야 합니다.",
+    "required": "부적합",
     "requiredMessage": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
+    "weak": "약함",
     "weakMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
     "strongMessage": "강력한 암호!",
-    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다."
+    "common": "너무 평범",
+    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다.",
+    "missingMessage": "패스워드가 필요합니다."
   },
   "sharing": {
     "confirmOwner": "시스템 소유자를 변경하면 현재 계정에서 소유권이 박탈 됩니다. 이 작업은 되돌릴 수 없습니다. 확실합니까?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "시스템에 연결할 수 없습니다.",
     "offline": "시스템이 오프라인 상태입니다.",
-    "openClient": "{{VMS_NAME}} 에서 열기",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "%VMS_NAME%에서 열기",
+    "openClientNoSystem": "%VMS_NAME% 열기",
+    "confirmMergeAction": "병합",
+    "mergeSystemTitle": "시스템 병합",
     "confirmRenameTitle": "시스템 이름",
     "confirmRenameAction": "저장",
     "successRename": "시스템 이름 저장",
-    "confirmDisconnectTitle": "{{PRODUCT_NAME}} 에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectTitle": "%PRODUCT_NAME%에서 시스템을 분리하실래요?",
     "confirmDisconnectAction": "연결 끊기",
     "confirmUnshareFromMe": "이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle": "시스템 연결을 끊으시겠습니까?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
     "confirmUnshareTitle": "사용자 삭제?",
     "confirmUnshareAction": "삭제",
-    "successDisconnected": "시스템이 성공적으로 {{PRODUCT_NAME}} 에서 분리 되었습니다.",
+    "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
   "account": {
@@ -183,24 +197,24 @@
     "saveChanges": "저장"
   },
   "downloads": {
-    "noClientDetectedTitle": "시스템이 성공적으로 {{VMS_NAME}} 에서 분리 되었습니다",
-    "action": "{{VMS_NAME}} 다운로드",
+    "noClientDetectedTitle": "시스템이 성공적으로 %VMS_NAME% 에서 분리 되었습니다",
+    "action": "%VMS_NAME% 다운로드",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
       "windows": {
-        "label": "윈도우즈",
+        "label": "Windows",
         "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "모든 시스템",
     "systems": "시스템"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "고해상도 스트림",
+      "lowStream": "낮은 스트림",
+      "transcoding": "트랜스코딩",
+      "unknown": "알 수 없음",
+      "copyToClipboard": "클립보드에 복사",
+      "copyDefaultText": "복사",
+      "copyActiveText": "클립보드에 복사됨"
+    },
+    "systemOffline": "시스템 오프라인",
+    "systemHasNoCameras": "카메라 없음",
+    "cameraStates": {
+      "offline": "오프라인",
+      "error": "오류",
+      "unauthorized": "인증이 필요합니다",
+      "noData": "데이터 없음",
+      "iosVideoTooLarge": "iOS는 fullHD (2MP: 1920x1080) 보다 큰 비디오를 지원하지 않습니다.",
+      "flashRequired": "동영상을 재생하기 위하여 <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>설치하세요.",
+      "flashOrWebmRequired": "Internet Explorer에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> 또는 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>을 설치하십시오.",
+      "noArmSupport": "이 브라우저 또는 장치는 ARM 기반 서버의 비디오 재생을 지원하지 않습니다.",
+      "noFormat": "상기 브라우저는 현 카메라의 비디오 재생을 지원하지 않습니다.",
+      "ieNoWebm": "Internet Explorer에 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM 코덱</a>를 설치 하십시요.",
+      "ieWin10": "Microsoft Edge 또는 Google 크롬 브라우저를 사용하십시오.",
+      "ubuntuNX": "이 브라우저는 ARM 기반 서버의 비디오를 지원하지 않습니다. 대신 Chromium 브라우저를 사용하십시오."
+    },
+    "searchCamPlaceholder": "검색",
+    "resolution": {
+      "auto": "자동",
+      "high": "높은",
+      "low": "낮은"
+    },
+    "chromeCastWarning": "크롬캐스트는 많은 리소스가 요구되어 서버에 문제가 발생할 수 있습니다.",
+    "voiceCommands": {
+      "play": "재생",
+      "pause": "일시정지",
+      "live": "go to live | show me live",
+      "view": "view + [카메라 명]",
+      "search": "찾기 + [text for searchbar]",
+      "clear search": "검색기록 지우기",
+      "expand server": "서버확장 + [server name]",
+      "collapse server": "서버축소 + [server name]",
+      "expand all servers": "모든 서버 확장",
+      "collapse all servers": "모든 서버 축소",
+      "stop listening": "듣기 중지",
+      "help": "도움말 | 명령 표시"
+    }
   }
 }

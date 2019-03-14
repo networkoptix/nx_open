@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        เอกสารเซิร์ฟเวอร์
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">การตั้งค่าเหล่านี้สามารถดูได้ที่:</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                สำหรับ Windows ในคีย์รีจิสทรี:
+                คอมพิวเตอร์ \ HKEY_LOCAL_MACHINE \ SOFTWARE \ "{{Config.productName}}" \ "{{Config.productName}} เซิร์ฟเวอร์สื่อ"
+            </p>
+            <p>
+                สำหรับแพลตฟอร์มอื่น ๆ ทั้งหมดจะอยู่ในไฟล์ config:
+                / opt /{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">การตั้งค่าเซิร์ฟเวอร์</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>ชื่อ</th>
+                        <th>&รายละเอียด</th>
+                        <th>ค่าเริ่มต้น</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Gelişmiş sunucu ayarları</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -106,7 +109,7 @@
             Yazmak için hiçbir ana disk seçilmemiş - vidyo kaydı bu sunucuya yapılmayacak.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Rezerve alan miktarı kalan boş alandan daha büyüktür. Mevcut video arşivi yer açmak için kaldırılabilir.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Tüm vurgulanan ayarları kaydet</div>
 
@@ -116,42 +119,27 @@
 
     <h2>Günlük ayarları</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Log seviyesi</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Günlük Devre dışı.</option>
-                    <option value="ALWAYS">Her zaman: Log hataları, uyarılar ve en önemli mesajlar.</option>
-                    <option value="ERROR">Hata: Sadece log hataları.</option>
-                    <option value="WARNING">Uyarı: log uyarıları ve hataları.</option>
-                    <option value="INFO">Bilgi: Hataları, uyarıları ve tüm mesajları günlüğe yazınız.</option>
-                    <option value="DEBUG">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri.</option>
-                    <option value="DEBUG2">Hata ayıklama: tüm sistem mesajları ve gelişmiş hata ayıklama bilgileri.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">None: Günlük Devre dışı.</option>
+                    <option value="always">Her zaman: Log hataları, uyarılar ve en önemli mesajlar.</option>
+                    <option value="error">Hata: Sadece log hataları.</option>
+                    <option value="warning">Uyarı: log uyarıları ve hataları.</option>
+                    <option value="info">Bilgi: Hataları, uyarıları ve tüm mesajları günlüğe yazınız.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">İşlem log seviyesi</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Günlük Devre dışı.</option>
-                    <option value="ALWAYS">Her zaman: Log hataları, uyarılar ve en önemli mesajlar.</option>
-                    <option value="ERROR">Hata: Sadece log hataları.</option>
-                    <option value="WARNING">Uyarı: log uyarıları ve hataları.</option>
-                    <option value="INFO">Bilgi: Hataları, uyarıları ve tüm mesajları günlüğe yazınız.</option>
-                    <option value="DEBUG">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri.</option>
-                    <option value="DEBUG2">Hata ayıklama: tüm sistem mesajları ve gelişmiş hata ayıklama bilgileri.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Kaydet</button>
         </div>
     </form>
 
-    <h1>Gelişmiş sistem ayarları</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
         <b>Dikkat!</b> Yapılan herhangi bir değişiklik sunucunun düzgün çalışmamasına neden olabilir.
     </div>

@@ -1,0 +1,47 @@
+{
+  "cameraLinks": {
+    "highStream": "Висока якість",
+    "lowStream": "Низька якість",
+    "transcoding": "Перекодування",
+    "unknown": "Невідомо",
+    "copyToClipboard": "копіювати в буфер обміну",
+    "copyDefaultText": "копіювати",
+    "copyActiveText": "скопійовано до буфера обміну"
+  },
+  "systemOffline": "Система знаходиться поза мережею",
+  "cameraStates": {
+    "offline": "Поза мережею",
+    "error": "Помилка",
+    "unauthorized": "Потрібна аутентифікація",
+    "noData": "Немає даних",
+    "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
+    "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео.",
+    "flashOrWebmRequired": "Відео не може бути відтворено. Можливо, потрібно <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановитиAdobe Flash</a> або<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для відтворення відео в Internet Explorer.",
+    "noArmSupport": "Цей браузер або пристрій не підтримує відтворення відео з серверів на базі ARM.",
+    "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
+    "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+    "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
+    "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium."
+  },
+  "searchCamPlaceholder": "Пошук",
+  "resolution": {
+    "auto": "Авто",
+    "high": "Високий",
+    "low": "Низький"
+  },
+  "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
+  "voiceCommands": {
+    "play": "відтворення",
+    "pause": "пауза",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "очистити вікно пошуку",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "розгорнути всі сервери",
+    "collapse all servers": "згорнути всі сервери",
+    "stop listening": "припинити прослуховування",
+    "help": "help | show commands"
+  }
+}

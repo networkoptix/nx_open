@@ -1,0 +1,29 @@
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="btn btn-dropdown-toggle dropdown-toggle"
+            (click)="show = !show"
+            [ngClass]="{'ng-invalid': !isValid}"
+            type="button" id="permissionsSelect" data-toggle="dropdown">
+
+        <span [innerHtml]="selection"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <ul class="dropdown-menu" [nxArrowNav]="show"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="permissionsSelect">
+
+        <li class="dropdown-item-container" *ngFor="let role of accessRoles">
+
+            <a href class="dropdown-item inset"
+               [ngClass]="{'selected': role.optionLabel == selection}"
+               (click)="show = false; changePermission(role);">
+                <span>{{role.optionLabel}}</span>
+            </a>
+        </li>
+    </ul>
+</div>

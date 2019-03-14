@@ -21,12 +21,19 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENVIRONMENT = False
+LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
+
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
 if not CUSTOMIZATION:
     CUSTOMIZATION = conf['customization']
+
+assert ('trafficRelay' in conf), 'Ivan, please add traffic relay to config for this instance'
+assert ('bucket' in conf), 'Ivan, please add s3 bucket to config for this instance'
+
+TRAFFIC_RELAY_HOST = '{systemId}.' + conf['trafficRelay']['host']  # {systemId}.relay-bur.vmsproxy.hdw.mx
+TRAFFIC_RELAY_PROTOCOL = 'https://'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -35,26 +42,32 @@ if not CUSTOMIZATION:
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'debug' in conf and conf['debug']
+DEBUG = 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
 
 ALLOWED_HOSTS = ['*']
 
+SKINS = ['blue', 'green', 'orange']
+DEFAULT_SKIN = 'blue'
 
 # Application definition
 
 INSTALLED_APPS = (
+    'dal',
+    'dal_select2',
     'admin_tools',
     'admin_tools.menu',
     'admin_tools.theming',
     'admin_tools.dashboard',
 
     'django.contrib.admin',
-    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'storages',
+
     'django_celery_results',
     'rest_framework',
     'rest_hooks',
@@ -67,7 +80,7 @@ INSTALLED_APPS = (
 )
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,6 +90,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'cloud.logger.CatchExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'cloud.urls'
@@ -94,7 +108,23 @@ if LOCAL_ENVIRONMENT:
     )
 
 ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
-
+ADMIN_TOOLS_MENU = 'cms.menu.CustomMenu'
+ADMIN_DASHBOARD = ('cms.models.ContentVersion',
+                   'cms.models.Context',
+                   'cms.models.ContextProxy',
+                   'cms.models.ContextTemplate',
+                   'cms.models.Customization',
+                   'cms.models.DataRecord',
+                   'cms.models.DataStructure',
+                   'cms.models.ExternalFile',
+                   'cms.models.Language',
+                   'cms.models.ProductType',
+                   'cms.models.UserGroupsToProductPermissions',
+                   'django_celery_results.*',
+                   'notifications.models.*',
+                   'rest_hooks.*',
+                   'zapier.models.*'
+                   )
 
 TEMPLATES = [
     {
@@ -141,9 +171,9 @@ DATABASES = {
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
             'charset': 'utf8mb4',
-            'init_command': 'SET '
-                'character_set_connection=utf8,'
-                'collation_connection=utf8_bin'
+            'init_command': 'SET \
+                character_set_server=utf8mb4,\
+                collation_server = utf8mb4_unicode_ci'
         }
     }
 }
@@ -161,8 +191,15 @@ CACHES = {
     }
 }
 
+
 if LOCAL_ENVIRONMENT:
-    conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
+    conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
+
+    # BROKER_URL = 'sqs://...'
+    # This setting is removed because every developer needs personal AWS credentials
+    # Ask Ivan V to provide you with config and credentials files for AWS and save them to ~/.aws/ directory
+    # Or go through file history in source control to find the last time it was here (changeset 49115a0427b3 or 4923e6b2575d)
+
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'portal_cache',
@@ -209,50 +246,74 @@ LOGGING = {
         '': {  # default settings for all django loggers
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.views.utils': {
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         },
         'api.helpers.exceptions': {
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         },
         'api.controllers.cloud_gateway': {
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         },
         'notifications.tasks': {
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         },
         'api.account_backend': {  # explicitly mention all modules with loogers
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         },
         'api.controller.cloud_api': {
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         },
         'api.views.account': {
+            'level': 'CRITICAL',
+            'propagate': False,
+            'handlers': ['console']
+        },
+        'cms.controllers.filldata': {
             'level': 'DEBUG',
-            'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'propagate': False,
+            'handlers': ['console']
         }
     }
 }
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) and s3 config
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_ROOT = BASE_DIR + '/static/integrations/'
+MEDIA_URL = '/static/integrations/'
+# #End of s3 config
+
+
+# START s3 config
+AWS_STORAGE_BUCKET_NAME = conf['bucket']
+
+S3_DOMAIN = conf['s3_domain'] if 's3_domain' in conf else '%s.s3.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = S3_DOMAIN % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'ContentDisposition': 'attachment',
+}
+# mysite is a default name for the admin site
+INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
+# END s3
+
+if LOCAL_ENVIRONMENT:
+    AWS_STORAGE_BUCKET_NAME = 'cloud-portal'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -263,24 +324,24 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.AllowAny',
     )
 }
+# Used for Zapier
 HOOK_EVENTS = {
     'user.send_zap_request': None
 }
 
 # Celery settings section
 
-#Configure AWS SQS
-#Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
-#BROKER_TRANSPORT_OPTIONS
+# Configure AWS SQS
+# Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
+# BROKER_TRANSPORT_OPTIONS
 #   queue_name_prefix allows you to name the queue for sqs
 #   region allows you to specify the aws region
-
 
 
 BROKER_URL = os.getenv('QUEUE_BROKER_URL')
 BROKER_CONNECTION_MAX_RETRIES = 1
 if not BROKER_URL:
-    BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
+    BROKER_URL = 'sqs://'
 
 BROKER_TRANSPORT_OPTIONS = {
     'queue_name_prefix' : conf['queue_name'] + '-',
@@ -297,7 +358,6 @@ BROKER_HEARTBEAT = 10  # Supposed to check connection with broker
 
 CLOUD_CONNECT = {
     'url': conf['cloud_db']['url'],
-    'gateway': conf['cloud_gateway']['url'],
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
     'customization': CUSTOMIZATION,
@@ -321,11 +381,11 @@ AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
-CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
-CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOW_CREDENTIALS = DEBUG
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
+CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 
 USE_ASYNC_QUEUE = True
 
@@ -368,9 +428,24 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
+    'review_version': {
+        'engine': 'email'
+    },
     'cloud_notification':{
         'engine': 'email',
         'queue': 'broadcast-notifications'
+    },
+    'cloud_invite':{
+        'engine': 'email'
+    },
+    'ipvd_feedback': {
+        'engine': 'email'
+    },
+    'sales_inquiry': {
+        'engine': 'email'
+    },
+    'support_request': {
+        'engine': 'email'
     }
 }
 
@@ -383,6 +458,8 @@ DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
+CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
+CMS_MAX_FILE_SIZE = 9437184
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

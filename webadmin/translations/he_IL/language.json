@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "צור חשבון",
         "errorNoHDD": "מכשיר זה מיועד לעבודה עם דיסק קשיח מותקן. <br>יש לכבות את המכשיר ולהתקין דיסק קשיח.",
-        "errorNoNetwork": "מכשיר זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
+        "errorNoNetwork": "התקן זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
     },
     "passwordRequirements": {
         "minLengthMessage": "סיסמא חייבת להכיל לפחות 8 תווים",
@@ -38,13 +38,15 @@
         "confirmRestoreSettingsNotNetwork": "האם לאפס את תצורת שרת? ארכיון והגדרות הרשת יישמרו.",
         "unavailable": "לא זמין",
         "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
-        "confirmDisconnectFromCloud": "נתק את המערכת מ {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloud": "נתק את המערכת מ- {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
         "confirmDisconnectFromCloudAction": "התנתק",
         "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
+        "disconnectedFromCloudError": "לא ניתן לנתק את המערכת",
         "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",
         "confirmDisconnectFromSystemAction": "ניתוק",
         "disconnectedFromSystemSuccess": "השרת נותק מהמערכת בהצלחה",
+        "disconnectedFromSystemError": "לא ניתן לנתק את השרת",
         "connectedSuccess": "מערכת חובר בהצלחה",
         "createLocalOwnerTitle": "צור מנהל המקומי",
         "confirmChangePassword": "שנה סיסמת מנהל מערכת",
@@ -74,9 +76,8 @@
         "emailFrom": "אי מייל מ",
         "emailSignature": "חתימת דוא\"ל",
         "emailSupportEmail": "דוא\"ל תמיכה",
-        "enableEdgeRecording": "אפשר הקלטות  edge",
+        "enableEdgeRecording": "אפשר הקלטות edge",
         "eventLogPeriodDays": "תקופת יומן האירועים (ימים)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "מחק פרופילי מצלמה ב- init אם יש צורך",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
         "ldapSearchFilter": "מסנן חיפוש LDAP",
@@ -87,7 +88,7 @@
         "maxRecordQueueSizeBytes": "גודל תור מרבי של רשומות (בתים)",
         "maxRecordQueueSizeElements": "גודל תור מרבי של רשומות (אלמנטים)",
         "maxRemoteArchiveSynchronizationThreads": "סינכרון מרבי של אשכולות סינכרון מרחוק",
-        "maxRtspConnectDurationSeconds": "משך התחברות Rstp מקסימלית בשניות.",
+        "maxRtspConnectDurationSeconds": "משך התחברות Rstp מקסימלית בשניות",
         "maxSceneItems": "פריטי סצנה מקסימליים (0 פירושו ברירת מחדל)",
         "proxyConnectTimeoutSec": "זמן קצוב לחיבור של שרת proxy (שניות)",
         "rtpTimeoutMs": "RTP פסק זמן (אלפיות השנייה)",
@@ -107,12 +108,26 @@
         "statisticsReportTimeCycle": "מרווח דוח סטטיסטיקה",
         "statisticsReportUpdateDelay": "דו\"ח סטטיסטי - עיכוב עדכון",
         "synchronizeTimeWithInternet": "סנכרן זמן עם אינטרנט",
-        "systemName": "שם מערכת",
+        "SystemName": "שם מערכת",
         "takeCameraOwnershipWithoutLock": "לקיחת בעלות על מצלמות ללא נעילה",
         "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
+        "primaryTimeServer": "Primary time synchronization server",
+        "osTimeChangeCheckPeriodMs": "OS time change check period",
+        "syncTimeExchangePeriod": "Sync time exchange period",
+        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
-        "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל"
+        "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל",
+        "useWindowsEmailLineFeed": "השתמש במעבר שורה של חלונות בהודעות דוא\"ל",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "Update status",
+        "watermarkSettings": "Watermark settings",
+        "maxWebMTranscoders": "כמות מקסימלית של חיבורי WEBM עבור השרת. Chrome פותח 2 חיבורים בו-זמנית, ולאחר מכן סוגר את הראשון. לכן, מומלץ להגדיר ערך> = 2 לפרמטר זה.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -122,7 +137,7 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
+        "SystemIsUnreacheble": "אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
         "incorrectCurrentPassword": "סיסמה נוכחית שגויה.",
         "incorrectRemotePassword": "שם או הסיסמה שגויים.",
         "incompatibleVersion": "לא ניתן להגיע למערכת, היא אנה קיימת או בעלת גירסה לא תואמת.",
@@ -134,9 +149,10 @@
         "cloudBothError": "אין אפשרות למזג מערכות. שתי מערכות מחוברות לענן. יש לנתק אחת קודם.",
         "cloudHostConflict": "אין אפשרות למזג מערכות, מאחר והשרתים נבנו עם שרתי ענן שונים",
         "licenceError": "אזהרה! אתה עומד למזג מערכות עם רישיונות Starter. רשיון Starter אחד בלבד מותר לכל מערכת, הרישיון השני יכובה. האם למזג בכל מקרה?",
+        "duplicateServersError": "לא ניתן למזג את 'מערכות' משום שיש להם לפחות שרת אחד עם אותו מזהה. הסר את השרת ונסה שוב.",
         "connectionFailed": "החיבור נכשל: ",
         "unknownError": "שגיאה לא מוכרת",
-        "mergeFailed": "המיזוג נכשל: ",
+        "mergeFailed": "המיזוג נכשל",
         "mergeSucceed": "המיזוג להצליח.",
         "newSystemDisplayName": "מערכת חדשה",
         "incompatibleProtocol": "גירסה לא תואמת",
@@ -144,7 +160,8 @@
         "incompatibleCloudState": "ענן מחובר"
     },
     "login": {
-        "incorrectPassword": "שם או הסיסמה שגויים"
+        "incorrectPassword": "שם או הסיסמה שגויים",
+        "authLockout": "יותר מדי ניסיונות. נסה שוב בעוד דקה."
     },
     "navigaion": {
         "cannotGetUser": "תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"

@@ -1,3 +1,3 @@
-Hallo, {{message.full_name}}
+Hallo, {{message.userFullName}}
 
 {{message.text_body}}

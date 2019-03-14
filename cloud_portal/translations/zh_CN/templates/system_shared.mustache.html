@@ -1,4 +1,4 @@
-<h1>你好，{{message.fullName}}</h1>
+<h1>你好，{{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a>与您共享视频管理系统“{{message.system_name}}”。</p>
@@ -6,6 +6,6 @@
 
 {{^message.sharer_name}}
 <p>您已被授予访问视频管理系统“{{message.system_name}}”的权限。</p>
-{{/message.sharer_name}}
+{{/message.sharer_name}} 
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">在%PRODUCT_NAME% Portal中查看</a>

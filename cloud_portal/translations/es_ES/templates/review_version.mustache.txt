@@ -2,7 +2,7 @@ Hay una nueva revisión para {{ message.product }}
 
 Haga clic en el vínculo para revisar el borrador {{ message.id }} para {{ message.product }}
 
-Enlace para repasar: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Enlace para repasar: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 En esta página puedes
 1) Crear una vista previa para ver los cambios más recientes.

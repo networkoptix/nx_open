@@ -1,0 +1,40 @@
+@import "~sass-rem";
+
+// Overwrites  ***********************
+$body-bg : $gray-100;
+
+// ***********************************
+
+html {
+    @include rem-baseline;
+    position   : relative;
+    min-height : 100%;
+    overflow-y : scroll;
+}
+
+body {
+    background-color : $body-bg;
+}
+
+h4 {
+    font-family : "robotobold";
+    @include media-breakpoint-down(sm) {
+        font-size : rem(16px);
+    }
+}
+
+h5 {
+    font-family : "robotoregular";
+    @include media-breakpoint-down(sm) {
+        font-size : rem(14px);
+    }
+}
+
+h6 {
+    font-family : "robotolight";
+    @include media-breakpoint-down(sm) {
+        font-size : rem(12px);
+    }
+}
+
+

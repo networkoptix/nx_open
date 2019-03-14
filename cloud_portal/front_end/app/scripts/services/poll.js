@@ -24,10 +24,14 @@ angular.module('cloudApp')
             function runPoll(){
                 activeInterval = $interval(function(){
                     activeFnPromise = fn(); // Call function
-                    activeFnPromise.finally(function(result){
+                    if (!activeFnPromise || typeof activeFnPromise.finally !== 'function'){
+                        console.error('Function passed to POLL service not a Promise ... got ->', activeFnPromise);
+                        activeFnPromise = $q.resolve(activeFnPromise);
+                    }
+                    activeFnPromise.finally(function (result) {
                         activeFnPromise = null;
                         deferred.notify(result);
-                        if(!cancelledPoll){
+                        if (!cancelledPoll) {
                             runPoll();
                         }
                     });

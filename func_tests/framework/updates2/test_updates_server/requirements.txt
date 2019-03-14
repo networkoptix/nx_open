@@ -1,5 +1,0 @@
-flask
-pathlib2
-click
-itsdangerous
-six

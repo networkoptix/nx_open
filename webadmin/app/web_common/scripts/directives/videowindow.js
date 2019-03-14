@@ -58,7 +58,7 @@ angular.module('nxCommon')
                             return src.type === mimeTypes[mediaformat];
                         });
                         if (scope.debugMode) {
-                            console.log('playing', src ? src.src : null);
+                            console.info('playing', src ? src.src : null);
                         }
                         //return 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8';
                         //return 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8';
@@ -220,7 +220,56 @@ angular.module('nxCommon')
                             nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
                         }
                     }
-
+    
+                    function playerReadyHandler(api) {
+                        makingPlayer = false;
+                        scope.vgApi = api;
+                        if (scope.vgSrc) {
+                            scope.vgApi.load(getFormatSrc('hls'));
+            
+                            scope.vgApi.addEventListener('loadeddata', function () {
+                                scope.loading = false;  // Video is ready - disable loading
+                                scope.playerHandler();
+                            });
+            
+                            scope.vgApi.addEventListener('timeupdate', function (event) {
+                                var video = event.srcElement || event.originalTarget;
+                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                            });
+            
+                            scope.vgApi.addEventListener('ended', function (event) {
+                                scope.vgUpdateTime({$currentTime: null, $duration: null});
+                            });
+                        }
+                        scope.vgPlayerReady({$API: api});
+                    }
+    
+                    function playerErrorHandler(error) {
+                        scope.loading = false; // Some error happended - stop loading
+                        resetPlayer();
+                        
+                        scope
+                            .playerHandler(error)
+                            .then(function (showError) {
+                                scope.videoFlags.errorLoading = showError;
+                
+                                // Trying to get error description requesting media stream url as ajax request
+                                if (scope.videoFlags.errorLoading) {
+                                    $http
+                                        .get(error.url)
+                                        .then(function (response) {
+                                            scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
+                                        }, function (failResponse) {
+                                            // What is here?
+                                            console.error('failResponse', failResponse);
+                                        });
+                                }
+                            }, function (error) {
+                                scope.videoFlags.errorLoading = error;
+                            });
+                    }
+    
+    
                     function initNativePlayer(nativeFormat) {
 
                         scope.native = true;
@@ -268,10 +317,25 @@ angular.module('nxCommon')
                                     //If the player stalls give it a chance to recover
                                     scope.vgApi.addEventListener('stalled', resetTimeout);
                                     scope.vgApi.addEventListener('error', function(e){
-                                        if(e.target.error.code != 4){
-                                            console.log(e.target.error);
-                                            playerErrorHandler(e.target.error);
-                                        }
+                                        $timeout(function () {
+                                            if (e.target === null) {
+                                                // this is a special case - interrupted video
+                                                // (switch to another camera)
+                                                return;
+                                            }
+        
+                                            var target = e.target;
+                                            if (target.error.url === undefined) {
+                                                target.error.url = target.currentSrc;
+                                            }
+        
+                                            // sometimes Error is thrown with currentSrc as host URL (Firefox)
+                                            if (target.error.url === window.location.origin + window.location.pathname) {
+                                                return;
+                                            }
+        
+                                            playerErrorHandler(target.error);
+                                        });
                                     });
                                 }
 
@@ -339,54 +403,7 @@ angular.module('nxCommon')
                     element.bind('contextmenu', function () {
                         return !!scope.debugMode;
                     }); // Kill context menu
-
-                    function playerReadyHandler(api) {
-                        makingPlayer = false;
-                        scope.vgApi = api;
-                        if (scope.vgSrc) {
-                            scope.vgApi.load(getFormatSrc('hls'));
-
-                            scope.vgApi.addEventListener('loadeddata', function () {
-                                scope.loading = false;  // Video is ready - disable loading
-                                scope.playerHandler();
-                            });
-
-                            scope.vgApi.addEventListener('timeupdate', function (event) {
-                                var video = event.srcElement || event.originalTarget;
-                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                            });
-
-                            scope.vgApi.addEventListener('ended', function (event) {
-                                scope.vgUpdateTime({$currentTime: null, $duration: null});
-                            });
-                        }
-                        scope.vgPlayerReady({$API: api});
-                    }
-
-                    function playerErrorHandler(error) {
-                        var err = angular.copy(error);
-
-                        scope.loading = false; // Some error happended - stop loading
-                        resetPlayer();
-
-                        scope
-                            .playerHandler(error)
-                            .then(function (showError) {
-                                scope.videoFlags.errorLoading = showError;
-
-                                // Trying to get error description requesting media stream url as ajax request
-                                if (scope.videoFlags.errorLoading) {
-                                    $http.get(err.url)
-                                        .then(function (response) {
-                                            scope.videoFlags.errorDescription = response.data.errorString;
-                                        }, function(failResponse){
-                                            // What is here?
-                                            console.error("failResponse", failResponse);
-                                        });
-                                }
-                            });
-                    }
-
+                    
                     function initNewPlayer() {
                         if (makingPlayer) {
                             return;
@@ -428,6 +445,7 @@ angular.module('nxCommon')
                     function srcChanged() {
                         scope.loading = true; // source changed - start loading
                         scope.videoFlags.errorLoading = false;
+                        scope.preview = "";
                         if (scope.vgSrc) {
                             scope.preview = getFormatSrc('jpeg');
                             scope.player = detectBestFormat();

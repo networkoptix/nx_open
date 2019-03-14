@@ -1,0 +1,13 @@
+<div class="process-button">
+    <div class="btn active focus loading" [ngClass]="buttonClass" *ngIf="process.processing">
+        <div>
+            <span class="dot1"></span><span class="dot2"></span><span class="dot3"></span>
+        </div>
+    </div>
+
+    <button class="btn"
+            [innerHTML]="buttonText"
+            [ngClass]="process.processing ? processing : buttonClass"
+            [disabled]="buttonDisabled"
+            (click)="checkForm()"></button>
+</div>

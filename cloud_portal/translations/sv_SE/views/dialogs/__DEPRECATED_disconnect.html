@@ -1,0 +1,34 @@
+<div ng-controller="DisconnectCtrl">
+    <form name="disconnectForm" novalidate>
+        <div class="modal-body">
+            <p class="warning-label">
+                Alla molnanvändare kommer raderas.
+            </p>
+            <p>
+                Systemet kommer att vara tillgängligt via lokalt nätverk med lokalt administratörskonto.
+            </p>
+            <p>
+                Ange lösenord för att fortsätta.
+            </p>
+
+            <div class="form-group" validate-field>
+                <label for="password">Lösenord</label>
+                <input class="form-control" ng-model="model.password" id="password" autocomplete="new-password"
+                       name="password" type="password" required autofocus>
+                <p class="help-block" >
+                    <span class="input-error" ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
+                        Lösenord krävs
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <process-button process="disconnecting"
+                            form="disconnectForm"
+                            action-type="'danger'"
+                            button-text="$root.L.system.confirmDisconnectAction"></process-button>
+
+            <button type="button" class="btn btn-default" ng-click="close()" >Avbryt</button>
+        </div>
+    </form>
+</div>

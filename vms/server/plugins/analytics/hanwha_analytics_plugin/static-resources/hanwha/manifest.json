@@ -1,0 +1,222 @@
+{
+    "capabilities": "deviceDependent",
+    "eventTypes": [
+        {
+            "id": "nx.hanwha.FaceDetection",
+            "name": "Face detection",
+            "_": "Following fields belong to private plugin implementation.",
+            "internalName": "FaceDetection",
+            "description": "Face %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hanwha.FogDetection",
+            "name": "Fog detection",
+            "internalName": "FogDetection",
+            "description": "Fog %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hanwha.VideoAnalytics.Passing",
+            "name": "Virtual line crossing",
+            "internalName": "VideoAnalytics.Passing",
+            "description": "Virtual line #%1 was crossed",
+            "flags": "regionDependent",
+            "regionDescription": "#%1"
+        },
+        {
+            "id": "nx.hanwha.VideoAnalytics.Entering",
+            "name": "Entering the area",
+            "internalName": "VideoAnalytics.Entering",
+            "description": "Object has entered %1",
+            "flags": "regionDependent",
+            "regionDescription": " the region #%1"
+        },
+        {
+            "id": "nx.hanwha.VideoAnalytics.Exiting",
+            "name": "Exiting the area",
+            "internalName": "VideoAnalytics.Exiting",
+            "description": "Object has exited %1",
+            "flags": "regionDependent",
+            "regionDescription": " the region #%1"
+        },
+        {
+            "id": "nx.hanwha.VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
+            "name": "Appearing in the area",
+            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
+            "description": "Object %1 ",
+            "positiveState": "appeared",
+            "regionDescription": "  in the region #%1"
+        },
+        {
+            "id": "nx.hanwha.VideoAnalytics.Intrusion",
+            "name": "Intrusion",
+            "internalName": "VideoAnalytics.Intrusion",
+            "description": "Intrusion %1",
+            "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.ShockDetection",
+            "name": "Shock detection",
+            "internalName": "ShockDetection",
+            "description": "Shock %1",
+            "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.TemperatureChangeDetection",
+            "name": "Temperature change detection",
+            "internalName": "TemperatureChangeDetection",
+            "description": "Temperature change %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hanwha.AudioDetection",
+            "name": "Audio detection",
+            "internalName": "AudioDetection",
+            "description": "The audio volume level is %1 the threshold",
+            "positiveState": "above",
+            "negativeState": "below",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hanwha.Tampering",
+            "name": "Tampering detection",
+            "internalName": "Tampering",
+            "description": "Tampering %1",
+            "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.DefocusDetection",
+            "name": "Defocusing detection",
+            "internalName": "DefocusDetection",
+            "description": "Defocusing %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hanwha.AlarmInput",
+            "name": "Dry contact input",
+            "internalName": "AlarmInput,NetworkAlarmInput",
+            "description": "Dry contact input has been %1",
+            "positiveState": "activated",
+            "negativeState": "deactivated",
+            "flags": "stateDependent|hidden"
+        },
+        {
+            "id": "nx.hanwha.MotionDetection",
+            "name": "Motion detection",
+            "internalName": "MotionDetection",
+            "description": "Motion %1%2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": "  in the region #%1"
+        },
+        {
+            "id": "nx.hanwha.AudioAnalytics.Scream",
+            "name": "Sound - Scream",
+            "internalName": "AudioAnalytics.Scream",
+            "description": "Scream %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.hanwha.AudioAnalytics.Gunshot",
+            "name": "Sound - Gunshot",
+            "internalName": "AudioAnalytics.Gunshot",
+            "description": "Gunshot %1",
+            "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.AudioAnalytics.Explosion",
+            "name": "Sound - Explosion",
+            "internalName": "AudioAnalytics.Explosion",
+            "description": "Explosion %1",
+            "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.AudioAnalytics.GlassBreak",
+            "name": "Sound - Glass break",
+            "internalName": "AudioAnalytics.GlassBreak",
+            "description": "Glass break %1",
+            "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.VideoAnalytics.Loitering",
+            "name": "Loitering",
+            "internalName": "VideoAnalytics.Loitering",
+            "description": "Loitering %1%2",
+            "positiveState": "has been detected",
+            "flags": "regionDependent",
+            "regionDescription": " in the region #%1"
+        },
+        {
+            "id": "nx.hanwha.Queue.1.Level.High",
+            "name": "Queue 1 high level",
+            "internalName": "Queue.1.Level.High",
+            "description": "Queue 1 level %1 ",
+            "positiveState": "is high",
+            "negativeState": "has decreased to medium",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "id": "nx.hanwha.Queue.1.Level.Medium",
+            "name": "Queue 1 medium level",
+            "internalName": "Queue.1.Level.Medium",
+            "description": "Queue 1 level %1",
+            "positiveState": "is medium",
+            "negativeState": "has decreased to low",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "id": "nx.hanwha.Queue.2.Level.High",
+            "name": "Queue 2 high level",
+            "internalName": "Queue.2.Level.High",
+            "description": "Queue 2 level %1 ",
+            "positiveState": "is high",
+            "negativeState": "has decreased to medium",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "id": "nx.hanwha.Queue.2.Level.Medium",
+            "name": "Queue 2 medium level",
+            "internalName": "Queue.2.Level.Medium",
+            "description": "Queue 2 level %1",
+            "positiveState": "is medium",
+            "negativeState": "has decreased to low",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "id": "nx.hanwha.Queue.3.Level.High",
+            "name": "Queue 3 high level",
+            "internalName": "Queue.3.Level.High",
+            "description": "Queue 3 level %1 ",
+            "positiveState": "is high",
+            "negativeState": "has decreased to medium",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "id": "nx.hanwha.Queue.3.Level.Medium",
+            "name": "Queue 3 medium level",
+            "internalName": "Queue.3.Level.Medium",
+            "description": "Queue 3 level %1",
+            "positiveState": "is medium",
+            "negativeState": "has decreased to low",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        }
+    ],
+    "groups": [
+        {
+            "id": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}",
+            "name": "Queue"
+        }
+    ]
+}

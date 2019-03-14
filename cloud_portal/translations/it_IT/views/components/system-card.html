@@ -1,30 +1,56 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>Your System</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Il suo sistema</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Rinomina sistema</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Unisci con un altro sistema</button>
+        </p>
+        <hr />
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnetti da
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
-        <h2>Owner</h2>
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
+        <h2>Proprietario</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>
         <p>
-            Your permissions:
-            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+            Le tue autorizzazioni: <b> {{$root.L.accessRoles[system.accessRole].label || system.accessRole}} </b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button class="btn btn-default" ng-click="rename()">Rinomina sistema</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
+        <button class="btn btn-default" ng-click="delete()">Disconnettiti dal mio account</button>
+    </div>
+</div>
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div><strong>{{mergeTargetSystem.name}}</strong> è stato unito a questo sistema</div>
+        <hr />
+        <div class="merge-info-text">A seconda della dimensione del database può richiedere fino a diverse ore</div>
+    </div>
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
+        <div>Questo sistema viene unito a <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr />
+        <div class="merge-info-text">
+            <p>A seconda delle dimensioni del database possono essere necessarie diverse ore.</p>
+            <p>Finché l'unione non è terminata, puoi accedere a questo sistema e guardare le immagini, ma non puoi modificare alcuna impostazione.</p>
+            <p>Una volta completata l'unione, tutti gli utenti e le telecamere di questo sistema diventeranno disponibili
+                nel sistema "<span class="merge-system-name">{{mergeTargetSystem.name}}</span> "e questo sistema sarà cancellato.</p>
+        </div>
     </div>
 </div>

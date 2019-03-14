@@ -6,6 +6,8 @@
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
+using nx::vms::api::ServerFlag;
+
 class FtConfiguringNewSystem:
     public MediaServerCloudIntegrationTest
 {
@@ -47,7 +49,7 @@ protected:
         client.setUserCredentials(nx::network::http::Credentials(
             accountEmail().c_str(),
             nx::network::http::PasswordAuthToken(accountPassword().c_str())));
-        ec2::ApiResourceParamDataList vmsSettings;
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, client.ec2GetSettings(&vmsSettings));
     }
 
@@ -81,7 +83,7 @@ protected:
             "admin",
             nx::network::http::PasswordAuthToken("admin")));
 
-        ec2::ApiResourceParamDataList vmsSettings;
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(
             ec2::ErrorCode::ok,
             client.ec2GetSettings(&vmsSettings));
@@ -98,11 +100,11 @@ protected:
 
         for (;;)
         {
-            QnModuleInformation moduleInformation;
+            nx::vms::api::ModuleInformation moduleInformation;
             ASSERT_EQ(
                 QnJsonRestResult::NoError,
                 client.getModuleInformation(&moduleInformation).error);
-            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+            if (moduleInformation.serverFlags.testFlag(ServerFlag::SF_NewSystem))
                 break;
         }
     }

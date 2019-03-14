@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <?include app_info.wxi ?>
+
+    <Product
+        Name='$(var.installerProductName)'
+        Manufacturer='$(var.manufacturer)'
+        Id='$(var.productId)'
+        UpgradeCode='$(var.productUpgradeCode)'
+        Language='1033'
+        Codepage='1252'
+        Version='$(var.productVersion)'>
+
+        <Package
+            Id='*'
+            Keywords='Installer'
+            Description="$(var.installerProductName) Installer"
+            Manufacturer='$(var.manufacturer)'
+            InstallerVersion='405'
+            Languages='1033'
+            Compressed='yes'
+            InstallScope='perMachine'
+            SummaryCodepage='1252'
+            Platform="x64"/>
+
+        <Media Id='1' Cabinet='data.cab' EmbedCab='yes'/>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFiles64Folder">
+                <Directory Id="ManufacturerDir" Name="$(var.manufacturer)">
+                    <Directory Id="ProductDir" Name="$(var.productName)">
+                        <Directory Id="MediaServerDir" Name="MediaServer">
+                            <Component Id="Qt5SerialPort" Win64="yes">
+                                <File
+                                    Source="$(var.qtDirectory)/Qt5SerialPort.dll"
+                                    KeyPath="yes"/>
+                            </Component>
+                            <Directory Id="PluginsDir" Name="plugins">
+                                <Component Id="Plugin" Win64="yes">
+                                    <File
+                                        Source="$(var.binariesDirectory)/plugins_optional/ssc_analytics_plugin.dll"
+                                        KeyPath="yes"/>
+                                </Component>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+
+        <Feature Id='Complete' Level='1'>
+            <ComponentRef Id='Plugin'/>
+            <ComponentRef Id='Qt5SerialPort'/>
+        </Feature>
+    </Product>
+</Wix>

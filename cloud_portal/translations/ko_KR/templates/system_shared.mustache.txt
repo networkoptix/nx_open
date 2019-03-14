@@ -1,4 +1,4 @@
-안녕하세요, {{message.fullName}}
+안녕하세요, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) 님이 비디오 관리시스템 "{{message.system_name}}" 에 대한 접근 권한을 공유하였습니다.
@@ -8,4 +8,4 @@
 당신은 비디오 관리 시스템 "{{message.system_name}}"에 대한 접근 권한이 부여되었습니다.
 {{/message.sharer_name}}
 
-{{PRODUCT_NAME}} 포털에서 보기: {{config.portal_url}}/systems/{{message.system_id}}
+%PRODUCT_NAME% 포털에서 보기: {{config.portal_url}}/systems/{{message.system_id}}

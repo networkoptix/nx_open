@@ -68,14 +68,38 @@ def generate_languages_files(languages, template_filename):
         with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
             data["language"] = lang
+
+            if data["language_name"]=='LANGUAGE_NAME':
+                sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong language_name. '
+                                 'File: ' + language_json_filename + '\n')
+                data["language_name"] = lang
             merge(data, all_strings)
         save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
-        merge_json("static/lang_" + lang + "/language.json",  "static/lang_" + lang + "/web_common/commonLanguage.json", 'common')
 
+        # Process i18n files
+        i18n_json_filename = os.path.join("../../../..", "translations", lang, 'language_i18n.json')
+        print("Load: " + i18n_json_filename)
+
+        if os.path.exists(i18n_json_filename):
+            with codecs.open(i18n_json_filename, 'r', 'utf-8') as file_descriptor:
+                data = json.load(file_descriptor)
+                data["language"] = lang
+
+                if "language_name" in data:
+                    if data["language_name"] == 'LANGUAGE_NAME':
+                        data["language_name"] = lang
+                else:
+                    data["language_name"] = lang
+
+                if data["language_name"] == lang:
+                    sys.stderr.write('ERROR: For BORIS to fix: language_i18n.json has wrong language_name. File: ' + i18n_json_filename + '\n')
+
+            save_content("static/lang_" + lang + "/language_i18n.json", json.dumps(data, ensure_ascii=False))
+        else:
+            sys.stderr.write('WARNING: ' + i18n_json_filename + ' don\'t exist.\n')
 
 languages = sys.argv[1:]
 if not languages:
     languages = ["en_US"]
 
-merge_json('static/language.json', 'static/web_common/commonLanguage.json', 'common')
 generate_languages_files(languages, 'static/language.json')

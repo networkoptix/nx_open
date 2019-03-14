@@ -1,12 +1,22 @@
-'use strict';
+(function () {
 
-angular.module('cloudApp')
-    .controller('StartPageCtrl', ['$scope','cloudApi','$location','$routeParams','dialogs','account', function ($scope,cloudApi,$location,$routeParams,dialogs,account) {
-        account.redirectAuthorised();
+    "use strict";
 
-        $scope.userEmail = account.getEmail();
+    angular
+        .module('cloudApp')
+        .controller('StartPageCtrl', StartPage);
 
-        if($routeParams.callLogin){
-            dialogs.login();
+    StartPage.$inject = [ '$scope', 'cloudApi', '$location', '$routeParams',
+        'dialogs', 'account', 'authorizationCheckService' ];
+
+    function StartPage($scope, cloudApi, $location, $routeParams,
+                       dialogs, account, authorizationCheckService) {
+
+        if ($routeParams.callLogin) {
+            dialogs.login(false);
+        } else {
+            authorizationCheckService.redirectAuthorised();
+            $scope.userEmail = account.getEmail();
         }
-    }]);
+    }
+})();

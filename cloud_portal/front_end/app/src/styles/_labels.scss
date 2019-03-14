@@ -1,0 +1,24 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+label {
+    font-family   : $font-family-regular;
+    font-size     : rem(13px);
+    line-height   : 16px;
+    margin-bottom : 8px;
+    color         : $dark9;
+    
+    &[disabled] {
+        opacity : .3;
+        cursor  : default;
+    }
+    
+    &:hover:not([disabled]) {
+        color : $dark1;
+    }
+    
+    &:active:not([disabled]) {
+        color : $dark9 !important;
+    }
+}

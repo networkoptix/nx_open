@@ -1,4 +1,4 @@
-Здравствуйте, {{message.fullName}}
+Здравствуйте, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) предоставил вам доступ к системе "{{message.system_name}}".
@@ -8,4 +8,4 @@
 Вам предоставлен доступ к системе видеонаблюдения «{{message.system_name}}».
 {{/message.sharer_name}}
 
-Просмотреть в {{PRODUCT_NAME}} портале: {{config.portal_url}}/systems/{{message.system_id}}
+Просмотреть в %PRODUCT_NAME% портале: {{config.portal_url}}/systems/{{message.system_id}}

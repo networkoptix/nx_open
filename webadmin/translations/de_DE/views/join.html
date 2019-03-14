@@ -4,7 +4,7 @@
         <h3 class="modal-title">Systeme zusammenführen</h3>
     </div>
 
-    <div class="col-sm-12">
+    <div class="modal-body">
         <ng-form name="findSystemForm">
             <div class="form-group">
                 <label for="otherSystemUrl" class="control-label">URL vom anderen System</label>
@@ -12,7 +12,7 @@
                     <div class="input-group" uib-dropdown>
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="Host:Port" required />
 
-                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                        <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Keine Systeme gefunden</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
@@ -20,7 +20,7 @@
                             </li>
                         </ul>
 
-                        <span type="button" class="input-group-addon dropdown-toggle">
+                        <span type="button" class="input-group-addon dropdown-toggle" uib-dropdown-toggle>
                             <span class="caret"></span>
                         </span>
                     </div>
@@ -55,9 +55,7 @@
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>Das derzeitige System
-<b>{{systems.systemName}}</b> soll mit System 
-<b>{{systems.joinSystemName}}</b> zusammengeführt werden</p>
+            <p>Das derzeitige System <b>{{systems.systemName}}</b> soll mit System <b>{{systems.joinSystemName}}</b> zusammengeführt werden</p>
             <p>
                 Das neue System soll das Passwort und den Namen von diesem System haben:<br/>
 <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}}(aktuell)</label><br/>

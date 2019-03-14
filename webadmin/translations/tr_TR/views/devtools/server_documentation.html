@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        Sunucu Dökümantasyonları
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Bu ayarlara şu adresten erişilebilir:</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                Windows:
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\"{{Config.productName}}"\"{{Config.productName}} Media Server"
+            </p>
+            <p>
+                Diğer tüm platformlar için bir yapılandırma dosyasına yerleştirilir:
+                / opt /{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">Sunucu Ayarları</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>İsim</th>
+                        <th>Açıklama</th>
+                        <th>Varsayılan değer</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

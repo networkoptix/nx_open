@@ -4,5 +4,5 @@
 
 {{>body}}
 
-{{companyUrl}}
-Поддержка: {{supportLink}}
+%COMPANY_LINK%
+Поддержка: %SUPPORT_LINK%

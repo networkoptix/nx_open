@@ -1,0 +1,3 @@
+nx_add_cloud_deploy_target(nxcloud_host_agent)
+add_dependencies(nxcloud_host_agent-docker-build cloud_portal-docker-build cloud_portal_nginx-docker-build)
+add_dependencies(nxcloud_host_agent-docker-push cloud_portal-docker-push cloud_portal_nginx-docker-push)

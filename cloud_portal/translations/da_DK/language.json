@@ -1,19 +1,20 @@
 {
-  "language_name": "LANGUAGE_NAME",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "language": "en_US",
+  "language_name": "Dansk",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Cancel",
-    "loginTitle": "Log in to {{PRODUCT_NAME}}",
+    "loginTitle": "Log in to %PRODUCT_NAME%",
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue",
     "logoutAuthorisedLogoutButton": "Log Out"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Welcome to",
     "register": "Create account in",
     "changePassword": "Change password -",
@@ -31,8 +32,8 @@
     "view": "View cameras - ",
     "debug": "Debug",
     "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} for ",
+    "download": "Download %VMS_NAME%",
+    "downloadPlatform": "Download %VMS_NAME% for ",
     "pageNotFound": "Page not found"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Administrator",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "description": "Use the %VMS_NAME% Client application to set up custom permissions"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "Cannot send confirmation Email",
     "cloudInvalidResponse": "Cloud DB returned an unexpected response",
     "notAuthorized": "Wrong password",
-    "wrongParameters": "Some parameters on the form are incorrect",
     "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
+    "wrongParameters": "Some parameters on the form are incorrect",
     "wrongCode": "Account is already activated or confirmation code is incorrect",
     "wrongCodeRestore": "Confirmation code is already used or incorrect",
     "forbidden": "You do not have permissions to perform this action",
     "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account is blocked",
+    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
     "notFound": "Not found",
     "alreadyExists": "This account already exists",
     "unknownError": "Unexpected error occured",
@@ -133,16 +134,18 @@
     "passwordMismatch": "Wrong password",
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
-    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection": "Connection to {{systemName}} lost",
-    "thisSystem": "the system"
+    "thisSystem": "the system",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",
     "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
     "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "strongMessage": "Strong password!",
-    "commonMessage": "This password is in top most popular passwords in the world"
+    "commonMessage": "This password is in top most popular passwords in the world",
+    "missingMessage": "Adgangskode er påkrævet"
   },
   "sharing": {
     "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
@@ -157,12 +160,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System is unreachable",
     "offline": "System is offline",
-    "openClient": "Open in {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "Open in %VMS_NAME%",
+    "openClientNoSystem": "Open %VMS_NAME%",
+    "confirmMergeAction": "Merge",
+    "mergeSystemTitle": "Merge Systems",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
     "successRename": "System name saved",
-    "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Disconnect System from %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Disconnect",
     "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
     "confirmUnshareFromMeTitle": "Disconnect System?",
@@ -170,8 +175,9 @@
     "confirmUnshare": "This user will not be able to access System. Are you sure?",
     "confirmUnshareTitle": "Delete user?",
     "confirmUnshareAction": "Delete",
-    "successDisconnected": "System is successfully disconnected from {{PRODUCT_NAME}}",
+    "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {
@@ -183,14 +189,14 @@
     "saveChanges": "Save"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Install %VMS_NAME% to view your System",
+    "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +206,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +215,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +267,53 @@
   "header": {
     "allSystems": "All Systems",
     "systems": "Systems"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "High stream",
+      "lowStream": "Low stream",
+      "transcoding": "Transcoding",
+      "unknown": "Unknown",
+      "copyToClipboard": "copy to clipboard",
+      "copyDefaultText": "copy",
+      "copyActiveText": "copied to clipboard"
+    },
+    "systemOffline": "System Offline",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Error",
+      "unauthorized": "Authentication required",
+      "noData": "No data",
+      "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
+      "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+      "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
+      "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
+      "noFormat": "This browser does not support video playback from this camera.",
+      "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+      "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
+      "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+    },
+    "searchCamPlaceholder": "Search",
+    "resolution": {
+      "auto": "Auto",
+      "high": "High",
+      "low": "Low"
+    },
+    "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+    "voiceCommands": {
+      "play": "play",
+      "pause": "pause",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "clear search",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "expand all servers",
+      "collapse all servers": "collapse all servers",
+      "stop listening": "stop listening",
+      "help": "help | show commands"
+    }
   }
 }

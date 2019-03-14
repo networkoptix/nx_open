@@ -183,7 +183,7 @@
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                אנא הקלד כתובת אימייל תקפה
+                אנא הכנס כתובת דוא"ל חוקית
             </div>
         </div>
 
@@ -254,9 +254,11 @@
         </div>
 
         <div class="form-group has-error"
-             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+             ng-if="forms.localForm.passwordInput.$valid &&
+                    (forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
-                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+                    forms.localForm.localPasswordConfirmation.$touched &&
+                    forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
                 כל השדות נדרשים
             </div>
@@ -282,7 +284,13 @@
                    uib-typeahead-input-formatter="getSystemName($model)"
                    uib-typeahead-focus-on-select="false"
                    uib-typeahead-min-length="0"
-                   uib-typeahead-show-hint="true">
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
+ placeholder="כתובת המערכת URL (https://host:port)"
+                   ng-change="clearRemoteError()"
+                   required
+ class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
@@ -319,13 +327,13 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>ממזג מערכות...</h2>
+    <h2>ממזג מערכות ...</h2>
     <p class="master-description">הפעולה עשויה להימשך כמה דקות</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>ממזג מערכות...</h2>
+    <h2>ממזג מערכות ...</h2>
     <p class="master-description">מנסה להתחבר למערכת</p>
 </div>
 
@@ -435,7 +443,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>אין אפשרות להגדיר מערכת</h2>
-    <p class="master-description">משהו השתבש לגמרי. <;0>; תיאור שגיאה: {{settings.localError}}
+    <p class="master-description">משהו השתבש לגמרי. <br>
+תיאור שגיאה: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">נסה שוב</button>

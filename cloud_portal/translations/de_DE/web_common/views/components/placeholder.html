@@ -6,9 +6,9 @@
             <div class="circleG circleG_3"></div>
         </div>
         <div ng-if="!preloader && iconClass" class="placeholder-icon" ng-class="iconClass"></div>
-        <div ng-if="!preloader && title" class="placeholder-title" ng-bind-html="title"></div>
+        <div ng-if="!preloader && placeholderTitle" class="placeholder-title" ng-bind-html="placeholderTitle"></div>
         <div ng-if="!preloader && message" class="placeholder-message" ng-bind-html="message"></div>
     </div>
     <img ng-if="preview" class="video-preview" ng-src="{{preview}}" ng-class="{'blur-preview': condition}"
-         error-loading="errorLoadingPreview" preview-image>
+         error-loading="errorLoadingPreview" loaded="false" preview-image>
 </div>

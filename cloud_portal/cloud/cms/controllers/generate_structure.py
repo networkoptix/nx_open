@@ -5,16 +5,19 @@ import io
 from collections import OrderedDict
 from PIL import Image  # get Pillow
 from zipfile import ZipFile
-from ..models import DataStructure, Context
+from ..models import Context, DataStructure, ProductType
 
 IGNORE_DIRECTORIES = ('help',)
-IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
+IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns', 'jpg', 'jpeg')
 
 
 def image_meta(data, extension):
-    with Image.open(io.BytesIO(data)) as img:
-        width, height = img.size
-    return OrderedDict([('width', width), ('height', height), ('format', extension)])
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            width, height = img.size
+        return OrderedDict([('width', width), ('height', height), ('format', extension)])
+    except:
+        return None
 
 
 def find_context(name, file_path, structure, product_name):
@@ -104,6 +107,8 @@ def read_data(data, short_name, context, cms_structure, product_name):
     structure_type = 'file'
     if extension in IMAGES_EXTENSIONS:
         meta = image_meta(data, extension)
+        if not meta:
+            return {'file': short_name, 'extension': extension}
         structure_type = 'image'
     elif check_if_customizable(data, short_name, cms_structure, product_name):
         return
@@ -112,9 +117,9 @@ def read_data(data, short_name, context, cms_structure, product_name):
 
 def iterate_zip(file_descriptor):
     zip_file = ZipFile(file_descriptor)
-    root = None
+    root = ''
     for name in zip_file.namelist():
-        if name.count('/') == 0:  #  ignore files from the root of the archive
+        if name.count('/') == 0:  # ignore files from the root of the archive
             print("IGNORED FILE", name)
             continue
         if name.endswith('/'):
@@ -139,7 +144,6 @@ def iterate_directory(directory):
 
 
 def iterate_contexts(file_iterator):
-    root = None
     context_name = 'root'
     for name, data in file_iterator:
         if name.startswith('__'):  # Ignore trash in archive from MACs
@@ -154,27 +158,33 @@ def iterate_contexts(file_iterator):
 
         if name.endswith('/'):  # this is directory
             if name.count('/') == 1:  # top level directory - update active_context
-                context_name = name
+                context_name = root_dir
             continue  # ignore directories
 
-        if name.count('/') == 1:  # file from top level directory - update active_context
+        if name.count('/') == 0:  # file from top level directory - update active_context
             context_name = 'root'
 
         yield name, context_name, data
 
 
 def process_files(file_iterator, product):
-    structure = OrderedDict([('product', product.name), ('canPreview', product.can_preview), ('contexts', [])])
-    root_context = find_context('root', '.', structure, product.name)
+    log_errors = []
+    structure = OrderedDict([('product', product.name),
+                             ('type', ProductType.PRODUCT_TYPES[product.product_type.type]),
+                             ('can_preview', product.can_preview),
+                             ('contexts', [])])
+    find_context('root', '.', structure, product.name)
     for short_name, context_name, data in iterate_contexts(file_iterator):
         context = find_context(context_name, context_name, structure, product.name)
-        read_data(data, short_name, context, structure, product.name)
-    return [structure]
+        error = read_data(data, short_name, context, structure, product.name)
+        if error:
+            log_errors.append(error)
+    return [structure], log_errors
 
 
-def from_zip(file_descriptor, product_name):
-    return process_files(iterate_zip(file_descriptor), product_name)
+def from_zip(file_descriptor, product):
+    return process_files(iterate_zip(file_descriptor), product)
 
 
-def from_directory(directory, product_name):
-    return process_files(iterate_directory(directory), product_name)
+def from_directory(directory, product):
+    return process_files(iterate_directory(directory), product)

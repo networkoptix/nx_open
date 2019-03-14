@@ -4,23 +4,23 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 此设备仅限于在与硬盘上运作.<br>
                 请关闭设备然后安装硬盘.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 此设备需要网路连接才能运作.<br>
                 请将它连接到本地网路或互联网
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 此装置之网路设定有误.<br>
                 请将其连接到网路或设置正确的 IP 位址.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>端口</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -40,20 +40,14 @@
                     <div>
                         <h3>重置服务器</h3>
                         <p>此操作将将此服务器恢复为默认值 (清除数据库并重置配置)。
-                            服务器将与当前系统分离。 视频存档将保持不变。</p>
+                            The server will be detached from the current System. 视频存档将保持不变。</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢复出厂默认值</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>从系统中分离服务器</h3>
-                        <p>此操作将从系统中分离服务器但保持数据库，本地用户和配置。
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
                             视频存档将保持不变。 <b>云用户将被删除。</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">从系统中分离</button></p>
-                    </div>
-                    <div>
-                        <h3>从系统中分离服务器</h3>
-                        <p>此操作将使服务器从系统中分离. 数据库, 本地用户和配置将被保留。
-                            视频存档将保持不变。<b>云端用户将被删除。</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">从系统中分离</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>重启</h3>
@@ -102,7 +96,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>此系统链接到 {{Config.cloud.productName}}，系统所有者︰ <b>{{cloudAccountName}}</b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">断开与 {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -110,12 +104,12 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">此系统未链接到 {{Config.cloud.productName}}
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">了解更多</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">将服务器连接到 Internet 来执行安装程序 {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">将系统连接到 {{Config.cloud.productName}} 需互联网连接</alert>
+                                   target="_blank">Learn more</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">将服务器连接到 Internet 来执行安装程序 {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">将系统连接到 {{Config.cloud.productName}} 需互联网连接</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">连接到 {{Config.cloud.productName}}</button>
@@ -123,6 +117,28 @@
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
                                    target="_blank">创建 {{Config.cloud.productName}} 帐户</a></p>
                         </div>
+                    </div>
+
+
+                    <div>
+                        <h3>传输加密</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> 强制传输加密
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    强制视频传输加密
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">保存</button>
+                        </form>
                     </div>
                 </uib-tab>
 

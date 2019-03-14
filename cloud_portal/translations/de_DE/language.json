@@ -1,19 +1,20 @@
 {
+  "language": "de_DE",
   "language_name": "Deutsch",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Abbrechen",
-    "loginTitle": "Anmelden bei {{PRODUCT_NAME}}",
+    "loginTitle": "Anmelden bei %PRODUCT_NAME%",
     "loginButton": "Anmelden",
     "logoutAuthorisedTitle": "Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton": "Fortfahren",
     "logoutAuthorisedLogoutButton": "Abmelden"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Willkommen bei",
     "register": "Account erstellen bei",
     "changePassword": "Passwort ändern -",
@@ -31,8 +32,8 @@
     "view": "Kameras ansehen - ",
     "debug": "Debug",
     "login": "Anmelden -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} für ",
+    "download": "%VMS_NAME% herunterladen",
+    "downloadPlatform": "Download %VMS_NAME% für ",
     "pageNotFound": "Seite nicht gefunden"
   },
   "systemStatuses": {
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Erweiterter Betrachter",
-      "description": "Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
+      "description": "Kann Livevideo ansehen, das Archiv durchsuchen, PTZ steuern usw"
     },
     "Administrator": {
       "label": "Administrator",
@@ -69,7 +70,7 @@
     },
     "Custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME% Clientanwendung"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -97,7 +98,7 @@
     },
     "custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME% Clientanwendung"
     }
   },
   "errorCodes": {
@@ -116,13 +117,13 @@
     "cantSendConfirmationPrefix": "Bestätigungsmail konnte nicht gesendet werden",
     "cloudInvalidResponse": "Cloud-DB hat eine unerwartete Antwort zurückgegeben",
     "notAuthorized": "Falsches Passwort",
-    "wrongParameters": "Einige Parameter in dem Formular sind falsch",
     "brokenAccount": "Unerwartetes Problem mit dem Konto. <a href=\"/restore_password\">Konto wiederherstellen</a>",
+    "wrongParameters": "Einige Parameter in dem Formular sind falsch",
     "wrongCode": "Account ist bereits aktiviert oder der Bestätigungscode ist falsch",
     "wrongCodeRestore": "Bestätigungscode wurde bereits verwendet oder ist falsch",
     "forbidden": "Sie haben keine Berechtigung diese Aktion auszuführen",
     "accountNotActivated": "Dieser Account ist noch nicht aktiviert. <a href=\"/activate\">Bestätigungsmail erneut senden</a>",
-    "accountBlocked": "Dieser Account wurde gesperrt",
+    "accountBlocked": "Dieses Konto ist vorübergehend gesperrt. Bitte versuchen Sie es in ein paar Minuten noch einmal.",
     "notFound": "Nicht gefunden",
     "alreadyExists": "Dieser Accounts existiert bereits",
     "unknownError": "Ein unerwarteter Fehler ist aufgetreten",
@@ -133,16 +134,26 @@
     "passwordMismatch": "Falsches Passwort",
     "cantEditYourself": "Eigene Berechtigungen zu ändern ist nicht erlaubt",
     "cantEditAdmin": "Dieser Benutzer hat Administratorberechtigungen",
-    "cantOpenClient": "Die Anwendung {{VMS_NAME}} wurde nicht gefunden. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "Die Anwendung %VMS_NAME% wurde nicht gefunden. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbindung zu {{systemName}} verloren",
-    "thisSystem": "das System"
+    "thisSystem": "das System",
+    "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
   },
   "passwordRequirements": {
+    "good": "gut",
+    "fair": "mittel",
+    "minLength": "zu kurz",
     "minLengthMessage": "Passwort muss mindestens 8 Zeichen enthalten",
+    "required": "falsch",
     "requiredMessage": "Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen",
+    "weak": "schlecht",
     "weakMessage": "Verwenden Sie Zahlen, Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
     "strongMessage": "Sicheres Passwort!",
-    "commonMessage": "Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt"
+    "common": "zu häufig verwendet",
+    "commonMessage": "Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt",
+    "missingMessage": "Passwort ist erforderlich"
   },
   "sharing": {
     "confirmOwner": "Wenn Sie den Systembesitzer ändern, werden Sie das Eigentum vom aktuellen Account widerrufen. Diese Handlung ist unwiderruflich. Sind Sie sich sicher?",
@@ -157,12 +168,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System ist nicht erreichbar",
     "offline": "System ist offline",
-    "openClient": "In {{VMS_NAME}} öffnen",
-    "openClientNoSystem": "Öffnen Sie {{VMS_NAME}}",
+    "openClient": "In %VMS_NAME% öffnen",
+    "openClientNoSystem": "Öffnen Sie %VMS_NAME%",
+    "confirmMergeAction": "Zusammenführen",
+    "mergeSystemTitle": "Systeme zusammenführen",
     "confirmRenameTitle": "Systemname",
     "confirmRenameAction": "Speichern",
     "successRename": "Systemname wurde gespeichert",
-    "confirmDisconnectTitle": "System von {{PRODUCT_NAME}} trennen?",
+    "confirmDisconnectTitle": "System getrennt von %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Trennen",
     "confirmUnshareFromMe": "Sie sind dabei dieses System von Ihrem Account zu trennen. Sie werden nicht mehr auf dieses System zugreifen können. Sind Sie sich sicher?",
     "confirmUnshareFromMeTitle": "System trennen?",
@@ -170,8 +183,9 @@
     "confirmUnshare": "Dieser Benutzer wird nicht in der Lage sein auf das System zuzugreifen. Sind Sie sich sicher?",
     "confirmUnshareTitle": "Benutzer löschen?",
     "confirmUnshareAction": "Löschen",
-    "successDisconnected": "Das System wurde erfoglreich von {{PRODUCT_NAME}} getrennt",
+    "successDisconnected": "Das System wurde erfoglreich von %PRODUCT_NAME% getrennt",
     "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
+    "successMerge": "System merge completed",
     "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt"
   },
   "account": {
@@ -183,14 +197,14 @@
     "saveChanges": "Speichern"
   },
   "downloads": {
-    "noClientDetectedTitle": "Installieren Sie {{VMS_NAME}}, um Ihr System anzusehen",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installieren Sie %VMS_NAME%, um Ihr System anzusehen",
+    "action": "%VMS_NAME% herunterladen",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,7 +214,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -209,7 +223,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",
@@ -261,5 +275,53 @@
   "header": {
     "allSystems": "Alle Systeme",
     "systems": "Systeme"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Hoher Stream",
+      "lowStream": "Niedriger Stream",
+      "transcoding": "Umkodierung",
+      "unknown": "Unbekannt",
+      "copyToClipboard": "in zwischenablage kopieren",
+      "copyDefaultText": "copieren",
+      "copyActiveText": "in die zwischenablage kopiert"
+    },
+    "systemOffline": "System offline",
+    "systemHasNoCameras": "KEINE KAMERAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Fehler",
+      "unauthorized": "Authentifizierung erforderlich",
+      "noData": "Keine Daten",
+      "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
+      "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos abzuspielen.",
+      "flashOrWebmRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
+      "noArmSupport": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
+      "noFormat": "Dieser Browser unterstützt keine Videowiedergabe von dieser Kamera.",
+      "ieNoWebm": "Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
+      "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
+      "ubuntuNX": "Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium."
+    },
+    "searchCamPlaceholder": "Suche",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Hoch",
+      "low": "Niedrig"
+    },
+    "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
+    "voiceCommands": {
+      "play": "abspielen",
+      "pause": "pause",
+      "live": "live gehen | live anzeigen",
+      "view": "ansicht + [kameraname]",
+      "search": "finden + [text für suchleiste]",
+      "clear search": "suche zurücksetzen",
+      "expand server": "server erweitern + [Servername]",
+      "collapse server": "server zusammenklappen + [Servername]",
+      "expand all servers": "alle Server erweitern",
+      "collapse all servers": "alle server zusammenklappen",
+      "stop listening": "abhören stoppen",
+      "help": "hilfe | befehle anzeigen"
+    }
   }
 }

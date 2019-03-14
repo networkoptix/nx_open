@@ -1,15 +1,13 @@
 <div class="row">
-    <div class="col-sm-6">
-        <h1 ng-if="gettingSystem.success" class="ellipsis">{{system.info.name}}
-            <span ng-if="!system.isOnline" class="label"
+    <div class="col-sm-6 d-flex">
+        <h1 ng-if="gettingSystem.success" class="ellipsis p-0">{{system.info.name}}
+            <span ng-if="!system.isOnline" class="badge badge-info"
                   ng-class="$root.C.systemStatuses[system.info.stateOfHealth].style || $root.C.systemStatuses.default.style">
                   {{$root.L.systemStatuses[system.info.stateOfHealth]||system.info.stateOfHealth}}</span>
 
-            <span ng-if="system.isOnline&&!system.isAvailable" class="label"
+            <span ng-if="system.isOnline&&!system.isAvailable" class="badge badge-info"
                   ng-class="$root.C.systemStatuses.unavailable.style">
                   {{$root.L.systemStatuses.unavailable}}</span>
- 
-Context | Request Context
         </h1>
     </div>
     <div class="col-sm-6">

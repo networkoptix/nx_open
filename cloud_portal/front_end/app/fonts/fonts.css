@@ -1,0 +1,45 @@
+
+@font-face {
+    font-family : 'robotolight';
+    src         : url('./roboto/roboto_light/Roboto-Light-webfont.eot');
+    src         : url('./roboto/roboto_light/Roboto-Light-webfont.eot?#iefix') format('embedded-opentype'),
+    url('./roboto/roboto_light/Roboto-Light-webfont.woff') format('woff'),
+    url('./roboto/roboto_light/Roboto-Light-webfont.ttf') format('truetype'),
+    url('./roboto/roboto_light/Roboto-Light-webfont.svg#robotolight') format('svg');
+    font-weight : 300 !important;
+    font-style  : normal;
+}
+
+@font-face {
+    font-family : 'robotoregular';
+    src         : url('./roboto/roboto_regular/Roboto-Regular-webfont.eot');
+    src         : url('./roboto/roboto_regular/Roboto-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+    url('./roboto/roboto_regular/Roboto-Regular-webfont.woff') format('woff'),
+    url('./roboto/roboto_regular/Roboto-Regular-webfont.ttf') format('truetype'),
+    url('./roboto/roboto_regular/Roboto-Regular-webfont.svg#robotoregular') format('svg');
+    font-weight : 400 !important;
+    font-style  : normal;
+}
+
+@font-face {
+    font-family : 'robotomedium';
+    src         : url('./roboto/roboto_medium/Roboto-Medium-webfont.eot');
+    src         : url('./roboto/roboto_medium/Roboto-Medium-webfont.eot?#iefix') format('embedded-opentype'),
+    url('./roboto/roboto_medium/Roboto-Medium-webfont.woff') format('woff'),
+    url('./roboto/roboto_medium/Roboto-Medium-webfont.ttf') format('truetype'),
+    url('./roboto/roboto_medium/Roboto-Medium-webfont.svg#robotomedium') format('svg');
+    font-weight : 500 !important;
+    font-style  : normal;
+}
+
+
+@font-face {
+    font-family : 'robotobold';
+    src         : url('./roboto/roboto_bold/Roboto-Bold-webfont.eot');
+    src         : url('./roboto/roboto_bold/Roboto-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+    url('./roboto/roboto_bold/Roboto-Bold-webfont.woff') format('woff'),
+    url('./roboto/roboto_bold/Roboto-Bold-webfont.ttf') format('truetype'),
+    url('./roboto/roboto_bold/Roboto-Bold-webfont.svg#robotobold') format('svg');
+    font-weight : 700 !important;
+    font-style  : normal;
+}

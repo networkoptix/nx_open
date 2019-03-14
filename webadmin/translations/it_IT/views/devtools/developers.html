@@ -1,74 +1,68 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Strumenti per gli sviluppatori</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Hai un'idea su come migliorare i nostri strumenti di sviluppo o vuoi solo iniziare una conversazione?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Lasciaci il tuo feedback</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Generatore di eventi generici</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System,
+            A Generic Event is a method of sending events from 3rd party Systems to a System,
             which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+            Generic Event Generator è uno strumento che consente di creare chiamate di eventi generici HTTP.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Generatore di eventi generici</a></p>
     </div>
     <div>
         <h3>Server API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
+            Server API provides a standard set of API calls for 3rd party Systems. It gives developers the ability to
+            access almost every System feature available in the regular client: query/manage System resources (servers,
             cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
             control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            <a href="#/developers/api"><b>Strumento di test API (nuovo)</b></a>
+            - documentazione interattiva con strumenti per provare le chiamate API<br>
+            <a href="#/developers/changelog">l'API Changelog</a>
+            - elenco dei cambiamenti nella documentazione API<br>
+            <a id="api-doc" href="api.xml" target="_blank">Documentazione API</a><br>
+            <a href="#/developers/serverDocumentation">Documentazione configurazione server</a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Pannello Dettagli telecamera</h3>
         <p>
-            Displays additional developer-friendly information for cameras in the Web Admin interface:
+            Visualizza informazioni aggiuntive per gli sviluppatori per le telecamere nell'interfaccia Web Admin:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>ID della telecamera</li>
+            <li>Collegamenti per tutti i flussi video disponibili</li>
+            <li>Esportazione diretta di video dal browser</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            Per aprire il pannello Dettagli telecamera: accedere all'interfaccia Web Admin, selezionare <a href="#/view"> Visualizza </a>, seleziona la telecamera, fai clic sull'icona delle impostazioni (ingranaggio), quindi seleziona "Dettagli telecamera"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">pannello Dettagli telecamera</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>SDK di integrazione della sorgente video</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            Video Source Integration SDK offre la possibilità di integrare praticamente qualsiasi sorgente video live o registrata (telecamere IP, NVR, DVR, ecc.) nel sistema. SDK rende possibile creare metodi per scoprire, visualizzare, analizzare e registrare video. Consente inoltre di integrare le porte I / O del dispositivo e le informazioni di rilevamento del movimento.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >scarica SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>SDK di archiviazione</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            Storage SDK offre la possibilità di integrare potenziali storage nel sistema. Consente agli sviluppatori di leggere o scrivere in qualsiasi posizione di archiviazione: locale, remoto e persino cloud-one. La creazione di un plug-in di archiviazione richiede l'implementazione di funzioni standard quali: flusso I / O, se il file esiste, elimina file, elenco di file nella cartella, ecc. SDK di archiviazione contiene anche un esempio per l'utilizzo di un server FTP come percorso di archiviazione.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >scarica SDK</a></p>
     </div>
 </div>

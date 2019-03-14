@@ -1,11 +1,15 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
-    <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        계정이 생성 되었습니다. <br>확인 메세지가 <br>{{account.email}} 로 전송되었습니다.
+    <h1 class="process-success d-flex align-items-center flex-column mt-5"
+        ng-if="(register.success || registerSuccess) && !activated">
+        <span> 계정이 생성되었습니다.</span>
+        <span> 확인 메시지를 보냈습니다. </span>
+      <span><strong>{{account.email}}</strong></span>
     </h1>
 
-    <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        계정이는 성공적으로 생성되었습니다.
+    <h1 class="process-success d-flex align-items-center flex-column mt-5"
+        ng-if="(register.success || registerSuccess) && activated">
+        <span>계정이는 성공적으로 생성되었습니다.</span>
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
@@ -16,64 +20,89 @@
         <input type="password" style="display:none">
         <!-- /end of special hack -->
 
-        <div class="form-group" validate-field>
-            <label for="firstName" class="col-sm-4 control-label">이름</label>
-            <div class="col-sm-4">
-                <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
-                       required
- name="firstName" autocomplete="off" autofocus>
+        <div class="form-group row" validate-field>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="firstName" class="text-left text-md-right control-label">이름</label>
             </div>
-            <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">이름이 필요합니다</span>
+            <div class="col-md-4">
+                <input type="text" class="form-control"
+                       ng-model="account.firstName" id="firstName" maxlength="255"
+                       required name="firstName" autocomplete="off" autofocus>
             </div>
-        </div>
-        <div class="form-group" validate-field>
-            <label for="lastName"  class="col-sm-4 control-label">성</label>
-            <div class="col-sm-4">
-                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
-                       required
- name="lastName" autocomplete="off">
-            </div>
-            <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">성이 필요합니다</span>
+            <div class="col-md-4">
+                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">이름이 필요합니다</span>
             </div>
         </div>
-        <div class="form-group" validate-field>
-            <label for="registerEmail"  class="col-sm-4 control-label">이메일</label>
-            <div class="col-sm-4">
-                <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
+        <div class="form-group row" validate-field>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="lastName"  class="text-left text-md-right control-label">성</label>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control"
+                       ng-model="account.lastName" id="lastName" maxlength="255"
+                       required name="lastName" autocomplete="off">
+            </div>
+            <div class="col-md-4">
+                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">성이 필요합니다</span>
+            </div>
+        </div>
+        <div class="form-group row" validate-field>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="registerEmail" class="text-left text-md-right control-label">이메일</label>
+            </div>
+            <div class="col-md-4">
+                <input ng-hide="lockEmail" type="email" class="form-control"
+                       ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
  ng-change="hideAlreadyExists()">
 
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
             </div>
-            <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">이메일이 필요합니다</span></div>
-
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">유효한 이메일을 입력하십시오</span></div>
-
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">이 이메일은 이미 {{PRODUCT_NAME}} 에 등록되었습니다</span></div>
+            <div class="col-md-4">
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">이메일이 필요합니다</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">유효한 이메일을 입력하십시오</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">상기 이메일은 이미 %PRODUCT_NAME%에 등록되었습니다</span></div>
             </div>
         </div>
-        <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
-                <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> 이메일 뉴스 레터를 구독</label>
+
+        <password-input ng-model="account.password"
+                        id="'registerPassword'"
+                        form="registerForm"
+                        label="$root.L.regActions.passwordLabel">
+        </password-input>
+
+        <div class="form-group row" validate-field>
+            <div class="offset-md-4 col-md-4">
+                <label class="checkbox mb-0 mb-md-3">
+                    <input type="checkbox"
+                           ng-model="account.accept"
+                           ng-model-options="{ updateOn: 'default', debounce: 0 }"
+                           name="accept" id="accept" required>
+                    <span class="checkmark">
+                        <svg viewbox="0 0 20 16">
+                            <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
+                            <polyline class="box" points="12.5,2.5 2.5,2.5 2.5,13.5 13.5,13.6 13.5,8.5"></polyline>
+                            <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
+                            <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
+                        </svg>
+                    </span>
+                    <span class="text"> <a href="/content/eula" target="_blank"> 이용 약관과 </a> 및 <a href="%PRIVACY_LINK%" target="_blank"> 개인 정보 보호 정책 </a></span> 에 동의 합니다.
+                </label>
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <span class="help-block input-error" ng-if="registerForm.accept.$dirty && registerForm.accept.$error.required">
+                    다음으로 진행하려면 이용 약관과 개인 정보 정책을 읽고 동의해야 합니다.</span>
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="offset-md-4 col-md-8 p-0 pl-md-2">
                 <process-button process="register"
                                 form="registerForm"
-                                class="pull-left"
+                                class="float-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    동의하시면 "계정 생성" 을 선택하세요
-                    <div><a href="/content/eula" target="_blank">이용 약관</a></div>
-                </div>
             </div>
         </div>
     </form>

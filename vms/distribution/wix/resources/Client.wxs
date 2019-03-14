@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <?include BuildVars.wxi ?>
+
+    <Fragment Id='FragmentClient'>
+
+        <DirectoryRef Id="INSTALLDIR">
+
+            <Component Id="AppLauncherConfigurationUser">
+                <RegistryKey Root="HKCU"
+                         Key="Software\[Manufacturer]\$(var.applauncherName)">
+                    <RegistryValue Type="string" Name="previousLaunchedVersion" Value="$(var.releaseVersionMajor).$(var.releaseVersionMinor)"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="ClientEulaVersion">
+                <RegistryKey Root="HKCU"
+                         Key="Software\[Manufacturer]\$(var.clientInternalName)">
+                    <RegistryValue Type="integer" Name="acceptedEulaVersion" Value="$(var.eulaVersion)"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="ClientUriHandler">
+                <RegistryKey Root="HKCR" Key="$(var.uriProtocol)">
+                    <RegistryValue Type="string" Value="$(var.clientDisplayName)"/>
+                    <RegistryValue Type="string" Name="URL Protocol" Value=""/>
+                    <RegistryValue Type="string" Name="version" Value="$(var.releaseVersionFull)"/>
+                    <RegistryKey Key="DefaultIcon">
+                        <RegistryValue
+                            Type="string"
+                            Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" ,0'/>
+                    </RegistryKey>
+                    <RegistryKey Key="shell">
+                        <RegistryValue Type="string" Value="open"/>
+                        <RegistryKey Key="open">
+                            <RegistryKey Key="command">
+                                <RegistryValue
+                                    Type="string"
+                                    Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" -- "%1"' />
+                            </RegistryKey>
+                        </RegistryKey>
+                    </RegistryKey>
+                </RegistryKey>
+            </Component>
+
+            <Directory Id="$(var.customization)ClientDir" Name="Client">
+                <Directory Id="$(var.customization)HelpDir" Name="help"/>
+
+                <Directory Id="InstallDirRoot" Name="$(var.releaseVersionFull)">
+
+                    <Component Id="MiniLauncherExecutable">
+                        <File Id="minilauncher.exe"
+                            Name="$(var.minilauncherBinaryName)"
+                            Source="$(var.SourceDir)/$(var.minilauncherBinaryName)"
+                            KeyPath="yes">
+                            <Shortcut Id="StartmenuAppLauncher"
+                                Directory="ProgramMenuDir"
+                                Name="$(var.productName)"
+                                WorkingDirectory='InstallDirRoot'
+                                Advertise="yes"
+                                Icon="icon_menu.exe"/>
+                            <Shortcut Id="DesktopClient"
+                                Directory="DesktopFolder"
+                                Name="$(var.productName)"
+                                WorkingDirectory='InstallDirRoot'
+                                Icon="icon_desktop.exe"/>
+                        </File>
+                    </Component>
+
+                    <Component Id="QtConf">
+                        <File Id="qt.conf" Name="qt.conf" Source="$(var.CurrentBinaryDir)/qt.conf" KeyPath="yes"/>
+                    </Component>
+
+                    <Component Id="AppLauncherExecutable">
+                        <File Id="applauncher.exe" Name="applauncher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes"/>
+                    </Component>
+
+                    <Directory Id="imageformats" Name="imageformats"/>
+                    <Directory Id="plugins" Name="plugins"/>
+                    <Directory Id="platforms" Name="platforms"/>
+                    <Directory Id="mediaservice" Name="mediaservice"/>
+                    <Directory Id="audio" Name="audio"/>
+                    <Directory Id="ClientQml" Name="qml"/>
+                    <Directory Id="ClientFontsDir" Name="fonts"/>
+                    <Directory Id="vox" Name="vox"/>
+
+                    <Component Id="ClientExecutable">
+                        <File Id="client.exe"
+                            Name="$(var.clientName).exe"
+                            Source="$(var.SourceDir)/$(var.clientName).exe"
+                            KeyPath="yes">
+                            <fire:FirewallException Id="FirewallExceptionClient"
+                                Name="$(var.productName)"
+                                Scope="any"
+                                IgnoreFailure="yes"/>
+                        </File>
+                        <File Id="launcherVersionFile"
+                            Name="$(var.launcherVersionFile)"
+                            Source="$(var.SourceDir)/$(var.launcherVersionFile)"/>
+                    </Component>
+
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+
+        <ComponentGroup Id="info_files"
+                Directory="InstallDirRoot"
+                Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
+
+
+        <Feature Id="ClientFeature" Title="$(var.productName) Client" Level="1"
+                 ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+
+            <ComponentGroupRef Id="shared_nx_libraries"/>
+            <ComponentGroupRef Id="shared_misc_libraries"/>
+            <ComponentGroupRef Id="shared_qt_libraries"/>
+            <ComponentGroupRef Id="shared_qt_platforms"/>
+            <ComponentGroupRef Id="shared_icu_libraries"/>
+            <ComponentGroupRef Id="shared_ucrt_libraries"/>
+            <ComponentGroupRef Id="shared_vcrt_libraries"/>
+            <ComponentGroupRef Id="client_nx_libraries"/>
+            <ComponentGroupRef Id="client_misc_libraries"/>
+            <ComponentGroupRef Id="client_qt_libraries"/>
+            <ComponentGroupRef Id="client_qt_imageformats"/>
+            <ComponentGroupRef Id="client_qt_mediaservice"/>
+            <ComponentGroupRef Id="client_qt_audio"/>
+            <ComponentGroupRef Id="vox"/>
+
+            <ComponentRef Id="NovFileAssociation"/>
+
+            <ComponentRef Id="MiniLauncherExecutable" />
+            <ComponentRef Id="AppLauncherExecutable" />
+            <ComponentRef Id="AppLauncherConfigurationUser" />
+            <ComponentRef Id="ClientExecutable" />
+            <ComponentRef Id="ClientUriHandler"/>
+            <ComponentRef Id="ClientEulaVersion"/>
+            <ComponentRef Id="QtConf"/>
+            <ComponentGroupRef Id="ClientHelpComponent"/>
+            <ComponentGroupRef Id="ClientFontsComponent"/>
+            <ComponentGroupRef Id="ClientBgComponent"/>
+            <ComponentGroupRef Id="ClientQmlComponent"/>
+            <ComponentGroupRef Id="info_files"/>
+        </Feature>
+    </Fragment>
+</Wix>

@@ -1,3 +1,9 @@
+#header #branding h1{
+    text-indent: unset !important;
+    background: none !important;
+    width: unset !important;
+}
+
 #header, .breadcrumbs {
     background: #212A2F !important;
 }
@@ -26,21 +32,26 @@
     text-align: center;
 }
 
+.form-row ul {
+    padding-inline-start: 160px;
+}
+
 .text-danger{
     color: red !important;
 }
 
-tr {
+.results tr {
     height: 40px !important;
 }
-tr > td, tr > th{
+.results tr > td, tr > th{
     vertical-align: middle;
     padding: 8px !important;
 }
 
-button > a {
-    color:black !important;
+td a.btn {
+    color:white !important;
     text-decoration:none !important;
+    background-color: #35464F;
 }
 
 button.btn-danger > a{
@@ -77,4 +88,37 @@ img.preview-image{
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 95px;
+}
+
+.submit-row input[type=checkbox]{
+    margin-top: -1px !important;
+}
+
+.submit-row a.btn-danger {
+    color: #fff !important;
+}
+
+.submit-row a.btn-default {
+    color: #333 !important;
+}
+
+.module h2 {
+    background: #35464F;
+}
+
+.custom-block {
+    margin-bottom: 60px !important;
+}
+
+.show-html{
+    word-wrap : break-word;
+    overflow-y: scroll;
+    max-height: 350px;
+    padding: 5px;
+    border: 1px solid silver;
+    border-radius: 5px;
+}
+
+.disabled-row{
+    background-color: lightgray;
 }

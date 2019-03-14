@@ -1,16 +1,14 @@
-<h1>Merhaba, {{message.fullName}}</h1>
+<h1>Merhaba, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a>sizle video yönetim sistemini paylaştı{{message.system_name}}.
 
-Bu hesabı görüntülemek ve yönetmek için lütfen <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'de hesap oluşturun </a> mevcut e-posta adresinizi kullanın ve talimatları uygulayın.</p>
+Bu hesabı görüntülemek ve yönetmek için lütfen <a href="{{config.portal_url}}">%PRODUCT_NAME%'de hesap oluşturun</a> mevcut e-posta adresinizi kullanın ve talimatları uygulayın.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 <p>Video yönetim sistemine "{{message.system_name}}" erişim izni verildi.
 
-Bu hesabı görüntülemek ve yönetmek için lütfen <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'de hesap oluşturun </a> mevcut e-posta adresinizi kullanın ve talimatları uygulayın.</p>
-{{/message.sharer_name}}
-
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+Bu hesabı görüntülemek ve yönetmek için lütfen <a href="{{config.portal_url}}">%PRODUCT_NAME%'de hesap oluşturun</a> mevcut e-posta adresinizi kullanın ve talimatları uygulayın.</p>
+{{/message.sharer_name}} <a class="btn" href="{{config.portal_url}}/register/{{message.code}}"> Hesap Oluştur </a>
 

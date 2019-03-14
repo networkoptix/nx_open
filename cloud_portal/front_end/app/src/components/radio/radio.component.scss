@@ -1,0 +1,111 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+nx-radio {
+    &[disabled] {
+        .nx-radio {
+            opacity : .3;
+
+            .check {
+                cursor : default;
+            }
+
+            input:hover ~ .check {
+                svg path.circle {
+                    fill : $dark9 !important;
+                }
+            }
+        }
+    }
+    
+    & + label {
+        cursor : pointer;
+    }
+
+    .nx-radio {
+        display : flex;
+        float   : left;
+        margin  : 0;
+
+        input[type="radio"] {
+            position : absolute;
+            opacity  : 0;
+        }
+
+        input:hover ~ .check {
+            svg path.circle {
+                fill : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg path.circle {
+                fill : $dark9 !important;
+            }
+        }
+
+        input:hover ~ .check {
+            svg path.circle {
+                fill : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg path.circle {
+                fill : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
+            }
+        }
+    }
+}
+
+.text {
+    font-family : $font-family-regular;
+    cursor      : pointer;
+    user-select : none;
+}
+
+.check {
+    cursor                      : pointer;
+    position                    : relative;
+    margin                      : -2px 0 0 0;
+    width                       : 20px;
+    height                      : 20px;
+    -webkit-tap-highlight-color : transparent;
+
+    &.checked {
+        svg {
+            circle {
+                display : block;
+            }
+        }
+    }
+
+    &.tristate {
+        svg {
+            // add when it's needed
+        }
+    }
+
+    svg {
+        height : 16px;
+        width  : 20px;
+
+        & path.circle {
+            fill : $dark9;
+        }
+
+        & circle {
+            fill    : $brand_core;
+            display : none;
+        }
+    }
+}
+

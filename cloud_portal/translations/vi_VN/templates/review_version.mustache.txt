@@ -2,7 +2,7 @@
 
 Nhấp vào liên kết để xem lại dự thảo {{ message.id }} cho {{ message.product }}
 
-Liên kết đến bài đánh giá: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
+Liên kết đến bài đánh giá: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 Trên trang này bạn có thể
 1) Tạo bản xem trước để xem các thay đổi gần đây nhất.

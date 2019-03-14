@@ -1,6 +1,13 @@
-$font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-base : "robotoregular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-regular : "robotoregular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-medium : "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-light : "robotolight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-bold : "robotobold", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
+@import '~sass-rem/rem';
 @import '_theme_palette';
+@import '/native-theme/_theme_palette';
+@import 'custom/custom_palette';
 
 // Brand colors
 // -------------------------
@@ -16,6 +23,7 @@ $gray-lighter:           $light3;    //~#EEE
 
 
 $body-bg:                 $light2;
+$text-color:              $dark9;
 $navbar-default-bg:       $light1;
 $navbar-default-link-color: $dark10;
 $navbar-margin-bottom:    10px;
@@ -49,25 +57,47 @@ $modal-header-border-color:   transparent;
 $modal-content-border-color:  transparent;
 $panel-default-heading-bg:    transparent;
 
+// Fonts
+$rem-baseline: 16px;
 
-$font-size-base:          14px;
-$font-size-large:         15px;
-$font-size-small:         13px;
+$font-size-base : rem(13px); // Assumes the browser default, typically `16px`
+$font-size-lg : $font-size-base * 1.25;
+$font-size-sm : rem(12px); //$font-size-base * .785;
 
-$font-size-h1:            22px;
-$font-size-h2:            20px;
-$font-size-h3:            18px;
-$font-size-h4:            16px;
-$font-size-h5:            $font-size-base; // 14px
-$font-size-h6:            12px;
+$h1-font-size : rem(22px); // $font-size-base * 1.4;
+$h2-font-size : rem(22px); // $font-size-base * 1.3;
+$h3-font-size : rem(18px); // $font-size-base * 1.2;
+$h4-font-size : rem(15px); // $font-size-base * 1;
+$h5-font-size : rem(14px); // $font-size-base;
+$h6-font-size : rem(14px); // $font-size-base * .875;
+
+$font-size-ssm : rem(11px);
+$line-height-ssm : rem(13px);
+
+// Font colors
+$font-color-medium : $dark9;
+$font-color-regular : $dark9;
+$font-color-light : $light16;
+$font-color-disabled : $light10;
+$font-color-error : $red_l2;
 
 $btn-font-weight:         bold;
 $headings-font-weight:    lighter;
 
 $border-radius-base:      2px;
 $border-radius-large:     4px;
-$border-radius-small:     2px;
+$border-radius-small:     $border-radius-base;
 
+// Variables from Bootstrap 3 ****************************
+$line-height-base : 1.5 !default;
+$line-height-computed : floor(($font-size-base * $line-height-base)); // ~20px
+$brand-primary : $brand_core;
+$brand-info : $brand_l2;
+$brand-success : $green_main;
+$brand-warning : $yellow_main;
+$brand-danger : $red_main;
+$jumbotron-color : tranparent;
+// ********************************************************
 
 $input-height-base:       32px;
 $input-bg:                $light1;
@@ -90,16 +120,15 @@ $grid-gutter-width:       16px;
 
 $modal-sm:                  400px;
 
-$modal-backdrop-bg:         $dark9;
-$modal-backdrop-opacity:    0.1;
+$modal-backdrop-bg:         $dark15;
+$modal-backdrop-opacity:    0.2;
 $modal-content-bg:          $light1;
+$modal-title-font-weight:   600;
 $modal-title-line-height:   24px;
-$modal-title-padding:       16px;
-$modal-inner-padding:       16px;
+$modal-title-padding:       12px;
+$modal-inner-padding:       12px;
 
 $form-group-margin-bottom:  12px;
-
-
 
 $state-success-text:             $green3;
 $state-success-bg:               $green2;
@@ -136,7 +165,8 @@ $link-color:                  $brand_d2;
 $link-hover-color:            $brand_core;
 
 $grid-float-breakpoint:       420px;
-$dialog-sm-float-breakpoint:     434px;
+$grid-float-breakpoint-max:   $grid-float-breakpoint - 1;
+$dialog-sm-float-breakpoint:  434px;
 
 $panel-body-padding:    16px;
 $panel-heading-padding: 16px;
@@ -149,3 +179,37 @@ $navbar-default-link-active-color: $brand_core;
 
 $dropdown-link-active-bg:   transparent;
 $dropdown-link-active-color: $brand_core;
+
+$collapse-first-width  : 920px;
+$collapse-second-width : 768px;
+
+#outline {
+    box-shadow : 0 0 0 2px transparentize($brand_l2, 0.4) !important;
+}
+
+#inset-outline {
+    box-shadow : inset 0 0 0 2px transparentize($brand_l2, 0.4) !important;
+}
+
+/* set the overriding variables */
+$grid-breakpoints : (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1440px
+);
+$container-max-widths : (
+        sm: 540px,
+        md: 720px,
+        lg: 960px,
+        xl: 1140px,
+        xxl: 1380px
+);
+
+/* badge component */
+$badge-font-size: rem(12px);
+$badge-border-radius: rem(2px);
+$badge-padding-x : rem(8px);
+$badge-padding-y : rem(3px);

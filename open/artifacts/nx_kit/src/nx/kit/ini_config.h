@@ -1,4 +1,3 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #pragma once
 
 #include <iostream>
@@ -15,9 +14,11 @@ namespace kit {
  * debugging and experimenting, with very little performance overhead. The default (initial) values
  * are defined in the code and lead to the nominal behavior, which can be overridden by creating
  * .ini files (with name=value lines) in the directory determined by the platform:
- * - Windows: "%NX_INI_DIR%\" (if env var defined), or "%LOCALAPPDATA%\nx_ini\" (otherwise).
- * - Unix-like: "$NX_INI_DIR/" (if env var defined), or "$HOME/.config/nx_ini/" (if $HOME defined),
- *     "/etc/nx_ini/" (otherwise).
+ * - Windows: "%NX_INI_DIR%\" (if NX_INI_DIR env var is defined), or "%LOCALAPPDATA%\nx_ini\"
+ *     (otherwise). ATTENTION: If LOCALAPPDATA env var contains non-ASCII chars, it will yield a
+ *     non-existing path.
+ * - Linux, MacOS: "$NX_INI_DIR/" (if NX_INI_DIR env var is defined), or "$HOME/.config/nx_ini/" (if
+ *     HOME env var is defined), "/etc/nx_ini/" (otherwise).
  * - Android: "/sdcard/".
  * - iOS: Not supported yet.
  *
@@ -76,9 +77,10 @@ public:
 
     /**
      * Use the specified directory for .ini files. If iniFilesDir is null or empty, and also before
-     * this call, a platform-dependent system temp directory is used, which can be changed defining
-     * a macro at compiling ini_config.cpp:
+     * this call, a platform-dependent directory is used (described in this class comment), which
+     * can be changed defining a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DEFAULT_INI_FILES_DIR=<enquoted-path-with-trailing-slash-or-backslash>
+     * @param iniFilesDir Should include the trailing slash or backslash.
      */
     static void setIniFilesDir(const char* iniFilesDir);
 
@@ -129,7 +131,7 @@ protected: // Used by macros.
         const char* paramName, const char* description);
 
 private:
-    struct Impl;
+    class Impl;
     Impl* const d;
 };
 

@@ -2,7 +2,7 @@ Er is een nieuwe revisie voor {{ message.product }}
 
 Klik op de link om de revisie te bekijken {{ message.id }} voor {{ message.product }}
 
-Link naar revisie: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
+Link naar concept beoordeling: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 Op deze pagina kunt u
 1) Een voorbeeld maken om de meest recente wijzigingen te zien.

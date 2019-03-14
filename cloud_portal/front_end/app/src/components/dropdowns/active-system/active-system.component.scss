@@ -1,0 +1,20 @@
+.popup {
+    &.arrow {
+        left: 16px;
+    }
+}
+
+.dropdown {
+    .dropdown-toggle {
+        padding-right    : 14px !important;
+        padding-left     : 14px !important;
+
+        &::after {
+            border : none;
+        }
+
+        .glyphicon-menu-hamburger {
+            margin : 0;
+        }
+    }
+}

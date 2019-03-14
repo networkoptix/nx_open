@@ -4,17 +4,18 @@
     <h3 class="modal-title" ng-bind-html="title"></h3>
 </div>
 
-<div class="col-sm-12">
-    <alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></alert>
+<div class="modal-body">
+    <uib-alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></uib-alert>
 
-    <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
+    <uib-alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></uib-alert>
 
-    <alert type="info" ng-if="connecting">חבר מערכת אל... <span class="product-name">{{Config.cloud.productName}}</span> ... <; 0>; זה עשוי להימשך בערך דקה.</alert>
+    <uib-alert type="info" ng-if="connecting">מתחבר למערכת... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
+זה עשוי להימשך בערך דקה.</uib-alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" ng-readonly="!connect"
-                   type="email" placeholder="דוא&quot;ל ענן" required auto-focus autocomplete="new-password">
+                   type="email" placeholder="דוא&quot;ל ענן" required auto-focus autocomplete="new-password" validate-email>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"

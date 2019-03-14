@@ -1,0 +1,6 @@
+module Nx.Controls.NavigationMenu
+
+NavigationMenu 1.0 NavigationMenu.qml
+MenuHeader 1.0 MenuHeader.qml
+MenuSeparator 1.0 MenuSeparator.qml
+MenuItem 1.0 MenuItem.qml

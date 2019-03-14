@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "utwórz konto",
         "errorNoHDD": "To urządzenie jest przeznaczone do działania z zainstalowanym dyskiem twardym. <br> Proszę wyłączyć urządzenie i zainstalować dysk twardy.",
-        "errorNoNetwork": "To urządzenie wymaga połączenia sieciowego. <br> Podłącz je do sieci lokalnej lub do Internetu"
+        "errorNoNetwork": "To urządzenie wymaga połączenia sieciowego.<br>Podłącz je do sieci lokalnej lub do Internetu"
     },
     "passwordRequirements": {
         "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",
@@ -42,9 +42,11 @@
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Wszyscy użytkownicy chmury zostaną usunięci.</span><br><br>System będzie dostępny w sieci lokalnej dla lokalnego konta administratora.",
         "confirmDisconnectFromCloudAction": "Rozłącz",
         "disconnectedFromCloudSuccess": "System został odłączony od {{CLOUD_NAME}}",
+        "disconnectedFromCloudError": "Nie można odłączyć systemu",
         "confirmDisconnectFromSystem": "Odłącz serwer z bieżącego systemu",
         "confirmDisconnectFromSystemAction": "Odłącz",
-        "disconnectedFromSystemSuccess": "Serwer został odłączony od systemu",
+        "disconnectedFromSystemSuccess": "Serwer został pomyślnie odłączony od systemu",
+        "disconnectedFromSystemError": "Nie można odłączyć serwera",
         "connectedSuccess": "System został podłączony pomyślnie",
         "createLocalOwnerTitle": "Utwórz lokalnego administratora",
         "confirmChangePassword": "Zmień hasło administratora",
@@ -76,7 +78,6 @@
         "emailSupportEmail": "E-mail do supportu",
         "enableEdgeRecording": "Włącz nagrywanie brzegowe",
         "eventLogPeriodDays": "Okres dziennika zdarzeń (dni)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "W razie potrzeby usuń profile kamery przy inicjalizacji",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",
@@ -107,12 +108,26 @@
         "statisticsReportTimeCycle": "Interwał raportu statystycznego",
         "statisticsReportUpdateDelay": "Raport statystyczny - opóźnienie aktualizacji",
         "synchronizeTimeWithInternet": "Synchronizuj czas z Internetem",
-        "systemName": "Nazwa systemu",
+        "SystemName": "Nazwa systemu",
         "takeCameraOwnershipWithoutLock": "Nie blokuj kamery przy podłączaniu",
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
+        "primaryTimeServer": "Podstawowy serwer synchronizacji czasu",
+        "osTimeChangeCheckPeriodMs": "Okres sprawdzania zmiany czasu systemu",
+        "syncTimeExchangePeriod": "Okres synchronizacji czasu",
+        "maxWearableArchiveSynchronizationThreads": "Max liczba wątków synchronizacji nagrań kamery przenośnej",
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
-        "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem"
+        "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
+        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Limit czasu fragmentacji wiadomości",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: limit czasu odpowiedzi na fragment",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Pokaż alternatywne sterowanie PTZ na obrazie",
+        "trafficEncryptionForced": "Wymuszaj szyfrowanie transmisji",
+        "videoTrafficEncryptionForced": "Wymuszaj szyfrowanie transmisji wideo",
+        "updateStatus": "Aktualizacja statusu",
+        "watermarkSettings": "Ustawienia znaku wodnego",
+        "maxWebMTranscoders": "Maksymalna liczba połączeń WEBM do serwera. Chrome jednocześnie otwiera 2 połączenia, a następnie zamyka pierwsze z nich, dlatego zaleca się ustawienie wartości >= 2.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -122,7 +137,7 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "System jest nieosiągalny lub nie istnieje.",
+        "SystemIsUnreacheble": "System jest nieosiągalny lub nie istnieje.",
         "incorrectCurrentPassword": "Nieprawidłowe bieżące hasło",
         "incorrectRemotePassword": "Nieprawidłowy login lub hasło.",
         "incompatibleVersion": "System jest nieosiągalny, nie istnieje lub ma niezgodną wersję.",
@@ -134,9 +149,10 @@
         "cloudBothError": "Nie można złączyć systemów. Oba systemy są podłączone do chmury. Trzeba z niej odłączyć przynajmniej jeden z nich.",
         "cloudHostConflict": "Nie można złączyć systemów, ponieważ serwery mają różne hosty w chmurze",
         "licenceError": "Uwaga! Zamierzasz złączyć systemy na licencjach Starter. Tylko jedna taka licencja może być wykorzystywana w złączonym systemie, więc druga z licencji zostanie dezaktywowana. Złączyć mimo to?",
+        "duplicateServersError": "Nie można połączyć systemów, ponieważ mają co najmniej jeden serwer o tym samym identyfikatorze. Usuń ten serwer i spróbuj ponownie.",
         "connectionFailed": "Błąd połączenia: ",
         "unknownError": "Nieznany błąd",
-        "mergeFailed": "Błąd złączania: ",
+        "mergeFailed": "Błąd złączania",
         "mergeSucceed": "Złączono pomyślnie.",
         "newSystemDisplayName": "Nowy system",
         "incompatibleProtocol": "niezgodna wersja",
@@ -144,7 +160,8 @@
         "incompatibleCloudState": "chmura połączona"
     },
     "login": {
-        "incorrectPassword": "Nieprawidłowy login lub hasło"
+        "incorrectPassword": "Nieprawidłowy login lub hasło",
+        "authLockout": "Zbyt wiele prób. Spróbuj ponownie za minutę."
     },
     "navigaion": {
         "cannotGetUser": "Błąd serwera: nie można pobrać danych bieżącego użytkownika"

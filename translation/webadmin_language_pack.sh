@@ -1,7 +1,7 @@
 #!/bin/bash
 
-crowdin upload sources -b vms_3.1 --config crowdin-vms.yaml
-crowdin download -b vms_3.1 --config crowdin-vms.yaml -l en-GB
+crowdin upload sources -b vms_3.2_hotfix --config crowdin-vms.yaml
+crowdin download -b vms_3.2_hotfix --config crowdin-vms.yaml -l en-GB
 
 DIRECTORY=webadmin_language_pack
 rm -rf $DIRECTORY || true

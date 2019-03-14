@@ -1,38 +1,76 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.core.cache import cache
+from django.core.cache import caches
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
+from api.helpers.exceptions import handle_exceptions, require_params,\
     APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
-import datetime, logging
+import datetime
 import json
+import logging
+import re
 import requests
 from cloud import settings
 from django.shortcuts import redirect
 
+from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProductPermissions
+
 logger = logging.getLogger(__name__)
+
+
+def get_suported_hardware_types():
+    return DataStructure.objects.get(name="%SUPPORTED_HARDWARE_TYPES%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_sorting_supported_devices():
+    return DataStructure.objects.get(name="%SORT_SUPPORTED_DEVICES%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_suported_resolutions():
+    return DataStructure.objects.get(name="%SUPPORTED_RESOLUTIONS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_footer_items():
+    return DataStructure.objects.get(name="%FOOTER_ITEMS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_public_downloads_status():
+    return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
+        find_actual_value(product=get_cloud_portal_product())
+
+
+def get_public_release_history_status():
+    return DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
+        find_actual_value(product=get_cloud_portal_product())
 
 
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def visited_key(request):
+    global_cache = caches['global']
     if request.method == 'GET':
         # Check cache value here
         if 'key' not in request.query_params:
             raise APIRequestException('Parameter key is missing', ErrorCodes.wrong_parameters,
                                       error_data=request.query_params)
         key = 'visited_key_' + request.query_params['key']
-        value = cache.get(key, False)
-    elif request.method == 'POST':
+        value = global_cache.get(key, False)
+
+        logger.debug('check visited: {0}: {1}'.format(key, value))
+
+    else:
         # Save cache value here
         require_params(request, ('key',))
         key = 'visited_key_' + request.data['key']
         value = datetime.datetime.now().strftime('%c')
+        global_cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
 
-        logger.debug('visited: ' + key + ': ' + value)
+        logger.debug('visited: {0}: {1}'.format(key, value))
 
-        cache.set(key, value, settings.LINKS_LIVE_TIMEOUT)
     return Response({'visited': value})
 
 
@@ -42,7 +80,7 @@ def language(request):
     if request.method == 'GET':  # Get language for current user
         from util.helpers import detect_language_by_request
         lang = detect_language_by_request(request)
-        language_file = '/static/lang_' + lang + '/language.json'
+        language_file = '/static/lang_{0}/language.json'.format(lang)
         # Return: redirect to language.json file for selected language
         response = redirect(language_file)
 
@@ -72,12 +110,12 @@ def language(request):
 @handle_exceptions
 def downloads_history(request):
     # TODO: later we can check specific permissions
-    customization = settings.CUSTOMIZATION
-    if not request.user.is_superuser and (request.user.customization != customization \
-                                     or not request.user.has_perm('api.can_view_release')):
-        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+    can_view_releases = UserGroupsToProductPermissions.\
+        check_customization_permission(request.user, settings.CUSTOMIZATION, 'api.can_view_release')
+    if not get_public_release_history_status() and not can_view_releases:
+        raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
-    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
+    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
     downloads_json = requests.get(downloads_url)
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()
@@ -91,17 +129,26 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not request.user.is_superuser and (request.user.customization != customization \
-                                     or not request.user.has_perm('api.can_view_release')):
-        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+    if not get_public_release_history_status() and not UserGroupsToProductPermissions.\
+            check_customization_permission(request.user, customization, 'api.can_view_release'):
+        raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
-    downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
+    if re.search(r'\D+', build):
+        raise APINotFoundException("Invalid build number", ErrorCodes.bad_request)
+
+    downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).\
+        replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
-    downloads_json.raise_for_status()
+
+    if downloads_json.status_code != 200:
+        raise APINotFoundException("Build number does not exist", ErrorCodes.not_found, error_data=request.query_params)
+
     downloads_json = downloads_json.json()
 
     if 'releaseNotes' not in downloads_json:
-        raise APINotFoundException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
+        raise APINotFoundException("No downloads.json for this build",
+                                   ErrorCodes.not_found,
+                                   error_data=request.query_params)
 
     updates_json = requests.get(settings.UPDATE_JSON)
     updates_json.raise_for_status()
@@ -109,7 +156,7 @@ def download_build(request, build):
 
     # find settings for customizations
     if customization not in updates_json:
-        logger.error('Customization not in updates.json: ' + customization + '. Ask Boris to fix that.')
+        logger.error('Customization not in updates.json: {0}. Ask Boris to fix that.'.format(customization))
         customization = 'default'
 
     updates_record = updates_json[customization]
@@ -122,11 +169,14 @@ def download_build(request, build):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def downloads(request):
+    global_cache = caches['global']
     customization = settings.CUSTOMIZATION
+    if not get_public_downloads_status() and not request.user.is_authenticated:
+        raise APIForbiddenException("Not authorized", ErrorCodes.not_authorized)
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
-        cache.set(cache_key, False)
-    downloads_json = cache.get(cache_key, False)
+        global_cache.set(cache_key, False)
+    downloads_json = global_cache.get(cache_key, False)
     if not downloads_json:
         # get updates.json
         updates_json = requests.get(settings.UPDATE_JSON)
@@ -135,29 +185,30 @@ def downloads(request):
 
         # find settings for customizations
         if customization not in updates_json:
-            logger.error('Customization not in updates.json: ' + customization + '. Ask Boris to fix that.')
-            customization = 'default'
+            logger.error('Customization not in updates.json: {0}. Ask Boris to fix that.'.format(customization))
+            return Response(None)
         updates_record = updates_json[customization]
         latest_version = updates_record['download_version'] if 'download_version' in updates_record else None
 
         # Fallback section for old structure and old versions
         if not latest_version or latest_version.startswith('2'):
             if latest_version and latest_version.startswith('2'):
-                logger.error('No 3.0 downloadable release for customization: ' + customization +
-                             '. Ask Boris to fix that')
+                logger.error('No 3.0 downloadable release for customization: {0}. '
+                             'Ask Boris to fix that.'.format(customization))
             else:
-                logger.error('No download_version in updates.json for customization: ' + customization +
-                             '. Ask Boris to fix that.')
+                logger.error('No download_version in updates.json for customization: {0}. '
+                             'Ask Boris to fix that.'.format(customization))
             latest_release = None
             if 'current_release' in updates_record:
                 latest_release = updates_record['current_release']
             if not latest_release:  # Hack for new customizations
-                logger.error('No official release for customization: ' + customization + '. Ask Boris to fix that.')
+                logger.error('No official release for customization: {0}. '
+                             'Ask Boris to fix that.'.format(customization))
                 latest_release = '3.0'
             if latest_release.startswith('2'):  # latest release is 2.* - fallback for 3.0
                 latest_release = '3.0'
             if latest_release not in updates_record['releases']:
-                logger.error('No 3.0 release for customization: ' + customization + '. Ask Boris to fix that')
+                logger.error('No 3.0 release for customization: {0}. Ask Boris to fix that.'.format(customization))
                 return Response(None)
             latest_version = updates_record['releases'][latest_release]
         # End of fallback section for old structure and old versions
@@ -176,7 +227,33 @@ def downloads(request):
         # evaluate file pathss
         # release_notes = updates_record['release_notes']
 
-        cache.set(cache_key, json.dumps(downloads_json))
+        global_cache.set(cache_key, json.dumps(downloads_json))
     else:
         downloads_json = json.loads(downloads_json)
+
+    # Remove platforms that are not marked as available.
+    available_platforms = DataStructure.objects.get(name='%AVAILABLE_DOWNLOADS_PLATFORM%').\
+        find_actual_value(get_cloud_portal_product())
+    platforms = []
+    for platform in downloads_json['platforms']:
+        if platform['name'] in available_platforms:
+            platforms.append(platform)
+
+    downloads_json['platforms'] = platforms
     return Response(downloads_json)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def get_settings(request):
+    settings_object = {
+        'footerItems': get_footer_items(),
+        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads': get_public_downloads_status(),
+        'publicReleases': get_public_release_history_status(),
+        'sortSupportedDevices': get_sorting_supported_devices(),
+        'supportedResolutions': get_suported_resolutions(),
+        'supportedHardwareTypes': get_suported_hardware_types()
+    }
+    return Response(settings_object)

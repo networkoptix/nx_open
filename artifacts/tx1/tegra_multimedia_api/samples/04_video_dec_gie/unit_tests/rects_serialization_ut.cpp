@@ -1,9 +1,7 @@
 #include <memory>
 #include <sstream>
 
-//#define NX_KIT_TEST_KEEP_TEMP_FILES
 #include <nx/kit/test.h>
-
 #include <nx/kit/debug.h>
 
 #include <rects_serialization.h>
@@ -24,16 +22,15 @@ static void checkRectsEq(const Rect& expected, const Rect& actual)
 
 static void testRects(const Rect rects[], int rectCount)
 {
-    const nx::kit::test::TempFile file("rects_", ".txt");
+    const std::string filename = std::string(nx::kit::test::tempDir()) + "rects.txt";
 
-    ASSERT_TRUE(writeRectsToFile(file.filename(), rects, rectCount));
+    ASSERT_TRUE(writeRectsToFile(filename, rects, rectCount));
 
     const int maxRectCount = rectCount + 100;
     std::vector<Rect> newRects(maxRectCount);
 
     int newRectCount = -1;
-    ASSERT_TRUE(readRectsFromFile(
-        file.filename(), &newRects.front(), maxRectCount, &newRectCount));
+    ASSERT_TRUE(readRectsFromFile(filename, &newRects.front(), maxRectCount, &newRectCount));
 
     ASSERT_EQ(rectCount, newRectCount);
     for (int i = 0; i < rectCount; ++i)
@@ -58,12 +55,12 @@ TEST(rects_serialization, twoRects)
 
 static void testModulus(int64_t modulus)
 {
-    const nx::kit::test::TempFile file("modulus_", ".txt");
+    const std::string filename = std::string(nx::kit::test::tempDir()) + "modulus.txt";
 
-    ASSERT_TRUE(writeModulusToFile(file.filename(), modulus));
+    ASSERT_TRUE(writeModulusToFile(filename, modulus));
 
     int64_t modulusFromFile = -1;
-    ASSERT_TRUE(readModulusFromFile(file.filename(), &modulusFromFile));
+    ASSERT_TRUE(readModulusFromFile(filename, &modulusFromFile));
     ASSERT_EQ(modulus, modulusFromFile);
 }
 

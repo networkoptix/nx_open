@@ -1,4 +1,7 @@
 <div class="container">
+    <h1><a href="#/metrics/">New: System health report</a></h1>
+</div>
+<div class="container">
     <h1>Haladó szerverbeállítások</h1>
 
     <div class="alert alert-danger" role="alert">
@@ -106,7 +109,7 @@
             Nincs fő tároló meghajtó kiválasztva a íráshoz - a videók nem lesznek rögzítve ezen a szerveren.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Aktuális felvétel eltávolítható, hogy helyet szabadítson fel.
+            A fenntartott tér mennyisége nagyobb, mint a hátralevő szabad hely. Aktuális felvétel eltávolítható, hogy helyet szabadítson fel.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">A mentéshez javítsa a kijelölt beállításokat</div>
 
@@ -116,42 +119,27 @@
 
     <h2>Naplóbeállítások</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Fő rendszernapló szintje</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Nincs: napló leállítva.</option>
-                    <option value="ALWAYS">Mindig: Napló hibák, figyelmeztetések és a legfontosabb üzenetek.</option>
-                    <option value="ERROR">Hiba: csak hibák naplózása.</option>
-                    <option value="WARNING">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
-                    <option value="INFO">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
-                    <option value="DEBUG">Hibakeresés: Minden rendszerüzenet és hibakeresési információ naplózása.</option>
-                    <option value="DEBUG2">Hibakeresés2: Minden rendszerüzenet és kiterjesztett hibakeresési információ naplózása.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Nincs: napló leállítva.</option>
+                    <option value="always">Mindig: Napló hibák, figyelmeztetések és a legfontosabb üzenetek.</option>
+                    <option value="error">Hiba: csak hibák naplózása.</option>
+                    <option value="warning">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
+                    <option value="info">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
+                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug2">Debug2: Log every System message and extended debug information.</option>
+                    <option value="verbose">Verbose: Log all information available.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Tranzakciós rendszernapló szintje</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Nincs: napló leállítva.</option>
-                    <option value="ALWAYS">Mindig: Napló hibák, figyelmeztetések és a legfontosabb üzenetek.</option>
-                    <option value="ERROR">Hiba: csak hibák naplózása.</option>
-                    <option value="WARNING">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
-                    <option value="INFO">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
-                    <option value="DEBUG">Hibakeresés: Minden rendszerüzenet és hibakeresési információ naplózása.</option>
-                    <option value="DEBUG2">Hibakeresés2: Minden rendszerüzenet és kiterjesztett hibakeresési információ naplózása.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Mentés</button>
         </div>
     </form>
 
-    <h1>Haladó rendszerbeállítások</h1>
+    <h1>Advanced System settings</h1>
     <div class="alert alert-danger" role="alert">
         <b>Figyelem!</b> Bármilyen változtatás ezen az oldalon a szerver hibás működéséhez vezethet.
     </div>
@@ -182,7 +170,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'üres'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">

@@ -1,8 +1,8 @@
-Merhaba,
+Merhaba, {{message.userFullName}},
 
   Lütfen e-posta adresinizi onaylamak ve hesabı etkinleştirmek için aşağıdaki bağlantıyı açın.
 
 {{config.portal_url}}/activate/{{message.code}}
 
-{{PRODUCT_NAME}}'e kaydolmadıysanız, bu e-postayı yok sayın.
+%PRODUCT_NAME%'e kaydolmadıysanız, bu e-postayı yok sayın.
 İletiyi veya bağlantıyı kimseyle paylaşmayın.

@@ -1,11 +1,11 @@
-Добро пожаловать в {{PRODUCT_NAME}}
+Добро пожаловать в %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) пригласил вас присоединиться к {{PRODUCT_NAME}} и открыл вам доступ с системе {{message.system_name}}.
+{{message.sharer_name}} ({{message.sharer_email}}) пригласил вас присоединиться к %PRODUCT_NAME% и открыл вам доступ с системе {{message.system_name}}.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Приглашаем вас присоединиться к {{PRODUCT_NAME}}.
+Приглашаем вас присоединиться к %PRODUCT_NAME%.
 Вам был предоставлен доступ к {{message.system_name}}.
 {{/message.sharer_name}}
 

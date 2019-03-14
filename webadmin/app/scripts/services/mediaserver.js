@@ -170,7 +170,8 @@ angular.module('webadminApp')
 
 
         mediaserver = {
-            checkCurrentPassword:function(password){
+            // TODO: remove this method and all usages in 4.1 release or later. We keep it for now to simplify merges
+            /*checkCurrentPassword:function(password){
                 var login = $localStorage.login;
                 var realm = $localStorage.realm;
                 var nonce = $localStorage.nonce;
@@ -180,7 +181,7 @@ angular.module('webadminApp')
                     return $q.when(true);
                 }
                 return $q.reject();
-            },
+            },*/
             getNonce:function(login, url){
                 var params = {
                     userName:login
@@ -205,6 +206,32 @@ angular.module('webadminApp')
                 var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
                 return auth;
+            },
+            debugLogin:function(login,password,realm,nonce,method){
+                var digestSource = login + ':' + realm + ':' + password;
+                var digestMD5 = md5(digestSource);
+                var methodSource = (method||'GET') + ':';
+                var methodMD5 = md5(methodSource);
+                var authDigestSource = digestMD5 + ':' + nonce + ':' + methodMD5;
+                var authDigestMD5 = md5(authDigestSource);
+                var authSource = login + ':' + nonce + ':' + authDigestMD5;
+                var authBase64 = Base64.encode(authSource);
+                return {
+                    alogin:login,
+                    bpassword:password,
+                    crealm:realm,
+                    dnonce:nonce,
+                    emethod:methodSource,
+                    emethodMD5:methodMD5,
+                    fdigestSource: digestSource,
+                    gdigestMD5: digestMD5,
+                    hmethodSource: methodSource,
+                    imethodMD5: methodMD5,
+                    jauthDigestSource: authDigestSource,
+                    kauthDigestMD5: authDigestMD5,
+                    lauthSource: authSource,
+                    mauthBase64: authBase64
+                };
             },
             login:function(login, password){
                 login = login.toLowerCase();
@@ -251,8 +278,8 @@ angular.module('webadminApp')
             url:function(){
                 return proxy;
             },
-            logUrl:function(params){
-                return proxy + '/web/api/showLog' + (params||'');
+            logUrl:function(name, lines){
+                return proxy + '/web/api/showLog?' + $.param({name: name, lines: lines});
             },
             authForMedia:function(){
                 return $localStorage.auth;
@@ -326,19 +353,22 @@ angular.module('webadminApp')
                     };
                 });
             },
-            disconnectFromCloud:function(ownerLogin,ownerPassword){
+            disconnectFromCloud:function(currentPassword, ownerLogin,ownerPassword){
                 var params = ownerPassword ? {
+                    currentPassword: currentPassword,
                     password: ownerPassword,
                     login: ownerLogin
-                }: null;
+                }: {currentPassword:currentPassword};
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
             },
-            disconnectFromSystem:function(){
-                return wrapPost(proxy + '/web/api/detachFromSystem');
+            disconnectFromSystem:function(currentPassword){
+                return wrapPost(proxy + '/web/api/detachFromSystem',{currentPassword:currentPassword});
             },
-            restoreFactoryDefaults:function(){
-                return wrapPost(proxy + '/web/api/restoreState');
+            restoreFactoryDefaults:function(currentPassword){
+                return wrapPost(proxy + '/web/api/restoreState', {
+                    currentPassword: currentPassword
+                });
             },
             setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName, systemSettings){
                 return wrapPost(proxy + '/web/api/setupCloudSystem',{
@@ -373,13 +403,14 @@ angular.module('webadminApp')
             },
 
 
-            changeAdminPassword: function(password) {
+            changeAdminPassword: function(newPassword, currentPassword) {
                 return wrapPost(proxy + '/web/api/configure', {
-                    password:password
+                    password: newPassword,
+                    currentPassword: currentPassword
                 });
             },
 
-            mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
+            mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem, currentPassword){
                 // 1. get remote nonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
@@ -400,7 +431,8 @@ angular.module('webadminApp')
                         getKey: getKey,
                         postKey: postKey,
                         url: url,
-                        takeRemoteSettings: !keepMySystem
+                        takeRemoteSettings: !keepMySystem,
+                        currentPassword: currentPassword
                     });
                 });
             },
@@ -419,11 +451,11 @@ angular.module('webadminApp')
                     if (url.indexOf('http') != 0) {
                         url = 'http://' + url;
                     }
-                    return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
+                    return wrapGet(proxy + '/web/api/pingSystem', {
                         getKey: getKey,
                         postKey: postKey,
                         url: url
-                    }));
+                    });
                 },function(error){
                     return $q.reject(error);
                 });
@@ -449,8 +481,18 @@ angular.module('webadminApp')
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
             },
-            logLevel:function(logId,level){
-                return wrapGet(proxy + '/web/api/logLevel?id=' + logId + (level?'&value=' + level:''));
+            logLevel:function(logId, loggerName, level) {
+                var query = {};
+                if(logId) {
+                    query.id = logId;
+                }
+                if(loggerName) {
+                    query.name = loggerName;
+                }
+                if(level) {
+                    query.value = level;
+                }
+                return wrapGet(proxy + '/web/api/logLevel?' + $.param(query));
             },
 
 
@@ -493,6 +535,8 @@ angular.module('webadminApp')
                 if(getParams && !_.isEmpty(getParams)){
                     params = delimeter + $.param(getParams);
                 }
+
+                params = params.replace(/=API_TOOL_OPTION_SET/,''); // special code for 'option' methods
 
                 url = proxy + url + params;
                 if(url.indexOf('/')!==0){
@@ -556,7 +600,9 @@ angular.module('webadminApp')
                     });
                 });
             },
-
+            getServerDocumentation:function(){
+                return wrapGet('/api/settingsDocumentation');
+            },
             networkSettings:function(settings){
                 if(!settings) {
                     return wrapGet(proxy + '/web/api/iflist');

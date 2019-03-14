@@ -1,14 +1,16 @@
-<h1>שלום, {{message.fullName}}</h1>
+<h1>שלום, {{message.userFullName}}</h1>
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> שיתף את מערכת {{message.system_name}} איתך.
 
-כדי להציג ולנהל אותה, צור חשבון ב <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> באמצעות כתובת האימייל הנוכחית שלך ובצע הוראות נוספות.</p>
-{{/message.sharer_name}} {{^message.sharer_name}}
-<p>ניתנה לך גישה למערכת ניהול וידאו "{{message.system_name}}".
-
-כדי להציג ולנהל אותה, צור חשבון ב <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a> באמצעות כתובת האימייל הנוכחית שלך ובצע הוראות נוספות.</p>
+כדי להציג ולנהל אותה, צור חשבון ב <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> באמצעות כתובת האימייל הנוכחית שלך ובצע הוראות נוספות.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Create Account</a>
+{{^message.sharer_name}}
+<p>ניתנה לך גישה למערכת ניהול וידאו "{{message.system_name}}".
+
+כדי להציג ולנהל אותה, צור חשבון ב <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> באמצעות כתובת האימייל הנוכחית שלך ובצע הוראות נוספות.</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">צור חשבון</a>
 

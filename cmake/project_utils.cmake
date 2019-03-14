@@ -18,15 +18,15 @@ function(nx_target_enable_werror target werror_condition)
     endif()
 
     if(${werror_condition})
-        target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
+        target_compile_options(${target} PRIVATE -Werror)
     endif()
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC WERROR NO_WERROR)
-    set(oneValueArgs LIBRARY_TYPE)
+    set(options NO_MOC NO_RC_FILE WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND)
+    set(oneValueArgs LIBRARY_TYPE RC_FILE)
     set(multiValueArgs
-        ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        ADDITIONAL_SOURCES ADDITIONAL_RESOURCES ADDITIONAL_MOCABLES
         SOURCE_EXCLUSIONS
         OTHER_SOURCES
         PUBLIC_LIBS PRIVATE_LIBS
@@ -41,7 +41,7 @@ function(nx_add_target name type)
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
-        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources" ${resources})
+        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
     endif()
 
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
@@ -55,7 +55,7 @@ function(nx_add_target name type)
 
         set(needed_qm_files)
         foreach(qm_file ${qm_files})
-            foreach(lang ${defaultTranslation} ${additionalTranslations})
+            foreach(lang ${translations})
                 if(qm_file MATCHES "${lang}\\.qm$")
                     list(APPEND needed_qm_files ${qm_file})
                     break()
@@ -95,13 +95,34 @@ function(nx_add_target name type)
         build_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}" "src")
     endif()
 
+    if(NX_MACOS_ARG_MAX_WORKAROUND AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+        # In MacOS CMake incorrectly evauates when command line is too long to pass linker
+        # arguments directly. Unfortunately there's no way to enforce passing arguments as a file.
+        # This dirty hack overcomes the evaluation limit and forces CMake to use a file.
+        set(dummy_directory_name "macos_arg_max_cmake_workaround")
+        foreach(i RANGE 10)
+            string(APPEND dummy_directory_name _${dummy_directory_name})
+        endforeach()
+        link_directories(${dummy_directory_name})
+    endif()
+
     if("${type}" STREQUAL "EXECUTABLE")
         set(rc_file)
         if(WINDOWS)
-            set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/hdwitness.rc")
-            configure_file(
-                "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/hdwitness.rc"
-                "${rc_file}")
+            if(NOT NX_NO_RC_FILE)
+                if(NX_RC_FILE)
+                    set(rc_source_file "${NX_RC_FILE}")
+                    set(rc_filename "${NX_RC_FILE}")
+                    get_filename_component(rc_filename ${rc_source_file} NAME)
+                    set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
+                else()
+                    set(rc_source_file "${CMAKE_SOURCE_DIR}/cmake/project.rc")
+                    set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
+                endif()
+                configure_file(
+                    "${rc_source_file}"
+                    "${rc_file}")
+            endif()
         endif()
 
         add_executable(${name} ${sources} "${rc_file}")
@@ -120,7 +141,7 @@ function(nx_add_target name type)
                     ${CMAKE_CURRENT_BINARY_DIR})
             endif()
 
-            if(codeSigning)
+            if(codeSigning AND NX_SIGNED)
                 nx_sign_windows_executable(${name})
             endif()
 
@@ -140,12 +161,12 @@ function(nx_add_target name type)
     endif()
 
     if(NOT NX_NO_MOC)
-        nx_add_qt_mocables(${name} ${hpp_files}
+        nx_add_qt_mocables(${name} ${hpp_files} ${NX_ADDITIONAL_MOCABLES}
             INCLUDE_DIRS
                 ${CMAKE_CURRENT_SOURCE_DIR}/src
                 # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
                 # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
-                ${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src
+                ${CMAKE_SOURCE_DIR}/libs/nx_fusion/src
         )
     endif()
 

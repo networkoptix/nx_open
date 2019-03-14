@@ -29,35 +29,51 @@ angular.module('webadminApp')
                     func.description.xml = func.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
                     _.each(func.params,function(param){
                         // Detecting type for param
-                        param.type = 'text';
                         param.description.xml = param.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
-
-                        if(param.name == 'cameraId'){
-                            param.type = 'camera';
+                        param.formType = param.type;
+                        if(param.name === 'cameraId'){
+                            param.formType = 'camera';
                         }
 
-                        if(_.contains(['time', 'timestamp', 'from', 'to', 'startTime', 'endTime', 'dateTime'],param.name)){
-                            param.type = 'timestamp';
-                        }
-
-                        if(param.values && param.values.length>0){
-                            param.type = 'enum';
-                            _.each(param.values,function(value){
-                                value.label = value.name;
-                                if(value.description.xml){
-                                    value.description.xml = value.description.xml.replace( /<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1' );
-                                    if(value.description.xml.trim() != ''){
-                                        value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                        if(param.type === 'enum' || param.type === 'flags'){
+                            if(!param.values){ // No values for enum - fallback to text
+                                param.formType = 'text';
+                            }else {
+                                _.each(param.values, function (value) {
+                                    value.label = value.name;
+                                    if (value.description.xml) {
+                                        value.description.xml = value.description.xml.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+                                        if (value.description.xml.trim() != '') {
+                                            value.label += ': ' + value.description.xml.replace(regex, ''); // Clean tags
+                                        }
                                     }
+                                });
+                                if (param.optional && (func.method == 'GET' || func.method == 'POST')) {
+                                    param.values.unshift({label: '', name: null});
                                 }
-                            });
-                            if(param.optional && (func.method == 'GET' || func.method == 'POST')){
-                                param.values.unshift({label:'', name:null});
                             }
                         }
 
+                        if(['object',
+                            'array',
+                            'stringArray',
+                            'binary'].indexOf(param.type)!=-1){
+                            // Cannot edit in form
+                            param.formType='info';
+                        }
+
+                        if(['float',
+                            'uuid',
+                            'objectJson',
+                            'arrayJson',
+                            'flags'].indexOf(param.type)!=-1){
+                            // Fallback to text
+                            param.formType='text';
+                        }
+
                         if(param.name.match(/[{}\.\[\]]/g)){
-                            param.type = 'info';
+                            // Part of object - not supported
+                            param.formType = 'info';
                         }
                     });
 
@@ -91,7 +107,8 @@ angular.module('webadminApp')
             $scope.activeFunction = method;
             $scope.apiMethod.method = method.method;
             $scope.apiMethod.name = method.url;
-            $scope.apiMethod.params = {}
+            $scope.apiMethod.permissions = method.permissions;
+            $scope.apiMethod.params = {};
             _.each(method.params,function(param){
                 $scope.apiMethod.params[param.name] = null;
             });
@@ -101,7 +118,7 @@ angular.module('webadminApp')
                 $location.path('/developers/api' + method.url, false);
             }
             return false;
-        }
+        };
         $scope.clearActiveFunction = function($event){
             $scope.activeGroup = null;
             $scope.activeFunction = null;
@@ -111,7 +128,7 @@ angular.module('webadminApp')
                 $location.path('/developers/api', false);
             }
             return false;
-        }
+        };
 
         if($scope.Config.developersFeedbackForm){
             $scope.developersFeedbackForm =
@@ -131,9 +148,7 @@ angular.module('webadminApp')
             };
         }
 
-        $scope.result={
-
-        };
+        $scope.result = {};
 
         function cleanParams(params){
             var newParams = {};
@@ -145,10 +160,10 @@ angular.module('webadminApp')
                     newParams[key] = params[key].getTime();
                     continue;
                 }
-                newParams[key] = params[key].toString().trim();
+                newParams[key] = params[key];
             }
             return newParams;
-        };
+        }
         $scope.getDebugUrl = function(){
             if($scope.apiMethod.method == 'GET'){
                 return mediaserver.debugFunctionUrl($scope.apiMethod.name,
@@ -183,7 +198,7 @@ angular.module('webadminApp')
             function formatResult(result){
                 $scope.result.status = result.status +  ':  ' + result.statusText;
                 if (typeof result.data === 'string' || result.data instanceof String){
-                    $scope.result.result = result.data;
+                    $scope.result.result = vkbeautify.xml(result.data, 4);
                 }else{
                     $scope.result.result = JSON.stringify(result.data, null,  '  ');
                 }

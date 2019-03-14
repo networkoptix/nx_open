@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<resources>
+    <oem name = "Hanwha Techwin">
+    <resource name="Hanwha_Common" id="EFC01393-CDAC-46E4-BB60-7AC4D8513E7F" type="Camera"/>
+    <resource name="Hanwha_Sunapi" public="Hanwha_Common">
+        <param name="supportedMotion" default_value="softwaregrid"/>
+        <param name="ptzCapabilities" default_value="0"/>
+        <param name="streamFpsSharing" default_value="noSharing"/>
+        <param name="removeCredentialsFromWebPageUrl" default_value="true"/>
+        <param name="hasAdvancedSecondaryStreamControls" default_value="true"/>
+    </resource>
+    </oem>
+</resources>

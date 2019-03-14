@@ -4,20 +4,20 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Thiết bị này được sử dụng để làm việc với ổ cứng đã được cài đặt. <br> Vui lòng tắt thiết bị để cài đặt một đĩa cứng mới.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Thiết bị này cần kết nối mạng để hoạt động. <br> Vui lòng kết nối với mạng Internet
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Cấu hình thiết bị mạng sai. <br> Hãy kết nối mạng hoặc thiết lập một địa chỉ IP chính xác.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Cổng</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -37,14 +37,14 @@
                     <div>
                         <h3>Khởi động lại máy chủ</h3>
                         <p>Việc thiết lập lại máy chủ về chế độ cài đặt mặc định (sẽ xóa cơ sở dữ liệu và đặt lại cấu hình).
-                            Tách máy chủ ra khỏi hệ thống hiện tại. Lưu trữ video sẽ vẫn còn nguyên vẹn.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Khôi phục mặc định của nha sản xuât</button></p>
+                            The server will be detached from the current System. Lưu trữ video sẽ vẫn còn nguyên vẹn.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Khôi phục mặc định của nhà sản xuât</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Tách máy chủ khỏi hệ thống</h3>
-                        <p>Hành động này sẽ tách máy chủ khỏi hệ thống giữ cơ sở dữ liệu, người dùng cục bộ và cấu hình.
-                            Lưu trữ video sẽ vẫn còn nguyên vẹn. Tất cả các tài khoản đám mây sẽ bị xóa</p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Tách máy chủ khỏi hệ thống</button></p>
+                        <h3>Detach server from the System</h3>
+                        <p>This action will detach server from the System keeping database, local users and configuration.
+                            Lưu trữ video sẽ vẫn còn nguyên vẹn. <b>Tất cả các tài khoản đám mây sẽ bị xóa</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the System</button></p>
                     </div>
                     <div>
                         <h3>Khởi động lại</h3>
@@ -68,7 +68,7 @@
 
                 <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
-                        <h3>tên</h3>
+                        <h3>Tên người sử dụng</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <input class="form-control" type="text" ng-model="settings.systemName">
@@ -91,7 +91,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Hệ thống này được liên kết đến {{Config.cloud.productName}}, chủ hệ thống: <b> {{cloudAccountName}} </b></p>
+                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Ngắt kết nối khỏi {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -99,17 +99,40 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Hệ thống này không được liên kết đến {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
+                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
+                                <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank"> Tìm hiểu thêm </a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Kết nối máy chủ với Internet để thực hiện cài đặt {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Cần kết nối Internet để kết nối Hệ thống với {{Config.cloud.productName}}</alert>
+                                   target="_blank">Learn more</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">Kết nối máy chủ với Internet để thực hiện cài đặt {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Cần kết nối Internet để kết nối Hệ thống với {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient"> Kết nối với {{Config.cloud.productName}} </button> <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
                                    target="_blank"> Tạo {{Config.cloud.productName}} Tài khoản </a></p>
                         </div>
+                    </div>
+
+
+                    <div>
+                        <h3>Mã hóa lưu lượng</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Buộc mã hóa lưu lượng
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
+                                    Buộc mã hóa lưu lượng video
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Tiết kiệm</button>
+                        </form>
                     </div>
                 </uib-tab>
 
@@ -126,7 +149,7 @@
                                 <tbody>
                                     <tr>
                                         <td><label for="timeZone">Múi giờ</label></td>
-                                        <td><label for="date">ngày tháng</label></td>
+                                        <td><label for="date">Ngày tháng</label></td>
                                         <td><label for="time">Thời gian</label></td>
                                         <td></td>
                                     </tr>
