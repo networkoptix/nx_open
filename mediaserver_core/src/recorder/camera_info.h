@@ -110,7 +110,7 @@ typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
 struct ReaderErrorInfo
 {
     QString message;
-    QnLogLevel severity;
+    utils::log::Level severity;
 };
 
 class ReaderHandler
@@ -128,37 +128,15 @@ class Reader
     class ParseResult
     {
     public:
-        enum class ParseCode
-        {
-            Ok,
-            NoData,
-            RegexpFailed,
-        };
-
-        ParseResult(ParseCode code): m_code(code) {}
-        ParseResult(ParseCode code, const QString& key, const QString& value):
-            m_code(code),
+        ParseResult(const QString& key, const QString& value):
             m_key(key),
             m_value(value)
         {}
 
         QString key() const { return m_key; }
         QString value() const { return m_value; }
-        ParseCode code() const {return m_code; }
-        QString errorString() const
-        {
-            switch (m_code)
-            {
-            case ParseCode::Ok: return QString(); break;
-            case ParseCode::NoData: return lit("Line is empty"); break;
-            case ParseCode::RegexpFailed: return lit("Line doesn't match parse pattern");
-            }
-
-            return "unknown";
-        }
 
     private:
-        ParseCode m_code;
         QString m_key;
         QString m_value;
     };
@@ -175,7 +153,7 @@ private:
     bool cameraAlreadyExists(const ArchiveCameraDataList* camerasList) const;
     bool readFileData();
     bool parseData();
-    ParseResult parseLine(const QString& line) const;
+    boost::optional<ParseResult> parseLine(const QString& line) const;
     QString infoFilePath() const;
     void addProperty(const ParseResult& result);
 

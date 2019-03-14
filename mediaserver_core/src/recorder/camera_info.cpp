@@ -64,7 +64,7 @@ Writer::Writer(WriterHandler* writeHandler):
 
 void Writer::write()
 {
-    NX_LOG(lit("[CamInfo] writing camera info files starting..."), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[CamInfo] writing camera info files starting..."));
 
     for (auto& storageUrl: m_handler->storagesUrls())
         for (int i = 0; i < static_cast<int>(QnServer::ChunksCatalogCount); ++i)
@@ -77,7 +77,7 @@ void Writer::write()
                     m_composer.make(m_handler->composerHandler(cameraId)));
             }
 
-    NX_LOG(lit("[CamInfo] writing camera info files DONE"), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[CamInfo] writing camera info files DONE"));
 }
 
 bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
@@ -91,10 +91,9 @@ bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFi
 
 void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
 {
-    NX_LOG(lit("%1: write camera info to %2. Data changed: %3")
-            .arg(Q_FUNC_INFO)
-            .arg(infoFilePath)
-            .arg(isWriteNeeded(infoFilePath, infoFileData)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Writing camera info to %1. Data changed: %2").args(
+        infoFilePath,
+        isWriteNeeded(infoFilePath, infoFileData)));
 
     if (isWriteNeeded(infoFilePath, infoFileData))
     {
@@ -150,9 +149,9 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly | QIODevice::Truncate));
     if (!outFile)
     {
-        NX_LOG(lit("%1. Create file failed for this path: %2")
+        NX_DEBUG(this, lit("%1. Create file failed for this path: %2")
                 .arg(Q_FUNC_INFO)
-                .arg(path), cl_logDEBUG1);
+                .arg(path));
         return false;
     }
     outFile->write(data);
@@ -241,7 +240,7 @@ bool Reader::initArchiveCamData()
         m_lastError = {
             lit("Unable to get parent id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -252,7 +251,7 @@ bool Reader::initArchiveCamData()
         m_lastError = {
             lit("Unable to get type id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -267,7 +266,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
         m_lastError = {
             lit("Archive camera %1 found but we already have camera with this id in the resource pool. Skipping.")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logDEBUG2
+            utils::log::Level::verbose
         };
         return true;
     }
@@ -283,7 +282,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
         m_lastError = {
             lit("Camera %1 is already in the archive camera list")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logDEBUG2
+            utils::log::Level::verbose
         };
         return true;
     }
@@ -305,7 +304,7 @@ bool Reader::readFileData()
         m_lastError =  {
             lit("File data is NULL for archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -318,39 +317,126 @@ bool Reader::parseData()
     QTextStream fileDataStream(&m_fileData);
     while (!fileDataStream.atEnd())
     {
-        ParseResult result = parseLine(fileDataStream.readLine());
-        switch (result.code())
-        {
-        case ParseResult::ParseCode::NoData: break;
-        case ParseResult::ParseCode::RegexpFailed:
-            m_lastError = {
-                lit("Camera info file %1 parse failed")
-                    .arg(infoFilePath()),
-                cl_logERROR
-            };
-            return false;
-        case ParseResult::ParseCode::Ok:
-            addProperty(result);
-            break;
-        }
+        const auto result = parseLine(fileDataStream.readLine());
+        if (result)
+            addProperty(*result);
     }
 
     return true;
 }
 
-Reader::ParseResult Reader::parseLine(const QString& line) const
+static int findMatchedDelimeter(const QString& src, char startBrace, char endBrace, bool include)
+{
+    int braceCount = 1;
+
+    for (int i = 1; i < src.size(); ++i)
+    {
+        if (src[i] == startBrace && include)
+            ++braceCount;
+        else if (src[i] == endBrace)
+            --braceCount;
+
+        if (braceCount == 0)
+        {
+            if (include)
+            {
+                if (i == src.size() - 1)
+                    return -1;
+                return i + 1;
+            }
+
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+static bool readInnerData(const QString& src, char startBrace, char endBrace, QString* dst, bool include)
+{
+    const int endPos = findMatchedDelimeter(src, startBrace, endBrace, include);
+    if (endPos == -1)
+        return false;
+
+    *dst = src.mid(0, endPos);
+    return true;
+}
+
+static bool readValue(const QString& src, QString* dst)
+{
+    if (src[0] == '{')
+        return readInnerData(src, '{', '}', dst, true);
+    if (src[0] == '[')
+        return readInnerData(src, '[', ']', dst, true);
+
+    return readInnerData(src, '"', '"', dst, false);
+}
+
+boost::optional<Reader::ParseResult> Reader::parseLine(const QString& line) const
 {
     if (line.isEmpty())
-        return ParseResult::ParseCode::NoData;
+        return boost::none;
 
-    thread_local QRegExp keyValueRegExp("^\"(.*)\"=\"(.*)\"$");
+    enum
+    {
+        waitingForKey,
+        readingKey,
+        waitingForValue,
+        readingValue,
+        eqSign,
+        done,
+        failed
+    } state = waitingForKey;
 
-    int reIndex = keyValueRegExp.indexIn(line);
-    if (reIndex == -1 || keyValueRegExp.captureCount() != 2)
-        return ParseResult::ParseCode::RegexpFailed;
+    QString key;
+    QString value;
+    int quoteCount = 0;
+    bool finished = false;
 
-    auto captureList = keyValueRegExp.capturedTexts();
-    return ParseResult(ParseResult::ParseCode::Ok, captureList[1], captureList[2]);
+    for (int i = 0; i < line.size(); ++i)
+    {
+        switch (state)
+        {
+            case waitingForKey:
+                if (line[i] == '"')
+                    state = readingKey;
+                break;
+            case readingKey:
+                if (line[i] == '"')
+                    state = eqSign;
+                else
+                    key.push_back(line[i]);
+                break;
+            case eqSign:
+                if (line[i] != '=')
+                    state = failed;
+                else
+                    state = waitingForValue;
+                break;
+            case waitingForValue:
+                if (line[i] != '"')
+                    state = failed;
+                else
+                    state = readingValue;
+                break;
+            case readingValue:
+                if (readValue(line.mid(i), &value))
+                    state = done;
+                else
+                    state = failed;
+                break;
+            case done:
+            case failed:
+                finished = true;
+                break;
+        }
+
+        if (finished)
+            break;
+    }
+
+    using ParseResult = Reader::ParseResult;
+    return state == done ? boost::optional<ParseResult>(ParseResult(key, value)) : boost::none;
 }
 
 void Reader::addProperty(const ParseResult& result)
@@ -402,7 +488,7 @@ bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
 
 void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const
 {
-    NX_LOG(errorInfo.message, errorInfo.severity);
+    NX_UTILS_LOG(errorInfo.severity, this, errorInfo.message);
 }
 
 

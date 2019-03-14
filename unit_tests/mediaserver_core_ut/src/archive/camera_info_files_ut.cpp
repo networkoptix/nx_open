@@ -293,58 +293,47 @@ const QnUuid kArchiveCamTypeGuid = QnUuid::fromStringSafe(lit("{1d250fa0-ce88-43
 QString kCameraId("cameraId");
 QString kFilePath("/some/" + kCameraId);
 
-const std::array<const char*, 5> kInvalidFileDataList = {
-R"#("cameraName"="testName"
-"cameraModel"="testModel"
-"groupId"="testGroupId"
-"groupName"="testGroupName
-"cameraUrl"="testUrl"
-"plainTestPropName"="plainTestPropValue"
-"specSymbolsTestPropName"="specSymbolPropValue"
-"additionalPropName"="additionalPropValue"
-)#",
+struct ExpectedInResult
+{
+    QString line;
+    bool shouldBeParsed;
+    QString key;
+    QString value;
 
-R"#("cameraName"="testName"
-"cameraModel"="testModel"
-"groupId"="testGroupId"
-"groupName"="testGroupName"
-"cameraUrl"="testUrl"
-"plainTestPropName""plainTestPropValue"
-"specSymbolsTestPropName"="specSymbolPropValue"
-"additionalPropName"="additionalPropValue"
-)#",
-
-R"#("cameraName"="testName"
-"cameraModel"="testModel"
-"testGroupId"
-"groupName"="testGroupName"
-"cameraUrl"="testUrl"
-"plainTestPropName"="plainTestPropValue"
-"specSymbolsTestPropName"="specSymbolPropValue"
-"additionalPropName"="additionalPropValue"
-)#",
-
-R"#("cameraName"="testName"
-="testModel"
-"groupId"="testGroupId"
-"groupName"="testGroupName"
-"cameraUrl"="testUrl"
-"plainTestPropName"="plainTestPropValue"
-"specSymbolsTestPropName"="specSymbolPropValue"
-"additionalPropName"="additionalPropValue"
-)#",
-
-R"#("cameraName"="testName"
-"cameraModel"="testModel"
-"groupId"="testGroupId"
-"groupName"="testGroupName"
-"cameraUrl"=
-"plainTestPropName"="plainTestPropValue"
-"specSymbolsTestPropName"="specSymbolPropValue"
-"additionalPropName"="additionalPropValue"
-)#",
-
+    ExpectedInResult(const QString& line, bool shouldBeParsed, const QString& key = "", const QString& value= ""):
+        line(line),
+        shouldBeParsed(shouldBeParsed),
+        key(key),
+        value(value)
+    {}
 };
+
+static const QList<ExpectedInResult> kPartiallyInvalidPropertyList = {
+    ExpectedInResult(R"#(_$garbage_!"validKey"="testName"_$garbage_!)#", true, "validKey", "testName"),
+    ExpectedInResult(R"#("groupId""testGroupId")#", false),
+    ExpectedInResult(R"#("groupName"="testGroupName)#", false),
+    ExpectedInResult(R"#("validJsonObj"="{"a": 1}"_$garbage_!)#", true, "validJsonObj", R"#({"a": 1})#"),
+    ExpectedInResult(R"#("validJsonArray"="["a", 1]"_$garbage_!)#", true, "validJsonArray", R"#(["a", 1])#"),
+    ExpectedInResult(R"#("{}")#", false),
+    ExpectedInResult(R"#("[]")#", false),
+};
+
+static const QByteArray infoFileFromExpectedList(const QList<ExpectedInResult>& expected)
+{
+    QByteArray result;
+    for (const auto& entry: expected)
+        result += entry.line + '\n';
+    return result;
+}
+
+static QList<ExpectedInResult> filterValid(const QList<ExpectedInResult>& expected)
+{
+    QList<ExpectedInResult> result;
+    std::copy_if(
+        expected.cbegin(), expected.cend(), std::back_inserter(result),
+        [](const ExpectedInResult& entry) { return entry.shouldBeParsed; });
+    return result;
+}
 
 enum class CameraPresence
 {
@@ -447,7 +436,7 @@ protected:
     void thenDataIsCorrect()
     {
         const nx::caminfo::ArchiveCameraData& camData = camDataList[0];
-        const ec2::ApiCameraData& coreData = camData.coreData;
+        const nx::vms::api::CameraData& coreData = camData.coreData;
 
         ASSERT_EQ(coreData.groupId, "testGroupId");
         ASSERT_EQ(coreData.groupName, "testGroupName");
@@ -515,18 +504,27 @@ TEST_F(ReaderTest, ErrorsInData)
          ModuleGuid::Found,
          ArchiveCamTypeId::Found,
          GetFileData::Successfull);
-    for (const char* fileData: kInvalidFileDataList)
-    {
-        nx::caminfo::Reader(
-            &readerHandler,
-            fileInfo,
-            [fileData](const QString&)
-            {
-                return QByteArray(fileData);
-            }
-            )(&camDataList);
 
-        then(ResultIs::Empty);
+    nx::caminfo::Reader(&readerHandler, fileInfo,
+        [](const QString&) { return infoFileFromExpectedList(kPartiallyInvalidPropertyList); })(
+            &camDataList);
+
+    const auto cameraData = camDataList[0];
+    const auto expectedValidCount = std::count_if(
+        kPartiallyInvalidPropertyList.cbegin(),
+        kPartiallyInvalidPropertyList.cend(),
+        [](const auto& entry) { return entry.shouldBeParsed; });
+    ASSERT_EQ(expectedValidCount, cameraData.properties.size());
+
+    for (const auto& expectedEntry: filterValid(kPartiallyInvalidPropertyList))
+    {
+        const auto expectedPropertyIt = std::find_if(
+            cameraData.properties.cbegin(), cameraData.properties.cend(),
+            [&expectedEntry](const auto& property)
+            {
+                return property.name == expectedEntry.key && property.value == expectedEntry.value;
+            });
+        ASSERT_NE(cameraData.properties.cend(), expectedPropertyIt);
     }
 }
 
