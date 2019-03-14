@@ -130,6 +130,9 @@ public:
         LAST_LOCAL_CONNECTION_URL,
         KNOWN_SERVER_URLS,
 
+        // Force client to reconnect only to the same server it was connected to.
+        STICKY_RECONNECT,
+
         EXPORT_MEDIA_SETTINGS,
         EXPORT_LAYOUT_SETTINGS,
         EXPORT_BOOKMARK_SETTINGS,
@@ -225,6 +228,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
+        QN_DECLARE_R_PROPERTY(bool,                         stickReconnectToServer,                             STICKY_RECONNECT,           false)
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMs,    setInitialLiveBufferMs,     INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMs,    setMaximumLiveBufferMs,     MAXIMUM_LIVE_BUFFER_MSECS,  500)
