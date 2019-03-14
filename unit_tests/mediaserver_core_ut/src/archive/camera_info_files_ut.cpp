@@ -436,7 +436,7 @@ protected:
     void thenDataIsCorrect()
     {
         const nx::caminfo::ArchiveCameraData& camData = camDataList[0];
-        const nx::vms::api::CameraData& coreData = camData.coreData;
+        const ec2::ApiCameraData& coreData = camData.coreData;
 
         ASSERT_EQ(coreData.groupId, "testGroupId");
         ASSERT_EQ(coreData.groupName, "testGroupName");
