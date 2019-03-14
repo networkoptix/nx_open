@@ -1162,13 +1162,15 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 {
+    using nx::vms::client::core::ReconnectHelper;
+
     nx::utils::Url currentUrl = commonModule()->currentUrl();
     NX_ASSERT(!currentUrl.isEmpty());
     if (currentUrl.isEmpty())
         return false;
 
     if (!m_reconnectHelper)
-        m_reconnectHelper.reset(new nx::vms::client::core::ReconnectHelper());
+        m_reconnectHelper.reset(new ReconnectHelper(qnSettings->stickReconnectToServer()));
 
     if (m_reconnectHelper->servers().isEmpty())
     {

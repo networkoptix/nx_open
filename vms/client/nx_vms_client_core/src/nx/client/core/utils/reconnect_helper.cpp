@@ -6,21 +6,19 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_display_info.h>
 
-#include <client/client_settings.h>
-
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/discovery/manager.h>
 
 namespace nx::vms::client::core {
 
-ReconnectHelper::ReconnectHelper(QObject* parent):
-    QObject(parent)
+ReconnectHelper::ReconnectHelper(bool stickyReconnect, QObject* parent):
+    base_type(parent)
 {
     m_userName = commonModule()->currentUrl().userName();
     m_password = commonModule()->currentUrl().password();
 
     const auto currentServer = commonModule()->currentServer();
-    if (currentServer && qnSettings->stickReconnectToServer())
+    if (currentServer && stickyReconnect)
         m_servers.append(currentServer);
     else  // List of all known servers. Should not be updated as we are disconnected.
         m_servers.append(resourcePool()->getAllServers(Qn::AnyStatus));
