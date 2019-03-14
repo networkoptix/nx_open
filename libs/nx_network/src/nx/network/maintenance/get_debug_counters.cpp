@@ -11,17 +11,25 @@ void GetDebugCounters::processRequest(
 {
     const auto& counters = SocketGlobals::instance().debugCounters();
 
-    const auto json = lm("{"
-        "\"tcpSocketCount\": %1, "
-        "\"stunConnectionCount\": %2, "
-        "\"httpServerConnectionCount\": %3}")
-        .args(counters.tcpSocketCount, counters.stunConnectionCount,
-            counters.httpServerConnectionCount).toUtf8();
+    std::map<std::string, int> values;
+    values.emplace("tcpSocketCount", counters.tcpSocketCount);
+    values.emplace("stunClientConnectionCount", counters.stunClientConnectionCount);
+    values.emplace("stunOverHttpClientConnectionCount", counters.stunOverHttpClientConnectionCount);
+    values.emplace("stunServerConnectionCount", counters.stunServerConnectionCount);
+    values.emplace("httpClientConnectionCount", counters.httpClientConnectionCount);
+    values.emplace("httpServerConnectionCount", counters.httpServerConnectionCount);
+    values.emplace("websocketConnectionCount", counters.websocketConnectionCount);
+
+    std::string json = "{";
+    for (const auto& val: values)
+        json += "\"" + val.first + "\":" + std::to_string(val.second) + ",";
+    json.pop_back();
+    json += "}";
 
     http::RequestResult result(http::StatusCode::ok);
     result.dataSource = std::make_unique<http::BufferSource>(
         "application/json",
-        json);
+        json.c_str());
     completionHandler(std::move(result));
 }
 

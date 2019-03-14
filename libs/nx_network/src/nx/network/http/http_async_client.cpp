@@ -83,6 +83,8 @@ AsyncClient::AsyncClient():
     m_precalculatedAuthorizationDisabled(false),
     m_numberOfRedirectsTried(0)
 {
+    ++SocketGlobals::instance().debugCounters().httpClientConnectionCount;
+
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
 }
 
@@ -94,6 +96,7 @@ AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
 
 AsyncClient::~AsyncClient()
 {
+    --SocketGlobals::instance().debugCounters().httpClientConnectionCount;
 }
 
 const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
