@@ -105,8 +105,17 @@ NotificationListModel::Private::Private(NotificationListModel* q):
                 const auto extraData = Private::extraData(event);
                 m_uuidHashes[extraData.first][extraData.second].remove(event.id);
                 m_players.remove(event.id);
+
+                for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
+                {
+                    if (it.value() == event.id)
+                    {
+                        m_itemsByLoadingSound.erase(it);
+                        break;
+                    }
+                }
             }
-    });
+        });
 
     connect(context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded, this,
