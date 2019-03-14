@@ -51,20 +51,22 @@ angular.module('nxCommon')
                         }
                         return false;
                     }
-    
+   
                     var ips = addresses.split(';'),
-                        ip;
+                        ip, ipFull;
                     
-                    ips.some(function (tmpIP) {
-                        tmpIP = tmpIP.split(':')[0];
+                    ips.some(function (address) {
+                        var tmpIP = address.split(':')[0];
+                        tmpIP = tmpIP.replace(/(^\w+:|^)\/\//, '');
                         
                         if (checkIsIPV4(tmpIP)) {
                             ip = tmpIP;
+                            ipFull = address;
                             return true;
                         }
                     });
                     
-                    return ip;
+                    return {ip : ip, ipFull : ipFull};
                 }
                 
                 function searchCams(searchText){
@@ -87,7 +89,10 @@ angular.module('nxCommon')
                             camsVisible = camsVisible || camera.visible;
                         });
                         
-                        server.ip = getIP(server.networkAddresses);
+                        var ip = getIP(server.networkAddresses);
+                        server.ip = ip.ip;
+                        server.ipFull = ip.ipFull;
+                        
                         server.visible = scope.searchCams === '' || camsVisible; /*||
                             has(server.name, scope.searchCams) ||
                             has(server.url, scope.searchCams); */

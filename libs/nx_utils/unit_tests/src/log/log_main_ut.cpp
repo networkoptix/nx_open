@@ -1,14 +1,17 @@
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
 #include <nx/kit/debug.h>
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/unused.h>
 
 #include <QtCore/QSize>
 
@@ -71,13 +74,22 @@ public:
                  Qt::CaseSensitive, QRegExp::Wildcard);
 
              EXPECT_TRUE(regExp.exactMatch(messages[i]))
-                 << "Line [" << messages[i].toStdString() << "]" << std::endl
+                 << "    Line [" << messages[i].toStdString() << "]" << std::endl
                  << "    does not match pattern [" << patterns[i] << "]";
         }
     }
 
+    void setIniValue(const int* iniField, int newValue)
+    {
+        const auto oldValue = *iniField;
+        int* mutableField = const_cast<int*>(iniField);
+        iniGuards.push_back(makeSharedGuard([=](){ *mutableField = oldValue; }));
+        *mutableField = newValue;
+    }
+
     Buffer* buffer = nullptr;
     const Level initialLevel;
+    std::vector<SharedGuardPtr> iniGuards;
 };
 
 TEST_F(LogMainTest, ExplicitTag)
@@ -142,6 +154,78 @@ TEST_F(LogMainTest, This)
         "* ERROR nx::utils::log::test::*LogMain*(0x*): Value error_count = 1",
         "* WARNING nx::utils::log::test::*LogMain*(0x*): Value error_count = 2",
         "* DEBUG nx::utils::log::test::*LogMain*(0x*): Value error_count = 3"});
+}
+
+TEST_F(LogMainTest, LevelReducer)
+{
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+
+    const auto logError = [this]() { NX_ERROR(this, "Error"); };
+    const auto logWarning = [this]() { NX_WARNING(this, "Warning"); };
+    const auto logInfo = [this]() { NX_INFO(this, "Info"); };
+
+    setIniValue(&ini().logLevelReducerPassLimit, 2);
+    setIniValue(&ini().logLevelReducerWindowSizeS, 60);
+
+    for (int i = 0; i != 4; ++i)
+        logWarning();
+
+    expectMessages({
+        "* WARNING *: Warning",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warning",
+        "* DEBUG *: Warning",
+        "* DEBUG *: Warning"
+    });
+
+    logWarning();
+    timeShift.applyRelativeShift(std::chrono::minutes(1));
+    logWarning();
+
+    expectMessages({
+        "* DEBUG *: Warning",
+        "* WARNING *: Warning",
+    });
+
+    for (int i = 0; i != 3; ++i)
+    {
+        logError();
+        logInfo();
+    }
+
+    expectMessages({
+        "* ERROR *: Error",
+        "* INFO *: Info",
+        "* ERROR *: TOO MANY SIMILAR MESSAGES: Error",
+        "* INFO *: Info",
+        "* DEBUG *: Error",
+        "* INFO *: Info",
+    });
+}
+
+TEST_F(LogMainTest, LevelReducerWithStream)
+{
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    const auto logWarning = [this]() { NX_WARNING(this) << "Warn"; };
+
+    setIniValue(&ini().logLevelReducerPassLimit, 1);
+    setIniValue(&ini().logLevelReducerWindowSizeS, 60);
+
+    logWarning();
+    logWarning();
+
+    expectMessages({
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warn",
+        "* DEBUG *: Warn",
+    });
+
+    logWarning();
+    timeShift.applyRelativeShift(std::chrono::minutes(1));
+    logWarning();
+
+    expectMessages({
+        "* DEBUG *: Warn",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warn",
+    });
 }
 
 //-------------------------------------------------------------------------------------------------

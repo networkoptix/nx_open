@@ -225,7 +225,7 @@ start_server()
     "$BIN_FILE" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1
     EXIT_STATUS=$?
     { set +x; } 2>/dev/null
-    echo "Server process has finished with exit code [$EXIT_STATUS]"
+    echo "Server process has finished with exit status [$EXIT_STATUS]"
 }
 
 start()

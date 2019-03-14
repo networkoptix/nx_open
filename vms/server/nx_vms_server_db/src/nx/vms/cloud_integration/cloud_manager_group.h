@@ -30,7 +30,7 @@ public:
         std::chrono::milliseconds delayBeforeSettingMasterFlag);
 
     void setCloudDbUrl(const nx::utils::Url &cdbUrl);
-
+    void init();
 private:
     QnMasterServerStatusWatcher m_masterServerStatusWatcher;
     QnConnectToCloudWatcher m_connectToCloudWatcher;
