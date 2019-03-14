@@ -1199,7 +1199,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     QStringList eventTopicTokens = result.split(QChar('/'));
     for (QString& token: eventTopicTokens)
     {
-        int nsSepIndex = token.indexOf(QChar(':'));
+        const int nsSepIndex = token.indexOf(QChar(':'));
         if (nsSepIndex != -1)
             token.remove(0, nsSepIndex + 1);
     }
@@ -1214,7 +1214,10 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     while (att && att->name && att->text)
     {
         if (QByteArray(att->name).toLower() == "utctime")
+        {
             dateTimeAsText = QString(att->text); // example: "2018-04-30T21:18:37Z"
+            break;
+        }
         att = att->next;
     }
 
@@ -1396,8 +1399,6 @@ void QnPlOnvifResource::handleOneNotification(
         "Topic = %1, Time = %2, Source = (%3, %4), Data = (%5, %6)",
         eventTopic, dateTime.toString("yyyy-MM-dd hh:mm:ss"),
         portSourceIter->name, portSourceIter->value, data.name, data.value);
-
-    static int e = 0;
 
     // saving port state
     const bool newValue = (data.value == "true")

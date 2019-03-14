@@ -37,7 +37,7 @@ auto measureTime(F f, const QString& message) -> std::result_of_t<F()>
     return f();
 }
 
-} // namespace <anonynous>
+} // namespace
 
 QnStorageDb::QnStorageDb(
     QnMediaServerModule* serverModule,
