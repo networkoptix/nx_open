@@ -18,7 +18,7 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_data_structures.h>
-#include <api/runtime_info_manager.h>
+
 #include <nx_ec/ec_api.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
@@ -47,20 +47,11 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 QSet<QnUuid> activeAnalyticsEngines(const QnVirtualCameraResource* device)
 {
-    const auto parentServer = device->getParentServer();
-    if (!parentServer)
+    const auto server = device->getParentServer();
+    if (!NX_ASSERT(server))
         return {};
 
-    const auto commonModule = device->commonModule();
-    if (!commonModule)
-        return {};
-
-    const auto runtimeInfoManager = commonModule->runtimeInfoManager();
-    if (!runtimeInfoManager)
-        return {};
-
-    const auto runtimeInfo = runtimeInfoManager->item(parentServer->getId());
-    return runtimeInfo.data.activeAnalyticsEngines;
+    return server->activeAnalyticsEngines();
 }
 
 std::map<QnUuid, std::set<QString>> filterByActiveEngines(
@@ -568,49 +559,21 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
     return QnAdvancedStreamParams();
 }
 
-const QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
+QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
-    if (!resourcePool())
-        return {};
-
-    auto enabledEngines = userEnabledAnalyticsEngines();
-
-    const auto activeEngines = activeAnalyticsEngines(this);
-    const auto compatibleEngineResources = compatibleAnalyticsEngineResources();
-
-    for (const auto& engineResource: compatibleEngineResources)
-    {
-        const auto engineId = engineResource->getId();
-        if (!activeEngines.contains(engineId))
-            continue;
-
-        if (engineResource->isDeviceDependent())
-            enabledEngines.insert(engineId);
-    }
-
-    return enabledEngines;
+    return enabledAnalyticsEngineResources().ids().toSet();
 }
 
 const nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::enabledAnalyticsEngineResources() const
 {
-    const auto resPool = resourcePool();
-    if (!resPool)
-        return {};
-
-    return resPool
-        ->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(enabledAnalyticsEngines());
-}
-
-const nx::vms::common::AnalyticsEngineResourceList
-    QnVirtualCameraResource::userEnabledAnalyticsEngineResources() const
-{
-    const auto resPool = resourcePool();
-    if (!resPool)
-        return {};
-
-    return resPool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
-        userEnabledAnalyticsEngines());
+    const auto selectedEngines = userEnabledAnalyticsEngines();
+    return compatibleAnalyticsEngineResources().filtered(
+        [selectedEngines](const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+        {
+            return engine->isDeviceDependent()
+                || selectedEngines.contains(engine->getId());
+        });
 }
 
 QSet<QnUuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
@@ -634,7 +597,7 @@ nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::compatibleAnalyticsEngineResources() const
 {
     const auto resPool = resourcePool();
-    if (!resPool)
+    if (!NX_ASSERT(resPool))
         return {};
 
     return resPool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
@@ -648,11 +611,15 @@ void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& 
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedEventTypes() const
 {
+    // This one looks very suspicious for me. Shouldn't we check enabledAnalyticsEngines() here?
+    // TODO: #dmishin
     return filterByActiveEngines(m_cachedSupportedEventTypes.get(), activeAnalyticsEngines(this));
 }
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectTypes() const
 {
+    // This one looks very suspicious for me. Shouldn't we check enabledAnalyticsEngines() here?
+    // TODO: #dmishin
     return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), activeAnalyticsEngines(this));
 }
 
@@ -682,7 +649,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedE
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedEventTypes() const
 {
     return calculateSupportedEntities(
-        [this](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
+        [](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
         {
             std::set<QString> result;
             result.insert(
@@ -699,7 +666,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedE
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedObjectTypes() const
 {
     return calculateSupportedEntities(
-        [this](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
+        [](const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentManifest)
         {
             std::set<QString> result;
             result.insert(

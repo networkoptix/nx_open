@@ -11,9 +11,6 @@
 #include "../redux/camera_settings_dialog_store.h"
 #include "../data/analytics_engine_info.h"
 
-#include <common/common_module.h>
-#include <api/runtime_info_manager.h>
-
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
@@ -41,7 +38,7 @@ public:
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
     void at_enginePropertyChanged(const QnResourcePtr& resource, const QString& key);
-    void at_engineManifestChanged(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+    void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
 
 public:
     CameraSettingsDialogStore* store = nullptr;
@@ -117,7 +114,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
             this, &Private::at_engineNameChanged);
         connect(engine, &QnResource::propertyChanged,
             this, &Private::at_enginePropertyChanged);
-        connect(engine, &nx::vms::common::AnalyticsEngineResource::manifestChanged,
+        connect(engine, &AnalyticsEngineResource::manifestChanged,
             this, &Private::at_engineManifestChanged);
 
         updateStore();
@@ -155,7 +152,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineManifestChanged(
-    const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+    const AnalyticsEngineResourcePtr& engine)
 {
     if (const auto it = engines.find(engine->getId()); it != engines.end())
     {
