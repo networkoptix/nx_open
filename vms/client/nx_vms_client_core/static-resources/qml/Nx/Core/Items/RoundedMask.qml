@@ -66,9 +66,10 @@ ShaderEffect
 
         bool isCellDiscarded(vec2 cell)
         {
-            return maskTextureValid
-                ? texture2D(maskTextureProvider, (cell + vec2(0.5)) / cellCounts).a < 0.5
-                : true;
+            if (maskTextureValid)
+                return texture2D(maskTextureProvider, (cell + vec2(0.5)) / cellCounts).a < 0.5;
+
+            return true;
         }
 
         bool isPixelDiscarded(vec2 cellCoords)
@@ -82,10 +83,11 @@ ShaderEffect
             bool discardedNextX = isCellDiscarded(vec2(next.x, cell.y));
             bool discardedNextY = isCellDiscarded(vec2(cell.x, next.y));
 
-            return isCellDiscarded(cell)
-                ? (radius < 0.5 || discardedNextX || discardedNextY)
-                : (radius >= 0.5 && discardedNextX && discardedNextY
-                    && isCellDiscarded(vec2(next.x, next.y)));
+            if (isCellDiscarded(cell))
+                return (radius < 0.5 || discardedNextX || discardedNextY);
+
+            return radius >= 0.5 && discardedNextX && discardedNextY
+                && isCellDiscarded(vec2(next.x, next.y));
         }
 
         void main()
@@ -100,6 +102,9 @@ ShaderEffect
                 || isPixelDiscarded(cellCoords + vec2(0.0, lineSizeInCellCoords.y))
                 || isPixelDiscarded(cellCoords - vec2(0.0, lineSizeInCellCoords.y));
 
-            gl_FragColor = border ? lineColor : (fillColor * qt_Opacity);
+            if (border)
+                gl_FragColor = lineColor;
+            else
+                gl_FragColor = fillColor * qt_Opacity;
         }"
 }
