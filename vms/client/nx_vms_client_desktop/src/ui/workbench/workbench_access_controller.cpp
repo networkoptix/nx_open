@@ -181,8 +181,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
             | Qn::WriteNamePermission;
     }
 
+    if (QnFileLayoutResourcePtr layout = resource.dynamicCast<QnFileLayoutResource>())
+        return calculateFileLayoutPermissions(layout);
+
+    // Note that QnFileLayoutResource case is treated above.
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-        return calculateLayoutPermissions(layout);
+        return calculateRemoteLayoutPermissions(layout);
 
     if (qnRuntime->isVideoWallMode())
         return Qn::VideoWallMediaPermissions;
@@ -215,10 +219,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     return resourceAccessManager()->permissions(m_user, resource);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
+Qn::Permissions QnWorkbenchAccessController::calculateRemoteLayoutPermissions(
     const QnLayoutResourcePtr& layout) const
 {
-    using namespace nx::vms::client::desktop;
     NX_ASSERT(layout);
 
     // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
@@ -226,32 +229,10 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
         ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
         : Qn::AllPermissions;
 
-    // Next line is effective if LayoutPermissionsRole is set.
-    if (layout.dynamicCast<QnFileLayoutResource>() && layout.dynamicCast<QnFileLayoutResource>()->isReadOnly())
-        readOnly &= Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
-
     // Some layouts are created with predefined permissions which are never changed.
     QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);
     if (presetPermissions.isValid() && presetPermissions.canConvert<int>())
         return (static_cast<Qn::Permissions>(presetPermissions.toInt()) & readOnly) | Qn::ReadPermission;
-
-    // Deal with normal (non explicitly-authorized) files separately.
-    if (auto fileLayout = layout.dynamicCast<QnFileLayoutResource>())
-    {
-        // Effective if no LayoutPermissionsRole is set.
-        if(fileLayout->isReadOnly() || fileLayout->requiresPassword())
-            return Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
-
-        auto permissions = Qn::ReadWriteSavePermission
-            | Qn::AddRemoveItemsPermission
-            | Qn::EditLayoutSettingsPermission
-            | Qn::WriteNamePermission;
-
-        if (layout->locked())
-            permissions &= ~Qn::AddRemoveItemsPermission;
-
-        return permissions;
-    }
 
     const auto loggedIn = !m_user
         ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
@@ -281,6 +262,25 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
 
     return resourceAccessManager()->permissions(m_user, layout);
 }
+
+Qn::Permissions QnWorkbenchAccessController::calculateFileLayoutPermissions(
+    const QnFileLayoutResourcePtr& layout) const
+{
+    NX_ASSERT(layout);
+
+    if (layout->isReadOnly() || layout->requiresPassword())
+        return Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    auto permissions = Qn::FullGenericPermissions
+        | Qn::AddRemoveItemsPermission
+        | Qn::EditLayoutSettingsPermission;
+
+    if (layout->locked())
+        permissions &= ~Qn::AddRemoveItemsPermission;
+
+    return permissions;
+}
+
 
 GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() const
 {

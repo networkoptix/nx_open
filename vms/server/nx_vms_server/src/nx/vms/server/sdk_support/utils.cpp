@@ -190,20 +190,6 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     return pixelFormat;
 }
 
-resource::AnalyticsEngineResourceList toServerEngineList(
-    const nx::vms::common::AnalyticsEngineResourceList engineList)
-{
-    resource::AnalyticsEngineResourceList result;
-    for (const auto& engine: engineList)
-    {
-        auto serverEngine = engine.dynamicCast<resource::AnalyticsEngineResource>();
-        if (serverEngine)
-            result.push_back(serverEngine);
-    }
-
-    return result;
-}
-
 nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
 {
     using namespace nx::sdk;

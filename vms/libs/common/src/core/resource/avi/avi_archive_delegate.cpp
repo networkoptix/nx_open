@@ -288,7 +288,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
      * non-IDR ones. That's why we check for such frames manually, but only one time per file open
      * or per seek.
      */
-    if (!m_keyFrameFound[data->channelNumber]
+    if (m_keyFrameFound.size() > data->channelNumber && !m_keyFrameFound[data->channelNumber]
         && (data->flags.testFlag(QnAbstractMediaData::MediaFlag::MediaFlags_AVKey)
             || isH264IFrame(data)))
     {

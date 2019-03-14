@@ -1054,7 +1054,6 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
     return "";
 }
 
-
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
     return getServerUrl(commonModule(), "/ec2/updateStatus");

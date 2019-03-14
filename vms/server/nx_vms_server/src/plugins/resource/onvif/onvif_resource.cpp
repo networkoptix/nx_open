@@ -1199,7 +1199,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     QStringList eventTopicTokens = result.split(QChar('/'));
     for (QString& token: eventTopicTokens)
     {
-        int nsSepIndex = token.indexOf(QChar(':'));
+        const int nsSepIndex = token.indexOf(QChar(':'));
         if (nsSepIndex != -1)
             token.remove(0, nsSepIndex + 1);
     }
@@ -1214,7 +1214,10 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     while (att && att->name && att->text)
     {
         if (QByteArray(att->name).toLower() == "utctime")
+        {
             dateTimeAsText = QString(att->text); // example: "2018-04-30T21:18:37Z"
+            break;
+        }
         att = att->next;
     }
 
@@ -1247,7 +1250,6 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
 void QnPlOnvifResource::handleOneNotification(
     const oasisWsnB2__NotificationMessageHolderType& notification, time_t minNotificationTime)
 {
-    std::cout << "Event " << std::endl;
     /*
         TODO: #szaitsev: This function should be completely rewritten in 4.1.
         In does not correspond onvif specification.
@@ -1398,12 +1400,6 @@ void QnPlOnvifResource::handleOneNotification(
         eventTopic, dateTime.toString("yyyy-MM-dd hh:mm:ss"),
         portSourceIter->name, portSourceIter->value, data.name, data.value);
 
-    static int e = 0;
-    std::cout << "Event " << ++e << " Topic=" << eventTopic.toStdString() << ", "
-        << dateTime.toString("yyyy-MM-dd hh:mm:ss").toStdString() << ", "
-        << "Source: " << portSourceIter->name << "=" << portSourceIter->value << ", "
-        << "Data: " << data.name << "=" << data.value << std::endl;
-
     // saving port state
     const bool newValue = (data.value == "true")
         || (data.value == "active") || (atoi(data.value.c_str()) > 0);
@@ -1416,7 +1412,6 @@ void QnPlOnvifResource::handleOneNotification(
     {
         state.value = newValue;
         onRelayInputStateChange(portSourceValue, state);
-        std::cout << "    >>>>>>>>>>>>>Signal" << std::endl;
     }
 }
 

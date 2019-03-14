@@ -18,6 +18,7 @@ QString QnFileLayoutResource::getUniqueId() const
 
 Qn::ResourceStatus QnFileLayoutResource::getStatus() const
 {
+    QnMutexLocker locker(&m_mutex);
     return m_localStatus;
 }
 
@@ -29,20 +30,25 @@ bool QnFileLayoutResource::isFile() const
 
 void QnFileLayoutResource::setIsEncrypted(bool encrypted)
 {
+    QnMutexLocker locker(&m_mutex);
     m_isEncrypted = encrypted;
 }
 
 bool QnFileLayoutResource::isEncrypted() const
 {
+    QnMutexLocker locker(&m_mutex);
     return m_isEncrypted;
 }
 
 bool QnFileLayoutResource::usePasswordToRead(const QString& password)
 {
-    if (m_password == password)
-        return true;
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_password == password)
+            return true;
 
-    m_password = password;
+        m_password = password;
+    }
     emit passwordChanged(toSharedPointer(this));
 
     return true; //< Won't check the password here. Check before calling this function.
@@ -50,32 +56,42 @@ bool QnFileLayoutResource::usePasswordToRead(const QString& password)
 
 QString QnFileLayoutResource::password() const
 {
+    QnMutexLocker locker(&m_mutex);
     return m_password;
 }
 
 void QnFileLayoutResource::setStatus(Qn::ResourceStatus newStatus,
     Qn::StatusChangeReason reason)
 {
-    if (m_localStatus == newStatus)
-        return;
+    {
+        QnMutexLocker locker(&m_mutex);
 
-    m_localStatus = newStatus;
+        if (m_localStatus == newStatus)
+            return;
 
-    NX_VERBOSE(this, "Signal status change for %1", newStatus);
+        m_localStatus = newStatus;
+
+        NX_VERBOSE(this, "Signal status change for %1", newStatus);
+    }
     emit statusChanged(toSharedPointer(this), reason);
 }
 
 void QnFileLayoutResource::setReadOnly(bool readOnly)
 {
-    if (m_isReadOnly == readOnly)
-        return;
+    {
+        QnMutexLocker locker(&m_mutex);
 
-    m_isReadOnly = readOnly;
+        if (m_isReadOnly == readOnly)
+            return;
+
+        m_isReadOnly = readOnly;
+    }
     emit readOnlyChanged(toSharedPointer(this));
 }
 
 bool QnFileLayoutResource::isReadOnly() const
 {
+    QnMutexLocker locker(&m_mutex);
     return m_isReadOnly;
 }
 

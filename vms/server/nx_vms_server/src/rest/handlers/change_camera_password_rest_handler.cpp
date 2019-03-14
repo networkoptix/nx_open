@@ -73,6 +73,17 @@ int QnChangeCameraPasswordRestHandler::executePost(
     QAuthenticator auth;
     auth.setUser(data.user);
     auth.setPassword(data.password);
+
+    const auto groupId = requestedCamera->getGroupId().isEmpty()
+        ? requestedCamera->getId().toString() : requestedCamera->getGroupId();
+
+    static QnMutex commonLock;
+    QnMutexLocker commonLocker(&commonLock);
+    QnMutexLocker lock(&m_cameraGroupLock[groupId]);
+
+    if (requestedCamera->getAuth() == auth)
+        return nx::network::http::StatusCode::ok;
+
     QString errorString;
     if (!requestedCamera->setCameraCredentialsSync(auth, &errorString))
     {

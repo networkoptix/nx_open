@@ -217,7 +217,7 @@
                         cameraId = $scope.activeCamera.id,
                         resolution = $scope.activeResolution,
                         resolutionHls = channels[resolution] || channels.Low,
-                        live = !playingPosition;
+                        live = !playingPosition && $scope.activeCamera.status !== 'Unauthorized';
                     
                     if ($scope.playerAPI) {
                         // Pause playing

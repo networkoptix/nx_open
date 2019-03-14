@@ -199,12 +199,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         function updateVideoSource(playingPosition) {
             // clear preview for next camera
             $scope.preview = '';
-            
-            if (!$scope.activeCamera ||
-                $scope.activeCamera.status === 'Unauthorized') {
-                
+    
+            if (!$scope.activeCamera) {
                 $scope.activeVideoSource = {src: ''};
-                
                 return;
             }
             
@@ -212,7 +209,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 cameraId = $scope.activeCamera.id,
                 resolution = $scope.activeResolution,
                 resolutionHls = channels[resolution] || channels.Low,
-                live = !playingPosition;
+                live = !playingPosition && $scope.activeCamera.status !== 'Unauthorized';
                 
             if($scope.playerAPI) {
                 // Pause playing
@@ -227,9 +224,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
 
             $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
+            
             if(live){
-                playingPosition = timeManager.nowToDisplay();
-            }else{
+                playingPosition = window.timeManager.nowToDisplay();
+            } else {
                 playingPosition = Math.round(playingPosition);
             }
 

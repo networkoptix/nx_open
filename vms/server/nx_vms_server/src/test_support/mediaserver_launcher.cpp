@@ -130,13 +130,12 @@ void MediaServerLauncher::prepareToStart()
     m_firstStartup = false;
 
     m_mediaServerProcess->setSetupModuleCallback(
-        [](QnMediaServerModule* serverModule)
-        {
-            const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
-            serverModule->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
-            serverModule->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
-            serverModule->commonModule()->setRunningInTestMode();
-        });
+        [](QnMediaServerModule* server)
+    {
+        const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
+        server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
+        server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
+    });
 
     connect(
         m_mediaServerProcess.get(),
