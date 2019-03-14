@@ -415,6 +415,8 @@ QByteArray Manager::extractRequestFromBuffer()
 nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
     nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
+    m_terminated = false;
+
     m_handler = handler;
 
     const QByteArray host = m_url.host().toLatin1();
