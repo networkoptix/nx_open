@@ -2493,7 +2493,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /ec2/finishUpdate
      * Puts a system in the 'Update Finished' state.
      * %param[opt]:option ignorePendingPeers Force an update process completion regardless actual
-     * peers state.
+     *     peers state.
      */
     reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
 
