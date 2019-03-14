@@ -2513,7 +2513,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /ec2/cancelUpdate
      * Puts a system in the 'Idle' state update-wise. This means that the current update
-     *     manifest is cleared and all downloads are cancelled.
+     * manifest is cleared and all downloads are cancelled.
      */
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
