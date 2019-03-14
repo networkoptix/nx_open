@@ -13,11 +13,13 @@
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/common/utils/ordered_requests_manager.h>
 
 namespace nx::vms::client::core {
 
 TwoWayAudioController::TwoWayAudioController(QObject* parent):
     base_type(parent),
+    m_requestsManager(new OrderedRequestsManager()),
     m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
 {
     connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
@@ -70,12 +72,10 @@ bool TwoWayAudioController::start()
     const auto callback =
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            if (handle == m_startHandle)
-                setStarted(success && result.error == QnRestResult::NoError);
-
+            setStarted(success && result.error == QnRestResult::NoError);
         };
     const auto connection = server->restConnection();
-    m_startHandle = connection->twoWayAudioCommand(m_sourceId, m_camera->getId(), true,
+    m_requestsManager->sendTwoWayAudioCommand(connection, m_sourceId, m_camera->getId(), true,
         nx::utils::guarded(this, callback), QThread::currentThread());
 
     return true;
@@ -94,8 +94,8 @@ void TwoWayAudioController::stop()
         return;
 
     const auto connection = server->restConnection();
-    connection->twoWayAudioCommand(m_sourceId, m_camera->getId(), false,
-        rest::ServerConnection::GetCallback());
+    m_requestsManager->sendTwoWayAudioCommand(connection, m_sourceId, m_camera->getId(), false,
+        rest::ServerConnection::GetCallback(), QThread::currentThread());
 }
 
 void TwoWayAudioController::setSourceId(const QString& value)
