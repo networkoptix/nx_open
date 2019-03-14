@@ -78,7 +78,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
         ? requestedCamera->getId().toString() : requestedCamera->getGroupId();
 
     static QnMutex commonLock;
-    static QnMutexLocker commonLocker(&commonLock);
+    QnMutexLocker commonLocker(&commonLock);
 
     auto itr = m_cameraGroupLock.find(groupId);
     if (itr == m_cameraGroupLock.end())
