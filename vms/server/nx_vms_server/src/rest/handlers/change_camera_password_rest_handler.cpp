@@ -79,11 +79,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
 
     static QnMutex commonLock;
     QnMutexLocker commonLocker(&commonLock);
-
-    auto itr = m_cameraGroupLock.find(groupId);
-    if (itr == m_cameraGroupLock.end())
-        itr = m_cameraGroupLock.emplace(groupId, QnMutex()).first;
-    QnMutexLocker lock(&itr->second);
+    QnMutexLocker lock(&m_cameraGroupLock[groupId]);
 
     if (requestedCamera->getAuth() == auth)
         return nx::network::http::StatusCode::ok;
