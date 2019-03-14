@@ -28,15 +28,6 @@
             "alarmName": "motionAlarm"
         },
         {
-            "eventTypeId": "6a34d742-9f83-47ba-93e2-811718fa49ac",
-            "eventName": { "value": "Sensor Alarm", "localization": {} },
-            "flags": "stateDependent",
-            "internalName": "SENSOR",
-            "alarmName": "sensorAlarmIn",
-            "_comment": "Notification from camera external sensor",
-            "unsupported": true
-        },
-        {
             "eventTypeId": "52764a47-bd7d-4447-bb4b-aaf0b0e7518f",
             "eventName": { "value": "Perimeter Intrusion [exclusive]", "localization": {} },
             "flags": "stateDependent",
@@ -78,17 +69,24 @@
             "alarmName": "colorAbnormal",
             "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Abnormal color detection"
         },
+    ],
+    "ignoredOutputEventTypes": [
+        {
+            "eventTypeId": "6a34d742-9f83-47ba-93e2-811718fa49ac",
+            "eventName": { "value": "Sensor Alarm", "localization": {} },
+            "flags": "stateDependent",
+            "internalName": "SENSOR",
+            "alarmName": "sensorAlarmIn",
+            "_comment": "Notification from camera external sensor"
+        },
         {
             "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
             "eventName": { "value": "Video Face Detection [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "VFD",
             "alarmName": "vfdAlarm",
-            "group": 1,
-            "unsupported": true
+            "group": 1
         }
-    ],
-    "ignoredOutputEventTypes": [
         {
             "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
             "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },

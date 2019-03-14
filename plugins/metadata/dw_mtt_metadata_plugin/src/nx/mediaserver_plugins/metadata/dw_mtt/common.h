@@ -19,9 +19,8 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
     QString internalName;
     QString alarmName;
     int group = 0;
-    bool unsupported = false;
 };
-#define DwMttAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)(alarmName)(group)(unsupported)
+#define DwMttAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)(alarmName)(group)
 
 struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 {

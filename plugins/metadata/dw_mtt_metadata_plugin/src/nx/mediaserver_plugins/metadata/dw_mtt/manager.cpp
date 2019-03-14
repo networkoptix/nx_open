@@ -86,8 +86,7 @@ Manager::Manager(Plugin* plugin,
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType : typedManifest.outputEventTypes)
     {
-        if(!eventType.unsupported)
-            typedCameraManifest.supportedEventTypes.push_back(eventType.eventTypeId);
+        typedCameraManifest.supportedEventTypes.push_back(eventType.eventTypeId);
     }
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
@@ -401,6 +400,14 @@ QByteArray Manager::extractRequestFromBuffer()
 
     m_buffer.remove(0, size);
     m_buffer.reserve(kBufferCapacity);
+
+    // The request may contain leading zeros. They hinder to debug. Let's eliminate them.
+    size_t nonZeroIndex = 0;
+    while (nonZeroIndex < request.size() && request.at(nonZeroIndex) == '\0')
+        ++nonZeroIndex;
+
+    if (nonZeroIndex)
+        request.remove(0, nonZeroIndex);
 
     return request;
 }
