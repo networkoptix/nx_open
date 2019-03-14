@@ -111,15 +111,9 @@ if(IOS)
 
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
 
-    if(developerBuild)
-        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
-            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
-        set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
-    else()
-        nx_configure_file(maven/filter-resources/mobile_client-release.entitlements
-            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
-        set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
-    endif()
+    nx_configure_file(maven/filter-resources/mobile_client-release.entitlements
+        ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
+    set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
 
     execute_process(
         COMMAND "${PROJECT_SOURCE_DIR}/build_utils/macos/get_provisioning_id.sh" "${provisioning_profile}"
