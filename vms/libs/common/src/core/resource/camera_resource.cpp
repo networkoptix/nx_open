@@ -597,7 +597,7 @@ nx::vms::common::AnalyticsEngineResourceList
     QnVirtualCameraResource::compatibleAnalyticsEngineResources() const
 {
     const auto resPool = resourcePool();
-    if (!NX_ASSERT(resPool))
+    if (!resPool)
         return {};
 
     return resPool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
