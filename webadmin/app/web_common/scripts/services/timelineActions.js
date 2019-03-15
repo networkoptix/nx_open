@@ -107,7 +107,6 @@ TimelineActions.prototype.setClickedCoordinate = function (mouseX) {
     self.scaleManager.clickedCoordinate(mouseX);
     
     var position = self.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
-    console.log('position ->', position);
     self.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
     
     self.stopAnimatingMove(); // Instantly jump to new position
@@ -120,7 +119,6 @@ TimelineActions.prototype.setClickedCoordinate = function (mouseX) {
 
 // linear is for holding function
 TimelineActions.prototype.animateScroll = function (targetPosition, linear) {
-    debugger;
     var self = this;
     self.delayWatchingPlayingPosition();
     if (typeof (self.scope.scrollTarget) == 'undefined') {
@@ -311,7 +309,6 @@ TimelineActions.prototype.updateZoomLevels = function (zoomTarget) {
 
 // Relative zoom (incremental)
 TimelineActions.prototype.zoom = function (zoomIn) {
-    debugger;
     var markerDate = this.scaleManager.playedPosition;
     
     //By default - use point under time marker
@@ -415,7 +412,6 @@ TimelineActions.prototype.scrollingToCursorStop = function () {
     }
 };
 TimelineActions.prototype.scrollingToCursorStart = function () {
-    debugger;
     var self = this;
     
     self.scaleManager.stopWatching();

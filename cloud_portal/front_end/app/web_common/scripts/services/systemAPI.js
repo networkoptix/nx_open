@@ -307,19 +307,22 @@ angular.module('nxCommon')
 
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
-            var data = {
-                    cameraId:cleanId(cameraId)
+            var endpoint = '/ec2/cameraThumbnail',
+                data = {
+                    cameraId: cleanId(cameraId)
                 };
-            if(time){
+            if (time) {
                 data.time = time;
+            } else {
+                endpoint += '?ignoreExternalArchive&time=LATEST';
             }
-            if(width){
+            if (width) {
                 data.width = width;
             }
-            if(height){
+            if (height) {
                 data.height = height;
             }
-            return this._setGetParams('/ec2/cameraThumbnail?ignoreExternalArchive', data, this.systemId && this.authGet());
+            return this._setGetParams(endpoint, data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};
