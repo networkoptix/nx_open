@@ -257,20 +257,20 @@ void PeerStateTracker::setVersionInformation(
     {
         if (auto item = findItemById(info.id))
         {
-            if (info.version != item->version)
+            if (info.version == item->version)
+                continue;
+
+            item->version = info.version;
+
+            bool installed = (info.version == m_targetVersion)
+                || item->state == StatusCode::latestUpdateInstalled;
+
+            if (installed != item->installed)
             {
-                item->version = info.version;
-
-                bool installed = (info.version == m_targetVersion)
-                    || item->state == StatusCode::latestUpdateInstalled;
-
-                if (installed != item->installed)
-                {
-                    item->installed = true;
-                    NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
-                }
-                emit itemChanged(item);
+                item->installed = true;
+                NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
             }
+            emit itemChanged(item);
         }
     }
 }
@@ -510,10 +510,6 @@ void PeerStateTracker::processInstallTaskSet()
 {
     NX_ASSERT(!m_peersIssued.isEmpty());
 
-    QSet<QnUuid> peersToRestartUpdate;
-    QSet<QnUuid> peersActive;
-    QSet<QnUuid> readyToInstall;
-
     for (const auto& item: m_items)
     {
         StatusCode state = item->state;
@@ -523,7 +519,7 @@ void PeerStateTracker::processInstallTaskSet()
             continue;
         //if (!m_peersIssued.contains(id))
         //    continue;
-        if (item->installed)
+        if (item->installed || state == StatusCode::latestUpdateInstalled)
         {
             if (m_peersActive.contains(id))
             {
@@ -541,11 +537,6 @@ void PeerStateTracker::processInstallTaskSet()
                     << "processInstallTaskSet() - peer"
                     << id << "has resumed installation";
                 m_peersActive.insert(id);
-                peersToRestartUpdate.insert(id);
-            }
-            if (item->component == UpdateItem::Component::server)
-            {
-                peersActive.insert(item->id);
             }
         }
         else
@@ -553,17 +544,7 @@ void PeerStateTracker::processInstallTaskSet()
             switch (state)
             {
                 case StatusCode::readyToInstall:
-                    if (m_peersActive.contains(id))
-                    {
-                        NX_VERBOSE(this)
-                            << "processInstallTaskSet() - peer "
-                            << id << "completed downloading and is ready to install";
-                        m_peersActive.remove(id);
-                        // TODO: Should force installing for this peers, until it is a client.
-                        // Client should wait until servers have completed installation.
-                        peersToRestartUpdate.insert(id);
-                    }
-                    readyToInstall.insert(id);
+                    // Nothing to do here.
                     break;
                 case StatusCode::error:
                 case StatusCode::idle:
@@ -587,14 +568,8 @@ void PeerStateTracker::processInstallTaskSet()
                     }
                     break;
                 case StatusCode::latestUpdateInstalled:
-                    if (m_peersActive.contains(id))
-                    {
-                        NX_VERBOSE(this)
-                            << "processInstallTaskSet() - peer"
-                            << id << "have already installed this package.";
-                        m_peersActive.remove(id);
-                    }
-                    m_peersComplete.insert(id);
+                    // We should have handled this state before.
+                    NX_ASSERT(false);
                     break;
                 case StatusCode::offline:
                     break;

@@ -1300,6 +1300,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
 
         auto serversHaveDownloaded = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
         auto serversAreDownloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+        auto serversWithError = m_stateTracker->getPeersInState(StatusCode::error);
         auto peersAreInstalling = m_serverUpdateTool->getServersInstalling();
         auto serversHaveInstalled = m_stateTracker->getPeersCompleteInstall();
 
@@ -1314,16 +1315,22 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
                 peersAreInstalling.insert(m_stateTracker->getClientPeerId());
             setTargetState(WidgetUpdateState::installing, peersAreInstalling);
         }
-        else if (!serversAreDownloading.empty())
+        else if (!serversAreDownloading.empty() || !serversWithError.empty())
         {
+            // Note: !serversWithError.empty() clause is a tricky one. Right now we have sane
+            // errors only for downloading state. Widget will recheck current after a second and
+            // will make further FSM adjustments.
+            auto targets = serversAreDownloading + serversWithError;
             NX_INFO(this)
-                << "processRemoteUpdateInformation() - servers" << serversAreDownloading << "are downloading an update";
-            setTargetState(WidgetUpdateState::downloading, serversAreDownloading);
+                << "processRemoteUpdateInformation() - servers"
+                << targets << "are in downloading or error state";
+            setTargetState(WidgetUpdateState::downloading, targets);
         }
         else if (!serversHaveDownloaded.empty())
         {
             NX_INFO(this)
-                << "processRemoteUpdateInformation() - servers" << serversHaveDownloaded << "have already downloaded an update";
+                << "processRemoteUpdateInformation() - servers"
+                << serversHaveDownloaded << "have already downloaded an update";
             setTargetState(WidgetUpdateState::readyInstall, {});
         }
         else if (!serversHaveInstalled.empty())
@@ -1378,15 +1385,15 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         messageBox->setIcon(QnMessageBoxIcon::Critical);
         messageBox->setText(tr("Failed to download update packages to some servers"));
 
-        QString text;
-        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-        messageBox->setInformativeText(text);
-
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
         auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
         injectResourceList(*messageBox, resourcesFailed);
+
+        QString text;
+        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
+        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+        messageBox->setInformativeText(text);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
             QDialogButtonBox::AcceptRole);
@@ -1408,8 +1415,6 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
             m_serverUpdateTool->requestStopAction();
             setTargetState(WidgetUpdateState::ready, {});
         }
-
-        setTargetState(WidgetUpdateState::readyInstall, peersComplete);
     }
 }
 
@@ -1597,7 +1602,8 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
     return true;
 }
 
-void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUuid> targets)
+void MultiServerUpdatesWidget::setTargetState(
+    WidgetUpdateState state, const QSet<QnUuid>& targets)
 {
     if (state != m_widgetState)
     {

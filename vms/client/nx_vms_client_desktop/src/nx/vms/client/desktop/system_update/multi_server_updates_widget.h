@@ -190,7 +190,7 @@ private:
     void closePanelNotifications();
 
     /** Advances UI FSM towards selected state. */
-    void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
+    void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {});
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
