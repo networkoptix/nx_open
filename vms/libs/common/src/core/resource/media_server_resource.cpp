@@ -140,13 +140,13 @@ QString QnMediaServerResource::getName() const
     }
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+        QnMediaServerUserAttributesPool::ScopedLock lk(
+            commonModule()->mediaServerUserAttributesPool(), getId());
 
-        if (const QnMediaServerUserAttributesPtr attributes = *lk)
-        {
-            if (!attributes->name.isEmpty())
-                return attributes->name;
-        }
+        const QnMediaServerUserAttributesPtr userAttributes = *lk;
+
+        if (!userAttributes->name.isEmpty())
+            return userAttributes->name;
     }
     return QnResource::getName();
 }

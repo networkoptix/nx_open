@@ -33,14 +33,17 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     m_resource(resource),
     m_server(server)
 {
-    NX_ASSERT(supportedResource(resource), "Loaders must not be created for unsupported resources");
+    NX_ASSERT(supportedResource(resource),
+        "Loaders must not be created for unsupported resources");
     init();
     initLoaders();
 
     m_analyticsFilter.deviceIds.push_back(m_resource->toResource()->getId());
 
     QTimer* loadTimer = new QTimer(this);
-    loadTimer->setInterval(requestIntervalMs / 10);  // time period will be loaded no often than once in 30 seconds, but timer should check it much more often
+    // Time period will be loaded no often than once in 30 seconds,
+    // but timer should check it much more often.
+    loadTimer->setInterval(requestIntervalMs / 10);
     loadTimer->setSingleShot(false);
     connect(loadTimer, &QTimer::timeout, this, [this]
     {
@@ -87,7 +90,9 @@ void QnCachingCameraDataLoader::initLoaders() {
 
         if (loader) {
             connect(loader, &QnAbstractCameraDataLoader::ready, this,
-                [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle)
+                [this, dataType]
+                (const QnAbstractCameraDataPtr &data,
+                    const QnTimePeriod &updatedPeriod, int handle)
                 {
                     trace(lit("Handling reply %1 for period %2 (%3)")
                         .arg(handle)
@@ -232,7 +237,8 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
 
         case Qn::AnalyticsContent:
         {
-            const qint64 analyticsDetailLevelMs = 200; //< Minimum required value to provide continuous display on the timeline
+            // Minimum required value to provide continuous display on the timeline.
+            const qint64 analyticsDetailLevelMs = 200;
             const auto filter = QString::fromUtf8(QJson::serialized(m_analyticsFilter));
             handle = loader->load(filter, analyticsDetailLevelMs);
             break;
@@ -254,7 +260,11 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, qint64 startTimeMs, Qn::TimePeriodContent dataType) {
+void QnCachingCameraDataLoader::at_loader_ready(
+    const QnAbstractCameraDataPtr& data,
+    qint64 startTimeMs,
+    Qn::TimePeriodContent dataType)
+{
     auto timePeriodType = (dataType);
     m_cameraChunks[timePeriodType] = data
         ? data->dataSource()
