@@ -13,6 +13,7 @@ void GetDebugCounters::processRequest(
 
     std::map<std::string, int> values;
     values.emplace("tcpSocketCount", counters.tcpSocketCount);
+    values.emplace("sslSocketCount", counters.sslSocketCount);
     values.emplace("stunClientConnectionCount", counters.stunClientConnectionCount);
     values.emplace("stunOverHttpClientConnectionCount", counters.stunOverHttpClientConnectionCount);
     values.emplace("stunServerConnectionCount", counters.stunServerConnectionCount);
