@@ -5,6 +5,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
+namespace nx::network::http::server::rest { class MessageDispatcher; }
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -37,7 +39,14 @@ public:
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) = 0;
 
-    virtual void setPublicUrl(const nx::utils::Url& nodeId) = 0;
+    virtual void setPublicUrl(const nx::utils::Url& publicUrl) = 0;
+
+    virtual void registerHttpApi(
+        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/)
+    {
+        //TODO get rid of me when cassandra is no longer used along with this interface.
+    }
+
 };
 
 } // namespace model
