@@ -28,6 +28,15 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
 
+#include <nx/fusion/model_functions.h>
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RtpTransportType, (numeric))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RtpTransportType,
+    (nx::vms::api::RtpTransportType::automatic, "Auto")
+    (nx::vms::api::RtpTransportType::tcp, "TCP")
+    (nx::vms::api::RtpTransportType::udp, "UDP")
+    (nx::vms::api::RtpTransportType::multicast, "Multicast"))
+
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
 

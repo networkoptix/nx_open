@@ -27,6 +27,8 @@ extern "C"
 #include <network/client_authenticate_helper.h>
 #include <nx/utils/elapsed_timer.h>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
 
@@ -40,6 +42,23 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadata
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+namespace nx {
+namespace vms {
+namespace api {
+
+enum class RtpTransportType
+{
+    automatic,
+    tcp,
+    udp,
+    multicast,
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RtpTransportType)
+
+} // namespace api
+} // namespace vms
+} // namespace nx
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RtpTransportType, (lexical));
 
 // Class name is quite misleading.
 // Actually it is RTCP statistics + NTP time from Onvif extension.
