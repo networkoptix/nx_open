@@ -1430,7 +1430,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
         setTargetState(WidgetUpdateState::installingStalled, m_stateTracker->getPeersIssued());
     }
 
-    auto peersDownloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+    auto peersInstalling = m_stateTracker->getPeersInstalling();
     auto peersComplete = m_stateTracker->getPeersComplete();
     auto readyToInstall = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
     auto peersFailed = m_stateTracker->getPeersFailed();
@@ -1439,7 +1439,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     m_serverUpdateTool->requestModuleInformation();
 
     // No peers are doing anything right now. We should check if installation is complete.
-    if (peersDownloading.empty())
+    if (peersInstalling.empty())
     {
         if (!peersComplete.empty())
         {
