@@ -98,6 +98,9 @@ namespace Qn
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
+
+    static const QString DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS = lit("doUpdatePortInSubscriptionAddress");
+
     static const QString kCanConfigureRemoteRecording = lit("canConfigureRemoteRecording");
 
     static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");

@@ -3442,7 +3442,13 @@ bool QnPlOnvifResource::createPullPointSubscription()
         }
 
         if (response.SubscriptionReference->Address)
-            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
+        {
+            const auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+            auto updatePort =
+                resData.value<bool>(Qn::DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS, true);
+            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(
+                response.SubscriptionReference->Address->__item, updatePort);
+        }
     }
 
     //adding task to refresh subscription
