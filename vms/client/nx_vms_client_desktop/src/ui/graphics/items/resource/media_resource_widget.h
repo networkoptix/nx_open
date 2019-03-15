@@ -114,7 +114,7 @@ public:
     /**
      * Clears this widget's motion selection region.
      */
-    void clearMotionSelection();
+    void clearMotionSelection(bool sendMotionChanged = true);
 
     bool isMotionSelectionEmpty() const;
 

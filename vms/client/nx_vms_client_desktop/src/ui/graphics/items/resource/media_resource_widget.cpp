@@ -1270,6 +1270,13 @@ bool QnMediaResourceWidget::isMotionSelectionEmpty() const
 
 void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
 {
+    // Just send changed() if gridRect is empty.
+    if (gridRect.isEmpty())
+    {
+        emit motionSelectionChanged();
+        return;
+    }
+
     ensureMotionSensitivity();
 
     bool changed = false;
@@ -1309,7 +1316,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
     }
 }
 
-void QnMediaResourceWidget::clearMotionSelection()
+void QnMediaResourceWidget::clearMotionSelection(bool sendMotionChanged)
 {
     if (isMotionSelectionEmpty())
         return;
@@ -1318,7 +1325,9 @@ void QnMediaResourceWidget::clearMotionSelection()
         m_motionSelection[i] = QRegion();
 
     invalidateMotionSelectionCache();
-    emit motionSelectionChanged();
+
+    if (sendMotionChanged)
+        emit motionSelectionChanged();
 }
 
 void QnMediaResourceWidget::setMotionSelection(const QList<QRegion>& regions)
