@@ -95,10 +95,6 @@ struct OnvifIniConfig: public nx::kit::IniConfig
 {
     OnvifIniConfig(): IniConfig("server_onvif.ini") {}
 
-    NX_INI_FLAG(1, doUpdatePortInSubscriptionAddress,
-        "Used in ONVIF event notification subscription.\n"
-        "Value 0 (false) may be used for debugging port forwarded devices.");
-
     static OnvifIniConfig& instance()
     {
         static OnvifIniConfig ini;

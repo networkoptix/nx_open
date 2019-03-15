@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.20",
+    "version": "1.0.1.22",
     "data": [
         {
             "keys": [
@@ -827,17 +827,22 @@
             "analogEncoder": true
         },
         {
+            "keys": [
+                "DW-ENHD16|DW-ENHD16*",
+                "DW|DW-ENHD16*"
+            ],
+            "doUpdatePortInSubscriptionAddress": false
+        },
+        {
             "keys": ["UNIVIEW|DVS4116"],
             "enableAdditionalManufacturerNormalization": true
         },
-
         {
             "keys": [
                 "*|DW-CP04", "*|DW-CP16"
             ],
             "isRebrendedActiCamera": true
         },
-
         {
             "keys": [
                 "ISD|*"

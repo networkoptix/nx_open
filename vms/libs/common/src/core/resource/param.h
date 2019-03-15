@@ -177,6 +177,8 @@ namespace ResourceDataKey
     static const QString kParseOnvifNotificationsWithHttpReader("parseOnvifNotificationsWithHttpReader");
     static const QString kDisableHevc("disableHevc");
 
+    static const QString kDoUpdatePortInSubscriptionAddress("doUpdatePortInSubscriptionAddress");
+
     // Rename?
     static const QString kNeedToReloadAllAdvancedParametersAfterApply("needToReloadAllAdvancedParametersAfterApply");
 
