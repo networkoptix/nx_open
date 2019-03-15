@@ -154,7 +154,7 @@ should respond to Tab key
     Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[2]
-    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
+    Location Should Be    ${PRIVACY POLICY URL FULL}
     Select Window    @{tabs}[0]
 
     Clear Register Fields

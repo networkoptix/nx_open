@@ -285,9 +285,9 @@ Sharing system with a user who is already in the list updates their permissions
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${random email}    ${ADMIN TEXT}
+    Delete All Emails
     Check User Permissions    ${random email}    ${ADMIN TEXT}
     Share To    ${random email}    ${VIEWER TEXT}
-    ${email ID}    Wait For Email    recipient=${email}    timeout=120    status=UNSEEN
     Delete All Emails
     Close Mailbox
     Check User Permissions    ${random email}    ${VIEWER TEXT}
@@ -313,7 +313,7 @@ Check share email for registered user
     Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     ${links}    Get Links From Email    ${email}
-    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${OWNER EMAIL}
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${EMAIL OWNER}
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}
     Delete All Emails

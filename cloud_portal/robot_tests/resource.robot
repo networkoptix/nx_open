@@ -72,7 +72,7 @@ Log In
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    5
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    10
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
     Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
@@ -167,6 +167,7 @@ Restore password
 
 Share To
     [arguments]    ${email}    ${permissions}
+    Wait Until Element Is Enabled    ${OPEN IN NX BUTTON}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}

@@ -57,10 +57,11 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Log in to Auto Tests System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
+    Click Element    ${DISCONNECT FORM}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
-should confirm, if not owner deletes system (You will loose access to this system)
+should confirm, if not owner deletes system (You will lose access to this system)
     [tags]    Threaded
     Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
@@ -68,6 +69,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Element Is Visible    ${DISCONNECT MODAL WARNING}
     Click Element    ${DISCONNECT MODAL WARNING}
+    Sleep    .5
     Click Button    ${DISCONNECT MODAL CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 

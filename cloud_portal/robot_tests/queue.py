@@ -20,7 +20,7 @@ serialList = list(set((test[0] for test in get_threaded_names("Unthreaded"))))
 
 
 q = Queue(maxsize=0)
-num_threads = 8
+num_threads = 12
 
 # actually runs the commands in the queue
 

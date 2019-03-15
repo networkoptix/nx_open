@@ -148,7 +148,7 @@ class NoptixLibrary(object):
                 return
             elif re.search(url, found):
                 return
-        raise Exception(url + " was not in the email.")
+        raise Exception(found + " was not in the email.")
 
     def get_os(self):
         plat = system()

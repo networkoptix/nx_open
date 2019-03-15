@@ -80,6 +80,7 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     [Tags]    Threaded
     Log In    ${email}    'aderhgadehf'
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${FORGOT PASSWORD}
+    Sleep    1
     Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}

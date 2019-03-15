@@ -48,13 +48,14 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${BACKDROP}
 
-should confirm, if not owner deletes system (You will loose access to this system)
+should confirm, if not owner deletes system (You will lose access to this system)
     [tags]    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM NX}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
+    Click Element    ${DISCONNECT FORM}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
