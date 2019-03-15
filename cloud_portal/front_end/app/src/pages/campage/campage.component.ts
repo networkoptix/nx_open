@@ -173,16 +173,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
         ];
     }
 
-    // toggleAllowedParameters(param, label1, label2) {
-    //     const paramLookup = this.filterModel.tags.find(x => x.id === param);
-    //     const paramLabel = this.allowedParameters.findIndex(x => x === label1 || x === label2);
-    //     if (paramLookup.value) {
-    //         this.allowedParameters[paramLabel] = label2;
-    //     } else {
-    //         this.allowedParameters[paramLabel] = label1;
-    //     }
-    // }
-
     ngDoCheck() {
         const filterChanges = this.differ.diff(this.filterModel);
         let vendorChanges;
@@ -196,13 +186,6 @@ export class NxCampageComponent implements OnInit, DoCheck {
         }
 
         const tagChanges = this.tagDiffer.diff(this.filterModel.tags.map(tag => tag.value));
-        // if (tagChanges) {
-            // this.toggleAllowedParameters('isAptzSupported', 'isPtzSupported', 'isAptzSupported');
-            // this.toggleAllowedParameters('isTwAudioSupported', 'isAudioSupported', 'isTwAudioSupported');
-
-            // make sure cam-table gets the new params
-        //     this.allowedParameters = [...this.allowedParameters];
-        // }
 
         if (this.filterModel.selects.find(x => x.id === 'resolution') !== undefined) {
             resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => {

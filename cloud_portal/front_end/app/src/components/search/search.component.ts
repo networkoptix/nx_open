@@ -176,7 +176,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
             this.localFilter.multiselects.forEach((filter) => {
                 if (filter.selected.length) { // not default value
-                    this.filterSelected = filter.selected[0];
+                    this.filterSelected = filter.items.find(x => x.id === filter.selected[0]).label;
                     this.numberFilters += filter.selected.length;
                 }
             });

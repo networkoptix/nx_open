@@ -41,7 +41,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     private items: any;
     private show: boolean;
-    private numSelected: string;
+    private textSelected: string;
     private innerValue: any;
     private filter: string;
 
@@ -113,13 +113,17 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     updateLabel() {
         switch (this.innerValue && this.innerValue.length) {
+            case 1: {
+                this.textSelected = this.items.find(x => x.id === this.innerValue[0]).label;
+                break;
+            }
             case 0:
             case this.items.length: {
-                this.numSelected = 'Any';
+                this.textSelected = 'Any';
                 break;
             }
             default: {
-                this.numSelected = this.innerValue.length + ' Selected';
+                this.textSelected = this.innerValue.length + ' Selected';
                 break;
             }
         }

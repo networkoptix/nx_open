@@ -37,9 +37,6 @@
     .nx-table-wrapper {
         margin : 0;
         max-width: 1048px;
-        @include media-breakpoint-up(xxl) {
-            width : auto;
-        }
         
         .nx-table-header {
             padding : .5rem .75rem;
@@ -50,31 +47,18 @@
                 display : inline-block;
                 white-space: normal;
     
-                //@include media-breakpoint-up(xxl) {
-                //    padding : .5rem .25rem .5rem .75rem;
-                //}
-                
                 &:nth-child(1) {
                     padding-left : .75rem;
-    
                     width : 175px;
-                    //@include media-breakpoint-up(xxl) {
-                    //    width : 270px;
-                    //}
+                    
                 }
 
                 &:nth-child(2) {
                     width : 160px;
-                    //@include media-breakpoint-up(xxl) {
-                    //    width : 270px;
-                    //}
                 }
                 
                 &:nth-child(3) {
                     width : 110px;
-                    //@include media-breakpoint-up(xxl) {
-                    //    width : 220px;
-                    //}
                 }
     
                 &:nth-child(4) {
@@ -135,10 +119,6 @@
             td {
                 display : inline-block;
     
-                //@include media-breakpoint-up(xxl) {
-                //    padding : .5rem .25rem .5rem .75rem;
-                //}
-    
                 &:nth-child(n+1) > div {
                     text-overflow : ellipsis;
                     overflow      : hidden;
@@ -147,23 +127,14 @@
                 &:nth-child(1) {
                     padding-left : .75rem;
                     width : 175px;
-                    //@include media-breakpoint-up(xxl) {
-                    //    width : 270px;
-                    //}
                 }
     
                 &:nth-child(2) {
                     width : 160px;
-                    //@include media-breakpoint-up(xxl) {
-                    //    width : 270px;
-                    //}
                 }
     
                 &:nth-child(3) {
                     width : 110px;
-                    //@include media-breakpoint-up(xxl) {
-                    //    width : 220px;
-                    //}
                 }
     
                 &:nth-child(4) {
@@ -202,31 +173,5 @@
             }
         }
     }
-    
-    //.toggle {
-    //    .nx-table {
-    //        th, td {
-    //            @include media-breakpoint-up(xxl) {
-    //                padding : .5rem .25rem;
-    //
-    //                &:nth-child(1) {
-    //                    width : 130px;
-    //                }
-    //
-    //                &:nth-child(2) {
-    //                    width : 130px;
-    //                }
-    //
-    //                &:nth-child(3) {
-    //                    width : 100px;
-    //                }
-    //
-    //                &:last-of-type {
-    //                    width : 50px;
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
     /*** END overwrite default table of component cam-table ***/
 }

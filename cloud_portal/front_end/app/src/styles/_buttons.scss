@@ -176,6 +176,7 @@ button, .btn {
 .btn-tag {
     color            : $light16;
     background-color : $light4;
+    max-width        : none;
     
     &:hover {
         background-color : $light5;
@@ -188,8 +189,9 @@ button, .btn {
 
 .btn-tag-selected {
     @include badge-selected($light16, $light17, $light18);
-    padding  : 0 40px 0 16px !important;
-    position : relative;
+    padding   : 0 40px 0 16px !important;
+    position  : relative;
+    max-width : none;
     
     .close-button {
         position        : absolute;
@@ -211,6 +213,7 @@ button, .btn {
     position      : relative;
     padding-left  : 2rem !important;
     padding-right : 1rem !important;
+    max-width     : none;
     
     .nav-arrow {
         height : 20px;

@@ -50,12 +50,15 @@ export class CampageSearchService {
             resolution = filter.selects.find(x => x.id === 'resolution').selected;
         }
 
-        if (filter.selects.find(x => x.id === 'resolution') !== undefined) {
+        if (filter.multiselects.find(x => x.id === 'vendors') !== undefined) {
             vendors = filter.multiselects.find(x => x.id === 'vendors').selected;
         }
 
-        if (filter.selects.find(x => x.id === 'resolution') !== undefined) {
-            types = filter.multiselects.find(x => x.id === 'hardwareTypes').selected;
+        if (filter.multiselects.find(x => x.id === 'hardwareTypes') !== undefined) {
+            const hardwareType = filter.multiselects.find(x => x.id === 'hardwareTypes');
+            if (hardwareType.selected.length) {
+                types = hardwareType.items.filter(x => !hardwareType.selected.includes(x.id));
+            }
         }
 
         const cameras = allCameras.filter(camera => {
@@ -73,7 +76,10 @@ export class CampageSearchService {
                 return false;
             }
 
-            if (types && types.length > 0 && types.indexOf(camera.hardwareType) === -1) {
+            if (types &&
+                types.length > 0 &&
+                types.find(type => type.label.toLowerCase() === camera.hardwareType.toLowerCase())) {
+
                 return false;
             }
 
