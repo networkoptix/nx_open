@@ -20,7 +20,7 @@ public:
         nx::vms::auth::AbstractNonceProvider* defaultNonceFetcher);
 
     nx::vms::cloud_integration::CloudManagerGroup& cloudManagerGroup();
-
+    void init();
 private:
     ::ec2::CloudConnector m_cloudConnector;
     nx::vms::cloud_integration::CloudManagerGroup m_cloudManagerGroup;

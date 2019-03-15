@@ -3,6 +3,7 @@
 #include "log_logger.h"
 
 #include <nx/utils/system_error.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace utils {
@@ -43,27 +44,70 @@ bool NX_UTILS_API showPasswords();
 
 namespace detail {
 
+class LevelReducer
+{
+public:
+    LevelReducer(Level level): m_level(level) {}
+    Level baseLevel() const { return m_level; }
+
+    std::pair<Level, bool /*isOnLimit*/> nextLevel()
+    {
+        if (m_level > Level::warning)
+            return {m_level, /*isOnLimit*/ false};
+
+        const auto limit = (uint32_t) ini().logLevelReducerPassLimit;
+        const auto windowSizeS = (uint32_t) ini().logLevelReducerWindowSizeS;
+
+        const auto nowS = (uint32_t) std::chrono::duration_cast<std::chrono::seconds>(
+            monotonicTime().time_since_epoch()).count();
+
+        const auto windowStartS = m_windowStartS.load();
+        if (m_passCount == 0 || windowStartS + windowSizeS <= nowS || windowStartS > nowS)
+        {
+            // It is possible to have a rase on these 2 atomics and actual log writing, but it would
+            // only affect the number of records on each level and their order.
+            m_windowStartS = nowS;
+            m_passCount = 0;
+        }
+
+        const auto newCount = ++m_passCount;
+        return {
+            (newCount <= limit) ? m_level : Level::debug,
+            /*isOnLimit*/ (newCount == limit)
+        };
+    }
+
+private:
+    const Level m_level;
+    std::atomic<uint32_t> m_passCount{0};
+    std::atomic<uint32_t> m_windowStartS{0};
+};
+
 class Helper
 {
 public:
     Helper() {} //< Constructing a helper which does not log anything.
 
-    Helper(Level level, Tag tag):
-        m_level(level),
+    Helper(LevelReducer* levelReducer, Tag tag):
         m_tag(std::move(tag)),
+        m_levelReducer(levelReducer),
         m_logger(getLogger(m_tag))
     {
-        if (!m_logger->isToBeLogged(m_level, m_tag))
+        if (!m_logger->isToBeLogged(levelReducer->baseLevel(), m_tag))
             m_logger.reset();
     }
 
-    void log(const QString& message) { m_logger->logForced(m_level, m_tag, message); }
+    void log(const QString& message)
+    {
+        const auto [level, isOnLimit] = m_levelReducer->nextLevel();
+        m_logger->log(level, m_tag, isOnLimit ? "TOO MANY SIMILAR MESSAGES: " + message : message);
+    }
 
     explicit operator bool() const { return m_logger.get(); }
 
 protected:
-   const Level m_level = Level::none;
    const Tag m_tag;
+   LevelReducer* const m_levelReducer = nullptr;
    std::shared_ptr<AbstractLogger> m_logger;
 };
 
@@ -107,13 +151,6 @@ private:
     QString m_delimiter = QStringLiteral(" ");
 };
 
-inline Stream makeStream(Level level, const Tag& tag)
-{
-    if (level > maxLevel())
-        return Stream();
-    return Stream(level, tag);
-}
-
 } // namespace detail
 
 /**
@@ -122,18 +159,27 @@ inline Stream makeStream(Level level, const Tag& tag)
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
     struct ScopeTag{}; /*< Used by NX_SCOPE_TAG to get scope from demangled type_info::name(). */ \
-    if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
+    if ((LEVEL) <= nx::utils::log::maxLevel()) \
     { \
         const auto systemErrorBak = SystemError::getLastOSErrorCode(); \
-        if (auto helper = nx::utils::log::detail::Helper((LEVEL), (TAG))) \
+        static nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
+        if (auto helper = nx::utils::log::detail::Helper(&levelReducer, (TAG))) \
             helper.log(nx::utils::log::makeMessage(__VA_ARGS__)); \
         SystemError::setLastErrorCode(systemErrorBak); \
     } \
 } while (0)
 
 #define NX_UTILS_LOG_STREAM(LEVEL, TAG) \
-    for (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG)); stream; stream.flush()) \
-        stream /* <<... */
+    for (auto stream = \
+            [&]() \
+            { \
+                if ((LEVEL) > nx::utils::log::maxLevel()) \
+                    return nx::utils::log::detail::Stream(); \
+                static nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
+                return nx::utils::log::detail::Stream(&levelReducer, (TAG));  \
+            }(); \
+        stream; stream.flush()) \
+            stream /* <<... */
 
 /**
  * Can be used to redirect nx_kit's NX_PRINT to log as following:
@@ -145,8 +191,7 @@ inline Stream makeStream(Level level, const Tag& tag)
  * </code></pre>
  */
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \
-    for (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG)); stream; stream.flush()) \
-        stream.setDelimiter(QString()) /* <<... */
+    NX_UTILS_LOG_STREAM(LEVEL, TAG).setDelimiter(QString()) /* <<... */
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_15TH_ARG(__VA_ARGS__, \

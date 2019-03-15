@@ -21,7 +21,7 @@ signals:
 protected:
     virtual bool canAcceptData() const override;
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
-    void finilizeSign();
+    void finalizeSign();
 private:
     nx::utils::QnCryptographicHash m_mdctx;
     QnAbstractMediaDataPtr m_prevFrame;

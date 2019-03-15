@@ -161,22 +161,25 @@ void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& param
     ui->settingsWidget->setEnabled(params.enabled);
 }
 
-void FisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams& params)
+QnMediaDewarpingParams FisheyeSettingsWidget::parameters() const
 {
-    params.enabled = ui->fisheyeEnabledButton->isChecked();
-    params.fovRot = ui->angleSpinBox->value();
+    QnMediaDewarpingParams result;
+    result.enabled = ui->fisheyeEnabledButton->isChecked();
+    result.fovRot = ui->angleSpinBox->value();
 
     if (ui->horizontalRadioButton->isChecked())
-        params.viewMode = QnMediaDewarpingParams::Horizontal;
+        result.viewMode = QnMediaDewarpingParams::Horizontal;
     else if (ui->viewDownButton->isChecked())
-        params.viewMode = QnMediaDewarpingParams::VerticalDown;
+        result.viewMode = QnMediaDewarpingParams::VerticalDown;
     else
-        params.viewMode = QnMediaDewarpingParams::VerticalUp;
+        result.viewMode = QnMediaDewarpingParams::VerticalUp;
 
-    params.xCenter = ui->calibrateWidget->center().x();
-    params.yCenter = ui->calibrateWidget->center().y();
-    params.radius = ui->calibrateWidget->radius();
-    params.hStretch = ui->calibrateWidget->horizontalStretch();
+    result.xCenter = ui->calibrateWidget->center().x();
+    result.yCenter = ui->calibrateWidget->center().y();
+    result.radius = ui->calibrateWidget->radius();
+    result.hStretch = ui->calibrateWidget->horizontalStretch();
+
+    return result;
 }
 
 bool FisheyeSettingsWidget::isReadOnly() const

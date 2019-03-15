@@ -34,8 +34,13 @@ public:
     virtual void SetUp() override
     {
         base_type::SetUp();
-        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
+        m_connectMethodMaskBak = ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
         startServer();
+    }
+
+    virtual void TearDown() override
+    {
+        ConnectorFactory::setEnabledCloudConnectMask(m_connectMethodMaskBak);
     }
 
     void assertServerIsAccessibleFromAnotherRelay()
@@ -118,6 +123,8 @@ private:
 
     nx::utils::promise<void> m_addPeerPromise;
     nx::utils::future<void> m_addPeerFuture;
+
+    int m_connectMethodMaskBak = 0;
 };
 
 TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)

@@ -251,8 +251,12 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     struct AnalyticsSettings
     {
+        // Engines, actual for the selected single camera.
         QList<AnalyticsEngineInfo> engines;
+
+        // Engines, which are enabled by the user.
         UserEditable<QSet<QnUuid>> enabledEngines;
+
         QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
         bool loading = false;
         QnUuid currentEngineId;

@@ -73,7 +73,8 @@ public:
         LookupCompletionHandler completionHandler) = 0;
 
     /**
-     * Select periods of time which contain any data suitable for filter.
+     * Select periods of time which contain any data suitable for filter. If some periods in the
+     * result period list have zero duration that means their durations are unspecified.
      */
     virtual void lookupTimePeriods(
         Filter filter,

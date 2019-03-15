@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <chrono>
+#include <vector>
 
 #include <nx/sdk/uuid.h>
 
@@ -28,12 +29,21 @@ struct LicensePlateInfo
     std::string plateNumber;
     nx::sdk::Uuid uuid;
     std::chrono::milliseconds lastAppearanceTime;
+    bool justDetected = true;
 };
 
 class SimpleLicensePlateTracker
 {
 public:
     LicensePlateInfo licensePlateInfo(const std::string& plateNumber) const;
+
+    void onNewFrame();
+
+    std::vector<LicensePlateInfo> takeOutdatedLicensePlateInfos();
+
+    void cleanUpOutdatedLicensePlateInfos();
+
+    std::vector<LicensePlateInfo> getJustDetectedLicensePlates();
 
 private:
     mutable std::map<std::string, LicensePlateInfo> m_licensePlates;

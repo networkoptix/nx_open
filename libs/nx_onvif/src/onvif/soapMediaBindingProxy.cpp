@@ -75,6 +75,35 @@ void MediaBindingProxy::MediaBindingProxy_init(soap_mode imode, soap_mode omode)
     soap_imode(this->soap, imode);
     soap_omode(this->soap, omode);
     soap_endpoint = NULL;
+
+    // Optimized namespace list for Media web service.
+    static const struct Namespace namespaces[] = {
+        // SOAP envelope and SOAP encoding.
+        {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
+        {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
+
+        // XML schema instance and XML schema definition.
+        {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
+        {"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
+
+        // XML MIME definition and XML-binary Optimized Packaging.
+        {"xmime", "http://tempuri.org/xmime.xsd", NULL, NULL},
+        {"xop", "http://www.w3.org/2004/08/xop/include", NULL, NULL},
+
+        // Web service security and web service security utility (used in SOAP headers).
+        {"wsse", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", NULL},
+        {"wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", NULL, NULL},
+
+        // ONVIF schema.
+        {"onvifXsd", "http://www.onvif.org/ver10/schema", NULL, NULL},
+        // ONVIF Media.
+        {"onvifMedia", "http://www.onvif.org/ver10/media/wsdl", NULL, NULL},
+
+        {NULL, NULL, NULL, NULL}
+    };
+
+#if 0
+    // Raw namespace list for Media web service.
     static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
@@ -141,6 +170,8 @@ void MediaBindingProxy::MediaBindingProxy_init(soap_mode imode, soap_mode omode)
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
+#endif
+
     soap_set_namespaces(this->soap, namespaces);
 }
 

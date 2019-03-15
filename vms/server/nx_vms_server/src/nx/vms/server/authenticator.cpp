@@ -105,8 +105,16 @@ Authenticator::Result Authenticator::tryAllMethods(
     nx::network::http::Response* response,
     bool isProxy)
 {
-    const auto sessionKey = nx::network::http::getHeaderValue(
-        request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    const auto sessionKey =
+        [&request]()
+        {
+            const auto value = nx::network::http::getHeaderValue(
+                request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+
+            // Some browsers like chrome refuse to delete expited cookies. Since this value is
+            // copied from it we have to check it was not deleted.
+            return value == "deleted" ? nx::network::http::StringType() : value;
+        }();
 
     if (!sessionKey.isEmpty())
     {

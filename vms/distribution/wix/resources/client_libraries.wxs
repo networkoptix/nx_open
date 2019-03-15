@@ -7,7 +7,6 @@
             <Component><File Name="nx_vms_utils.dll" KeyPath="yes"/></Component>
             <Component><File Name="nx_vms_applauncher_api.dll" KeyPath="yes"/></Component>
             <Component><File Name="vms_gateway_core.dll" KeyPath="yes"/></Component>
-            <Component><File Name="nx_relaying.dll" KeyPath="yes"/></Component>
             <Component><File Name="qtkeychain.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
 

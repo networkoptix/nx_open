@@ -23,7 +23,7 @@ get_distributable_plugins_list(server_plugins_optional_list nx_server_plugins_op
 
 if(WINDOWS)
     add_subdirectory(wix)
-elseif((LINUX AND box STREQUAL "none") OR (box STREQUAL "tx1")) #< Desktop Linux or Tegra.
+elseif(LINUX AND (box STREQUAL "none" OR arch STREQUAL "arm64")) #< Desktop Linux or generic arm64 device.
     add_subdirectory(deb)
 elseif(MACOSX)
     add_subdirectory(dmg)

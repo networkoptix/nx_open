@@ -260,6 +260,7 @@ void Connection::fillAuthInfo(
     bool /*authByKey*/)
 {
     NX_ASSERT(false, "This method is used for outgoing connections only. Not implemented");
+    return false;
 }
 
 } // namespace nx::clusterdb::engine::transport::p2p::websocket

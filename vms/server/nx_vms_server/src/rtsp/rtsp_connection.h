@@ -14,15 +14,6 @@ class QnArchiveStreamReader;
 
 struct RtspServerTrackInfo
 {
-    enum class MediaType
-    {
-        Undefined,
-        Video,
-        Audio,
-        Subtitles,
-        MetaData
-    };
-
     RtspServerTrackInfo():
         clientPort(-1),
         clientRtcpPort(0),
@@ -30,10 +21,9 @@ struct RtspServerTrackInfo
         firstRtpTime(-1),
         mediaSocket(0),
         rtcpSocket(0),
-        mediaType(MediaType::Undefined)
-    {
+        mediaType(QnAbstractMediaData::UNKNOWN)
+    {}
 
-    }
     ~RtspServerTrackInfo()
     {
         delete mediaSocket;
@@ -60,7 +50,7 @@ struct RtspServerTrackInfo
     qint64 firstRtpTime;
     nx::network::AbstractDatagramSocket* mediaSocket;
     nx::network::AbstractDatagramSocket* rtcpSocket;
-    MediaType mediaType;
+    QnAbstractMediaData::DataType mediaType;
 
 private:
     AbstractRtspEncoderPtr encoder;
@@ -103,7 +93,7 @@ public:
     RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
     QnMediaServerModule* serverModule() const;
-protected:
+private:
     virtual void run();
     void addResponseRangeHeader();
 private slots:
@@ -126,25 +116,22 @@ private:
     nx::network::rtsp::StatusCodeValue composeSetup();
     nx::network::rtsp::StatusCodeValue composePlay();
     nx::network::rtsp::StatusCodeValue composePause();
-    int extractTrackId(const QString& path);
     nx::network::rtsp::StatusCodeValue composeTeardown();
-    void processRangeHeader();
     nx::network::rtsp::StatusCodeValue composeSetParameter();
     nx::network::rtsp::StatusCodeValue composeGetParameter();
+    void processRangeHeader();
     void createDataProvider();
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    AbstractRtspEncoderPtr createEncoderByMediaData(
-        QnConstAbstractMediaDataPtr mediaHigh,
-        QnConstAbstractMediaDataPtr mediaLow,
-        MediaQuality quality);
+    AbstractRtspEncoderPtr createRtpEncoder(QnAbstractMediaData::DataType dataType);
     QnConstAbstractMediaDataPtr getCameraData(
         QnAbstractMediaData::DataType dataType, MediaQuality quality);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
     void updatePredefinedTracks();
+    void updateRtpEncoders();
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
     QnConstMediaContextPtr getAudioCodecContext(int audioTrackIndex) const;

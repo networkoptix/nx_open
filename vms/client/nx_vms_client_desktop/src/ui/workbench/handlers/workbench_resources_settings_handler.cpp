@@ -291,7 +291,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                             sourceCamera,
                             task.streamQuality,
                             task.fps,
-                            QString()); //< Bitrate for default codec.
+                            /*codec*/ QString()); //< Bitrate for default codec.
 
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
                     const auto targetNormalBitrate =
@@ -299,7 +299,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                             camera,
                             task.streamQuality,
                             task.fps,
-                            QString()); //< Bitrate for default codec.
+                            /*codec*/ QString()); //< Bitrate for default codec.
 
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;

@@ -112,7 +112,11 @@ public:
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nx::sdk::IStringMap* params() override { return m_params.get(); }
+    virtual const nx::sdk::IStringMap* params() override
+    {
+        m_params->addRef();
+        return m_params.get();
+    }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -155,10 +159,10 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     nx::sdk::analytics::IEngine* engine,
     const AnalyticsAction& actionData)
 {
-    Action action(actionData, outActionResult);
+    auto action = nx::sdk::makePtr<Action>(actionData, outActionResult);
 
     nx::sdk::Error error = nx::sdk::Error::noError;
-    engine->executeAction(&action, &error);
+    engine->executeAction(action.get(), &error);
 
     // By this time, the Engine either already called Action::handleResult(), or is not going to
     // do it.

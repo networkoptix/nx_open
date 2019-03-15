@@ -166,12 +166,13 @@ struct WorkbenchExportHandler::Private
     WorkbenchExportHandler* const q;
     QScopedPointer<ExportManager> exportManager;
 
-    struct ExportInfo
+    struct ExportContext
     {
         Filename filename;
+        bool silent = false;
         QPointer<QnProgressDialog> progressDialog;
     };
-    QHash<QnUuid, ExportInfo> runningExports;
+    QHash<QnUuid, ExportContext> runningExports;
 
     explicit Private(WorkbenchExportHandler* owner):
         q(owner),
@@ -190,15 +191,15 @@ struct WorkbenchExportHandler::Private
 
     bool isInRunningExports(const Filename& filename) const
     {
-        for (const auto& running: runningExports)
+        for (const auto& exportContext: runningExports)
         {
-            if (running.filename == filename)
+            if (exportContext.filename == filename)
                 return true;
         }
         return false;
     }
 
-    QnUuid initExport(const Filename& fileName)
+    QnUuid createExportContext(const Filename& fileName, bool silent = false)
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         QString fullPath = fileName.completeFileName();
@@ -223,7 +224,7 @@ struct WorkbenchExportHandler::Private
                 progressDialog->hide();
             });
 
-        runningExports.insert(exportProcessId, { fileName, progressDialog });
+        runningExports.insert(exportProcessId, { fileName, silent, progressDialog });
 
         return exportProcessId;
     }
@@ -298,7 +299,6 @@ struct WorkbenchExportHandler::Private
     }
 };
 
-
 WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -356,10 +356,10 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     if (!d->runningExports.contains(info.id))
         return;
 
-    const auto exportProcess = d->runningExports.take(info.id);
+    const auto exportContext = d->runningExports.take(info.id);
     context()->instance<WorkbenchProgressManager>()->remove(info.id);
 
-    if (auto dialog = exportProcess.progressDialog)
+    if (auto dialog = exportContext.progressDialog)
     {
         dialog->hide();
         dialog->deleteLater();
@@ -369,10 +369,11 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     {
         case ExportProcessStatus::success:
         {
-            const auto resource = d->ensureResourceIsInPool(exportProcess.filename, resourcePool());
+            const auto resource = d->ensureResourceIsInPool(exportContext.filename, resourcePool());
             if (const auto layout = resource.dynamicCast<QnLayoutResource>())
                 snapshotManager()->store(layout);
-            QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
+            if (!exportContext.silent)
+                QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
             break;
         }
         case ExportProcessStatus::failure:
@@ -448,8 +449,8 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    auto context = prepareExportTool(dialog);
-    runExport(std::move(context));
+    auto exportToolInstance = prepareExportTool(dialog);
+    runExport(std::move(exportToolInstance));
 }
 
 void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parameters& parameters)
@@ -484,8 +485,8 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    auto context = prepareExportTool(dialog);
-    runExport(std::move(context));
+    auto exportToolInstance = prepareExportTool(dialog);
+    runExport(std::move(exportToolInstance));
 }
 
 void WorkbenchExportHandler::handleExportBookmarksAction()
@@ -513,11 +514,11 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    auto context = prepareExportTool(dialog);
-    runExport(std::move(context));
+    auto exportToolInstance = prepareExportTool(dialog);
+    runExport(std::move(exportToolInstance));
 }
 
-void WorkbenchExportHandler::runExport(ExportInstance&& context)
+void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
 {
     QnUuid exportProcessId;
     std::unique_ptr<AbstractExportTool> exportTool;
@@ -566,7 +567,7 @@ void WorkbenchExportHandler::runExport(ExportInstance&& context)
     }
 }
 
-WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool(
+WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExportTool(
     const ExportSettingsDialog& dialog)
 {
     QnUuid exportId;
@@ -577,7 +578,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
         case ExportSettingsDialog::Mode::Media:
         {
             auto settings = dialog.exportMediaSettings();
-            exportId = d->initExport(settings.fileName);
+            exportId = d->createExportContext(settings.fileName);
 
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
@@ -617,7 +618,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
         case ExportSettingsDialog::Mode::Layout:
         {
             const auto settings = dialog.exportLayoutSettings();
-            exportId = d->initExport(settings.fileName);
+            exportId = d->createExportContext(settings.fileName);
             tool.reset(new ExportLayoutTool(settings));
             break;
         }
@@ -715,7 +716,6 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
-    const auto period = layout->getLocalRange();
 
     NX_ASSERT(layout && layout->isFile());
     if (!layout || !layout->isFile())
@@ -740,7 +740,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));
 
-    QnUuid exportId = d->initExport(layoutSettings.fileName);
+    QnUuid exportId = d->createExportContext(layoutSettings.fileName, true); //< No messagebox on success.
 
     runExport(std::make_pair(exportId, std::move(exportTool)));
 }

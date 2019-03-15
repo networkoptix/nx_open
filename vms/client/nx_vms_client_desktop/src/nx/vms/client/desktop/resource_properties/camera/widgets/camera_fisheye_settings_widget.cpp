@@ -36,9 +36,7 @@ CameraFisheyeSettingsWidget::CameraFisheyeSettingsWidget(
     connect(m_widget, &FisheyeSettingsWidget::dataChanged, this,
         [this, store]()
         {
-            QnMediaDewarpingParams params;
-            m_widget->submitToParams(params);
-            store->setFisheyeSettings(params);
+            store->setFisheyeSettings(m_widget->parameters());
         });
 }
 

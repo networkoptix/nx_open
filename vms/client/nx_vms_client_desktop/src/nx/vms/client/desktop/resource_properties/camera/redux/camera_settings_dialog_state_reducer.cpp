@@ -754,18 +754,22 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     if (state.canForcePanTiltCapabilities())
     {
-        fetchFromCameras<bool>(
-            state.expert.forcedPtzPanTiltCapability,
-            cameras,
-            canForcePanTiltCapabilities);
+        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, cameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousPanTiltCapabilities);
+            });
     }
 
     if (state.canForceZoomCapability())
     {
-        fetchFromCameras<bool>(
-            state.expert.forcedPtzZoomCapability,
-            cameras,
-            canForceZoomCapability);
+        fetchFromCameras<bool>(state.expert.forcedPtzZoomCapability, cameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousZoomCapability);
+            });
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);

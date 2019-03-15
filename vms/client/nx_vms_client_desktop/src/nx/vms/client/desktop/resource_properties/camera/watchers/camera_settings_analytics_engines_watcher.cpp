@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <utils/common/connective.h>
 
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
@@ -27,26 +28,71 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
 
 } // namespace
 
-class CameraSettingsAnalyticsEnginesWatcher::Private: public QObject
+class CameraSettingsAnalyticsEnginesWatcher::Private: public Connective<QObject>
 {
 public:
+    void initialize(QnResourcePool* resourcePool);
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
     void updateStore();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
     void at_enginePropertyChanged(const QnResourcePtr& resource, const QString& key);
-    void at_engineManifestChanged(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+    void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
 
 public:
     CameraSettingsDialogStore* store = nullptr;
+    QnVirtualCameraResourcePtr camera;
     QHash<QnUuid, AnalyticsEngineInfo> engines;
-    QSet<QnUuid> enabledEngines;
-    QHash<QnUuid, QVariantMap> settingsValuesByEngineId;
 };
+
+void CameraSettingsAnalyticsEnginesWatcher::Private::initialize(QnResourcePool* resourcePool)
+{
+    connect(resourcePool, &QnResourcePool::resourceAdded, this, &Private::at_resourceAdded);
+    connect(resourcePool, &QnResourcePool::resourceRemoved, this, &Private::at_resourceRemoved);
+
+    for (const auto& engine: resourcePool->getResources<AnalyticsEngineResource>())
+        at_resourceAdded(engine);
+}
+
+void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
+    const QnVirtualCameraResourcePtr& newCamera)
+{
+    if (camera == newCamera)
+        return;
+
+    if (camera)
+        camera->disconnect(this);
+
+    camera = newCamera;
+
+    if (camera)
+        connect(camera, &QnResource::parentIdChanged, this, &Private::updateStore);
+
+    updateStore();
+}
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::updateStore()
 {
+    if (!camera)
+    {
+        store->setAnalyticsEngines({});
+        return;
+    }
+
     auto enginesList = engines.values();
+    const auto compatibleEngines = camera->compatibleAnalyticsEngines();
+
+    const auto isIncompatibleEngine =
+        [compatibleEngines](const AnalyticsEngineInfo& engineInfo)
+        {
+            return !compatibleEngines.contains(engineInfo.id);
+        };
+
+    enginesList.erase(
+        std::remove_if(enginesList.begin(), enginesList.end(), isIncompatibleEngine),
+        enginesList.end());
+
     std::sort(enginesList.begin(), enginesList.end(),
         [](const auto& left, const auto& right) { return left.name < right.name; });
 
@@ -64,11 +110,11 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 
         engines[info.id] = info;
 
-        connect(engine.data(), &QnResource::nameChanged,
+        connect(engine, &QnResource::nameChanged,
             this, &Private::at_engineNameChanged);
-        connect(engine.data(), &QnResource::propertyChanged,
+        connect(engine, &QnResource::propertyChanged,
             this, &Private::at_enginePropertyChanged);
-        connect(engine.data(), &nx::vms::common::AnalyticsEngineResource::manifestChanged,
+        connect(engine, &AnalyticsEngineResource::manifestChanged,
             this, &Private::at_engineManifestChanged);
 
         updateStore();
@@ -106,7 +152,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
 }
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineManifestChanged(
-    const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+    const AnalyticsEngineResourcePtr& engine)
 {
     if (const auto it = engines.find(engine->getId()); it != engines.end())
     {
@@ -123,16 +169,19 @@ CameraSettingsAnalyticsEnginesWatcher::CameraSettingsAnalyticsEnginesWatcher(
     d(new Private())
 {
     d->store = store;
-
-    connect(resourcePool(), &QnResourcePool::resourceAdded,
-        d.data(), &Private::at_resourceAdded);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
-        d.data(), &Private::at_resourceRemoved);
-
-    for (const auto& engine: resourcePool()->getResources<AnalyticsEngineResource>())
-        d->at_resourceAdded(engine);
+    d->initialize(resourcePool());
 }
 
 CameraSettingsAnalyticsEnginesWatcher::~CameraSettingsAnalyticsEnginesWatcher() = default;
+
+QnVirtualCameraResourcePtr CameraSettingsAnalyticsEnginesWatcher::camera() const
+{
+    return d->camera;
+}
+
+void CameraSettingsAnalyticsEnginesWatcher::setCamera(const QnVirtualCameraResourcePtr& camera)
+{
+    d->setCamera(camera);
+}
 
 } // namespace nx::vms::client::desktop

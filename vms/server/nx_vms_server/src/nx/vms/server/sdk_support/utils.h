@@ -66,7 +66,7 @@ std::optional<Manifest> loadManifestFromFile(const QString& filename)
                 .args(message, filename);
         };
 
-    if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
+    if (!NX_ASSERT(pluginsIni().analyticsManifestSubstitutePath[0]))
         return std::nullopt;
 
     const QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(
@@ -213,9 +213,6 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel);
-
-resource::AnalyticsEngineResourceList toServerEngineList(
-    const nx::vms::common::AnalyticsEngineResourceList engineList);
 
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 

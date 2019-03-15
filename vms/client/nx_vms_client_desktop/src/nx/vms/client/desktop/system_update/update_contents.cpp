@@ -316,7 +316,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             alreadyInstalled = false;
         }
 
-        if (package)
+        if (package && serverVersion <= targetVersion)
         {
             package->targets.push_back(server->getId());
             contents.serversWithUpdate.insert(server->getId());

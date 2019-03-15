@@ -93,6 +93,7 @@ copyLibs()
         'libmediaserver*'
         'libcloud_db.*'
         'libnx_cassandra*'
+        'libnx_relaying*'
         'libconnection_mediator*'
         'libnx_clusterdb*'
         'libnx_discovery_api_client*'
@@ -105,8 +106,10 @@ copyLibs()
 
         SKIP_LIBRARY=0
 
-        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"; do
-            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]; then
+        for BLACKLIST_ITEM in "${LIB_BLACKLIST[@]}"
+        do
+            if [[ $LIB_BASENAME == $BLACKLIST_ITEM ]]
+            then
                 SKIP_LIBRARY=1
                 break
             fi
