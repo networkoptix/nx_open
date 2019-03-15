@@ -41,6 +41,7 @@ set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(mac.skip.sign "true")
 
+set(codeSigning "OFF")
 
 set(ios.new_bundle_identifier "com.cox.cb.vms")
 set(ios.group_identifier "group.com.cox.cb.hdsec")
