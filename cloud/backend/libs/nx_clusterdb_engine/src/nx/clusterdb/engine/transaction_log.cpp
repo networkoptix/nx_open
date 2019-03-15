@@ -39,7 +39,6 @@ void CommandLog::startDbTransaction(
     nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> onDbUpdateCompleted)
 {
     // TODO: monitoring request queue size and returning ResultCode::retryLater if exceeded
-
     m_dbManager->executeUpdate(
         [this, systemId, dbOperationsFunc = std::move(dbOperationsFunc)](
             nx::sql::QueryContext* queryContext) -> nx::sql::DBResult
@@ -221,6 +220,11 @@ void CommandLog::setOnTransactionReceived(
     OnTransactionReceivedHandler handler)
 {
     m_onTransactionReceivedHandler = std::move(handler);
+}
+
+void CommandLog::pleaseStopSync()
+{
+    m_startedAsyncCallsCounter.wait();
 }
 
 nx::sql::DBResult CommandLog::fillCache()

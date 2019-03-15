@@ -84,6 +84,12 @@ const nx::cloud::discovery::DiscoveryClient* DiscoveryManager::discoveryClient()
     return m_discoveryClient.get();
 }
 
+void DiscoveryManager::pleaseStopSync()
+{
+    if (m_discoveryClient)
+        m_discoveryClient->pleaseStopSync();
+}
+
 nx::cloud::discovery::NodeInfo DiscoveryManager::buildNodeInfo(
     const nx::utils::Url& synchronizationEngineUrl) const
 {

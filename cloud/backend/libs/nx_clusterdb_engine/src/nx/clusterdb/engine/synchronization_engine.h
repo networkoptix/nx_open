@@ -40,6 +40,8 @@ public:
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
     ~SynchronizationEngine();
 
+    void pleaseStopSync();
+
     OutgoingCommandDispatcher& outgoingTransactionDispatcher();
     const OutgoingCommandDispatcher& outgoingTransactionDispatcher() const;
 

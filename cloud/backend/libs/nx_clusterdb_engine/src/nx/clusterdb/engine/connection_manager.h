@@ -98,6 +98,8 @@ public:
         OutgoingCommandDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
 
+    void pleaseStopSync();
+
     bool addNewConnection(ConnectionContext connectionContext);
 
     void removeConnection(const std::string& connectionId);

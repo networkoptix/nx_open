@@ -43,6 +43,11 @@ ConnectionManager::~ConnectionManager()
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()
         .removeSubscription(m_onNewTransactionSubscriptionId);
 
+    pleaseStopSync();
+}
+
+void ConnectionManager::pleaseStopSync()
+{
     ConnectionDict localConnections;
     {
         QnMutexLocker lk(&m_mutex);

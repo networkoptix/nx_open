@@ -69,7 +69,15 @@ SynchronizationEngine::SynchronizationEngine(
 
 SynchronizationEngine::~SynchronizationEngine()
 {
+    pleaseStopSync();
+}
+
+void SynchronizationEngine::pleaseStopSync()
+{
     m_startedAsyncCallsCounter.wait();
+    m_connectionManager.pleaseStopSync();
+    m_commandLog.pleaseStopSync();
+    m_discoveryManager.pleaseStopSync();
 }
 
 OutgoingCommandDispatcher&

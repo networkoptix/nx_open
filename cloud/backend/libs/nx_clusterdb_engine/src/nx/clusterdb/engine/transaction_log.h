@@ -239,6 +239,8 @@ public:
 
     void setOnTransactionReceived(OnTransactionReceivedHandler handler);
 
+    void pleaseStopSync();
+
 private:
     struct DbTransactionContext
     {

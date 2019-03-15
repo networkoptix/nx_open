@@ -39,6 +39,11 @@ public:
      */
     const nx::cloud::discovery::DiscoveryClient* discoveryClient() const;
 
+    /**
+     * stops the discovery manager, blocking until it stops.
+     */
+    void pleaseStopSync();
+
 private:
     nx::cloud::discovery::NodeInfo buildNodeInfo(
         const nx::utils::Url& synchronizationEngineUrl) const;
