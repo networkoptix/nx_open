@@ -57,7 +57,11 @@ void CommandLog::startDbTransaction(
 
             return saveActualSequence(queryContext, systemId);
         },
-        std::move(onDbUpdateCompleted));
+        [lock = m_startedAsyncCallsCounter.getScopedIncrement(),
+            onDbUpdateCompleted = std::move(onDbUpdateCompleted)](nx::sql::DBResult dbResult)
+        {
+            onDbUpdateCompleted(dbResult);
+        });
 }
 
 nx::sql::DBResult CommandLog::updateTimestampHiForSystem(
@@ -171,7 +175,8 @@ void CommandLog::readTransactions(
         std::bind(
             &CommandLog::fetchTransactions, this,
             _1, systemId, filter, outputDataPtr),
-        [completionHandler = std::move(completionHandler), outputData = std::move(outputData)](
+        [completionHandler = std::move(completionHandler), outputData = std::move(outputData),
+         lock = m_startedAsyncCallsCounter.getScopedIncrement()](
             nx::sql::DBResult dbResult)
         {
             completionHandler(
