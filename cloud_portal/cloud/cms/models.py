@@ -80,10 +80,10 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'supported_resolutions': product.read_global_value("%SUPPORTED_RESOLUTIONS%"),
                 'supported_hardware_types': product.read_global_value("%SUPPORTED_HARDWARE_TYPES%"),
                 'search_tags': product.read_global_value("%SEARCH_TAGS%"),
+                'vendors_shown': product.read_global_value("%VENDORS_SHOWN%"),
                 'product_name': product.read_global_value("%PRODUCT_NAME%"),
                 'vms_name': product.read_global_value("%VMS_NAME%"),
-                'landing_layout': product.read_global_value("%LAYOUT%"),
-                'landing_block1': product.read_global_value("%BLOCK1_CONTENT%")
+
             }
         }
         cache.set(customization_name, data)

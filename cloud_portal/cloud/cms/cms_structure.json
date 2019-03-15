@@ -592,6 +592,14 @@
             ]
           },
           {
+            "label": "Number of vendors shown",
+            "name": "%VENDORS_SHOWN%",
+            "value": "30",
+            "description": "How many vendors will be shown on IPVD landing page",
+            "advanced": true,
+            "optional": false
+          },
+          {
             "label": "Search tags",
             "name": "%SEARCH_TAGS%",
             "description": "Defines search tags",

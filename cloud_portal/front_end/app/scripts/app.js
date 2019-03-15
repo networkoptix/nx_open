@@ -107,6 +107,7 @@ window.L = {};
                     CONFIG.campage.supportedResolutions = response.supportedResolutions;
                     CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;
                     CONFIG.campage.searchTags = response.searchTags;
+                    CONFIG.campage.vendorsShown = response.vendorsShown;
                 });
 
                 $.ajax({
