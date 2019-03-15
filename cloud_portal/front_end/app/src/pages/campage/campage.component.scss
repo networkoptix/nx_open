@@ -8,19 +8,16 @@
 
 .campage {
     
-    nx-layout-right {
-        .layout {
-            padding : 0 1rem 1rem !important;
-            
-            .card-columns {
-                padding-left  : 0 !important;
-                padding-right : 0 !important;
+    max-width : 1440px;
+    
+    nx-vendor-list {
+        .card {
+            margin : 0 0 1rem;
+        
+            &--body {
+                padding-bottom : .75rem;
             }
         }
-    }
-    
-    .card {
-        margin : 0;
     }
     
     .list-inline > li {
@@ -32,13 +29,17 @@
     .text-placeholder {
         color       : $light16;
         font-family : $font-family-regular;
-        font-size   : 20px;
-        height      : 32px;
+        font-size   : rem(20px);
+        height      : 2rem;
     }
     
     /*** overwrite default table of component cam-table ***/
     .nx-table-wrapper {
         margin : 0;
+        width: 1092px;
+        @include media-breakpoint-up(xxl) {
+            width : auto;
+        }
         
         .nx-table-header {
             padding : .5rem .75rem;
@@ -49,10 +50,6 @@
                 display : inline-block;
                 white-space: normal;
     
-                @include media-breakpoint-up(lg) {
-                    padding : .5rem .25rem;
-                }
-    
                 @include media-breakpoint-up(xxl) {
                     padding : .5rem .25rem .5rem .75rem;
                 }
@@ -62,14 +59,14 @@
     
                     width : 175px;
                     @include media-breakpoint-up(xxl) {
-                        width : 240px;
+                        width : 270px;
                     }
                 }
 
                 &:nth-child(2) {
                     width : 160px;
                     @include media-breakpoint-up(xxl) {
-                        width : 225px;
+                        width : 270px;
                     }
                 }
                 
@@ -126,10 +123,6 @@
             td {
                 display : inline-block;
     
-                @include media-breakpoint-up(lg) {
-                    padding : .5rem .25rem;
-                }
-    
                 @include media-breakpoint-up(xxl) {
                     padding : .5rem .25rem .5rem .75rem;
                 }
@@ -143,14 +136,14 @@
                     padding-left : .75rem;
                     width : 175px;
                     @include media-breakpoint-up(xxl) {
-                        width : 240px;
+                        width : 270px;
                     }
                 }
     
                 &:nth-child(2) {
                     width : 160px;
                     @include media-breakpoint-up(xxl) {
-                        width : 225px;
+                        width : 270px;
                     }
                 }
     

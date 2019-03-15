@@ -28,6 +28,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
     private localFilter: any = {};
     private numberFilters = 0;
+    public filterSelected: any;
     private params: any = {};
     private config: any;
     private uriPath: string;
@@ -50,6 +51,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.skinny = (this.skinny !== undefined);  // optional param
         this.expandable = (this.expandable !== undefined);  // optional param
         this.showAdvancedOptions = !this.expandable;
+        this.filterSelected = '';
 
         // Example URI
         // /campage?search=Axis&tags=isAptzSupported&resolution=SVGA&vendors=Axis,30X,Sony
@@ -151,26 +153,30 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
     numberOfOptionsSelected() {
         this.numberFilters = 0;
+        this.filterSelected = '';
 
         if (this.localFilter.tags) {
             this.localFilter.tags.forEach((filter) => {
                 if (filter.value) {
+                    this.filterSelected = filter.label;
                     this.numberFilters++;
                 }
             });
         }
 
-        if (this.localFilter.selects) {
+        if (this.localFilter.selects && this.localFilter.selects.length) {
             this.localFilter.selects.forEach((filter) => {
                 if (filter.selected && filter.selected.value !== '0') { // not default value
+                    this.filterSelected = filter.selected.name;
                     this.numberFilters++;
                 }
             });
         }
 
-        if (this.localFilter.multiselects) {
+        if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
             this.localFilter.multiselects.forEach((filter) => {
-                if (filter.selected) { // not default value
+                if (filter.selected.length) { // not default value
+                    this.filterSelected = filter.selected[0];
                     this.numberFilters += filter.selected.length;
                 }
             });
@@ -199,6 +205,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         }
 
         this.numberFilters = 0;
+        this.filterSelected = '';
         this.setRouteParams();
         this.onChangeCallback(this.localFilter);
 

@@ -2,21 +2,47 @@
 
     <div class="row m-0">
         <div class="col-12 p-0">
-            <div class="btn-group w-100">
-                <span class="glyphicon glyphicon-search icon-search"></span>
-                <input [(ngModel)]="localFilter.query"
-                       [ngModelOptions]="{debounceTime : config.search.debounceTime}"
-                       (ngModelChange)="modelChanged()"
-                       [ngClass]="{'non-empty': localFilter.query != ''}"
-                       [maxlength]="config.search.maxLength"
-                       type="text"
-                       class="form-control w-100 search-input"
-                       name="query"
-                       autocomplete="off"
-                       placeholder="Search"/>
+            <div class="d-inline-flex w-100">
+                <div class="search-group">
+                    <span class="glyphicon glyphicon-search icon-search"></span>
+                    <input [(ngModel)]="localFilter.query"
+                           [ngModelOptions]="{debounceTime : config.search.debounceTime}"
+                           (ngModelChange)="modelChanged()"
+                           [ngClass]="{'non-empty': localFilter.query != ''}"
+                           [maxlength]="config.search.maxLength"
+                           type="text"
+                           class="form-control search-input"
+                           name="query"
+                           autocomplete="off"
+                           placeholder="Search by model or manufacturer"/>
 
-                <button class="search-clear btn btn-clear" [hidden]="!localFilter.query" (click)="resetQuery()">
-                    <span class="glyphicon-close"></span>
+                    <button class="search-clear btn btn-clear" [hidden]="!localFilter.query" (click)="resetQuery()">
+                        <span class="glyphicon-close"></span>
+                    </button>
+                </div>
+                <button class="btn btn-big btn-tag-selected ml-3"
+                        *ngIf="numberFilters != 0">
+
+                    <div [ngSwitch]="numberFilters" class="ml-2 mr-3">
+                        <span *ngSwitchCase="1">
+                            '{{filterSelected}}' filter applied
+                        </span>
+                        <span *ngSwitchDefault>
+                            {{numberFilters}} filters applied
+                        </span>
+                    </div>
+
+                    <span class="close-button" (click)="resetFilters()">
+                        <span class="glyphicon tag-close-icon"></span>
+                    </span>
+                </button>
+
+                <button class="btn btn-arrow btn-big btn-tag ml-3" (click)="toggleOptions()">
+                    <div class="nav-arrow">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span translate>Advanced search</span>
                 </button>
             </div>
         </div>
@@ -71,41 +97,5 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-12 dropdown p-0 mt-2" *ngIf="expandable && advSearch"
-             [ngClass]="{'show': showAdvancedOptions}" (nxClickElsewhere)="show = false">
-            <div class="area clearfix d-flex">
-                <div class="float-left">
-                    <a href class="btn-text" (click)="toggleOptions()">
-                        <div class="nav-arrow">
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <span translate>Advanced search</span>
-                    </a>
-                </div>
-                <div *ngIf="numberFilters != 0" class="ml-3 float-left d-flex align-items-baseline">
-                    <span>(</span>
-                    <div [ngSwitch]="numberFilters" class="">
-                        <span *ngSwitchCase="1">
-                        1 filter applied
-                    </span>
-                        <span *ngSwitchDefault>
-                        {{numberFilters}} filters applied
-                    </span>
-                    </div>
-                    <div class="ml-2 ">
-                        <a href class="btn-text has-icon position-relative"
-                           (click)="resetFilters()">
-                            <span class="close"></span>
-                            <span translate>Clear All</span>
-                        </a>
-                    </div>
-                    <span>)</span>
-                </div>
-            </div>
-            <hr class="mb-0 mt-2 w-100" [hidden]="!showAdvancedOptions">
-        </div>
-
     </div>
 </div>

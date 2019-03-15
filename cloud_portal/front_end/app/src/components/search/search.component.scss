@@ -32,59 +32,64 @@
         }
     }
     
-    .icon-search {
-        position : absolute;
-        margin   : 10px 0 0 10px;
-    }
+    .search-group {
+        flex-shrink : 4;
+        position    : relative;
+        width       : 100%;
+        
+        .icon-search {
+            position : absolute;
+            margin   : 12px 0 0 14px;
+        }
     
-    .search-input {
-        width         : 200px;
-        height        : 40px;
-        padding-left  : 48px;
-        padding-right : 40px;
-        font-size     : 15px;
-        font-family   : $font-family-regular;
-        color         : $light16;
-        border-radius : 2px;
-        border        : 1px solid $light6;
-        background    : transparent;
+        .search-input {
+            height        : 40px;
+            padding-left  : 48px;
+            padding-right : 40px;
+            font-size     : 15px;
+            font-family   : $font-family-regular;
+            color         : $light16;
+            border-radius : 2px;
+            border        : 1px solid $light6;
+            background    : transparent;
         
-        &:placeholder-shown {
-            @include placeholder();
-        }
+            &:placeholder-shown {
+                @include placeholder();
+            }
         
-        &:active, &:focus, &.non-empty {
-            background-color : $light1;
-            color            : $dark9;
-            border           : 1px solid $brand_core;
-        }
+            &:active, &:focus, &.non-empty {
+                background-color : $light1;
+                color            : $dark9;
+                border           : 1px solid $brand_core;
+            }
         
-        &:hover:not(:active):not(:focus) {
-            border : 1px solid $light8;
-        }
+            &:hover:not(:active):not(:focus) {
+                border : 1px solid $light8;
+            }
         
-        &:-webkit-autofill,
-        &:-webkit-autofill:hover,
-        &:-webkit-autofill:active,
-        &:-webkit-autofill:focus {
-            background-color        : $light1 !important;
-            color                   : $dark9 !important;
-            -webkit-box-shadow      : 0 0 0 1000px $light1 inset !important;
-            -webkit-text-fill-color : $dark9 !important;
+            &:-webkit-autofill,
+            &:-webkit-autofill:hover,
+            &:-webkit-autofill:active,
+            &:-webkit-autofill:focus {
+                background-color        : $light1 !important;
+                color                   : $dark9 !important;
+                -webkit-box-shadow      : 0 0 0 1000px $light1 inset !important;
+                -webkit-text-fill-color : $dark9 !important;
+            }
         }
-    }
     
-    .search-clear {
-        position    : absolute;
-        right       : 2px;
-        top         : 0;
-        bottom      : 0;
-        line-height : 40px;
-        margin      : auto;
-        cursor      : pointer;
-        width       : rem(36px);
-        height      : rem(36px);
-        padding     : 0;
+        .search-clear {
+            position    : absolute;
+            right       : 2px;
+            top         : 0;
+            bottom      : 0;
+            line-height : 40px;
+            margin      : auto;
+            cursor      : pointer;
+            width       : rem(36px);
+            height      : rem(36px);
+            padding     : 0;
+        }
     }
     
     .drop {

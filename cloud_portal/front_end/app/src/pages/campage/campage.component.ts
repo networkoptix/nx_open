@@ -53,10 +53,10 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   private setupDefaults() {
       this.allowedParameters = [
-          'count', 'vendor', 'model', 'hardwareType',
+          'vendor', 'model', 'hardwareType',
           'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported',
           'isTwAudioSupported', 'isPtzSupported', 'isAptzSupported',
-          'isFisheye', 'isMdSupported', 'isIoSupported'
+          'isFisheye', 'isMdSupported', 'isIoSupported', 'count'
       ];
 
       this.data = undefined;

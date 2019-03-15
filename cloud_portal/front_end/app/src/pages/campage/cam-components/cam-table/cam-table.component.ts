@@ -27,11 +27,12 @@ export class CamTableComponent implements OnChanges, OnInit {
   private selectedHeader;
   private sortOrderASC: boolean;
   private results;
-  private readonly cameraHeaders;
+  private cameraHeaders;
   private showHeaders;
   private paramsShown;
   private lang;
   private params: any;
+  private debug: boolean;
 
   pager: any = {};
   pagedItems: any[];
@@ -76,7 +77,8 @@ export class CamTableComponent implements OnChanges, OnInit {
           this.lang.campage.isPtzSupported,
           this.lang.campage.isFisheye,
           this.lang.campage.isMdSupported,
-          this.lang.campage.isIoSupported
+          this.lang.campage.isIoSupported,
+          this.lang.campage.count
       ];
 
       this.pagerMaxSize = this.CONFIG.campage.pagerMaxSize;
@@ -161,6 +163,8 @@ export class CamTableComponent implements OnChanges, OnInit {
                 this.allowedParameters.splice(index, 1);
             }
         });
+
+        this.cameraHeaders.splice(-1, 1); // remove 'count'
     }
 
     showParametersFor(item) {
@@ -200,17 +204,22 @@ export class CamTableComponent implements OnChanges, OnInit {
                 this.selectedRow = undefined;
             }
         }
-
-        if (changes.allowedParameters) {
-            this.filterAllowedParams();
-        }
     }
 
     ngOnInit() {
-        this.showHeaders = this.cameraHeaders;
+        this.uri
+            .getURI()
+            .subscribe(params => {
+                if (params.debug === undefined) {
+                    this.debug = false;
+                    this.filterAllowedParams();
+                }
+
+                this.showHeaders = this.cameraHeaders;
+            });
 
         this.results = this._elements.length;
-        this.csvFilename = CamTableComponent.getCurrentDate();
+        this.csvFilename = Date.now();
         this.csvCameraData = this.getCsvData();
 
         this.uri
@@ -296,10 +305,6 @@ export class CamTableComponent implements OnChanges, OnInit {
                     'I/O': CamTableComponent.yesNo(camera.isIoSupported)
                })
         );
-  }
-
-  static getCurrentDate() {
-      return Date.now();
   }
 
     isString(x: any): boolean {

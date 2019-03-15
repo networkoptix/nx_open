@@ -1,5 +1,6 @@
 {
 	"campage" : {
+		"count" : "Count",
 		"vendor" : "Manufacturer",
 		"model" : "Model",
 		"hardwareType" : "Type",
@@ -20,7 +21,15 @@
 		"multiSensorCamera": "Multi-Sensor Camera",
 		"encoder": "Encoder",
 		"dvr": "DVR",
-		"other": "Other"
+		"other": "Other",
+		"PTZ cameras" : "PTZ cameras",
+		"Advanced PTZ cameras" : "Advanced PTZ cameras",
+		"Fisheye Cameras" : "Fisheye Cameras",
+		"Cameras supporting H.265" : "Cameras supporting H.265",
+		"I / O modules" : "I / O modules",
+		"Multisensor Cameras" : "Multisensor Cameras",
+		"Cameras with 2-way audio" : "Cameras with 2-way audio",
+		"Extra high resolution cameras" : "Extra high resolution cameras"
 	},
 	"integration" : {
 		"previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.",

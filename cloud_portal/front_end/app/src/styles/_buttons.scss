@@ -1,6 +1,7 @@
 @import '../../styles/custom/custom_palette';
 @import '../../styles/theme_palette';
 @import '../../styles/theme_variables';
+@import '../styles/mixins';
 
 #button {
     height        : 2rem;
@@ -39,6 +40,10 @@
 // Overwrite Boostrap section ************
 button, .btn {
     @extend #button;
+}
+
+.btn.btn-big {
+    height : 40px;
 }
 
 .btn.btn-default, .btn.btn-dropdown-toggle {
@@ -166,6 +171,64 @@ button, .btn {
 
 .btn-dropdown-toggle {
     background-color : transparent;
+}
+
+.btn-tag {
+    color            : $light16;
+    background-color : $light4;
+    
+    &:hover {
+        background-color : $light5;
+    }
+    
+    &:active {
+        background-color : $light6;
+    }
+}
+
+.btn-tag-selected {
+    @include badge-selected($brand_core, $brand_d1, $brand_d2);
+    padding  : 0 40px 0 16px !important;
+    position : relative;
+    
+    .close-button {
+        position        : absolute;
+        right           : 0;
+        border-radius   : 2px;
+        display         : flex;
+        justify-content : center;
+        align-items     : center;
+        height          : 40px;
+        width           : 40px;
+        
+        .tag-close-icon {
+            margin : 0;
+        }
+    }
+}
+
+.btn.btn-arrow {
+    position     : relative;
+    padding-left : 2rem;
+    
+    .nav-arrow {
+        height : 20px;
+        float  : left;
+        right  : auto;
+        left   : 5px;
+        
+        span {
+            background-color : $light16;
+        }
+    }
+    
+    &.has-icon {
+        padding-left : 20px;
+    }
+    
+    & > span {
+        margin : 0;
+    }
 }
 
 .btn-text {

@@ -4,12 +4,13 @@ import {
 import { NxConfigService }        from '../../services/nx-config';
 import { NG_VALUE_ACCESSOR }      from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NxUriService }           from '../../services/uri.service';
 
 /* USAGE
  <nx-vendor-list
-         vendors=[]
-         cameras=[]
-        [(ngModel)]="filterModel">
+ vendors=[]
+ cameras=[]
+ [(ngModel)]="filterModel">
  </nx-vendor-list>
  */
 
@@ -17,7 +18,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     selector   : 'nx-vendor-list',
     templateUrl: 'vendor-list.component.html',
     styleUrls  : ['vendor-list.component.scss'],
-    providers: [{
+    providers  : [{
         provide    : NG_VALUE_ACCESSOR,
         useExisting: forwardRef(() => NxVendorListComponent),
         multi      : true
@@ -28,46 +29,53 @@ export class NxVendorListComponent implements OnInit {
     @Input() cameras: any;
 
     CONFIG: any;
-    arrGridColumns: number[];
 
+
+    private filters: any = [];
     private filter: any = {};
 
     constructor(CONFIG: NxConfigService,
+                private uri: NxUriService,
                 private _router: Router,
                 private _route: ActivatedRoute) {
 
         this.CONFIG = CONFIG.getConfig();
 
-        this.arrGridColumns = Array.apply(undefined, Array(this.CONFIG.campage.vendorGroups)).map((x, i) => i);
+        this.filters = [
+            {
+                label: 'PTZ cameras', id: 'isPtzSupported'
+            },
+            {
+                label: 'Advanced PTZ cameras', id: 'isAptzSupported'
+            },
+            {
+                label: 'Fisheye Cameras', id: 'isFisheye'
+            },
+            {
+                label: 'Cameras supporting H.265', id: 'isH265'
+            },
+            {
+                label: 'I / O modules', id: 'isIoSupported'
+            },
+            {
+                label: 'Multi-sensor Cameras', id: 'isMultiSensor'
+            },
+            {
+                label: 'Cameras with 2-way audio', id: 'isTwAudioSupported'
+            },
+            {
+                label: 'Extra high resolution cameras', id: 'maxResolution'
+            }
+        ];
     }
 
-    ngOnInit() {}
-
-    vendorGroup(n) {
-        function nstart(m) {
-            if (m === 0) {
-                return 0;
-            }
-
-            return nstart(m - 1) + ncol(m - 1);
-        }
-
-        function ncol(m) {
-            return m < (cols - (M * cols - total)) ? M : (M - 1);
-        }
-
-        const total = this.vendors.length,
-              cols  = this.CONFIG.campage.vendorGroups,
-              M     = Math.ceil(total / cols),
-              n1    = nstart(n),
-              n2    = ncol(n);
-
-        return { start: n1, end: n1 + n2 };
+    ngOnInit() {
     }
 
     // Form control functions
     // The method set in registerOnChange to emit changes back to the form
-    private propagateChange = (_: any) => {};
+    private propagateChange = (_: any) => {
+    };
 
     writeValue(value: any) {
         if (value) {
@@ -90,33 +98,46 @@ export class NxVendorListComponent implements OnInit {
     registerOnTouched(fn: () => void): void {
     }
 
-    setVendor(value) {
+    setFilter(filter) {
         interface Params {
             [key: string]: any;
         }
 
         const queryParams: Params = {};
 
-        this.filter.multiselects.find((select) => {
-            if (select.id === 'vendors') {
-                select.selected.push(value);
+        if (filter.id === 'maxResolution') {
+            this.filter.selects.find((select) => {
+                if (select.id === 'resolution') {
+                    queryParams.resolution = select.items[select.items.length - 1].name;
+                }
+            });
+        } else {
+            queryParams.tags = filter.id;
+        }
 
-                queryParams[select.id] = select.selected;
+        this.uri.updateURI('/campage', queryParams, true);
 
-                // changes the route without moving from the current view or
-                // triggering a navigation event,
-                this._router.navigate(['/campage'], {
-                    queryParams,
-                    relativeTo: this._route,
-                    replaceUrl: true,
-                    queryParamsHandling: 'merge',
-                    // do not trigger navigation
-                    // skipLocationChange : true
-                });
-            }
-        });
         // Propagate component's value attribute (model)
-        this.propagateChange({...this.filter});
+        this.propagateChange({ ...this.filter });
+
+        return false;
     }
+
+    setVendor(value) {
+        interface Params {
+            [key: string]: any;
+        }
+
+        const queryParams: Params = {};
+        queryParams.search = value;
+
+        this.uri.updateURI('/campage', queryParams, true);
+
+        // Propagate component's value attribute (model)
+        this.propagateChange({ ...this.filter });
+
+        return false;
+    }
+
 
 }

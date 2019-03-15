@@ -300,7 +300,7 @@ export class NxConfigService {
                 carouselImageLeave: '0.25s ease-out'
             },
             campage: {
-                vendorGroups: 4,
+                vendorsShown: 40,
                 pagerMaxSize: 4
             },
             search: {

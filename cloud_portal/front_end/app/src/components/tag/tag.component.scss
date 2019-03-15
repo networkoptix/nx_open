@@ -1,12 +1,7 @@
 @import '../../../styles/custom/custom_palette';
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
-
-#selected-tag {
-    color: $light1;
-    padding-left: 12px !important;
-    padding-right: 0px !important;
-}
+@import '../../styles/mixins';
 
 button {
     font-family: $font-family-regular;
@@ -25,30 +20,6 @@ button {
 
 .tag-close-icon {
     margin: auto !important;
-}
-
-@mixin badge-effects($default, $hover, $active) {
-    background-color: $default;
-    &:hover {
-        background-color : $hover;
-    }
-    
-    &:active {
-        background-color : $active;
-    }
-}
-
-@mixin badge-selected($default, $hover, $active) {
-    @extend #selected-tag;
-    background-color : $default;
-    
-    & > span.close-button:hover {
-        background-color : $hover;
-    }
-    
-    & > span.close-button:active {
-        background-color : $active;
-    }
 }
 
 .badge,
