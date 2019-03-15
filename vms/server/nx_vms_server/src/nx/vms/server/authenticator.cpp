@@ -832,6 +832,18 @@ Qn::AuthResult Authenticator::tryAuthRecord(
         authorization,
         &response.headers);
 
+    if (errorCode == Qn::AuthResult::Auth_OK)
+    {
+        NX_VERBOSE(this, "Auth record authenticated. User %1, nonce %2",
+            authorization.digest->userid, authorization.digest->params["nonce"]);
+    }
+    else
+    {
+        NX_DEBUG(this, "Failed to authenticate auth record. User %1, nonce %2, realm %3. %4",
+            authorization.digest->userid, authorization.digest->params["nonce"],
+            authorization.digest->params["realm"], toString(errorCode));
+    }
+
     if (const auto user = resource.dynamicCast<QnUserResource>())
     {
         if (accessRights)

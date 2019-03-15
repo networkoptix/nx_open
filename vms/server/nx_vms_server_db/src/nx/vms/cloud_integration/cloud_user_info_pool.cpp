@@ -19,7 +19,7 @@ namespace nx {
 namespace vms {
 namespace cloud_integration {
 
-static const QString kCloudAuthInfoKey = 
+static const QString kCloudAuthInfoKey =
     QLatin1String(nx::cloud::db::api::kVmsUserAuthInfoAttributeName);
 
 // CloudUserInfoPoolSupplier
@@ -134,9 +134,8 @@ Qn::AuthResult CloudUserInfoPool::authenticate(
 
     if (!CdbNonceFetcher::parseCloudNonce(nonce, &cloudNonce, &nonceTrailer))
     {
-        NX_ERROR(this, lm("parseCloudNonce() failed. User: %1, nonce: %2")
-            .arg(userName)
-            .arg(nonce));
+        NX_ERROR(this, "parseCloudNonce() failed. User: %1, nonce: %2",
+            userName, nonce);
         return Qn::Auth_WrongDigest;
     }
 
@@ -151,10 +150,14 @@ Qn::AuthResult CloudUserInfoPool::authenticate(
         nonceTrailer,
         ha2);
 
-    if (authHeader.digest->params["response"] == calculatedResponse)
-        return Qn::Auth_OK;
+    if (authHeader.digest->params["response"] != calculatedResponse)
+    {
+        NX_DEBUG(this, "User %1 authentication failed. Nonce %2, cloud nonce %3",
+            userName, nonce, cloudNonce);
+        return Qn::Auth_WrongPassword;
+    }
 
-    return Qn::Auth_WrongPassword;
+    return Qn::Auth_OK;
 }
 
 boost::optional<nx::Buffer> CloudUserInfoPool::intermediateResponseByUserNonce(
