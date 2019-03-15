@@ -23,6 +23,8 @@ public:
 
     nx::utils::Url url() const;
 
+    int onlineNodesCount() const;
+
 private:
     void registerRequestHandlers(
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher);

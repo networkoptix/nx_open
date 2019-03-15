@@ -50,6 +50,12 @@ nx::utils::Url DiscoveryServer::url() const
         .setEndpoint(m_httpServer.serverAddress());
 }
 
+int DiscoveryServer::onlineNodesCount() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return (int)m_onlineNodes.size();
+}
+
 void DiscoveryServer::registerRequestHandlers(
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
