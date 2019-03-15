@@ -6,6 +6,10 @@ class QnSettings;
 
 namespace nx::cloud::discovery {
 
+/**
+ * Settings for tuning discovery service.
+ * All settings exist under group name "discovery".
+ */
 struct NX_DISCOVERY_CLIENT_API Settings
 {
     /**
