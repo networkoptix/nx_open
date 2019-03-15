@@ -30,9 +30,17 @@ void SynchronizationSettings::load(const QnSettings& settings)
 
     nodeId = settings.value(kNodeId, nodeId.c_str()).toString().toStdString();
 
-    maxConcurrentConnectionsFromSystem = settings.value(
-        kMaxConcurrentConnectionsFromSystem,
-        kMaxConcurrentConnectionsFromSystemDefault).toInt();
+    if (clusterId.empty())
+    {
+        maxConcurrentConnectionsFromSystem = settings.value(
+            kMaxConcurrentConnectionsFromSystem,
+            kMaxConcurrentConnectionsFromSystemDefault).toInt();
+    }
+    else
+    {
+        maxConcurrentConnectionsFromSystem = std::numeric_limits<int>::max();
+    }
+
 
     discovery.load(settings);
 }
