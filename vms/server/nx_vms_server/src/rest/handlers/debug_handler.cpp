@@ -88,10 +88,10 @@ int QnDebugHandler::executeGet(
             {
                 const auto delayS = value.toInt();
                 if (!delayS)
-                    return result(StatusCode::forbidden, "Ignoring - uinvalud delay " + value);
+                    return result(StatusCode::forbidden, "Ignoring - invalid delay " + value);
 
                 std::this_thread::sleep_for(std::chrono::seconds(delayS));
-                return result(StatusCode::ok, "Dalayed replay");
+                return result(StatusCode::ok, "Delayed reply");
             }
     }
     const QString message = lm("Unexpected enum value: %1").arg(static_cast<int>(action));
