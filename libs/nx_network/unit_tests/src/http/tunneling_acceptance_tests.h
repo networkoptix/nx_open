@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -75,6 +77,11 @@ protected:
         m_timeout = timeout;
     }
 
+    void setHttpConnectionInactivityTimeout(std::chrono::milliseconds timeout)
+    {
+        m_httpConnectionInactivityTimeout = timeout;
+    }
+
     void addSomeCustomHttpHeadersToTheClient()
     {
         m_customHeaders.emplace("H1", "V1.1");
@@ -145,7 +152,7 @@ protected:
 
     void andCustomHeadersAreReportedToTheServer()
     {
-        for (const auto& header: m_customHeaders)
+        for (const auto& header : m_customHeaders)
         {
             bool found = false;
 
@@ -164,6 +171,11 @@ protected:
         }
     }
 
+    nx::utils::Url baseUrl() const
+    {
+        return m_baseUrl;
+    }
+
 private:
     Server<> m_tunnelingServer;
     std::unique_ptr<Client> m_tunnelingClient;
@@ -178,6 +190,7 @@ private:
     nx::utils::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
     std::optional<std::chrono::milliseconds> m_timeout;
+    std::optional<std::chrono::milliseconds> m_httpConnectionInactivityTimeout;
 
     virtual void authorize(
         const RequestContext* requestContext,
@@ -190,8 +203,14 @@ private:
     void startHttpServer()
     {
         m_httpServer = std::make_unique<TestHttpServer>();
+        if (m_httpConnectionInactivityTimeout)
+        {
+            m_httpServer->server().setConnectionInactivityTimeout(
+                *m_httpConnectionInactivityTimeout);
+        }
 
         ASSERT_TRUE(m_httpServer->bindAndListen());
+
         m_baseUrl = nx::network::url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_httpServer->serverAddress())
             .setPath(kBasePath);
@@ -260,69 +279,5 @@ private:
     {
     }
 };
-
-//-------------------------------------------------------------------------------------------------
-
-TEST_P(HttpTunneling, tunnel_is_established)
-{
-    whenRequestTunnel();
-    thenTunnelIsEstablished();
-}
-
-TEST_P(HttpTunneling, error_is_reported)
-{
-    stopTunnelingServer();
-
-    whenRequestTunnel();
-    thenTunnelIsNotEstablished();
-}
-
-TEST_P(HttpTunneling, timeout_supported)
-{
-    setEstablishTunnelTimeout(std::chrono::milliseconds(1));
-
-    givenSilentTunnellingServer();
-
-    whenRequestTunnel();
-
-    thenTunnelIsNotEstablished();
-    andResultCodeIs(SystemError::timedOut);
-}
-
-TEST_P(HttpTunneling, custom_http_headers_are_transferred)
-{
-    addSomeCustomHttpHeadersToTheClient();
-    whenRequestTunnel();
-
-    thenTunnelIsEstablished();
-    andCustomHeadersAreReportedToTheServer();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-INSTANTIATE_TEST_CASE_P(
-    EveryMethod,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::all));
-
-INSTANTIATE_TEST_CASE_P(
-    GetPostWithLargeMessageBody,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::getPost));
-
-INSTANTIATE_TEST_CASE_P(
-    ConnectionUpgrade,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::connectionUpgrade));
-
-INSTANTIATE_TEST_CASE_P(
-    Experimental,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::experimental));
-
-INSTANTIATE_TEST_CASE_P(
-    Ssl,
-    HttpTunneling,
-    ::testing::Values(TunnelMethod::ssl));
 
 } // namespace nx::network::http::tunneling::test
