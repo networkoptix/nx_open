@@ -56,7 +56,8 @@
     }
 }
 
-.dropdown.show {
+.dropdown.show,
+.btn-tag.selected{
     .nav-arrow span:nth-child(1) {
         -webkit-transform : rotate(45deg);
         -moz-transform    : rotate(45deg);

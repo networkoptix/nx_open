@@ -187,7 +187,7 @@ button, .btn {
 }
 
 .btn-tag-selected {
-    @include badge-selected($brand_core, $brand_d1, $brand_d2);
+    @include badge-selected($light16, $light17, $light18);
     padding  : 0 40px 0 16px !important;
     position : relative;
     
@@ -208,8 +208,9 @@ button, .btn {
 }
 
 .btn.btn-arrow {
-    position     : relative;
-    padding-left : 2rem;
+    position      : relative;
+    padding-left  : 2rem !important;
+    padding-right : 1rem !important;
     
     .nav-arrow {
         height : 20px;
@@ -228,6 +229,16 @@ button, .btn {
     
     & > span {
         margin : 0;
+    }
+    
+    &.selected {
+        @include badge-selected($light16, $light17, $light18);
+    
+        .nav-arrow {
+            span {
+                background-color : $light1;
+            }
+        }
     }
 }
 

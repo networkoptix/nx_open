@@ -37,7 +37,10 @@
                     </span>
                 </button>
 
-                <button class="btn btn-arrow btn-big btn-tag ml-3" (click)="toggleOptions()">
+                <button class="btn btn-arrow btn-big btn-tag ml-3"
+                        [ngClass]="{'selected' : showAdvancedOptions}"
+                        (click)="toggleOptions()">
+
                     <div class="nav-arrow">
                         <span></span>
                         <span></span>
@@ -48,7 +51,7 @@
         </div>
 
         <div class="row col-12 m-0 p-0" [hidden]="!showAdvancedOptions">
-            <div class="row col-xxl-6 mt-3 m-0 p-0"
+            <div class="row col-12 col-lg-9 col-xxl-6 mt-3 m-0 p-0"
                  *ngIf="localFilter.selects && localFilter.selects.length || localFilter.multiselects && localFilter.multiselects.length">
 
                 <div class="drop col-12 col-lg-4 mt-3 mt-lg-0 pl-0 pr-0 pr-lg-3" *ngFor="let select of localFilter.selects">

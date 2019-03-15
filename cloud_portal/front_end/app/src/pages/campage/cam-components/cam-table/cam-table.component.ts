@@ -164,7 +164,11 @@ export class CamTableComponent implements OnChanges, OnInit {
             }
         });
 
-        this.cameraHeaders.splice(-1, 1); // remove 'count'
+        this.cameraHeaders.forEach((item, index) => {
+            if (serviceParams.indexOf(item.toLowerCase()) > -1) {
+                this.cameraHeaders.splice(index, 1);
+            }
+        });
     }
 
     showParametersFor(item) {

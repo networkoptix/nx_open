@@ -36,9 +36,10 @@
     /*** overwrite default table of component cam-table ***/
     .nx-table-wrapper {
         margin : 0;
-        width: 1092px;
+        max-width: 1092px;
         @include media-breakpoint-up(xxl) {
             width : auto;
+            max-width : 1440px;
         }
         
         .nx-table-header {
