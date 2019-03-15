@@ -129,15 +129,19 @@ export class NxVendorListComponent implements OnInit {
         }
 
         const queryParams: Params = {};
-        queryParams.search = value;
 
-        this.uri.updateURI('/campage', queryParams, true);
+        this.filter.multiselects.find((select) => {
+            if (select.id === 'vendors') {
+                select.selected.push(value);
 
+                queryParams[select.id] = select.selected;
+
+                this.uri.updateURI('/campage', queryParams, true);
+            }
+        });
         // Propagate component's value attribute (model)
         this.propagateChange({ ...this.filter });
 
         return false;
     }
-
-
 }
