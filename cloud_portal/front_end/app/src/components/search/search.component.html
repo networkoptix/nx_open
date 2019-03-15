@@ -2,7 +2,7 @@
 
     <div class="row m-0">
         <div class="col-12 p-0">
-            <div class="d-inline-flex w-100">
+            <div class="d-block d-lg-inline-flex flex-lg-row w-100">
                 <div class="search-group">
                     <span class="glyphicon glyphicon-search icon-search"></span>
                     <input [(ngModel)]="localFilter.query"
@@ -20,7 +20,7 @@
                         <span class="glyphicon-close"></span>
                     </button>
                 </div>
-                <button class="btn btn-big btn-tag-selected ml-3"
+                <button class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
                         *ngIf="numberFilters != 0">
 
                     <div [ngSwitch]="numberFilters" class="ml-2 mr-3">
@@ -37,7 +37,7 @@
                     </span>
                 </button>
 
-                <button class="btn btn-arrow btn-big btn-tag ml-3"
+                <button class="btn btn-arrow btn-big btn-tag ml-lg-3 mt-3 mt-lg-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
                         (click)="toggleOptions()">
 

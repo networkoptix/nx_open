@@ -23,7 +23,7 @@
             </nx-cam-table>
         </div>
 
-        <div class="row m-0 pt-3 pb-3 pl-2"
+        <div class="row m-0 pt-3 pb-3 pl-0"
              [style.display]="!mobileDetailMode ? 'none' : 'block'">
 
             <button class="btn btn-default btn-back" (click)="resetActiveCamera()">
@@ -32,7 +32,7 @@
             </button>
         </div>
 
-        <div class="order-0 order-lg-1 pb-3 pr-0 col-12 col-lg-4 col-xl-3"
+        <div class="order-0 order-lg-1 pb-3 pl-0 pl-lg-2 pr-0 col-12 col-lg-4 col-xl-3"
              *ngIf="activeCamera">
 
             <nx-block>
