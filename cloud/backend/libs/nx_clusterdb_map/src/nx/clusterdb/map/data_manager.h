@@ -148,7 +148,7 @@ private:
     /**
      * Retrieves the key/value pairs in the range[keyLowerBound, keyUpperBound]
      */
-    std::map<std::string, std::string> getRangeFromDb(
+    std::optional<std::map<std::string, std::string>> getRangeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound,
         const std::string& keyUpperBound);
@@ -156,7 +156,7 @@ private:
     /**
      * Retrieves the key/value pairs >= keyLowerBound.
      */
-    std::map<std::string, std::string> getRangeFromDb(
+    std::optional<std::map<std::string, std::string>> getRangeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound);
 
@@ -196,7 +196,7 @@ private:
     nx::clusterdb::engine::SynchronizationEngine* m_syncEngine = nullptr;
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     std::string m_clusterId;
-    EventProvider * m_eventProvider;
+    EventProvider* m_eventProvider;
 
     dao::KeyValueDao m_keyValueDao;
 };
