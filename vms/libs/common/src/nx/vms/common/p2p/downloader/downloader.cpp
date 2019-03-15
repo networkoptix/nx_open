@@ -153,6 +153,11 @@ QString Downloader::filePath(const QString& fileName) const
     return d->storage->filePath(fileName);
 }
 
+QDir Downloader::downloadsDirectory() const
+{
+    return d->storage->downloadsDirectory();
+}
+
 FileInformation Downloader::fileInformation(const QString& fileName) const
 {
     return d->storage->fileInformation(fileName);

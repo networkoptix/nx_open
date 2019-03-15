@@ -62,11 +62,12 @@ void DescriptorManager::commit()
     if (!resPool)
         return;
 
-    const auto cModule = commonModule();
-    if (!cModule)
+    const auto commonModule = this->commonModule();
+    if (!commonModule)
         return;
 
-    const auto server = resPool->getResourceById<QnMediaServerResource>(cModule->moduleGUID());
+    const auto server = resPool->getResourceById<QnMediaServerResource>(
+        commonModule->moduleGUID());
 
     if (server)
         server->savePropertiesAsync();

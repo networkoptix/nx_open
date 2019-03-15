@@ -108,6 +108,7 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
             QnTimePeriodList::unionTimePeriods(totalPeriodList, timePeriodList);
     }
 
+    // We consider intervals with zero (i.e. unspecified) length as intervals with minimal length.
     for (auto& timePeriod: totalPeriodList)
     {
         if (timePeriod.isEmpty())

@@ -273,11 +273,13 @@ void QnLayoutResource::updateItem(const QnLayoutItemData &item)
 
 QnTimePeriod QnLayoutResource::getLocalRange() const
 {
+    QnMutexLocker locker(&m_mutex);
     return m_localRange;
 }
 
 void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
 {
+    QnMutexLocker locker(&m_mutex);
     m_localRange = value;
 }
 

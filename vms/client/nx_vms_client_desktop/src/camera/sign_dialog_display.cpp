@@ -1,4 +1,4 @@
-#include "sync_dialog_display.h"
+#include "sign_dialog_display.h"
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
 #include "nx/streaming/archive_stream_reader.h"
@@ -22,7 +22,7 @@ QnSignDialogDisplay::~QnSignDialogDisplay()
 {
 }
 
-void QnSignDialogDisplay::finilizeSign()
+void QnSignDialogDisplay::finalizeSign()
 {
     QByteArray signFromPicture;
     QByteArray calculatedSign;
@@ -95,7 +95,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_display[0]->display(m_lastKeyFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
         if (m_hasProcessedMedia)
         {
-            finilizeSign();
+            finalizeSign();
         }
         else
         {
@@ -155,7 +155,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
 
     if (video && (video->flags & QnAbstractMediaData::MediaFlags_StillImage))
-        finilizeSign();
+        finalizeSign();
 
     return true;
 }

@@ -354,7 +354,7 @@ void EventSearchWidget::resetFilters()
 
 QString EventSearchWidget::placeholderText(bool constrained) const
 {
-    return constrained ? tr("No events") : tr("No events occured");
+    return constrained ? tr("No events") : tr("No events occurred");
 }
 
 QString EventSearchWidget::itemCounterText(int count) const
