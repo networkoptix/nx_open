@@ -4,6 +4,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <nx/cloud/relay/model/clusterdb_map_remote_relay_peer_pool.h>
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
@@ -427,7 +428,7 @@ std::unique_ptr<model::AbstractRemoteRelayPeerPool>
     RemoteRelayPeerPoolFactory::defaultFactory(
         const conf::Settings& settings)
 {
-    return std::make_unique<model::RemoteRelayPeerPool>(settings);
+    return std::make_unique<model::ClusterDbMapRemoteRelayPeerPool>(settings);
 }
 
 } // namespace model
