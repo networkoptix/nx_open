@@ -67,7 +67,7 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
     std::chrono::minutes(10);
 
 //-------------------------------------------------------------------------------------------------
-// ConnectingPeer
+// CassandraConnection
 
 static const QString kCassandraHost("cassandra/host");
 static const QString kDefaultCassandraHost;
@@ -179,6 +179,11 @@ const CassandraConnection& Settings::cassandraConnection() const
     return m_cassandraConnection;
 }
 
+const ClusterDbMap& Settings::clusterDbMap() const
+{
+    return m_clusterDbMap;
+}
+
 void Settings::loadSettings()
 {
     retryDelay = std::chrono::milliseconds(settings().value(
@@ -191,6 +196,7 @@ void Settings::loadSettings()
     m_listeningPeer.load(settings());
     loadConnectingPeer();
     loadCassandraHost();
+    m_clusterDbMap.load(settings());
 }
 
 void Settings::loadServer()
@@ -280,6 +286,12 @@ void Settings::loadCassandraHost()
         nx::utils::parseTimerDuration(
             settings().value(kDelayBeforeRetryingInitialConnect).toString(),
             kDefaultDelayBeforeRetryingInitialConnect);
+}
+
+void ClusterDbMap::load(const QnSettings& settings)
+{
+    sql.loadFromSettings(settings);
+    map.load(settings);
 }
 
 } // namespace conf

@@ -9,6 +9,8 @@
 #include <nx/utils/std/optional.h>
 
 #include <nx/cloud/relaying/settings.h>
+#include <nx/clusterdb/map/settings.h>
+#include <nx/sql/types.h>
 
 namespace nx {
 namespace cloud {
@@ -63,6 +65,14 @@ struct CassandraConnection
     CassandraConnection();
 };
 
+struct ClusterDbMap
+{
+    nx::sql::ConnectionOptions sql;
+    nx::clusterdb::map::Settings map;
+
+    void load(const QnSettings& settings);
+};
+
 class Settings:
     public nx::utils::BasicServiceSettings
 {
@@ -85,6 +95,7 @@ public:
     const Https& https() const;
     const Proxy& proxy() const;
     const CassandraConnection& cassandraConnection() const;
+    const ClusterDbMap& clusterDbMap() const;
 
 private:
     utils::log::Settings m_logging;
@@ -95,6 +106,7 @@ private:
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
     CassandraConnection m_cassandraConnection;
+    ClusterDbMap m_clusterDbMap;
 
     virtual void loadSettings() override;
 
