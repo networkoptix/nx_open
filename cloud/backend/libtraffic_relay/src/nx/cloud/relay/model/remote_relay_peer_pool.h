@@ -19,13 +19,6 @@
 
 namespace nx {
 
-namespace conf {
-
-class Settings;
-struct ClusterDbMap;
-
-} // namespace conf
-
 namespace cloud::relay::model {
 
 class ClusterDbMapRemoteRelayPeerPool:
