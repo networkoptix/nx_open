@@ -31,6 +31,11 @@ const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() con
     return m_model->listeningPeerPool();
 }
 
+const model::AbstractRemoteRelayPeerPool& RelayService::remoteRelayPeerPool() const
+{
+    return m_model->remoteRelayPeerPool();
+}
+
 std::unique_ptr<utils::AbstractServiceSettings> RelayService::createSettings()
 {
     return std::make_unique<conf::Settings>();
