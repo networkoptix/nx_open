@@ -111,6 +111,7 @@ bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& setti
             publicUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
     }
 
+    m_model->remoteRelayPeerPool().registerHttpApi(&m_view->messageDispatcher());
     m_model->remoteRelayPeerPool().setPublicUrl(publicUrl);
 
     return true;
