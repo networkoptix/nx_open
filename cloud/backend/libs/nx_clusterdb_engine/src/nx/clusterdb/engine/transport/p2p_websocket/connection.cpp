@@ -255,7 +255,7 @@ int Connection::highestProtocolVersionCompatibleWithRemotePeer() const
         : remotePeer().protoVersion;
 }
 
-void Connection::fillAuthInfo(
+bool Connection::fillAuthInfo(
     nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
