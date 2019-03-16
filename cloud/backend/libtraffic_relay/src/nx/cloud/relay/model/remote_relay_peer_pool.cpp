@@ -312,7 +312,9 @@ void RemoteRelayPeerPool::removePeer(
 
 void RemoteRelayPeerPool::setPublicUrl(const nx::utils::Url& publicUrl)
 {
-    m_publicUrl = publicUrl.toStdString();
+    m_publicUrl = publicUrl.port() > 0
+        ? nx::network::SocketAddress(publicUrl.host(), publicUrl.port()).toStdString()
+        : publicUrl.host().toStdString();
 }
 
 bool RemoteRelayPeerPool::bindUpdateParameters(
