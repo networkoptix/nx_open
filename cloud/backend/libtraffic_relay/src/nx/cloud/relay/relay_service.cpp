@@ -52,8 +52,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
             return -1;
 
         NX_INFO(this, lm("Retrying model initialization after delay"));
-        std::this_thread::sleep_for(
-            settings.cassandraConnection().delayBeforeRetryingInitialConnect);
+        std::this_thread::sleep_for(settings.retryDelay);
     }
     m_model = &model;
 
