@@ -5,7 +5,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
-#include <nx/cloud/relay/model/clusterdb_map_remote_relay_peer_pool.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 
 
 namespace nx {

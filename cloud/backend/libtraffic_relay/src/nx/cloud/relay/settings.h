@@ -57,14 +57,6 @@ struct ConnectingPeer
     ConnectingPeer();
 };
 
-struct CassandraConnection
-{
-    std::string host;
-    std::chrono::milliseconds delayBeforeRetryingInitialConnect;
-
-    CassandraConnection();
-};
-
 struct ClusterDbMap
 {
     nx::sql::ConnectionOptions sql;
@@ -94,7 +86,6 @@ public:
     const Http& http() const;
     const Https& https() const;
     const Proxy& proxy() const;
-    const CassandraConnection& cassandraConnection() const;
     const ClusterDbMap& clusterDbMap() const;
 
 private:
@@ -105,7 +96,6 @@ private:
     Proxy m_proxy;
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
-    CassandraConnection m_cassandraConnection;
     ClusterDbMap m_clusterDbMap;
 
     virtual void loadSettings() override;
@@ -120,7 +110,6 @@ private:
     void loadHttps();
     void loadProxy();
     void loadConnectingPeer();
-    void loadCassandraHost();
 };
 
 } // namespace conf
