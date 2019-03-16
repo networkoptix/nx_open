@@ -105,6 +105,10 @@ bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& setti
     else
     {
         publicUrl.setHost(settings.server().name.c_str());
+        if (!m_view->httpEndpoints().empty())
+            publicUrl.setScheme(nx::network::http::kUrlSchemeName);
+        else
+            publicUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
     }
 
     m_model->remoteRelayPeerPool().setPublicUrl(publicUrl);
