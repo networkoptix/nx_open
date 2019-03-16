@@ -77,6 +77,9 @@ static const QString kDelayBeforeRetryingInitialConnect(
 static constexpr std::chrono::seconds kDefaultDelayBeforeRetryingInitialConnect =
     std::chrono::seconds(10);
 
+static constexpr char kRetryDelay[] = "retryDelay";
+static const std::chrono::milliseconds kDefaultRetryDelay = std::chrono::seconds(10);
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -113,7 +116,8 @@ Settings::Settings():
     base_type(
         nx::utils::AppInfo::organizationNameForSettings(),
         AppInfo::applicationName(),
-        kModuleName)
+        kModuleName),
+    retryDelay(kDefaultRetryDelay)
 {
 }
 
@@ -177,6 +181,9 @@ const CassandraConnection& Settings::cassandraConnection() const
 
 void Settings::loadSettings()
 {
+    retryDelay = std::chrono::milliseconds(settings().value(
+        kRetryDelay,
+        kDefaultRetryDelay.count()).toInt());
     m_logging.load(settings(), QLatin1String("log"));
     loadServer();
     loadHttp();

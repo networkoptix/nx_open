@@ -77,6 +77,7 @@ public:
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;
 
+    std::chrono::milliseconds retryDelay;
     const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Server& server() const;
