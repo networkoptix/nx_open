@@ -188,7 +188,7 @@ void Settings::loadSettings()
 {
     retryDelay = std::chrono::milliseconds(settings().value(
         kRetryDelay,
-        kDefaultRetryDelay.count()).toInt());
+        static_cast<int>(kDefaultRetryDelay.count())).toInt());
     m_logging.load(settings(), QLatin1String("log"));
     loadServer();
     loadHttp();
