@@ -41,7 +41,8 @@ void Settings::load(const QnSettings& settings)
         settings.value(kRoundTripPadding).toString(),
         kDefaultRoundTripPadding);
 
-    registrationErrorDelay = nx::utils::parseTimerDuration(settings.value(kRegistrationErrorDelay).toString(),
+    registrationErrorDelay = nx::utils::parseTimerDuration(
+        settings.value(kRegistrationErrorDelay).toString(),
         kDefaultRegistrationErrorDelay);
 
     onlineNodesRequestDelay = nx::utils::parseTimerDuration(
