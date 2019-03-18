@@ -25,30 +25,47 @@ namespace test {
 
 namespace {
 
-class ClusterDbMapRemoteRelayPeerPool:
-    public model::ClusterDbMapRemoteRelayPeerPool
+class TestRemoteRelayPeerPool:
+    public model::RemoteRelayPeerPool
 {
-    using base_type = model::ClusterDbMapRemoteRelayPeerPool;
+    using base_type = model::RemoteRelayPeerPool;
 
 public:
-    ClusterDbMapRemoteRelayPeerPool(
+    TestRemoteRelayPeerPool(
         const conf::Settings& settings,
-        nx::utils::SyncQueue<bool>* initEvent)
+        nx::utils::SyncQueue<bool>* initEvents,
+        const bool* const forceConnectionFailure)
         :
         base_type(settings),
-        m_initEvent(initEvent)
+        m_initEvents(initEvents),
+        m_forceConnectionFailure(forceConnectionFailure)
     {
     }
 
     virtual bool connectToDb() override
     {
+        if (*m_forceConnectionFailure)
+        {
+            m_initEvents->push(false);
+            return false;
+        }
+
         bool connected = base_type::connectToDb();
-        m_initEvent->push(connected);
+        m_initEvents->push(connected);
         return connected;
     }
 
+    virtual bool isConnected() const override
+    {
+        if (*m_forceConnectionFailure)
+            return false;
+
+        return base_type::isConnected();
+    }
+
 private:
-    nx::utils::SyncQueue<bool>* m_initEvent;
+    nx::utils::SyncQueue<bool>* m_initEvents;
+    const bool* const m_forceConnectionFailure = nullptr;
 };
 
 } // namespace
@@ -79,13 +96,20 @@ protected:
     {
         using namespace std::placeholders;
 
+        m_forceConnectionFailure = true;
+
         m_factoryFunctionBak = model::RemoteRelayPeerPoolFactory::instance().setCustomFunc(
-            std::bind(&RelayService::createTestClusterDbMapRemoteRelayPeerPool, this, _1));
+            [this](const conf::Settings& settings)
+            {
+                return std::make_unique<TestRemoteRelayPeerPool>(
+                    settings,
+                    &m_initEvents,
+                    &m_forceConnectionFailure);
+            });
 
         addRelayInstance({}, false);
 
-        // In the case of clusterdb map, database initialization should not fail unless there is
-        // sqllite file problem. There is no host to connect to.
+        ASSERT_FALSE(m_initEvents.pop());
     }
 
     void givenStartedRelay(std::vector<const char*> args = {})
@@ -95,7 +119,7 @@ protected:
 
     void whenStartDb()
     {
-        // Do nothing.
+        m_forceConnectionFailure = false;
     }
 
     void thenRelayHasConnectedToDb()
@@ -114,15 +138,9 @@ protected:
     }
 
 private:
+    bool m_forceConnectionFailure = false;
     nx::utils::SyncQueue<bool> m_initEvents;
     std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool> createTestClusterDbMapRemoteRelayPeerPool(
-        const conf::Settings& settings)
-    {
-        return std::make_unique<ClusterDbMapRemoteRelayPeerPool>(
-            settings,
-            &m_initEvents);
-    }
 };
 
 // cassandra specific functionality that doesn't apply to sync engine

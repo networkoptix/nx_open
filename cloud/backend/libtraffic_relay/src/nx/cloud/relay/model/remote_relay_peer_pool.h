@@ -21,12 +21,12 @@ namespace nx {
 
 namespace cloud::relay::model {
 
-class ClusterDbMapRemoteRelayPeerPool:
+class RemoteRelayPeerPool:
     public AbstractRemoteRelayPeerPool
 {
 public:
-    ClusterDbMapRemoteRelayPeerPool(const conf::Settings& settings);
-    virtual ~ClusterDbMapRemoteRelayPeerPool();
+    RemoteRelayPeerPool(const conf::Settings& settings);
+    virtual ~RemoteRelayPeerPool();
 
     /**
       * NOTE: Can be blocking. But, must return eventually.

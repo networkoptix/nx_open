@@ -24,7 +24,7 @@ static std::string toLowerReversed(std::string domainName)
 
 } //namespace
 
-ClusterDbMapRemoteRelayPeerPool::ClusterDbMapRemoteRelayPeerPool(const conf::Settings& settings):
+RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
     m_settings(settings.clusterDbMap()),
     m_baseApiPath(nx::clusterdb::engine::kBaseSynchronizationPath)
 {
@@ -32,13 +32,13 @@ ClusterDbMapRemoteRelayPeerPool::ClusterDbMapRemoteRelayPeerPool(const conf::Set
     connectToDb();
 }
 
-ClusterDbMapRemoteRelayPeerPool::~ClusterDbMapRemoteRelayPeerPool()
+RemoteRelayPeerPool::~RemoteRelayPeerPool()
 {
     if (m_map)
         m_map->synchronizationEngine().pleaseStopSync();
 }
 
-bool ClusterDbMapRemoteRelayPeerPool::connectToDb()
+bool RemoteRelayPeerPool::connectToDb()
 {
     if (isConnected())
         return true;
@@ -73,12 +73,12 @@ bool ClusterDbMapRemoteRelayPeerPool::connectToDb()
     return isConnected();
 }
 
-bool ClusterDbMapRemoteRelayPeerPool::isConnected() const
+bool RemoteRelayPeerPool::isConnected() const
 {
     return m_map != nullptr;
 }
 
-void ClusterDbMapRemoteRelayPeerPool::findRelayByDomain(
+void RemoteRelayPeerPool::findRelayByDomain(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(std::string)> handler) const
 {
@@ -113,7 +113,7 @@ void ClusterDbMapRemoteRelayPeerPool::findRelayByDomain(
     });
 }
 
-void ClusterDbMapRemoteRelayPeerPool::addPeer(
+void RemoteRelayPeerPool::addPeer(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
@@ -138,7 +138,7 @@ void ClusterDbMapRemoteRelayPeerPool::addPeer(
     });
 }
 
-void ClusterDbMapRemoteRelayPeerPool::removePeer(
+void RemoteRelayPeerPool::removePeer(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
@@ -162,7 +162,7 @@ void ClusterDbMapRemoteRelayPeerPool::removePeer(
     });
 }
 
-void ClusterDbMapRemoteRelayPeerPool::setPublicUrl(
+void RemoteRelayPeerPool::setPublicUrl(
     const nx::utils::Url& publicUrl)
 {
     m_domainName = publicUrl.port() > 0
@@ -177,7 +177,7 @@ void ClusterDbMapRemoteRelayPeerPool::setPublicUrl(
     startDiscovery();
 }
 
-void ClusterDbMapRemoteRelayPeerPool::registerHttpApi(
+void RemoteRelayPeerPool::registerHttpApi(
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
     if (m_httpApiRegistered)
@@ -196,7 +196,7 @@ void ClusterDbMapRemoteRelayPeerPool::registerHttpApi(
     startDiscovery();
 }
 
-void ClusterDbMapRemoteRelayPeerPool::startDiscovery()
+void RemoteRelayPeerPool::startDiscovery()
 {
     if (m_map && !m_syncEngineUrl.isEmpty())
     {
@@ -225,7 +225,7 @@ std::unique_ptr<model::AbstractRemoteRelayPeerPool>
     RemoteRelayPeerPoolFactory::defaultFactory(
         const conf::Settings& settings)
 {
-    return std::make_unique<ClusterDbMapRemoteRelayPeerPool>(settings);
+    return std::make_unique<RemoteRelayPeerPool>(settings);
 }
 
 } // namespace nx::cloud::relay::model
