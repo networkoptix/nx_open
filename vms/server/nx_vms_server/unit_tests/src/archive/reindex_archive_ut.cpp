@@ -64,6 +64,7 @@ private:
 
     std::unique_ptr<MediaServerLauncher> m_server;
     Archive m_generatedArchive;
+    QString m_baseDirPath;
 
     void onReindexFinished(QnSystemHealth::MessageType message)
     {
@@ -79,7 +80,7 @@ private:
         NX_ASSERT(!storages.isEmpty());
 
         const auto storage = storages[0];
-        const auto baseDirPath = storage->getUrl();
+        m_baseDirPath = storage->getUrl();
 
         return Catalog();
     }
