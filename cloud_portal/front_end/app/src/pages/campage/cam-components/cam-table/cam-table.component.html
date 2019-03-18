@@ -3,9 +3,10 @@
         <table class="table table-hover nx-table">
             <thead>
                 <tr>
-                    <th *ngFor="let header of showHeaders"
+                    <th *ngFor="let header of showHeaders; index as i"
                         class="align-bottom"
-                        (click)="toggleHeaderSort(header)">
+                        (click)="toggleHeaderSort(header)"
+                        [ngClass]="{'debug' : debug}">
 
                         <div class="caption d-flex">
                             <div class="" [innerHTML]="header"></div>
@@ -24,7 +25,10 @@
                 <tr *ngFor="let item of pagedItems | keyvalue: byKey; let i = index"
                     [ngClass]="{'selected': i == selectedRow}"
                     (click)="setClickedRow(i, item);">
-                    <td *ngFor="let p of showParametersFor(item)" class="text-left">
+
+                    <td *ngFor="let p of showParametersFor(item); index as idx" class="text-left"
+                        [ngClass]="{'debug' : debug}">
+
                         <div *ngIf="isString(item.value[p]); else icon">
                             {{ item.value[p] }}
                         </div>

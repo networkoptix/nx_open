@@ -50,11 +50,22 @@
                 &:nth-child(1) {
                     padding-left : .75rem;
                     width : 175px;
-                    
+                }
+    
+                &.debug {
+                    &:nth-child(1) {
+                        width : 130px;
+                    }
                 }
 
                 &:nth-child(2) {
                     width : 160px;
+                }
+    
+                &.debug {
+                    &:nth-child(2) {
+                        width : 130px;
+                    }
                 }
                 
                 &:nth-child(3) {
@@ -110,8 +121,8 @@
                 &:nth-child(n+8) {
                     width : 70px;
                 }
-                
-                &:last-of-type {
+    
+                &:nth-child(11) { // I/O last column
                     width : 60px;
                 }
             }
@@ -128,9 +139,21 @@
                     padding-left : .75rem;
                     width : 175px;
                 }
+                
+                &.debug {
+                    &:nth-child(1) {
+                        width : 130px;
+                    }
+                }
     
                 &:nth-child(2) {
                     width : 160px;
+                }
+    
+                &.debug {
+                    &:nth-child(2) {
+                        width : 130px;
+                    }
                 }
     
                 &:nth-child(3) {
@@ -167,7 +190,7 @@
                     width : 70px;
                 }
     
-                &:last-of-type {
+                &:nth-child(11) { // I/O last column
                     width : 60px;
                 }
             }

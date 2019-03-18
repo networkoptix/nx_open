@@ -50,7 +50,7 @@
                             (click)="change($event, item)">
                     </nx-checkbox>
 
-                    <label for="{{item.id}}">{{item.label}}</label>
+                    <label for="{{item.id}}">{{item.label.name || item.label}}</label>
                 </div>
             </li>
         </ul>

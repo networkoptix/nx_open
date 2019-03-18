@@ -214,6 +214,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         this.uri
             .getURI()
             .subscribe(params => {
+                this.debug = true;
                 if (params.debug === undefined) {
                     this.debug = false;
                     this.filterAllowedParams();

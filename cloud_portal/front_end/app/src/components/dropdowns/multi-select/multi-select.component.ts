@@ -39,9 +39,9 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     @Input() canSelectAll: any;
     @Input() canSearch: any;
 
-    private items: any;
+    private items: any = {};
     private show: boolean;
-    private textSelected: string;
+    private textSelected: any = {};
     private innerValue: any;
     private filter: string;
 
@@ -114,7 +114,11 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     updateLabel() {
         switch (this.innerValue && this.innerValue.length) {
             case 1: {
-                this.textSelected = this.items.find(x => x.id === this.innerValue[0]).label;
+                this.textSelected = this.items.find(item => {
+                    return (item.label.name || item.id) === this.innerValue[0];
+                });
+                // Aggregated MSelect items vs. simple list
+                this.textSelected = this.textSelected.label.name || this.textSelected.label;
                 break;
             }
             case 0:

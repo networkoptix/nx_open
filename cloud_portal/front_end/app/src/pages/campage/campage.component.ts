@@ -25,7 +25,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     CONFIG: any = {};
     data: any;
     company: any;
-    vendors: string[];
+    vendors: any = [];
     resolution: string;
     itemsPerPage: number;
     query: string;
@@ -248,7 +248,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   camerasSuccessFn(data) {
        const vendorModelCount = {};
-       const vendors = new Set();
+       const vendors = [];
        const camerasWithAliases = [];
 
        data.forEach(camera => {
@@ -265,7 +265,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
                camera.resolutionArea = 0;
            }
 
-           vendors.add(camera.vendor);
+           vendors.push({vendor : camera.vendor, count : camera.count});
 
            if (camera.aliases) {
                camerasWithAliases.push(camera);
@@ -300,9 +300,11 @@ export class NxCampageComponent implements OnInit, DoCheck {
            });
        });
 
-       this.vendors = Array.from(vendors).sort((a, b) => {
-           return a.toLowerCase().localeCompare(b.toLowerCase());
-       });
+      // Calculate vendor popularity based on vendor's camera model's popularity
+      this.vendors = Object.values(vendors.reduce((a, c) => {
+          (a[c.vendor] || (a[c.vendor] = { name: c.vendor, count: 0 })).count += c.count;
+          return a;
+      }, {}));
   }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)

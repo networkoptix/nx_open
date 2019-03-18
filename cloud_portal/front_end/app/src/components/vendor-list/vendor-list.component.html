@@ -6,14 +6,14 @@
     </header>
 
     <nx-section>
-        <div class="float-left mr-1 mb-1" *ngFor="let vendor of vendors.slice(0,CONFIG.campage.vendorsShown)">
+        <div class="float-left mr-1 mb-1" *ngFor="let vendor of vendors">
             <nx-tag (click)="setVendor(vendor)"
                     [value]="null">
-                {{vendor}}
+                {{vendor.name}} <span *ngIf="debug">({{vendor.count}})</span>
             </nx-tag>
         </div>
         <div class="manufacture-info">
-            <span>... and {{vendors.length - CONFIG.campage.vendorsShown}} more</span>
+            <span>... and {{remainingVendors}} more</span>
         </div>
     </nx-section>
 </nx-block>

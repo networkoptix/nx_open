@@ -51,7 +51,6 @@
     "In-Client Upgrade:": "In-Client Upgrade:", 
     "Instructions": "Instructions", 
     "Integrations": "Integrations", 
-    "John Doe": "John Doe", 
     "Latest version": "Latest version", 
     "Log In": "Log In", 
     "Log Out": "Log Out", 
@@ -160,7 +159,6 @@
     }, 
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.", 
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 
-    "john@doe.com": "john@doe.com", 
     "latest build": "latest build", 
     "servers in the merged System.": "servers in the merged System."
 }

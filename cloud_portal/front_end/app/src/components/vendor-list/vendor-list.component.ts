@@ -1,6 +1,6 @@
 import {
-    Component, EventEmitter, forwardRef, Input, OnInit, Output
-}                                 from '@angular/core';
+    Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges
+} from '@angular/core';
 import { NxConfigService }        from '../../services/nx-config';
 import { NG_VALUE_ACCESSOR }      from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,15 +24,19 @@ import { NxUriService }           from '../../services/uri.service';
         multi      : true
     }]
 })
-export class NxVendorListComponent implements OnInit {
+export class NxVendorListComponent implements OnInit, OnChanges {
     @Input() vendors: any;
     @Input() cameras: any;
 
     CONFIG: any;
 
-
+    private debug: boolean;
     private filters: any = [];
     private filter: any = {};
+
+    private ASC = true;
+    private DESC = false;
+    private remainingVendors: number;
 
     constructor(CONFIG: NxConfigService,
                 private uri: NxUriService,
@@ -40,6 +44,7 @@ export class NxVendorListComponent implements OnInit {
                 private _route: ActivatedRoute) {
 
         this.CONFIG = CONFIG.getConfig();
+        this.debug = false;
 
         this.filters = [
             {
@@ -70,6 +75,13 @@ export class NxVendorListComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.uri
+            .getURI()
+            .subscribe(params => {
+                if (params.debug !== undefined) {
+                    this.debug = true;
+                }
+            });
     }
 
     // Form control functions
@@ -80,6 +92,27 @@ export class NxVendorListComponent implements OnInit {
     writeValue(value: any) {
         if (value) {
             this.filter = value;
+        }
+    }
+
+    byParam (a, b, param, order) {
+        if (a[param] < b[param]) {
+            return (order) ? -1 : 1;
+        }
+        if (a[param] > b[param]) {
+            return (order) ? 1 : -1;
+        }
+        return 0;
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.vendors) {
+            this.remainingVendors = changes.vendors.currentValue.length - this.CONFIG.campage.vendorsShown;
+            this.vendors = changes.vendors
+                    .currentValue
+                    .sort((a, b) => this.byParam(a, b, 'count', this.DESC))
+                    .slice(0, this.CONFIG.campage.vendorsShown)
+                    .sort((a, b) => this.byParam(a, b, 'name', this.ASC));
         }
     }
 
@@ -123,7 +156,7 @@ export class NxVendorListComponent implements OnInit {
         return false;
     }
 
-    setVendor(value) {
+    setVendor(vendor) {
         interface Params {
             [key: string]: any;
         }
@@ -132,7 +165,7 @@ export class NxVendorListComponent implements OnInit {
 
         this.filter.multiselects.find((select) => {
             if (select.id === 'vendors') {
-                select.selected.push(value);
+                select.selected.push(vendor.name);
 
                 queryParams[select.id] = select.selected;
 
