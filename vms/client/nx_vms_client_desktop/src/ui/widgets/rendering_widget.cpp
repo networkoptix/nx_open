@@ -1,6 +1,7 @@
 #include "rendering_widget.h"
 
 #include <QtCore/QTimer>
+#include <QtGui/QScreen>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -32,10 +33,9 @@ QSize rendererSourceSize(const QnResourceWidgetRenderer* renderer)
 
 QnRenderingWidget::QnRenderingWidget(
     QWidget* parent,
-    QGLWidget* shareWidget,
     Qt::WindowFlags f)
     :
-    QGLWidget(parent, shareWidget, f)
+    QOpenGLWidget(parent, f)
 {
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() { update(); });
@@ -170,7 +170,7 @@ void QnRenderingWidget::ensureDisplay()
         return;
 
     m_display.reset(new QnResourceDisplay(m_resource->toResourcePtr()));
-    m_renderer = new QnResourceWidgetRenderer(nullptr, context());
+    m_renderer = new QnResourceWidgetRenderer(nullptr, this);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QWidget::updateGeometry);
 
@@ -192,7 +192,7 @@ void QnRenderingWidget::ensureDisplay()
 // -------------------------------------------------------------------------- //
 void QnRenderingWidget::initializeGL()
 {
-    QGLWidget::initializeGL();
+    QOpenGLWidget::initializeGL();
     invalidateDisplay(); /* OpenGL context may have changed. */
 
     glClearColor(0, 0, 0, 0);
@@ -204,14 +204,15 @@ void QnRenderingWidget::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
 
-    auto renderer = QnOpenGLRendererManager::instance(context());
+    auto renderer = QnOpenGLRendererManager::instance(this);
 
     QMatrix4x4 matrix;
     matrix.translate(-1.0, 1.0, 0.0);
 
-    const auto aspect = QGLContext::currentContext()->device()->devicePixelRatio();
-    const auto scaleBase = 2.0 * aspect;
-    matrix.scale(scaleBase / width, -scaleBase / height, 1.0);
+    const auto currentScreenNumber = qApp->desktop()->screenNumber(parentWidget());
+    const auto screen = qApp->screens().at(currentScreenNumber);
+    const auto aspect = screen->devicePixelRatio();
+    matrix.scale(2.0 * aspect / width, 2.0 * -aspect / height, 1.0);
     renderer->setProjectionMatrix(matrix);
 }
 

@@ -9,6 +9,8 @@ class QGLContext;
 
 //class QnColorShaderProgram;
 
+// TODO: #ynikitenkov DO WE NEED IT? Can't find any usages in mobile/desktop/server projects.
+
 class QnLoadingProgressPainter: protected QOpenGLFunctions {
 public:
     /**

@@ -1,41 +1,50 @@
-#ifndef QN_GL_CONTEXT_DATA_H
-#define QN_GL_CONTEXT_DATA_H
+#pragma once
 
 #include <QHash>
-#include <nx/utils/thread/mutex.h>
 #include <QSharedPointer>
-#include <QtOpenGL/QGLContext>
+#include <nx/utils/thread/mutex.h>
+
+class QOpenGLWidget;
 
 template<class T>
-class QnGlContextDataStardardFactory {
+class QnGlContextDataStardardFactory
+{
 public:
-    T *operator()(const QGLContext *) {
+    T *operator()(QOpenGLWidget* /*glWidget*/)
+    {
         return new T();
     }
 };
 
 template<class T>
-class QnGlContextDataForwardingFactory {
+class QnGlContextDataForwardingFactory
+{
 public:
-    T *operator()(const QGLContext *context) {
-        return new T(context);
+    T *operator()(QOpenGLWidget* glWidget)
+    {
+        return new T(glWidget);
     }
 };
 
-
-template<class T, class Factory = QnGlContextDataForwardingFactory<T> >
-class QnGlContextData {
+template<class T, class Factory = QnGlContextDataForwardingFactory<T>>
+class QnGlContextData
+{
 public:
-    typedef QHash<const QGLContext *, QSharedPointer<T> > map_type;
+    using PointerType = QSharedPointer<T>;
+    using HashType = QHash<const QOpenGLWidget*, PointerType>;
 
-    QnGlContextData(const Factory &factory = Factory()): m_factory(factory) {}
+    QnGlContextData(const Factory &factory = Factory()):
+        m_factory(factory)
+    {
+    }
 
-    QSharedPointer<T> get(const QGLContext *context) {
-        QnMutexLocker locked( &m_mutex );
+    PointerType get(QOpenGLWidget* glWidget)
+    {
+        const QnMutexLocker locked(&m_mutex);
 
-        typename map_type::iterator pos = m_map.find(context);
+        typename HashType::iterator pos = m_map.find(glWidget);
         if(pos == m_map.end())
-            pos = m_map.insert(context, QSharedPointer<T>(m_factory(context)));
+            pos = m_map.insert(glWidget, QSharedPointer<T>(m_factory(glWidget)));
 
         return *pos;
     }
@@ -43,7 +52,5 @@ public:
 private:
     QnMutex m_mutex;
     Factory m_factory;
-    map_type m_map;
+    HashType m_map;
 };
-
-#endif // QN_GL_CONTEXT_DATA_H

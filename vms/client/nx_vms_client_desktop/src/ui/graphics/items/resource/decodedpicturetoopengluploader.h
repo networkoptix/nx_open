@@ -11,7 +11,7 @@
 #include <set>
 #include <vector>
 
-#include <QtOpenGL/QGLContext>
+#include <QtWidgets/QOpenGLWidget>
 #include <nx/utils/thread/mutex.h>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
@@ -158,7 +158,7 @@ public:
         \note If \a asyncDepth is 0 then it is possible that getUploadedPicture() will return NULL (if the only gl buffer is currently used for uploading)
     */
     DecodedPictureToOpenGLUploader(
-        const QGLContext* const mainContext,
+        QOpenGLWidget* glWidget,
         unsigned int asyncDepth = 1 );
     virtual ~DecodedPictureToOpenGLUploader();
 
@@ -277,7 +277,9 @@ private:
     int m_fileNumber;
     bool m_hardwareDecoderUsed;
     bool m_asyncUploadUsed;
-    QGLContext* m_initializedCtx;
+
+    QOpenGLContext* m_initializedContext = nullptr;
+    QSurface* m_initializedSurface = nullptr;
 
     nx::vms::api::ImageCorrectionData m_imageCorrection;
 

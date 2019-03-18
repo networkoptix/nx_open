@@ -14,7 +14,7 @@ public:
     QnFglrxFullScreen(QObject *parent = NULL);
 
 protected:
-    void updateFglrxMode(bool force = false);
+    void updateFglrxMode(QWidget* viewport, bool force = false);
 
     virtual bool registeredNotify(QWidget *viewport) override;
     virtual void unregisteredNotify(QWidget *viewport) override;

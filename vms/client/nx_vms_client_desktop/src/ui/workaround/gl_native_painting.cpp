@@ -2,11 +2,10 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-#include <QtOpenGL/QGLContext>
-
 #include "opengl_renderer.h"
 
-void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
+void QnGlNativePainting::begin(QOpenGLWidget* glWidget, QPainter* painter)
+{
     painter->beginNativePainting();
 
     QPaintEngine *engine = painter->paintEngine();
@@ -25,8 +24,8 @@ void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
             , painter->device()->height() * aspect);
         QMatrix4x4 m;
         m.ortho(0, sz.width(), sz.height(), 0, -999999, 999999);
-        QnOpenGLRendererManager::instance(context)->setProjectionMatrix(m);
-        QnOpenGLRendererManager::instance(context)->setModelViewMatrix(QMatrix4x4(painter->deviceTransform()));
+        QnOpenGLRendererManager::instance(glWidget)->setProjectionMatrix(m);
+        QnOpenGLRendererManager::instance(glWidget)->setModelViewMatrix(QMatrix4x4(painter->deviceTransform()));
 
         if (painter->hasClipping())
         {
@@ -37,6 +36,7 @@ void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
     }
 }
 
-void QnGlNativePainting::end(QPainter *painter) {
+void QnGlNativePainting::end(QPainter *painter)
+{
     painter->endNativePainting();
 }

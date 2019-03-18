@@ -4,7 +4,6 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtGui/QOpenGLFunctions>
-#include <QtOpenGL/QGLContext>
 
 #include <utils/media/frame_info.h>
 #include <nx/streaming/media_data_packet.h> //< For QnMetaDataV1Ptr.
@@ -58,7 +57,7 @@ class QnGLRenderer : protected QnGlFunctions, protected QOpenGLFunctions
 public:
     static bool isPixelFormatSupported(AVPixelFormat pixfmt);
 
-    QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider );
+    QnGLRenderer(QOpenGLWidget* glWidget, const DecodedPictureToOpenGLUploader& decodedPictureProvider );
     ~QnGLRenderer();
 
     /*!

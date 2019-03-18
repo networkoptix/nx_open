@@ -8,7 +8,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtOpenGL/QGLContext>
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <translation/datetime_formatter.h>
 
@@ -538,7 +538,16 @@ void QnWorkbenchDisplay::initSceneView()
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
-        auto viewport = new QGLWidget(m_view);
+        class GG: public QOpenGLWidget
+        {
+            virtual void paintGL()
+            {
+                context()->functions()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            }
+        };
+
+
+        auto viewport = new QOpenGLWidget(m_view);
         if (const auto window = viewport->windowHandle())
         {
             connect(window, &QWindow::screenChanged, this,
@@ -548,9 +557,11 @@ void QnWorkbenchDisplay::initSceneView()
                         setScreenRecursive(item, screen);
                 });
         }
+
+//        viewport->update(); //< Forces OpenGL context initialization.
+        viewport->makeCurrent();
         m_view->setViewport(viewport);
 
-        viewport->makeCurrent();
         QnGlHardwareChecker::checkCurrentContext(true);
 
         /* QGLTextureCache leaks memory very fast when limit exceeded (Qt 5.6.1). */

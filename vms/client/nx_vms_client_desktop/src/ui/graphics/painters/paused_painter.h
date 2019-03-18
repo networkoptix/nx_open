@@ -8,6 +8,7 @@ class QGLContext;
 
 //class QnColorShaderProgram;
 
+// TODO: remove me?
 class QnPausedPainter: protected QOpenGLFunctions {
 public:
     QnPausedPainter(const QGLContext *context);

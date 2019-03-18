@@ -275,7 +275,7 @@ protected:
         return (stateFlags & Hovered) ? 1.0 : 0.5;
     }
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *widget, const QRectF &rect) {
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
 

@@ -13,6 +13,7 @@
 
 bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 {
+    return true;
     const QByteArray extensionsString = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
     const QByteArray versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
     const QByteArray rendererString = reinterpret_cast<const char*>(glGetString(GL_RENDERER));

@@ -8,6 +8,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 
@@ -466,8 +467,8 @@ void QnMediaResourceWidget::initRenderer()
     // Strictly speaking, this is a hack.
     // We shouldn't be using OpenGL context in class constructor.
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
-    const auto viewport = qobject_cast<const QGLWidget*>(view ? view->viewport() : nullptr);
-    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
+    const auto viewport = dynamic_cast<QOpenGLWidget*>(view ? view->viewport() : nullptr);
+    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
     m_renderer->inUse();
@@ -1105,7 +1106,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     const QRectF& sourceSubRect,
     const QRectF& targetRect)
 {
-    QnGlNativePainting::begin(m_renderer->glContext(), painter);
+    QnGlNativePainting::begin(m_renderer->openGLWidget(), painter);
 
     const qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);

@@ -8,7 +8,7 @@
 
 #include <deque>
 
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QRunnable>
 #include <QtCore/QThread>
@@ -76,12 +76,13 @@ public:
         \note It is recommended to call this method from GUI thread. In other case, behavour can be implementation-specific
     */
     bool ensureThereAreContextsSharedWith(
-        QGLWidget* const glWidget,
+        QOpenGLWidget* const glWidget,
         int poolSizeIncrement = -1 );
     /*!
         If on pool shared with \a parentContexts, an empty pool is created and returned
     */
-    const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& getPoolOfContextsSharedWith( const QGLContext* const parentContext ) const;
+    const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >&
+        getPoolOfContextsSharedWith( const QOpenGLWidget* parentOpenGLWidget) const;
 
     static DecodedPictureToOpenGLUploaderContextPool* instance();
 
@@ -89,14 +90,14 @@ private:
     struct UploaderPoolContext
     {
         std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> > uploaders;
-        QGLWidget* shareWidget;
+        QOpenGLWidget* shareWidget;
 
         UploaderPoolContext();
     };
 
     mutable QnMutex m_mutex;
     //map<parent context, pool of contexts shared with parent>
-    mutable std::map<const QGLContext*, UploaderPoolContext> m_auxiliaryGLContextPool;
+    mutable std::map<const QOpenGLWidget*, UploaderPoolContext> m_auxiliaryGLContextPool;
     WId m_paintWindowId;
     size_t m_optimalGLContextPoolSize;
 

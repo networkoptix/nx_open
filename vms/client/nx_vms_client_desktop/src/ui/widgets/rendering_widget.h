@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <core/resource/resource_fwd.h>
 
@@ -12,14 +12,13 @@ typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
  * Widget for displaying video from the given resource without constructing
  * the heavy graphics scene machinery.
  */
-class QnRenderingWidget: public QGLWidget
+class QnRenderingWidget: public QOpenGLWidget
 {
     Q_OBJECT
 
 public:
     explicit QnRenderingWidget(
         QWidget* parent = nullptr,
-        QGLWidget* shareWidget = nullptr,
         Qt::WindowFlags f = 0);
 
     virtual ~QnRenderingWidget() override;

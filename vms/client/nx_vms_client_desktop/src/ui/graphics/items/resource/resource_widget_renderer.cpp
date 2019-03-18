@@ -16,22 +16,24 @@ using namespace std::chrono;
 
 const microseconds kNoPtsValue{AV_NOPTS_VALUE};
 
-QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* context):
+QnResourceWidgetRenderer::QnResourceWidgetRenderer(
+    QObject* parent,
+    QOpenGLWidget* openGLWidget):
     QnAbstractRenderer(parent),
-    m_glContext(context)
+    m_openGLWidget(openGLWidget)
 {
-    NX_ASSERT(context);
+    const auto previousContext = QOpenGLContext::currentContext();
+    QSurface* previousSurface = previousContext ? previousContext->surface() : nullptr;
 
-    const auto currentContextBak = QGLContext::currentContext();
-    if (context && currentContextBak != context)
-        const_cast<QGLContext*>(context)->makeCurrent();
+    const auto differentContext = openGLWidget && previousContext != openGLWidget->context();
+    if (differentContext)
+        openGLWidget->makeCurrent();
 
-    if (context && currentContextBak != context)
+    if (differentContext)
     {
-        if (currentContextBak)
-            const_cast<QGLContext*>(currentContextBak)->makeCurrent();
-        else
-            const_cast<QGLContext*>(context)->doneCurrent();
+        openGLWidget->doneCurrent();
+        if (previousContext)
+            previousContext->makeCurrent(previousSurface);
     }
 
     setChannelCount(1);
@@ -44,7 +46,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     if (channelCount < 1)
         return;
 
-    m_glContext->makeCurrent();
+    m_openGLWidget->makeCurrent();
     m_panoFactor = channelCount;
     m_renderingContexts.resize(channelCount);
 
@@ -54,9 +56,9 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
             continue;
 
         ctx = {};
-        ctx.uploader = std::make_shared<DecodedPictureToOpenGLUploader>(m_glContext);
+        ctx.uploader.reset(new DecodedPictureToOpenGLUploader(m_openGLWidget));
         ctx.uploader->setForceSoftYUV(qnRuntime->isSoftwareYuv());
-        ctx.renderer = std::make_shared<QnGLRenderer>(m_glContext, *ctx.uploader);
+        ctx.renderer.reset(new QnGLRenderer(m_openGLWidget, *ctx.uploader));
         ctx.renderer->setBlurEnabled(qnSettings->isGlBlurEnabled());
         ctx.renderer->setScreenshotInterface(m_screenshotInterface);
         ctx.uploader->setYV12ToRgbShaderUsed(ctx.renderer->isYV12ToRgbShaderUsed());
@@ -329,9 +331,9 @@ QSize QnResourceWidgetRenderer::sourceSize() const
     return m_sourceSize;
 }
 
-const QGLContext* QnResourceWidgetRenderer::glContext() const
+QOpenGLWidget* QnResourceWidgetRenderer::openGLWidget() const
 {
-    return m_glContext;
+    return m_openGLWidget;
 }
 
 bool QnResourceWidgetRenderer::isDisplaying(

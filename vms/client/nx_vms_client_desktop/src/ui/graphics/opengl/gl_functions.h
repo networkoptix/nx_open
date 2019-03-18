@@ -1,10 +1,10 @@
-#ifndef QN_GL_FUNCTIONS_H
-#define QN_GL_FUNCTIONS_H
+#pragma once
 
-#include <cstddef> /* For std::ptrdiff_t. */
+#include <cstddef>
 
-#include <QtOpenGL/QGLContext>
+#include <QtOpenGL/QGL>
 
+class QOpenGLWidget;
 class QnGlFunctionsPrivate;
 
 #ifndef GL_ARB_vertex_buffer_object
@@ -19,10 +19,11 @@ typedef char GLchar;
 typedef struct __GLsync *GLsync;
 typedef uint64_t GLuint64;
 
-
-class QnGlFunctions {
+class QnGlFunctions
+{
 public:
-    enum Feature {
+    enum Feature
+    {
         ShadersBroken       = 0x10000000,   /**< Vendor has messed something up, and shaders are not supported. */
         NoOpenGLFullScreen  = 0x20000000    /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
     };
@@ -33,17 +34,12 @@ public:
      * 
      * \param context                   OpenGL context that this functions instance will work with. 
      */
-    QnGlFunctions(const QGLContext *context);
+    QnGlFunctions(QOpenGLWidget* glWidget);
 
     /**
      * Virtual destructor.
      */
     virtual ~QnGlFunctions();
-
-    /**
-     * \returns                         OpenGL context that this functions instance works with.
-     */
-    const QGLContext *context() const;
 
     /**
      * \returns                         Set of features supported by the current OpenGL context.
@@ -60,7 +56,9 @@ public:
      */
 	const OpenGLInfo& openGLInfo() const;
 
-	/**
+    QOpenGLWidget* glWidget() const;
+
+    /**
      * \returns                         Returns last (cached) \class OpenGLInfo setting (might be empty).
      */
 	static OpenGLInfo openGLCachedInfo();
@@ -88,9 +86,9 @@ public:
     static bool isWarningsEnabled();
 
 private:
-    QSharedPointer<QnGlFunctionsPrivate> d;
+    using PrivatePtr = QSharedPointer<QnGlFunctionsPrivate>;
+    static PrivatePtr createPrivate(QOpenGLWidget* glWidget);
+    PrivatePtr d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnGlFunctions::Features)
-
-#endif // QN_GL_FUNCTIONS_H

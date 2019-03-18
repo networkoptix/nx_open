@@ -52,7 +52,7 @@ private:
 
     QScopedPointer<QnSignDialogDisplay> m_camDispay;
     QScopedPointer<QnAbstractArchiveStreamReader> m_reader;
-    QScopedPointer<QnSignDialogGlWidget> m_glWindow;
+    QScopedPointer<QnSignDialogGlWidget> m_openGLWidget;
     QnResourceWidgetRenderer *m_renderer = nullptr;
     QnSignInfo* m_srcVideoInfo = nullptr;
     QVBoxLayout* m_layout = nullptr;

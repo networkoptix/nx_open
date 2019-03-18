@@ -160,13 +160,13 @@ public:
     bool nv12SharedUsed;
     QScopedPointer<QnGlFunctions> functions;
 
-    DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
-        QOpenGLFunctions(context->contextHandle()),
+    DecodedPictureToOpenGLUploaderPrivate(QOpenGLWidget* glWidget):
+        QOpenGLFunctions(glWidget->context()),
         supportsNonPower2Textures(false),
         forceSoftYUV(false),
         yv12SharedUsed(false),
         nv12SharedUsed(false),
-        functions(new QnGlFunctions(context))
+        functions(new QnGlFunctions(glWidget))
     {
         initializeOpenGLFunctions();
 
@@ -1264,10 +1264,10 @@ static DecodedPictureToOpenGLUploader* runningUploader = NULL;
 #endif
 
 DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
-    const QGLContext* const mainContext,
+    QOpenGLWidget* glWidget,
     unsigned int /*asyncDepth*/ )
 :
-    d( new DecodedPictureToOpenGLUploaderPrivate(mainContext) ),
+    d(new DecodedPictureToOpenGLUploaderPrivate(glWidget)),
     m_format( AV_PIX_FMT_NONE ),
     m_yuv2rgbBuffer( NULL ),
     m_yuv2rgbBufferLen( 0 ),
@@ -1278,8 +1278,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_rgbaBuf( NULL ),
     m_fileNumber( 0 ),
     m_hardwareDecoderUsed( false ),
-    m_asyncUploadUsed( false ),
-    m_initializedCtx( NULL )
+    m_asyncUploadUsed( false )
 {
 #ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >&
@@ -1370,15 +1369,20 @@ void DecodedPictureToOpenGLUploader::pleaseStop()
         while( !m_picturesBeingRendered.empty() )
             m_cond.wait( lk.mutex() );
 
-        const QGLContext* curCtx = QGLContext::currentContext();
-        if( curCtx != m_initializedCtx && m_initializedCtx )
-            m_initializedCtx->makeCurrent();
+        const auto previousContext = QOpenGLContext::currentContext();
+        QSurface* previousSurface = previousContext ? previousContext->surface() : nullptr;
+
+        const bool differentContext = m_initializedContext && previousContext != m_initializedContext;
+        if(differentContext)
+            m_initializedContext->makeCurrent(m_initializedSurface);
+
         releasePictureBuffersNonSafe();
-        if( curCtx != m_initializedCtx && m_initializedCtx )
+
+        if(differentContext)
         {
-            m_initializedCtx->doneCurrent();
-            if( curCtx )
-                const_cast<QGLContext*>(curCtx)->makeCurrent();
+            m_initializedContext->doneCurrent();
+            if(previousContext)
+                previousContext->makeCurrent(previousSurface);
         }
     }
 #endif
@@ -2048,8 +2052,11 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 {
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-    if( !m_initializedCtx && !m_asyncUploadUsed )
-        m_initializedCtx = const_cast<QGLContext*>(QGLContext::currentContext());
+    if(m_initializedContext && !m_asyncUploadUsed)
+    {
+        m_initializedContext = QOpenGLContext::currentContext();
+        m_initializedSurface = m_initializedContext->surface();
+    }
 #endif
 
     //NX_INFO(this, lm("uploadDataToGl. %1").arg((size_t) this));

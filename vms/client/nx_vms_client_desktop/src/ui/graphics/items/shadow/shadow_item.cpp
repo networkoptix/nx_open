@@ -77,7 +77,8 @@ void QnShadowItem::ensureShadowShape() const {
     m_shapeValid = m_shadowShape.size() > 0;
 }
 
-void QnShadowItem::initializeVao() {
+void QnShadowItem::initializeVao(QOpenGLWidget* glWidget)
+{
     if (!m_shapeValid) 
         return;
 
@@ -99,7 +100,7 @@ void QnShadowItem::initializeVao() {
     const int VERTEX_POS_SIZE = 2; // x, y
     const int VERTEX_POS_INDX = 0;
 
-    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorShader();
+    auto shader = QnOpenGLRendererManager::instance(glWidget)->getColorShader();
 
     m_positionBuffer.create();
     m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
@@ -148,27 +149,30 @@ QPainterPath QnShadowItem::shape() const {
     return QPainterPath();
 }
 
-void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget* widget)
+{
     ensureShadowShape();
 
     if (!m_shapeValid)
         return;
 
     if (!m_vaoInitialized)
-        initializeVao();
+        initializeVao(qobject_cast<QOpenGLWidget*>(widget));
 
     /* Color for drawing the shadow. */
     QColor color = m_color;
     color.setAlpha(color.alpha() * effectiveOpacity());
     
-    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    QnGlNativePainting::begin(glWidget, painter);
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
    
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(color);
-    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorShader();
+    const auto renderer = QnOpenGLRendererManager::instance(glWidget);
+    renderer->setColor(color);
+    auto shader = renderer->getColorShader();
     /* Draw shadowed rect. */
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_shadowShape.size(), shader);
+    renderer->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_shadowShape.size(), shader);
 
     glDisable(GL_BLEND); 
     QnGlNativePainting::end(painter);

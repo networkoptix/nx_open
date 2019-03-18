@@ -1,5 +1,8 @@
 #include "opengl_renderer.h"
 
+#include <QtGui/QOpenGLFunctions>
+#include <QtWidgets/QOpenGLWidget>
+
 #include "ui/graphics/opengl/gl_shortcuts.h"
 
 #include <ui/graphics/shaders/base_shader_program.h>
@@ -8,7 +11,6 @@
 #include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 
-#include <QtGui/QOpenGLFunctions>
 
 QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_colorProgram(new QnColorGLShaderProgram(parent)),
@@ -197,16 +199,15 @@ void QnOpenGLRenderer::popModelViewMatrix() {
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
 
-QnOpenGLRenderer* QnOpenGLRendererManager::instance(const QGLContext* a_context)
+QnOpenGLRenderer* QnOpenGLRendererManager::instance(QOpenGLWidget* glWidget)
 {
-    QnOpenGLRendererManager* manager = qn_openGlRenderManager_instance();
+    auto manager = qn_openGlRenderManager_instance();
+    auto it = manager->m_container.find(glWidget);
+    if (it != manager->m_container.end())
+        return *it;
 
-    auto it = manager->m_container.find(a_context);
-    if ( it != manager->m_container.end() )
-        return (*it);
-
-    manager->m_container.insert(a_context, new QnOpenGLRenderer());
-    return *(manager->m_container.find(a_context));
+    manager->m_container.insert(glWidget, new QnOpenGLRenderer());
+    return *(manager->m_container.find(glWidget));
 }
 
 QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /* = NULL*/):

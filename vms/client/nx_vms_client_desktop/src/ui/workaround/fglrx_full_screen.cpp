@@ -1,7 +1,7 @@
 #include "fglrx_full_screen.h"
 
 #include <QtWidgets/QAction>
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
@@ -18,19 +18,14 @@ QnFglrxFullScreen::QnFglrxFullScreen(QObject *parent):
 {
     display()->instrumentManager()->installInstrument(this);
 
-    updateFglrxMode(true);
+    updateFglrxMode(nullptr, true);
 }
 
-void QnFglrxFullScreen::updateFglrxMode(bool force) {
+void QnFglrxFullScreen::updateFglrxMode(QWidget* viewport, bool force) {
     bool fglrxMode = false;
 
-    foreach(QGraphicsView *view, display()->instrumentManager()->views()) {
-        if(QGLWidget *viewport = dynamic_cast<QGLWidget *>(view->viewport())) {
-            fglrxMode = (QnGlFunctions(viewport->context()).features() & QnGlFunctions::NoOpenGLFullScreen);
-            if(fglrxMode)
-                break;
-        }
-    }
+    if(QOpenGLWidget* glWidget = dynamic_cast<QOpenGLWidget*>(viewport))
+        fglrxMode = QnGlFunctions(glWidget).features().testFlag(QnGlFunctions::NoOpenGLFullScreen);
 
     if(m_fglrxMode == fglrxMode && !force)
         return;
@@ -41,11 +36,13 @@ void QnFglrxFullScreen::updateFglrxMode(bool force) {
         menu()->registerAlias(action::EffectiveMaximizeAction, action::MaximizeAction);
 }
 
-bool QnFglrxFullScreen::registeredNotify(QWidget *) {
-    updateFglrxMode();
+bool QnFglrxFullScreen::registeredNotify(QWidget* viewport)
+{
+    //updateFglrxMode(viewport);
     return true;
 }
 
-void QnFglrxFullScreen::unregisteredNotify(QWidget *) {
-    updateFglrxMode();
+void QnFglrxFullScreen::unregisteredNotify(QWidget* viewport)
+{
+    //updateFglrxMode(viewport);
 }

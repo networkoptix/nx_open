@@ -120,7 +120,7 @@ DecodedPictureToOpenGLUploaderContextPool::~DecodedPictureToOpenGLUploaderContex
 }
 
 bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith(
-    QGLWidget* const shareWidget,
+    QOpenGLWidget* const shareWidget,
     int poolSizeIncrement )
 {
 #ifdef NX_GLCONTEXT_PRESENT
@@ -159,12 +159,11 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
 #endif
 }
 
-const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& DecodedPictureToOpenGLUploaderContextPool::getPoolOfContextsSharedWith( const QGLContext* const parentContext ) const
+const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& DecodedPictureToOpenGLUploaderContextPool::getPoolOfContextsSharedWith(
+    const QOpenGLWidget* parentOpenGLWidget) const
 {
     QnMutexLocker lk( &m_mutex );
-
-    std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& pool = m_auxiliaryGLContextPool[parentContext].uploaders;
-    return pool;
+    return m_auxiliaryGLContextPool[parentOpenGLWidget].uploaders;
 }
 
 DecodedPictureToOpenGLUploaderContextPool* DecodedPictureToOpenGLUploaderContextPool::instance()
