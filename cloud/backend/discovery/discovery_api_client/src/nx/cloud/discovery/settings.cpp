@@ -1,5 +1,6 @@
 #include "settings.h"
 
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/deprecated_settings.h>
 
 namespace nx::cloud::discovery {
@@ -36,19 +37,16 @@ void Settings::load(const QnSettings& settings)
     discoveryServiceUrl =
         settings.value(kDiscoveryServiceUrl, kDefaultDiscoveryServiceUrl).toString();
 
-    // On Linux, count() returns a long, which is unsupported by QVariant constructors
-    // int is supported though.
-    roundTripPadding = std::chrono::milliseconds(settings.value(
-        kRoundTripPadding,
-        (int)kDefaultRoundTripPadding.count()).toInt());
+    roundTripPadding = nx::utils::parseTimerDuration(
+        settings.value(kRoundTripPadding).toString(),
+        kDefaultRoundTripPadding);
 
-    registrationErrorDelay = std::chrono::milliseconds(settings.value(
-        kRegistrationErrorDelay,
-        (int)kDefaultRegistrationErrorDelay.count()).toInt());
+    registrationErrorDelay = nx::utils::parseTimerDuration(settings.value(kRegistrationErrorDelay).toString(),
+        kDefaultRegistrationErrorDelay);
 
-    onlineNodesRequestDelay = std::chrono::milliseconds(settings.value(
-        kOnlineNodesRequestDelay,
-        (int)kDefaultOnlineNodesRequestDelay.count()).toInt());
+    onlineNodesRequestDelay = nx::utils::parseTimerDuration(
+        settings.value(kOnlineNodesRequestDelay).toString(),
+        kDefaultOnlineNodesRequestDelay);
 }
 
 } // namespace nx::cloud::discovery

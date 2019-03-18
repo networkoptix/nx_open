@@ -75,26 +75,15 @@ public:
 
     void addNodeContext(const nx::utils::Url& discoveryServiceUrl)
     {
-        const auto discoveryServiceUrlArg = lm("--discovery/discoveryServiceUrl=%1")
-            .arg(discoveryServiceUrl.toString());
-
-        // 2 milliseconds padding for testing purposes
-        const auto roundTripPaddingArg = lm("--discovery/roundTripPadding=%1")
-            .arg(QString::number(2));
-
-        const auto registrationErrorDelayArg = lm("--discovery/registrationErrorDelay=%1")
-            .arg(100);
-
-        const auto onlineNodesRequestDelayArg = lm("--discovery/onlineNodesRequestDelay=%1")
-            .arg(QString::number(2));
-
         m_fixture.addPeer(/*startAndWaitUntilStarted*/ false);
         Peer& peer = m_fixture.peer(m_fixture.peerCount() - 1);
 
-        peer.process().addArg(discoveryServiceUrlArg.toUtf8().constData());
-        peer.process().addArg(roundTripPaddingArg.toUtf8().constData());
-        peer.process().addArg(registrationErrorDelayArg.toUtf8().constData());
-        peer.process().addArg(onlineNodesRequestDelayArg.toUtf8().constData());
+        peer.process().addArg(
+            "-discovery/discoveryServiceUrl",
+            discoveryServiceUrl.toStdString().c_str());
+        peer.process().addArg("-discovery/roundTripPadding", "2ms");
+        peer.process().addArg("-discovery/registrationErrorDelay", "10ms");
+        peer.process().addArg("-discovery/onlineNodesRequestDelay", "2ms");
 
         ASSERT_TRUE(peer.process().startAndWaitUntilStarted());
 
