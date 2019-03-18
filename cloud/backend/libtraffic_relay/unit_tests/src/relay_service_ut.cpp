@@ -11,7 +11,6 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relay/model/clusterdb_map_remote_relay_peer_pool.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/settings.h>
 

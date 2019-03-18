@@ -38,7 +38,7 @@ nx::utils::Url Relay::basicUrl() const
 
 //-------------------------------------------------------------------------------------------------
 
-BasicComponentTest::BasicComponentTest(Mode mode):
+BasicComponentTest::BasicComponentTest(Mode /*mode*/):
     base_type("traffic_relay", QString()),
     m_discoveryServer(kClusterId)
 {
@@ -48,7 +48,6 @@ BasicComponentTest::BasicComponentTest(Mode mode):
         []() { return network::HostAddress("127.0.0.1"); });
 
     m_serverListening = m_discoveryServer.bindAndListen();
-
 }
 
 void BasicComponentTest::addRelayInstance(
