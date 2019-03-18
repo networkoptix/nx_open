@@ -139,6 +139,8 @@ public:
     // Holds QT property value.
     Player::State state;
 
+    Player::AutoJumpPolicy autoJumpPolicy = Player::AutoJumpPolicy::DisableAutoJumpOnPreviewing;
+
     // Holds QT property value.
     Player::MediaStatus mediaStatus;
 
@@ -951,6 +953,22 @@ qint64 Player::position() const
     return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
+Player::AutoJumpPolicy Player::autoJumpPolicy() const
+{
+    Q_D(const Player);
+    return d->autoJumpPolicy;
+}
+
+void Player::setAutoJumpPolicy(AutoJumpPolicy policy)
+{
+    Q_D(Player);
+    if (policy == d->autoJumpPolicy)
+        return;
+
+    d->autoJumpPolicy = policy;
+    emit autoJumpPolicyChanged();
+}
+
 void Player::setPosition(qint64 value)
 {
     if (value > QDateTime::currentMSecsSinceEpoch())
@@ -963,10 +981,11 @@ void Player::setPosition(qint64 value)
 
     if (d->archiveReader)
     {
-
         const qint64 valueUsec = msecToUsec(value);
         qint64 actualPositionUsec = valueUsec;
-        const bool allowCorrection = playbackState() != State::Previewing;
+        const bool allowCorrection =
+            d->autoJumpPolicy != Player::AutoJumpPolicy::DisableAutoJump
+            && playbackState() != State::Previewing;
         d->archiveReader->jumpTo(valueUsec, valueUsec, allowCorrection, &actualPositionUsec);
 
         const qint64 actualJumpPositionMsec = usecToMsec(actualPositionUsec);

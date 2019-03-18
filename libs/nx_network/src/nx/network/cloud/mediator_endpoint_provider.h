@@ -32,17 +32,37 @@ struct MediatorAddress
     }
 };
 
-// TODO: #ak Merge this class with ConnectionMediatorUrlFetcher.
-class MediatorEndpointProvider:
+//-------------------------------------------------------------------------------------------------
+
+class AbstractMediatorEndpointProvider:
     public nx::network::aio::BasicPollable
 {
-public:
     using base_type = nx::network::aio::BasicPollable;
 
+public:
     using FetchMediatorEndpointsCompletionHandler =
         nx::utils::MoveOnlyFunc<void(
             nx::network::http::StatusCode::Value /*resultCode*/)>;
 
+    /**
+     * After successful completion of this method, mediator address can be received
+     * with AbstractMediatorEndpointProvider::mediatorAddress().
+     */
+    virtual void fetchMediatorEndpoints(
+        FetchMediatorEndpointsCompletionHandler handler) = 0;
+
+    virtual std::optional<MediatorAddress> mediatorAddress() const = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+// TODO: #ak Merge this class with ConnectionMediatorUrlFetcher.
+class MediatorEndpointProvider:
+    public AbstractMediatorEndpointProvider
+{
+    using base_type = AbstractMediatorEndpointProvider;
+
+public:
     MediatorEndpointProvider(const std::string& cloudHost);
 
     virtual void bindToAioThread(
@@ -52,10 +72,10 @@ public:
 
     void mockupMediatorAddress(const MediatorAddress& mediatorAddress);
 
-    void fetchMediatorEndpoints(
-        FetchMediatorEndpointsCompletionHandler handler);
+    virtual void fetchMediatorEndpoints(
+        FetchMediatorEndpointsCompletionHandler handler) override;
 
-    std::optional<MediatorAddress> mediatorAddress() const;
+    virtual std::optional<MediatorAddress> mediatorAddress() const override;
 
 protected:
     virtual void stopWhileInAioThread() override;

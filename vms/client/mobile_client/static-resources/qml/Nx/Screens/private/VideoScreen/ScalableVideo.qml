@@ -21,6 +21,7 @@ ZoomableFlickable
     property size fitSize: content.boundedSize(width, height)
 
     signal showRoiHint()
+    signal hideRoiHint()
 
     interactive: !fisheyeMode
 
@@ -291,6 +292,7 @@ ZoomableFlickable
         {
             id: motionSearchController
 
+            dragThreshold: control.mouseArea.drag.threshold
             parent: content.videoOutput
             anchors.fill: parent
             viewport: control
@@ -317,6 +319,12 @@ ZoomableFlickable
             {
                 target: control
                 onMovementEnded: motionSearchController.updateDefaultRoi()
+            }
+
+            onDrawingRoiChanged:
+            {
+                if (drawingRoi)
+                    control.hideRoiHint()
             }
         }
     }

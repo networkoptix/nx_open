@@ -819,11 +819,13 @@ bool QnSecurityCamResource::isRecordingEventAttached() const
 void QnSecurityCamResource::recordingEventAttached()
 {
     m_recActionCnt++;
+    emit recordingActionChanged(toSharedPointer(this));
 }
 
 void QnSecurityCamResource::recordingEventDetached()
 {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
+    emit recordingActionChanged(toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getUserDefinedName() const

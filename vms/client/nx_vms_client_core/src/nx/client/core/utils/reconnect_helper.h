@@ -12,8 +12,10 @@ namespace nx::vms::client::core {
 class ReconnectHelper: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
+    using base_type = QObject;
+
 public:
-    ReconnectHelper(QObject *parent = NULL);
+    ReconnectHelper(bool stickyReconnect = false, QObject* parent = nullptr);
 
     QnMediaServerResourceList servers() const;
 

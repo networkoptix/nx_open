@@ -1,62 +1,25 @@
 #include <gtest/gtest.h>
 
-#include "mediator_functional_test.h"
+#include <nx/network/stun/async_client.h>
+#include <nx/network/stun/stun_types.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/thread/sync_queue.h>
+
+#include "api_test_fixture.h"
 
 namespace nx {
 namespace hpm {
 namespace test {
 
 class StunApi:
-    public MediatorFunctionalTest
+    public ApiTestFixture<nx::network::stun::AsyncClient>
 {
-public:
-    ~StunApi()
-    {
-        if (m_connection)
-            m_connection->pleaseStopSync();
-    }
-
 protected:
-    virtual void SetUp() override
+    virtual nx::utils::Url stunApiUrl() const override
     {
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        return nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
+            .setEndpoint(stunTcpEndpoint());
     }
-
-    void openInactiveConnection()
-    {
-        m_connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(m_connection->connect(stunTcpEndpoint(), nx::network::kNoTimeout));
-    }
-
-    void waitForConnectionIsClosedByServer()
-    {
-        std::array<char, 256> readBuf;
-        for (;;)
-        {
-            const int bytesRead = m_connection->recv(readBuf.data(), readBuf.size(), 0);
-            if (bytesRead > 0)
-                continue;
-            if (bytesRead == 0 ||
-                nx::network::socketCannotRecoverFromError(SystemError::getLastOSErrorCode()))
-            {
-                break;
-            }
-        }
-    }
-
-    void assertConnectionIsNotClosedDuring(std::chrono::milliseconds delay)
-    {
-        ASSERT_TRUE(m_connection->setRecvTimeout(delay.count()));
-
-        std::array<char, 256> readBuf;
-        ASSERT_EQ(-1, m_connection->recv(readBuf.data(), readBuf.size(), 0));
-        ASSERT_TRUE(
-            SystemError::getLastOSErrorCode() == SystemError::timedOut ||
-            SystemError::getLastOSErrorCode() == SystemError::wouldBlock);
-    }
-
-private:
-    std::unique_ptr<nx::network::TCPSocket> m_connection;
 };
 
 TEST_F(StunApi, inactive_connection_is_not_closed_without_inactivity_timeout)
@@ -80,7 +43,17 @@ public:
 TEST_F(StunApiLowInactivityTimeout, inactive_connection_is_closed_by_timeout)
 {
     openInactiveConnection();
-    waitForConnectionIsClosedByServer();
+    waitForConnectionIsClosedByMediator();
+}
+
+TEST_F(StunApiLowInactivityTimeout, malformed_request_is_properly_handled)
+{
+    whenSendMalformedRequest();
+
+    thenReponseIsReceived();
+    andResponseCodeIs(api::ResultCode::badRequest);
+
+    waitForConnectionIsClosedByMediator();
 }
 
 } // namespace test

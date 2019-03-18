@@ -34,7 +34,7 @@ ServerUpdatesModel::ServerUpdatesModel(
 
     connect(m_tracker.get(), &PeerStateTracker::itemAdded,
         this, &ServerUpdatesModel::atItemAdded);
-    connect(m_tracker.get(), &PeerStateTracker::itemRemoved,
+    connect(m_tracker.get(), &PeerStateTracker::itemToBeRemoved,
         this, &ServerUpdatesModel::atItemRemoved);
     connect(m_tracker.get(), &PeerStateTracker::itemChanged,
         this, &ServerUpdatesModel::atItemChanged);

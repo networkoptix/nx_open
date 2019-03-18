@@ -88,8 +88,6 @@ namespace Qn
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
         LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
         LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
-        LayoutEncryptionRole,                       /**< Role for encrypted layout. 'true' if encrypted. */
-        LayoutPasswordRole,                         /**< Role for encrypted layout. QString containing a password. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */

@@ -115,7 +115,7 @@ signals:
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 
 protected:
-    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
     virtual void setState(State state);
     void stopWhileInAioThread();
@@ -133,9 +133,8 @@ protected:
 private:
     enum class CredentialsSource
     {
-        remoteUrl,
+        userNameAndPassword,
         serverKey,
-        appserverConnectionFactory,
         none,
     };
 protected:
@@ -146,7 +145,7 @@ private:
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
 
-    CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
+    CredentialsSource m_credentialsSource = CredentialsSource::userNameAndPassword;
 
     vms::api::PeerDataEx m_remotePeer;
     vms::api::PeerDataEx m_localPeer;

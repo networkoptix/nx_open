@@ -19,6 +19,7 @@ def short_release_version(version):
 
 
 def determine_package_versions(
+    target,
     platform,
     box,
     release_version,
@@ -54,7 +55,7 @@ def determine_package_versions(
     if platform == "windows":
         v["ffmpeg"] = "3.1.9"
 
-    if platform == "linux" and box == "none":
+    if platform == "linux" and box == "none" and target != "linux-arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
@@ -89,7 +90,7 @@ def determine_package_versions(
     if box == "edge1":
         v["sysroot"] = "jessie"
 
-    if box == "tx1":
+    if target == "linux-arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
@@ -107,7 +108,7 @@ def determine_package_versions(
 def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
     have_mediaserver = platform not in ("android", "ios", "macosx")
     have_desktop_client = platform in ("windows", "macosx") \
-        or (platform == "linux" and box in ("none", "tx1"))
+        or (platform == "linux" and (box == "none" or arch == "arm64"))
     have_mobile_client = have_desktop_client or platform in ("android", "ios")
 
     sync = syncher.sync
@@ -131,7 +132,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     sync("any/detection_plugin_interface")
 
-    if box in ("rpi", "bpi", "bananapi", "edge1", "tx1"):
+    if box in ("rpi", "bpi", "bananapi", "edge1") or (platform, arch) == ("linux", "arm64"):
         sync("linux-%s/openssl" % arch)
     else:
         sync("openssl")
@@ -144,7 +145,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if box == "rpi":
         sync("cifs-utils")
 
-    if box == "tx1":
+    if (platform, arch) == ("linux", "arm64"):
         sync("tegra_video")
         sync("jetpack")
         sync("deepstream")
@@ -152,7 +153,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if (platform == "linux" and box == "none") or (box == "tx1"):
+    if platform == "linux" and (box == "none" or arch == "arm64"):
         sync("cifs-utils")
 
     if platform == "windows":
@@ -228,11 +229,7 @@ def parse_target(target):
             platform = "ios"
         else:
             platform = "linux"
-
-            if box == "tx1":
-                arch = "aarch64"
-            else:
-                arch = "arm"
+            arch = "arm"
 
     return platform, arch, box
 
@@ -299,6 +296,7 @@ def main():
     else:
         syncher.rdep_target = args.target
     syncher.versions = determine_package_versions(
+        args.target,
         platform,
         box,
         args.release_version,

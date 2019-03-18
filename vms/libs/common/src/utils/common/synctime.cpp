@@ -23,6 +23,12 @@ QnSyncTime::QnSyncTime(QObject *parent): QObject(parent)
 {
 }
 
+QnSyncTime::~QnSyncTime()
+{
+    // It should help tracking a crash when application exits.
+    NX_VERBOSE(this, "~QnSyncTime()");
+}
+
 QDateTime QnSyncTime::currentDateTime() const
 {
     return QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch());

@@ -33,6 +33,8 @@ public:
     nx::network::stun::MessageDispatcher& dispatcher();
     const MultiAddressStunServer& server() const;
 
+    const nx::network::server::AbstractStatisticsProvider& statisticsProvider() const;
+
 private:
     const conf::Settings& m_settings;
     network::stun::MessageDispatcher m_stunMessageDispatcher;
@@ -41,6 +43,7 @@ private:
     std::unique_ptr<network::server::MultiAddressServer<network::stun::UdpServer>> m_udpStunServer;
     std::vector<network::SocketAddress> m_udpEndpoints;
     std::vector<network::SocketAddress> m_tcpEndpoints;
+    nx::network::server::AggregateStatisticsProvider m_stunServerStatisticsProvider;
 
     void initializeHttpTunnelling(http::Server* httpServer);
     bool bind();

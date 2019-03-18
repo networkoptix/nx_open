@@ -33,6 +33,7 @@ SystemError::ErrorCode startProcessDetached(
         {
             args->startupInfo->dwFlags &= ~DWORD(STARTF_USESTDHANDLES);
             args->flags |= CREATE_NEW_CONSOLE;
+            args->inheritHandles = false;
         });
 
     return p.startDetached(pid)? SystemError::noError : SystemError::fileNotFound;

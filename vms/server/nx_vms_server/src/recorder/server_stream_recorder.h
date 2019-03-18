@@ -110,6 +110,7 @@ private:
     };
 
     void updateRecordingType(const ScheduleTaskWithThresholds& scheduleTask);
+    qint64 calculatePrebufferingSizeFromRulesUsec() const;
     void updateStreamParams();
     bool isMotionRec(Qn::RecordingType recType) const;
     void updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData);

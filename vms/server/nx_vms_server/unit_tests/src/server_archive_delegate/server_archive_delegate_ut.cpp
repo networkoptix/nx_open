@@ -382,10 +382,10 @@ private:
                 ? serverModule->normalStorageManager() : serverModule->backupStorageManager();
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::HiQualityCatalog);
-            manager->m_rebuildCancelled = false;
+            //manager->m_rebuildCancelled = false;
 
-            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::LowQualityCatalog, archiveCameras);
-            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::HiQualityCatalog, archiveCameras);
+            //manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::LowQualityCatalog, archiveCameras);
+            //manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::HiQualityCatalog, archiveCameras);
         }
     }
 

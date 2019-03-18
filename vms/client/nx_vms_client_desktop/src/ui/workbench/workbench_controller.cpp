@@ -221,14 +221,15 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         [](QGraphicsItem* item)
         {
             const auto widget = dynamic_cast<QnResourceWidget*>(item);
-            if (!widget)
+            if (!widget || widget->options().testFlag(QnResourceWidget::WindowRotationForbidden))
                 return false;
+
             const auto workbenchItem = widget->item();
             if (!workbenchItem)
                 return false;
+
             const auto layout = workbenchItem->layout();
-            return !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden)
-                && !layout->locked();
+            return layout && !layout->locked();
         }));
 
     /* Item instruments. */

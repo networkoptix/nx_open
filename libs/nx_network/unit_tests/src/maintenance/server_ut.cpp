@@ -14,10 +14,10 @@ struct DebugCounters
 {
     int tcpSocketCount = 0;
     int stunConnectionCount = 0;
-    int httpConnectionCount = 0;
+    int httpServerConnectionCount = 0;
 };
 
-#define DebugCounters_Fields (tcpSocketCount)(stunConnectionCount)(httpConnectionCount)
+#define DebugCounters_Fields (tcpSocketCount)(stunConnectionCount)(httpServerConnectionCount)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (DebugCounters),
@@ -73,7 +73,7 @@ protected:
         ASSERT_TRUE(msgBody);
 
         const auto debugCounters = QJson::deserialized<DebugCounters>(*msgBody);
-        ASSERT_EQ(1U, debugCounters.httpConnectionCount);
+        ASSERT_EQ(1U, debugCounters.httpServerConnectionCount);
         ASSERT_EQ(2U, debugCounters.tcpSocketCount);
         ASSERT_EQ(0U, debugCounters.stunConnectionCount);
     }

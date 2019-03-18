@@ -65,7 +65,6 @@ protected:
     bool atCancelCurrentAction();
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
-    void atCloudSettingsChanged();
 
     void clearUpdateInfo();
     void pickLocalFile();
@@ -118,6 +117,10 @@ private:
     void setAutoUpdateCheckMode(bool mode);
     void autoCheckForUpdates();
     void checkForInternetUpdates(bool initial = false);
+    /**
+     * Repeat validation process for current update information. Will work only in 'Ready' state.
+     */
+    void repeatUpdateValidation();
 
     /**
      * Describes all possible display modes for update version.
@@ -233,7 +236,6 @@ private:
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;
     nx::utils::SoftwareVersion m_targetVersion;
-    bool m_holdConnection = false;
 
     WidgetUpdateState m_widgetState = WidgetUpdateState::initial;
 
@@ -250,18 +252,6 @@ private:
 
     /** Id of the progress notification at the right panel. */
     QnUuid m_rightPanelDownloadProgress;
-
-    /**
-     * This sets are changed every time we are initiating some update action.
-     * Set of servers that are currently active.
-     */
-    QSet<QnUuid> m_peersActive;
-    /** Set of servers that are used for the current task. */
-    QSet<QnUuid> m_peersIssued;
-    /** A set of servers that have completed current task. */
-    QSet<QnUuid> m_peersComplete;
-    /** A set of servers that have failed current task. */
-    QSet<QnUuid> m_peersFailed;
 };
 
 } // namespace nx::vms::client::desktop

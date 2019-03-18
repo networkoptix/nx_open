@@ -34,7 +34,7 @@ struct DebugCounters
 {
     std::atomic<int> tcpSocketCount{0};
     std::atomic<int> stunConnectionCount{0};
-    std::atomic<int> httpConnectionCount{0};
+    std::atomic<int> httpServerConnectionCount{0};
 };
 
 class NX_NETWORK_API SocketGlobals

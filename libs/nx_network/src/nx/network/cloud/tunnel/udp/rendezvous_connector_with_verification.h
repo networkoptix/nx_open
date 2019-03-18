@@ -20,7 +20,7 @@ public:
     RendezvousConnectorWithVerification(
         std::string connectSessionId,
         SocketAddress remotePeerAddress,
-        std::unique_ptr<nx::network::UDPSocket> udpSocket);
+        std::unique_ptr<AbstractDatagramSocket> udpSocket);
 
     RendezvousConnectorWithVerification(
         std::string connectSessionId,

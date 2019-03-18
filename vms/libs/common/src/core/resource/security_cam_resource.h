@@ -404,6 +404,8 @@ signals:
         const QString& caption,
         const QString& description,
         qint64 timestamp );
+
+    void recordingActionChanged(const QnResourcePtr& resource);
 protected slots:
     virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();

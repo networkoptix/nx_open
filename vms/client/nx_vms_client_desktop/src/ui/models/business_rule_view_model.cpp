@@ -63,29 +63,17 @@ QString braced(const QString& source)
 
 QVector<QnUuid> toIdList(const QSet<QnUuid>& src)
 {
-    QVector<QnUuid> result;
-    result.reserve(src.size());
-    for (auto id : src)
-        result << id;
-    return result;
+    return src.toList().toVector();
 }
 
 QSet<QnUuid> toIdSet(const QVector<QnUuid>& src)
 {
-    QSet<QnUuid> result;
-    result.reserve(src.size());
-    for (auto id : src)
-        result << id;
-    return result;
+    return src.toList().toSet();
 }
 
 QSet<QnUuid> toIds(const QnResourceList& resources)
 {
-    QSet<QnUuid> result;
-    for (auto resource : resources)
-        result << resource->getId();
-
-    return result;
+    return resources.ids().toSet();
 }
 
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType eventType)

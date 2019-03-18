@@ -2,7 +2,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <QString>
+#include <QtCore/QString>
 #include <QMap>
 
 namespace {
@@ -16,7 +16,7 @@ static constexpr float kFpsFactorMultiplier = 1.0f;
 static constexpr float kMaxSuggestedBitrateKbps = 192.0f;
 static constexpr float kDefaultBitratePerGop = 30.0f;
 
-static const QMap<QString, float> kBitrateMultiplyerByCodec =
+static const QMap<QString, float> kBitrateMultiplierByCodec =
     { { "MJPEG", 2.0f }, { "H264", 1.0f }, { "H265", 0.8 } };
 
 constexpr float bitrateCoefficient(Qn::StreamQuality quality)
@@ -62,7 +62,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
 
     const float frameRateFactor = kFpsFactorMultiplier * fps;
 
-    const float bitrateMultiplyer = kBitrateMultiplyerByCodec.value(codec, 1.0f);
+    const float bitrateMultiplyer = kBitrateMultiplierByCodec.value(codec, 1.0f);
 
     const float result = qualityFactor * resolutionFactor * frameRateFactor * bitrateMultiplyer;
 

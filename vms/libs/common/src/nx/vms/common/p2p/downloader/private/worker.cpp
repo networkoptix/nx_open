@@ -401,12 +401,11 @@ void Worker::requestFileInformationInternal()
         NX_VERBOSE(m_logTag, "Requesting %1 from server %2.",
             requestSubjectString(m_state), peerName);
 
-        const auto handle = m_peerManager->requestFileInfo(peer, m_fileName,
-            [this](
-                bool success, rest::Handle handle, const FileInformation& fileInfo)
+        const auto handle = m_peerManager->requestFileInfo(peer, m_fileName, nx::utils::guarded(this,
+            [this](bool success, rest::Handle handle, const FileInformation& fileInfo)
             {
                 handleFileInformationReply(success, handle, fileInfo);
-            });
+            }));
         if (handle > 0)
             m_contextByHandle[handle] = RequestContext(peer, State::requestingFileInformation);
     }
@@ -592,12 +591,12 @@ void Worker::requestChecksums()
             requestSubjectString(State::requestingChecksums),
             m_peerManager->peerString(peer));
 
-        const auto handle = m_peerManager->requestChecksums(peer, m_fileName,
+        const auto handle = m_peerManager->requestChecksums(peer, m_fileName, nx::utils::guarded(this,
             [this](
                 bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
             {
                 handleChecksumsReply(success, handle, checksums);
-            });
+            }));
         if (handle > 0)
             m_contextByHandle[handle] = RequestContext(peer, State::requestingChecksums);
     }

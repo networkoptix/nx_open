@@ -1289,8 +1289,8 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID() && checkIfMyStorage(storage))
     {
-        removeStorage(storage);
         storageDbPool()->removeSDB(storage);
+        removeStorage(storage);
     }
 }
 

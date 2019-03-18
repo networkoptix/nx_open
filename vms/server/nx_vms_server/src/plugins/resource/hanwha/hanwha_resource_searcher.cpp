@@ -147,7 +147,10 @@ QnResourceList HanwhaResourceSearcher::findResources()
         m_foundUpnpResources.clear();
         m_alreadyFoundMacAddresses.clear();
     }
+
+    NX_VERBOSE(this, "Found UPnP resources: %1", upnpResults);
     addResourcesViaSunApi(upnpResults);
+    NX_VERBOSE(this, "Found UPnP or SUNAPI resources: %1", upnpResults);
     return upnpResults;
 }
 
@@ -326,17 +329,18 @@ bool HanwhaResourceSearcher::processPacket(
     if (!isHanwhaCamera(devInfo))
         return false;
 
+    NX_VERBOSE(this, "Got UPnP Hanwha device: [%1] (serial: [%2], address: [%3])",
+        devInfo.modelName, devInfo.serialNumber, deviceEndpoint);
     nx::utils::MacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
         cameraMac = nx::utils::MacAddress(devInfo.serialNumber);
     if (cameraMac.isNull())
     {
-        NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
-            .arg(devInfo.udn).arg(devInfo.serialNumber));
+        NX_WARNING(this,
+            "Can't obtain MAC address for hanwha device: [%1] (udn: [%2], serial: [%3])",
+            devInfo.modelName, devInfo.udn, devInfo.serialNumber);
         return false;
     }
-
-    QString model(devInfo.modelName);
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -347,6 +351,9 @@ bool HanwhaResourceSearcher::processPacket(
         if (itr != m_sunapiDiscoveredDevices.end()
             && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
         {
+            NX_DEBUG(this,
+                "Device [%1] (%2) was discovered by SUNAPI, skipping device info found by UPnP",
+                itr.value().modelName, itr.key());
             return false;
         }
 
@@ -408,6 +415,8 @@ void HanwhaResourceSearcher::createResource(
 
     auto auth = rpRes ? rpRes->getAuth() : getDefaultAuth();
     resource->setDefaultAuth(auth);
+
+    NX_DEBUG(this, "Found resource: %1", resource);
     result << resource;
     if (rpRes)
         addMultichannelResources(result, auth);

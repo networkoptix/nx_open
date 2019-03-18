@@ -2473,23 +2473,48 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
-    /**%apidoc[proprietary] GET /ec2/updateInformation/freeSpaceForUpdateFiles
-     * Get free space available for downloading and extracting update files.
-     * %param[proprietary]:option local If present, the request should not be redirected to another
-     *     server.
-     * %param[proprietary]:option extraFormatting If present and the requested result format is
-     *     non-binary, indentation and spacing will be used to improve readability.
-     * %param[default]:enum format
-     * %return The amount of free space available for update files in bytes for each online server
-     *     in the system, in the specified format.
+    /**%apidoc GET /ec2/updateInformation
+     * Retrieves a currently present or specified via a parameter update information manifest.
+     * %param[opt]:string version If present, Media Server makes an attempt to retrieve an update
+     *      manifest for the specified version id from the dedicated updates server and return it
+     *      as a result.
+     * %return:object JSON with the update manifest.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
         commonModule()->engineVersion()));
+
+    /**%apidoc POST /ec2/startUpdate
+     * Starts an update process.
+     * %param:object JSON with the update manifest. This JSON might be requested with the
+     *     /ec2/updateInformation?version=versionId request.
+     */
     reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
+
+    /**%apidoc POST /ec2/finishUpdate
+     * Puts a system in the 'Update Finished' state.
+     * %param[opt]:option ignorePendingPeers Force an update process completion regardless actual
+     *     peers state.
+     */
     reg("ec2/finishUpdate", new QnFinishUpdateRestHandler(serverModule()));
+
+    /**%apidoc GET /ec2/updateStatus
+     * Retrieves a current update processing system-wide state.
+     * %return:object A JSON array with the current update per-server state. Possible values for a
+     *     specific server are: idle, downloading, preparing, readyToInstall,
+     *     latestUpdateInstalled, offline, error.
+     */
     reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
+
+    /**%apidoc POST /api/installUpdate
+     * Initiates update package installation.
+     */
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule(),
         [this]() { m_installUpdateRequestReceived = true; }));
+
+    /**%apidoc POST /ec2/cancelUpdate
+     * Puts a system in the 'Idle' state update-wise. This means that the current update
+     * manifest is cleared and all downloads are cancelled.
+     */
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/cameraThumbnail
@@ -3572,12 +3597,12 @@ void MediaServerProcess::stopObjects()
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
+    m_ec2ConnectionFactory->shutdown();
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
     serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
 
-    m_ec2ConnectionFactory->shutdown();
 
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
@@ -4433,6 +4458,7 @@ void MediaServerProcess::run()
 
     serverModule->sdkObjectFactory()->init();
     serverModule->analyticsManager()->init();
+    m_cloudIntegrationManager->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 

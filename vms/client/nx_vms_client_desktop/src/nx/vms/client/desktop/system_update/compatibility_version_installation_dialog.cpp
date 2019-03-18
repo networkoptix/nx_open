@@ -1,9 +1,9 @@
+#include "compatibility_version_installation_dialog.h"
+#include "ui_compatibility_version_installation_dialog.h"
+
 #include <chrono>
 
 #include <QtWidgets/QPushButton>
-
-#include "compatibility_version_installation_dialog.h"
-#include "ui_compatibility_version_installation_dialog.h"
 
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>

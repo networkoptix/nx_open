@@ -142,6 +142,7 @@ private:
     QnCloudUrlHelper* m_cloudUrlHelper;
 
     QString m_localPrefix;
+    QMargins m_customMargins;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

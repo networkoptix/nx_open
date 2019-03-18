@@ -20,6 +20,7 @@ public:
     const QnClientConnectionStatus* connectionStatus() const;
 
     void setHoldConnection(bool holdConnection);
+    bool isConnectionHeld() const;
 
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const override;

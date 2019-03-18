@@ -108,6 +108,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.enforceMediatorEndpoint, "--enforce-mediator");
 
     addParserParam(commandLineParser, &result.qmlRoot, "--qml-root");
+    QString qmlImportPaths;
+    addParserParam(commandLineParser, &qmlImportPaths, "--qml-import-paths");
 
     commandLineParser.parse(argc, (const char**) argv, stderr);
 
@@ -121,6 +123,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
+
+    result.qmlImportPaths = qmlImportPaths.split(',', QString::SkipEmptyParts);
 
     // First unparsed entry is the application path.
     NX_ASSERT(!unparsed.empty());

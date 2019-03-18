@@ -180,7 +180,6 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 void QnResourceDiscoveryManager::stop()
 {
     pleaseStop();
-    quit();
     wait();
 }
 
@@ -193,6 +192,7 @@ void QnResourceDiscoveryManager::pleaseStop()
             searcher->pleaseStop();
     }
     base_type::pleaseStop();
+    quit(); //telling thread's event loop to return
 }
 
 void QnResourceDiscoveryManager::run()
@@ -423,13 +423,28 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
         const auto camera = commonModule()->resourcePool()->getResourceByUniqueId(manualCamera.uniqueId)
             .dynamicCast<QnSecurityCamResource>();
 
-        if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
+        if (camera && (camera->hasFlags(Qn::foreigner) && !canTakeForeignCamera(camera, 0)))
         {
-            NX_VERBOSE(this, lm("Manual camera %1 check host address %2")
-                .args(manualCamera.uniqueId, manualCamera.url));
-
-            searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
+            NX_VERBOSE(this, lm("Skip foreigh camera %1 on %2").args(
+                manualCamera.uniqueId, manualCamera.url));
+            continue;
         }
+
+        // There is a little problem: if camera goes offline on manual addition we will still try to
+        // ping it until it's found even if discovery mode is disabled.
+        // TODO: Refactor so samera is not pinged on manual addition. The resource from manual
+        // search handler should be used instead!
+        if (!manualCamera.searcher || (
+            camera && manualCamera.searcher->discoveryMode() == DiscoveryMode::disabled))
+        {
+            NX_VERBOSE(this, lm("Skip disabled searcher for camera %1 on %2").args(
+                manualCamera.uniqueId, manualCamera.url));
+            continue;
+        }
+
+        NX_VERBOSE(this, lm("Check %1 on %2").args(
+            manualCamera.uniqueId, manualCamera.url));
+        searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
     }
 
     for (auto& future: searchFutures)

@@ -1287,9 +1287,8 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
         }
     }
 
-    NX_VERBOSE(this)
-        << lm("Metadata [%2] processed by %3 consumers")
-            .arg(static_cast<int>(metadata->metadataType)).arg(consumersCount);
+    NX_VERBOSE(this, "Metadata [%1] processed by %2 consumers",
+        (int) metadata->metadataType, consumersCount);
 }
 
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)

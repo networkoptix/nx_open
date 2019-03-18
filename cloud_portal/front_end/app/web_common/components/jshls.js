@@ -83,8 +83,7 @@ import * as Hls from 'hls.js';
                 var parsingDuration = data.stats.tparsed - data.stats.tload;
                 if (stats.levelParsed) {
                     this.sumLevelParsingMs += parsingDuration;
-                }
-                else {
+                } else {
                     this.sumLevelParsingMs = parsingDuration;
                 }
                 stats.levelParsed++;
@@ -143,8 +142,7 @@ import * as Hls from 'hls.js';
                     stats.autoLevelCappingMin = Math.min(stats.autoLevelCappingMin, hls.autoLevelCapping);
                     stats.autoLevelCappingMax = Math.max(stats.autoLevelCappingMax, hls.autoLevelCapping);
                     stats.fragBuffered++;
-                }
-                else {
+                } else {
                     stats.fragMinLatency = stats.fragMaxLatency = latency;
                     stats.fragMinProcess = stats.fragMaxProcess = process;
                     stats.fragMinKbps = stats.fragMaxKbps = bitrate;
@@ -201,8 +199,7 @@ import * as Hls from 'hls.js';
                         if (this.levelLastAuto && level !== stats.autoLevelLast) {
                             stats.autoLevelSwitch++;
                         }
-                    }
-                    else {
+                    } else {
                         stats.autoLevelMin = stats.autoLevelMax = level;
                         stats.autoLevelSwitch = 0;
                         stats.fragChangedAuto = 1;
@@ -211,8 +208,7 @@ import * as Hls from 'hls.js';
                     this.sumAutoLevel += level;
                     stats.autoLevelAvg = Math.round(1000 * this.sumAutoLevel / stats.fragChangedAuto) / 1000;
                     stats.autoLevelLast = level;
-                }
-                else {
+                } else {
                     if (stats.fragChangedManual) {
                         stats.manualLevelMin = Math.min(stats.manualLevelMin, level);
                         stats.manualLevelMax = Math.max(stats.manualLevelMax, level);
@@ -220,8 +216,7 @@ import * as Hls from 'hls.js';
                         if (!this.levelLastAuto && level !== stats.manualLevelLast) {
                             stats.manualLevelSwitch++;
                         }
-                    }
-                    else {
+                    } else {
                         stats.manualLevelMin = stats.manualLevelMax = level;
                         stats.manualLevelSwitch = 0;
                         stats.fragChangedManual = 1;
@@ -235,8 +230,7 @@ import * as Hls from 'hls.js';
                 if (stats) {
                     if (stats.fragLoadEmergencyAborted === undefined) {
                         stats.fragLoadEmergencyAborted = 1;
-                    }
-                    else {
+                    } else {
                         stats.fragLoadEmergencyAborted++;
                     }
                 }
@@ -261,8 +255,7 @@ import * as Hls from 'hls.js';
                             if (data.response.code === 0) {
                                 console.log('this might be a CORS issue, consider installing <a href="https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi">Allow-Control-Allow-Origin</a> Chrome Extension');
                             }
-                        }
-                        catch (err) {
+                        } catch (err) {
                             var reason = (data.response) ? data.response.text : data.networkDetails.statusText;
                             console.log('Cannot load <a href="' + data.context.url + '">' + data.context.url + '</a><br>Reason: ' + reason);
                         }
@@ -312,10 +305,9 @@ import * as Hls from 'hls.js';
                     case Hls.default.ErrorDetails.BUFFER_APPENDING_ERROR:
                         console.log('Buffer Appending Error');
                         break;
-                    /*case Hls.default.ErrorDetails.BUFFER_STALLED_ERROR:
-                        console.log("Buffer Stalled Error");
-                        console.log(jshlsApi.hls.streamController._bufferedFrags);
-                        //jshlsApi.hls.handleMediaError();*/
+                    // case Hls.default.ErrorDetails.BUFFER_STALLED_ERROR:
+                    //     jshlsApi.load(jshlsApi.video.src);
+                    //     break;
                     default:
                         break;
                 }
@@ -341,16 +333,14 @@ import * as Hls from 'hls.js';
                 // track all errors independently
                 if (stats[data.details] === undefined) {
                     stats[data.details] = 1;
-                }
-                else {
+                } else {
                     stats[data.details] += 1;
                 }
                 // track fatal error
                 if (data.fatal) {
                     if (stats.fatalError === undefined) {
                         stats.fatalError = 1;
-                    }
-                    else {
+                    } else {
                         stats.fatalError += 1;
                     }
                 }
@@ -370,8 +360,7 @@ import * as Hls from 'hls.js';
                 if (stats) {
                     if (stats.fpsDropEvent === undefined) {
                         stats.fpsDropEvent = 1;
-                    }
-                    else {
+                    } else {
                         stats.fpsDropEvent++;
                     }
                     stats.fpsTotalDroppedFrames = data.totalDroppedFrames;
