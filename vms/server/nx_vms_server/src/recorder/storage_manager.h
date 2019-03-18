@@ -52,7 +52,7 @@ extern "C" {
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
-class ScanMediaFilesTask;
+class ArchiveIndexer;
 class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
