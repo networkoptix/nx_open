@@ -546,7 +546,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
             *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
         authResult = tryHttpBasic(request.requestLine.method, authorizationHeader, response, accessRights);
 
-        if (authResult == Qn::Auth_OK && userResource &&
+        if (authResult == Qn::Auth_OK && userResource && userResource->isLocal() &&
             (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
         {
             updateUserHashes(userResource, QString::fromUtf8(authorizationHeader.basic->password));
