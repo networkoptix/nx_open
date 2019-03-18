@@ -68,8 +68,8 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr char kRetryDelay[] = "retryDelay";
-static const std::chrono::milliseconds kDefaultRetryDelay = std::chrono::seconds(10);
+static constexpr char kConnectionRetryDelay[] = "clusterDbMap/connectionRetryDelay";
+static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
 
 } // namespace
 
@@ -102,8 +102,7 @@ Settings::Settings():
     base_type(
         nx::utils::AppInfo::organizationNameForSettings(),
         AppInfo::applicationName(),
-        kModuleName),
-    retryDelay(kDefaultRetryDelay)
+        kModuleName)
 {
 }
 
@@ -167,9 +166,6 @@ const ClusterDbMap& Settings::clusterDbMap() const
 
 void Settings::loadSettings()
 {
-    retryDelay = std::chrono::milliseconds(settings().value(
-        kRetryDelay,
-        static_cast<int>(kDefaultRetryDelay.count())).toInt());
     m_logging.load(settings(), QLatin1String("log"));
     loadServer();
     loadHttp();
@@ -256,8 +252,16 @@ void Settings::loadConnectingPeer()
             kDefaultConnectSessionIdleTimeout);
 }
 
+ClusterDbMap::ClusterDbMap():
+    connectionRetryDelay(kDefaultConnectionRetryDelay)
+{
+}
+
 void ClusterDbMap::load(const QnSettings& settings)
 {
+    connectionRetryDelay = nx::utils::parseTimerDuration(
+        settings.value(kConnectionRetryDelay).toString(),
+        kDefaultConnectionRetryDelay);
     sql.loadFromSettings(settings);
     map.load(settings);
 }

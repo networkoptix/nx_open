@@ -107,7 +107,7 @@ protected:
                     &m_forceConnectionFailure);
             });
 
-        addRelayInstance({}, false);
+        addRelayInstance({"-clusterDbMap/connectionRetryDelay", "10ms"}, false);
 
         ASSERT_FALSE(m_initEvents.pop());
     }

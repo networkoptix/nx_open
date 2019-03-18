@@ -59,8 +59,11 @@ struct ConnectingPeer
 
 struct ClusterDbMap
 {
+    std::chrono::milliseconds connectionRetryDelay;
     nx::sql::ConnectionOptions sql;
     nx::clusterdb::map::Settings map;
+
+    ClusterDbMap();
 
     void load(const QnSettings& settings);
 };
@@ -79,7 +82,6 @@ public:
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;
 
-    std::chrono::milliseconds retryDelay;
     const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Server& server() const;
