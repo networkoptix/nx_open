@@ -146,7 +146,11 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
         return CameraDiagnostics::NoErrorResult();
 
     nx::utils::Url url = nx::utils::url::parseUrlFields(m_resource->getUrl());
-    NX_ASSERT(url.query() == QString(), lm("Not empty query: [%1]").args(url));
+    if (url.query() != QString())
+    {
+        closeStream();
+        return CameraDiagnostics::CameraInvalidParams(lm("Not empty query: [%1]").args(url));
+    }
     url.setQuery(lm("primary=%1&fps=%2").args(getRole() == Qn::CR_LiveVideo, params.fps));
 
     if (m_tcpSock->isClosed())
