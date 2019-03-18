@@ -764,7 +764,7 @@ void QnResource::initAsync(bool optional)
     if (!resourcePool->threadPool()->tryStart(task))
     {
         delete task;
-        NX_DEBUG(this, "Init task was not started");
+        NX_DEBUG(this, "Not running init task: thread pool is fully loaded");
         return;
     }
 
