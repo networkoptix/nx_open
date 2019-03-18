@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/read_only.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
@@ -149,6 +150,12 @@ QString SimpleMotionSearchWidget::placeholderText(bool constrained) const
 QString SimpleMotionSearchWidget::itemCounterText(int count) const
 {
     return tr("%n motion events", "", count);
+}
+
+bool SimpleMotionSearchWidget::calculateAllowance() const
+{
+    return model()->isOnline()
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
 }
 
 } // namespace nx::vms::client::desktop

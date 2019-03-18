@@ -24,6 +24,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
@@ -152,7 +153,10 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
 
 bool AnalyticsSearchWidget::calculateAllowance() const
 {
-    if (!model()->isOnline())
+    const bool hasPermissions = model()->isOnline()
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+
+    if (!hasPermissions)
         return false;
 
     const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
