@@ -85,6 +85,9 @@ public:
             case ErrorCode::forbidden:
                 resultBody.clear();
                 return nx::network::http::StatusCode::forbidden;
+            case ErrorCode::badRequest:
+                resultBody.clear();
+                return nx::network::http::StatusCode::badRequest;
             default:
                 resultBody.clear();
                 return nx::network::http::StatusCode::internalServerError;
@@ -317,6 +320,12 @@ private:
                 QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::Forbidden,
                     "Unable to retrieve existing object to merge with.");
                 return nx::network::http::StatusCode::forbidden;
+            }
+            case ErrorCode::badRequest:
+            {
+                QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::BadRequest,
+                    "Bad request.");
+                return nx::network::http::StatusCode::badRequest;
             }
 
             default:

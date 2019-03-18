@@ -498,8 +498,9 @@ private:
         const auto descriptor = getTransactionDescriptorByTransaction(tran);
         if (!descriptor)
             return ErrorCode::forbidden;
-        if (!descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
-            return ErrorCode::forbidden;
+        auto errorCode = descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
 
         postProcessList->push_back(std::bind(
             PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
@@ -877,7 +878,7 @@ public:
                         updatedTran.command = ApiCommand::removeAnalyticsEngine;
                         break;
                     default:
-                        return processUpdateSync(tran, transactionsPostProcessList, 0);
+                        return ErrorCode::badRequest;
                 }
                 return processUpdateSync(updatedTran, transactionsPostProcessList); //< calling recursively
             }
