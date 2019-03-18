@@ -5,6 +5,7 @@
 #include <test_support/mediaserver_launcher.h>
 #include <health/system_health.h>
 #include <recorder/storage_manager.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::server::test {
 
@@ -19,15 +20,16 @@ protected:
         startupFlags.setFlag(MediaServerLauncher::noPlugins);
 
         m_server.reset(new MediaServerLauncher(QString(), 0, startupFlags));
-        QObject::connect(
-            m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
-            this, &Reindex::onReindexFinished);
     }
 
     void whenServerStarted()
     {
         m_server->addSetting("minStorageSpace", 0);
         ASSERT_TRUE(m_server->start());
+
+        QObject::connect(
+            m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
+            this, &Reindex::onReindexFinished);
     }
 
     void givenSomeArchiveOnHdd()
@@ -73,13 +75,20 @@ private:
         std::chrono::time_point<std::chrono::system_clock> startPoint,
         int count)
     {
+        const auto storages = m_server->serverModule()->resourcePool()->getResources<QnStorageResource>();
+        NX_ASSERT(!storages.isEmpty());
+
+        const auto storage = storages[0];
+        const auto baseDirPath = storage->getUrl();
+
+        return Catalog();
     }
 };
 
 TEST_F(Reindex, FastArchiveScan_AllDataRetrieved)
 {
-    givenSomeArchiveOnHdd();
     whenServerStarted();
+    givenSomeArchiveOnHdd();
     thenAllArchiveShouldBeFastScannedCorreclty();
 }
 

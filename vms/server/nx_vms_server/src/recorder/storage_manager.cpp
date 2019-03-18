@@ -376,8 +376,8 @@ private:
 
         if (!hasTasksToProcess())
             resetState();
-        else
-            m_totalCatalogs += catalogsToScan.size();
+
+        m_totalCatalogs += catalogsToScan.size();
 
         if (partialScan)
             addPartialScanTasks(storage, catalogsToScan);
@@ -419,6 +419,7 @@ private:
                 }
 
                 processPartialTasks(&lock);
+                break;
             case Qn::RebuildState_FullScan:
                 if (m_fullScanTasks.isEmpty())
                 {
@@ -433,6 +434,13 @@ private:
                 processFullTasks(&lock);
                 break;
         }
+    }
+
+    virtual void pleaseStop() override
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        QnLongRunnable::pleaseStop();
+        m_waitCondition.wakeOne();
     }
 
     void processFullTasks(nx::utils::MutexLocker* lock)
