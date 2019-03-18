@@ -64,7 +64,6 @@ const int kTooLateDayOfWeek = Qt::Thursday;
 const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 const int kVersionLabelFontSizePixels = 24;
 const int kVersionLabelFontWeight = QFont::DemiBold;
-const auto kExpectedInstallPeriodSec = 4.0;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;
@@ -174,6 +173,9 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_statusItemDelegate.reset(new ServerStatusItemDelegate(ui->tableView));
     ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::ProgressColumn, m_statusItemDelegate.get());
 
+    m_resourceNameDelegate.reset(new QnResourceItemDelegate(ui->tableView));
+    ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::NameColumn, m_resourceNameDelegate.get());
+
     connect(m_sortedModel.get(), &SortedPeerUpdatesModel::dataChanged,
         this, &MultiServerUpdatesWidget::atModelDataChanged);
 
@@ -183,6 +185,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     if (auto horizontalHeader = ui->tableView->horizontalHeader())
     {
         horizontalHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::NameColumn, QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::ProgressColumn, QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::StatusMessageColumn,
             QHeaderView::Stretch);
