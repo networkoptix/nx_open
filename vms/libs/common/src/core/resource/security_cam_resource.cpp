@@ -168,13 +168,6 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
-                || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
-                || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
-                || key == ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify)
-            {
-                emit ptzConfigurationChanged(toSharedPointer(this));
-            }
         });
 
     QnMediaResource::initMediaResource();

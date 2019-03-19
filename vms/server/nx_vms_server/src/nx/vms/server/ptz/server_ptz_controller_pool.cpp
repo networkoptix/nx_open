@@ -120,32 +120,24 @@ void ServerPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
 QnPtzControllerPtr ServerPtzControllerPool::createController(
     const QnResourcePtr& resource) const
 {
-    NX_DEBUG(this, lm("Attempting to create PTZ controller for resource %1 (%2)")
-        .args(resource->getName(), resource->getId()));
+    auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
+    if (!NX_ASSERT(camera != nullptr, lm("Resource %1 is not a camera").args(resource)))
+        return QnPtzControllerPtr();
 
-    if (resource->flags() & Qn::foreigner)
+    NX_DEBUG(this, lm("Attempting to create PTZ controller for resource %1 (%2)")
+        .args(camera->getName(), camera->getId()));
+
+    if (camera->flags() & Qn::foreigner)
     {
         NX_DEBUG(this, lm("Resource %1 (%2) belongs to another server, do nothing.")
-            .args(resource->getName(), resource->getId()));
+            .args(camera->getName(), camera->getId()));
         return QnPtzControllerPtr();
     }
 
-    if (!resource->isInitialized())
+    if (!camera->isInitialized())
     {
         NX_DEBUG(this, lm("Resource %1 (%2) is not initialized, do nothing.")
-            .args(resource->getName(), resource->getId()));
-        return QnPtzControllerPtr();
-    }
-
-    auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
-    if (!camera)
-    {
-        NX_DEBUG(
-            this,
-            lm("Resource %1 (%2) is not a descendant of "
-                "nx::vms::server::resource::Camera, do nothing.")
-                .args(resource->getName(), resource->getId()));
-
+            .args(camera->getName(), camera->getId()));
         return QnPtzControllerPtr();
     }
 
@@ -157,7 +149,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
             this,
             lm("Resource %1 (%2) created an empty ptz controller, "
                 "resetting resource PTZ capabilities.")
-                .args(resource->getName(), resource->getId()));
+                .args(camera->getName(), camera->getId()));
 
         if (cameraPtzCapabilities != Ptz::NoPtzCapabilities)
             camera->setPtzCapabilities(Ptz::NoPtzCapabilities);
@@ -172,10 +164,6 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
         || camera->ptzCapabilitiesUserIsAllowedToModify() != Ptz::Capability::NoPtzCapabilities)
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
-        connect(
-            camera.get(), &QnSecurityCamResource::ptzConfigurationChanged,
-            this, &ServerPtzControllerPool::at_ptzConfigurationChanged,
-            (Qt::ConnectionType) (Qt::DirectConnection | Qt::UniqueConnection));
     }
 
     ptz::ControllerWrappingParameters wrappingParameters;
@@ -191,7 +179,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
         this,
         lm("Wrapping PTZ controller for resource %1 (%2). "
            "Parameters: %3")
-            .args(resource->getName(), resource->getId(), wrappingParameters));
+            .args(camera->getName(), camera->getId(), wrappingParameters));
 
     controller = ptz::wrapController(controller, wrappingParameters);
     const auto controllerCapabilities = ptz::capabilities(controller);
@@ -207,17 +195,6 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     }
 
     return controller;
-}
-
-void ServerPtzControllerPool::at_ptzConfigurationChanged(const QnResourcePtr &resource)
-{
-    if (!resource->isInitialized() || resource->isInitializationInProgress())
-        return;
-
-    NX_DEBUG(this, "PTZ configuration changed for resource %1 (%2), initiate reinitialization",
-        resource->getName(), resource->getId());
-
-    resource->reinitAsync();
 }
 
 void ServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)
