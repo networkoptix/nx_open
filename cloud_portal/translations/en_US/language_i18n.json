@@ -115,7 +115,17 @@
     "Your Name": "Your Name", 
     "Your browser is not supported": "Your browser is not supported", 
     "before proceeding.": "before proceeding.", 
-    "campage": {
+    "integration": {
+        "backToEditText": "Back to the editing interfaces", 
+        "Access Control": "Access Control", 
+        "previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.", 
+        "Storage": "Storage", 
+        "Connector": "Connector", 
+        "Health Monitor": "Health Monitor", 
+        "Drone": "Drone", 
+        "Data Analytics": "Data Analytics"
+    }, 
+    "ipvd": {
         "Cameras supporting H.265": "Cameras supporting H.265", 
         "isAptzSupported": "Advanced PTZ", 
         "hardwareType": "Type", 
@@ -146,16 +156,6 @@
         "other": "Other", 
         "isPtzSupported": "PTZ", 
         "dvr": "DVR"
-    }, 
-    "integration": {
-        "backToEditText": "Back to the editing interfaces", 
-        "Access Control": "Access Control", 
-        "previewRibbonText": "This page is a preview of the latest changes, and it doesn't match publicly available version.", 
-        "Storage": "Storage", 
-        "Connector": "Connector", 
-        "Health Monitor": "Health Monitor", 
-        "Drone": "Drone", 
-        "Data Analytics": "Data Analytics"
     }, 
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.", 
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 

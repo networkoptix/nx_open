@@ -4,6 +4,7 @@ import { NxLanguageProviderService } from './nx-language-provider';
 import { NxConfigService }           from './nx-config';
 import { NxAppStateService }         from './nx-app-state.service';
 import { downgradeInjectable }       from '@angular/upgrade/static';
+import { NxUtilsService }            from './utils';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { downgradeInjectable }       from '@angular/upgrade/static';
     providers      : [
         NxAppStateService,
         NxLanguageProviderService,
-        NxConfigService
+        NxConfigService,
+        NxUtilsService,
     ],
     exports        : []
 })
