@@ -111,8 +111,10 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
     selectCameras(AbstractSearchWidget::Cameras::layout);
 
-    connect(model(), &AbstractSearchListModel::isOnlineChanged,
-        this, &AnalyticsSearchWidget::updateAllowance);
+    connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
+        &AnalyticsSearchWidget::updateAllowance);
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+        &AnalyticsSearchWidget::updateAllowance);
 }
 
 AnalyticsSearchWidget::~AnalyticsSearchWidget()
