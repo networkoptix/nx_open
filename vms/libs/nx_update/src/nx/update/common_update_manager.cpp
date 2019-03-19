@@ -83,7 +83,13 @@ update::Status CommonUpdateManager::start()
         fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
     }
 
-    switch (downloader()->addFile(fileInformation))
+    const auto addFileResult = downloader()->addFile(fileInformation);
+    NX_DEBUG(
+        this,
+        lm("Downloader::addFile (%1) called. Result is: %2")
+            .args(fileInformation.name, addFileResult));
+
+    switch (addFileResult)
     {
     case downloader::ResultCode::ok:
         return update::Status(
