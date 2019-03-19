@@ -624,11 +624,12 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     const auto palette = ui->layoutPreviewWidget->palette();
     d->setLayout(layout, palette);
 
-    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
-    if (qnRuntime->isAcsMode() || baseName.isEmpty())
-        baseName = tr("exported");
+    auto baseFullName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
+    if (qnRuntime->isAcsMode() || baseFullName.isEmpty())
+        baseFullName = tr("exported");
+
     Filename baseFileName = d->exportLayoutSettings().fileName;
-    baseFileName.name = baseName;
+    baseFileName.name = Filename::parse(baseFullName).name;
     ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 

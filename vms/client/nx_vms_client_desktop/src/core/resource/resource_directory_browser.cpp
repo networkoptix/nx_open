@@ -55,9 +55,8 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid& resourceT
 {
     QnResourcePtr result;
 
-    if (!isResourceTypeSupported(resourceTypeId)) {
+    if (!isResourceTypeSupported(resourceTypeId))
         return result;
-    }
 
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     result = createArchiveResource(params.url, resourcePool);
@@ -66,11 +65,13 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid& resourceT
     return result;
 }
 
-QString QnResourceDirectoryBrowser::manufacturer() const {
+QString QnResourceDirectoryBrowser::manufacturer() const
+{
     return lit("DirectoryBrowser");
 }
 
-void QnResourceDirectoryBrowser::cleanup() {
+void QnResourceDirectoryBrowser::cleanup()
+{
     m_resourceReady = false;
 }
 
@@ -137,10 +138,11 @@ void QnResourceDirectoryBrowser::at_startLocalDiscovery()
     resourcePool()->addResources(findResources());
 }
 
-QnResourceDirectoryBrowser::BrowseHandler QnResourceDirectoryBrowser::makeDiscoveryHandler(QnResourceList& result, QStringList& paths)
+QnResourceDirectoryBrowser::BrowseHandler QnResourceDirectoryBrowser::makeDiscoveryHandler(
+    QnResourceList& result, QStringList& paths)
 {
     return
-        [this, &result, &paths](const QString& path, bool isDir)->bool
+        [this, &result, &paths](const QString& path, bool isDir) -> bool
         {
             paths.append(path);
 
@@ -164,7 +166,11 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename) con
 }
 
 // =============================================================================================
-int QnResourceDirectoryBrowser::findResources(const QString& directory, const ResourceCache& cache, BrowseHandler handler, int maxResources)
+int QnResourceDirectoryBrowser::findResources(
+    const QString& directory,
+    const ResourceCache& cache,
+    BrowseHandler handler,
+    int maxResources)
 {
     // Note: This method can be called from a separate thread. Beware!
     NX_DEBUG(this, lit("Checking %1").arg(directory));
@@ -301,7 +307,7 @@ void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& pa
     }
 
     // This is the case for removed folder.
-    // We need to all files in our resource cache for existance.
+    // We need to check all files in our resource cache for existence.
     for (const auto entry: cache)
     {
         QString path = entry->getUrl();
@@ -326,7 +332,8 @@ void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
     }
 }
 
-void QnResourceDirectoryBrowser::at_trackResources(const QnResourceList& resources, const QStringList& paths)
+void QnResourceDirectoryBrowser::at_trackResources(const QnResourceList& resources,
+    const QStringList& paths)
 {
     QnMutexLocker lock(&m_cacheMutex);
     int skipped = 0;

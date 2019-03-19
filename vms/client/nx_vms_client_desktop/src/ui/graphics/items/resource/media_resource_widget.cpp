@@ -1202,10 +1202,10 @@ void QnMediaResourceWidget::updateTwoWayAudioWidget()
 {
     const auto user = context()->user();
     const bool twoWayAudioWidgetRequired = !d->isPreviewSearchLayout
+        && user //< Video wall has userInput permission but no actual user.
         && d->camera
         && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput)
-        && NX_ASSERT(user);
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
     if (twoWayAudioWidgetRequired)
     {
