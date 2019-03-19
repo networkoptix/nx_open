@@ -142,6 +142,8 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap)
 
     m_pixmaps[flags] = pixmap;
 
+    m_textures.remove(flags); //< This will force update of texture on repaint.
+
     update();
 }
 
@@ -281,10 +283,27 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
         });
 }
 
+bool QnImageButtonWidget::safeBindTexture(StateFlags flags)
+{
+    const auto it = m_textures.find(flags);
+    if (it != m_textures.end())
+    {
+        (*it)->bind();
+        return true;
+    }
+
+    const auto& texturePixmap = pixmap(flags);
+    if (texturePixmap.isNull())
+        return false;
+
+    const auto texture = TexturePtr(new QOpenGLTexture(texturePixmap.toImage()));
+    m_textures.insert(flags, texture);
+    texture->bind();
+    return true;
+}
+
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *glWidget, const QRectF &rect)
 {
-
-    return;
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
         imageRect = nx::vms::client::core::Geometry::eroded(imageRect, m_imageMargins);
@@ -294,24 +313,8 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     else if (m_dynamic)
         updateVao(imageRect);
 
-    bool isZero = qFuzzyIsNull(progress);
-    bool isOne = qFuzzyCompare(progress, 1.0);
-
-    const QPixmap &startPixmap = pixmap(startState);
-    const QPixmap &endPixmap = pixmap(endState);
-
-    if (isZero && startPixmap.isNull())
-    {
-        return;
-    }
-    else if (isOne && endPixmap.isNull())
-    {
-        return;
-    }
-    else if (startPixmap.isNull() && endPixmap.isNull())
-    {
-        return;
-    }
+    const bool isZero = qFuzzyIsNull(progress);
+    const bool isOne = qFuzzyCompare(progress, 1.0);
 
     QnGlNativePainting::begin(glWidget, painter);
 
@@ -325,8 +328,8 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     glWidget->makeCurrent();
     if (isOne || isZero)
     {
-//        QOpenGLTexture texture((isZero ? startPixmap : endPixmap).toImage());
-//        texture.bind();
+        if (!safeBindTexture(isZero ? startState : endState))
+            return;
 
         auto shader = renderer->getTextureShader();
         shader->bind();
@@ -339,13 +342,13 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     {
         auto shader = renderer->getTextureTransitionShader();
 
-//        renderer->glActiveTexture(GL_TEXTURE1);
-//        QOpenGLTexture texture(endPixmap.toImage());
-//        texture.bind();
+        renderer->glActiveTexture(GL_TEXTURE1);
+        if (!safeBindTexture(endState))
+            return;
 
         renderer->glActiveTexture(GL_TEXTURE0);
-//        QOpenGLTexture texture2(startPixmap.toImage());
-//        texture.bind();
+        if (!safeBindTexture(startState))
+            return;
 
         shader->bind();
         shader->setProgress(progress);

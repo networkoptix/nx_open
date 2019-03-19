@@ -6,6 +6,7 @@
 #include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLVertexArrayObject>
+#include <QtGui/QOpenGLTexture>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
@@ -134,6 +135,13 @@ protected:
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
+
+    using TexturePtr = QSharedPointer<QOpenGLTexture>;
+    using TextureHash = QHash<StateFlags, TexturePtr>;
+
+    bool safeBindTexture(StateFlags flags);
+
+    TextureHash m_textures;
 
     std::array<QPixmap, MaxState + 1> m_pixmaps;
 
