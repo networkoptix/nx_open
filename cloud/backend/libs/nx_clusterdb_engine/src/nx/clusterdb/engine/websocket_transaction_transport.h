@@ -44,7 +44,7 @@ public:
         const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) override;
     virtual void start() override;
 
-    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
 protected:

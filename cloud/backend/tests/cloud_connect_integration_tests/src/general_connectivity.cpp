@@ -23,13 +23,13 @@ class GeneralConnectivity:
 protected:
     void givenListeningCloudServer()
     {
-        assertConnectionCanBeEstablished();
+        assertCloudConnectionCanBeEstablished();
     }
 
     void whenConnectToThePeerUsingDomainName()
     {
         setRemotePeerName(cloudSystemCredentials().systemId.toStdString());
-        assertConnectionCanBeEstablished();
+        assertCloudConnectionCanBeEstablished();
     }
 
     void whenConnectionToMediatorIsBroken()
@@ -62,7 +62,7 @@ protected:
 
 TEST_F(GeneralConnectivity, connect_works)
 {
-    assertConnectionCanBeEstablished();
+    assertCloudConnectionCanBeEstablished();
 }
 
 TEST_F(GeneralConnectivity, remote_peer_full_name_is_known_on_client_side)
@@ -78,7 +78,7 @@ TEST_F(GeneralConnectivity, server_accepts_connections_after_reconnect_to_mediat
     whenConnectionToMediatorIsBroken();
 
     thenConnectionToMediatorIsRestored();
-    assertConnectionCanBeEstablished();
+    assertCloudConnectionCanBeEstablished();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ public:
 
 TEST_F(GeneralConnectivityCompatibilityRawStunConnection, cloud_connection_can_be_established)
 {
-    assertConnectionCanBeEstablished();
+    assertCloudConnectionCanBeEstablished();
 }
 
 //-------------------------------------------------------------------------------------------------

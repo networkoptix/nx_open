@@ -4,8 +4,9 @@ require('./vendor/cast-framework.js');
 require('./vendor/cast-sender.js');
 require('./vendor/client-detection.js');
 require('./vendor/date.js');
-require('./vendor/hls.js');
 require('./vendor/Impetus.js');
+
+require('../../../node_modules/hls.js');
 
 require('./../components/flashls.js');
 require('./../components/jshls.js');

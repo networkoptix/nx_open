@@ -633,6 +633,7 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 bool QnResource::init()
 {
     auto commonModule = this->commonModule();
+    auto parentId = getParentId();
     {
         QnMutexLocker lock(&m_initMutex);
         if (!commonModule || commonModule->isNeedToStop())
@@ -651,32 +652,34 @@ bool QnResource::init()
     NX_DEBUG(this, "Initialization result: %1",
         initResult.toString(commonModule->resourcePool()));
 
-    bool changed = false;
+    bool isInitialized = false;
     {
         QnMutexLocker lock(&m_initMutex);
         m_initInProgress = false;
         if (m_interuptInitialization)
         {
-            NX_VERBOSE(this, "Initilization is interrupted");
+            NX_VERBOSE(this, "Initialization is interrupted");
             return init();
         }
 
-        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
         {
             QnMutexLocker lk(&m_mutex);
             m_prevInitializationResult = initResult;
+
+            if (parentId != m_parentId)
+                return false; //< Initialization has been interrupted by changing parentId.
+            isInitialized = m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
         }
 
         m_initializationAttemptCount.fetchAndAddOrdered(1);
 
-        changed = m_initialized;
-        if (m_initialized)
+        if (isInitialized)
             initializationDone();
         else if (isOnline())
             setStatus(Qn::Offline);
     }
 
-    if (changed)
+    if (isInitialized)
         emit initializedChanged(toSharedPointer(this));
 
     return true;
@@ -718,36 +721,54 @@ void QnResource::reinitAsync()
 
 void QnResource::initAsync(bool optional)
 {
+    NX_VERBOSE(this, "Async init requested (optional: %1)", optional);
+
     qint64 t = getUsecTimer();
 
     QnMutexLocker lock(&m_initAsyncMutex);
 
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
+    {
+        NX_VERBOSE(this, "Not running init task: init was recently (%1us < %2us)",
+            t - m_lastInitTime, MIN_INIT_INTERVAL);
         return;
+    }
 
     if (commonModule()->isNeedToStop())
+    {
+        NX_VERBOSE(this, "Not running init task: server is stopping");
         return;
+    }
 
     if (hasFlags(Qn::foreigner))
-        return; // removed to other server
+    {
+        NX_VERBOSE(this, "Not running init task: removed to other server");
+        return;
+    }
 
     auto resourcePool = this->resourcePool();
     if (!resourcePool)
+    {
+        NX_DEBUG(this, "Not running init task: resource pool is unavailable");
         return;
+    }
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    if (optional)
-    {
-        if (resourcePool->threadPool()->tryStart(task))
-            m_lastInitTime = t;
-        else
-            delete task;
-    }
-    else
+    if (!optional)
     {
         m_lastInitTime = t;
         resourcePool->threadPool()->start(task);
+        return;
     }
+
+    if (!resourcePool->threadPool()->tryStart(task))
+    {
+        delete task;
+        NX_DEBUG(this, "Init task was not started");
+        return;
+    }
+
+    m_lastInitTime = t;
 }
 
 CameraDiagnostics::Result QnResource::prevInitializationResult() const

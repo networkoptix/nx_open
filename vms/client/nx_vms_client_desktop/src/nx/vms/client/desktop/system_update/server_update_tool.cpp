@@ -859,10 +859,9 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
             {
                 if (response.error != QnRestResult::NoError)
                 {
-                    NX_DEBUG(
-                        this,
-                        lm("requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: %1")
-                            .args(response.errorString));
+                    NX_DEBUG(this,
+                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: %1",
+                        response.errorString);
                 }
 
                 if (tool)
@@ -1054,7 +1053,6 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
     }
     return "";
 }
-
 
 QString ServerUpdateTool::getUpdateStateUrl() const
 {

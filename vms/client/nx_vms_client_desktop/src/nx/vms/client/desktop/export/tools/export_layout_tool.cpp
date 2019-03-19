@@ -92,28 +92,6 @@ struct ExportLayoutTool::Private
         emit q->statusChanged(status);
     }
 
-    // Replace Cameras with AviResources for saving local layouts.
-    void refreshLocalLayoutInTree() const
-    {
-        const auto dummyLayout = layout::layoutFromFile(settings.fileName.completeFileName());
-
-        if (dummyLayout)
-        {
-            // Check if there were any cameras on old layout.
-            const auto resources = settings.layout->layoutResources();
-            if (resources.end() == std::find_if(resources.begin(), resources.end(),
-                    [](QnResourcePtr resource) { return resource.dynamicCast<QnVirtualCameraResource>(); }))
-            {
-                return; // No cameras - no need to refresh.
-            }
-
-            settings.layout->setItems(QnLayoutItemDataMap());
-            settings.layout->setItems(dummyLayout->getItems());
-            // Set password again to make sure that new AviResources do get it.
-            settings.layout->usePasswordForRecordings(layout::password(settings.layout));
-        }
-    }
-
     void finishExport()
     {
         switch (status)
@@ -141,7 +119,11 @@ struct ExportLayoutTool::Private
                 storage->renameFile(storage->getUrl(), targetFilename);
 
             if (settings.mode == ExportLayoutSettings::Mode::LocalSave)
-                refreshLocalLayoutInTree();
+            {
+                auto fileLayout = settings.layout.dynamicCast<QnFileLayoutResource>();
+                NX_ASSERT(fileLayout);
+                layout::reloadFromFile(fileLayout, settings.encryption.password);
+            }
         }
 
         emit q->finished();
@@ -251,8 +233,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     m_layout->setItems(items);
 
     // Set up layout watermark, but only if it misses one.
-    if (m_layout->data(Qn::LayoutWatermarkRole).isNull())
-        if (d->settings.watermark.visible())
+    if (m_layout->data(Qn::LayoutWatermarkRole).isNull() && d->settings.watermark.visible())
             m_layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(d->settings.watermark));
 
     return result;

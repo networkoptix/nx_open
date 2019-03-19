@@ -73,6 +73,17 @@ int QnChangeCameraPasswordRestHandler::executePost(
     QAuthenticator auth;
     auth.setUser(data.user);
     auth.setPassword(data.password);
+
+    const auto groupId = requestedCamera->getGroupId().isEmpty()
+        ? requestedCamera->getId().toString() : requestedCamera->getGroupId();
+
+    static QnMutex commonLock;
+    QnMutexLocker commonLocker(&commonLock);
+    QnMutexLocker lock(&m_cameraGroupLock[groupId]);
+
+    if (requestedCamera->getAuth() == auth)
+        return nx::network::http::StatusCode::ok;
+
     QString errorString;
     if (!requestedCamera->setCameraCredentialsSync(auth, &errorString))
     {
@@ -80,6 +91,8 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
+    // NOTE: Reinitialising all camera resources from the group for multichannel cameras
+    NX_DEBUG(this, "Starting reinitialisation of camera to use new credentials");
     for (auto camera: allCamerasInGroup(requestedCamera))
     {
         camera->setAuth(auth);

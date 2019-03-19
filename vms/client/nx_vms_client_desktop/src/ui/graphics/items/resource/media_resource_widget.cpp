@@ -58,22 +58,22 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
+#include <nx/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/client/core/motion/motion_grid.h>
-#include <nx/vms/client/desktop/utils/entropix_image_enhancer.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/core/utils/geometry.h>
+
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
-#include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
-#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
+#include <nx/vms/client/desktop/utils/entropix_image_enhancer.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
 
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
-#include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
-#include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
-#include <nx/client/core/utils/geometry.h>
-#include <nx/client/core/media/consuming_motion_metadata_provider.h>
-#include <nx/client/core/media/consuming_analytics_metadata_provider.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -1202,10 +1202,10 @@ void QnMediaResourceWidget::updateTwoWayAudioWidget()
 {
     const auto user = context()->user();
     const bool twoWayAudioWidgetRequired = !d->isPreviewSearchLayout
+        && user //< Video wall has userInput permission but no actual user.
         && d->camera
         && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput)
-        && NX_ASSERT(user);
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
     if (twoWayAudioWidgetRequired)
     {
@@ -1270,6 +1270,13 @@ bool QnMediaResourceWidget::isMotionSelectionEmpty() const
 
 void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
 {
+    // Just send changed() if gridRect is empty.
+    if (gridRect.isEmpty())
+    {
+        emit motionSelectionChanged();
+        return;
+    }
+
     ensureMotionSensitivity();
 
     bool changed = false;
@@ -1309,7 +1316,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
     }
 }
 
-void QnMediaResourceWidget::clearMotionSelection()
+void QnMediaResourceWidget::clearMotionSelection(bool sendMotionChanged)
 {
     if (isMotionSelectionEmpty())
         return;
@@ -1318,7 +1325,9 @@ void QnMediaResourceWidget::clearMotionSelection()
         m_motionSelection[i] = QRegion();
 
     invalidateMotionSelectionCache();
-    emit motionSelectionChanged();
+
+    if (sendMotionChanged)
+        emit motionSelectionChanged();
 }
 
 void QnMediaResourceWidget::setMotionSelection(const QList<QRegion>& regions)
@@ -1572,8 +1581,15 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
             scaleStripper.mapRect(paintRect));
     }
 
-    if (result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
+    const bool videoFramePresent = result == Qn::NewFrameRendered || result == Qn::OldFrameRendered;
+    if (videoFramePresent)
+    {
+        integrations::paintVideoOverlays(this, painter);
+    }
+    else
+    {
         base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
+    }
 
     return result;
 }

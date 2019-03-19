@@ -136,6 +136,15 @@ void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const String& name, const QnUuid&
     }
 }
 
+void OutgoingTunnelPool::removeAllTunnelsSync()
+{
+    pleaseStopSync();
+
+    QnMutexLocker lock(&m_mutex);
+    m_terminated = false;
+    m_stopping = false;
+}
+
 OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClosedSubscription()
 {
     return m_onTunnelClosedSubscription;

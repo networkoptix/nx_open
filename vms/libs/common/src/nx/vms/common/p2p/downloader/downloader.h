@@ -30,6 +30,8 @@ public:
 
     QString filePath(const QString& fileName) const;
 
+    QDir downloadsDirectory() const;
+
     FileInformation fileInformation(const QString& fileName) const;
 
     ResultCode addFile(const FileInformation& fileInformation);

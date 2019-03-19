@@ -391,6 +391,17 @@ TEST_F(AuthenticationTest, noCloudConnect)
 
 }
 
+TEST_F(AuthenticationTest, getNonce)
+{
+    for (const auto& r: {"/api/getNonce?userName=admin", "/web/api/getNonce?userName=admin"})
+    {
+        expectGetResult(r, {});
+        expectGetResult(r, {{"Cookie", "x-runtime-guid=deleted"}});
+        expectGetResult(r, {{"X-Runtime-Guid", "deleted"}});
+        expectGetResult(r, {{"Cookie", "x-runtime-guid=deleted"}, {"X-Runtime-Guid", "deleted"}});
+    }
+}
+
 TEST_F(AuthenticationTest, cookieNoCloudConnect)
 {
     // We have cloud user but not connected to cloud yet.

@@ -1283,8 +1283,8 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID() && checkIfMyStorage(storage))
     {
-        removeStorage(storage);
         storageDbPool()->removeSDB(storage);
+        removeStorage(storage);
     }
 }
 
@@ -2451,6 +2451,8 @@ void QnStorageManager::testStoragesDone()
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
+    NX_VERBOSE(this, "Changing storage [%1] status to [%2]...", fileStorage, status);
+
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
         NX_INFO(this,

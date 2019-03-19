@@ -24,8 +24,8 @@ public:
 
     virtual bool hasHeightForWidth() const;
 
-    static DialogCode showEulaHtml(const QString& html, QWidget* parent = nullptr);
-    static DialogCode showEulaFromFile(const QString& path, QWidget* parent = nullptr);
+    static bool acceptEulaHtml(const QString& html, QWidget* parent = nullptr);
+    static bool acceptEulaFromFile(const QString& path, QWidget* parent = nullptr);
 
 protected:
     virtual bool event(QEvent* event) override;

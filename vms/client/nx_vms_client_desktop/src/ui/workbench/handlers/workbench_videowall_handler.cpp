@@ -304,10 +304,15 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_videoWallMode.ready = false;
     m_controlMode.active = false;
     m_controlMode.sequence = 0;
+
     m_controlMode.cacheTimer = new QTimer(this);
     m_controlMode.cacheTimer->setInterval(cacheMessagesTimeoutMs);
     connect(m_controlMode.cacheTimer, &QTimer::timeout, this,
         &QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout);
+    m_controlMode.syncPlayTimer = new QTimer(this);
+    m_controlMode.syncPlayTimer->start(30000); //< We believe one sync in 30s is reasonable.
+    connect(m_controlMode.syncPlayTimer, &QTimer::timeout, this,
+        &QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested);
 
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
@@ -479,7 +484,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
         connect(navigator(), &QnWorkbenchNavigator::positionChanged, this,
-            &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
+            &QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested);
         connect(navigator(), &QnWorkbenchNavigator::playingChanged, this,
             &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
         connect(navigator(), &QnWorkbenchNavigator::speedChanged, this,
@@ -2748,7 +2753,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
     sendMessage(message, cached);
 }
 
-void QnWorkbenchVideoWallHandler::at_navigator_positionChanged()
+void QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested()
 {
     if (!m_controlMode.active)
         return;

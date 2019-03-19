@@ -54,7 +54,7 @@ namespace ec2
 
         nx::utils::Url url(m_queryProcessor->getUrl());
         url.setScheme(nx::network::http::urlSheme(m_connectionInfo.allowSslConnections));
-        url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ));
+        url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveUserInfo));
         QUrlQuery q;
         url.setQuery(q);
         m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(

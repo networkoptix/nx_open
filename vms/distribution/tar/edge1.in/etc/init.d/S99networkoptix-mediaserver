@@ -175,9 +175,9 @@ processCoreDumpIfNeeded()
     # Check whether exactly one core file exists with a time in a name.
     if [ $(expr match "$OLD_CORE_TIME" "[0-9]*\$") != 0 ]
     then
-        if [ ! $(expr $TIME - $OLD_CORE_TIME) -gt $(expr 24 \* 60 \* 60) ]
+        if [ $(expr $TIME - $OLD_CORE_TIME) -gt $(expr 24 \* 60 \* 60) ]
         then
-            # Old core is more than a day older.
+            echo "Old core is more than a day older"
             return 1
         fi
     fi
@@ -218,6 +218,16 @@ checkSdCard()
     fi
 }
 
+start_server()
+{
+    echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
+    set -x #< Log the next command.
+    "$BIN_FILE" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1
+    EXIT_STATUS=$?
+    { set +x; } 2>/dev/null
+    echo "Server process has finished with exit status [$EXIT_STATUS]"
+}
+
 start()
 {
     SERVICE_PID=$(pidof "$BIN_NAME")
@@ -252,11 +262,8 @@ start()
         REDIRECT_OUTPUT="/dev/null"
     fi
 
-    echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
-    set -x #< Log the next command.
-    "$BIN_FILE" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1 &
-    { set +x; } 2>/dev/null
-
+    start_server&
+    
     sleep 3
     # See if mediaserver instantly crashes.
     if [ ! -z "$(pidof "$BIN_NAME")" ]

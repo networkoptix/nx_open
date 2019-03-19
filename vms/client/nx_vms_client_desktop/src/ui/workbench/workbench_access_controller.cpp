@@ -16,6 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -62,19 +63,6 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
                 recalculateAllPermissions();
             else
                 updatePermissions(subject.user());
-        });
-
-    // Capture password setting or dropping for layout.
-    connect(qnResourceRuntimeDataManager,
-        &QnResourceRuntimeDataManager::resourceDataChanged,
-        this,
-        [this](const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
-        {
-            if (role == Qn::LayoutPasswordRole)
-            {
-                if (auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
-                    updatePermissions(layout);
-            }
         });
 
     recalculateAllPermissions();
@@ -184,12 +172,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
     {
-        if(auto videoFile = resource.dynamicCast<QnAviResource>())
-        {
-            if (videoFile->requiresPassword())
-                return Qn::NoPermissions;
-        }
-
         return Qn::ReadPermission
             | Qn::ViewContentPermission
             | Qn::ViewLivePermission
@@ -199,8 +181,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
             | Qn::WriteNamePermission;
     }
 
+    if (QnFileLayoutResourcePtr layout = resource.dynamicCast<QnFileLayoutResource>())
+        return calculateFileLayoutPermissions(layout);
+
+    // Note that QnFileLayoutResource case is treated above.
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-        return calculateLayoutPermissions(layout);
+        return calculateRemoteLayoutPermissions(layout);
 
     if (qnRuntime->isVideoWallMode())
         return Qn::VideoWallMediaPermissions;
@@ -233,14 +219,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     return resourceAccessManager()->permissions(m_user, resource);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
+Qn::Permissions QnWorkbenchAccessController::calculateRemoteLayoutPermissions(
     const QnLayoutResourcePtr& layout) const
 {
-    using namespace nx::vms::client::desktop;
     NX_ASSERT(layout);
 
     // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
-    const auto readOnly = commonModule()->isReadOnly()
+    auto readOnly = commonModule()->isReadOnly()
         ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
         : Qn::AllPermissions;
 
@@ -248,23 +233,6 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);
     if (presetPermissions.isValid() && presetPermissions.canConvert<int>())
         return (static_cast<Qn::Permissions>(presetPermissions.toInt()) & readOnly) | Qn::ReadPermission;
-
-    // Deal with normal (non explicitly-authorized) files separately.
-    if (layout->isFile())
-    {
-        if(layout::requiresPassword(layout))
-            return Qn::WriteNamePermission | Qn::ReadPermission;
-
-        auto permissions = Qn::ReadWriteSavePermission
-            | Qn::AddRemoveItemsPermission
-            | Qn::EditLayoutSettingsPermission
-            | Qn::WriteNamePermission;
-
-        if (layout->locked())
-            permissions &= ~Qn::AddRemoveItemsPermission;
-
-        return permissions;
-    }
 
     const auto loggedIn = !m_user
         ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
@@ -294,6 +262,25 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
 
     return resourceAccessManager()->permissions(m_user, layout);
 }
+
+Qn::Permissions QnWorkbenchAccessController::calculateFileLayoutPermissions(
+    const QnFileLayoutResourcePtr& layout) const
+{
+    NX_ASSERT(layout);
+
+    if (layout->isReadOnly() || layout->requiresPassword())
+        return Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
+
+    auto permissions = Qn::FullGenericPermissions
+        | Qn::AddRemoveItemsPermission
+        | Qn::EditLayoutSettingsPermission;
+
+    if (layout->locked())
+        permissions &= ~Qn::AddRemoveItemsPermission;
+
+    return permissions;
+}
+
 
 GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() const
 {
@@ -352,22 +339,22 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
-    // Capture password setting or dropping for exported video.
-    if(auto videoFile = resource.dynamicCast<QnAviResource>())
-    {
-        connect(videoFile, &QnAviResource::storageAccessChanged, this,
-            [this, videoFile]()
-            {
-                updatePermissions(videoFile);
-            });
-    }
-
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+    }
+
+    // Capture password setting or dropping for layout.
+    if (const auto& fileLayout = resource.dynamicCast<QnFileLayoutResource>())
+    {
+        connect(fileLayout, &QnFileLayoutResource::passwordChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+        // readOnly may also change when re-reading encrypted layout.
+        connect(fileLayout, &QnFileLayoutResource::readOnlyChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 

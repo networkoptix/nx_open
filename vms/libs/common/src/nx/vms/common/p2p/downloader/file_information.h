@@ -63,9 +63,6 @@ public:
     float calculateDownloadProgress() const;
     // Calculates total number of bytes downloaded.
     int calculateDownloadedBytes() const;
-    QString key() const;
-    static QString keyFromFileName(const QString& fileName);
-
 };
 
 #define FileInformation_Fields \

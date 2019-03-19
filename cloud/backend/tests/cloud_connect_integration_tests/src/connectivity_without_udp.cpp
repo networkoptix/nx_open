@@ -24,7 +24,7 @@ protected:
 
 TEST_F(ConnectivityWithoutUdp, connect_works)
 {
-    assertConnectionCanBeEstablished();
+    assertCloudConnectionCanBeEstablished();
 }
 
 } // namespace nx::network::cloud::test

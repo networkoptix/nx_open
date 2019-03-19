@@ -40,6 +40,9 @@ public:
 
     QList<nx::vms::api::analytics::EngineManifest::ObjectAction> supportedObjectActions() const;
 
+    /**
+     * Device-dependent Engines are always running on a Device and cannot be disabled by the user.
+     */
     bool isDeviceDependent() const;
 
     bool isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;

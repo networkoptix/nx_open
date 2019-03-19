@@ -101,6 +101,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -1170,7 +1171,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if (item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
         if (startDisplay)
             mediaWidget->display()->start();
@@ -1198,7 +1199,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             // Zoom windows must not be controlled by radass.
             if (!mediaWidget->isZoomWindow())
                 qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
+
         }
+
+        integrations::registerWidget(mediaWidget);
     }
 
     return true;
@@ -2298,6 +2302,9 @@ void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed()
     if (widget)
     {
         widget->disconnect(this);
+
+        if (const auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget))
+            integrations::unregisterWidget(mediaWidget);
 
         if (widget->item())
         {

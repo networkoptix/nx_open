@@ -105,12 +105,43 @@
                     server.expanded = !server.expanded;
                     scope.storage.serverStates[ server.id ] = server.expanded;
                 };
+    
+                function getIP(addresses) {
+                    function checkIsIPV4(entry) {
+                        var blocks = entry.split('.');
+                        if (blocks.length === 4) {
+                            return blocks.every(function (block) {
+                                return !isNaN(block) &&
+                                    parseInt(block, 10) >= 0 &&
+                                    parseInt(block, 10) <= 255;
+                            });
+                        }
+                        return false;
+                    }
+        
+                    var ips = addresses.split(';'),
+                        ip;
+        
+                    ips.some(function (tmpIP) {
+                        tmpIP = tmpIP.split(':')[0];
+            
+                        if (checkIsIPV4(tmpIP)) {
+                            ip = tmpIP;
+                            return true;
+                        }
+                    });
+        
+                    return ip;
+                }
 
                 function updateMediaServers () {
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
 
                     if (scope.mediaServers) {
                         scope.mediaServers.forEach(function (server) {
+                            
+                            server.ip = getIP(server.networkAddresses);
+                            
                             if (Object.keys(scope.storage.serverStates).length === 0) {
                                 server.expanded = false;
                                 return;

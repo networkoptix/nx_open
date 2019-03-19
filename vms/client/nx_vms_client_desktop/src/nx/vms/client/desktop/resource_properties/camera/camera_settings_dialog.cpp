@@ -40,6 +40,7 @@
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
 #include "camera_advanced_settings_widget.h"
+#include "../fisheye/fisheye_preview_controller.h"
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -60,6 +61,7 @@ struct CameraSettingsDialog::Private: public QObject
     QSharedPointer<CameraThumbnailManager> previewManager;
     QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdaptor;
+    QPointer<FisheyePreviewController> fisheyePreviewController;
 
     Private(CameraSettingsDialog* q): q(q) {}
 
@@ -237,6 +239,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     d->deviceAgentSettingsAdaptor = new DeviceAgentSettingsAdapter(d->store, this);
 
+    d->fisheyePreviewController = new FisheyePreviewController(this);
+
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
@@ -304,7 +308,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         selectionWatcher,
         &QnWorkbenchSelectionWatcher::selectionChanged,
         this,
-        [this](const QnResourceList& resources)
+        [this, selectionWatcher](const QnResourceList& resources)
         {
             if (isHidden())
                 return;
@@ -346,6 +350,20 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     // Make sure we will not handle stateChanged, triggered when creating watchers.
     connect(d->store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraSettingsDialog::updateState);
+
+    connect(d->store,
+        &CameraSettingsDialogStore::stateChanged,
+        d->fisheyePreviewController,
+        [this](const CameraSettingsDialogState& state)
+        {
+            const auto singleCamera = d->cameras.size() == 1
+                ? d->cameras.first()
+                : QnVirtualCameraResourcePtr();
+
+            d->fisheyePreviewController->preview(
+                singleCamera,
+                state.singleCameraSettings.fisheyeDewarping());
+        });
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()
@@ -368,6 +386,10 @@ void CameraSettingsDialog::forcedUpdate()
 
 bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
+    // Ignore click on the same camera.
+    if (!force && d->cameras == cameras)
+        return true;
+
     const bool askConfirmation =
         !force
         && isVisible()
@@ -400,11 +422,18 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
     d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
+    d->analyticsEnginesWatcher->setCamera(singleCamera);
 
     d->handleCamerasWithDefaultPasswordChanged();
     d->handleCamerasChanged();
 
     return true;
+}
+
+void CameraSettingsDialog::reject()
+{
+    d->resetChanges();
+    base_type::reject();
 }
 
 void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
@@ -416,9 +445,6 @@ void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton but
         case QDialogButtonBox::Apply:
             if (d->hasChanges())
                 d->applyChanges();
-            break;
-        case QDialogButtonBox::Cancel:
-            d->resetChanges();
             break;
         default:
             break;
@@ -468,11 +494,9 @@ void CameraSettingsDialog::updateButtonsAvailability()
         applyButton->setEnabled(d->hasChanges());
 }
 
-void CameraSettingsDialog::updateState()
+void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
 {
     static const QString kWindowTitlePattern = lit("%1 - %2");
-
-    const auto& state = d->store->state();
 
     const QString caption = QnCameraDeviceStringSet(
         tr("Device Settings"),
@@ -518,7 +542,8 @@ void CameraSettingsDialog::updateState()
 
     setPageVisible(int(CameraSettingsTab::advanced), state.isSingleCamera());
 
-    setPageVisible(int(CameraSettingsTab::analytics), state.isSingleCamera());
+    setPageVisible(int(CameraSettingsTab::analytics),
+        state.isSingleCamera() && !state.analytics.engines.empty());
 
     // Always displaying for single camera as it contains Logical Id setup.
     setPageVisible(int(CameraSettingsTab::expert),

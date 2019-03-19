@@ -238,7 +238,7 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
             .arg(getSoftwareTriggerName(params));
     }
 
-    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occurred").arg(eventName(params.eventType));
 }
 
 QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
@@ -450,12 +450,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkRtpPacketLoss:
         {
-            NetworkIssueEvent::PacketLossSequence seq = NetworkIssueEvent::decodePacketLossSequence(reasonParamsEncoded);
-            if (seq.valid)
-                result = tr("RTP packet loss detected, prev seq.=%1 next seq.=%2.").arg(seq.prev).arg(seq.next);
-            else
-                result = tr("RTP packet loss detected.");
-            break;
+            return tr("RTP packet loss detected.");
         }
         case EventReason::networkBadCameraTime:
         {
@@ -647,7 +642,7 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
         .setQuery(QString("time=%1").arg(timeStampMs));
 
     NX_ASSERT(url.isValid());
-    return url.toString();
+    return url.toWebClientStandardViolatingUrl();
 }
 
 QString StringsHelper::toggleStateToString(EventState state) const

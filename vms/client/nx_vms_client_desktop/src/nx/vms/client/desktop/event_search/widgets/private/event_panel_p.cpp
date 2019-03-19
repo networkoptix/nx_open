@@ -78,7 +78,11 @@ EventPanel::Private::Private(EventPanel* q):
     for (auto [tab, synchronizer]: nx::utils::keyValueRange(m_synchronizers))
     {
         connect(synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
-            [this, tab = tab](bool isActive) { setTabCurrent(tab, isActive); });
+            [this, tab = tab](bool isActive)
+            {
+                if (tab->isAllowed())
+                    setTabCurrent(tab, isActive);
+            });
     }
 
     connect(m_tabs, &QTabWidget::currentChanged, this,
