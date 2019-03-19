@@ -498,7 +498,7 @@ private:
     void updateProgress(const QnStorageResourcePtr& storage, Qn::RebuildState state)
     {
         const qreal storageProgress =
-            (qreal) m_storageToProgress[storage->getUrl()].processedCatalogs++
+            (qreal) ++m_storageToProgress[storage->getUrl()].processedCatalogs
             / m_storageToProgress[storage->getUrl()].totalCatalogs;
 
         m_owner->setRebuildInfo(QnStorageScanData(
@@ -522,6 +522,7 @@ private:
             m_owner->scanMediaCatalog(
                 scanTask.storage, scanTask.catalog, scanTask.scanFilter, nullptr);
             lock->relock();
+            m_processedCatalogs++;
             updateProgress(scanTask.storage, Qn::RebuildState::RebuildState_PartialScan);
         }
 
