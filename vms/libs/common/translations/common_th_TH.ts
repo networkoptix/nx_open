@@ -106,6 +106,11 @@
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
     </message>
+    <message>
+      <source>Cloud systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -1242,10 +1247,6 @@
       <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>มีเหตุการณ์ %1 หลายครั้ง</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>เหตุการณ์: %1</translation>
     </message>
@@ -1328,10 +1329,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>การเชื่อมต่อกับกล้อง (กระแสรอง) ถูกปิดโดยไม่คาดคิด.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1521,6 +1518,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation type="unfinished">Camera time is back to normal</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

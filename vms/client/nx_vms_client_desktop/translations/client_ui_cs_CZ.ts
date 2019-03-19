@@ -2569,44 +2569,6 @@
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>Zrušit</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>Zdá se, že proces aktualizace trvá déle než obvykle. Počkejte prosím.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>Automaticky kontrolovat aktualizace</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>Aktualizování na...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>Odkaz zkopírován</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>Máte nainstalovanou nejnovější verzi</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Použití systémových aktualizací na konci týdne se nedoporučuje.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>

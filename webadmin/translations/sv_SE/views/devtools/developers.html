@@ -1,11 +1,11 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Utvecklarverktyg</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Har en idé på hur man kan förbättra våra utvecklingsverktyg eller bara vill starta en konversation?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Lämna feedback</a></p>
     </div>
 
     <div>
@@ -13,7 +13,7 @@
         <p>
             A Generic Event is a method of sending events from 3rd party Systems to a System,
             which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+            Den generiska Eventgeneratorn är ett verktyg som hjälper bygga HTTP Generic Event förfrågningar.
         </p>
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
@@ -26,50 +26,49 @@
             control PTZ cameras, and more.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a><br>
-            <a href="#/developers/serverDocumentation">Server Settings Documentation</a>
+            <a href="#/developers/api"><b> API-testverktyg (nytt) </b></a>
+            - Interaktiv dokumentation med verktyg för testning av API-samtal <br>
+            <a href="#/developers/changelog"> API Changelog </a>
+            - lista över bryta ändringar i API <br>
+            <a id="api-doc" href="api.xml" target="_blank"> API-dokumentation </a> <br>
+            <a href="#/developers/serverDocumentation"> Serverinställningar Dokumentation </a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Panel för kameradetaljer</h3>
         <p>
-            Displays additional developer-friendly information for cameras in the Web Admin interface:
+            Visar ytterligare utvecklarvänlig information för kameror i Web Admin-gränssnittet:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Kamera-ID</li>
+            <li>Länkar för alla tillgängliga videoströmmar</li>
+            <li>Direktexportera video från webbläsare</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            För att öppna kameradetaljeringspanelen - navigera till webbadministratörsgränssnittet, välj <a href="#/view"> Visa </a>,
+            välj målkamera, klicka på inställningsikonen (kugghjul) och välj sedan "Kamerainformation"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">Öppna panel för kameradetaljer</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>Integration av videokälla SDK</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            Videokälla Integration SDK ger möjlighet att integrera praktiskt taget alla live eller inspelade videokällor
+            (IP-kameror, NVR, DVR, etc.) till System. SDK gör det möjligt att skapa metoder för att upptäcka,
+            visa, analysera och spela in video. Det möjliggör också integrering av enhetens I/O-portar och information om rörelsedetektering.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >hämta SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>Lagrings SDK</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            Lagring SDK ger möjlighet att integrera potentiell lagring i System. Det låter utvecklare
+            läsa från eller skriva till någon lagringsplats: lokal, fjärr och till och med moln. Skapa ett
+            plugin för lagringsutrymme kräver implementering av standardfunktioner som: I/O-ström, om filen finns, radera fil, lista med
+            filer i mappen etc. LagringsSDK innehåller också ett exempel för att använda en FTP-server som en lagringsplats.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >hämta SDK</a></p>
     </div>
 </div>

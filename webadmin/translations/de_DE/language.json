@@ -127,7 +127,7 @@
         "updateStatus": "Update-Status",
         "watermarkSettings": "Wasserzeicheneinstellungen",
         "maxWebMTranscoders": "Maximale Anzahl von WEBM-Verbindungen für den Server. Chrome öffnet 2 Verbindungen auf einmal und schließt dann die erste. Es wird daher empfohlen, den Wert >=2 auf diesen Parameter zu setzen.",
-        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
+        "maxEventLogRecords": "Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert."
     },
     "info": {
         "tabs": {

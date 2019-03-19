@@ -120,7 +120,7 @@
     <h2>Ustawienia dziennika</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} poziom logowania</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Brak: rejestrowanie w dzienniku jest wyłączone.</option>
@@ -187,7 +187,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Uwaga!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Uwaga!</b> Niektóre zmiany wymagają ponownego uruchomienia <b>wszystkich</b> serwerów w systemie.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Uruchom ponownie bieżący serwer</button>
         </div>

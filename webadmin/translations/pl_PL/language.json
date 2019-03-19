@@ -127,7 +127,7 @@
         "updateStatus": "Aktualizacja statusu",
         "watermarkSettings": "Ustawienia znaku wodnego",
         "maxWebMTranscoders": "Maksymalna liczba połączeń WEBM do serwera. Chrome jednocześnie otwiera 2 połączenia, a następnie zamyka pierwsze z nich, dlatego zaleca się ustawienie wartości >= 2.",
-        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
+        "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość."
     },
     "info": {
         "tabs": {
