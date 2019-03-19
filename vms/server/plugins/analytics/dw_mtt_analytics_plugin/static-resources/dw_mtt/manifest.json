@@ -21,7 +21,7 @@
             "alarmName": "motionAlarm"
         },
         {
-            "id": "nx.dw_mtt.PEA",
+            "id": "nx.dw_mtt.PEA.perimeterAlarm",
             "name": "Perimeter Intrusion [exclusive]",
             "flags": "stateDependent",
             "internalName": "PEA",
@@ -30,7 +30,7 @@
             "_comment": "PEA is responsible both for Line Crossing and Perimeter Intrusion"
         },
         {
-            "id": "nx.dw_mtt.PEA",
+            "id": "nx.dw_mtt.PEA.tripwireAlarm",
             "name": "Line Crossing [exclusive]",
             "flags": "stateDependent",
             "internalName": "PEA",
