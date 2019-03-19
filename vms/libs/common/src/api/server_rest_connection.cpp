@@ -988,6 +988,12 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         targetThread);
 }
 
+Handle ServerConnection::debug(
+    const QString& action, const QString& value, PostCallback callback, QThread *targetThread)
+{
+    return executeGet("/api/debug", {{action, value}}, callback, targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const

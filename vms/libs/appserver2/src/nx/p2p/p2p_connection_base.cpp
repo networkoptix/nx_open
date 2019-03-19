@@ -209,7 +209,8 @@ void ConnectionBase::onHttpClientDone()
         // try next credential source
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
         using namespace std::placeholders;
-        if (m_credentialsSource < CredentialsSource::none
+        if (m_httpClient->url().userName().isEmpty()
+            && m_credentialsSource < CredentialsSource::none
             && fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
         {
             m_httpClient->doGet(
@@ -344,7 +345,8 @@ void ConnectionBase::startConnection()
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
 
-    fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
+    if (requestUrl.userName().isEmpty())
+        fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
 
     m_httpClient->doGet(
         requestUrl,

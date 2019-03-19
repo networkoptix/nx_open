@@ -3285,7 +3285,7 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_AnalyticsEngine;
     else
     {
-        NX_ASSERT(false, "Unknown object type");
+        NX_WARNING(this, lm("Unknown object type for object %1").arg(objectId));
         return ApiObject_NotDefined;
     }
 }

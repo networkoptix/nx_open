@@ -85,6 +85,9 @@ public:
             case ErrorCode::forbidden:
                 resultBody.clear();
                 return nx::network::http::StatusCode::forbidden;
+            case ErrorCode::badRequest:
+                resultBody.clear();
+                return nx::network::http::StatusCode::badRequest;
             default:
                 resultBody.clear();
                 return nx::network::http::StatusCode::internalServerError;
@@ -318,6 +321,12 @@ private:
                     "Unable to retrieve existing object to merge with.");
                 return nx::network::http::StatusCode::forbidden;
             }
+            case ErrorCode::badRequest:
+            {
+                QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::BadRequest,
+                    "Bad request.");
+                return nx::network::http::StatusCode::badRequest;
+            }
 
             default:
             {
@@ -329,13 +338,19 @@ private:
 
         QJsonValue jsonValue;
         QJson::serialize(existingData, &jsonValue);
-        mergeJsonValues(&jsonValue, incompleteJsonValue);
+        QString errorMessage;
+        if (!mergeJsonValues(&jsonValue, incompleteJsonValue, &errorMessage))
+        {
+            QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::CantProcessRequest,
+                errorMessage);
+            return nx::network::http::StatusCode::badRequest;
+        }
 
         if (!QJson::deserialize<RequestData>(jsonValue, requestData))
         {
             QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::CantProcessRequest,
                 "Unable to deserialize merged Json data to destination object.");
-            return nx::network::http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::badRequest;
         }
 
         return makeSuccess(requestData, outResultBody, outSuccess);
@@ -438,13 +453,38 @@ private:
         return errorCode;
     }
 
-    void mergeJsonValues(QJsonValue* existingValue, const QJsonValue& incompleteValue)
+    bool mergeJsonValues(
+        QJsonValue* existingValue,
+        const QJsonValue& incompleteValue,
+        QString* outErrorMessage,
+        const QString& fieldName = QString())
     {
+        auto toString = [](QJsonValue::Type jsonType)
+        {
+            switch(jsonType)
+            {
+                case QJsonValue::Null:
+                    return "Null";
+                case QJsonValue::Bool:
+                    return "Bool";
+                case QJsonValue::Double:
+                    return "Double";
+                case QJsonValue::String:
+                    return "String";
+                case QJsonValue::Array:
+                    return "Array";
+                case QJsonValue::Object:
+                    return "Object";
+                default:
+                    return "Undefined";
+            }
+        };
+
         if (incompleteValue.type() == QJsonValue::Undefined //< Missing field type, as per Qt doc.
             || incompleteValue.type() == QJsonValue::Null) //< Missing field type, actual.
         {
             NX_VERBOSE(this, "        Incomplete value field is missing - ignored");
-            return; //< leave recursion
+            return true; //< leave recursion
         }
 
         NX_VERBOSE(this, "BEGIN merge:");
@@ -453,10 +493,12 @@ private:
 
         if (incompleteValue.type() != existingValue->type())
         {
-            NX_VERBOSE(this, lm("INTERNAL ERROR: Incomplete value type %1, existing value type %2")
-                .arg(int(incompleteValue.type())).arg(int(existingValue->type())));
-            NX_ASSERT(false);
-            return;
+            const QString fieldReference =
+                fieldName.isEmpty() ? "" : lm(" field \"%1\"").arg(fieldName);
+            *outErrorMessage = lm("Request%1 has invalid type. Expected type \"%2\", actual type \"%3\"")
+                .args(fieldReference, toString(existingValue->type()), toString(incompleteValue.type()));
+            NX_WARNING(this, *outErrorMessage);
+            return false;
         }
 
         switch (existingValue->type())
@@ -477,7 +519,8 @@ private:
                 {
                     NX_VERBOSE(this, lm("    Field \"%1\":").arg(it.key()));
                     QJsonValue field = it.value();
-                    mergeJsonValues(&field, incompleteValue.toObject()[it.key()]); //< recursion
+                    if (!mergeJsonValues(&field, incompleteValue.toObject()[it.key()], outErrorMessage, it.key())) //< recursion
+                        return false;
                     it.value() = field; //< Write back possibly changed field.
                     NX_VERBOSE(this, lm("    Assigned %1").arg(QJson::serialize(it.value())));
                 }
@@ -490,6 +533,7 @@ private:
         }
 
         NX_VERBOSE(this, lm("END merge: new value: %1").arg(QJson::serialize(*existingValue)));
+        return true;
     }
 
 private:

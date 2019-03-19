@@ -404,6 +404,7 @@ CameraDiagnostics::Result Camera::initInternal()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
+    NX_VERBOSE(this, "Initialising camera driver");
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
