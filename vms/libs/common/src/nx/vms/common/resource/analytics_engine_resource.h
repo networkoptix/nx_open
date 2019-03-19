@@ -41,7 +41,7 @@ public:
     QList<nx::vms::api::analytics::EngineManifest::ObjectAction> supportedObjectActions() const;
 
     /**
-     * Device-dependent engines are always running on the device and cannot be disabled by user.
+     * Device-dependent Engines are always running on a Device and cannot be disabled by the user.
      */
     bool isDeviceDependent() const;
 

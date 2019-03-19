@@ -45,15 +45,6 @@ bool storeUrlForRole(Qn::ConnectionRole role)
     return false;
 }
 
-QSet<QnUuid> activeAnalyticsEngines(const QnVirtualCameraResource* device)
-{
-    const auto server = device->getParentServer();
-    if (!NX_ASSERT(server))
-        return {};
-
-    return server->activeAnalyticsEngines();
-}
-
 std::map<QnUuid, std::set<QString>> filterByActiveEngines(
     std::map<QnUuid, std::set<QString>> entitiesByEngine,
     const QSet<QnUuid>& activeEngines)
@@ -70,23 +61,18 @@ std::map<QnUuid, std::set<QString>> filterByActiveEngines(
     return entitiesByEngine;
 }
 
-} // namespace
+static const QString kUserEnabledAnalyticsEnginesProperty("userEnabledAnalyticsEngines");
+static const QString kDeviceAgentsSettingsValuesProperty("deviceAgentsSettingsValuesProperty");
+static const QString kDeviceAgentManifestsProperty("deviceAgentManifests");
 
-const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
-    "userEnabledAnalyticsEngines");
+} // namespace
 
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
     "compatibleAnalyticsEngines");
 
-const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
-    "deviceAgentsSettingsValuesProperty");
-
-const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty("deviceAgentManifests");
-
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
-    m_lastIssueTimer(),
     m_cachedUserEnabledAnalyticsEngines(
         [this]() { return calculateUserEnabledAnalyticsEngines(); }, &m_cacheMutex),
     m_cachedCompatibleAnalyticsEngines(
@@ -606,30 +592,38 @@ nx::vms::common::AnalyticsEngineResourceList
 
 void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines)
 {
+    auto ensureEnginesAreActive =
+        [this, engines]
+        {
+            const auto server = getParentServer();
+            if (!server)
+                return false;
+
+            // Make sure all set engines are active.
+            return (engines - server->activeAnalyticsEngineIds()).empty();
+        };
+
+    NX_ASSERT_HEAVY_CONDITION(ensureEnginesAreActive());
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedEventTypes() const
 {
-    // This one looks very suspicious for me. Shouldn't we check enabledAnalyticsEngines() here?
-    // TODO: #dmishin
-    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), activeAnalyticsEngines(this));
+    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), enabledAnalyticsEngines());
 }
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectTypes() const
 {
-    // This one looks very suspicious for me. Shouldn't we check enabledAnalyticsEngines() here?
-    // TODO: #dmishin
-    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), activeAnalyticsEngines(this));
+    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), enabledAnalyticsEngines());
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines()
+QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines()
+QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
@@ -681,7 +675,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedO
 }
 
 QnVirtualCameraResource::DeviceAgentManifestMap
-    QnVirtualCameraResource::fetchDeviceAgentManifests()
+    QnVirtualCameraResource::fetchDeviceAgentManifests() const
 {
     return QJson::deserialized<DeviceAgentManifestMap>(
         getProperty(kDeviceAgentManifestsProperty).toUtf8());
@@ -723,7 +717,7 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
 }
 
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
-    QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId)
+    QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId) const
 {
     const auto manifests = m_cachedDeviceAgentManifests.get();
     auto it = manifests.find(engineId);
