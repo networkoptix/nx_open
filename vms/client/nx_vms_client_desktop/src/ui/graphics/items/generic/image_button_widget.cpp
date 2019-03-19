@@ -284,6 +284,7 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *glWidget, const QRectF &rect)
 {
 
+    return;
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
         imageRect = nx::vms::client::core::Geometry::eroded(imageRect, m_imageMargins);
@@ -324,8 +325,8 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     glWidget->makeCurrent();
     if (isOne || isZero)
     {
-        QOpenGLTexture texture((isZero ? startPixmap : endPixmap).toImage());
-        texture.bind();
+//        QOpenGLTexture texture((isZero ? startPixmap : endPixmap).toImage());
+//        texture.bind();
 
         auto shader = renderer->getTextureShader();
         shader->bind();
@@ -338,13 +339,13 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     {
         auto shader = renderer->getTextureTransitionShader();
 
-        renderer->glActiveTexture(GL_TEXTURE1);
-        QOpenGLTexture texture(endPixmap.toImage());
-        texture.bind();
+//        renderer->glActiveTexture(GL_TEXTURE1);
+//        QOpenGLTexture texture(endPixmap.toImage());
+//        texture.bind();
 
         renderer->glActiveTexture(GL_TEXTURE0);
-        QOpenGLTexture texture2(startPixmap.toImage());
-        texture.bind();
+//        QOpenGLTexture texture2(startPixmap.toImage());
+//        texture.bind();
 
         shader->bind();
         shader->setProgress(progress);

@@ -365,11 +365,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     setLayout(m_globalLayout);
 
-    // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-    // We have to use the trick below to prevent blinks on start.
-    if (nx::utils::AppInfo::isMacOsX())
-        m_viewLayout->setStackingMode(QStackedLayout::StackAll);
-
     if (m_welcomeScreen)
         m_viewLayout->addWidget(m_welcomeScreen);
 
@@ -432,36 +427,11 @@ void MainWindow::updateWidgetsVisibility()
                 ? static_cast<QWidget*>(m_welcomeScreen)
                 : static_cast<QWidget*>(m_view.data());
 
-            if (currentWidget == m_viewLayout->currentWidget())
-                return;
-
-            // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-            // We have to use the trick below to prevent blinks on start.
-            if (nx::utils::AppInfo::isMacOsX())
-                m_viewLayout->setStackingMode(QStackedLayout::StackOne);
-
-            m_viewLayout->setCurrentWidget(currentWidget);
-
-            // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-            // For some reason when we switch widgets visibility we start to loose paint events.
-            // This results to hangs until you resize or hide/show main window in MacOs.
-            // Workaround below fixes it.
-            if (nx::utils::AppInfo::isMacOsX())
-            {
-                static const QSize kSizeChange(100, 100);
-                const auto currentGeometry = geometry();
-                setGeometry(QRect(currentGeometry.topLeft(), currentGeometry.size() + kSizeChange));
-                setGeometry(currentGeometry);
-            }
+            if (currentWidget != m_viewLayout->currentWidget())
+                m_viewLayout->setCurrentWidget(currentWidget);
         };
 
-    // TODO: #ynikitenkov Remove this workaround when we integrate QOpenGLWidget.
-    // For some reason mouse events don't go to the QGraphicsView if we change visibility
-    // under some circumstances in MacOs. This ugly workaround fixes it.
-    if (nx::utils::AppInfo::isMacOsX())
-        executeLater(switchWidgetsCallback, this);
-    else
-        switchWidgetsCallback();
+    switchWidgetsCallback();
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen).
     m_titleBar->setVisible(isTitleVisible());
@@ -733,6 +703,15 @@ void MainWindow::updateContentsMargins()
 // -------------------------------------------------------------------------- //
 bool MainWindow::event(QEvent* event)
 {
+    {
+        // TODO: THIS IS TEMPORARY CODE. LOOKS LIKE SOMEHOW REPAINTING OCCURES TWICE
+        // invastigate and fix this.
+        if (event->type() == QEvent::UpdateRequest || event->type() == QEvent::Paint)
+            {
+                return false;
+            }
+    }
+
     bool result = base_type::event(event);
 
     if (event->type() == QEvent::WindowActivate)
