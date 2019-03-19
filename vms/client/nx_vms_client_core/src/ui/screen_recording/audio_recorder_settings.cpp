@@ -116,7 +116,19 @@ void QnAudioRecorderSettings::setSecondaryAudioDeviceName(const QString& audioDe
 
 QnAudioDeviceInfo QnAudioRecorderSettings::defaultPrimaryAudioDevice() const
 {
-    return QnAudioDeviceInfo(QAudioDeviceInfo::defaultInputDevice(), QString());
+    const DeviceList& devices = availableDevices();
+
+    const QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
+    if (info.isNull() && !devices.isEmpty())
+        return devices.first();
+
+    const auto it = std::find_if(devices.begin(), devices.end(),
+        [&info](const QnAudioDeviceInfo& item) { return info == item; });
+
+    if (it != devices.end())
+        return *it;
+
+    return {};
 }
 
 QnAudioDeviceInfo QnAudioRecorderSettings::defaultSecondaryAudioDevice() const
