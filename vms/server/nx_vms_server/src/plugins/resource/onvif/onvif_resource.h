@@ -540,16 +540,21 @@ private:
         std::string name;
         std::string value;
         onvifSimpleItem() = default;
-        onvifSimpleItem(const char* name, const char* value): name(name), value(value) {}
+        onvifSimpleItem(const char* name, const char* value):
+            name(name ? name : ""), value(value ? value : "")
+        {
+        }
     };
 
     // TODO: The following static functions should be moved to a separate class in 4.1.
-    static const char* attributeTextByName(const soap_dom_element* element, const char* attributeName);
-    static onvifSimpleItem parseSimpleItem(const soap_dom_element* element);
-    static onvifSimpleItem parseChildSimpleItem(const soap_dom_element* element);
-    static std::vector<onvifSimpleItem> parseChildSimpleItems(const soap_dom_element* element);
-    static void parseSourceAndData(const soap_dom_element* element,
-        std::vector<onvifSimpleItem>* source, onvifSimpleItem* data);
+    static const char* attributeTextByName(const soap_dom_element& element, const char* attributeName);
+    static onvifSimpleItem parseSimpleItem(const soap_dom_element& element);
+
+    static onvifSimpleItem parseChildSimpleItem(const soap_dom_element& element);
+    static std::vector<onvifSimpleItem> parseChildSimpleItems(const soap_dom_element& element);
+    static void parseSourceAndData(const soap_dom_element& element,
+        std::vector<onvifSimpleItem>* outSource, onvifSimpleItem* outData);
+
     static QString parseEventTopic(const char* text);
     static QDateTime parseDateTime(const soap_dom_attribute* att, QTimeZone timeZone);
     static std::string makeItemNameList(const std::vector<onvifSimpleItem>& items);
