@@ -1396,6 +1396,8 @@ void QnWorkbenchNavigator::timelineCatchUp(qint64 toMs)
 
     m_positionAnimator->setSpeed(catchUpMsPerSecond);
     m_positionAnimator->animateTo(toMs);
+
+    emit positionChanged(); //< We use it for Video Wall sync.
 }
 
 bool QnWorkbenchNavigator::isTimelineCatchingUp() const
@@ -1632,15 +1634,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 {
                     /* If media is live or position deviation is too big we quickly catch-up, otherwise smoothly correct: */
                     if (timeMSec == endTimeMSec || qAbs(timeMSec - m_animatedPosition) >= qAbs(kCatchUpThresholdMs * speed()))
-                    {
                         timelineCatchUp(timeMSec);
-                        emit positionChanged(); //< We use it for Video Wall sync.
-                    }
                     else
-                    {
                         timelineCorrect(timeMSec);
-                    }
-
                 }
             }
             else
