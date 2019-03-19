@@ -103,11 +103,11 @@ window.L = {};
                     
                     angular.extend(CONFIG, appState);
                     
-                    CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
-                    CONFIG.campage.supportedResolutions = response.supportedResolutions;
-                    CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;
-                    CONFIG.campage.searchTags = response.searchTags;
-                    CONFIG.campage.vendorsShown = +response.vendorsShown;
+                    CONFIG.ipvd.sortSupportedDevices = response.sortSupportedDevices;
+                    CONFIG.ipvd.supportedResolutions = response.supportedResolutions;
+                    CONFIG.ipvd.supportedHardwareTypes = response.supportedHardwareTypes;
+                    CONFIG.ipvd.searchTags = response.searchTags;
+                    CONFIG.ipvd.vendorsShown = +response.vendorsShown;
                 });
 
                 $.ajax({
@@ -373,7 +373,7 @@ window.L = {};
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
                             })
-                            .when('/campage', {
+                            .when('/ipvd', {
                                 template: ''
                             })
                             .when('/sandbox', {

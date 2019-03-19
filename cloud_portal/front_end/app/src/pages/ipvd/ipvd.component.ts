@@ -6,7 +6,7 @@ import {
     ViewEncapsulation
 }                                              from '@angular/core';
 import { CamerasService }                      from '../../services/cameras.service';
-import { CampageSearchService }                from './campage-search.service';
+import { IpvdSearchService }                   from './ipvd-search.service';
 import { NxModalMessageComponent }             from '../../dialogs/message/message.component';
 import { NxConfigService }                     from '../../services/nx-config';
 import { TranslateService }                    from '@ngx-translate/core';
@@ -14,13 +14,13 @@ import { NxUriService }                        from '../../services/uri.service'
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 @Component({
-    selector     : 'campage',
-    templateUrl  : 'campage.component.html',
-    styleUrls    : ['campage.component.scss'],
+    selector     : 'ipvd',
+    templateUrl  : 'ipvd.component.html',
+    styleUrls    : ['ipvd.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
 
-export class NxCampageComponent implements OnInit, DoCheck {
+export class NxIpvdComponent implements OnInit, DoCheck {
     lang: any = {};
     CONFIG: any = {};
     data: any;
@@ -50,6 +50,8 @@ export class NxCampageComponent implements OnInit, DoCheck {
     mobileDetailMode: boolean;
 
     hwtypes: any;
+    private ASC = true;
+    private DESC = false;
 
   private setupDefaults() {
       this.allowedParameters = [
@@ -98,7 +100,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     constructor(private configService: NxConfigService,
                 private translate: TranslateService,
                 private cameraService: CamerasService,
-                private cameraSearchService: CampageSearchService,
+                private cameraSearchService: IpvdSearchService,
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
                 private differs: KeyValueDiffers,
@@ -115,7 +117,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
     ngOnInit() {
         // Example URI
-        // /campage?vendors=30X&camera=IPPTZ-ELS2IRL30X-ATI
+        // /ipvd?vendors=30X&camera=IPPTZ-ELS2IRL30X-ATI
         this.uri
             .getURI()
             .subscribe(params => {
@@ -132,7 +134,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterResolutions() {
-        this.resolutions = JSON.parse(this.CONFIG.campage.supportedResolutions);
+        this.resolutions = JSON.parse(this.CONFIG.ipvd.supportedResolutions);
 
         this.filterModel.selects = [
             {
@@ -152,20 +154,21 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
     addFilterTags() {
-        this.filterModel.tags = JSON.parse(this.CONFIG.campage.searchTags);
-        this.filterModel.tags.forEach(tag => tag.label = this.lang.campage[tag.id]);
+        this.filterModel.tags = JSON.parse(this.CONFIG.ipvd.searchTags);
+        this.filterModel.tags.forEach(tag => tag.label = this.lang.ipvd[tag.id]);
     }
 
     addFilterTypes() {
-        this.hardwareTypes = JSON.parse(this.CONFIG.campage.supportedHardwareTypes);
+        this.hardwareTypes = JSON.parse(this.CONFIG.ipvd.supportedHardwareTypes);
         this.hardwareTypes.forEach(type => {
-            type.label = this.lang.campage[type.id];
+            type.label = this.lang.ipvd[type.id];
         });
 
         this.filterModel.multiselects = [
             {
                 id      : 'hardwareTypes',
                 label   : 'Types',
+                singular: 'Type',
                 items   : this.hardwareTypes,
                 selected: []
             }
@@ -231,8 +234,9 @@ export class NxCampageComponent implements OnInit, DoCheck {
                         {
                             id      : 'vendors',
                             label   : 'Manufacturers',
+                            singular: 'Manufacturer',
                             items   : this.vendors.map(v => (
-                                    { id: v, label: v }
+                                    { id: v.name, label: v.name }
                             )),
                             selected: []
                         });
@@ -305,7 +309,19 @@ export class NxCampageComponent implements OnInit, DoCheck {
           (a[c.vendor] || (a[c.vendor] = { name: c.vendor, count: 0 })).count += c.count;
           return a;
       }, {}));
+
+      this.vendors.sort((a, b) => this.byParam(a, b, 'name' , this.ASC));
   }
+
+    byParam(a, b, param, order) {
+        if (a[param] < b[param]) {
+            return (order) ? -1 : 1;
+        }
+        if (a[param] > b[param]) {
+            return (order) ? 1 : -1;
+        }
+        return 0;
+    }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
   preFilterCameraTable (cameras) {
@@ -332,7 +348,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
         if (this.data) {
             this.cameraSearchService
-                .campageSearch(this.data, this.filter)
+                .ipvdSearch(this.data, this.filter)
                 .subscribe(cameras => {
                     this.activeCamera = undefined;
                     this.cameras = cameras;
@@ -361,7 +377,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
           return;
       }
 
-      this.uri.updateURI('/campage', [
+      this.uri.updateURI('/ipvd', [
           {
               key: 'camera', value: elementSelected.model || elementSelected.value.model
           }
@@ -424,7 +440,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
     }
 
   resetActiveCamera() {
-      this.uri.updateURI('/campage', [{ key: 'camera', value: undefined }]);
+      this.uri.updateURI('/ipvd', [{ key: 'camera', value: undefined }]);
       this.activeCamera = undefined;
       this.toggleCamview = false;
       this.mobileDetailMode = false;

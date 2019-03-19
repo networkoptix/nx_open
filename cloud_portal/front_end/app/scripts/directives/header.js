@@ -47,7 +47,7 @@
                 // scope.activeSystem = {};
 
                 function updateActive() {
-                    scope.active.campage = isActive('/campage');
+                    scope.active.ipvd = isActive('/ipvd');
                     scope.active.integrations = isActive('/integrations');
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');

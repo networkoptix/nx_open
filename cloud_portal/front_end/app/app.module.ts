@@ -38,7 +38,7 @@ export function createTranslateLoader(http: HttpClient) {
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/sandbox') ||
-            url.toString().startsWith('/campage') ||
+            url.toString().startsWith('/ipvd') ||
             url.toString().startsWith('/main') ||
             url.toString().startsWith('/other') ||
             url.toString().startsWith('/servers') ||

@@ -23,13 +23,8 @@
                 <button class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
                         *ngIf="numberFilters != 0">
 
-                    <div [ngSwitch]="numberFilters" class="ml-2 mr-3">
-                        <span *ngSwitchCase="1">
-                            '{{filterSelected}}' filter applied
-                        </span>
-                        <span *ngSwitchDefault>
-                            {{numberFilters}} filters applied
-                        </span>
+                    <div class="ml-2 mr-3">
+                        {{filterSelected}}
                     </div>
 
                     <span class="close-button" (click)="resetFilters()">

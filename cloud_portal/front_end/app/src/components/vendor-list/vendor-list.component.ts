@@ -107,11 +107,11 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.vendors) {
-            this.remainingVendors = changes.vendors.currentValue.length - this.CONFIG.campage.vendorsShown;
+            this.remainingVendors = changes.vendors.currentValue.length - this.CONFIG.ipvd.vendorsShown;
             this.vendors = changes.vendors
                     .currentValue
                     .sort((a, b) => this.byParam(a, b, 'count', this.DESC))
-                    .slice(0, this.CONFIG.campage.vendorsShown)
+                    .slice(0, this.CONFIG.ipvd.vendorsShown)
                     .sort((a, b) => this.byParam(a, b, 'name', this.ASC));
         }
     }
@@ -148,7 +148,7 @@ export class NxVendorListComponent implements OnInit, OnChanges {
             queryParams.tags = filter.id;
         }
 
-        this.uri.updateURI('/campage', queryParams, true);
+        this.uri.updateURI('/ipvd', queryParams, true);
 
         // Propagate component's value attribute (model)
         this.propagateChange({ ...this.filter });
@@ -169,7 +169,7 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
                 queryParams[select.id] = select.selected;
 
-                this.uri.updateURI('/campage', queryParams, true);
+                this.uri.updateURI('/ipvd', queryParams, true);
             }
         });
         // Propagate component's value attribute (model)

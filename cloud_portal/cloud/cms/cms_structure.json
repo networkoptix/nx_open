@@ -696,7 +696,7 @@
               },
               {
                 "name": "Supported Devices",
-                "url": "/campage",
+                "url": "/ipvd",
                 "newWindow": false,
                 "enabled": true
               }

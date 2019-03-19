@@ -67,21 +67,21 @@ export class CamTableComponent implements OnChanges, OnInit {
 
       this.paramsShown = 6;
       this.cameraHeaders = [
-          this.lang.campage.vendor,
-          this.lang.campage.model,
-          this.lang.campage.hardwareType,
-          this.lang.campage.maxResolution,
-          this.lang.campage.maxFps,
-          this.lang.campage.primaryCodec,
-          this.lang.campage.isAudioSupported,
-          this.lang.campage.isPtzSupported,
-          this.lang.campage.isFisheye,
-          this.lang.campage.isMdSupported,
-          this.lang.campage.isIoSupported,
-          this.lang.campage.count
+          this.lang.ipvd.vendor,
+          this.lang.ipvd.model,
+          this.lang.ipvd.hardwareType,
+          this.lang.ipvd.maxResolution,
+          this.lang.ipvd.maxFps,
+          this.lang.ipvd.primaryCodec,
+          this.lang.ipvd.isAudioSupported,
+          this.lang.ipvd.isPtzSupported,
+          this.lang.ipvd.isFisheye,
+          this.lang.ipvd.isMdSupported,
+          this.lang.ipvd.isIoSupported,
+          this.lang.ipvd.count
       ];
 
-      this.pagerMaxSize = this.CONFIG.campage.pagerMaxSize;
+      this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
   }
 
     byKey(a, b) {
@@ -124,14 +124,14 @@ export class CamTableComponent implements OnChanges, OnInit {
 
     toggleHeaderSort(param) {
         let filter;
-        for (const [key, value] of Object.entries(this.lang.campage)) {
+        for (const [key, value] of Object.entries(this.lang.ipvd)) {
             if (value === param) {
                 filter = key;
                 break;
             }
         }
 
-        this.sortOrderASC = (this.lang.campage[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
+        this.sortOrderASC = (this.lang.ipvd[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
         this.toggleSort(filter);
     }
 
@@ -151,7 +151,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         this.setPage(1, true /* keep uri intact */);
 
         this.selectedHeader = this.cameraHeaders.find(x => {
-            return x === this.lang.campage[param];
+            return x === this.lang.ipvd[param];
         });
     }
 
@@ -190,13 +190,13 @@ export class CamTableComponent implements OnChanges, OnInit {
 
     sortElements() {
         // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
-        const sortBy = (this.CONFIG.campage.sortSupportedDevices) ? 'count' : 'sortKey';
+        const sortBy = (this.CONFIG.ipvd.sortSupportedDevices) ? 'count' : 'sortKey';
         this.toggleSort(sortBy);
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.elements) {
-            this.sortOrderASC = !this.CONFIG.campage.sortSupportedDevices;
+            this.sortOrderASC = !this.CONFIG.ipvd.sortSupportedDevices;
             this._elements = changes.elements.currentValue;
             this.results = this._elements.length;
 
@@ -263,7 +263,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
 
         if (this.params && +this.params.page > this.pager.pages.length) {
-            this.uri.updateURI('/campage', [
+            this.uri.updateURI('/ipvd', [
                 {
                     key: 'page', value: this.pager.currentPage
                 }
@@ -273,7 +273,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         if (!keep) {
             // clear selected camera
             this.setClickedRow(-1, {});
-            this.uri.updateURI('/campage', [
+            this.uri.updateURI('/ipvd', [
                 {
                     key: 'page', value: this.pager.currentPage
                 }, {

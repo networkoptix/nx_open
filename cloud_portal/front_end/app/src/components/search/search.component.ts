@@ -25,12 +25,12 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     @Input() expandable: any;
     @Input() skinny: any;
 
-
-    private localFilter: any = {};
-    private numberFilters = 0;
+    public numberFilters = 0;
     public filterSelected: any;
+    public localFilter: any = {};
+    public config: any;
+
     private params: any = {};
-    private config: any;
     private uriPath: string;
     private showAdvancedOptions: boolean;
 
@@ -54,7 +54,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.filterSelected = '';
 
         // Example URI
-        // /campage?search=Axis&tags=isAptzSupported&resolution=SVGA&vendors=Axis,30X,Sony
+        // /ipvd?search=Axis&tags=isAptzSupported&resolution=SVGA&vendors=Axis,30X,Sony
         this._route
             .queryParams
             .subscribe(params => {
@@ -155,36 +155,72 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.numberFilters = 0;
         this.filterSelected = '';
 
+        let flag = 0;
+        let tagsSelected;
+        let selectsSelected;
+        let multiSelectsSelected;
+
         if (this.localFilter.tags) {
             this.localFilter.tags.forEach((filter) => {
                 if (filter.value) {
-                    this.filterSelected = filter.label;
                     this.numberFilters++;
+                    if (this.numberFilters > 1) {
+                        selectsSelected = this.numberFilters + ' filters applied';
+                    } else {
+                        tagsSelected = filter.label;
+                    }
+                    flag++;
                 }
             });
         }
 
         if (this.localFilter.selects && this.localFilter.selects.length) {
-            this.localFilter.selects.forEach((filter) => {
-                if (filter.selected && filter.selected.value !== '0') { // not default value
-                    this.filterSelected = filter.selected.name;
+            this.localFilter.selects.forEach((select) => {
+                if (select.selected && select.selected.value !== '0') { // not default value
                     this.numberFilters++;
+                    if (this.numberFilters > 1) {
+                        selectsSelected = this.numberFilters + ' filters applied';
+                    } else {
+                        selectsSelected = select.label + ' - ' + select.selected.name;
+                    }
+                    flag++;
                 }
             });
         }
 
         if (this.localFilter.multiselects && this.localFilter.multiselects.length) {
-            this.localFilter.multiselects.forEach((filter) => {
-                if (filter.selected.length) { // not default value
-                    this.filterSelected = filter.items.find(item => {
-                        return (item.label.name || item.id) === filter.selected[0];
-                    });
-                    // Aggregated MSelect items vs. simple list
-                    this.filterSelected = this.filterSelected.label.name || this.filterSelected.id;
-                    this.numberFilters += filter.selected.length;
+            this.localFilter.multiselects.forEach((select) => {
+
+                this.numberFilters += select.selected.length;
+
+                if (select.selected.length > 0) {
+                    flag++;
+
+                    switch (select.selected.length) {
+                        case 1 :
+                            const label = select.singular || select.label;
+                            multiSelectsSelected = label + ' - ' + select.items.find(item => {
+                                return (item.label.name || item.id) === select.selected[0];
+                            }).label;
+                            break;
+                        default :
+                            multiSelectsSelected = select.selected.length + ' ' + select.label.toLowerCase();
+                    }
                 }
             });
         }
+
+        if (this.localFilter.query !== '') {
+            this.numberFilters++;
+        }
+
+        if (flag === 1 && this.localFilter.query !== '') {
+            this.filterSelected = tagsSelected || selectsSelected || multiSelectsSelected;
+            return;
+        }
+
+        const str = (this.numberFilters === 1) ? ' filter applied' : ' filters applied';
+        this.filterSelected = this.numberFilters + str;
     }
 
     resetFilters() {

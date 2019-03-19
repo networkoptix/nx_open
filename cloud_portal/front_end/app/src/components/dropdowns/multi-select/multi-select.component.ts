@@ -39,11 +39,11 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     @Input() canSelectAll: any;
     @Input() canSearch: any;
 
-    private items: any = {};
-    private show: boolean;
-    private textSelected: any = {};
+    public items: any = {};
+    public filter: string;
+    public show: boolean;
+    public textSelected: any = {};
     private innerValue: any;
-    private filter: string;
 
     // Placeholders for the callbacks which are later provided
     // by the Control Value Accessor
@@ -141,6 +141,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes.itemsOrig) {
+            debugger;
             this.items = changes.itemsOrig.currentValue.map(obj => ({ ...obj }));
             this.updateItems();
         }

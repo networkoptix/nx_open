@@ -8,7 +8,7 @@ import 'rxjs/add/operator/switchMap';
 @Injectable({
     providedIn: 'root'
 })
-export class CampageSearchService {
+export class IpvdSearchService {
 
     private _vendors: any;
 
@@ -24,7 +24,7 @@ export class CampageSearchService {
         this._vendors = list;
     }
 
-    campageSearch(allCameras, filter): Observable<any> {
+    ipvdSearch(allCameras, filter): Observable<any> {
         const query = filter.query;
         const queryTerms = query.trim().split(' ');
         const preferredVendors = '';

@@ -8,7 +8,7 @@ import { NgbModule }            from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule }      from '@ngx-translate/core';
 import { Angular2CsvModule }    from 'angular2-csv';
 
-import { NxCampageComponent } from './campage.component';
+import { NxIpvdComponent }    from './ipvd.component';
 import { ComponentsModule }   from '../../components/components.module';
 import { CamTableComponent }  from './cam-components/cam-table/cam-table.component';
 import { CamViewComponent }   from './cam-components/cam-view/cam-view.component';
@@ -16,7 +16,7 @@ import { CsvButtonComponent } from './cam-components/csv-button/csv-button.compo
 import { BoolIconComponent }  from './cam-components/bool-icon/bool-icon.component';
 
 const appRoutes: Routes = [
-    { path: 'campage', component: NxCampageComponent }
+    { path: 'ipvd', component: NxIpvdComponent }
 ];
 
 @NgModule({
@@ -35,7 +35,7 @@ const appRoutes: Routes = [
     ],
     providers      : [],
     declarations   : [
-        NxCampageComponent,
+        NxIpvdComponent,
         CamTableComponent,
         CamViewComponent,
         CsvButtonComponent,
@@ -43,11 +43,11 @@ const appRoutes: Routes = [
     ],
     bootstrap      : [],
     entryComponents: [
-        NxCampageComponent
+        NxIpvdComponent
     ],
     exports        : [
-        NxCampageComponent
+        NxIpvdComponent
     ]
 })
 
-export class CampageModule { }
+export class IpvdModule { }

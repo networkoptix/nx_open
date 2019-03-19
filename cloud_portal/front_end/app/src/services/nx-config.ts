@@ -299,7 +299,7 @@ export class NxConfigService {
                 carouselImageEnter: '0.25s ease-in',
                 carouselImageLeave: '0.25s ease-out'
             },
-            campage: {
+            ipvd: {
                 pagerMaxSize: 4
             },
             search: {
