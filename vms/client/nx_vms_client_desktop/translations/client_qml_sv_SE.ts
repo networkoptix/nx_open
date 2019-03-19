@@ -16,99 +16,99 @@
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation type="unfinished">Searching servers in your local network...</translation>
+      <translation>Söker på servrar i ditt lokala nätverk...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation type="unfinished">No servers found</translation>
+      <translation>Inga servrar hittades</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation type="unfinished">Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</translation>
+      <translation>Kontrollera din nätverksanslutning eller tryck &quot;Anslut till Server&quot; knappen för att ange känd serveradress</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation type="unfinished">Click to setup</translation>
+      <translation>Klicka för att konfigurera</translation>
     </message>
   </context>
   <context>
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Logga in</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Lösenord</translation>
     </message>
     <message>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Spara lösenord</translation>
     </message>
     <message>
       <source>Auto-login</source>
-      <translation type="unfinished">Auto-login</translation>
+      <translation>Autoinloggning</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Anslut</translation>
     </message>
   </context>
   <context>
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Sök</translation>
     </message>
   </context>
   <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>OFÖRENLIG</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>ONÅBAR</translation>
     </message>
     <message>
       <source>SAFE MODE</source>
-      <translation type="unfinished">SAFE MODE</translation>
+      <translation>SÄKERT LÄGE</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Ny server</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Ingenting hittades</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Anslut till en annan server...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Anslut till servern...</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Laddar ...</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
+      <translation>Du har ingen åtkomst till %1. Vissa funktioner kan vara otillgängliga.</translation>
     </message>
   </context>
 </TS>

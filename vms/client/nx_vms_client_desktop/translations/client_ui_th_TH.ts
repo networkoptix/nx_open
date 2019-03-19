@@ -2569,44 +2569,6 @@
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>ยกเลิก</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>ดูเหมือนว่าขั้นตอนการปรับปรุงคือการใช้เวลามากขึ้นกว่าปกติ กรุณารอต่อไป.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>ตรวจหาการปรับปรุงโดยอัตโนมัติ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>กำลังอัปเดตเป็น...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>คัดลอกลิ้งค์แล้ว</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>คุณได้ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>ไม่แนะนำให้ใช้การอัปเดตระบบในช่วงปลายสัปดาห์</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
