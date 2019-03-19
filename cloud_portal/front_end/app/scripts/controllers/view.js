@@ -31,7 +31,7 @@
                     });
                 }
 
-                nxAppStateService.setFooterVisibility(false)
+                nxAppStateService.setFooterVisibility(false);
                 
                 // Check if page is displayed inside an iframe
                 $scope.isInIframe = ($window.location !== $window.parent.location);
