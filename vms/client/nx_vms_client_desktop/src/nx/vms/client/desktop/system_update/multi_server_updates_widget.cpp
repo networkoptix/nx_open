@@ -1669,7 +1669,7 @@ void MultiServerUpdatesWidget::setTargetState(
     // TODO: We could try to move to 'far' states, with no direct transition.
     // Should invent something for such case.
     m_widgetState = state;
-    m_stateTracker->setTaskSet(targets);
+    m_stateTracker->setTask(targets);
     m_updateRemoteStateChanged = true;
     m_updateLocalStateChanged = true;
 }

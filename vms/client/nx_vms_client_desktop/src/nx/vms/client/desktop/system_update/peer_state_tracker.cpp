@@ -12,9 +12,11 @@
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
-namespace  {
-    auto kWaitForServerReturn = std::chrono::minutes(10);
-}
+namespace {
+
+auto kWaitForServerReturn = std::chrono::minutes(10);
+
+} // anonymous namespace
 
 namespace nx::vms::client::desktop {
 
@@ -22,8 +24,8 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    if(ini().massSystemUpdateWaitForServerOnline)
-        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnline);
+    if(ini().massSystemUpdateWaitForServerOnlineOverride)
+        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnlineOverride);
     else
         m_waitForServerReturn = kWaitForServerReturn;
 }
@@ -598,7 +600,7 @@ QSet<QnUuid> PeerStateTracker::getPeersFailed() const
     return m_peersFailed;
 }
 
-void PeerStateTracker::setTaskSet(const QSet<QnUuid> &targets)
+void PeerStateTracker::setTask(const QSet<QnUuid> &targets)
 {
     m_peersActive = targets;
     m_peersIssued = targets;
