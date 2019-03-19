@@ -141,7 +141,6 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes.itemsOrig) {
-            debugger;
             this.items = changes.itemsOrig.currentValue.map(obj => ({ ...obj }));
             this.updateItems();
         }

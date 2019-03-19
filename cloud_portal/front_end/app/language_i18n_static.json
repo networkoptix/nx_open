@@ -1,4 +1,8 @@
 {
+	"search": {
+		"filter applied" : "filter applied",
+		"filters applied" : "filters applied"
+	},
 	"ipvd" : {
 		"count" : "Count",
 		"vendor" : "Manufacturer",

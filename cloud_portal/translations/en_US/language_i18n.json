@@ -160,5 +160,9 @@
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.", 
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 
     "latest build": "latest build", 
+    "search": {
+        "filter applied": "filter applied", 
+        "filters applied": "filters applied"
+    }, 
     "servers in the merged System.": "servers in the merged System."
 }

@@ -1,13 +1,13 @@
 import {
     Component, OnInit, Input, ElementRef,
-    forwardRef, Renderer2, ViewEncapsulation,
-    SimpleChanges, OnChanges
+    forwardRef, Renderer2, ViewEncapsulation
 }                                                  from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, Router }                  from '@angular/router';
 import { NxConfigService }                         from '../../services/nx-config';
 import { isArray }                                 from 'rxjs/internal-compatibility';
 import { NxUriService }                            from '../../services/uri.service';
+import { TranslateService }                        from '@ngx-translate/core';
 
 @Component({
     selector     : 'nx-search',
@@ -30,6 +30,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     public localFilter: any = {};
     public config: any;
 
+    private lang: any = {};
     private params: any = {};
     private uriPath: string;
     private showAdvancedOptions: boolean;
@@ -41,7 +42,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                 private _route: ActivatedRoute,
                 private _renderer: Renderer2,
                 private uri: NxUriService,
-                configService: NxConfigService) {
+                private configService: NxConfigService,
+                private translate: TranslateService) {
 
         this.config = configService.getConfig();
         this.uriPath = '/' + this._route.snapshot.url[0].path;
@@ -152,6 +154,13 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     numberOfOptionsSelected() {
+        this.lang = this.translate.translations[this.translate.currentLang];
+
+        // No need to run this function while ngModel's writeValue initializes
+        if (Object.keys(this.localFilter).length === 0 || !this.lang) {
+            return;
+        }
+
         this.numberFilters = 0;
         this.filterSelected = '';
 
@@ -165,7 +174,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                 if (filter.value) {
                     this.numberFilters++;
                     if (this.numberFilters > 1) {
-                        selectsSelected = this.numberFilters + ' filters applied';
+                        selectsSelected = this.numberFilters + ' ' + this.lang.search['filters applied'];
                     } else {
                         tagsSelected = filter.label;
                     }
@@ -179,7 +188,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                 if (select.selected && select.selected.value !== '0') { // not default value
                     this.numberFilters++;
                     if (this.numberFilters > 1) {
-                        selectsSelected = this.numberFilters + ' filters applied';
+                        selectsSelected = this.numberFilters + ' ' + this.lang.search['filters applied'];
                     } else {
                         selectsSelected = select.label + ' - ' + select.selected.name;
                     }
@@ -214,12 +223,15 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             this.numberFilters++;
         }
 
-        if (flag === 1 && this.localFilter.query !== '') {
+        if (flag === 1 && this.localFilter.query === '') {
             this.filterSelected = tagsSelected || selectsSelected || multiSelectsSelected;
             return;
         }
 
-        const str = (this.numberFilters === 1) ? ' filter applied' : ' filters applied';
+        const str = (this.numberFilters === 1) ?
+                ' ' + this.lang.search['filter applied'] :
+                ' ' + this.lang.search['filters applied'];
+
         this.filterSelected = this.numberFilters + str;
     }
 
