@@ -45,6 +45,8 @@ ${SYSTEM NAME AUTO TESTS HEADER}      //header//li/a/span[text()="Auto Tests"]
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered track by system.id"]
 ${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
 
+${DIFFERENT OWNER TITLE}              //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='different owner']
+
 #AUTO TESTS 2 is an offline system used for testing offline status on the systems page and offline status on the system page
 ${AUTO TESTS 2}                       Auto Tests 2
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), "${AUTOTESTS OFFLINE TEXT}")]

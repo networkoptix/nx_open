@@ -168,8 +168,15 @@ Search can be cleared by x button
     Click Link    ${SYSTEM SEARCH X BUTTON}
     Element Text Should Be    ${SYSTEMS SEARCH INPUT}    ${EMPTY}
 
-Search should only be visible with 9 or more systems
+Searching for owner email should only show systems with that owner
+    [tags]    C41891    Threaded
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    Input Text    ${SYSTEMS SEARCH INPUT}    ${EMAIL OWNER}
+    Run Keyword And Expect Error    *    Element Should Not Be Visible    ${DIFFERENT OWNER TITLE}
 
+Search should only be visible with 9 or more systems
     [tags]    C41890
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
