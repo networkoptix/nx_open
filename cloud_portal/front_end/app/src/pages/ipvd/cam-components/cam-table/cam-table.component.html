@@ -26,7 +26,7 @@
                     [ngClass]="{'selected': i == selectedRow}"
                     (click)="setClickedRow(i, item);">
 
-                    <td *ngFor="let p of showParametersFor(item); index as idx" class="text-left"
+                    <td *ngFor="let p of showParametersFor(item)" class="text-left"
                         [ngClass]="{'debug' : debug}">
 
                         <div *ngIf="isString(item.value[p]); else icon">

@@ -1,11 +1,12 @@
 import {
     Component, Input, Output, EventEmitter,
     OnChanges, SimpleChanges,
-    OnInit, ViewEncapsulation }   from '@angular/core';
-import { NxPagerService }         from '../../../../services/pager.service';
-import { NxConfigService }        from '../../../../services/nx-config';
-import { TranslateService }       from '@ngx-translate/core';
-import { NxUriService }           from '../../../../services/uri.service';
+    OnInit, ViewEncapsulation } from '@angular/core';
+import { NxPagerService }       from '../../../../services/pager.service';
+import { NxConfigService }      from '../../../../services/nx-config';
+import { TranslateService }     from '@ngx-translate/core';
+import { NxUriService }         from '../../../../services/uri.service';
+import { NxUtilsService }       from '../../../../services/utils.service';
 
 @Component({
   selector: 'nx-cam-table',
@@ -22,13 +23,14 @@ export class CamTableComponent implements OnChanges, OnInit {
 
   @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
 
+  public selectedHeader;
+  public showHeaders;
+
   private _elements: any[];
   private selectedRow;
-  private selectedHeader;
   private sortOrderASC: boolean;
   private results;
   private cameraHeaders;
-  private showHeaders;
   private paramsShown;
   private lang;
   private params: any;
@@ -84,44 +86,6 @@ export class CamTableComponent implements OnChanges, OnInit {
       this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
   }
 
-    byKey(a, b) {
-        if (+a.key < +b.key) {
-            return -1;
-        }
-        if (+a.key > +b.key) {
-            return 1;
-        }
-        return 0;
-    }
-
-    sortBy(fn) {
-        return (a, b) => {
-            if (fn(a) < fn(b)) {
-                return (this.sortOrderASC) ? -1 : 1;
-            }
-            if (fn(a) > fn(b)) {
-                return (this.sortOrderASC) ? 1 : -1;
-            }
-            return 0;
-        };
-    }
-
-    sortByResolution(fn) {
-        return (a, b) => {
-            const x = fn(a).map(Number);
-            const y = fn(b).map(Number);
-
-            if (x[0] < y[0] || x[1] < y[1]) {
-                return (this.sortOrderASC) ? -1 : 1;
-            }
-            if (x[0] > y[0] || x[1] > y[1]) {
-                return (this.sortOrderASC) ? 1 : -1;
-            }
-            return 0;
-
-        };
-    }
-
     toggleHeaderSort(param) {
         let filter;
         for (const [key, value] of Object.entries(this.lang.ipvd)) {
@@ -139,14 +103,21 @@ export class CamTableComponent implements OnChanges, OnInit {
         let byParam;
 
         if (param === 'maxResolution') {
-            byParam = this.sortByResolution((elm) => {
+            byParam = NxUtilsService.byResolution((elm) => {
                 return elm[param].split('x');
-            });
+            }, this.sortOrderASC);
+
+        } else if (param === 'isPtzSupported') {
+            byParam = NxUtilsService.byParam((elm) => {
+                return !elm.isAptzSupported;
+            }, this.sortOrderASC);
+
         } else {
-            byParam = this.sortBy((elm) => {
+            byParam = NxUtilsService.byParam((elm) => {
                 return (typeof elm[param] === 'string') ? elm[param].toLowerCase() : elm[param];
-            });
+            }, this.sortOrderASC);
         }
+
         this._elements.sort(byParam);
         this.setPage(1, true /* keep uri intact */);
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewEncapsulation, Input, Output, EventEmitter } from '@angular/core';
 import { TranslateService }                                                          from '@ngx-translate/core';
-import { NxUtilsService }                                                            from '../../../services/utils';
+import { NxUtilsService }                                                            from '../../../services/utils.service';
 
 @Component({
     selector: 'nx-language-select',
@@ -77,9 +77,9 @@ export class NxLanguageDropdown implements OnInit {
             .getLanguages()
             .then((data: any) => {
                 this.languages = data.data;
-                this.languages.sort((a, b) => {
-                    return NxUtilsService.byParam(a, b, 'language', NxUtilsService.sortASC);
-                });
+                this.languages.sort(NxUtilsService.byParam((lang) => {
+                    return lang.language;
+                }, NxUtilsService.sortASC));
 
                 this.splitLanguages();
 
