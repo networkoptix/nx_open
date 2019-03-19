@@ -100,7 +100,6 @@ void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals
             emit q->downloadFailed(fileName);
     }
 }
-
 //-------------------------------------------------------------------------------------------------
 
 Downloader::Downloader(

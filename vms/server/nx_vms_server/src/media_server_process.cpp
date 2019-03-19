@@ -3865,7 +3865,6 @@ void MediaServerProcess::connectSignals()
         {
             Downloader* downloader = this->serverModule()->findInstance<Downloader>();
             downloader->startDownloads();
-            downloader->findExistingDownloads();
         });
 
     connect(commonModule()->resourceDiscoveryManager(),
