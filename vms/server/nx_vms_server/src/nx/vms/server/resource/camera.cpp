@@ -420,7 +420,8 @@ void Camera::initializationDone()
     fixInputPortMonitoring();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(
+    nx::vms::api::StreamIndex /*streamIndex*/)
 {
     // Implementation may be overloaded in a driver.
     return StreamCapabilityMap();
