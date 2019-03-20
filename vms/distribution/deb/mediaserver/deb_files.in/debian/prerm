@@ -5,6 +5,10 @@
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
+is_systemd_used() {
+    [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
+}
+
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_GROUP_SUFFIX="@cloud_group_suffix@"
 CLOUD_NAME="@cloudName@"
@@ -30,34 +34,14 @@ then
     db_go || true
     db_get @deb.customization.company.name@-mediaserver/removeDatabase
 
-    if [ "$RET" = "$KEEP" -a "$2" = "in-favour" ]
+    if is_systemd_used
     then
-        # Here we check cloud instances conflict prior to upgrade. Pre-installation script has a
-        # similar check which is required for updates from old versions which do not have this
-        # check.
-
-        echo "Checking $CLOUD_NAME compatibility..." >&2
-
-        NEW_CLOUD_GROUP_SUFFIX=$(echo "$3" | sed "s/$COMPANY_NAME-mediaserver//")
-        IS_CONNECTED_TO_CLOUD=$($CFG_HELPER isConnectedToCloud)
-
-        if [ "$IS_CONNECTED_TO_CLOUD" = "yes" \
-            -a "$CLOUD_GROUP_SUFFIX" != "$NEW_CLOUD_GROUP_SUFFIX" ]
-        then
-            echo >&2
-            echo "You are going to install a package for another cloud instance." >&2
-            echo "Please unlink the system from $CLOUD_NAME first."
-            echo "Exiting..." >&2
-            echo >&2
-            exit 1
-        fi
+        systemctl disable $COMPANY_NAME-mediaserver
+        systemctl disable $COMPANY_NAME-root-tool
+    else
+        service $COMPANY_NAME-mediaserver stop || true
+        service $COMPANY_NAME-root-tool stop || true
     fi
-
-    which systemctl && (systemctl disable $COMPANY_NAME-mediaserver || exit $?)
-    which systemctl && (systemctl disable $COMPANY_NAME-root-tool || exit $?)
-
-    service $COMPANY_NAME-mediaserver stop || true
-    service $COMPANY_NAME-root-tool stop || true
 
     $CFG_HELPER sysIdTime -d
 
