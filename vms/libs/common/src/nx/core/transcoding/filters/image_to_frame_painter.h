@@ -8,6 +8,7 @@
 #include <transcoding/filters/abstract_image_filter.h>
 
 class QImage;
+struct SwsContext;
 
 namespace nx {
 namespace core {
@@ -33,7 +34,8 @@ private:
     void updateTargetImage();
 
     void clearImages();
-
+    CLVideoDecoderOutputPtr drawToFfmpeg(const CLVideoDecoderOutputPtr& frame);
+    CLVideoDecoderOutputPtr drawToSse(const CLVideoDecoderOutputPtr& frame);
 private:
     using AlignedBufferPtr = std::shared_ptr<quint8>;
 
@@ -49,6 +51,9 @@ private:
 
     AlignedBufferPtr m_finalImageBytes;
     QImage m_finalImage;
+
+    SwsContext* m_toImageContext = nullptr;
+    SwsContext* m_fromImageContext = nullptr;
 };
 
 } // namespace detail

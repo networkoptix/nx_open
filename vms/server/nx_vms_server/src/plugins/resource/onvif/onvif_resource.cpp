@@ -1125,20 +1125,21 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
 */
 
 /*static*/ const char* QnPlOnvifResource::attributeTextByName(
-    const soap_dom_element* element, const char* attributeName)
+    const soap_dom_element& element, const char* attributeName)
 {
     NX_ASSERT(attributeName);
-    // soap_dom_element methods have no const specifiers, so we are compelled to use const_cast
-    soap_dom_attribute_iterator it = const_cast<soap_dom_element*>(element)->att_find(attributeName);
-    const char* const text = (it != soap_dom_attribute_iterator())
-        ? (it->text ? it->text : "")
-        : "";
-    NX_ASSERT(text);
-    return text;
+    const soap_dom_attribute* att = element.atts;
+    while (att)
+    {
+        if (att->name && std::strcmp(att->name, attributeName) == 0)
+            return att->text;
+        att = att->next;
+    }
+    return nullptr;
 }
 
 /*static*/ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseSimpleItem(
-    const soap_dom_element* element)
+    const soap_dom_element& element)
 {
     // if an element is a simple item, it has the only subelement
     // with attributes "Name" and "Value"
@@ -1148,46 +1149,53 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
 }
 
 /*static*/ QnPlOnvifResource::onvifSimpleItem  QnPlOnvifResource::parseChildSimpleItem(
-    const soap_dom_element* element)
+    const soap_dom_element& element)
 {
-    if (element->elts)
-        return parseSimpleItem(element->elts);
+    if (element.elts)
+        return parseSimpleItem(*element.elts);
     else
         return onvifSimpleItem();
 }
 
 /*static*/ std::vector<QnPlOnvifResource::onvifSimpleItem> QnPlOnvifResource::parseChildSimpleItems(
-    const soap_dom_element* element)
+    const soap_dom_element& element)
 {
     // if an element contains a simple item, it has the only subelement
     // with attributes "Name" and "Value"
     std::vector<onvifSimpleItem> result;
-    for (soap_dom_element* subElement = element->elts; subElement; subElement = subElement->next)
+    const soap_dom_element* subElement = element.elts;
+    while (subElement)
     {
-
-        result.emplace_back(parseSimpleItem(subElement));
+        result.emplace_back(parseSimpleItem(*subElement));
+        subElement = subElement->next;
     }
     return result;
 }
 
 /*static*/ void QnPlOnvifResource::parseSourceAndData(
-    const soap_dom_element* element,
-    std::vector<QnPlOnvifResource::onvifSimpleItem>* source,
-    QnPlOnvifResource::onvifSimpleItem* data)
+    const soap_dom_element& element,
+    std::vector<QnPlOnvifResource::onvifSimpleItem>* outSource,
+    QnPlOnvifResource::onvifSimpleItem* outData)
 {
+    NX_ASSERT(outSource);
+    NX_ASSERT(outData);
+
     static const QByteArray kSource = "Source";
     static const QByteArray kData = "Data";
-    for (soap_dom_element* elt = element->elts; elt; elt = elt->next)
+
+    const soap_dom_element* elt = element.elts;
+    while (elt)
     {
-        if (!elt->name)
-            continue;
-        const QByteArray name = QByteArray::fromRawData(elt->name, (int)strlen(elt->name));
-        QByteArray pureName = name.split(':').back();
-        soap_dom_element* subElement = elt->elts;
-        if (pureName == kSource)
-            *source = parseChildSimpleItems(elt);
-        else if (pureName == kData)
-            *data = parseChildSimpleItem(elt);
+        if (elt->name)
+        {
+            const QByteArray name = QByteArray::fromRawData(elt->name, (int)strlen(elt->name));
+            QByteArray pureName = name.split(':').back();
+            if (pureName == kSource)
+                *outSource = parseChildSimpleItems(*elt);
+            else if (pureName == kData)
+                *outData = parseChildSimpleItem(*elt);
+        }
+        elt = elt->next;
     }
 }
 
@@ -1310,7 +1318,7 @@ void QnPlOnvifResource::handleOneNotification(
 
     std::vector<onvifSimpleItem> source;
     onvifSimpleItem data;
-    parseSourceAndData(&notification.Message.__any, &source, &data);
+    parseSourceAndData(notification.Message.__any, &source, &data);
 
     if (source.empty())
     {
