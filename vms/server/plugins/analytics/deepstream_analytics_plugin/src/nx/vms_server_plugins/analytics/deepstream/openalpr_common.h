@@ -7,7 +7,9 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace deepstream {
 
-extern const std::string kLicensePlateGuid;
+static const std::string kLicensePlateObjectTypeId = "nx.openalpr.licencePlate";
+
+static const std::string kLicensePlateDetectedEventTypeId = "nx.openalpr.licensePlateDetected";
 
 } // namespace deepstream
 } // namespace analytics

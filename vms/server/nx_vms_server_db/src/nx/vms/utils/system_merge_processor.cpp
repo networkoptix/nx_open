@@ -89,29 +89,28 @@ QnJsonRestResult SystemMergeProcessor::merge(
         return result;
     }
 
-    result.setReply(m_remoteModuleInformation);
+    auto makeError =
+        [&](const QString& logMessage)
+        {
+            NX_DEBUG(this, logMessage);
+            result.setReply(m_remoteModuleInformation);
+            return result;
+        };
 
     result = checkWhetherMergeIsPossible(data);
     if (result.error)
-    {
-        NX_DEBUG(this, lm("Systems cannot be merged"));
-        return result;
-    }
+        return makeError("Systems cannot be merged");
+
 
     result = mergeSystems(accessRights, data);
     if (result.error)
-    {
-        NX_DEBUG(this, lm("Failed to merge systems. %1")
-            .args(toString(result.error)));
-        return result;
-    }
+        return makeError(lm("Failed to merge systems. %1").args(toString(result.error)));
 
     nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     if (!addMergeHistoryRecord(data, &mergeHistoryRecord))
     {
-        NX_DEBUG(this, "Failed to add merge history data");
         setMergeError(&result, MergeStatus::unknownError);
-        return result;
+        return makeError("Failed to add merge history data");
     }
     QJson::serialize(mergeHistoryRecord, &result.reply);
 

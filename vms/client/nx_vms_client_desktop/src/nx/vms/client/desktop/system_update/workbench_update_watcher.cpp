@@ -16,6 +16,7 @@
 
 #include <client/client_settings.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <ui/dialogs/common/message_box.h>
@@ -142,7 +143,17 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
         return;
     QString updateUrl = qnSettings->updateFeedUrl();
     NX_ASSERT(!updateUrl.isEmpty());
-    m_private->m_updateCheck = m_private->m_serverUpdateTool->checkLatestUpdate(updateUrl);
+
+    QString changesetOverride = ini().autoUpdatesCheckChangesetOverride;
+    if (changesetOverride.isEmpty())
+    {
+        m_private->m_updateCheck = m_private->m_serverUpdateTool->checkLatestUpdate(updateUrl);
+    }
+    else
+    {
+        m_private->m_updateCheck = m_private->m_serverUpdateTool->checkSpecificChangeset(
+            updateUrl, changesetOverride);
+    }
 }
 
 void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)

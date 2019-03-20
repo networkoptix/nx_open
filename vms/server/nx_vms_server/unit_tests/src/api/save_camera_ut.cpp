@@ -29,7 +29,7 @@ TEST(SaveCamera_, invalidData)
     cameraData.physicalId = "non-matching physicalId";
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({"id", "physicalId", "parentId", "typeId", "vendor"}),
-        nx::network::http::StatusCode::forbidden);
+        nx::network::http::StatusCode::badRequest);
 
     NX_INFO(this, "Create another camera with auto-generated id.");
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,

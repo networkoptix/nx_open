@@ -29,7 +29,7 @@ angular.module('nxCommon')
         * Service is initialised to work with specific system and server.
         * Each instance representing a single connection and is cached
         *
-        * 
+        *
         * TODO (v 3.2): Support websocket connection to server as well
         * */
 
@@ -161,7 +161,7 @@ angular.module('nxCommon')
 
         /* Authentication */
         ServerConnection.prototype.getCurrentUser = function (forcereload){
-            if(forcereload){ // Clean cache to 
+            if(forcereload){ // Clean cache to
                 self.currentUser = null;
                 self.userRequest = null;
             }
@@ -315,17 +315,22 @@ angular.module('nxCommon')
 
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
-            var data = {
-                    cameraId:cleanId(cameraId),
-                    time: time || 'LATEST'
+            var endpoint = '/ec2/cameraThumbnail',
+                data = {
+                    cameraId: cleanId(cameraId)
                 };
-            if(width){
+            if (time) {
+                data.time = time;
+            } else {
+                endpoint += '?ignoreExternalArchive&time=LATEST';
+            }
+            if (width) {
                 data.width = width;
             }
-            if(height){
+            if (height) {
                 data.height = height;
             }
-            return this._setGetParams('/ec2/cameraThumbnail?ignoreExternalArchive', data, this.systemId && this.authGet());
+            return this._setGetParams(endpoint, data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};

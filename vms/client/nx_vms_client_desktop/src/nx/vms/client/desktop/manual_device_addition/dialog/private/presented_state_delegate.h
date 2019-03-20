@@ -1,13 +1,13 @@
 #pragma once
 
-#include <QtWidgets/QStyledItemDelegate>
+#include "found_devices_delegate.h"
 
 namespace nx::vms::client::desktop {
 
-class PresentedStateDelegate: public QStyledItemDelegate
+class PresentedStateDelegate: public FoundDevicesDelegate
 {
     Q_OBJECT
-    using base_type = QStyledItemDelegate;
+    using base_type = FoundDevicesDelegate;
 
 public:
     PresentedStateDelegate(QObject* parent = nullptr);

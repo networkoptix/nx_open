@@ -326,9 +326,6 @@ private:
     QString m_reasonPhrase;
     QString m_videoLayout;
 
-    char* m_additionalReadBuffer;
-    int m_additionalReadBufferPos;
-    int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
     QByteArray m_userAgent;
     nx::network::http::header::AuthScheme::Value m_defaultAuthScheme;

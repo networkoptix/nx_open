@@ -265,9 +265,6 @@ QnRtspClient::QnRtspClient(
     m_isAudioEnabled(true),
     m_TimeOut(0),
     m_tcpSock(std::move(tcpSock)),
-    m_additionalReadBuffer( nullptr ),
-    m_additionalReadBufferPos( 0 ),
-    m_additionalReadBufferSize( 0 ),
     m_rtspAuthCtx(config.shouldGuessAuthDigest),
     m_userAgent(nx::network::http::userAgentString()),
     m_defaultAuthScheme(nx::network::http::header::AuthScheme::basic)
@@ -277,16 +274,12 @@ QnRtspClient::QnRtspClient(
 
     if( !m_tcpSock )
         m_tcpSock = nx::network::SocketFactory::createStreamSocket();
-
-    m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
 }
 
 QnRtspClient::~QnRtspClient()
 {
     stop();
     delete [] m_responseBuffer;
-
-    delete[] m_additionalReadBuffer;
 }
 
 nx::network::rtsp::StatusCodeValue QnRtspClient::getLastResponseCode() const
@@ -395,7 +388,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         QnMutexLocker lock(&m_socketMutex);
         previousSocketHolder = std::move(m_tcpSock);
         m_tcpSock = nx::network::SocketFactory::createStreamSocket(isSslRequired);
-        m_additionalReadBufferSize = 0;
+
     }
 
     m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);

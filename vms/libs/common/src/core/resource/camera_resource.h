@@ -83,15 +83,43 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
-    const QSet<QnUuid> enabledAnalyticsEngines() const;
+    /**
+     * Analytics engines (ids) which are actually compatible, enabled and active.
+     */
+    QSet<QnUuid> enabledAnalyticsEngines() const;
+
+    /**
+     * Analytics engines which are actually compatible, enabled and active.
+     */
     const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
 
-    const nx::vms::common::AnalyticsEngineResourceList userEnabledAnalyticsEngineResources() const;
+    /**
+     * Analytics engines (ids) which are explicitly enabled by the user. Not validated against
+     * actually active engines or compatible engines.
+     */
     QSet<QnUuid> userEnabledAnalyticsEngines() const;
+
+    /**
+     * Update analytics engines (ids), which should be used with this camera. Not validated against
+     * actually active engines or compatible engines.
+     */
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
+    /**
+     * Analytics engines (ids), which can be potentially used with the camera. Only actually running
+     * on the parent server engines are included.
+     */
     const QSet<QnUuid> compatibleAnalyticsEngines() const;
+
+    /**
+     * Analytics engines, which can be potentially used with the camera. Only actually running
+     * on the parent server engines are included.
+     */
     nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
+
+    /**
+     * Update analytics engines (ids), which can be potentially used with the camera.
+     */
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;

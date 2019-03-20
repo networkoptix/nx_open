@@ -17,7 +17,8 @@
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 
-QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const QString& layoutUrl)
+QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
+    const QString& layoutUrl, const QString& password)
 {
     // Create storage handler and read layout info.
     QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule(), layoutUrl);
@@ -30,7 +31,6 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
 
     QnFileLayoutResourcePtr layout(new QnFileLayoutResource());
 
-    // Deal with encrypted layouts.
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
     if (!fileInfo.isValid)
         return QnFileLayoutResourcePtr();
@@ -45,17 +45,20 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
         apiLayout = apiLayoutMessage.data;
     }
 
-    auto layoutBase = layout.staticCast<QnLayoutResource>();
-    ec2::fromApiToResource(apiLayout, layoutBase);
+    // Layout is not accessible if it is Encrypted and we do not know the password.
+    bool layoutIsAccessible =
+        !fileInfo.isCrypted || (!password.isEmpty() && checkPassword(password, fileInfo));
+    if (!layoutIsAccessible && !password.isEmpty())
+        NX_WARNING(NX_SCOPE_TAG, "Loading encrypted layout file with wrong password.");
 
-    QnLayoutItemDataList orderedItems;
-    foreach(const auto& item, apiLayout.items)
-    {
-        orderedItems << QnLayoutItemData();
-        ec2::fromApiToResource(item, orderedItems.last());
-    }
+    // We would like to remove items if the layout is not accessible.
+    if (!layoutIsAccessible)
+        apiLayout.items = {};
 
     QnUuid layoutId = guidFromArbitraryData(layoutUrl);
+
+    auto layoutBase = layout.staticCast<QnLayoutResource>();
+    ec2::fromApiToResource(apiLayout, layoutBase);
 
     layout->setId(layoutId);
     layout->setParentId(QnUuid());
@@ -63,7 +66,21 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
     layout->setUrl(layoutUrl);
 
     if (fileInfo.isCrypted)
-        nx::vms::client::desktop::layout::markAsEncrypted(layout);
+        layout->setIsEncrypted(true);
+    if (fileInfo.isCrypted && layoutIsAccessible)
+        layout->usePasswordToRead(password);
+
+    // At this point we have enough info for layout node itself.
+    // We should do nothing more if the layout is not accessible.
+    if (!layoutIsAccessible)
+        return layout;
+
+    QnLayoutItemDataList orderedItems;
+    foreach(const auto& item, apiLayout.items)
+    {
+        orderedItems << QnLayoutItemData();
+        ec2::fromApiToResource(item, orderedItems.last());
+    }
 
     QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
     if (rangeFile)
@@ -81,11 +98,8 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
         if (data.size() >= (int)sizeof(quint32))
         {
             quint32 flags = *((quint32*)data.data());
-            if (flags & QnLayoutFileStorageResource::ReadOnly)
-            {
-                Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
-                layout->setData(Qn::LayoutPermissionsRole, (int)permissions);
-            }
+            // Currently QnFileLayoutResource::readOnly() lives together with LayoutPermissionsRole.
+            layout->setReadOnly(flags & QnLayoutFileStorageResource::ReadOnly);
             if (flags & QnLayoutFileStorageResource::ContainsCameras)
                 layoutWithCameras = true;
         }
@@ -138,8 +152,10 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
             path += lit(".mkv");
         item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(layoutUrl, path);
 
-        QnStorageResourcePtr storage(
+        QnLayoutFileStorageResourcePtr fileStorage(
             new QnLayoutFileStorageResource(qnClientCoreModule->commonModule(), layoutUrl));
+        fileStorage->usePasswordToRead(password); //< Set the password or do nothing.
+        auto storage = fileStorage.dynamicCast<QnStorageResource>();
 
         QnAviResourcePtr aviResource(
             new QnAviResource(item.resource.uniqueId, qnClientCoreModule->commonModule()));
@@ -203,4 +219,29 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(const Q
     layout->setItems(updatedItems);
 
     return layout;
+}
+
+bool nx::vms::client::desktop::layout::reloadFromFile(
+    QnFileLayoutResourcePtr layout, const QString& password)
+{
+    if (!NX_ASSERT(layout))
+        return false;
+
+    // Remove all layout AVI streams from resource pool.
+    auto resources = layout->layoutResources();
+    layout->setItems(QnLayoutItemDataList());
+    for(const auto& resource: resources)
+    {
+        if (resource.dynamicCast<QnAviResource>())
+            layout->resourcePool()->removeResource(resource);
+    }
+
+    QnFileLayoutResourcePtr updatedLayout = layoutFromFile(layout->getUrl(), password);
+    if (!updatedLayout)
+        return false;
+
+    updatedLayout->cloneItems(updatedLayout); //< This will alter item.id for items to prevent errors.
+    layout->update(updatedLayout);
+
+    return true;
 }

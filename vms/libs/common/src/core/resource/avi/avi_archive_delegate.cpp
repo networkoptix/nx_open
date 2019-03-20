@@ -426,8 +426,12 @@ bool QnAviArchiveDelegate::open(
             // Stepa: Dirty hack, but I don't know how to do it another way in current architecture.
             auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
             auto aviResource = m_resource.dynamicCast<QnAviResource>();
-            if (fileStorage && aviResource)
-                fileStorage->usePasswordToRead(aviResource->password());
+            if (aviResource)
+            {
+                auto aviStorage = aviResource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
+                if (fileStorage && aviStorage)
+                    fileStorage->usePasswordToRead(aviStorage->password());
+            }
 
             if(!m_storage)
                 return false;

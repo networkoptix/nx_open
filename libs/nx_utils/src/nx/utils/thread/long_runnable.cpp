@@ -65,6 +65,8 @@ public:
 
     void waitForDestruction()
     {
+        return; //< See VMS-13414
+
         QnMutexLocker lock(&m_mutex);
         while (!m_created.isEmpty())
         {

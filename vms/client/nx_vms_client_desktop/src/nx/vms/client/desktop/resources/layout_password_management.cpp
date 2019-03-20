@@ -3,10 +3,9 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/layout_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource/file_layout_resource.h>
 #include <nx/core/layout/layout_file_info.h>
-
-#include <client/client_globals.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <ui/dialogs/common/input_dialog.h>
 
@@ -27,18 +26,18 @@ namespace {
 // Returns lambda to validate a password based on checksum.
 auto passwordValidator(const QnLayoutResourcePtr& layout)
 {
-    const auto fileInfo = core::layout::identifyFile(layout->getUrl());
+    const auto fileInfo = nx::core::layout::identifyFile(layout->getUrl());
     return
         [fileInfo](const QString& value) -> ValidationResult
-    {
-        if (value.isEmpty())
-            return ValidationResult(EncryptedLayoutStrings::tr("Please enter a valid password"));
+        {
+            if (value.isEmpty())
+                return ValidationResult(EncryptedLayoutStrings::tr("Please enter a valid password"));
 
-        if (!checkPassword(value.trimmed(), fileInfo)) //< Trimming password!
-            return ValidationResult(EncryptedLayoutStrings::tr("The password is not valid."));
+            if (!checkPassword(value.trimmed(), fileInfo)) //< Trimming password!
+                return ValidationResult(EncryptedLayoutStrings::tr("The password is not valid."));
 
-        return ValidationResult(QValidator::Acceptable);
-    };
+            return ValidationResult(QValidator::Acceptable);
+        };
 };
 
 QnInputDialog* createPasswordDialog(const QString message, QWidget* parent)
@@ -53,60 +52,38 @@ QnInputDialog* createPasswordDialog(const QString message, QWidget* parent)
 
 } // namespace
 
-void markAsEncrypted(const QnLayoutResourcePtr& layout, bool value)
-{
-    NX_ASSERT(layout->isFile());
-    qnResourceRuntimeDataManager->setResourceData(layout, Qn::LayoutEncryptionRole, value);
-}
-
 bool isEncrypted(const QnLayoutResourcePtr& layout)
 {
-    return layout->isFile()
-        && qnResourceRuntimeDataManager->resourceData(layout, Qn::LayoutEncryptionRole).toBool();
+    const auto fileLayout = layout.dynamicCast<QnFileLayoutResource>();
+    return fileLayout && fileLayout->isEncrypted();
 }
 
 QString password(const QnLayoutResourcePtr& layout)
 {
-    return qnResourceRuntimeDataManager->resourceData(layout, Qn::LayoutPasswordRole).toString();
+    const auto fileLayout = layout.dynamicCast<QnFileLayoutResource>();
+    return fileLayout ? fileLayout->password() : QString();
 }
 
-bool requiresPassword(const QnLayoutResourcePtr& layout)
+QString askPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
-    return isEncrypted(layout)
-        && password(layout).isEmpty();
-}
+    auto fileLayout = layout.dynamicCast<QnFileLayoutResource>();
+    if (!NX_ASSERT(fileLayout))
+        return QString();
 
-void usePasswordToOpen(const QnLayoutResourcePtr& layout, const QString& password)
-{
-    NX_ASSERT(isEncrypted(layout));
-    qnResourceRuntimeDataManager->setResourceData(layout, Qn::LayoutPasswordRole, password);
-    layout->usePasswordForRecordings(password);
-}
-
-void forgetPassword(const QnLayoutResourcePtr& layout)
-{
-    NX_ASSERT(isEncrypted(layout));
-    qnResourceRuntimeDataManager->cleanupResourceData(layout, Qn::LayoutPasswordRole);
-    layout->forgetPasswordForRecordings();
-}
-
-bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
-{
     auto dialog = createPasswordDialog(
         EncryptedLayoutStrings::tr("The file %1 is encrypted. Please enter the password:").
             arg(QFileInfo(layout->getUrl()).fileName()),
         parent);
 
-
     dialog->setValidator(passwordValidator(layout));
 
     if (dialog->exec() == QDialog::Accepted)
     {
-        usePasswordToOpen(layout, dialog->value().trimmed());
-        return true;
+        fileLayout->usePasswordToRead(dialog->value().trimmed());
+        return dialog->value().trimmed();
     }
 
-    return false;
+    return QString();
 }
 
 bool confirmPassword(const QnLayoutResourcePtr& layout, QWidget* parent)

@@ -61,8 +61,11 @@ class BasicAbstractObjectFactory:
 
 public:
     BasicAbstractObjectFactory():
-        base_type([this](auto&&... args)
-            { return defaultFactory(std::forward<decltype(args)>(args)...); })
+        base_type(
+            [this](auto&&... args)
+            {
+                return defaultFactory(std::forward<decltype(args)>(args)...);
+            })
     {
     }
 

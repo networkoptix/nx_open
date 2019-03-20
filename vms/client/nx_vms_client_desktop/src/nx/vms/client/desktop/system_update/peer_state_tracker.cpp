@@ -8,8 +8,13 @@
 #include <network/system_helpers.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
+
+namespace  {
+    auto kWaitForServerReturn = std::chrono::minutes(10);
+}
 
 namespace nx::vms::client::desktop {
 
@@ -17,7 +22,10 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-
+    if(ini().massSystemUpdateWaitForServerOnline)
+        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnline);
+    else
+        m_waitForServerReturn = kWaitForServerReturn;
 }
 
 bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
@@ -25,17 +33,21 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
 
+    auto itemsCache = m_items;
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
-        emit itemRemoved(*it);
+        emit itemToBeRemoved(*it);
     if (m_clientItem)
     {
-        emit itemRemoved(m_clientItem);
+        emit itemToBeRemoved(m_clientItem);
         m_clientItem.reset();
     }
 
     m_items.clear();
     m_activeServers.clear();
+
+    for (auto it = itemsCache.rbegin(); it != itemsCache.rend(); ++it)
+        emit itemRemoved(*it);
 
     if (!pool)
     {
@@ -139,6 +151,22 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
 {
     NX_ASSERT(!version.isNull());
     m_targetVersion = version;
+
+    for (auto& item: m_items)
+    {
+        if (version != item->version)
+        {
+            bool installed = (item->version == m_targetVersion)
+                || item->state == StatusCode::latestUpdateInstalled;
+
+            if (installed != item->installed)
+            {
+                item->installed = true;
+                NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
+            }
+            emit itemChanged(item);
+        }
+    }
 }
 
 void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const QString& message)
@@ -197,9 +225,27 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 item->installing = false;
+            if (item->statusUnknown)
+            {
+                NX_DEBUG(this, "clearing unknown status for peer %1", item->id);
+                item->statusUnknown = false;
+            }
             // Ignoring 'offline' status from /ec2/updateStatus.
             //item->offline = (status.second.code == StatusCode::offline);
             emit itemChanged(item);
+        }
+    }
+}
+
+void PeerStateTracker::markStatusUnknown(const QSet<QnUuid>& targets)
+{
+    for (const auto& uid: targets)
+    {
+        if (auto item = findItemById(uid))
+        {
+            // Only server's state can be 'unknown'.
+            if (item->component == UpdateItem::Component::server)
+                item->statusUnknown = true;
         }
     }
 }
@@ -289,7 +335,7 @@ QSet<QnUuid> PeerStateTracker::getAllPeers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getServersInState(StatusCode state) const
+QSet<QnUuid> PeerStateTracker::getPeersInState(StatusCode state) const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -359,6 +405,241 @@ QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
     return result;
 }
 
+QSet<QnUuid> PeerStateTracker::getPeersWithUnknownStatus() const
+{
+    QSet<QnUuid> result;
+    for (const auto& item: m_items)
+    {
+        if (item->statusUnknown && !item->offline)
+            result.insert(item->id);
+    }
+    return result;
+}
+
+void PeerStateTracker::processDownloadTaskSet()
+{
+    NX_ASSERT(!m_peersIssued.isEmpty());
+    auto now = UpdateItem::Clock::now();
+
+    for (const auto& item: m_items)
+    {
+        StatusCode state = item->state;
+        auto id = item->id;
+
+        if (!m_peersIssued.contains(id))
+            continue;
+
+        if (item->statusUnknown)
+            continue;
+
+        if (item->incompatible)
+            continue;
+
+        if (item->offline || state == StatusCode::offline)
+        {
+            auto delta = now - item->lastTimeOnline;
+            if (delta > m_waitForServerReturn)
+            {
+                NX_VERBOSE(this, "processDownloadTaskSet() "
+                    "peer %1 has been offline for too long. Skipping it.", id);
+                m_peersActive.remove(id);
+                m_peersIssued.remove(id);
+            }
+        }
+        else if (item->installed)
+        {
+            if (m_peersActive.contains(id))
+            {
+                NX_VERBOSE(this, "processDownloadTaskSet() ",
+                    "peer %1 has already installed this package.", id);
+                m_peersActive.remove(id);
+            }
+            m_peersComplete.insert(id);
+        }
+        else
+        {
+            switch (state)
+            {
+                case StatusCode::readyToInstall:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this, "processDownloadTaskSet() "
+                            "peer %1 completed downloading and is ready to install", id);
+                        m_peersActive.remove(id);
+                    }
+                    m_peersComplete.insert(id);
+                    break;
+                case StatusCode::error:
+                case StatusCode::idle:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this, "processDownloadTaskSet() "
+                            "peer %1 failed to download update package", id);
+                        m_peersActive.remove(id);
+                    }
+                    m_peersFailed.insert(id);
+                    break;
+                case StatusCode::preparing:
+                case StatusCode::downloading:
+                    if (!m_peersActive.contains(id) && m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this, "processDownloadTaskSet() "
+                            "peer %1 has resumed downloading.", id);
+                        m_peersActive.insert(id);
+                    }
+                    break;
+                case StatusCode::offline:
+                    // We should have already handled this case.
+                    NX_ASSERT(false);
+                    break;
+                case StatusCode::latestUpdateInstalled:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this, "processDownloadTaskSet() "
+                            "peer %1 has already installed this package.", id);
+                        m_peersActive.remove(id);
+                    }
+                    m_peersComplete.insert(id);
+                    break;
+            }
+        }
+    }
+}
+
+void PeerStateTracker::processInstallTaskSet()
+{
+    NX_ASSERT(!m_peersIssued.isEmpty());
+
+    QSet<QnUuid> peersToRestartUpdate;
+    QSet<QnUuid> peersActive;
+    QSet<QnUuid> readyToInstall;
+
+    for (const auto& item: m_items)
+    {
+        StatusCode state = item->state;
+        auto id = item->id;
+
+        if (item->incompatible)
+            continue;
+        //if (!m_peersIssued.contains(id))
+        //    continue;
+        if (item->installed)
+        {
+            if (m_peersActive.contains(id))
+            {
+                NX_VERBOSE(this,
+                    "processInstallTaskSet() - peer %1 has already installed this package.", id);
+                m_peersActive.remove(id);
+            }
+            m_peersComplete.insert(id);
+        }
+        else if (item->installing)
+        {
+            if (!m_peersActive.contains(id))
+            {
+                NX_VERBOSE(this)
+                    << "processInstallTaskSet() - peer"
+                    << id << "has resumed installation";
+                m_peersActive.insert(id);
+                peersToRestartUpdate.insert(id);
+            }
+            if (item->component == UpdateItem::Component::server)
+            {
+                peersActive.insert(item->id);
+            }
+        }
+        else
+        {
+            switch (state)
+            {
+                case StatusCode::readyToInstall:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this)
+                            << "processInstallTaskSet() - peer "
+                            << id << "completed downloading and is ready to install";
+                        m_peersActive.remove(id);
+                        // TODO: Should force installing for this peers, until it is a client.
+                        // Client should wait until servers have completed installation.
+                        peersToRestartUpdate.insert(id);
+                    }
+                    readyToInstall.insert(id);
+                    break;
+                case StatusCode::error:
+                case StatusCode::idle:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this)
+                            << "processInstallTaskSet() - peer"
+                            << id << "failed to download update package";
+                        m_peersFailed.insert(id);
+                        m_peersActive.remove(id);
+                    }
+                    break;
+                case StatusCode::preparing:
+                case StatusCode::downloading:
+                    if (!m_peersActive.contains(id)/* && m_peersIssued.contains(id)*/)
+                    {
+                        NX_VERBOSE(this)
+                            << "processInstallTaskSet() - peer"
+                            << id << "resumed downloading.";
+                        m_peersActive.insert(id);
+                    }
+                    break;
+                case StatusCode::latestUpdateInstalled:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this)
+                            << "processInstallTaskSet() - peer"
+                            << id << "have already installed this package.";
+                        m_peersActive.remove(id);
+                    }
+                    m_peersComplete.insert(id);
+                    break;
+                case StatusCode::offline:
+                    break;
+            }
+        }
+    }
+}
+
+QSet<QnUuid> PeerStateTracker::getPeersComplete() const
+{
+    return m_peersComplete;
+}
+
+QSet<QnUuid> PeerStateTracker::getPeersActive() const
+{
+    return m_peersActive;
+}
+
+QSet<QnUuid> PeerStateTracker::getPeersIssued() const
+{
+    return m_peersIssued;
+}
+
+QSet<QnUuid> PeerStateTracker::getPeersFailed() const
+{
+    return m_peersFailed;
+}
+
+void PeerStateTracker::setTaskSet(const QSet<QnUuid> &targets)
+{
+    m_peersActive = targets;
+    m_peersIssued = targets;
+    m_peersComplete = {};
+    m_peersFailed = {};
+}
+
+void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& /*error*/)
+{
+    for (const auto& id: targets)
+    {
+        if (auto item = findItemById(id))
+            m_peersFailed.insert(id);
+    }
+}
+
 void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
@@ -381,6 +662,12 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
         return;
     }
 
+    if (status == Qn::Incompatible)
+    {
+        NX_VERBOSE(this, "atResourceAdded(%1) - incompatible", server->getName());
+        return;
+    }
+
     UpdateItemPtr item;
     {
         QnMutexLocker locker(&m_dataLock);
@@ -400,18 +687,23 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
         return;
 
     server->disconnect(this);
-    auto item = findItemById(server->getId());
+    auto id = server->getId();
+    auto item = findItemById(id);
     if (!item)
         return;
 
     // We should emit this event before m_items size is changed
-    emit itemRemoved(item);
+    emit itemToBeRemoved(item);
     {
         QnMutexLocker locker(&m_dataLock);
-        m_activeServers.erase(server->getId());
+        m_activeServers.erase(id);
+        m_peersIssued.remove(id);
+        m_peersFailed.remove(id);
+        m_peersActive.remove(id);
         m_items.removeAt(item->row);
         updateContentsIndex();
     }
+    emit itemRemoved(item);
 }
 
 void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
@@ -439,7 +731,7 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
 {
     NX_ASSERT(m_clientItem);
     using State = ClientUpdateTool::State;
-    NX_VERBOSE(this, "PeerStateTracker::atClientupdateStateChanged(%1, %2)",
+    NX_VERBOSE(this, "atClientupdateStateChanged(%1, %2)",
         ClientUpdateTool::toString(State(state)), percentComplete);
 
     m_clientItem->installing = false;
@@ -523,7 +815,12 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
 UpdateItemPtr PeerStateTracker::addItemForClient()
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
-    item->id = commonModule()->globalSettings()->localSystemId();
+
+    // This ID is much more easy to distinguish.
+    if (ini().massSystemUpdateDebugInfo)
+        item->id = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    else
+        item->id = commonModule()->globalSettings()->localSystemId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
@@ -541,6 +838,9 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 
     bool incompatible = status == Qn::ResourceStatus::Incompatible
         || server->hasFlags(Qn::fake_server);
+
+    // We should not get incompatible servers here. They are should be filtered out before.
+    NX_ASSERT(!incompatible);
     if (incompatible != item->onlyLegacyUpdate)
     {
         item->onlyLegacyUpdate = incompatible;
@@ -565,6 +865,18 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     bool viewAsOffline = !server->isOnline() || incompatible;
     if (item->offline != viewAsOffline)
     {
+        if (viewAsOffline)
+        {
+            // TODO: Should track online->offline changes for task sets
+            item->lastTimeOnline = UpdateItem::Clock::now();
+            item->statusUnknown = false;
+        }
+        else
+        {
+            // TODO: Should track offline->online changes for task sets:
+            //  - peersActive
+            //  - peersFailed
+        }
         item->offline = viewAsOffline;
         changed = true;
     }

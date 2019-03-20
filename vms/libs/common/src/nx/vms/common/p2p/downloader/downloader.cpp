@@ -100,7 +100,6 @@ void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals
             emit q->downloadFailed(fileName);
     }
 }
-
 //-------------------------------------------------------------------------------------------------
 
 Downloader::Downloader(
@@ -151,6 +150,11 @@ QStringList Downloader::files() const
 QString Downloader::filePath(const QString& fileName) const
 {
     return d->storage->filePath(fileName);
+}
+
+QDir Downloader::downloadsDirectory() const
+{
+    return d->storage->downloadsDirectory();
 }
 
 FileInformation Downloader::fileInformation(const QString& fileName) const

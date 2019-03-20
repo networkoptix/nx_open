@@ -238,7 +238,7 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
             .arg(getSoftwareTriggerName(params));
     }
 
-    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occurred").arg(eventName(params.eventType));
 }
 
 QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
