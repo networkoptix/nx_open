@@ -110,7 +110,7 @@ void QnMediaServerResource::beforeDestroy()
     m_firstCamera.clear();
 }
 
-QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngines() const
+QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 {
     const auto commonModule = this->commonModule();
     if (!NX_ASSERT(commonModule))

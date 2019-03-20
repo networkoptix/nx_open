@@ -239,6 +239,8 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
             binding->restartAnalytics(m_device->deviceAgentSettingsValues(engineId));
         else
             binding->stopAnalytics();
+
+        updateSupportedFrameTypes();
     }
 }
 

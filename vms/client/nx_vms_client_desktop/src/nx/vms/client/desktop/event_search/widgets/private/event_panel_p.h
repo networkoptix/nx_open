@@ -21,6 +21,7 @@ namespace nx::vms::client::desktop {
 class NotificationListWidget;
 class NotificationCounterLabel;
 
+class AbstractSearchWidget;
 class SimpleMotionSearchWidget;
 class BookmarkSearchWidget;
 class EventSearchWidget;
@@ -62,7 +63,7 @@ private:
     EventSearchWidget* const m_eventsTab;
     AnalyticsSearchWidget* const m_analyticsTab;
 
-    const QHash<QWidget*, AbstractSearchSynchronizer*> m_synchronizers;
+    const QHash<AbstractSearchWidget*, AbstractSearchSynchronizer*> m_synchronizers;
     const QHash<QWidget*, Tab> m_tabIds;
 
     QWidget* m_previousTab = nullptr;

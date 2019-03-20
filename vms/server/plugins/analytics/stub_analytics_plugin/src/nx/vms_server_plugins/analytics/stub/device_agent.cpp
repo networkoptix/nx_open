@@ -108,6 +108,25 @@ void DeviceAgent::settingsReceived()
     }
 }
 
+/** @param func Name of the caller for logging; supply __func__. */
+void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
+{
+    NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
+        << " frame #" << m_frameCounter;
+
+    if (m_frameCounter == ini().crashDeviceAgentOnFrameN)
+    {
+        const std::string message = nx::kit::utils::format(
+            "ATTENTION: Intentionally crashing the process at frame #%d as per %s",
+            m_frameCounter, ini().iniFile());
+        NX_PRINT << message;
+        nx::kit::debug::intentionallyCrash(message.c_str());
+    }
+
+    ++m_frameCounter;
+    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+}
+
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     if (engine()->needUncompressedVideoFrames())
@@ -116,9 +135,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
-    ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+    processVideoFrame(videoFrame, __func__);
     return true;
 }
 
@@ -130,12 +147,8 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         return false;
     }
 
-    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUs() << " us";
-
-    ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
-
-    return checkFrame(videoFrame);
+    processVideoFrame(videoFrame, __func__);
+    return checkVideoFrame(videoFrame);
 }
 
 bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
@@ -454,7 +467,7 @@ int64_t DeviceAgent::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool DeviceAgent::checkFrame(const IUncompressedVideoFrame* frame) const
+bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 {
     if (frame->pixelFormat() != engine()->pixelFormat())
     {

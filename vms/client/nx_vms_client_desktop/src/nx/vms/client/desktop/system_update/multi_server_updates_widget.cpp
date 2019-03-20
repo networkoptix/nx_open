@@ -64,7 +64,6 @@ const int kTooLateDayOfWeek = Qt::Thursday;
 const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 const int kVersionLabelFontSizePixels = 24;
 const int kVersionLabelFontWeight = QFont::DemiBold;
-const auto kExpectedInstallPeriodSec = 4.0;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;
@@ -174,6 +173,9 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_statusItemDelegate.reset(new ServerStatusItemDelegate(ui->tableView));
     ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::ProgressColumn, m_statusItemDelegate.get());
 
+    m_resourceNameDelegate.reset(new QnResourceItemDelegate(ui->tableView));
+    ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::NameColumn, m_resourceNameDelegate.get());
+
     connect(m_sortedModel.get(), &SortedPeerUpdatesModel::dataChanged,
         this, &MultiServerUpdatesWidget::atModelDataChanged);
 
@@ -183,6 +185,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     if (auto horizontalHeader = ui->tableView->horizontalHeader())
     {
         horizontalHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::NameColumn, QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::ProgressColumn, QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::StatusMessageColumn,
             QHeaderView::Stretch);
@@ -290,25 +293,30 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         {
             NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
 
-            if (m_stateTracker)
+            if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool()))
             {
-                if (m_stateTracker->setResourceFeed(resourcePool()))
+                // We will be here when we connected to another system.
+                // We should run update check again. This should fix VMS-13037.
+                if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
                 {
-                    // We will be here when we connected to another system.
-                    // We should run update check again. This should fix VMS-13037.
-                    if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
-                    {
-                        QString updateUrl = qnSettings->updateFeedUrl();
-                        m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
-                    }
+                    QString updateUrl = qnSettings->updateFeedUrl();
+                    m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
                 }
-                else
-                {
-                    // We will be here when we disconnect from the server.
-                    // So we can clear our state as well.
-                    clearUpdateInfo();
-                    setTargetState(WidgetUpdateState::initial, {});
-                }
+            }
+        });
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        [this](const QnUserResourcePtr &user)
+        {
+            // This prevents widget from recalculating update report for each server removed from
+            // the resource pool during disconnect.
+            if (!user)
+            {
+                NX_DEBUG(this, "Disconnected from the system. Cleaning up current update context");
+                // We will be here when we disconnect from the server.
+                // So we can clear our state as well.
+                clearUpdateInfo();
+                setTargetState(WidgetUpdateState::initial, {});
             }
         });
 
@@ -1300,6 +1308,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
 
         auto serversHaveDownloaded = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
         auto serversAreDownloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+        auto serversWithError = m_stateTracker->getPeersInState(StatusCode::error);
         auto peersAreInstalling = m_serverUpdateTool->getServersInstalling();
         auto serversHaveInstalled = m_stateTracker->getPeersCompleteInstall();
 
@@ -1314,16 +1323,22 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
                 peersAreInstalling.insert(m_stateTracker->getClientPeerId());
             setTargetState(WidgetUpdateState::installing, peersAreInstalling);
         }
-        else if (!serversAreDownloading.empty())
+        else if (!serversAreDownloading.empty() || !serversWithError.empty())
         {
+            // Note: !serversWithError.empty() clause is a tricky one. Right now we have sane
+            // errors only for downloading state. Widget will recheck current after a second and
+            // will make further FSM adjustments.
+            auto targets = serversAreDownloading + serversWithError;
             NX_INFO(this)
-                << "processRemoteUpdateInformation() - servers" << serversAreDownloading << "are downloading an update";
-            setTargetState(WidgetUpdateState::downloading, serversAreDownloading);
+                << "processRemoteUpdateInformation() - servers"
+                << targets << "are in downloading or error state";
+            setTargetState(WidgetUpdateState::downloading, targets);
         }
         else if (!serversHaveDownloaded.empty())
         {
             NX_INFO(this)
-                << "processRemoteUpdateInformation() - servers" << serversHaveDownloaded << "have already downloaded an update";
+                << "processRemoteUpdateInformation() - servers"
+                << serversHaveDownloaded << "have already downloaded an update";
             setTargetState(WidgetUpdateState::readyInstall, {});
         }
         else if (!serversHaveInstalled.empty())
@@ -1378,15 +1393,15 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         messageBox->setIcon(QnMessageBoxIcon::Critical);
         messageBox->setText(tr("Failed to download update packages to some servers"));
 
-        QString text;
-        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
-        messageBox->setInformativeText(text);
-
         // TODO: Client can be here as well, but it would not be displayed.
         // Should we display it somehow?
         auto resourcesFailed = resourcePool()->getResourcesByIds(peersFailed.toList());
         injectResourceList(*messageBox, resourcesFailed);
+
+        QString text;
+        text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
+        text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
+        messageBox->setInformativeText(text);
 
         auto tryAgain = messageBox->addButton(tr("Try again"),
             QDialogButtonBox::AcceptRole);
@@ -1408,8 +1423,6 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
             m_serverUpdateTool->requestStopAction();
             setTargetState(WidgetUpdateState::ready, {});
         }
-
-        setTargetState(WidgetUpdateState::readyInstall, peersComplete);
     }
 }
 
@@ -1425,7 +1438,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
         setTargetState(WidgetUpdateState::installingStalled, m_stateTracker->getPeersIssued());
     }
 
-    auto peersDownloading = m_stateTracker->getPeersInState(StatusCode::downloading);
+    auto peersInstalling = m_stateTracker->getPeersInstalling();
     auto peersComplete = m_stateTracker->getPeersComplete();
     auto readyToInstall = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
     auto peersFailed = m_stateTracker->getPeersFailed();
@@ -1434,7 +1447,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     m_serverUpdateTool->requestModuleInformation();
 
     // No peers are doing anything right now. We should check if installation is complete.
-    if (peersDownloading.empty())
+    if (peersInstalling.empty())
     {
         if (!peersComplete.empty())
         {
@@ -1597,7 +1610,8 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
     return true;
 }
 
-void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUuid> targets)
+void MultiServerUpdatesWidget::setTargetState(
+    WidgetUpdateState state, const QSet<QnUuid>& targets)
 {
     if (state != m_widgetState)
     {
@@ -1660,7 +1674,7 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
     // TODO: We could try to move to 'far' states, with no direct transition.
     // Should invent something for such case.
     m_widgetState = state;
-    m_stateTracker->setTaskSet(targets);
+    m_stateTracker->setTask(targets);
     m_updateRemoteStateChanged = true;
     m_updateLocalStateChanged = true;
 }

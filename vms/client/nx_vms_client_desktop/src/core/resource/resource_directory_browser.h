@@ -22,7 +22,7 @@ public:
 
     virtual QnResourcePtr checkFile(const QString& filename) const override;
 
-    void dropResourcesFromFolder(const QString& path);
+    void dropResourcesFromDirectory(const QString& path);
 
     // Local files search only once. Use cleanup before search to re-search files again
     void cleanup();
@@ -61,7 +61,6 @@ protected:
 
 protected:
     void at_filesystemDirectoryChanged(const QString& path);
-    void at_filesystemFileChanged(const QString& path);
     void at_trackResources(const QnResourceList& resources, const QStringList& paths);
     void at_startLocalDiscovery();
 

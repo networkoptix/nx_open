@@ -10,6 +10,7 @@
 
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/delegates/resource_item_delegate.h>
 
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -190,7 +191,7 @@ private:
     void closePanelNotifications();
 
     /** Advances UI FSM towards selected state. */
-    void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
+    void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {});
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
@@ -224,6 +225,7 @@ private:
     std::shared_ptr<PeerStateTracker> m_stateTracker;
     std::unique_ptr<SortedPeerUpdatesModel> m_sortedModel;
     std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
+    std::unique_ptr<QnResourceItemDelegate> m_resourceNameDelegate;
 
     /** ServerUpdateTool promises this. */
     std::future<nx::update::UpdateContents> m_updateCheck;

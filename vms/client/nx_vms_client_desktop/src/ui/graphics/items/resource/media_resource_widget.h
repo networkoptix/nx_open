@@ -114,7 +114,7 @@ public:
     /**
      * Clears this widget's motion selection region.
      */
-    void clearMotionSelection();
+    void clearMotionSelection(bool sendMotionChanged = true);
 
     bool isMotionSelectionEmpty() const;
 
@@ -196,6 +196,7 @@ signals:
     void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
     void ptzControllerChanged();
+    void analyticsSupportChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;

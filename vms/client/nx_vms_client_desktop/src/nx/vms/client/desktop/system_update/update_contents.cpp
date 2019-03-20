@@ -170,7 +170,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     contents.missingUpdate.clear();
 
     // Check if some packages from manifest do not exist.
-    if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerted)
+    if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
     {
         contents.filesToUpload.clear();
         QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
@@ -194,7 +194,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 }
             }
         }
-        contents.packagesGenerted = true;
+        contents.packagesGenerated = true;
         contents.info.packages = checked;
     }
 

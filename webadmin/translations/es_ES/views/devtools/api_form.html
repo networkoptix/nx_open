@@ -67,8 +67,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="!param.optional">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="!param.optional"> (requerido) </small>
+            <small ng-if="param.proprietary"> (propietario) </small>
         </label>
         <div class="col-sm-10">
             <div ng-switch on="param.formType">
