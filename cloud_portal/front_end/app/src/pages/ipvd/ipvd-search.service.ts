@@ -25,7 +25,7 @@ export class IpvdSearchService {
     }
 
     ipvdSearch(allCameras, filter): Observable<any> {
-        const query = filter.query;
+        const query = filter.query.toLowerCase();
         const queryTerms = query.trim().split(' ');
         const preferredVendors = '';
 

@@ -3,7 +3,7 @@
         <table class="table table-hover nx-table">
             <thead>
                 <tr>
-                    <th *ngFor="let header of showHeaders; index as i"
+                    <th *ngFor="let header of showHeaders"
                         class="align-bottom"
                         (click)="toggleHeaderSort(header)"
                         [ngClass]="{'debug' : debug}">
