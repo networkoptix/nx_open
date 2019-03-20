@@ -30,19 +30,16 @@ QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 
 QString QnTestCameraResource::getHostAddress() const
 {
-    QString url = getUrl();
-    int start = QString(QLatin1String("tcp://")).length();
-    int end = url.indexOf(QLatin1Char(':'), start);
-    if (start >= 0 && end > start)
-        return url.mid(start, end-start);
-    else
-        return QString();
+    nx::utils::Url url(getUrl());
+    NX_ASSERT(url.isValid(), lm("invald URL: %1").args(url));
+    return url.host();
 }
 
 void QnTestCameraResource::setHostAddress(const QString &ip)
 {
-    QUrl url(getUrl());
+    nx::utils::Url url(getUrl());
     url.setHost(ip);
+    NX_ASSERT(url.isValid(), lm("invald URL: %1").args(url));
     setUrl(url.toString());
 }
 

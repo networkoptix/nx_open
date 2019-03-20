@@ -145,11 +145,13 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    QString urlStr = m_resource->getUrl();
-    QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
-
-    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == Qn::CR_LiveVideo).arg(params.fps);
-    QUrl url(urlStr);
+    nx::utils::Url url = nx::utils::url::parseUrlFields(m_resource->getUrl());
+    if (url.query() != QString())
+    {
+        closeStream();
+        return CameraDiagnostics::CameraInvalidParams(lm("Not empty query: [%1]").args(url));
+    }
+    url.setQuery(lm("primary=%1&fps=%2").args(getRole() == Qn::CR_LiveVideo, params.fps));
 
     if (m_tcpSock->isClosed())
     {
@@ -160,13 +162,19 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
     m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
     m_tcpSock->setSendTimeout(TESTCAM_TIMEOUT);
 
+    NX_VERBOSE(this, "Sending data to URL [%1]", url);
     if (!m_tcpSock->connect(url.host(), url.port(), nx::network::deprecated::kDefaultConnectTimeout))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
     }
-    QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
-    m_tcpSock->send(path.data(), path.size() + 1);
+
+    const QByteArray data = (url.path() + url.query() + url.fragment()).toUtf8();
+    if (!m_tcpSock->send(data.data(), data.size() + 1))
+    {
+       closeStream();
+       return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), url.port());
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }

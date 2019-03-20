@@ -43,13 +43,26 @@ update::Status CommonUpdateManager::start()
     update::Status updateStatus;
 
     bool shouldDownload = statusAppropriateForDownload(&package, &updateStatus);
+    NX_DEBUG(
+        this,
+        lm("Start update: ShouldDownload: %1, package valid: %2")
+            .args(shouldDownload, package.isValid()));
     if (shouldDownload || !package.isValid())
     {
         m_downloaderFailDetail = DownloaderFailDetail::noError;
         for (const auto& file : downloader()->files())
         {
+            NX_DEBUG(
+                this,
+                lm("Start update: existing file: %1").args(file));
             if (file.contains("updates/"))
+            {
+
+                NX_DEBUG(
+                    this,
+                    lm("Start update: removing file: %1").args(file));
                 downloader()->deleteFile(file);
+            }
         }
         installer()->stopSync();
     }
@@ -276,7 +289,12 @@ update::FindPackageResult CommonUpdateManager::findPackage(
     update::Package* outPackage,
     QString* outMessage) const
 {
-    return update::findPackage(*commonModule(), outPackage, outMessage);
+    const auto result = update::findPackage(*commonModule(), outPackage, outMessage);
+    NX_DEBUG(
+        this,
+        lm("Find package called. Result: %1, message: %2")
+            .args((int) result, outMessage == nullptr ? "" : *outMessage));
+    return result;
 }
 
 bool CommonUpdateManager::deserializedUpdateInformation(update::Information* outUpdateInformation,

@@ -3726,8 +3726,9 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     if (response.SubscriptionReference.Address)
     {
+        const auto resData = resourceData();
         const bool updatePort =
-            OnvifIniConfig::instance().doUpdatePortInSubscriptionAddress;
+            resData.value<bool>(ResourceDataKey::kDoUpdatePortInSubscriptionAddress, true);
         m_onvifNotificationSubscriptionReference =
             fromOnvifDiscoveredUrl(response.SubscriptionReference.Address, updatePort);
     }

@@ -513,6 +513,10 @@ static FindPackageResult findPackage(
     QString* outMessage)
 {
     update::Information updateInformation;
+    NX_DEBUG(
+        nx::utils::log::Tag(QString("UpdateCheck")),
+        lm("update::findPackage: serialized update information is empty %1")
+            .args(serializedUpdateInformation.isEmpty()));
     const auto deserializeResult = fromByteArray(serializedUpdateInformation,
         &updateInformation, outMessage);
     if (deserializeResult != FindPackageResult::ok)

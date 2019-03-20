@@ -2178,13 +2178,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
+        // TODO: Code duplication with QnWorkbenchAccessController.
+        if (d->camera->licenseType() == Qn::LC_VMAX && !d->camera->isLicenseUsed())
+        {
+            const auto requiredPermission = d->isPlayingLive()
+                ? Qn::ViewLivePermission
+                : Qn::ViewFootagePermission;
 
-        const Qn::Permission requiredPermission = d->isPlayingLive()
-            ? Qn::ViewLivePermission
-            : Qn::ViewFootagePermission;
-
-        if (!accessController()->hasPermissions(d->camera, requiredPermission))
-            return Qn::AnalogWithoutLicenseOverlay;
+            if (!accessController()->hasPermissions(d->camera, requiredPermission))
+                return Qn::AnalogWithoutLicenseOverlay;
+        }
     }
 
     if (d->isIoModule)

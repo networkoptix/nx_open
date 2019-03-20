@@ -141,26 +141,28 @@ static int checkForUpdateInformationRemotely(
     bool done = false;
     auto mergeFunction =
         [&done](
-            const QnUuid& serverId, bool success, const nx::update::Information& reply,
-            nx::update::Information& outputReply)
+            const QnUuid& /*serverId*/, bool success, const QnJsonRestResult& reply,
+            QnJsonRestResult& outputReply)
         {
+            nx::update::Information updateInfo = reply.deserialized<nx::update::Information>();
             if (done)
                 return;
 
-            if (success && reply.isValid() && !done)
+            if (success && updateInfo.isValid() && !done)
             {
                 outputReply = reply;
                 done = true;
             }
         };
 
-    nx::update::Information outputReply;
+    QnJsonRestResult outputReply;
     detail::requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 
     if (done)
     {
-        QnFusionRestHandlerDetail::serializeJsonRestReply(outputReply, params, *result, *contentType,
-            QnRestResult());
+        QnFusionRestHandlerDetail::serialize(
+            outputReply, *result, *contentType, Qn::JsonFormat,
+            params.contains("extraFormatting"));
         return nx::network::http::StatusCode::ok;
     }
 

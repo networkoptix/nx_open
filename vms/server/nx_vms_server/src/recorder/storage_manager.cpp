@@ -2451,7 +2451,7 @@ void QnStorageManager::testStoragesDone()
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
-    NX_VERBOSE(this, "Changing storage [%1] status to [%2]...", fileStorage, status);
+    NX_VERBOSE(this, "Changing storage [%1] status to [%2]", fileStorage, status);
 
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
