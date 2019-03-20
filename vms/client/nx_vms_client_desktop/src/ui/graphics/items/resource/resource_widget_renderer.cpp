@@ -10,7 +10,6 @@
 #include <nx/streaming/config.h>
 
 #include "decodedpicturetoopengluploader.h"
-#include "decodedpicturetoopengluploadercontextpool.h"
 
 using namespace std::chrono;
 

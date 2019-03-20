@@ -19,16 +19,13 @@
 #include <nx/streaming/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
 #include <nx/utils/thread/stoppable.h>
-#include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 
 #include "utils/color_space/image_correction.h"
 
-
-class AsyncPicDataUploader;
+class QSurface;
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploaderPrivate;
-class DecodedPictureToOpenGLUploadThread;
 class QnGlRendererTexture;
 class QnGlRendererTexturePack;
 class AVPacketUploader;
@@ -58,7 +55,6 @@ public:
     class UploadedPicture
     {
         friend class DecodedPictureToOpenGLUploader;
-        friend class AsyncPicDataUploader;
 
     public:
         AVPixelFormat colorFormat() const;
@@ -110,7 +106,6 @@ public:
         std::vector<PBOData> m_pbo;
         bool m_skippingForbidden;
         int m_flags;
-        GLFence m_glFence;
         ImageCorrectionResult m_imgCorrection;
         QRectF m_displayedRect;
         QnGlRendererTexturePack* m_texturePack;
@@ -204,12 +199,10 @@ public:
     void setYV12ToRgbShaderUsed( bool yv12SharedUsed );
     void setNV12ToRgbShaderUsed( bool nv12SharedUsed );
 
-    //!This method is called by asynchronous uploader when upload is done
-    void pictureDataUploadSucceeded( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
+    //!This method is called when upload is done
+    void pictureDataUploadSucceeded(UploadedPicture* const picture);
     //!This method is called by asynchronous uploader when upload has failed
-    void pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
-    //!Uploader calles this method, if picture uploading has been cancelled from outside
-    void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
+    void pictureDataUploadFailed(UploadedPicture* const picture);
 
     void setImageCorrection(const nx::vms::api::ImageCorrectionData& value);
     nx::vms::api::ImageCorrectionData getImageCorrection() const;
@@ -251,13 +244,9 @@ private:
     mutable std::deque<UploadedPicture*> m_picturesBeingRendered;
     mutable std::deque<AVPacketUploader*> m_framesWaitingUploadInGUIThread;
     bool m_terminated;
-    mutable std::deque<AsyncPicDataUploader*> m_unusedAsyncUploaders;
-    std::deque<AsyncPicDataUploader*> m_usedAsyncUploaders;
-    QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
     quint8* m_rgbaBuf;
     int m_fileNumber;
     bool m_hardwareDecoderUsed;
-    bool m_asyncUploadUsed;
 
     QOpenGLContext* m_initializedContext = nullptr;
     QSurface* m_initializedSurface = nullptr;

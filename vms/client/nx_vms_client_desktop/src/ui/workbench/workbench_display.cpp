@@ -67,7 +67,6 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/generic/splash_item.h>
@@ -550,7 +549,6 @@ void QnWorkbenchDisplay::initSceneView()
 
         viewport->makeCurrent();
         m_view->setViewport(viewport);
-
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 

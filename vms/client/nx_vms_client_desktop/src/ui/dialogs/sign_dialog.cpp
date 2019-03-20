@@ -14,7 +14,6 @@
 #include "camera/sync_dialog_display.h"
 
 #include "ui/workaround/gl_native_painting.h"
-#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/help/help_topic_accessor.h"
 #include "ui/help/help_topics.h"
@@ -90,8 +89,6 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
 
     m_openGLWidget.reset(new QnSignDialogGlWidget(this));
     m_layout->addWidget(m_openGLWidget.data());
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-        m_openGLWidget.data());
 
     m_srcVideoInfo = new QnSignInfo();
 

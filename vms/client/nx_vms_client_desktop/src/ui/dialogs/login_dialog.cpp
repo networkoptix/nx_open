@@ -44,7 +44,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -215,7 +214,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_renderingWidget);
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
