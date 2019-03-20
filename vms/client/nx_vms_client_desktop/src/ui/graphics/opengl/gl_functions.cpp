@@ -105,9 +105,9 @@ public:
     {
         qn_glFunctionsGlobal()->initialize(glWidget);
 
-//		m_openGLInfo.version = getGLString(GL_VERSION);
-//		m_openGLInfo.vendor = getGLString(GL_VENDOR);
-//		m_openGLInfo.renderer = getGLString(GL_RENDERER);
+        m_openGLInfo.version = getGLString(GL_VERSION);
+        m_openGLInfo.vendor = getGLString(GL_VENDOR);
+        m_openGLInfo.renderer = getGLString(GL_RENDERER);
 
         {
 			QnMutexLocker lock(&m_mutex);
