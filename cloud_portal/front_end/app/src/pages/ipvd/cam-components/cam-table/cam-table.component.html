@@ -29,7 +29,7 @@
                     <td *ngFor="let p of showParametersFor(item)" class="text-left"
                         [ngClass]="{'debug' : debug}">
 
-                        <div *ngIf="isString(item[p]); else icon">
+                        <div *ngIf="!isBoolean(item[p]); else icon">
                             {{ item[p] }}
                         </div>
                         <ng-template #icon>

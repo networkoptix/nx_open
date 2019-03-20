@@ -302,7 +302,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         );
   }
 
-    isString(x: any): boolean {
-        return typeof x === 'string';
+    isBoolean(x: any): boolean {
+        return !(typeof x === 'string' || typeof x === 'number');
     }
 }
