@@ -20,8 +20,8 @@ QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     m_positionBuffer(QOpenGLBuffer::VertexBuffer)
 {
     setAcceptedMouseButtons(0);
-    
-    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+
+    /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
 
@@ -79,7 +79,7 @@ void QnShadowItem::ensureShadowShape() const {
 
 void QnShadowItem::initializeVao(QOpenGLWidget* glWidget)
 {
-    if (!m_shapeValid) 
+    if (!m_shapeValid)
         return;
 
     /* Generate vertex data. */
@@ -162,18 +162,20 @@ void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     /* Color for drawing the shadow. */
     QColor color = m_color;
     color.setAlpha(color.alpha() * effectiveOpacity());
-    
+
     const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
     QnGlNativePainting::begin(glWidget, painter);
-    glEnable(GL_BLEND); 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-   
+
+    const auto functions = glWidget->context()->functions();
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     const auto renderer = QnOpenGLRendererManager::instance(glWidget);
     renderer->setColor(color);
     auto shader = renderer->getColorShader();
     /* Draw shadowed rect. */
     renderer->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_shadowShape.size(), shader);
 
-    glDisable(GL_BLEND); 
+    functions->glDisable(GL_BLEND);
     QnGlNativePainting::end(painter);
 }

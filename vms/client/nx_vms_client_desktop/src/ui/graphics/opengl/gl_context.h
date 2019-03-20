@@ -4,7 +4,7 @@
 
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
 
-#define NX_GLCONTEXT_PRESENT
+//#define NX_GLCONTEXT_PRESENT
 
 #include <memory>
 
@@ -69,7 +69,7 @@ public:
         \note This method MUST be called from GUI thread only
     */
     GLContext( WId wnd = 0, SYS_GL_CTX_HANDLE contextHandleToShareWith = NULL );
-    //!Create context, shared with \a shareWidget context 
+    //!Create context, shared with \a shareWidget context
     /*!
         \note This constructor can be called from GUI thread only, since it uses \a getSysHandleOfQtContext method
     */

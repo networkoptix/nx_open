@@ -22,11 +22,6 @@
 #include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 
-//#define GL_COPY_AGGREGATION
-#ifdef GL_COPY_AGGREGATION
-#include "aggregationsurface.h"
-#define UPLOAD_TO_GL_IN_GUI_THREAD
-#endif
 #include "utils/color_space/image_correction.h"
 
 
@@ -88,10 +83,6 @@ public:
         QnGlRendererTexture* texture( int index ) const;
         GLuint pboID( int index ) const;
         int flags() const;
-#ifdef GL_COPY_AGGREGATION
-        void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
-        const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
-#endif
         void processImage(
             quint8* yPlane,
             int width,
@@ -241,16 +232,6 @@ public:
         uint8_t* planes[],
         int lineSizes[],
         bool isVideoMemory );
-#ifdef GL_COPY_AGGREGATION
-    bool uploadDataToGlWithAggregation(
-        DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-        const AVPixelFormat format,
-        const unsigned int width,
-        const unsigned int height,
-        uint8_t* planes[],
-        int lineSizes[],
-        bool /*isVideoMemory*/ );
-#endif
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;

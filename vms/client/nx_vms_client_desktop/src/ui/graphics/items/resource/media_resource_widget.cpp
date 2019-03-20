@@ -1106,15 +1106,18 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     const QRectF& sourceSubRect,
     const QRectF& targetRect)
 {
-    QnGlNativePainting::begin(m_renderer->openGLWidget(), painter);
+    const auto glWidget = m_renderer->openGLWidget();
+    QnGlNativePainting::begin(glWidget, painter);
+
+    const auto functions = glWidget->context()->functions();
 
     const qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
     if (!opaque || (base_type::resource()->flags() & Qn::still_image))
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        functions->glEnable(GL_BLEND);
+        functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     m_renderer->setBlurFactor(m_statusOverlay->opacity());

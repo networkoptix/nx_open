@@ -39,16 +39,16 @@ QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
 }
 
 void  QnOpenGLRenderer::setColor(const QVector4D& c)
-{ 
-    m_color = c; 
+{
+    m_color = c;
 };
 
 void  QnOpenGLRenderer::setColor(const QColor& c)
-{ 
-    m_color.setX(c.redF()); 
-    m_color.setY(c.greenF()); 
-    m_color.setZ(c.blueF()); 
-    m_color.setW(c.alphaF()); 
+{
+    m_color.setX(c.redF());
+    m_color.setY(c.greenF());
+    m_color.setZ(c.blueF());
+    m_color.setW(c.alphaF());
 };
 
 void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProgram* shader )
@@ -150,7 +150,7 @@ void QnOpenGLRenderer::drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao,
     shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
     vao->release();
-    glCheckError("render");    
+    glCheckError("render");
 }
 
 QnColorPerVertexGLShaderProgram* QnOpenGLRenderer::getColorPerVertexShader() const {
@@ -220,32 +220,41 @@ QnOpenGLRendererManager::~QnOpenGLRendererManager() {
         delete renderer;
 }
 
-void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
+void loadImageData(
+    QOpenGLFunctions* renderer,
+    int texture_wigth,
+    int texture_height,
+    int image_width,
+    int image_heigth,
+    int gl_bytes_per_pixel,
+    int gl_format,
+    const uchar* pixels)
 {
     Q_UNUSED(texture_wigth);
     Q_UNUSED(gl_bytes_per_pixel);
 
     // if ( texture_wigth >= image_width )
     {
-        glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , image_width, qMin(image_heigth,texture_height), gl_format, GL_UNSIGNED_BYTE, pixels );
+        renderer->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image_width,
+            qMin(image_heigth, texture_height), gl_format, GL_UNSIGNED_BYTE, pixels);
         glCheckError("glTexSubImage2D");
-    } 
-    
-    /* 
+    }
+
+    /*
        Following check reduces amount of data to be loaded to video card by the cost of increased GPU consumption.
        On the practice, data difference is very low but GPU consumption is very high, especially on integrated video.
-       Disabling it. 
+       Disabling it.
        --gdm
     */
     /*else if (texture_wigth < image_width)
-    {        
+    {
         int h = qMin(image_heigth,texture_height);
         for( int y = 0; y < h; y++ )
         {
             const uchar *row = pixels + (y*image_width) * gl_bytes_per_pixel;
-            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
+            renderer->glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
             glCheckError("glTexSubImage2D");
-    	}   
-		 
+    	}
+
 	}*/
 }

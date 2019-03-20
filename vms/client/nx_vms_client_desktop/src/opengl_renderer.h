@@ -80,6 +80,7 @@ private:
 };
 
 void loadImageData(
+    QOpenGLFunctions* renderer,
     int texture_wigth,
     int texture_height,
     int image_width,

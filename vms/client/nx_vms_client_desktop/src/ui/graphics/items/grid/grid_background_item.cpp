@@ -1,6 +1,8 @@
 #include "grid_background_item.h"
 
 #include <QtGui/QPainter>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
 
 #include <common/common_module.h>
 
@@ -553,7 +555,7 @@ void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename
 void QnGridBackgroundItem::paint(
     QPainter* painter,
     const QStyleOptionGraphicsItem* /* option*/,
-    QWidget* /*widget*/)
+    QWidget* widget)
 {
     Q_D(QnGridBackgroundItem);
 
@@ -584,38 +586,44 @@ void QnGridBackgroundItem::paint(
     }
 
 #ifdef NATIVE_PAINT_BACKGROUND
-    if( !m_imgAsFrame )
+
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    if (!glWidget)
         return;
 
-    if(!m_imgUploader)
+    if (!m_imgAsFrame)
+        return;
+
+    if (!m_imgUploader)
     {
-        m_imgUploader.reset( new DecodedPictureToOpenGLUploader(QGLContext::currentContext()) );
-        m_renderer.reset( new QnGLRenderer(QGLContext::currentContext(), *m_imgUploader) );
+        m_imgUploader.reset(new DecodedPictureToOpenGLUploader(glWidget));
+        m_renderer.reset(new QnGLRenderer(glWidget, *m_imgUploader));
         m_imgUploader->setYV12ToRgbShaderUsed(m_renderer->isYV12ToRgbShaderUsed());
         m_imgUploader->setNV12ToRgbShaderUsed(m_renderer->isNV12ToRgbShaderUsed());
     }
 
-    if( !d->imgUploaded )
+    if (!d->imgUploaded)
     {
         //uploading image to opengl texture
         m_imgUploader->uploadDecodedPicture( m_imgAsFrame );
         d->imgUploaded = true;
     }
 
-    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
+    QnGlNativePainting::begin(glWidget, painter);
+    const auto functions = glWidget->context()->functions();
 
-    if( m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA )
+    if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        functions->glEnable(GL_BLEND);
+        functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    m_imgUploader->setOpacity( painter->opacity() );
+    m_imgUploader->setOpacity(painter->opacity());
 
     m_renderer->paint(QRectF(0, 0, 1, 1), targetRect);
 
-    if( m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA )
-        glDisable(GL_BLEND);
+    if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
+        functions->glDisable(GL_BLEND);
 
     QnGlNativePainting::end(painter);
 

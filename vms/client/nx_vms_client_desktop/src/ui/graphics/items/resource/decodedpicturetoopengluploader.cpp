@@ -55,7 +55,7 @@ extern "C"
 #error "UPLOAD_SYSMEM_FRAMES_ASYNC and UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD cannot be defined simultaneously"
 #endif
 
-#define ASYNC_UPLOADING_USED
+//#define ASYNC_UPLOADING_USED
 #if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && !defined(UPLOAD_SYSMEM_FRAMES_ASYNC) && !defined(_WIN32)
 #undef ASYNC_UPLOADING_USED
 #endif
@@ -271,7 +271,7 @@ public:
         //NOTE we do not delete texture here because it belongs to auxiliary gl context which will be removed when these textures are not needed anymore
         if( m_id != std::numeric_limits<GLuint>::max() )
         {
-            glDeleteTextures(1, &m_id);
+            m_renderer->glDeleteTextures(1, &m_id);
             m_id = std::numeric_limits<GLuint>::max();
         }
     }
@@ -320,13 +320,13 @@ public:
 			m_textureSize = textureSize;
             m_internalFormat = internalFormat;
 
-            glBindTexture(GL_TEXTURE_2D, m_id);
+            m_renderer->glBindTexture(GL_TEXTURE_2D, m_id);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, NULL);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_renderer->clampConstant);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_renderer->clampConstant);
+            m_renderer->glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, NULL);
+            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_renderer->clampConstant);
+            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_renderer->clampConstant);
 
             result = true;
         } else {
@@ -351,12 +351,12 @@ public:
             size_t fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
             uchar *filler = m_renderer->filler(fillValue, fillSize);
 
-            glBindTexture(GL_TEXTURE_2D, m_id);
+            m_renderer->glBindTexture(GL_TEXTURE_2D, m_id);
             if (roundedWidth < textureSize.width()) {
 
                 //NX_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
 
-                glTexSubImage2D(
+                m_renderer->glTexSubImage2D(
                     GL_TEXTURE_2D,
                     0,
                     roundedWidth,
@@ -370,7 +370,7 @@ public:
             }
 
             if (height < textureSize.height()) {
-                glTexSubImage2D(
+                m_renderer->glTexSubImage2D(
                     GL_TEXTURE_2D,
                     0,
                     0,
@@ -391,7 +391,7 @@ public:
         if(m_allocated)
             return;
 
-        glGenTextures(1, &m_id);
+        m_renderer->glGenTextures(1, &m_id);
         glCheckError("glGenTextures");
 
         m_allocated = true;
@@ -487,25 +487,10 @@ public:
 #endif
     }
 
-#ifdef GL_COPY_AGGREGATION
-    void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect )
-    {
-        m_surfaceRect = surfaceRect;
-    }
-
-    const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const
-    {
-        return m_surfaceRect;
-    }
-#endif
-
 private:
     mutable std::vector<GLuint> m_picTextures;
     QScopedPointer<QnGlRendererTexture> m_textures[MAX_PLANE_COUNT];
     AVPixelFormat m_format;
-#ifdef GL_COPY_AGGREGATION
-    QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
-#endif
 };
 
 
@@ -599,19 +584,6 @@ int DecodedPictureToOpenGLUploader::UploadedPicture::flags() const
 {
     return m_flags;
 }
-
-#ifdef GL_COPY_AGGREGATION
-void DecodedPictureToOpenGLUploader::UploadedPicture::setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect )
-{
-    m_texturePack->setAggregationSurfaceRect( surfaceRect );
-}
-
-const QSharedPointer<AggregationSurfaceRect>& DecodedPictureToOpenGLUploader::UploadedPicture::aggregationSurfaceRect() const
-{
-    return m_texturePack->aggregationSurfaceRect();
-}
-#endif
-
 
 DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPictureToOpenGLUploader* const uploader )
 :
@@ -823,11 +795,7 @@ public:
         nx::vms::api::ImageCorrectionData imCor = m_uploader->getImageCorrection();
         pictureBuf->processImage(m_planes[0], cropRect.width(), cropRect.height(), m_lineSizes[0], imCor);
 
-#ifdef GL_COPY_AGGREGATION
-        if( !m_uploader->uploadDataToGlWithAggregation(
-#else
         if( !m_uploader->uploadDataToGl(
-#endif
                 pictureBuf,
 #ifdef RENDERER_SUPPORTS_NV12
                 AV_PIX_FMT_NV12,
@@ -1160,11 +1128,7 @@ public:
         m_isRunning = true;
 
         m_success =
-#ifdef GL_COPY_AGGREGATION
-            m_uploader->uploadDataToGlWithAggregation(
-#else
             m_uploader->uploadDataToGl(
-#endif
                 m_dest,
                 (AVPixelFormat)m_src->format,
                 m_src->width,
@@ -1752,14 +1716,6 @@ void DecodedPictureToOpenGLUploader::ensureQueueLessThen(int maxSize)
     }
 }
 
-#ifdef GL_COPY_AGGREGATION
-static DecodedPictureToOpenGLUploader::UploadedPicture* resetAggregationSurfaceRect( DecodedPictureToOpenGLUploader::UploadedPicture* pic )
-{
-    pic->setAggregationSurfaceRect( QSharedPointer<AggregationSurfaceRect>() );
-    return pic;
-}
-#endif
-
 void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 {
     QnMutexLocker lk( &m_mutex );
@@ -1834,15 +1790,6 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
     std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
     NX_ASSERT( it != m_picturesBeingRendered.end() );
 
-#ifdef GL_COPY_AGGREGATION
-    //clearing all rendered pictures. Only one rendered picture is required (so that there is always anything to show)
-    std::transform(
-        m_renderedPictures.begin(),
-        m_renderedPictures.end(),
-        std::back_inserter(m_emptyBuffers),
-        resetAggregationSurfaceRect );
-    m_renderedPictures.clear();
-#endif
     m_renderedPictures.push_back( *it );
     m_picturesBeingRendered.erase( it );
     m_cond.wakeAll();
@@ -1902,9 +1849,6 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUpload
     //considering picture buffer invalid
     if( picture )
     {
-#ifdef GL_COPY_AGGREGATION
-        picture->setAggregationSurfaceRect( QSharedPointer<AggregationSurfaceRect>() );
-#endif
         m_emptyBuffers.push_back( picture );
     }
 
@@ -2154,18 +2098,18 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                     .arg(qPower2Ceil(r_w[i],ROUND_COEFF))
                     .arg(h[i])
                     .arg(reinterpret_cast<size_t>(planes[i])));
-            glBindTexture( GL_TEXTURE_2D, texture->id() );
+            d->glBindTexture( GL_TEXTURE_2D, texture->id() );
             glCheckError("glBindTexture");
 
             const quint64 lineSizes_i = lineSizes[i];
             const quint64 r_w_i = r_w[i];
-//            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
+//            d->glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
             glCheckError("glPixelStorei");
             NX_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
 
             #ifndef USE_PBO
 				//loadImageData(qPower2Ceil(r_w_i,ROUND_COEFF),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
-                loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
+                loadImageData(d.get(), texture->textureSize().width(),texture->textureSize().height(),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
 #else
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,qPower2Ceil(r_w_i,ROUND_COEFF),h[i],GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
 #endif
@@ -2175,13 +2119,13 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #ifdef USE_SINGLE_PBO_PER_FRAME
             //have to synchronize every time, since single PBO buffer used
-            glFlush();
-            glFinish();
+            d->glFlush();
+            d->glFinish();
 #endif
 #endif
         }
 
-        glBindTexture( GL_TEXTURE_2D, 0 );
+        d->glBindTexture( GL_TEXTURE_2D, 0 );
 
         emptyPictureBuf->setColorFormat( format == AV_PIX_FMT_YUVA420P ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P );
     }
@@ -2195,11 +2139,12 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             else
                 texture->ensureInitialized( width / 2, height / 2, lineSizes[i]/2, 2, GL_LUMINANCE_ALPHA, 2, -1 );
 
-            glBindTexture( GL_TEXTURE_2D, texture->id() );
+            d->glBindTexture( GL_TEXTURE_2D, texture->id() );
             const uchar* pixels = planes[i];
-//            glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? lineSizes[0] : (lineSizes[1]/2) );
+//            d->glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? lineSizes[0] : (lineSizes[1]/2) );
 
-            loadImageData(  texture->textureSize().width(),
+            loadImageData(d.get(),
+                            texture->textureSize().width(),
                             texture->textureSize().height(),
                             i == 0 ? lineSizes[0] : (lineSizes[1]/2),
                             i == 0 ? height : height / 2,
@@ -2207,14 +2152,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
                             pixels);
             /*
-            glTexSubImage2D(GL_TEXTURE_2D, 0,
+            d->glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2,
                             i == 0 ? height : height / 2,
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
                             GL_UNSIGNED_BYTE, pixels );*/
             glCheckError("glTexSubImage2D");
-            glBindTexture( GL_TEXTURE_2D, 0 );
+            d->glBindTexture( GL_TEXTURE_2D, 0 );
             bitrateCalculator.bytesProcessed( (i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2)*(i == 0 ? height : height / 2) );
             //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             //glCheckError("glPixelStorei");
@@ -2240,7 +2185,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
         texture->ensureInitialized( r_w[0], h[0], lineSizes[0], bytesPerPixel, GL_RGBA, 4, 0 );
 
-        glBindTexture(GL_TEXTURE_2D, texture->id());
+        d->glBindTexture(GL_TEXTURE_2D, texture->id());
 
         uchar* pixels = planes[0];
         if (isYuvFormat(format))
@@ -2314,21 +2259,21 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         }
 
 
-//        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
+//        d->glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
         glCheckError("glPixelStorei");
 
         int w = qPower2Ceil(r_w[0],ROUND_COEFF);
         int gl_bytes_per_pixel = glBytesPerPixel(format);
         int gl_format = glRGBFormat(format);
 
-        loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
+        loadImageData(d.get(), texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
         bitrateCalculator.bytesProcessed( w*h[0]*4 );
         glCheckError("glTexSubImage2D");
 
-//        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+//        d->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glCheckError("glPixelStorei");
 
-        glBindTexture( GL_TEXTURE_2D, 0 );
+        d->glBindTexture( GL_TEXTURE_2D, 0 );
 
         emptyPictureBuf->setColorFormat( AV_PIX_FMT_RGBA );
 
@@ -2343,55 +2288,13 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     if( m_hardwareDecoderUsed )
 #endif
     {
-        glFlush();
-        glFinish();
+        d->glFlush();
+        d->glFinish();
     }
 #endif
 
     return true;
 }
-
-#ifdef GL_COPY_AGGREGATION
-bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
-    DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-    const AVPixelFormat format,
-    const unsigned int width,
-    const unsigned int height,
-    uint8_t* planes[],
-    int lineSizes[],
-    bool /*isVideoMemory*/ )
-{
-    //taking aggregation surface having enough free space
-    const QSharedPointer<AggregationSurfaceRect>& surfaceRect = AggregationSurfacePool::instance()->takeSurfaceRect(
-        m_uploadThread->glContext(),
-        format,
-        QSize(width, height) );
-    if( !surfaceRect )
-        return false;
-
-    //copying data to aggregation surface
-#ifndef DISABLE_FRAME_UPLOAD
-#ifdef SINGLE_STREAM_UPLOAD
-    if( this == runningUploader )
-#endif  //SINGLE_STREAM_UPLOAD
-    surfaceRect->uploadData( planes, lineSizes, 3 ); //TODO/IMPL exact plane count
-#endif  //DISABLE_FRAME_UPLOAD
-
-    //filling emptyPictureBuf
-    emptyPictureBuf->setColorFormat( format );
-    emptyPictureBuf->setAggregationSurfaceRect( surfaceRect );
-
-#ifndef UPLOAD_TO_GL_IN_GUI_THREAD
-    if( GetTickCount() - surfaceRect->surface()->prevGLUploadClock > 300 )
-    {
-        surfaceRect->ensureUploadedToOGL( opacity() );
-        surfaceRect->surface()->prevGLUploadClock = GetTickCount();
-    }
-#endif
-
-    return true;
-}
-#endif
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {

@@ -318,14 +318,16 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     QnGlNativePainting::begin(glWidget, painter);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     QVector4D shaderColor = QVector4D(1.0, 1.0, 1.0, painter->opacity());
 
     auto renderer = QnOpenGLRendererManager::instance(glWidget);
 
     glWidget->makeCurrent();
+
+    const auto functions = glWidget->context()->functions();
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     if (isOne || isZero)
     {
         if (!safeBindTexture(isZero ? startState : endState))
@@ -359,7 +361,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         shader->release();
     }
 
-    glDisable(GL_BLEND);
+    functions->glDisable(GL_BLEND);
     QnGlNativePainting::end(painter);
 }
 
