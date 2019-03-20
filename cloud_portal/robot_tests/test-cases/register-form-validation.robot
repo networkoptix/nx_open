@@ -19,7 +19,7 @@ ${valid email}                 noptixqa+valid@gmail.com
 
 *** Test Cases ***                        FIRST       LAST        EMAIL                     PASS                        CHECKED
 Invalid Email 1 noptixqagmail.com         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
-    [tags]    C41557
+    [tags]    C41557    C41860
 Invalid Email 2 @gmail.com                mark        hamill      @gmail.com                ${BASE PASSWORD}            True
     [tags]    C41557
 Invalid Email 3 noptixqa@gmail..com       mark        hamill      noptixqa@gmail..com       ${BASE PASSWORD}            True
@@ -72,7 +72,7 @@ Trailing Space Password                   mark        hamill      ${valid email}
 Middle Space Password qweasd 123          mark        hamill      ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41862
 Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
-    [tags]    C41556
+    [tags]    C41556    C41860
 Symbol Password pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}    mark        hamill      ${valid email}            ${symbol password}          True
     [tags]    C41861
 Invalid First Name                        ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
@@ -131,8 +131,8 @@ Check Password Badge
     ...    ELSE IF    '''${pass}'''=='''${no upper password}''' or '''${pass}'''=='''${weak password}'''    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
     ...    ELSE IF    '''${pass}'''=='''${common password}'''    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
     ...    ELSE IF    '''${pass}'''=='''${CYRILLIC TEXT}''' or '''${pass}'''=='''${SMILEY TEXT}''' or '''${pass}'''=='''${GLYPH TEXT}''' or '''${pass}'''=='''${TM TEXT}''' or '''${pass}'''=='''${SPACE}${BASE PASSWORD}''' or '''${pass}'''=='''${BASE PASSWORD}${SPACE}'''    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
-    ...    ELSE IF    '''${pass}'''=='''${fair password}''' or '''${pass}'''=='''${symbol password}'''   Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
-    ...    ELSE IF    '''${pass}'''=='''${BASE PASSWORD}'''    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${symbol password}'''   Move focus and check badge    ${PASSWORD IS FAIR BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${BASE PASSWORD}'''    Move focus and check badge    ${PASSWORD IS GOOD BADGE}
 
 Check Email Outline
     [Arguments]    ${email}
@@ -162,3 +162,9 @@ Check Last Name Outline
 
 Check Terms and Conditions Error
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS ERROR}
+
+Move focus and check badge
+    [Arguments]    ${badge}
+    Element Should Be Visible    ${badge}
+    Click Element    ${REGISTER FORM}
+    Element Should Be Visible    ${badge}
