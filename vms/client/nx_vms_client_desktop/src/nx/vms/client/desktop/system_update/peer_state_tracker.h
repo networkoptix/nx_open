@@ -124,7 +124,9 @@ public:
     /** Clear update check errors for all the peers. */
     void clearVerificationErrors();
 
+    /** Checks if any peer has verification error. */
     bool hasVerificationErrors() const;
+
     bool hasStatusErrors() const;
 
 public:
@@ -183,6 +185,7 @@ signals:
      */
     void itemAdded(UpdateItemPtr item);
     void itemChanged(UpdateItemPtr item);
+    void itemOnlineStatusChanged(UpdateItemPtr item);
 
     /**
      * Called right before UpdateItem is removed from the list.
