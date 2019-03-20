@@ -6,11 +6,16 @@
 
 namespace nx {
 namespace kit {
+namespace apple_utils {
 
-std::string processName()
+std::vector<std::string> getProcessCmdLineArgs()
 {
-    return [[[NSProcessInfo processInfo] processName] UTF8String];
+    std::vector<std::string> argumentsVector;
+    for (argument in [[NSProcessInfo processInfo] arguments])
+        argumentsVector.push_back([argument UTF8String]);
+    return argumentsVector;
 }
 
+} // namespace apple_utils
 } // namespace kit
 } // namespace nx

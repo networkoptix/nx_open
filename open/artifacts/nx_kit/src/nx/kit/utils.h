@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #if defined(QT_CORE_LIB)
     // To be supported in toString().
@@ -38,6 +39,12 @@ inline bool isAsciiPrintable(int c)
 }
 
 /**
+ * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
+ * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
+ */
+NX_KIT_API std::string baseName(std::string path);
+
+/**
  * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
  */
 template<typename T>
@@ -54,6 +61,15 @@ std::string format(const std::string& formatStr, Args... args)
     result.resize(size - /* trailing '\0' */ 1);
     return result;
 }
+
+//-------------------------------------------------------------------------------------------------
+// OS support.
+
+/**
+ * @return Command line arguments of the proccess, cached after the first call. If arguments are
+ *     not available, then returns a single empty string.
+ */
+NX_KIT_API const std::vector<std::string>& getProcessCmdLineArgs();
 
 //-------------------------------------------------------------------------------------------------
 // Aligned allocation.
