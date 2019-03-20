@@ -237,9 +237,9 @@ void Downloader::stopDownloads()
         worker->stop();
 }
 
-void Downloader::findExistingDownloads(bool waitForFinished)
+void Downloader::findExistingDownloads()
 {
-    d->storage->findDownloads(waitForFinished);
+    d->storage->findDownloads(true);
 }
 
 void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,

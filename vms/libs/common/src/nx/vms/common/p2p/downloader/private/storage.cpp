@@ -115,7 +115,7 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
     {
         NX_WARNING(
             this,
-            lm("Downloader: Add downloaded file (%1) failed. File not found.").args(info.fullFilePath));
+            "Downloader: Add downloaded file (%1) failed. File not found.", info.fullFilePath);
         return ResultCode::fileDoesNotExist;
     }
 
@@ -153,7 +153,7 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
 
     emit fileAdded(info);
 
-    NX_DEBUG(this, lm("Downloader: Add downloaded file (%1) succeeded").args(info.fullFilePath));
+    NX_DEBUG(this, "Downloader: Add downloaded file (%1) succeeded", info.fullFilePath);
     return ResultCode::ok;
 }
 
@@ -585,7 +585,7 @@ void Storage::findDownloadsImpl()
     for (const auto& entry: QDir(metadataDirectoryPath()).entryInfoList(QDir::Files))
     {
         auto fileName = entry.absoluteFilePath();
-        NX_DEBUG(this, lm("Downloader: Find downloads: Processing metadata file %1").args(fileName));
+        NX_DEBUG(this, "Downloader: Find downloads: Processing metadata file %1", fileName);
         if (!fileName.endsWith(kMetadataSuffix))
             continue;
 
@@ -594,7 +594,7 @@ void Storage::findDownloadsImpl()
         {
             NX_DEBUG(
                 this,
-                lm("Downloader: Find downloads: Load metadata file (%1) failed").args(fileName));
+                "Downloader: Find downloads: Load metadata file (%1) failed", fileName);
             continue;
         }
 
@@ -607,7 +607,7 @@ void Storage::findDownloadsImpl()
         const auto resultCode = addFile(fileInfo, /*updateTouchTime*/ false);
         NX_DEBUG(
             this,
-            lm("Downloader: Find downloads: Add file (%1) result = %2").args(fileInfo.name, resultCode));
+            "Downloader: Find downloads: Add file (%1) result = %2", fileInfo.name, resultCode);
     }
 }
 
@@ -713,8 +713,8 @@ FileMetadata Storage::loadMetadata(const QString& fileName)
     const bool deserializeResult = QJson::deserialize(data, &fileInfo);
     NX_DEBUG(
         this,
-        lm("Downloader: load metadata (%1). Deserialize result: %2. File information valid: %3")
-            .args(fileName, deserializeResult ? "success" : "fail", fileInfo.isValid()));
+        "Downloader: load metadata (%1). Deserialize result: %2. File information valid: %3",
+            fileName, deserializeResult ? "success" : "fail", fileInfo.isValid());
 
     const auto previousStatus = fileInfo.status;
     checkDownloadCompleted(fileInfo);

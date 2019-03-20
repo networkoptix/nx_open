@@ -57,7 +57,7 @@ public:
 
     void startDownloads();
     void stopDownloads();
-    void findExistingDownloads(bool waitForFinished = false);
+    void findExistingDownloads();
 
     static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
         std::function<void(bool)> callback);
