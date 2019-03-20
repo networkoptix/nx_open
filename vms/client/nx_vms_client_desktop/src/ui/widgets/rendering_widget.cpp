@@ -209,10 +209,7 @@ void QnRenderingWidget::resizeGL(int width, int height)
     QMatrix4x4 matrix;
     matrix.translate(-1.0, 1.0, 0.0);
 
-    const auto currentScreenNumber = qApp->desktop()->screenNumber(parentWidget());
-    const auto screen = qApp->screens().at(currentScreenNumber);
-    const auto aspect = screen->devicePixelRatio();
-    matrix.scale(2.0 * aspect / width, 2.0 * -aspect / height, 1.0);
+    matrix.scale(2.0 / width, - 2.0 / height, 1.0);
     renderer->setProjectionMatrix(matrix);
 }
 
