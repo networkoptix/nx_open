@@ -176,7 +176,7 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPt
     if (m_croppedImage.isNull())
         return frame;
 
-    if (frame->format != AV_PIX_FMT_YUV420P || QnAppInfo::isArm() || 1)
+    if (frame->format != AV_PIX_FMT_YUV420P || QnAppInfo::isArm())
         return drawToFfmpeg(frame);
     else
         return drawToSse(frame);
