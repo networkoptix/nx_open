@@ -1278,9 +1278,11 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
 
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
+    qDebug() << "STORAGE MANAGER: NEW RESOURCE ADDED" << resource->getName();
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID())
     {
+        qDebug() << "STORAGE MANAGER: NEW STORAGE ADDED" << storage->getUrl() << "IS BACKUP:" << storage->isBackup();
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
         if (fileStorage && nx::mserver_aux::isStorageUnmounted(
             serverModule()->platform(),
