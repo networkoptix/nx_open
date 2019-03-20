@@ -600,11 +600,13 @@ public:
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            qDebug() << "TESTING STORAGE: " << storage->getUrl() << "is FileStorage:" << (bool) fileStorage;
             if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
                 m_owner->serverModule()->platform(),
                 storage,
                 m_settings))
             {
+                qDebug() << "TESTING STORAGE: SET IS MOUNTED" << storage->getUrl();
                 fileStorage->setMounted(true);
             }
         }
@@ -616,6 +618,7 @@ public:
 
             Qn::ResourceStatus status =
                 storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+            qDebug() << "TESTING STORAGE" << storage->getUrl() << "STATUS" << (int) status;
             if (storage->getStatus() != status)
                 m_owner->changeStorageStatus(storage, status);
 
@@ -1278,11 +1281,9 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
 
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
-    qDebug() << "STORAGE MANAGER: NEW RESOURCE ADDED" << resource->getName();
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID())
     {
-        qDebug() << "STORAGE MANAGER: NEW STORAGE ADDED" << storage->getUrl() << "IS BACKUP:" << storage->isBackup();
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
         if (fileStorage && nx::mserver_aux::isStorageUnmounted(
             serverModule()->platform(),
