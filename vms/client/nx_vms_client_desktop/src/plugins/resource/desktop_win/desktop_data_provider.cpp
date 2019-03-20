@@ -82,8 +82,9 @@ int QnDesktopDataProvider::EncodedAudioInfo::nameToWaveIndex()
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
+            // This may look like "Microphone (Realtec Hi".
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name == tmp)
+            if (name.startsWith(tmp))
             {
                 if (--devNum == 0)
                     return i;

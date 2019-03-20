@@ -118,15 +118,20 @@ QnAudioDeviceInfo QnAudioRecorderSettings::defaultPrimaryAudioDevice() const
 {
     const DeviceList& devices = availableDevices();
 
+    // On windows it always returns non-existent "Default Audio Input Device".
     const QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-    if (info.isNull() && !devices.isEmpty())
+
+    if (!info.isNull())
+    {
+        const auto it = std::find_if(devices.begin(), devices.end(),
+            [&info](const QnAudioDeviceInfo& item) { return info == item; });
+
+        if (it != devices.end())
+            return *it;
+    }
+
+    if (!devices.isEmpty())
         return devices.first();
-
-    const auto it = std::find_if(devices.begin(), devices.end(),
-        [&info](const QnAudioDeviceInfo& item) { return info == item; });
-
-    if (it != devices.end())
-        return *it;
 
     return {};
 }
