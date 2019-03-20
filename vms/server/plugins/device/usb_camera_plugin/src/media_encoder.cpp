@@ -285,4 +285,21 @@ void MediaEncoder::fillResolutionList(
     *outInfoListCount = j;
 }
 
+int MediaEncoder::getConfiguredLiveStreamReader(
+    nxcip::LiveStreamConfig* /*config*/, nxcip::StreamReader** /*reader*/)
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int MediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int MediaEncoder::getVideoFormat(
+    nxcip::CompressionType* /*codec*/, nxcip::PixelFormat* /*pixelFormat*/) const
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
 } // namespace nx::usb_cam
