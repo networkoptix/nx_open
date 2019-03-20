@@ -81,12 +81,13 @@ void ImageToFramePainter::setImage(
     updateTargetImage();
 }
 
-void ImageToFramePainter::updateSourceSize(const QSize& sourceSize)
+void ImageToFramePainter::updateTargetImage(const QSize& sourceSize, AVPixelFormat pixelFormat)
 {
-    if (sourceSize == m_sourceSize)
+    if (sourceSize == m_sourceSize && m_pixelFormat == pixelFormat)
         return;
 
     m_sourceSize = sourceSize;
+    m_pixelFormat = pixelFormat;
     updateTargetImage();
 }
 
@@ -170,12 +171,12 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawToSse(const CLVideoDecoderOutpu
 
 CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPtr& frame)
 {
-    updateSourceSize(QSize(frame->width, frame->height));
+    updateTargetImage(QSize(frame->width, frame->height), (AVPixelFormat) frame->format);
 
     if (m_croppedImage.isNull())
         return frame;
 
-    if (frame->format != AV_PIX_FMT_YUV420P || QnAppInfo::isArm())
+    if (frame->format != AV_PIX_FMT_YUV420P || QnAppInfo::isArm() || 1)
         return drawToFfmpeg(frame);
     else
         return drawToSse(frame);
@@ -188,8 +189,14 @@ void ImageToFramePainter::clearImages()
     m_finalImageBytes.reset();
 }
 
+
 void ImageToFramePainter::updateTargetImage()
 {
+    sws_freeContext(m_toImageContext);
+    sws_freeContext(m_fromImageContext);
+    m_toImageContext = nullptr;
+    m_fromImageContext = nullptr;
+
     if (!m_sourceSize.isValid() || m_image.isNull())
     {
         clearImages();

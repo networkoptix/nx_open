@@ -7,6 +7,11 @@
 
 #include <transcoding/filters/abstract_image_filter.h>
 
+extern "C"
+{
+#include "libavutil/pixfmt.h"
+}
+
 class QImage;
 struct SwsContext;
 
@@ -26,11 +31,10 @@ public:
         const QPoint& offset,
         Qt::Alignment alignment);
 
-    void updateSourceSize(const QSize& sourceSize);
-
     CLVideoDecoderOutputPtr drawTo(const CLVideoDecoderOutputPtr& frame);
 
 private:
+    void updateTargetImage(const QSize& sourceSize, AVPixelFormat format);
     void updateTargetImage();
 
     void clearImages();
@@ -54,6 +58,7 @@ private:
 
     SwsContext* m_toImageContext = nullptr;
     SwsContext* m_fromImageContext = nullptr;
+    AVPixelFormat m_pixelFormat = AV_PIX_FMT_NONE;
 };
 
 } // namespace detail
