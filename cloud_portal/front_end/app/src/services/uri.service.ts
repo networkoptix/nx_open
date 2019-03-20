@@ -1,6 +1,8 @@
-import { Injectable }             from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable }             from 'rxjs';
+import { Inject, Injectable, PLATFORM_ID }       from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { Observable }                            from 'rxjs';
+import { isPlatformBrowser }                     from '@angular/common';
+
 
 @Injectable({
     providedIn: 'root'
@@ -8,7 +10,8 @@ import { Observable }             from 'rxjs';
 export class NxUriService {
 
     constructor(private router: Router,
-                private route: ActivatedRoute) {
+                private route: ActivatedRoute,
+                @Inject(PLATFORM_ID) private platformId: object) {
     }
 
     getURI(): Observable<any> {
@@ -30,6 +33,9 @@ export class NxUriService {
             queryParams = objParams;
         }
 
+        // preserve window offset
+        const offset = window.pageYOffset;
+
         // changes the route without moving from the current view or
         // triggering a navigation event,
         this.router.navigate([navigateTo], {
@@ -40,5 +46,11 @@ export class NxUriService {
             // do not trigger navigation
             // skipLocationChange : true
         });
+
+        if (isPlatformBrowser(this.platformId)) {
+            this.router.events.subscribe((event: NavigationEnd) => {
+                window.scroll(0, offset);
+            });
+        }
     }
 }
