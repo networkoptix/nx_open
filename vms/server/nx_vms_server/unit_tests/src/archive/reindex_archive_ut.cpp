@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 namespace nx::vms::server::test {
 
@@ -160,7 +161,7 @@ private:
             if (testStorageIt == allStorages.cend())
             {
                 qDebug() << "WAITING FOR STORAGE";
-                std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 continue;
             }
 
@@ -171,7 +172,16 @@ private:
                 qDebug() << "STORAGE FOUND" << "WRITABLE" << storage->isWritable() << "ONLINE:" << storage->isOnline() << "USED:" << storage->isUsedForWriting();
 
                 if (!(storage->isWritable() && storage->isOnline() && storage->isUsedForWriting()))
+                {
+                    const auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+                    ASSERT_TRUE((bool) fileStorage);
+                    fileStorage->setMounted(true);
                     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+                }
+                else
+                {
+                    break;
+                }
             }
 
             break;
