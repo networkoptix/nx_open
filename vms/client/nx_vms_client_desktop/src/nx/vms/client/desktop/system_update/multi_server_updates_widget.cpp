@@ -293,25 +293,30 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         {
             NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
 
-            if (m_stateTracker)
+            if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool()))
             {
-                if (m_stateTracker->setResourceFeed(resourcePool()))
+                // We will be here when we connected to another system.
+                // We should run update check again. This should fix VMS-13037.
+                if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
                 {
-                    // We will be here when we connected to another system.
-                    // We should run update check again. This should fix VMS-13037.
-                    if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
-                    {
-                        QString updateUrl = qnSettings->updateFeedUrl();
-                        m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
-                    }
+                    QString updateUrl = qnSettings->updateFeedUrl();
+                    m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
                 }
-                else
-                {
-                    // We will be here when we disconnect from the server.
-                    // So we can clear our state as well.
-                    clearUpdateInfo();
-                    setTargetState(WidgetUpdateState::initial, {});
-                }
+            }
+        });
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        [this](const QnUserResourcePtr &user)
+        {
+            // This prevents widget from recalculating update report for each server removed from
+            // the resource pool during disconnect.
+            if (!user)
+            {
+                NX_DEBUG(this, "Disconnected from the system. Cleaning up current update context");
+                // We will be here when we disconnect from the server.
+                // So we can clear our state as well.
+                clearUpdateInfo();
+                setTargetState(WidgetUpdateState::initial, {});
             }
         });
 
