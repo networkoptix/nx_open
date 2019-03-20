@@ -75,7 +75,6 @@
 #include <ui/graphics/items/grid/grid_background_item.h>
 
 #include <ui/graphics/view/graphics_view.h>
-#include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -546,8 +545,7 @@ void QnWorkbenchDisplay::initSceneView()
             }
         };
 
-
-        auto viewport = new QOpenGLWidget(m_view);
+        const auto viewport = new QOpenGLWidget(m_view);
         if (const auto window = viewport->windowHandle())
         {
             connect(window, &QWindow::screenChanged, this,
@@ -558,17 +556,8 @@ void QnWorkbenchDisplay::initSceneView()
                 });
         }
 
-//        viewport->update(); //< Forces OpenGL context initialization.
         viewport->makeCurrent();
         m_view->setViewport(viewport);
-
-        QnGlHardwareChecker::checkCurrentContext(true);
-
-        /* QGLTextureCache leaks memory very fast when limit exceeded (Qt 5.6.1). */
-        QGLContext::currentContext()->setTextureCacheLimit(2 * 1024 * 1024);
-
-        /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
-        DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
 
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);

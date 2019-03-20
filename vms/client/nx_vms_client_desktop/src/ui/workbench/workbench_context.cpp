@@ -28,6 +28,7 @@
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <ui/graphics/instruments/gl_checker_instrument.h>
 
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
@@ -38,7 +39,6 @@
 
 #include <ui/style/webview_style.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workaround/fglrx_full_screen.h>
 #ifdef Q_OS_LINUX
 #include <ui/workaround/x11_launcher_workaround.h>
 #endif
@@ -118,6 +118,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         statisticsManager, &QnStatisticsManager::sendStatistics);
 
     instance<nx::vms::client::desktop::SystemHealthState>();
+    instance<QnGLCheckerInstrument>();
 
     initWorkarounds();
 }
@@ -383,8 +384,6 @@ QnWorkbenchContext::StartupParametersCode
 
 void QnWorkbenchContext::initWorkarounds()
 {
-    instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
-
     action::IDType effectiveMaximizeActionId = action::FullscreenAction;
 #ifdef Q_OS_LINUX
     /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
