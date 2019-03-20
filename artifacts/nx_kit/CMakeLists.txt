@@ -31,7 +31,7 @@ set(nx_kit_files
 )
 
 if(APPLE)
-    set (nx_kit_files ${nx_kit_files}
+    set(nx_kit_files ${nx_kit_files}
         src/nx/kit/apple_utils.h
         src/nx/kit/apple_utils.mm
     )

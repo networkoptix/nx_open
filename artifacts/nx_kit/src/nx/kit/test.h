@@ -90,7 +90,7 @@ NX_KIT_API const char* staticTempDir();
  * </code></pre>
  * @return Number of failed tests.
  */
-NX_KIT_API int runAllTests(const char* testSuiteName, int argc, const char* const argv[]);
+NX_KIT_API int runAllTests(const char *testSuiteName);
 
 NX_KIT_API void createFile(const char* filename, const char* content);
 
