@@ -15,7 +15,7 @@ namespace usb_cam {
 class CameraManager;
 class StreamReader;
 
-class MediaEncoder: public nxcip::CameraMediaEncoder2
+class MediaEncoder: public nxcip::CameraMediaEncoder5
 {
 public:
      MediaEncoder(
@@ -35,6 +35,8 @@ public:
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
+    virtual const char* audioExtradata() const override;
+    virtual int audioExtradataSize() const override;
     virtual int getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const override;
 
 protected:

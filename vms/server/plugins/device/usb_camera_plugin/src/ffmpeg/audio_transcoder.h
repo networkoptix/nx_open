@@ -16,15 +16,16 @@ namespace nx::usb_cam::ffmpeg {
 class AudioTranscoder
 {
 public:
-    int initialize(AVStream * stream);
+    int initialize(AVStream* stream);
     void uninitialize();
     int sendPacket(const ffmpeg::Packet& packet);
     int receivePacket(std::shared_ptr<ffmpeg::Packet>& result);
     int targetSampleRate() { return m_encoder->sampleRate(); }
+    AVCodecContext* getCodecContext();
 
 private:
-    int initializeDecoder(AVStream* stream);
     int initializeEncoder();
+    int initializeDecoder(AVStream* stream);
     int initializeResampledFrame();
     int initalizeResampleContext(const AVFrame* frame);
     int decodeNextFrame(ffmpeg::Frame* outFrame);
