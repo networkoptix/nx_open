@@ -61,29 +61,26 @@ QnResourceList extractResources(const QList<QUrl>& urls)
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
 }
 
+
 } // namespace
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_view(new QQuickView(qnClientCoreModule->mainQmlEngine(), nullptr))
+    base_type(qnClientCoreModule->mainQmlEngine(), parent),
+    QnWorkbenchContextAware(parent)
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
 
-    m_view->rootContext()->setContextProperty(lit("context"), this);
-    m_view->setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
-    m_view->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    if (m_view->status() == QQuickView::Error)
+    rootContext()->setContextProperty(lit("context"), this);
+    setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
+    setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    if (status() == QQuickWidget::Error)
     {
-        for (const auto& error: m_view->errors())
+        for (const auto& error: errors())
             NX_ERROR(this, error.toString());
         NX_CRITICAL(false, "Welcome screen loading failed.");
     }
-
-    const auto layout = new QVBoxLayout(this);
-    layout->setContentsMargins(QMargins());
-    layout->addWidget(QWidget::createWindowContainer(m_view), 1);
 
     NX_CRITICAL(qnStartupTileManager, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, "Cloud watcher does not exist");
@@ -196,7 +193,7 @@ void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
 void QnWorkbenchWelcomeScreen::changeEvent(QEvent* event)
 {
     if (event->type() == QEvent::PaletteChange)
-        m_view->setColor(palette().color(QPalette::Window));
+        quickWindow()->setColor(palette().color(QPalette::Window));
 
     base_type::changeEvent(event);
 }
@@ -297,7 +294,7 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
     // Repainting the widget to guarantee that started screen recording won't contain the visible
     // message.
     // TODO: Find a better way to achieve the same effect.
-    m_view->update();
+    update();
     repaint();
 
     qApp->flush();
@@ -307,11 +304,6 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 QString QnWorkbenchWelcomeScreen::message() const
 {
     return m_message;
-}
-
-void QnWorkbenchWelcomeScreen::activateView() const
-{
-    return m_view->requestActivate();
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
@@ -381,7 +373,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
 {
-    if (const auto rootItem = m_view->rootObject())
+    if (const auto rootItem = rootObject())
         rootItem->forceActiveFocus();
 }
 

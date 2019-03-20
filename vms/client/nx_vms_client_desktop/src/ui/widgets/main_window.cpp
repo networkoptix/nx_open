@@ -712,21 +712,9 @@ bool MainWindow::event(QEvent* event)
             }
     }
 
-    bool result = base_type::event(event);
-
-    if (event->type() == QEvent::WindowActivate)
-    {
-        // Workaround for QTBUG-34414
-        if (m_welcomeScreen && m_welcomeScreenVisible)
-        {
-            activateWindow();
-            m_welcomeScreen->activateView();
-        }
-    }
-    else if (event->type() == QnEvent::WinSystemMenu)
-    {
+    const bool result = base_type::event(event);
+    if (event->type() == QnEvent::WinSystemMenu)
         action(action::MainMenuAction)->trigger();
-    }
 
     return result;
 }
