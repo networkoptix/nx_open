@@ -109,7 +109,34 @@ export class CamTableComponent implements OnChanges, OnInit {
 
         } else if (param === 'isPtzSupported') {
             byParam = NxUtilsService.byParam((elm) => {
-                return !elm.isAptzSupported;
+                if (elm.isAptzSupported) {
+                    return 0;
+                }
+                if (elm.isPtzSupported) {
+                    return 1;
+                }
+                if (elm.isPtzSupported === false) {
+                    return 2;
+                }
+                if (elm.isPtzSupported === null) {
+                    return 3;
+                }
+            }, this.sortOrderASC);
+
+        } else if (param === 'isAudioSupported') {
+            byParam = NxUtilsService.byParam((elm) => {
+                if (elm.isAudioSupported === null) {
+                    return 3;
+                }
+                if (elm.isAudioSupported === false) {
+                    return 2;
+                }
+                if (elm.isTwAudioSupported) {
+                    return 0;
+                }
+                if (elm.isAudioSupported) {
+                    return 1;
+                }
             }, this.sortOrderASC);
 
         } else {
@@ -119,7 +146,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         this._elements.sort(byParam);
-        this.setPage(1, true /* keep uri intact */);
+        this.setPage(1, false /* do not keep uri */);
 
         this.selectedHeader = this.cameraHeaders.find(x => {
             return x === this.lang.ipvd[param];
@@ -148,11 +175,11 @@ export class CamTableComponent implements OnChanges, OnInit {
         let idxToBeRemoved;
         let param;
 
-        param = (item.value.isAptzSupported) ? 'isPtzSupported' : 'isAptzSupported';
+        param = (item.isAptzSupported) ? 'isPtzSupported' : 'isAptzSupported';
         idxToBeRemoved = showParameters.indexOf(param);
         showParameters.splice(idxToBeRemoved, 1);
 
-        param = (item.value.isTwAudioSupported) ? 'isAudioSupported' : 'isTwAudioSupported';
+        param = (item.isTwAudioSupported) ? 'isAudioSupported' : 'isTwAudioSupported';
         idxToBeRemoved = showParameters.indexOf(param);
         showParameters.splice(idxToBeRemoved, 1);
 
@@ -259,14 +286,6 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
     }
 
-  static yesNo (bVal) {
-      if (bVal === undefined || bVal === null) {
-          return 'Unknown';
-      }
-
-      return bVal ? 'Yes' : 'No';
-  }
-
   getCsvData() {
       return this._elements.map(camera => ({
                     'Vendor': camera.vendor,
@@ -274,11 +293,11 @@ export class CamTableComponent implements OnChanges, OnInit {
                     'Max Resolution': camera.maxResolution,
                     'Max FPS': camera.maxFps,
                     'Codec': camera.primaryCodec,
-                    '2-Way Audio': CamTableComponent.yesNo(camera.isTwAudioSupported),
-                    'Advanced PTZ': CamTableComponent.yesNo(camera.isAptzSupported),
-                    'Fisheye': CamTableComponent.yesNo(camera.isFisheye),
-                    'Motion': CamTableComponent.yesNo(camera.isMdSupported),
-                    'I/O': CamTableComponent.yesNo(camera.isIoSupported)
+                    '2-Way Audio': NxUtilsService.yesNo(camera.isTwAudioSupported),
+                    'Advanced PTZ': NxUtilsService.yesNo(camera.isAptzSupported),
+                    'Fisheye': NxUtilsService.yesNo(camera.isFisheye),
+                    'Motion': NxUtilsService.yesNo(camera.isMdSupported),
+                    'I/O': NxUtilsService.yesNo(camera.isIoSupported)
                })
         );
   }

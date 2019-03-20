@@ -22,18 +22,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of pagedItems | keyvalue: byKey; let i = index"
+                <tr *ngFor="let item of pagedItems; let i = index"
                     [ngClass]="{'selected': i == selectedRow}"
                     (click)="setClickedRow(i, item);">
 
                     <td *ngFor="let p of showParametersFor(item)" class="text-left"
                         [ngClass]="{'debug' : debug}">
 
-                        <div *ngIf="isString(item.value[p]); else icon">
-                            {{ item.value[p] }}
+                        <div *ngIf="isString(item[p]); else icon">
+                            {{ item[p] }}
                         </div>
                         <ng-template #icon>
-                            <nx-bool-icon [param]="p" [value]="item.value[p]"></nx-bool-icon>
+                            <nx-bool-icon [param]="p" [value]="item[p]"></nx-bool-icon>
                         </ng-template>
                     </td>
                 </tr>

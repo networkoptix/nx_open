@@ -9,7 +9,7 @@ export class BoolIconComponent implements OnInit {
     @Input() param: string;
     @Input() value: string;
 
-    private additional: string;
+    public additional: string;
 
     constructor() {
     }

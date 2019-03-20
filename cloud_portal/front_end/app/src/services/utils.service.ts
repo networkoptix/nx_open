@@ -42,4 +42,12 @@ export class NxUtilsService {
 
         };
     }
+
+    static yesNo(bVal) {
+        if (bVal === undefined || bVal === null) {
+            return 'Unknown';
+        }
+
+        return bVal ? 'Yes' : 'No';
+    }
 }
