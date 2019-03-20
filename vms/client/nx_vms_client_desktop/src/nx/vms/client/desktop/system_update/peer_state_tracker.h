@@ -151,16 +151,22 @@ public:
     /**
      * Getters for task sets.
      */
+
+    /** Set task set of peers that completed current action. */
     QSet<QnUuid> getPeersComplete() const;
+    /** Get task set of peers that are currently active. */
     QSet<QnUuid> getPeersActive() const;
+    /** Get task set of peers that are participating in current action. */
     QSet<QnUuid> getPeersIssued() const;
+    /** Get task set of peers that have failed current action. */
     QSet<QnUuid> getPeersFailed() const;
 
     /**
      * We call it every time we start or stop next task, like ready->downloading,
      * readyToInstall->installing or when we cancel current action.
+     * It will reset all internal task sets.
      */
-    void setTaskSet(const QSet<QnUuid>& targets);
+    void setTask(const QSet<QnUuid>& targets);
 
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
 

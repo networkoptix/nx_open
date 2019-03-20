@@ -220,7 +220,7 @@ struct UpdateContents
     QList<Package> manualPackages;
     bool cloudIsCompatible = true;
 
-    bool packagesGenerted = false;
+    bool packagesGenerated = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
 

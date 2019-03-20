@@ -115,7 +115,8 @@ static InformationError findCustomizationInfo(
     result->releaseNotesUrl = customizationInfo->release_notes;
     result->releaseDeliveryDays = customizationInfo->release_delivery;
     result->releaseDateMs = customizationInfo->release_date;
-    result->description = customizationInfo->description;
+    // As of 4.0 we do not use description from customization info.
+    //result->description = customizationInfo->description;
     return InformationError::noError;
 }
 
@@ -221,7 +222,6 @@ static InformationError parseLegacyPackages(
 static InformationError parseHeader(
     const QJsonObject& topLevelObject,
     const QString& baseUpdateUrl,
-    bool isLegacyData,
     Information* result)
 {
     if (!QJson::deserialize(topLevelObject, "version", &result->version))
@@ -247,15 +247,7 @@ static InformationError parseHeader(
         NX_WARNING(typeid(Information)) << "no eula data at" << baseUpdateUrl;
     }
 
-    QString description;
-    // Legacy updates: e take update's description from the root updates.json and
-    // override it by description in updates.json.
-    // New updates: we take description only from packages.json.
-    if ((QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
-        || !isLegacyData)
-    {
-        result->description = description;
-    }
+    QJson::deserialize(topLevelObject, "description", &result->description);
     return InformationError::noError;
 }
 
@@ -270,7 +262,7 @@ static InformationError parseAndExtractInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    auto error = parseHeader(topLevelObject, baseUpdateUrl, /*isLegacyData=*/false, result);
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
 
@@ -292,7 +284,7 @@ static InformationError parseAndExtractLegacyInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    auto error = parseHeader(topLevelObject, baseUpdateUrl, /*isLegacyData=*/true, result);
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
 

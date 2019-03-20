@@ -66,8 +66,5 @@ public:
     static float qualityToNumeric(Qn::DecoderQuality quality);
 
 private:
-    QnAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0) const;
-
-private:
     QSettings settings;
 };

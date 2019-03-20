@@ -2,38 +2,44 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
-#include "qnaudio_device_info.h"
+
+#include <utils/common/value_cache.h>
+
+#include "audio_device_info.h"
 
 class QnAudioRecorderSettings: public QObject
 {
-    Q_OBJECT
-    using base_type = QObject;
-
 public:
+    using DeviceList = QList<QnAudioDeviceInfo>;
+
+    static QString kNoDevice;
+
     explicit QnAudioRecorderSettings(QObject* parent = nullptr);
-    virtual ~QnAudioRecorderSettings();
+    virtual ~QnAudioRecorderSettings() override;
+
+    DeviceList availableDevices() const { return m_devices.get(); }
 
     QnAudioDeviceInfo primaryAudioDevice() const;
 
     QString primaryAudioDeviceName() const;
-    void setPrimaryAudioDeviceByName(const QString &name);
+    void setPrimaryAudioDeviceName(const QString& name);
 
     QnAudioDeviceInfo secondaryAudioDevice() const;
 
     QString secondaryAudioDeviceName() const;
-    void setSecondaryAudioDeviceByName(const QString &name);
+    void setSecondaryAudioDeviceName(const QString& name);
+
+    QnAudioDeviceInfo defaultPrimaryAudioDevice() const;
+    QnAudioDeviceInfo defaultSecondaryAudioDevice() const;
 
     QString recordingFolder() const;
-    void setRecordingFolder(QString folder);
-
-    static QString getFullDeviceName(const QString& shortName);
-    static QStringList availableDeviceNames(QAudio::Mode mode);
-    static void splitFullName(const QString& name, QString& shortName, int& index);
+    void setRecordingFolder(const QString& folder);
 
 private:
-    QnAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode,
-        bool* isDefault = nullptr) const;
+    QnAudioDeviceInfo getDeviceByName(const QString& name) const;
 
-protected:
-    QSettings settings;
+private:
+    QnMutex* m_mutex; //< For m_devices.
+    CachedValue<DeviceList> m_devices;
+    QSettings m_settings;
 };
