@@ -11,6 +11,8 @@ set(uri.protocol "piko-vms")
 set(cloudName "piko Cloud")
 
 # Default settings
+set(backgroundImage
+    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Crop\"}")
 set(defaultWebPages "{\"Home Page\": \"https://www.cooksecuritygroup.com\"}")
 
 # Support section
