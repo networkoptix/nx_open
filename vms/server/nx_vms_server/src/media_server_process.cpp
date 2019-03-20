@@ -2317,6 +2317,7 @@ void MediaServerProcess::registerRestHandlers(
      * To modify a settings, it is needed to specify the setting name as a query parameter. Thus,
      * this method doesn't have fixed parameter names. To obtain the full list of possible names,
      * call this method without parameters.
+     * Example: /api/systemSettings?smtpTimeout=30&amp;smtpUser=test
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
