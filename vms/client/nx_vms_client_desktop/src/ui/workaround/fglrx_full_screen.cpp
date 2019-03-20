@@ -21,7 +21,7 @@ QnFglrxFullScreen::QnFglrxFullScreen(QObject *parent):
     updateFglrxMode(nullptr, true);
 }
 
-void QnFglrxFullScreen::updateFglrxMode(QWidget* viewport, bool force) {
+void QnFglrxFullScreen::updateFglrxMode(QOpenGLWidget* viewport, bool force) {
     bool fglrxMode = false;
 
     if(QOpenGLWidget* glWidget = dynamic_cast<QOpenGLWidget*>(viewport))
@@ -38,11 +38,23 @@ void QnFglrxFullScreen::updateFglrxMode(QWidget* viewport, bool force) {
 
 bool QnFglrxFullScreen::registeredNotify(QWidget* viewport)
 {
-    //updateFglrxMode(viewport);
+    viewport->installEventFilter(this);
     return true;
 }
 
 void QnFglrxFullScreen::unregisteredNotify(QWidget* viewport)
 {
-    //updateFglrxMode(viewport);
+    viewport->removeEventFilter(this);
+}
+
+bool QnFglrxFullScreen::eventFilter(QObject* watched, QEvent* event)
+{
+    const bool result = base_type::eventFilter(watched, event);
+    const auto viewport = qobject_cast<QOpenGLWidget*>(watched);
+    if (!viewport || event->type() != QEvent::UpdateRequest)
+        return result;
+
+    viewport->removeEventFilter(this);
+    updateFglrxMode(viewport);
+    return result;
 }
