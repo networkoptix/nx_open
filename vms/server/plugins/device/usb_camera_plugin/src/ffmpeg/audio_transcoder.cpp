@@ -127,10 +127,6 @@ int AudioTranscoder::initialize(AVStream * stream)
     if (status < 0)
         return status;
 
-    status = m_adtsInjector.initialize(m_encoder.get());
-    if (status < 0)
-        return status;
-
     m_decodedFrame = std::make_unique<ffmpeg::Frame>();
     return status;
 }
@@ -147,8 +143,6 @@ void AudioTranscoder::uninitialize()
     if (m_encoder)
         m_encoder->flush();
     m_encoder.reset(nullptr);
-
-    m_adtsInjector.uninitialize();
 }
 
 int AudioTranscoder::sendPacket(const ffmpeg::Packet& packet)
@@ -191,15 +185,6 @@ int AudioTranscoder::receivePacket(std::shared_ptr<ffmpeg::Packet>& result)
     if (status < 0)
         return status;
 
-    // Get duration before injecting into the packet because injection erases other fields.
-    int64_t duration = result->packet()->duration;
-
-    // Inject ADTS header into each packet becuase AAC encoder does not do it.
-    status = m_adtsInjector.inject(result.get());
-    if (status < 0)
-        return status;
-
-    result->packet()->duration = duration;
     return status;
 }
 

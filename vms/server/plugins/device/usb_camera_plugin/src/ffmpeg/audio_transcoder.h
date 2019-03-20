@@ -6,7 +6,6 @@
 #include "packet.h"
 #include "codec.h"
 #include "frame.h"
-#include "camera/adts_injector.h"
 
 struct SwrContext;
 struct AVStream;
@@ -38,7 +37,6 @@ private:
     std::unique_ptr<ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
     std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
-    AdtsInjector m_adtsInjector;
 
     struct SwrContext * m_resampleContext = nullptr;
 };
