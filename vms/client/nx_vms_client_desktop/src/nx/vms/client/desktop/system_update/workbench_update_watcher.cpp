@@ -85,7 +85,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
         this, &WorkbenchUpdateWatcher::atUpdateCurrentState);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
-            [this](const QnUserResourcePtr &user)
+        [this](const QnUserResourcePtr &user)
         {
             m_userLoggedIn = user != nullptr;
             syncState();
