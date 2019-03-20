@@ -537,14 +537,6 @@ void QnWorkbenchDisplay::initSceneView()
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
-        class GG: public QOpenGLWidget
-        {
-            virtual void paintGL()
-            {
-                context()->functions()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            }
-        };
-
         const auto viewport = new QOpenGLWidget(m_view);
         if (const auto window = viewport->windowHandle())
         {

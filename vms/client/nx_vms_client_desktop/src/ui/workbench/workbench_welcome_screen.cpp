@@ -61,7 +61,6 @@ QnResourceList extractResources(const QList<QUrl>& urls)
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
 }
 
-
 } // namespace
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):

@@ -21,7 +21,6 @@ void QnGraphicsView::paintEvent(QPaintEvent* event)
     auto context = QOpenGLContext::currentContext();
     if (!context)
     {
-        qWarning() << viewport();
         if (const auto glWidget = qobject_cast<QOpenGLWidget*>(viewport()))
             glWidget->makeCurrent();
 

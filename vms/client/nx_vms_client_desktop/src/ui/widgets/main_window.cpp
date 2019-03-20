@@ -703,15 +703,6 @@ void MainWindow::updateContentsMargins()
 // -------------------------------------------------------------------------- //
 bool MainWindow::event(QEvent* event)
 {
-    {
-        // TODO: THIS IS TEMPORARY CODE. LOOKS LIKE SOMEHOW REPAINTING OCCURES TWICE
-        // invastigate and fix this.
-        if (event->type() == QEvent::UpdateRequest || event->type() == QEvent::Paint)
-            {
-                return false;
-            }
-    }
-
     const bool result = base_type::event(event);
     if (event->type() == QnEvent::WinSystemMenu)
         action(action::MainMenuAction)->trigger();
