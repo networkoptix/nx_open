@@ -47,6 +47,8 @@ then
 
     if [ "$RET" = "$REMOVE" ]
     then
-        rm -f /opt/$COMPANY_NAME/mediaserver/var/*.sqlite*
+        find "/opt/$COMPANY_NAME/mediaserver/var" -name "*.sqlite*" \
+            -a ! -name "ecs_static.sqlite*" \
+            |xargs rm -f
     fi
 fi
