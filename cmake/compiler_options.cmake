@@ -33,6 +33,8 @@ add_definitions(
     -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
+set(isEdgeServer "false")
+
 if(WINDOWS)
     add_definitions(
         -D_CRT_RAND_S
@@ -49,6 +51,7 @@ endif()
 if(box MATCHES "isd|edge1")
     set(enableAllVendors OFF)
     add_definitions(-DEDGE_SERVER)
+    set(isEdgeServer "true")
 endif()
 
 if(WINDOWS)

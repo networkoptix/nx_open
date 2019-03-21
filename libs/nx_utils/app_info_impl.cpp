@@ -101,6 +101,11 @@ QString AppInfo::armBox()
         return QString();
 }
 
+bool AppInfo::isEdgeServer()
+{
+    return ${isEdgeServer};
+}
+
 bool AppInfo::isArm()
 {
     #if defined(__arm__) || defined(__aarch64__)

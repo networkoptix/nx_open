@@ -34,6 +34,7 @@
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -336,9 +337,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
-#ifndef EDGE_SERVER
-        pingResources(rpNetRes);
-#endif
+        if (!nx::utils::AppInfo::isEdgeServer())
+            pingResources(rpNetRes);
         it = resources.erase(it); // do not need to investigate OK resources
     }
 

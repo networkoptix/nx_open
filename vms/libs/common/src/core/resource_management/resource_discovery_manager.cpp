@@ -30,6 +30,7 @@
 #include <common/common_module.h>
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <api/runtime_info_manager.h>
 
@@ -358,7 +359,8 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (camera->hasFlags(Qn::desktop_camera))
         return true;
 
-    #if defined(EDGE_SERVER)
+    if (nx::utils::AppInfo::isEdgeServer())
+    {
         if (!ownServer->isRedundancy())
         {
             // Return own camera back for edge server.
@@ -367,7 +369,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
             nx::network::getMacFromPrimaryIF(mac, &host);
             return camera->getUniqueId().toLocal8Bit() == QByteArray(mac);
         }
-    #endif
+    }
 
     if (mServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
@@ -567,7 +569,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
-                #if defined(EDGE_SERVER)
+                if (nx::utils::AppInfo::isEdgeServer())
                 {
                     char mac[nx::network::MAC_ADDR_LEN];
                     char* host = nullptr;
@@ -580,7 +582,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                         continue;
                     }
                 }
-                #endif
 
                 it = resources.erase( it );
                 continue;
@@ -781,9 +782,8 @@ void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSea
         // TODO: #akolesnikov Edge server MUST always discover edge camera despite disabledVendors
         //     setting, but MUST check disabledVendors for all other vendors (if they enabled on
         //     edge server).
-        #if !defined(EDGE_SERVER)
+        if (!nx::utils::AppInfo::isEdgeServer())
             disabledVendorsForAutoSearch = commonModule()->globalSettings()->disabledVendorsSet();
-        #endif
 
         //no lower_bound, since QSet is built on top of hash
         if( disabledVendorsForAutoSearch.contains(searcher->manufacturer()+lit("=partial")) )

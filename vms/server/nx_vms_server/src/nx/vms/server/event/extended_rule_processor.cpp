@@ -52,9 +52,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <utils/common/delayed.h>
 
-#if !defined(EDGE_SERVER)
 #include <providers/speech_synthesis_data_provider.h>
-#endif
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
@@ -76,6 +74,7 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <api/helpers/camera_id_helper.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 

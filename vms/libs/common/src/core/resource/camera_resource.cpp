@@ -25,6 +25,7 @@
 #include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -327,11 +328,7 @@ static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const Cam
 
 static bool transcodingAvailable()
 {
-    #if !defined(EDGE_SERVER) && !defined(__arm__)
-        return true;
-    #else
-        return false;
-    #endif
+    return !nx::utils::AppInfo::isArm() && !nx::utils::AppInfo::isEdgeServer();
 }
 
 bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )

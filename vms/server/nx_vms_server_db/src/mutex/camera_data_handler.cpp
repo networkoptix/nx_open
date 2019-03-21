@@ -2,6 +2,8 @@
 
 #include <nx/network/nettools.h> //< For MAC_ADDR_LEN and getMacFromPrimaryIF.
 
+#include <nx/utils/app_info.h>
+
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -22,7 +24,7 @@ QnMutexCameraDataHandler::QnMutexCameraDataHandler(QnCommonModule* commonModule)
 
 QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 {
-    #if defined(EDGE_SERVER)
+    if (nx::utils::AppInfo::isEdgeServer())
     {
         char mac[nx::network::MAC_ADDR_LEN];
         char* host = nullptr;
@@ -48,7 +50,6 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
             }
         }
     }
-    #endif
 
     const auto& resPool = commonModule()->resourcePool();
 

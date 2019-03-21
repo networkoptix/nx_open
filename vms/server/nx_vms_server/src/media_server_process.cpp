@@ -333,12 +333,6 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
 
 std::unique_ptr<QnStaticCommonModule> MediaServerProcess::m_staticCommonModule;
 
-#ifdef EDGE_SERVER
-static const int DEFAULT_MAX_CAMERAS = 1;
-#else
-static const int DEFAULT_MAX_CAMERAS = 128;
-#endif
-
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -2952,9 +2946,8 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-    #if defined(EDGE_SERVER)
+    if (nx::utils::AppInfo::isEdgeServer())
         serverFlags |= nx::vms::api::SF_Edge;
-    #endif
 
     if (QnAppInfo::isBpi())
     {
@@ -3436,7 +3429,7 @@ bool MediaServerProcess::setUpMediaServerResource(
             server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
             server->setId(serverGuid);
-            server->setMaxCameras(DEFAULT_MAX_CAMERAS);
+            server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
@@ -4489,12 +4482,13 @@ void MediaServerProcess::run()
 
     updateRootPassword();
 
-    #if !defined(EDGE_SERVER)
+    if (!nx::utils::AppInfo::isEdgeServer())
+    {
         // TODO: #sivanov Rewrite this consistently with other settings.
         updateDisabledVendorsIfNeeded();
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
-    #endif
+    }
     if (m_setupModuleCallback)
         m_setupModuleCallback(serverModule.get());
 

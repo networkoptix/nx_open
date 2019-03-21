@@ -16,6 +16,7 @@
 #include <utils/common/util.h>
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
+#include <nx/utils/app_info.h>
 
 QString QnFileConnectionProcessor::externalPackagePath()
 {
@@ -148,7 +149,7 @@ bool QnFileConnectionProcessor::loadFile(
 QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& contentType)
 {
     Q_D(QnFileConnectionProcessor);
-    #if !defined(EDGE_SERVER)
+    if (!nx::utils::AppInfo::isEdgeServer())
     {
         const QString header =
             nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding");
@@ -162,8 +163,6 @@ QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& cont
             }
         }
     }
-    #endif
-
     return QByteArray();
 }
 

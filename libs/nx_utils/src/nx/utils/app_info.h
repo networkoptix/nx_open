@@ -24,6 +24,7 @@ public:
     static QString linuxOrganizationName();
     static QString organizationNameForSettings();
 
+    static bool isEdgeServer();
     static bool isArm();
     static bool isWin64();
     static bool isWin32();

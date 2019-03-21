@@ -76,7 +76,8 @@ void QnMediaServerResourceSearchers::initialize()
         registerSearcher(new QnWearableCameraResourceSearcher(serverModule()));
     #endif
 
-    #if !defined(EDGE_SERVER)
+    if (!nx::utils::AppInfo::isEdgeServer())
+    {
         #if defined(ENABLE_ARECONT)
             registerSearcher(new QnPlArecontResourceSearcher(serverModule()));
         #endif
@@ -125,7 +126,7 @@ void QnMediaServerResourceSearchers::initialize()
             registerSearcher(new QnFlexWatchResourceSearcher(serverModule()));
             registerSearcher(new OnvifResourceSearcher(serverModule()));
         #endif
-    #endif
+    }
 }
 
 QnMediaServerResourceSearchers::~QnMediaServerResourceSearchers()
