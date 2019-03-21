@@ -1,4 +1,5 @@
 import os
+import sys
 
 import argparse
 import yaml
@@ -6,14 +7,12 @@ import yaml
 import environment
 from light_interface import light
 from candle_interface import candle
-from signtool_interface import sign_software, sign_hardware
 from insignia_interface import extract_engine, reattach_engine
 
 engine_tmp_folder = 'obj'
 
 # TODO: #GDM Remove filtered variables
 
-sign_binaries_option = '${windows.skip.sign}' != 'true'
 build_paxton_option = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
 installer_target_dir = '${installer.target.dir}'
@@ -87,20 +86,16 @@ paxton_exe_components = ['PaxtonPackage', 'Product-paxton-exe']
 
 
 def sign(output_file, code_signing):
-    signtool_directory = code_signing['signtool_directory']
-    timestamp_server = code_signing['timestamp_server']
-    if code_signing['hardware']:
-        sign_hardware(
-            signtool_directory=signtool_directory,
-            target_file=output_file,
-            timestamp_server=timestamp_server)
-    else:
-        sign_software(
-            signtool_directory=signtool_directory,
-            target_file=output_file,
-            sign_password=code_signing['sign_password'],
-            certificate=code_signing['certificate'],
-            timestamp_server=timestamp_server)
+    url = code_signing['url']
+    customization = code_signing['customization']
+    trusted_timestamping = code_signing['trusted_timestamping']
+    script = code_signing['script']
+
+    script_path, script_name = os.path.split(script)
+    sys.path.insert(0, script_path)
+    from sign_binary import sign_binary
+    sys.path.pop(0)
+    sign_binary(url, output_file, output_file, customization, trusted_timestamping)
 
 
 def candle_and_light(project, filename, components, candle_variables):

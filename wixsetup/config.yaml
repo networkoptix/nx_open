@@ -27,12 +27,10 @@ launcher_version_file: '${launcher.version.file}'
 # Signing section
 code_signing: {
   enabled: ${codeSigning},
-  hardware: ${hardwareSigning},
-  signtool_directory: '${signtool_directory}/bin',
-  certificate: '${certificates_path}/wixsetup/${sign.cer}',
-  sign_password: '${sign.password}',
-  sign_description: '${company.name} ${display.product.name}',
-  timestamp_server: '${signing_timestamp_server}'
+  url: '${signingServer}',
+  customization: '${customization}',
+  trusted_timestamping: ${trustedTimestamping},
+  script: '${CMAKE_SOURCE_DIR}/build_utils/sign_binary.py'
 }
 
 # Distrib names

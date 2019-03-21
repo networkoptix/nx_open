@@ -2,12 +2,12 @@
 
 import argparse
 import os
+import sys
 import yaml
 
 from heat_interface import harvest_dir
 from light_interface import light
 from candle_interface import candle
-from signtool_interface import sign_software, sign_hardware
 from insignia_interface import extract_engine, reattach_engine
 
 engine_tmp_folder = 'obj'
@@ -38,15 +38,6 @@ installer_language_pattern = 'theme_{}.wxl'
 
 class Config():
 
-    class CodeSigning():
-        def __init__(self, config):
-            self.enabled = config['enabled']
-            self.hardware = config['hardware']
-            self.signtool_directory = config['signtool_directory']
-            self.timestamp_server = config['timestamp_server']
-            self.password = config['sign_password']
-            self.certificate = config['certificate']
-
     def __init__(self, args):
         with open(args.config, 'r') as f:
             config = yaml.load(f)
@@ -60,7 +51,7 @@ class Config():
         self.sources_directory = args.sources_dir
         self.arch = config['arch']
         self.tmp_folder = os.path.join(self.sources_directory, engine_tmp_folder)
-        self.code_signing = Config.CodeSigning(config['code_signing'])
+        self.code_signing = config['code_signing']
 
 
 def candle_and_light(
@@ -90,19 +81,16 @@ def candle_and_light(
 
 
 def sign(code_signing, target_file):
-    if code_signing.enabled:
-        if code_signing.hardware:
-            sign_hardware(
-                signtool_directory=code_signing.signtool_directory,
-                target_file=target_file,
-                timestamp_server=code_signing.timestamp_server)
-        else:
-            sign_software(
-                signtool_directory=code_signing.signtool_directory,
-                target_file=target_file,
-                sign_password=code_signing.password,
-                certificate=code_signing.certificate,
-                timestamp_server=code_signing.timestamp_server)
+    url = code_signing['url']
+    customization = code_signing['customization']
+    trusted_timestamping = code_signing['trusted_timestamping']
+    script = code_signing['script']
+
+    script_path, script_name = os.path.split(script)
+    sys.path.insert(0, script_path)
+    from sign_binary import sign_binary
+    sys.path.pop(0)
+    sign_binary(url, target_file, target_file, customization, trusted_timestamping)
 
 
 def build_msi(
@@ -118,7 +106,8 @@ def build_msi(
         output_file=output_file,
         components=components,
         candle_variables=candle_variables)
-    sign(config.code_signing, output_file)
+    if config.code_signing['enabled']:
+        sign(config.code_signing, output_file)
 
 
 def build_exe(
@@ -134,7 +123,7 @@ def build_exe(
         output_file=output_file,
         components=components,
         candle_variables=candle_variables)
-    if config.code_signing.enabled:
+    if config.code_signing['enabled']:
         engine_filename = project + '.engine.exe'
         engine_path = os.path.join(config.tmp_folder, engine_filename)
         # Extract engine

@@ -19,7 +19,6 @@ set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
 set(server_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/server")
 
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
-file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
 file(TO_CMAKE_PATH ${certificates_path} certificates_path)
 file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
@@ -30,9 +29,6 @@ nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 file(COPY "${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf"
-    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/signtool_interface.py"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
