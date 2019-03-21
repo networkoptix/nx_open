@@ -120,7 +120,7 @@ private:
     QStackedLayout* m_viewLayout = nullptr;
     QBoxLayout* m_globalLayout = nullptr;
 
-    bool m_welcomeScreenVisible = true;
+    bool m_welcomeScreenVisible = false;
     bool m_titleVisible = true;
 
     bool m_drawCustomFrame = false;
@@ -134,6 +134,7 @@ private:
 #endif
 
     bool m_inFullscreenTransition = false;
+    bool m_initialized = false;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(MainWindow::Options);

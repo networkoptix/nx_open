@@ -159,9 +159,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_welcomeScreen(qnRuntime->isDesktopMode() ? new QnWorkbenchWelcomeScreen(this) : nullptr),
     m_titleBar(new QnMainWindowTitleBarWidget(this, context))
 {
-    if (!m_welcomeScreen)
-        m_welcomeScreenVisible = false;
-
     QnHiDpiWorkarounds::init();
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -391,6 +388,16 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
         Q_UNUSED(vsyncWorkaround);
     }
+
+    installEventHandler(m_view->viewport(), QEvent::Show, this,
+            [this]()
+            {
+                if (m_initialized)
+                    return;
+
+                m_initialized = true;
+                setWelcomeScreenVisible(true);
+            });
 
     updateWidgetsVisibility();
 }
