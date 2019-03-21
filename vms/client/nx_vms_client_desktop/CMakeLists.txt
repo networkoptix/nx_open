@@ -44,7 +44,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
     OTHER_SOURCES
         ${QML_FILES}
     PUBLIC_LIBS
-        Qt5::Core Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
+        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebKit Qt5::WebKitWidgets
         Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
         Qt5::Svg
         nx_vms_client_core

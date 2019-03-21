@@ -3,11 +3,15 @@
 
 #include <cassert>
 
+#include <QtCore/QPointer>
 #include <QtGui/QPainter>
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QStyle>
-#include <QtOpenGL/QGLContext>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>

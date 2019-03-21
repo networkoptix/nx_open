@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-#include <QtOpenGL/QGL>
+#include <QtGui/QOpenGLContext>
 
 class QOpenGLWidget;
 class QnGlFunctionsPrivate;
@@ -31,8 +31,8 @@ public:
 
     /**
      * Constructor.
-     * 
-     * \param context                   OpenGL context that this functions instance will work with. 
+     *
+     * \param context                   OpenGL context that this functions instance will work with.
      */
     QnGlFunctions(QOpenGLWidget* glWidget);
 
@@ -70,7 +70,7 @@ public:
 
     /**
      * \param target                    Value to estimate. Only <tt>GL_MAX_TEXTURE_SIZE</tt> is currently supported.
-     * \returns                         Estimated value. It is not guaranteed to be equal to the real value obtained 
+     * \returns                         Estimated value. It is not guaranteed to be equal to the real value obtained
      *                                  via <tt>glGetIntegerv</tt> function, but it will be safe to use.
      */
     static GLint estimatedInteger(GLenum target);

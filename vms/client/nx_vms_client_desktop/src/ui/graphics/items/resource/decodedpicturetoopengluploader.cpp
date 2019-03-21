@@ -13,6 +13,9 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
+#include <QtCore/QRunnable>
+#include <QtWidgets/QApplication>
+
 #include <utils/common/util.h> /* For random. */
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
@@ -96,9 +99,7 @@ static BitrateCalculator bitrateCalculator;
 // -------------------------------------------------------------------------- //
 // DecodedPictureToOpenGLUploaderPrivate
 // -------------------------------------------------------------------------- //
-class DecodedPictureToOpenGLUploaderPrivate
-:
-    public QOpenGLFunctions
+class DecodedPictureToOpenGLUploaderPrivate: public QOpenGLFunctions
 {
     Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate)
 

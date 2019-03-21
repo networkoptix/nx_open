@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include <QtGui/QPainter>
 #include <QtWidgets/QOpenGLWidget>
 
 #include <ui/workaround/gl_native_painting.h>

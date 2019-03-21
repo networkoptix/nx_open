@@ -1,6 +1,7 @@
 #include "opengl_renderer.h"
 
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLVertexArrayObject>
 #include <QtWidgets/QOpenGLWidget>
 
 #include "ui/graphics/opengl/gl_shortcuts.h"

@@ -1,5 +1,9 @@
 #include "shadow_item.h"
 
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include <QtWidgets/QOpenGLWidget>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/graphics/opengl/gl_shortcuts.h>

@@ -1,13 +1,12 @@
-#ifndef QN_COLOR_SHADER_PROGRAM_H
-#define QN_COLOR_SHADER_PROGRAM_H
+#pragma once
 
 #include <QtCore/QSharedPointer>
-#include <QtOpenGL/QGLShaderProgram>
 #include "base_shader_program.h"
 
-class QnColorGLShaderProgram : public QnGLShaderProgram 
+class QnColorGLShaderProgram: public QnGLShaderProgram
 {
     Q_OBJECT
+
 public:
     QnColorGLShaderProgram(QObject *parent = NULL);
 
@@ -29,6 +28,3 @@ public:
 private:
     int m_color;
 };
-
-
-#endif // QN_COLOR_SHADER_PROGRAM_H

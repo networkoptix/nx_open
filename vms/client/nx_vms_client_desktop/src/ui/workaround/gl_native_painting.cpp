@@ -1,5 +1,7 @@
 #include "gl_native_painting.h"
 
+#include <QtGui/QPainter>
+#include <QtGui/QPaintEngine>
 #include <QtGui/QOpenGLFunctions>
 
 #include "opengl_renderer.h"

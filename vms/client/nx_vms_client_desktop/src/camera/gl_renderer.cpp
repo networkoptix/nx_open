@@ -1,7 +1,6 @@
 #include "gl_renderer.h"
 
 #include <QtGui/qopengl.h>
-#include <QOpenGLFramebufferObject>
 
 #include <cassert>
 

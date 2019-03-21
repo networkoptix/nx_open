@@ -1,6 +1,6 @@
 #include "desktop_resource.h"
 
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include "plugins/resource/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
@@ -9,16 +9,14 @@
 
 //static QnWinDesktopResource* instance = 0;
 
-QnWinDesktopResource::QnWinDesktopResource(QGLWidget* mainWindow):
-    QnDesktopResource()
+QnWinDesktopResource::QnWinDesktopResource(QOpenGLWidget* mainWindow):
+    m_mainWidget(mainWindow)
 {
-    m_mainWidget = mainWindow;
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
 
     const QString name = lit("Desktop");
     setName(name);
     setUrl(name);
-    m_desktopDataProvider = 0;
     setId(QnDesktopResource::getDesktopResourceUuid()); // only one desktop resource is allowed)
 }
 

@@ -4,6 +4,9 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLBuffer>
+#include <QtGui/QOpenGLVertexArrayObject>
+#include <QtGui/QOpenGLFramebufferObject>
 
 #include <utils/media/frame_info.h>
 #include <nx/streaming/media_data_packet.h> //< For QnMetaDataV1Ptr.
@@ -61,7 +64,7 @@ public:
     ~QnGLRenderer();
 
     /*!
-        Called with corresponding QGLContext is surely alive
+        Called with corresponding QOpenGLContext is surely alive
     */
     void beforeDestroy();
 

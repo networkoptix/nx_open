@@ -1,6 +1,10 @@
 #include "graphics_view.h"
 
-#include <QtOpenGL/QtOpenGL>
+#include <QtGui/QOpenGLContext>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QOpenGLWidget>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+#include <QtGui/QWheelEvent>
 
 #include <nx/utils/log/assert.h>
 

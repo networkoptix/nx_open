@@ -5,9 +5,10 @@
 
 #include <QtCore/QtAlgorithms>
 #include <QtCore/QScopedValueRollback>
+#include <QtGui/QScreen>
+#include <QtGui/QWindow>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsProxyWidget>
-#include <QtOpenGL/QGLContext>
 #include <QtWidgets/QOpenGLWidget>
 
 #include <translation/datetime_formatter.h>

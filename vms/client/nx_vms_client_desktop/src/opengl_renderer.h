@@ -8,8 +8,6 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-#include <QtOpenGL/QGLShaderProgram>
-
 class QOpenGLWidget;
 class QOpenGLVertexArrayObject;
 
