@@ -22,6 +22,7 @@ namespace plugins {
 namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
+static const QString kTooManyConnectionsMessagePattern("maximum");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
@@ -90,7 +91,11 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     const auto openResult = m_rtpReader.openStream();
     NX_DEBUG(this, lm("Open RTSP %1 for device %2").args(
         streamUrlString, m_resource->getUniqueId()));
-
+    if (!openResult &&
+        openResult.toString(resourcePool()).toLower().contains(kTooManyConnectionsMessagePattern))
+    {
+        return CameraDiagnostics::TooManyOpenedConnectionsResult();
+    }
     return openResult;
 }
 
