@@ -18,7 +18,7 @@ Log in to Autotests 2 System
     Validate Log In
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 Restart
     Register Keyword To Run On Failure    NONE
@@ -168,6 +168,16 @@ does not show Share button to viewer, advanced viewer, live viewer
     \  Register Keyword To Run On Failure    Failure Tasks
     \  Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \  Log Out
+
+Your permissions is shown for non-owners
+    [tags]    Threaded    C41881
+    ${users}         Set Variable    ${EMAIL ADVVIEWER}    ${EMAIL VIEWER}    ${EMAIL LIVEVIEWER}    ${EMAIL CUSTOM}    ${EMAIL ADMIN}
+    ${users text}    Set Variable    ${ADV VIEWER TEXT}    ${VIEWER TEXT}     ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}     ${ADMIN TEXT}
+    :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
+    \    Log in to Auto Tests 2 System    ${user}
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
+    \    Log Out
+    \    Validate Log Out
 
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    C41881    Threaded
