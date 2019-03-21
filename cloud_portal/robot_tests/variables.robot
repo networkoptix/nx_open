@@ -137,6 +137,7 @@ ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='sys
 ${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),"${SYSTEM NAME IS REQUIRED TEXT}")]
 
 ${OWNER NAME}                         //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]
+${OWNER LABEL}                        //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]/../h2[contains(text(), "${OWNER TEXT}")]
 ${OWNER EMAIL}                        //a[@ng-href="mailto:${EMAIL OWNER}"]
 ${YOUR PERMISSIONS}                   //ng-include[@src="$root.C.viewsDir + 'components/system-card.html'"]//p[contains(text(), "${YOUR PERMISSIONS TEXT}")]
 

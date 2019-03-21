@@ -120,8 +120,8 @@ correct items are shown for advanced viewer and below
     ${users text}    Set Variable    ${ADV VIEWER TEXT}    ${VIEWER TEXT}     ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
     :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
     \    Log in to Auto Tests System    ${user}
-    \    Log     ${text}
-    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER LABEL}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
+    \    Element Should Be Enabled    ${DISCONNECT FROM MY ACCOUNT}
     \    Element Should Not Be Visible    ${RENAME SYSTEM}
     \    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \    Element Should Not Be Visible    ${USERS LIST}
