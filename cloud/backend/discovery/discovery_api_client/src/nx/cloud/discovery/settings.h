@@ -14,7 +14,7 @@ struct NX_DISCOVERY_CLIENT_API Settings
 {
     /**
      * The base url that the discovery client uses to connect to the discovery service.
-     * The default value is https://discovery.nxvms.com
+     * The default value is https://discovery.vmsproxy.com
      */
     nx::utils::Url discoveryServiceUrl;
 
@@ -35,7 +35,7 @@ struct NX_DISCOVERY_CLIENT_API Settings
     /**
      * The amount of time to wait before sending a request for online nodes after receiving
      * a response from the previous request.
-     * the default value is 30 seconds.
+     * The default value is 30 seconds.
      */
     std::chrono::milliseconds onlineNodesRequestDelay;
 

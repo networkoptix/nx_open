@@ -8,7 +8,7 @@ namespace nx::cloud::discovery {
 namespace {
 
 static const QLatin1String kDiscoveryServiceUrl("discovery/discoveryServiceUrl");
-static const QLatin1String kDefaultDiscoveryServiceUrl("https://discovery.nxvms.com");
+static const QLatin1String kDefaultDiscoveryServiceUrl("https://discovery.vmsproxy.com");
 
 static const QLatin1String kRoundTripPadding("discovery/roundTripPadding");
 static const std::chrono::milliseconds kDefaultRoundTripPadding =
