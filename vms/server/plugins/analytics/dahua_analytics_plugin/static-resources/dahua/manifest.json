@@ -8,7 +8,7 @@
             "description": "Video motion %1 %2",
             "positiveState": "has been detected",
             "negativeState": "has ended",
-            "flags": "regionDependent | stateDependent",
+            "flags": "regionDependent",
             "regionDescription": "in the region#%1",
             "groupId": "nx.dahua.group.BasicEvents"
         },
@@ -29,7 +29,7 @@
             "description": "Video blind %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
-            "flags": "stateDependent",
+            "flags": "noFlags",
             "groupId": "nx.dahua.group.BasicEvents"
         },
         {
@@ -104,7 +104,7 @@
             "description": "Face %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
-            "flags": "stateDependent",
+            "flags": "noFlags",
             "groupId": "nx.dahua.group.SimpleAnalyticsEvents"
         },
         {
@@ -124,7 +124,7 @@
             "description": "Audio input abnormal %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
-            "flags": "stateDependent",
+            "flags": "noFlags",
             "groupId": "nx.dahua.group.AudioEvents"
         },
         {
@@ -182,7 +182,7 @@
             "description": "Alarm local %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
-            "flags": "stateDependent",
+            "flags": "noFlags",
             "groupId": "nx.dahua.group.AlarmEvents"
         } ,
         {
