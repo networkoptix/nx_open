@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import sys
 import time
@@ -7,14 +8,16 @@ import distutils.spawn
 import rdep_config
 
 OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cygwin")
-REPOSITORY_PATH = os.path.join(os.getenv("environment"), "packages")
-SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
+REPOSITORY_PATH = os.getenv("RDEP_PACKAGES_DIR")
+if not REPOSITORY_PATH:
+    # TODO: This block is for backward compatibility. Remove it when CI is re-configured.
+    REPOSITORY_PATH = os.getenv("environment")
+    if REPOSITORY_PATH:
+        REPOSITORY_PATH = os.path.join(REPOSITORY_PATH, "packages")
+SYNC_URL = "rsync://mono.enk.me/buildenv/rdep/packages"
 if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
-PUSH_URL = "rsync@enk.me:buildenv/rdep/packages"
-
-def print_no_rsync():
-    print >> sys.stderr, "Cannot find rsync executable. Please install it or specify in .rderc."
+PUSH_URL = "rsync@mono.enk.me:buildenv/rdep/packages"
 
 def configure(print_summary = False):
     if not os.path.isdir(REPOSITORY_PATH):
@@ -33,13 +36,11 @@ def configure(print_summary = False):
         rsync = distutils.spawn.find_executable("rsync")
         if not rsync:
             if not OS_IS_WINDOWS:
-                print_no_rsync()
+                print(
+                    "Cannot find rsync executable. Please install it or specify in .rderc",
+                    file=sys.stderr)
                 return False
 
-            rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
-            if not os.path.isfile(rsync):
-                print_no_rsync()
-                return False
             global_config.set_rsync(rsync)
 
     if not global_config.get_name():
@@ -54,11 +55,11 @@ def configure(print_summary = False):
                 global_config.set_name(username)
 
     if print_summary:
-        print "Rdep repository is ready."
-        print "  Path =", REPOSITORY_PATH
-        print "  Sync URL =", SYNC_URL
-        print "  Push URL =", PUSH_URL
-        print "  Rsync =", rsync
+        print("Rdep repository is ready.")
+        print("  Path =", REPOSITORY_PATH)
+        print("  Sync URL =", SYNC_URL)
+        print("  Push URL =", PUSH_URL)
+        print("  Rsync =", rsync)
 
     return True
 
