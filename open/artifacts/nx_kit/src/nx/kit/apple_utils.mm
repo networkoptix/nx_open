@@ -11,7 +11,9 @@ namespace apple_utils {
 std::vector<std::string> getProcessCmdLineArgs()
 {
     std::vector<std::string> argumentsVector;
-    for (argument in [[NSProcessInfo processInfo] arguments])
+    NSEnumerator* e = [[[NSProcessInfo processInfo] arguments] objectEnumerator];
+    NSString* argument;
+    while (argument = [e nextObject])
         argumentsVector.push_back([argument UTF8String]);
     return argumentsVector;
 }

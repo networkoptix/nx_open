@@ -5,6 +5,13 @@
 #include <string>
 #include <algorithm>
 
+#if defined(_WIN32)
+    #include <windows.h>
+    #include <codecvt>
+#elif defined(__APPLE__)
+    #include <nx/kit/apple_utils.h>
+#endif
+
 namespace nx {
 namespace kit {
 namespace utils {
@@ -48,7 +55,10 @@ const std::vector<std::string>& getProcessCmdLineArgs()
         int argc;
         LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
         if (!argv || argc == 0)
-            return std::vector<std::string>{""};
+        {
+            args = std::vector<std::string>{""};
+            return args;
+        }
 
         for (int i = 0; i < argc; ++i)
         {
@@ -57,7 +67,7 @@ const std::vector<std::string>& getProcessCmdLineArgs()
         }
         LocalFree(argv);
     #elif defined(__APPLE__)
-        args = apple_utils::getProcessCmdLineArgs();
+        args = nx::kit::apple_utils::getProcessCmdLineArgs();
     #else //< Assuming Linux-like OS.
         std::ifstream inputStream("/proc/self/cmdline");
         std::string arg;
