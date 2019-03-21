@@ -321,7 +321,11 @@ public:
         bool intersects(const QnTimePeriod& period) const;
     };
 
-    void scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
+    void scanMediaFiles(
+        const QString& folder,
+        const QnStorageResourcePtr &storage,
+        QMap<qint64, Chunk>& allChunks,
+        QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter);
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);

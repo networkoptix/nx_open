@@ -502,7 +502,6 @@ struct ModifyResourceAccess
                 isRemove ? "Remove" : "Modify",
                 userResource ? userResource->getId().toString() : QString(),
                 target ? target->getId().toString() : QString());
-
         return result;
     }
 

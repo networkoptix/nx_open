@@ -123,7 +123,7 @@ void MediaServerLauncher::prepareToStart()
     m_configFile.close();
 
     m_mediaServerProcess.reset();
-    m_mediaServerProcess.reset(new MediaServerProcess(argv.size() - 1, (char**) argv.data()));
+    m_mediaServerProcess.reset(new MediaServerProcess((int) argv.size() - 1, (char**) argv.data()));
     connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this,
         &MediaServerLauncher::started);
 

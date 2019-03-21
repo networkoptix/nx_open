@@ -600,13 +600,11 @@ public:
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            qDebug() << "TESTING STORAGE: " << storage->getUrl() << "is FileStorage:" << (bool) fileStorage;
             if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
                 m_owner->serverModule()->platform(),
                 storage,
                 m_settings))
             {
-                qDebug() << "TESTING STORAGE: SET IS MOUNTED" << storage->getUrl();
                 fileStorage->setMounted(true);
             }
         }
@@ -618,7 +616,6 @@ public:
 
             Qn::ResourceStatus status =
                 storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
-            qDebug() << "TESTING STORAGE" << storage->getUrl() << "STATUS" << (int) status;
             if (storage->getStatus() != status)
                 m_owner->changeStorageStatus(storage, status);
 
@@ -880,6 +877,8 @@ void QnStorageManager::scanMediaCatalog(
         new DeviceFileCatalog(serverModule(), cameraUuid, quality, m_role));
 
     newCatalog->scanMediaFiles(cameraPath, storage, newChunks, emptyFileList, filter);
+    for (const auto& chunk: newChunks)
+        newCatalog->addChunk(chunk);
     replaceChunks(filter.scanPeriod, storage, newCatalog, cameraUuid, quality);
 }
 
@@ -1289,7 +1288,9 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
             serverModule()->platform(),
             fileStorage,
             &serverModule()->settings()))
+        {
             fileStorage->setMounted(false);
+        }
 
         if (checkIfMyStorage(storage))
             addStorage(storage);

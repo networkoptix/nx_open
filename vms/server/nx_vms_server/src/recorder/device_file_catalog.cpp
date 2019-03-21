@@ -474,8 +474,12 @@ bool DeviceFileCatalog::needRebuildPause()
     return !m_pauseList.isEmpty();
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
-    QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
+void DeviceFileCatalog::scanMediaFiles(
+    const QString& folder,
+    const QnStorageResourcePtr &storage,
+    QMap<qint64, Chunk>& allChunks,
+    QVector<EmptyFileInfo>& emptyFileList,
+    const ScanFilter& filter)
 {
     NX_VERBOSE(this, "%1 Processing directory %2", __func__, nx::utils::url::hidePassword(folder));
     QnAbstractStorageResource::FileInfoList files;

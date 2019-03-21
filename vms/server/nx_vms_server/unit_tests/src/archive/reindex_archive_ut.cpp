@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <test_support/mediaserver_launcher.h>
+#include <test_support/utils.h>
 #include <health/system_health.h>
 #include <recorder/storage_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -13,8 +14,6 @@
 namespace nx::vms::server::test {
 
 namespace {
-
-static const QString kTestStorageDirName = "test_storage";
 
 struct ChunkData
 {
@@ -59,7 +58,6 @@ static ChunkDataList generateChunksForQuality(
         NX_ASSERT(QDir().mkpath(fullDirPath));
         NX_ASSERT(QFile(fullFileName).open(QIODevice::WriteOnly));
 
-        qDebug() << "Creating chunk" << fullFileName;
         result.push_back(ChunkData{startTimeMs, durationMs});
         startTimeMs += durationMs + 5;
     }
@@ -92,9 +90,7 @@ protected:
     {
         m_server.reset(new MediaServerLauncher());
 
-        m_storagePath = QDir(m_server->dataDir()).absoluteFilePath(kTestStorageDirName);
-        qDebug() << "STORAGE PATH:" << m_storagePath;
-
+        m_storagePath = QDir(m_server->dataDir()).absoluteFilePath("test_storage");
         QDir(m_storagePath).removeRecursively();
         QDir().mkpath(m_storagePath);
     }
@@ -108,14 +104,11 @@ protected:
     void whenServerStarted()
     {
         ASSERT_TRUE(m_server->start());
-
-        createStorage();
         QObject::connect(
             m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
-            this, &Reindex::onReindexFinished);
+            this, &Reindex::onReindexFinished, Qt::DirectConnection);
 
-        m_server->serverModule()->normalStorageManager()->initDone();
-        waitForStorageToAppear();
+        ut::utils::addTestStorage(m_server.get(), m_storagePath);
     }
 
     void whenServerStopped()
@@ -134,95 +127,30 @@ protected:
 
     void thenAllArchiveShouldBeFastScannedCorreclty()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(100));
+        int i;
+        (void) i;
     }
 
 private:
     std::unique_ptr<MediaServerLauncher> m_server;
     Archive m_generatedArchive;
     QString m_storagePath;
+    QMap<QString, DeviceFileCatalogPtr> m_serverCatalog[QnServer::ChunksCatalogCount];
 
     void onReindexFinished(QnSystemHealth::MessageType message)
     {
-        qDebug() << "REINDEX FINISHED" << message;
+        acquireServerCatalog(m_server->serverModule()->normalStorageManager(), "camera1");
+        acquireServerCatalog(m_server->serverModule()->normalStorageManager(), "camera2");
     }
 
-    void waitForStorageToAppear()
+    void acquireServerCatalog(QnStorageManager* storageManager, const QString& cameraName)
     {
-        while (true)
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
-            const auto allStorages = m_server->serverModule()->normalStorageManager()->getStorages();
-            qDebug() << "ALL STORAGES SIZE:" << allStorages.size();
-
-            const auto testStorageIt = std::find_if(
-                allStorages.cbegin(), allStorages.cend(),
-                [this](const auto& storage) { return storage->getUrl() == m_storagePath; });
-
-            if (testStorageIt == allStorages.cend())
-            {
-                qDebug() << "WAITING FOR STORAGE";
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                continue;
-            }
-
-            while (true)
-            {
-                const auto storage = *testStorageIt;
-                //ASSERT_TRUE(storage->isWritable() && storage->isOnline() && storage->isUsedForWriting());
-                qDebug() << "STORAGE FOUND" << "WRITABLE" << storage->isWritable() << "ONLINE:" << storage->isOnline() << "USED:" << storage->isUsedForWriting();
-
-                if (!(storage->isWritable() && storage->isOnline() && storage->isUsedForWriting()))
-                {
-                    const auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-                    ASSERT_TRUE((bool) fileStorage);
-                    fileStorage->setMounted(true);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            break;
+            m_serverCatalog[i][cameraName] = storageManager->getFileCatalog(
+                cameraName, (QnServer::ChunksCatalog) i);
         }
     }
-
-    void createStorage()
-    {
-        ASSERT_FALSE(m_storagePath.isEmpty());
-
-        QnStorageResourcePtr storage(m_server->serverModule()->storagePluginFactory()->createStorage(
-            m_server->commonModule(), "ufile"));
-        storage->setName("Test storage");
-        storage->setParentId(m_server->commonModule()->moduleGUID());
-        storage->setUrl(m_storagePath);
-        storage->setSpaceLimit(0);
-        storage->setStorageType("local");
-        storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
-
-        qDebug() << "CREATE STORAGE" << m_storagePath << "OPERATIONAL:" << storage->isUsedForWriting();
-
-        QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
-        if (resType)
-            storage->setTypeId(resType->getId());
-
-        QList<QnStorageResourcePtr> storages{storage};
-        nx::vms::api::StorageDataList apiStorages;
-        ec2::fromResourceListToApi(QList<QnStorageResourcePtr>{storage}, apiStorages);
-
-        const auto ec2Connection = m_server->serverModule()->ec2Connection();
-        ASSERT_EQ(
-            ec2::ErrorCode::ok,
-            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages));
-
-        for(const auto &storage: storages)
-        {
-            m_server->serverModule()->commonModule()->messageProcessor()->updateResource(
-                storage, ec2::NotificationSource::Local);
-        }
-    }
-
 };
 
 TEST_F(Reindex, FastArchiveScan_AllDataRetrieved)
@@ -231,7 +159,7 @@ TEST_F(Reindex, FastArchiveScan_AllDataRetrieved)
     //whenServerStopped();
     givenSomeArchiveOnHdd();
     whenServerStarted();
-    //thenAllArchiveShouldBeFastScannedCorreclty();
+    thenAllArchiveShouldBeFastScannedCorreclty();
 }
 
 } // nx::vms::server::test
