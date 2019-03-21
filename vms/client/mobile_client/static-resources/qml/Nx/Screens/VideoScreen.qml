@@ -284,7 +284,14 @@ PageBase
 
         onClicked: toggleUi()
 
-        onShowRoiHint: banner.showText(qsTr("Tap and hold to select an area"))
+        readonly property string roiHintText: qsTr("Tap and hold to select an area")
+        onHideRoiHint:
+        {
+            if (banner.text == roiHintText)
+                banner.hide()
+        }
+
+        onShowRoiHint: banner.showText(roiHintText)
 
         Connections
         {
@@ -298,7 +305,9 @@ PageBase
                 showUi()
             }
 
-            onRequestDrawing: videoNavigation.motionSearchMode = true
+            onRequestUnallowedDrawing:
+                banner.showText(qsTr("Enable motion search first to select an area"))
+
             onEmptyRoiCleared:
                 banner.showText(qsTr("Invalid custom area. Please draw a correct one."))
         }

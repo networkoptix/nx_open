@@ -69,10 +69,6 @@ if(ANDROID)
 endif()
 
 if(ANDROID)
-    nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/android
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    nx_copy(${customization_dir}/icons/android/android
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     nx_configure_file("maven/filter-resources/android/AndroidManifest.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml")
     nx_configure_file("maven/filter-resources/android/res/values/strings.xml"
@@ -97,7 +93,10 @@ if(ANDROID)
 
     add_android_apk(mobile_client_apk TARGET mobile_client
         FILE_NAME ${apk_file_name}
-        PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
+        PACKAGE_SOURCES
+            ${CMAKE_CURRENT_BINARY_DIR}/android
+            ${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/android
+            ${customization_dir}/icons/android/android
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         VERSION "${mobileClientVersion.full}"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
@@ -112,15 +111,9 @@ if(IOS)
 
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
 
-    if(developerBuild)
-        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
-            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
-        set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
-    else()
-        nx_configure_file(maven/filter-resources/mobile_client-release.entitlements
-            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
-        set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
-    endif()
+    nx_configure_file(maven/filter-resources/mobile_client-release.entitlements
+        ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
+    set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
 
     execute_process(
         COMMAND "${PROJECT_SOURCE_DIR}/build_utils/macos/get_provisioning_id.sh" "${provisioning_profile}"
