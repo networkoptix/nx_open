@@ -381,7 +381,7 @@ void TextToWaveServer::run()
 {
     initSystemThreadId();
 
-    FestivalInitializer(m_binaryPath, m_initializedPromise);
+    const FestivalInitializer festivalInitializer(m_binaryPath, m_initializedPromise);
 
     while( !needToStop() )
     {
