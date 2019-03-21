@@ -327,11 +327,10 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
     // Is there a better place for it?
     if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
     {
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        localFilesSearcher->setPathCheckList(dirs);
-        emit localFilesSearcher->startLocalDiscovery();
+        QStringList paths;
+        paths.append(qnSettings->mediaFolder());
+        paths.append(qnSettings->extraMediaFolders());
+        localFilesSearcher->setLocalResourcesDirectories(paths);
     }
 }
 

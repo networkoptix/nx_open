@@ -2,75 +2,48 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include <core/resource/client_resource_fwd.h>
+#include "local_resources_directory_model.h"
 
-class QnResourceDirectoryBrowser:
-    public QObject,
-    public QnAbstractFileResourceSearcher
+namespace nx::vms::client::desktop {
+
+class QnLocalResourceProducer: public QObject
 {
     Q_OBJECT
-
     using base_type = QObject;
+
+public:
+    QnLocalResourceProducer(QObject* parent = nullptr);
+    void createLocalResources(const QStringList& pathList);
+};
+
+class QnResourceDirectoryBrowser:
+    public QObject
+{
+    Q_OBJECT
+    using base_type = QObject;
+
 public:
     QnResourceDirectoryBrowser(QObject* parent = nullptr);
+    virtual ~QnResourceDirectoryBrowser() override;
 
-    virtual QnResourcePtr createResource(const QnUuid& resourceTypeId, const QnResourceParams& params) override;
-
-    virtual QString manufacturer() const override;
-    virtual QnResourceList findResources() override;
-
-    virtual void setPathCheckList(const QStringList& paths) override;
-
-    virtual QnResourcePtr checkFile(const QString& filename) const override;
-
-    void dropResourcesFromDirectory(const QString& path);
-
-    // Local files search only once. Use cleanup before search to re-search files again
-    void cleanup();
+    void setLocalResourcesDirectories(const QStringList& paths);
 
     static QnFileLayoutResourcePtr layoutFromFile(const QString& filename,
         QnResourcePool* resourcePool);
     static QnResourcePtr resourceFromFile(const QString& filename, QnResourcePool* resourcePool);
+    static QnResourcePtr createArchiveResource(const QString& filename,
+        QnResourcePool* resourcePool);
 
 signals:
-    void startLocalDiscovery();
-    void trackResources(const QnResourceList& resources, const QStringList& paths);
-
-protected:
-    using ResourceCache = QMap<QString, QnResourcePtr>;
-    bool m_resourceReady{false};
-
-    static QnResourcePtr createArchiveResource(const QString& filename, QnResourcePool* resourcePool);
-
-    /**
-     * Handler type for file discovery
-     * @param path - path to discovered entity. It can be file or directory
-     * @param isDir - flag that mentions whether we have a file or directory
-     * @return bool
-     */
-    typedef std::function<bool(const QString& path, bool isDir)> BrowseHandler;
-
-    /**
-     * Recursive search for resources
-     * @param directory - directory for the search
-     * @param cache - current resource cache. Files, that are already in the cache are ignored.
-     * @param handler - handler to be called for each discovered directory and file
-     * @param maxResources - limit to number of resources to discover. Set to -1 to get all the resources
-     * @return number of resources discovered
-     */
-    int findResources(const QString& directory, const ResourceCache& cache, BrowseHandler handler, int maxResources);
-
-protected:
-    void at_filesystemDirectoryChanged(const QString& path);
-    void at_trackResources(const QnResourceList& resources, const QStringList& paths);
-    void at_startLocalDiscovery();
+    void initLocalResources(const QStringList& pathList);
 
 private:
-    BrowseHandler makeDiscoveryHandler(QnResourceList& output, QStringList& paths);
+    void dropResourcesFromDirectory(const QString& path);
 
 private:
-    QFileSystemWatcher m_fsWatcher;
-
-    // Local resource cache for fast mapping between file path and resource pointers
-    ResourceCache m_resourceCache;
-    mutable QnMutex m_cacheMutex;
+    QnLocalResourcesDirectoryModel* m_localResourceDirectoryModel;
+    QThread* m_resourceProducerThread;
+    QnLocalResourceProducer* m_resourceProducer;
 };
+
+} // namespace nx::vms::client::desktop

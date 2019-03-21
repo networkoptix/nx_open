@@ -105,7 +105,7 @@ private:
 };
 
 // =====================================================================
-class QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
+class QnAbstractNetworkResourceSearcher: public QnAbstractResourceSearcher
 {
 protected:
     QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
@@ -114,26 +114,4 @@ public:
     // checks this QHostAddress and creates a QnResource in case of success
     // this function is designed for manual resource addition
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
-};
-
-// =====================================================================
-
-// TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher
-{
-protected:
-    explicit QnAbstractFileResourceSearcher(QnCommonModule* commonModule);
-
-public:
-    QStringList getPathCheckList() const;
-    virtual void setPathCheckList(const QStringList& paths);
-    virtual void clearPathCheckList();
-
-    // creates an instance of proper resource from file
-    virtual QnResourcePtr checkFile(const QString &filename) const = 0;
-    QnResourceList checkFiles(const QStringList &files) const;
-
-protected:
-    mutable QnMutex m_mutex;
-    QStringList m_pathListToCheck;
 };
