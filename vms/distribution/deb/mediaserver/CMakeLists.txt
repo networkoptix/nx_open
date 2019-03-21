@@ -8,49 +8,6 @@ if(withRootTool)
     list(APPEND depends root_tool)
 endif()
 
-# Variables used for configuring files.
-set(common_depends
-    "zlib1g (>= 1:1.1.4)"
-    "debconf (>= 0.5) | debconf-2.0"
-    "python"
-    "psmisc"
-    "systemd | upstart (>= 0.6.5-8)"
-    "libsm6"
-    "libice6"
-    "libaudio2"
-    "libogg0"
-    "libxfixes3"
-    "libxrender1"
-    "libfontconfig1"
-    "libgl1-mesa-glx"
-    "cifs-utils"
-    "net-tools"
-    "libcap2-bin"
-    "libldap-2.4-2"
-)
-string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
-
-if(NOT "${targetDevice}" STREQUAL "linux-arm64")
-    set(arch.depends ", syslinux")
-endif()
-
-if(cloudGroup STREQUAL "prod")
-    set(cloud_group_suffix)
-else()
-    set(cloud_group_suffix "-${cloudGroup}")
-endif()
-
-set(conflicting_packages
-    "${deb.customization.company.name}-mediaserver-1.2 (<< VERSION)")
-string(APPEND conflicting_packages
-    ",\n ${deb.customization.company.name}-entcontroller (<< VERSION)")
-foreach(suffix "" "-test" "-demo" "-dev")
-    if(NOT "${suffix}" STREQUAL "${cloud_group_suffix}")
-        string(APPEND conflicting_packages
-            ",\n ${deb.customization.company.name}-mediaserver${suffix}")
-    endif()
-endforeach()
-
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/deb_files.in
     ${CMAKE_CURRENT_BINARY_DIR}
