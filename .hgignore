@@ -24,6 +24,7 @@ subinclude:cloud_portal/.hgignore
 subinclude:webadmin/.hgignore
 subinclude:cloud/backend/cloud_tests/monitoring/.hgignore
 subinclude:cloud/backend/cloud_tests/health_site/.hgignore
+subinclude:cloud/deploy/monitoring_simple/.hgignore
 
 # Build folders in the repository root.
 re:^build/
