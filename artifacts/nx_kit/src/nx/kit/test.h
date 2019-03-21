@@ -82,9 +82,9 @@ NX_KIT_API const char* staticTempDir();
  * Usage: call from main():
  * <pre><code>
  *
- *     int main(int argc, const char* const argv[])
+ *     int main()
  *     {
- *         return nx::kit::test::runAllTests("myTests", argc, argv);
+ *         return nx::kit::test::runAllTests("myTests");
  *     }
  *
  * </code></pre>
