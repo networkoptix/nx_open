@@ -8,7 +8,7 @@ set(product.name.short "piko")
 set(product.appName "piko")
 set(company.name "Cook Security Group")
 set(uri.protocol "piko-vms")
-set(cloudName "piko Cloud")
+set(cloudName "Piko Cloud")
 
 # Default settings
 set(backgroundImage
