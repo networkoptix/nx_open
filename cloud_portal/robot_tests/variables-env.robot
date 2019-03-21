@@ -44,6 +44,7 @@ ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filt
 ${SYSTEM NAME AUTO TESTS HEADER}      //header//li/a/span[text()="Auto Tests"]
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered track by system.id"]
 ${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
+${VIEWER IN SYSTEM}                   //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL VIEWER}')]
 
 ${DIFFERENT OWNER TITLE}              //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='different owner']
 

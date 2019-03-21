@@ -24,6 +24,7 @@ Check Systems Text
 Reset DB and Open New Browser On Failure
     Close Browser
     Reset user owner first/last name
+    Make sure viewer is in the system
     Open Browser and go to URL    ${url}
 
 Restart
