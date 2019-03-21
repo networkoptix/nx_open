@@ -243,7 +243,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     // This button is hidden for now. We will implement it in future.
     ui->downloadAndInstall->hide();
 
-    connect(ui->releaseNotesLabel, &QLabel::linkActivated, this,
+    connect(ui->releaseNotesUrl, &QLabel::linkActivated, this,
         [this]()
         {
             if (m_haveValidUpdate && !m_updateInfo.info.releaseNotesUrl.isEmpty())
@@ -349,7 +349,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->longUpdateWarning->setVisible(false);
     ui->browseUpdate->setVisible(false);
 
-    ui->releaseNotesLabel->setText(QString("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->releaseNotesUrl->setText(QString("<a href='notes'>%1</a>").arg(tr("Release notes")));
 
     setWarningFrame(ui->releaseDescriptionLabel);
     ui->releaseDescriptionLabel->setOpenExternalLinks(true);
@@ -1400,7 +1400,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
         return;
 
     // No peers are doing anything. So we consider current state transition is complete
-    NX_INFO(this) << "processRemoteDownloading() - download is complete";
+    NX_INFO(this) << "processRemoteDownloading() - download has stopped";
 
     if (peersComplete.size() >= peersIssued.size())
     {
@@ -1826,13 +1826,28 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
         }
 
-        if (!m_haveValidUpdate)
-            ui->releaseDescriptionLabel->setText(QString());
-
         bool browseUpdateVisible = false;
-        if (/*!m_haveValidUpdate && */m_widgetState != WidgetUpdateState::readyInstall)
+        if (/*!m_haveValidUpdate && */m_widgetState == WidgetUpdateState::ready)
         {
-            if (m_updateSourceMode == UpdateSourceType::internetSpecific)
+            if (m_haveValidUpdate)
+            {
+                if (m_updateSourceMode == UpdateSourceType::file)
+                {
+                    browseUpdateVisible = true;
+                    ui->browseUpdate->setText(tr("Browse for Another File..."));
+                }
+                else if (m_updateSourceMode == UpdateSourceType::internetSpecific && hasLatestVersion)
+                {
+                    browseUpdateVisible = true;
+                    ui->browseUpdate->setText(tr("Select Another Build"));
+                }
+            }
+            else if (m_updateSourceMode == UpdateSourceType::internet)
+            {
+                browseUpdateVisible = true;
+                ui->browseUpdate->setText(tr("Update to Specific Build"));
+            }
+            else if (m_updateSourceMode == UpdateSourceType::internetSpecific)
             {
                 browseUpdateVisible = true;
                 ui->browseUpdate->setText(tr("Select Another Build"));
@@ -1841,11 +1856,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
             {
                 browseUpdateVisible = true;
                 ui->browseUpdate->setText(tr("Browse for Another File..."));
-            }
-            else if (hasLatestVersion)
-            {
-                browseUpdateVisible = true;
-                ui->browseUpdate->setText(tr("Update to Specific Build"));
             }
         }
         ui->browseUpdate->setVisible(browseUpdateVisible);
@@ -2050,10 +2060,10 @@ void MultiServerUpdatesWidget::syncVersionInfoVisibility()
     ui->errorLabel->setVisible(hasError);
 
     const bool hasReleaseDescription = !ui->releaseDescriptionLabel->text().isEmpty();
-    ui->releaseDescriptionHolder->setVisible(hasReleaseDescription && !hasError);
+    ui->releaseDescriptionHolder->setVisible(hasReleaseDescription  && !hasError);
 
     const bool hasReleaseNotes = !m_updateInfo.info.releaseNotesUrl.isEmpty();
-    ui->releaseNotesLabel->setVisible(hasReleaseNotes && !hasError);
+    ui->releaseNotesUrl->setVisible(hasReleaseNotes && !hasError);
 }
 
 void MultiServerUpdatesWidget::syncDebugInfoToUi()
