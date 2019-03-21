@@ -38,9 +38,6 @@ then
     then
         systemctl disable $COMPANY_NAME-mediaserver
         systemctl disable $COMPANY_NAME-root-tool
-    else
-        service $COMPANY_NAME-mediaserver stop || true
-        service $COMPANY_NAME-root-tool stop || true
     fi
 
     $CFG_HELPER sysIdTime -d
@@ -52,3 +49,6 @@ then
             |xargs rm -f
     fi
 fi
+
+service $COMPANY_NAME-mediaserver stop || true
+service $COMPANY_NAME-root-tool stop || true
