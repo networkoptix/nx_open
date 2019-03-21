@@ -35,13 +35,12 @@ static ChunkDataList generateChunksForQuality(
     const QString& baseDir,
     const QString& cameraName,
     const QString& quality,
-    std::chrono::time_point<std::chrono::system_clock> startPoint,
+    qint64 startTimeMs,
     int count)
 {
     using namespace std::chrono;
 
     const int durationMs = 70000;
-    qint64 startTimeMs = duration_cast<milliseconds>(startPoint.time_since_epoch()).count();
     ChunkDataList result;
 
     for (int i = 0; i < count; ++i)
@@ -68,15 +67,15 @@ static ChunkDataList generateChunksForQuality(
 static Catalog generateCameraArchive(
     const QString& baseDir,
     const QString& cameraName,
-    std::chrono::time_point<std::chrono::system_clock> startPoint,
+    qint64 startTimeMs,
     int count)
 {
     Catalog result;
     result.lowQualityChunks = generateChunksForQuality(
-        baseDir, cameraName, "low_quality", startPoint, count);
+        baseDir, cameraName, "low_quality", startTimeMs, count);
 
     result.highQualityChunks = generateChunksForQuality(
-        baseDir, cameraName, "hi_quality", startPoint, count);
+        baseDir, cameraName, "hi_quality", startTimeMs, count);
 
     return result;
 }
@@ -119,11 +118,39 @@ protected:
 
     void givenSomeArchiveOnHdd()
     {
-        m_generatedArchive["camera1"] = generateCameraArchive(
-            m_storagePath, "camera1", std::chrono::system_clock::now() - std::chrono::hours(24), 10);
+        addArchiveDataForCamera("camera1", 10);
+        addArchiveDataForCamera("camera2", 5);
+    }
 
-        m_generatedArchive["camera2"] = generateCameraArchive(
-            m_storagePath, "camera2", std::chrono::system_clock::now() - std::chrono::hours(23), 5);
+    void addArchiveDataForCamera(const QString& cameraName, int count)
+    {
+        qint64 startTimeMs = 0;
+        for (const auto& catalog: m_generatedArchive)
+        {
+            if (!catalog.lowQualityChunks.empty() && startTimeMs < catalog.lowQualityChunks.back().startTimeMs)
+                startTimeMs = catalog.lowQualityChunks.back().startTimeMs;
+
+            if (!catalog.highQualityChunks.empty() && startTimeMs < catalog.highQualityChunks.back().startTimeMs)
+                startTimeMs = catalog.highQualityChunks.back().startTimeMs;
+        }
+
+        using namespace std::chrono;
+        if (startTimeMs == 0)
+        {
+            startTimeMs = duration_cast<milliseconds>(
+                (system_clock::now() - hours(24)).time_since_epoch()).count();
+        }
+
+        startTimeMs += 10;
+        const auto newCatalog = generateCameraArchive(m_storagePath, cameraName, startTimeMs, count);
+
+        std::copy(
+            newCatalog.lowQualityChunks.cbegin(), newCatalog.lowQualityChunks.cend(),
+            std::back_inserter(m_generatedArchive[cameraName].lowQualityChunks));
+
+        std::copy(
+            newCatalog.highQualityChunks.cbegin(), newCatalog.highQualityChunks.cend(),
+            std::back_inserter(m_generatedArchive[cameraName].highQualityChunks));
     }
 
     void thenAllArchiveShouldBeFastScannedCorreclty()
@@ -141,6 +168,7 @@ protected:
 
     void whenSomeArchiveDataAdded()
     {
+        givenSomeArchiveOnHdd();
     }
 
 private:
