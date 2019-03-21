@@ -703,11 +703,6 @@ void MainWindow::updateContentsMargins()
 // -------------------------------------------------------------------------- //
 bool MainWindow::event(QEvent* event)
 {
-    // We have to filter out QEvent::UpdateRequest after we moved to QOpenGLWidget. Otherwise we
-    // have double swapBuffer calls that highly affect performance.
-    if (event->type() == QEvent::UpdateRequest)
-        return true;
-
     const bool result = base_type::event(event);
     if (event->type() == QnEvent::WinSystemMenu)
         action(action::MainMenuAction)->trigger();
