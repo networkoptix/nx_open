@@ -109,12 +109,8 @@ void QnMediaServerResourceSearchers::initialize()
             registerSearcher(new flir::FcResourceSearcher(serverModule()));
             registerSearcher(new QnFlirResourceSearcher(serverModule()));
             #if defined(ENABLE_ONVIF)
-            bool enableSequentialFlirOnvifSearcher = commonModule
-                ->globalSettings()
-                ->sequentialFlirOnvifSearcherEnabled();
-
-            if (enableSequentialFlirOnvifSearcher)
-                registerSearcher(new flir::OnvifResourceSearcher(serverModule()));
+                if (commonModule->globalSettings()->sequentialFlirOnvifSearcherEnabled())
+                    registerSearcher(new flir::OnvifResourceSearcher(serverModule()));
             #endif
         #endif
 
