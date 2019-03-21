@@ -30,7 +30,7 @@ TEST(utils, baseName)
 
     #if defined(_WIN32)
         ASSERT_STREQ("bar", baseName("d:bar"));
-        ASSERT_STREQ("bar", baseName("X:\bar"));
+        ASSERT_STREQ("bar", baseName("X:\\bar"));
     #endif
 }
 

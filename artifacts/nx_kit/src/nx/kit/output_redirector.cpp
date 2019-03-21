@@ -6,22 +6,12 @@
 #include <vector>
 #include <string>
 
-#if defined(_WIN32)
-    #include <windows.h>
-    #include <winbase.h>
-    #include <shellapi.h>
-    #include <atlstr.h>
-    #include <codecvt>
-    #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
-#elif defined(__APPLE__)
-    #include <nx/kit/apple_utils.h>
-#else //< Assuming Linux-like OS.
-    #include <libgen.h>
-    #include <memory.h>
-#endif
-
 #include "ini_config.h"
 #include "utils.h"
+
+#if defined(_WIN32)
+    #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
+#endif
 
 namespace nx {
 namespace kit {
