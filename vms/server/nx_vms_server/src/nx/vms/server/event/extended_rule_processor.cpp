@@ -375,10 +375,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
 {
-    #if defined(EDGE_SERVER) || defined(__aarch64__)
-        return true;
-    #endif
-
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     const auto params = action->getParams();
     const auto text = params.sayText;
     const auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(
@@ -397,6 +394,7 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
     transmitter->subscribe(
         speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
     speechProvider->startIfNotRunning();
+#endif // !defined(EDGE_SERVER) && !defined(__aarch64__)
     return true;
 }
 
