@@ -603,7 +603,7 @@ void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& 
             return (engines - server->activeAnalyticsEngineIds()).empty();
         };
 
-    NX_ASSERT_HEAVY_CONDITION(ensureEnginesAreActive());
+    //NX_ASSERT_HEAVY_CONDITION(ensureEnginesAreActive());
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 

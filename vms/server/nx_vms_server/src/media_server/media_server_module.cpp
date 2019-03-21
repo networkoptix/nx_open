@@ -261,12 +261,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
-    m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(),
-        commonModule(),
-        nullptr,
-        this));
-
     m_pluginManager = store(new PluginManager(this));
 
 
@@ -322,13 +316,43 @@ QnMediaServerModule::QnMediaServerModule(
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
+void QnMediaServerModule::initializeP2PDownloader()
+{
+    m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
+        downloadsDirectory(),
+        commonModule(),
+        nullptr,
+        this));
+}
+
 QDir QnMediaServerModule::downloadsDirectory() const
 {
     static const QString kDownloads("downloads");
     QDir dir(settings().dataDir());
-    dir.mkpath(kDownloads);
-    dir.cd(kDownloads);
-    return dir;
+    const auto downloadsPath = dir.absoluteFilePath(kDownloads);
+    if (!dir.mkdir(kDownloads))
+    {
+        auto err = strerror(errno);
+        const auto basePath = dir.absolutePath();
+
+        if (!dir.exists())
+        {
+            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
+                "Base dir=%2 does not exists as well, err=%3", downloadsPath, basePath, err);
+        }
+        else
+        {
+            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
+                "Base dir=%2, err=%3", downloadsPath, basePath, err);
+        }
+    }
+    else
+    {
+        NX_VERBOSE(this, "downloadsDirectory() - created directory %1 for downloads.",
+            downloadsPath);
+    }
+
+    return downloadsPath;
 }
 
 void QnMediaServerModule::stopStorages()
