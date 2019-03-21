@@ -119,8 +119,6 @@ TEST(GetImageHelper, updateDstSize_maxSize)
         updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
 }
 
-#if !defined(EDGE_SERVER)
-
 TEST(GetImageHelper, determineStreamIndex)
 {
     using StreamIndex = nx::vms::api::StreamIndex;
@@ -169,7 +167,5 @@ TEST(GetImageHelper, determineStreamIndex)
     request.size = {kSecondaryStreamSize.width() / 2, kSecondaryStreamSize.height() * 2};
     EXPECT_EQ(StreamIndex::primary, helper.determineStreamIndex(request));
 }
-
-#endif // !defined(EDGE_SERVER)
 
 } // namespace nx::test
