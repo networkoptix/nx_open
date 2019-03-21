@@ -439,7 +439,7 @@ namespace nxcip
     class CameraMediaEncoder3: public CameraMediaEncoder2
     {
     public:
-        //!Returns configured stream reader, providing live data stream
+        //!Returns configured stream reader, providing live data stream. Required method!
         /*!
             \a BaseCameraManager::nativeMediaStreamCapability should be present.
 
@@ -452,7 +452,7 @@ namespace nxcip
         */
         virtual int getConfiguredLiveStreamReader(LiveStreamConfig * config, StreamReader ** reader) = 0;
 
-        //!Returns video format
+        //!Returns video format. Optional method.
         /*!
             \param[out] codec
             \param[out] pixelFormat
