@@ -66,7 +66,7 @@ module.exports = {
             template: 'index-template.html',
             filename: 'index.html',
             inject: false,
-            chunks: ['commons', 'polyfills','vendor', 'app', 'webcommon', 'appnew'],
+            chunks: ['commons', 'polyfills', 'vendor', 'app', 'webcommon', 'appnew'],
             chunksSortMode: 'manual'
         }),
 
