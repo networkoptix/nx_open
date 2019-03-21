@@ -19,6 +19,7 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/delayed.h>
 #include <utils/math/color_transformations.h>
 
 #include <nx/api/mediaserver/image_request.h>
@@ -1190,7 +1191,14 @@ void EventRibbon::Private::doUpdateView()
     updateHighlightedTiles();
 
     if (!m_animations.empty())
-        qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
+    {
+        const auto callback =
+            [this]() { qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest)); };
+
+        // This workaround prevents QAnimation and client hangs.
+        static const int kWorkaroundDelayMs = 15;
+        executeDelayedParented(callback, kWorkaroundDelayMs, this);
+    }
 }
 
 void EventRibbon::Private::fadeIn(EventTile* widget)
