@@ -3,44 +3,41 @@
 #include <QtCore/QTimer>
 #include <QtCore/QEvent>
 #include <QtCore/QCoreApplication>
+#include <QtWidgets/QWidget>
 
 namespace {
-    const int kFpsLimit = 60;
-    const int kTimeBetweenUpdatesMs = 1000 / kFpsLimit;
-}
 
-QnVSyncWorkaround::QnVSyncWorkaround(QObject *watched, QObject *parent) :
+using namespace std::chrono;
+
+constexpr int kFpsLimit = 60;
+constexpr milliseconds kTimeBetweenUpdates = 1000ms / kFpsLimit;
+
+} // namespace
+
+QnVSyncWorkaround::QnVSyncWorkaround(QWidget* watched, QObject* parent):
     QObject(parent),
-    m_watched(watched),
-    m_updateEventToPass(NULL)
+    m_watched(watched)
 {
-    watched->installEventFilter(this);
+    const auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, m_watched,
+        [this]()
+        {
+            m_paintAllowed = true;
+            m_watched->update();
+        });
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &QnVSyncWorkaround::updateWatchedWidget);
-    timer->start(kTimeBetweenUpdatesMs);   // to achieve 60 fps
-
-    m_elapsedTimer.start();
+    timer->start(kTimeBetweenUpdates);
+    m_watched->installEventFilter(this);
 }
 
-bool QnVSyncWorkaround::eventFilter(QObject *object, QEvent *event) {
-    if (object != m_watched || event->type() != QEvent::UpdateRequest)
+bool QnVSyncWorkaround::eventFilter(QObject* object, QEvent* event)
+{
+    if (object != m_watched || event->type() != QEvent::Paint)
         return false;
 
-    qint64 elapsed = m_elapsedTimer.elapsed();
-    if (elapsed < kTimeBetweenUpdatesMs && event != m_updateEventToPass)
+    if (!m_paintAllowed)
         return true;
 
-    /* Avoiding double-redraw if someone will update us */
-    m_updateEventToPass = NULL;
-    m_elapsedTimer.restart();
+    m_paintAllowed = false;
     return false;
-}
-
-void QnVSyncWorkaround::updateWatchedWidget()
-{
-    QEvent forcedUpdate(QEvent::UpdateRequest);
-    m_updateEventToPass = &forcedUpdate;
-    QCoreApplication::sendEvent(m_watched, &forcedUpdate);
-    m_updateEventToPass = nullptr;
 }
