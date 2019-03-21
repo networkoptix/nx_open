@@ -10,6 +10,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QOpenGLWidget>
+#include <QtGui/private/qopengltexturecache_p.h>
 
 #include <translation/datetime_formatter.h>
 
@@ -509,6 +510,16 @@ bool QnWorkbenchDisplay::animationAllowed() const
     return !m_lightMode.testFlag(Qn::LightModeNoAnimation);
 }
 
+// ------------------------------------------------------------------------------------------------
+// TODO: FIXME: THIS IS A HACK THAT SHOULD BE REPLACED WITH A QT PATCH.
+class QnOpenGLTextureCacheHack: public QOpenGLSharedResource
+{
+public:
+    QMutex m_mutex;
+    QCache<quint64, QOpenGLCachedTexture> m_cache;
+};
+// ------------------------------------------------------------------------------------------------
+
 void QnWorkbenchDisplay::initSceneView()
 {
     NX_ASSERT(m_scene && m_view);
@@ -558,6 +569,21 @@ void QnWorkbenchDisplay::initSceneView()
 
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+
+        // ----------------------------------------------------------------------------------------
+        // TODO: FIXME: THIS IS A HACK THAT SHOULD BE REPLACED WITH A QT PATCH.
+        QSharedPointer<QMetaObject::Connection> connection(new QMetaObject::Connection);
+        const auto hackInit =
+            [this, connection, viewport]()
+            {
+                auto cache = QOpenGLTextureCache::cacheForContext(viewport->context());
+                auto cacheHack = reinterpret_cast<QnOpenGLTextureCacheHack*>(cache);
+                cacheHack->m_cache.setMaxCost(2 * 1024 * 1024);
+                QObject::disconnect(*connection);
+            };
+
+        *connection = connect(viewport, &QOpenGLWidget::aboutToCompose, this, hackInit);
+        // ----------------------------------------------------------------------------------------
 
 #ifndef Q_OS_MACX
         /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
