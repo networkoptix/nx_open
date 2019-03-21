@@ -93,7 +93,6 @@ protected:
         thenOperationSucceeded();
         andValueIsInDb();
         andValueIsInSecondDb();
-        andValueIsInSecondDb();
     }
 
     void givenKeyValuePairWithEmptyKey()
@@ -417,27 +416,32 @@ protected:
     void andValueIsInDb(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
         m_fetchedValue.clear();
-        whenFetchValue(dbIndex, keyValuePairIndex);
-        thenOperationSucceeded();
-        andFetchedValueMatchesGivenValue(keyValuePairIndex);
+        while (m_fetchedValue != keyValuePair(keyValuePairIndex)->value)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            whenFetchValue(dbIndex, keyValuePairIndex);
+        }
     }
 
     void andValueIsInSecondDb()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         andValueIsInDb(/*dbIndex*/ 1);
     }
 
-    void andValueIsNotInDb(size_t dbIndex = 0)
+    void andValueIsNotInDb(size_t dbIndex = 0, size_t keyValuePairIndex = 0)
     {
-        whenFetchValue(dbIndex);
+        // Setting m_fetchedValuee because whenFetchValue() will overwrite it
+        m_fetchedValue = keyValuePair(keyValuePairIndex)->value;
+        while (!m_fetchedValue.empty())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            whenFetchValue(dbIndex);
+        }
         thenOperationFailed(map::ResultCode::notFound);
-        andFetchedValueIsEmpty();
     }
 
     void andValueIsNotInSecondDb()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         andValueIsNotInDb(/*dbIndex*/ 1);
     }
 
@@ -729,6 +733,7 @@ TEST_F(Database, fetches_key_value_pair)
     whenFetchValue();
 
     thenOperationSucceeded();
+
     andFetchedValueMatchesGivenValue();
 }
 
@@ -736,18 +741,22 @@ TEST_F(Database, inserts_key_value_pair)
 {
     givenEmptyDb();
     givenBinaryKeyValuePair();
+
     whenInsertKeyValuePair();
 
     thenOperationSucceeded();
+
     andValueIsInDb();
 }
 
 TEST_F(Database, removes_key_value_pair)
 {
     givenDbWithBinaryKeyValuePair();
+
     whenRemoveKey();
 
     thenOperationSucceeded();
+
     andValueIsNotInDb();
 }
 
@@ -768,6 +777,7 @@ TEST_F(Database, updates_key_value_pair)
 TEST_F(Database, handles_removing_non_existent_key)
 {
     givenDbWithBinaryKeyValuePair();
+
     whenRemoveNonExistentKey();
 
     thenOperationSucceeded();
@@ -777,9 +787,11 @@ TEST_F(Database, fails_to_fetch_non_existent_value)
 {
     givenEmptyDb();
     givenBinaryKeyValuePair();
+
     whenFetchValue();
 
     thenOperationFailed(map::ResultCode::notFound);
+
     andFetchedValueIsEmpty();
 }
 
@@ -787,6 +799,7 @@ TEST_F(Database, rejects_insert_with_empty_key)
 {
     givenOneDb();
     givenKeyValuePairWithEmptyKey();
+
     whenInsertKeyValuePair();
 
     thenOperationFailed(map::ResultCode::logicError);
@@ -796,6 +809,7 @@ TEST_F(Database, rejects_fetch_with_empty_string)
 {
     givenOneDb();
     givenKeyValuePairWithEmptyKey();
+
     whenFetchValue();
 
     thenOperationFailed(map::ResultCode::logicError);
@@ -805,6 +819,7 @@ TEST_F(Database, rejects_remove_with_empty_string)
 {
     givenOneDb();
     givenKeyValuePairWithEmptyKey();
+
     whenRemoveKey();
 
     thenOperationFailed(map::ResultCode::logicError);
@@ -844,6 +859,7 @@ TEST_F(Database, does_not_trigger_record_inserted_event_after_unsubscribing)
     whenInsertKeyValuePair();
 
     thenEventIsNotTriggered();
+
     andEventReceivedKeyDoesNotMatchInsertionKey();
 }
 
@@ -855,6 +871,7 @@ TEST_F(Database, does_not_trigger_record_removed_event_after_unsubscribing)
     whenRemoveKey();
 
     thenEventIsNotTriggered();
+
     andEventReceivedKeyDoesNotMatchRemovalKey();
 }
 
@@ -945,6 +962,7 @@ TEST_F(Database, fetches_range_with_upperbound)
     whenRequestRangeWithUpperBound();
 
     thenOperationSucceeded();
+
     andFetchedRangeMatchesExpectedRange();
 }
 
@@ -955,6 +973,7 @@ TEST_F(Database, fetches_range_without_upperbound)
     whenRequestRangeWithoutUpperBound();
 
     thenOperationSucceeded();
+
     andFetchedRangeMatchesExpectedRange();
 }
 
@@ -965,6 +984,7 @@ TEST_F(Database, fetches_range_with_lowerbound)
     whenRequestRangeWithLowerBound();
 
     thenOperationSucceeded();
+
     andFetchedRangeMatchesExpectedRange();
 }
 
@@ -993,6 +1013,7 @@ TEST_F(Database, fetches_range_when_lowerbound_and_upperbound_are_equal)
     whenRequestRangeWithEqualLowerBoundAndUpperBound();
 
     thenOperationSucceeded();
+
     andFetchedRangeMatchesExpectedRange();
 }
 
@@ -1054,6 +1075,7 @@ TEST_F(Database, multiple_nodes_synchronize_insert_operation)
     whenInsertKeyValuePair();
 
     thenOperationSucceeded();
+
     andValueIsInDb();
     andValueIsInSecondDb();
 }
@@ -1065,6 +1087,7 @@ TEST_F(Database, multiple_nodes_synchronize_remove_operation)
     whenRemoveKey();
 
     thenOperationSucceeded();
+
     andValueIsNotInDb();
     andValueIsNotInSecondDb();
 }
