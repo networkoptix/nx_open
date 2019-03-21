@@ -358,16 +358,17 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (camera->hasFlags(Qn::desktop_camera))
         return true;
 
-#ifdef EDGE_SERVER
-    if (!ownServer->isRedundancy())
-    {
-        // return own camera back for edge server
-        char  mac[nx::network::MAC_ADDR_LEN];
-        char* host = 0;
-        nx::network::getMacFromPrimaryIF(mac, &host);
-        return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
-    }
-#endif
+    #if defined(EDGE_SERVER)
+        if (!ownServer->isRedundancy())
+        {
+            // Return own camera back for edge server.
+            char mac[nx::network::MAC_ADDR_LEN];
+            char* host = nullptr;
+            nx::network::getMacFromPrimaryIF(mac, &host);
+            return camera->getUniqueId().toLocal8Bit() == QByteArray(mac);
+        }
+    #endif
+
     if (mServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
 
@@ -566,17 +567,20 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
-#ifdef EDGE_SERVER
-                char  mac[nx::network::MAC_ADDR_LEN];
-                char* host = 0;
-                nx::network::getMacFromPrimaryIF(mac, &host);
-                if( existingCamRes->getUniqueId().toLocal8Bit() == QByteArray(mac) )
+                #if defined(EDGE_SERVER)
                 {
-                    //on edge server always discovering camera to be able to move it to the edge server if needed
-                    ++it;
-                    continue;
+                    char mac[nx::network::MAC_ADDR_LEN];
+                    char* host = nullptr;
+                    nx::network::getMacFromPrimaryIF(mac, &host);
+                    if (existingCamRes->getUniqueId().toLocal8Bit() == QByteArray(mac))
+                    {
+                        // On edge server, always discovering camera to be able to move it to the
+                        // edge server if needed.
+                        ++it;
+                        continue;
+                    }
                 }
-#endif
+                #endif
 
                 it = resources.erase( it );
                 continue;
@@ -774,11 +778,12 @@ void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSea
     else
     {
         QSet<QString> disabledVendorsForAutoSearch;
-        //TODO #ak edge server MUST always discover edge camera despite disabledVendors setting,
-        //but MUST check disabledVendors for all other vendors (if they enabled on edge server)
-#ifndef EDGE_SERVER
-        disabledVendorsForAutoSearch = commonModule()->globalSettings()->disabledVendorsSet();
-#endif
+        // TODO: #akolesnikov Edge server MUST always discover edge camera despite disabledVendors
+        //     setting, but MUST check disabledVendors for all other vendors (if they enabled on
+        //     edge server).
+        #if !defined(EDGE_SERVER)
+            disabledVendorsForAutoSearch = commonModule()->globalSettings()->disabledVendorsSet();
+        #endif
 
         //no lower_bound, since QSet is built on top of hash
         if( disabledVendorsForAutoSearch.contains(searcher->manufacturer()+lit("=partial")) )

@@ -279,7 +279,7 @@
 #include <core/resource/storage_plugin_factory.h>
 
 #if !defined(EDGE_SERVER)
-    #include <nx_speech_synthesizer/text_to_wav.h>
+    #include <nx/speech_synthesizer/text_to_wave_server.h>
     #include <nx/utils/file_system.h>
 #endif
 
@@ -4490,7 +4490,7 @@ void MediaServerProcess::run()
     updateRootPassword();
 
     #if !defined(EDGE_SERVER)
-        // TODO: #sivanov Make this the common way with other settings.
+        // TODO: #sivanov Rewrite this consistently with other settings.
         updateDisabledVendorsIfNeeded();
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
@@ -4700,10 +4700,9 @@ int MediaServerProcess::main(int argc, char* argv[])
         signal( SIGUSR1, SIGUSR1_handler);
     #endif
 
+    // Festival should be initialized before QnVideoService has started because of a Festival bug.
     #if !defined(EDGE_SERVER)
-        // Festival should be initialized before QnVideoService has started because of a bug in
-        // festival.
-        std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        auto textToWaveServer = std::make_unique<nx::speech_synthesizer::TextToWaveServer>(
             nx::utils::file_system::applicationDirPath(argc, argv));
         textToWaveServer->start();
         textToWaveServer->waitForStarted();

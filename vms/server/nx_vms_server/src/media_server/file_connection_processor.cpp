@@ -148,15 +148,22 @@ bool QnFileConnectionProcessor::loadFile(
 QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& contentType)
 {
     Q_D(QnFileConnectionProcessor);
-#ifndef EDGE_SERVER
-    if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
+    #if !defined(EDGE_SERVER)
     {
-        if (!contentType.contains("image")) {
-            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
-            return "gzip";
+        const QString header =
+            nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding");
+        if (header.toLower().contains("gzip") && !d->response.messageBody.isEmpty())
+        {
+            if (!contentType.contains("image"))
+            {
+                d->response.messageBody =
+                    nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
+                return "gzip";
+            }
         }
     }
-#endif
+    #endif
+
     return QByteArray();
 }
 

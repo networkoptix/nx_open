@@ -4,8 +4,6 @@
 
 #include <QtCore/QList>
 
-#include <api/app_server_connection.h>
-
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
@@ -25,7 +23,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_history.h>
-
+#include <core/resource/resource_command_processor.h>
 #include <core/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
@@ -71,7 +69,6 @@
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
 #include <common/common_module.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
-#include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
@@ -378,7 +375,10 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
 {
-#if !defined(EDGE_SERVER) && !defined(__aarch64__)
+    #if defined(EDGE_SERVER) || defined(__aarch64__)
+        return true;
+    #endif
+
     const auto params = action->getParams();
     const auto text = params.sayText;
     const auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(
@@ -394,12 +394,10 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
         return false;
 
     QnAbstractStreamDataProviderPtr speechProvider(new QnSpeechSynthesisDataProvider(text));
-    transmitter->subscribe(speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+    transmitter->subscribe(
+        speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
     speechProvider->startIfNotRunning();
     return true;
-#else
-    return true;
-#endif
 }
 
 bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr& action)

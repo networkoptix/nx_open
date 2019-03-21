@@ -325,12 +325,14 @@ static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const Cam
     return streamParamsMatched && resolutionMatched;
 }
 
-#if !defined(EDGE_SERVER) && !defined(__arm__)
-#define TRANSCODING_AVAILABLE
-static const bool transcodingAvailable = true;
-#else
-static const bool transcodingAvailable = false;
-#endif
+static bool transcodingAvailable()
+{
+    #if !defined(EDGE_SERVER) && !defined(__arm__)
+        return true;
+    #else
+        return false;
+    #endif
+}
 
 bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
@@ -352,7 +354,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
         } ) != supportedMediaStreams.streams.end();
 
     bool needUpdateStreamInfo = true;
-    if( isTranscodingAllowedByCurrentMediaStreamsParam == transcodingAvailable )
+    if (isTranscodingAllowedByCurrentMediaStreamsParam == transcodingAvailable())
     {
         //checking if stream info has been changed
         for( auto it = supportedMediaStreams.streams.begin();
@@ -535,18 +537,18 @@ void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supp
         ++it;
     }
 
-         // TODO: #GDM change to bool transcodingAvailable variable check
-#ifdef TRANSCODING_AVAILABLE
-    static const char* WEBM_TRANSPORT_NAME = "webm";
+    if (transcodingAvailable())
+    {
+        static const char* WEBM_TRANSPORT_NAME = "webm";
 
-    CameraMediaStreamInfo transcodedStream;
-    //any resolution is supported
-    transcodedStream.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
-    transcodedStream.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
-    transcodedStream.transports.push_back( QLatin1String(WEBM_TRANSPORT_NAME) );
-    transcodedStream.transcodingRequired = true;
-    fullStreamList.streams.push_back( transcodedStream );
-#endif
+        CameraMediaStreamInfo transcodedStream;
+        // Any resolution is supported.
+        transcodedStream.transports.push_back(QLatin1String(RTSP_TRANSPORT_NAME));
+        transcodedStream.transports.push_back(QLatin1String(MJPEG_TRANSPORT_NAME));
+        transcodedStream.transports.push_back(QLatin1String(WEBM_TRANSPORT_NAME));
+        transcodedStream.transcodingRequired = true;
+        fullStreamList.streams.push_back(transcodedStream);
+    }
 
     //saving fullStreamList;
     QByteArray serializedStreams = QJson::serialized( fullStreamList );

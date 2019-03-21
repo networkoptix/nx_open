@@ -79,7 +79,7 @@
 
 #include <ui/workaround/combobox_wheel_filter.h>
 
-#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/file_system.h>
 
 #include <utils/common/app_info.h>
@@ -303,7 +303,7 @@ int runApplication(int argc, char** argv)
 
     nx::utils::rlimit::setMaxFileDescriptors(8000);
 
-    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+    auto textToWaveServer = std::make_unique<nx::speech_synthesizer::TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
 
     textToWaveServer->start();

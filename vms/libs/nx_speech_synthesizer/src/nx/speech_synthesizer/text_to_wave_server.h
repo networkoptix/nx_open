@@ -12,11 +12,15 @@
 #include <utils/common/threadqueue.h>
 #include <utils/media/audioformat.h>
 
-//!Synthesizes wav based on \a text. Uses festival engine
-/*!
-    \param text Only latin1 string is supported
-    \note Has internal thread. Holds queue of text to synthetise
-*/
+namespace nx::speech_synthesizer {
+
+/**
+ * Synthesizes wav based on a text. Uses festival engine.
+ *
+ * NOTE: Has an internal thread. Holds the queue of a text to synthesize.
+ *
+ * @param text Only latin-1 string is supported.
+ */
 class TextToWaveServer:
     public QnLongRunnable,
     public Singleton<TextToWaveServer>
@@ -32,32 +36,34 @@ public:
     virtual void pleaseStop() override;
 
 public slots:
-    //!Adds task to the queue
-    /*!
-        \return ID of generation context. 0 in case of error
-    */
-    int generateSoundAsync( const QString& text, QIODevice* const dest );
-    //!Adds task to the queue and blocks till speech is generated (or failed)
-    /*!
-        \return generation result
-        \note This method is synchronous and reentrant
-    */
+    /**
+     * Adds the task to the queue.
+     * @return Id of the generation context, or 0 in case of error.
+     */
+    int generateSoundAsync(const QString& text, QIODevice* const dest);
+
+    /**
+     * Adds the task to the queue and blocks until the speech is generated (or it fails).
+     *
+     * NOTE: This method is synchronous and reentrant.
+     *
+     * @return Generation result.
+     */
     bool generateSoundSync(
         const QString& text,
         QIODevice* const dest,
         QnAudioFormat* outFormat = nullptr);
 
 signals:
-    //!Emitted in any case on text generation done (successful or not)
-    void done( int textID, bool result );
+    /** Emitted in any case on text generation done (successful or not). */
+    void done(int textId, bool result);
 
 protected:
     virtual void run() override;
 
 private:
-    class SynthetiseSpeechTask
+    struct SynthesizeSpeechTask
     {
-    public:
         int id;
         QString text;
         QIODevice* dest;
@@ -65,25 +71,26 @@ private:
         bool result;
         bool done;
 
-        SynthetiseSpeechTask()
-        :
-            id( 0 ),
+        SynthesizeSpeechTask():
+            id(0),
             dest(nullptr),
             format(QnAudioFormat()),
-            result( false ),
-            done( false )
+            result(false),
+            done(false)
         {
         }
     };
 
     QString m_binaryPath;
-    QnSafeQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
-    QAtomicInt m_prevTaskID;
+    QnSafeQueue<QSharedPointer<SynthesizeSpeechTask>> m_textQueue;
+    QAtomicInt m_prevTaskId;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
 
     nx::utils::promise<void> m_initializedPromise;
     nx::utils::future<void> m_initializedFuture;
 
-    QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
+    QSharedPointer<SynthesizeSpeechTask> addTaskToQueue(const QString& text, QIODevice* dest);
 };
+
+} // namespace nx::speech_synthesizer
