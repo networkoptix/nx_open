@@ -78,6 +78,12 @@ include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 
+# Code signing can be forcefully disabled in the customization, so declaring it before.
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
+
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
 include(properties)
@@ -111,10 +117,7 @@ include(test_utils)
 
 nx_create_dev_qt_conf()
 
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
+
 
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
