@@ -6,6 +6,7 @@
 #include "mediaserver_launcher.h"
 
 #include <core/resource/storage_plugin_factory.h>
+#include <core/resource_management//resource_pool.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <recorder/storage_manager.h>
@@ -97,7 +98,6 @@ static void waitForStorageToAppear(MediaServerLauncher* server, const QString& s
 
         if (testStorageIt == allStorages.cend())
         {
-            qDebug() << "WAITING FOR STORAGE";
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             continue;
         }
@@ -122,6 +122,14 @@ static void waitForStorageToAppear(MediaServerLauncher* server, const QString& s
 void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
 {
     NX_ASSERT(!storagePath.isEmpty());
+
+    const auto existingStorages = server->serverModule()->resourcePool()->getResources<QnStorageResource>();
+    const auto existingIt = std::find_if(
+        existingStorages.cbegin(), existingStorages.cend(),
+        [&storagePath](const auto& storage) { return storage->getUrl() == storagePath; });
+
+    if (existingIt != existingStorages.cend())
+        return;
 
     QnStorageResourcePtr storage(server->serverModule()->storagePluginFactory()->createStorage(
             server->commonModule(), "ufile"));

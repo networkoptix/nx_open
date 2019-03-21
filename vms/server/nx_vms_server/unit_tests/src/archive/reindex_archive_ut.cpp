@@ -114,6 +114,7 @@ protected:
     void whenServerStopped()
     {
         ASSERT_TRUE(m_server->stop());
+        m_reindexFinished = false;
     }
 
     void givenSomeArchiveOnHdd()
@@ -127,8 +128,19 @@ protected:
 
     void thenAllArchiveShouldBeFastScannedCorreclty()
     {
-        int i;
-        (void) i;
+        NX_MUTEX_LOCKER lock(&m_reindexMutex);
+        while (!m_reindexFinished)
+            m_reindexWaitCondition.wait(&m_reindexMutex);
+
+        for (auto it = m_generatedArchive.cbegin(); it != m_generatedArchive.cend(); ++it)
+        {
+            assertDataEquality(QnServer::LowQualityCatalog, it.key(), it.value().lowQualityChunks);
+            assertDataEquality(QnServer::HiQualityCatalog, it.key(), it.value().highQualityChunks);
+        }
+    }
+
+    void whenSomeArchiveDataAdded()
+    {
     }
 
 private:
@@ -136,11 +148,18 @@ private:
     Archive m_generatedArchive;
     QString m_storagePath;
     QMap<QString, DeviceFileCatalogPtr> m_serverCatalog[QnServer::ChunksCatalogCount];
+    QnMutex m_reindexMutex;
+    QnWaitCondition m_reindexWaitCondition;
+    bool m_reindexFinished = false;
 
     void onReindexFinished(QnSystemHealth::MessageType message)
     {
+        NX_MUTEX_LOCKER lock(&m_reindexMutex);
         acquireServerCatalog(m_server->serverModule()->normalStorageManager(), "camera1");
         acquireServerCatalog(m_server->serverModule()->normalStorageManager(), "camera2");
+
+        m_reindexFinished = true;
+        m_reindexWaitCondition.wakeOne();
     }
 
     void acquireServerCatalog(QnStorageManager* storageManager, const QString& cameraName)
@@ -151,13 +170,36 @@ private:
                 cameraName, (QnServer::ChunksCatalog) i);
         }
     }
+
+    void assertDataEquality(
+        QnServer::ChunksCatalog quality,
+        const QString& cameraName,
+        const ChunkDataList& generatedChunks)
+    {
+        const auto serverCatalogIt = m_serverCatalog[QnServer::LowQualityCatalog].find(cameraName);
+        ASSERT_NE(m_serverCatalog[quality].cend(), serverCatalogIt);
+
+        const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
+        ASSERT_EQ(generatedChunks.size(), serverChunks.size());
+        for (int i = 0; i < serverChunks.size(); ++i)
+            ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);
+
+    }
 };
 
 TEST_F(Reindex, FastArchiveScan_AllDataRetrieved)
 {
-    //whenServerStarted();
-    //whenServerStopped();
     givenSomeArchiveOnHdd();
+    whenServerStarted();
+    thenAllArchiveShouldBeFastScannedCorreclty();
+}
+
+TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
+{
+    givenSomeArchiveOnHdd();
+    whenServerStarted();
+    whenServerStopped();
+    whenSomeArchiveDataAdded();
     whenServerStarted();
     thenAllArchiveShouldBeFastScannedCorreclty();
 }
