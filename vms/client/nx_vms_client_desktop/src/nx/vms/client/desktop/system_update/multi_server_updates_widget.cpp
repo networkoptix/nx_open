@@ -288,6 +288,22 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             repeatUpdateValidation();
         });
 
+    connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
+        [this](UpdateItemPtr item)
+        {
+            if (m_widgetState != WidgetUpdateState::ready)
+                return;
+
+            if (!item->offline || !item->verificationMessage.isEmpty())
+            {
+                // TODO: Make more conservative check: only check if server goes online, or if
+                // server has errors and goes offline.
+                NX_VERBOSE(this,
+                   "peer %1 has changed online status. We should repeat validation.", item->id);
+                repeatUpdateValidation();
+            }
+        });
+
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
         {
@@ -594,21 +610,27 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                 QStringList packageErrors;
                 auto missing = contents.missingUpdate.size()
                     + contents.unsuportedSystemsReport.size();
-                if (contents.missingClientPackage)
+                auto clientId = m_stateTracker->getClientPeerId();
+
+                if (missing)
                 {
-                    if (missing)
+                    if (contents.missingUpdate.contains(clientId))
                     {
-                        packageErrors << tr("Missing update package for the client and %n servers",
-                            "", missing);
+                        if (missing > 1)
+                        {
+                            // Decrementing 'missing' value to remove client package from the counter.
+                            packageErrors << tr("Missing update package for the client and %n servers",
+                                "", missing - 1);
+                        }
+                        else
+                        {
+                            packageErrors << tr("Missing update package for the client");
+                        }
                     }
                     else
                     {
-                        packageErrors << tr("Missing update package for the client");
+                        packageErrors << tr("Missing update package for some servers");
                     }
-                }
-                else if (missing)
-                {
-                    packageErrors << tr("Missing update package for some servers");
                 }
 
                 report.versionHighlight = VersionReport::HighlightMode::bright;

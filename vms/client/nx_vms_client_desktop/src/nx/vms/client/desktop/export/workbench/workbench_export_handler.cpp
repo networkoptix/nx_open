@@ -174,6 +174,8 @@ struct WorkbenchExportHandler::Private
     };
     QHash<QnUuid, ExportContext> runningExports;
 
+    QScopedPointer<QnMessageBox> startingExportMessageBox;
+
     explicit Private(WorkbenchExportHandler* owner):
         q(owner),
         exportManager(new ExportManager())
@@ -359,6 +361,8 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     const auto exportContext = d->runningExports.take(info.id);
     context()->instance<WorkbenchProgressManager>()->remove(info.id);
 
+    d->startingExportMessageBox.reset(); //< Close "Starting Export..." messagebox if exists.
+
     if (auto dialog = exportContext.progressDialog)
     {
         dialog->hide();
@@ -530,19 +534,18 @@ void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
     if (exportProcessId.isNull())
         return;
 
-    QScopedPointer<QnMessageBox> startingExportMessageBox;
-    startingExportMessageBox.reset(new QnMessageBox(QnMessageBoxIcon::Information,
+    d->startingExportMessageBox.reset(new QnMessageBox(QnMessageBoxIcon::Information,
         tr("Starting export..."), QString(), QDialogButtonBox::NoButton,
         QDialogButtonBox::NoButton, mainWindowWidget()));
 
     // Only show this message if startExport() takes some time.
     // startExport() will call processEvents().
-    QTimer::singleShot(300, startingExportMessageBox.get(), &QDialog::show);
+    QTimer::singleShot(300, d->startingExportMessageBox.get(), &QDialog::show);
 
     d->exportManager->startExport(exportProcessId, std::move(exportTool));
 
     // If no processEvents() called, the messageBox is destroyed and no timer will be called.
-    startingExportMessageBox.reset();
+    d->startingExportMessageBox.reset();
 
     const auto info = d->exportManager->info(exportProcessId);
 
