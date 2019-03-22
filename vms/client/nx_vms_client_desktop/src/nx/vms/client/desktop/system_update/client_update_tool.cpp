@@ -129,6 +129,7 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     if (m_serverConnection)
     {
         // Requesting remote update info.
+        // NOTE: This can be a 3.2 system, so we can fail this step completely.
         m_serverConnection->getInstalledUpdateInfo(
             [this, tool=QPointer<ClientUpdateTool>(this)](
                 bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
