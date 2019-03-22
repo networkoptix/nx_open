@@ -20,6 +20,9 @@ BIN_DIR="$BASE_DIR/bin"
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
+service $COMPANY_NAME-mediaserver stop || true
+service $COMPANY_NAME-root-tool stop || true
+
 if [ "$1" = "remove" ]
 then
     REMOVE="Remove the Database"
@@ -49,6 +52,3 @@ then
             |xargs rm -f
     fi
 fi
-
-service $COMPANY_NAME-mediaserver stop || true
-service $COMPANY_NAME-root-tool stop || true
