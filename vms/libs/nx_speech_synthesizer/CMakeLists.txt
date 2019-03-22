@@ -1,11 +1,17 @@
 set(libs common)
 
-if(NOT targetDevice STREQUAL "edge1")
+if(enableSpeechSynthesizer)
     list(APPEND libs festival)
 endif()
 
 nx_add_target(nx_speech_synthesizer LIBRARY
     PUBLIC_LIBS ${libs})
+
+if(NOT enableSpeechSynthesizer)
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/speech_synthesizer/text_to_wave_server.cpp
+        PROPERTIES COMPILE_FLAGS -DDISABLE_FESTIVAL)
+endif()
 
 if(MACOSX)
     find_library(CoreServices_LIBRARY CoreServices)

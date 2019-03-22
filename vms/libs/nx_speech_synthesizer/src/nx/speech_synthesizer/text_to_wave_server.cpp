@@ -1,5 +1,7 @@
 #include "text_to_wave_server.h"
 
+#if !defined(DISABLE_FESTIVAL)
+
 #if defined(QN_USE_VLD)
     #include <vld.h>
 #endif
@@ -8,8 +10,6 @@ static char festivalVoxPath[256];
 
 #include <festival/festival.h>
 #include <EST_wave_aux.h>
-
-namespace nx::speech_synthesizer {
 
 namespace {
 
@@ -281,18 +281,12 @@ static void deinitFestival()
     festival_tidy_up();
 }
 
-static int textToWaveFestival(const EST_String& text, EST_Wave& wave)
-{
-    return festival_text_to_wave(text, wave);
-}
-
-static bool textToWaveInternal(
-    const QString& text, QIODevice* const dest, QnAudioFormat* outFormat)
+static bool textToWave(const QString& text, QIODevice* const dest, QnAudioFormat* outFormat)
 {
     // Convert to a waveform.
     EST_Wave wave;
     const EST_String srcText(text.toLatin1().constData());
-    const bool textToWaveFestivalSucceeded = textToWaveFestival(srcText, wave);
+    const bool textToWaveFestivalSucceeded = festival_text_to_wave(srcText, wave);
 
     if (outFormat)
     {
@@ -324,21 +318,66 @@ static bool textToWaveInternal(
     ) == write_ok;
 }
 
-struct FestivalInitializer
+/** Festival wrapper - only this class uses Festival directly via the functions above. */
+struct FestivalEngine
 {
-    FestivalInitializer(const QString& binaryPath, nx::utils::promise<void>& initializedPromise)
+    static bool isEnabled() { return true; }
+
+    FestivalEngine(const QString& binaryPath, nx::utils::promise<void>& initializedPromise)
     {
         initFestival(binaryPath);
         initializedPromise.set_value();
     };
 
-    ~FestivalInitializer()
+    ~FestivalEngine()
     {
         deinitFestival();
     };
+
+    /** NOTE: Not declared static to emphasize the need for the initialized instance. */
+    bool textToWave(const QString& text, QIODevice* const dest, QnAudioFormat* outFormat) const
+    {
+        return ::textToWave(text, dest, outFormat);
+    }
 };
 
 } // namespace
+
+#else // !defined(DISABLE_FESTIVAL)
+
+/** Stub. */
+struct FestivalEngine
+{
+    static bool isEnabled() { return false; }
+
+    FestivalEngine(const QString& /*binaryPath*/, nx::utils::promise<void>& /*initializedPromise*/)
+    {
+        NX_ASSERT(false);
+    };
+
+    ~FestivalEngine()
+    {
+        NX_ASSERT(false);
+    };
+
+    bool textToWave(
+        const QString& /*text*/, QIODevice* /*dest*/, QnAudioFormat* /*outFormat*/) const
+    {
+        NX_ASSERT(false);
+        return false;
+    }
+};
+
+#endif // !defined(DISABLE_FESTIVAL)
+
+//-------------------------------------------------------------------------------------------------
+
+namespace nx::speech_synthesizer {
+
+/*static*/ bool TextToWaveServer::isEnabled()
+{
+    return FestivalEngine::isEnabled();
+}
 
 TextToWaveServer::TextToWaveServer(const QString& binaryPath):
     m_binaryPath(binaryPath),
@@ -389,7 +428,7 @@ void TextToWaveServer::run()
 {
     initSystemThreadId();
 
-    FestivalInitializer festivalInitializer(m_binaryPath, m_initializedPromise);
+    FestivalEngine festivalEngine(m_binaryPath, m_initializedPromise);
 
     while (!needToStop())
     {
@@ -399,7 +438,7 @@ void TextToWaveServer::run()
         if (!task->dest)
             continue;
 
-        const bool result = textToWaveInternal(task->text, task->dest, &task->format);
+        const bool result = festivalEngine.textToWave(task->text, task->dest, &task->format);
 
         {
             QnMutexLocker lock(&m_mutex);

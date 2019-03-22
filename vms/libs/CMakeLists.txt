@@ -23,7 +23,7 @@ if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_media)
 endif()
 
-if((withMediaServer OR withDesktopClient) AND NOT targetDevice STREQUAL edge1)
+if(withMediaServer OR withDesktopClient)
     add_subdirectory(nx_speech_synthesizer)
 endif()
 

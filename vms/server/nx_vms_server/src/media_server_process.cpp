@@ -278,10 +278,8 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 
-#if !defined(EDGE_SERVER)
-    #include <nx/speech_synthesizer/text_to_wave_server.h>
-    #include <nx/utils/file_system.h>
-#endif
+#include <providers/speech_synthesis_data_provider.h>
+#include <nx/utils/file_system.h>
 
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
@@ -4695,12 +4693,8 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     // Festival should be initialized before QnVideoService has started because of a Festival bug.
-    #if !defined(EDGE_SERVER)
-        auto textToWaveServer = std::make_unique<nx::speech_synthesizer::TextToWaveServer>(
-            nx::utils::file_system::applicationDirPath(argc, argv));
-        textToWaveServer->start();
-        textToWaveServer->waitForStarted();
-    #endif
+    auto speechSynthesisDataProviderBackend = QnSpeechSynthesisDataProvider::backendInstance(
+        nx::utils::file_system::applicationDirPath(argc, argv));
 
     QnVideoService service(argc, argv);
 

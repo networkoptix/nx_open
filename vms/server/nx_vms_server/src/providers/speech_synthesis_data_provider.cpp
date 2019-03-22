@@ -1,5 +1,4 @@
 #include "speech_synthesis_data_provider.h"
-#if !defined(EDGE_SERVER)
 
 #include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <core/dataconsumer/audio_data_transmitter.h>
@@ -12,11 +11,32 @@
 
 static const size_t kDefaultDataChunkSize = 2048;
 
+/*static*/ bool QnSpeechSynthesisDataProvider::isEnabled()
+{
+    return nx::speech_synthesizer::TextToWaveServer::isEnabled();
+}
+
+/*static*/ std::shared_ptr<QnSpeechSynthesisDataProvider::OpaqueBackend>
+    QnSpeechSynthesisDataProvider::backendInstance(const QString& applicationDirPath)
+{
+    if (!isEnabled())
+        return nullptr;
+
+    // Create the only instance of TextToWaveServer singleton.
+    auto textToWaveServer =
+        std::make_shared<nx::speech_synthesizer::TextToWaveServer>(applicationDirPath);
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
+
+    return textToWaveServer;
+}
+
 QnSpeechSynthesisDataProvider::QnSpeechSynthesisDataProvider(const QString& text):
     QnAbstractStreamDataProvider(QnResourcePtr(new QnResource())),
     m_text(text),
     m_curPos(0)
 {
+    NX_ASSERT(isEnabled());
 }
 
 QnSpeechSynthesisDataProvider::~QnSpeechSynthesisDataProvider()
@@ -117,4 +137,3 @@ QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text, bool*
     const std::size_t kSynthesizerOutputHeaderSize = 52;
     return soundBuf.data().mid(kSynthesizerOutputHeaderSize);
 }
-#endif // !defined(EDGE_SERVER)

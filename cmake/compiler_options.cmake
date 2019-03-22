@@ -33,6 +33,7 @@ add_definitions(
     -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
+set(enableSpeechSynthesizer "true")
 set(isEdgeServer "false")
 
 if(WINDOWS)
@@ -50,8 +51,8 @@ endif()
 
 if(box MATCHES "isd|edge1")
     set(enableAllVendors OFF)
-    add_definitions(-DEDGE_SERVER)
     set(isEdgeServer "true")
+    set(enableSpeechSynthesizer "false")
 endif()
 
 if(WINDOWS)
