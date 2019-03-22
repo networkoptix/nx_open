@@ -15,11 +15,8 @@
 namespace nx::speech_synthesizer {
 
 /**
- * Synthesizes wav based on a text. Uses festival engine.
- *
- * NOTE: Has an internal thread. Holds the queue of a text to synthesize.
- *
- * @param text Only latin-1 string is supported.
+ * Synthesizes wav based on a text. Uses Festival engine. Has an internal thread. Holds the queue
+ * of texts to synthesize.
  */
 class TextToWaveServer:
     public QnLongRunnable,
@@ -47,6 +44,7 @@ public slots:
      *
      * NOTE: This method is synchronous and reentrant.
      *
+     * @param text Only latin-1 string is supported.
      * @return Generation result.
      */
     bool generateSoundSync(

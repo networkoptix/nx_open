@@ -49,7 +49,7 @@ QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext(
 
 QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
 {
-    if (m_curPos >= m_rawBuffer.size())
+    if ((int) m_curPos >= m_rawBuffer.size())
         return QnAbstractMediaDataPtr();
 
     QnWritableCompressedAudioDataPtr packet(
@@ -58,7 +58,7 @@ QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
             kDefaultDataChunkSize,
             m_ctx));
 
-    const auto bytesRest = m_rawBuffer.size() - m_curPos;
+    const size_t bytesRest = m_rawBuffer.size() - m_curPos;
     packet->m_data.write(
         m_rawBuffer.constData() + m_curPos,
         (bytesRest < kDefaultDataChunkSize) ? bytesRest : kDefaultDataChunkSize);

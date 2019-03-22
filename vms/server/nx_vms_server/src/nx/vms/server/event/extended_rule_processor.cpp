@@ -857,7 +857,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             if (camRes->hasVideo(nullptr))
             {
                 const qint64 eventTimeUs = action->getRuntimeParams().eventTimestampUsec;
-                const qint64 currentTimeBeforeGetUs = qnSyncTime->currentUSecsSinceEpoch();
 
                 TimespampedFrame timestempedFrame = getEventScreenshotEncoded(
                     action->getRuntimeParams().eventResourceId, eventTimeUs, SCREENSHOT_SIZE);

@@ -4691,7 +4691,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     #if defined(__linux__)
-        signal( SIGUSR1, SIGUSR1_handler);
+        signal(SIGUSR1, SIGUSR1_handler);
     #endif
 
     // Festival should be initialized before QnVideoService has started because of a Festival bug.
