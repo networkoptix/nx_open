@@ -91,7 +91,7 @@ void EulaDialog::updateSize()
     if (!window)
         return;
 
-    const auto maximumSize = window->screen()->size()
+    const auto maximumSize = window->screen()->availableSize()
         - client::core::Geometry::sizeDelta(window->frameMargins());
 
     setFixedSize(kDesiredSize.boundedTo(maximumSize));
@@ -113,7 +113,7 @@ bool EulaDialog::event(QEvent* event)
 
             updateSize();
             window->setFramePosition(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-                window->frameGeometry().size(), window->screen()->geometry()).topLeft());
+                window->frameGeometry().size(), window->screen()->availableGeometry()).topLeft());
 
             break;
         }
