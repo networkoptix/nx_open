@@ -278,10 +278,8 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 
-#if !defined(EDGE_SERVER)
-    #include <nx_speech_synthesizer/text_to_wav.h>
-    #include <nx/utils/file_system.h>
-#endif
+#include <providers/speech_synthesis_data_provider.h>
+#include <nx/utils/file_system.h>
 
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
@@ -332,12 +330,6 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
 } // namespace
 
 std::unique_ptr<QnStaticCommonModule> MediaServerProcess::m_staticCommonModule;
-
-#ifdef EDGE_SERVER
-static const int DEFAULT_MAX_CAMERAS = 1;
-#else
-static const int DEFAULT_MAX_CAMERAS = 128;
-#endif
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -2952,9 +2944,8 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-    #if defined(EDGE_SERVER)
+    if (nx::utils::AppInfo::isEdgeServer())
         serverFlags |= nx::vms::api::SF_Edge;
-    #endif
 
     if (QnAppInfo::isBpi())
     {
@@ -3436,7 +3427,7 @@ bool MediaServerProcess::setUpMediaServerResource(
             server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
             server->setId(serverGuid);
-            server->setMaxCameras(DEFAULT_MAX_CAMERAS);
+            server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
@@ -4489,12 +4480,13 @@ void MediaServerProcess::run()
 
     updateRootPassword();
 
-    #if !defined(EDGE_SERVER)
-        // TODO: #sivanov Make this the common way with other settings.
+    if (!nx::utils::AppInfo::isEdgeServer())
+    {
+        // TODO: #sivanov Rewrite this consistently with other settings.
         updateDisabledVendorsIfNeeded();
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
-    #endif
+    }
     if (m_setupModuleCallback)
         m_setupModuleCallback(serverModule.get());
 
@@ -4697,17 +4689,12 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     #if defined(__linux__)
-        signal( SIGUSR1, SIGUSR1_handler);
+        signal(SIGUSR1, SIGUSR1_handler);
     #endif
 
-    #if !defined(EDGE_SERVER)
-        // Festival should be initialized before QnVideoService has started because of a bug in
-        // festival.
-        std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
-            nx::utils::file_system::applicationDirPath(argc, argv));
-        textToWaveServer->start();
-        textToWaveServer->waitForStarted();
-    #endif
+    // Festival should be initialized before QnVideoService has started because of a Festival bug.
+    auto speechSynthesisDataProviderBackend = QnSpeechSynthesisDataProvider::backendInstance(
+        nx::utils::file_system::applicationDirPath(argc, argv));
 
     QnVideoService service(argc, argv);
 

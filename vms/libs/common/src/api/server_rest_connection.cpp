@@ -134,6 +134,25 @@ rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, co
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
+Handle ServerConnection::createGenericEvent(
+    const QString& source,
+    const QString& caption,
+    const QString& description,
+    const nx::vms::event::EventMetaData& metadata,
+    nx::vms::api::EventState toggleState,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("source", source);
+    params.insert("caption", caption);
+    params.insert("description", description);
+    if (toggleState != nx::vms::api::EventState::undefined)
+        params.insert("state", QnLexical::serialized(toggleState));
+    params.insert("metadata", QString::fromUtf8(QJson::serialized(metadata)));
+    return executeGet("/api/createEvent", params, callback, targetThread);
+}
+
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
 {
     QnMediaServerResourcePtr server =
@@ -1136,6 +1155,9 @@ void invoke(Callback<ResultType> callback,
     else
         trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
 
+    if (!callback)
+        return;
+
     if (targetThread)
     {
          auto ptr = std::make_shared<ResultType>(std::move(result));
@@ -1166,6 +1188,9 @@ void invoke(ServerConnection::Result<QByteArray>::type callback,
         trace(serverId, id, lit("Reply success for %1ms").arg(elapsed.elapsed()));
     else
         trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
+
+    if (!callback)
+        return;
 
     if (targetThread)
     {

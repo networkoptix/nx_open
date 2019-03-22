@@ -270,6 +270,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             updateButtonsVisibility();
         });
 
+    connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
+        &QnMediaResourceWidget::analyticsSupportChanged);
+
     if (d->camera)
     {
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
@@ -2766,7 +2769,8 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
-    if (!isAnalyticsSupported())
+    // We should be able to disable analytics if it is not supported anymore.
+    if (analyticsEnabled && !isAnalyticsSupported())
         return;
 
     if (auto reader = display()->archiveReader())

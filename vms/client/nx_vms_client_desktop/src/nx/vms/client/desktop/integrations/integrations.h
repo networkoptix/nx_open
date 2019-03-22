@@ -10,6 +10,8 @@ namespace nx::vms::client::desktop::integrations {
  */
 void initialize(QObject* storageParent);
 
+void connectionEstablished(ec2::AbstractECConnectionPtr connection);
+
 /**
  * Register custom menu actions, provided by the integrations.
  */

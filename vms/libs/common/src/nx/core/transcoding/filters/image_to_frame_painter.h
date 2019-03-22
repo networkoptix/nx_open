@@ -7,7 +7,13 @@
 
 #include <transcoding/filters/abstract_image_filter.h>
 
+extern "C"
+{
+#include "libavutil/pixfmt.h"
+}
+
 class QImage;
+struct SwsContext;
 
 namespace nx {
 namespace core {
@@ -25,15 +31,15 @@ public:
         const QPoint& offset,
         Qt::Alignment alignment);
 
-    void updateSourceSize(const QSize& sourceSize);
-
     CLVideoDecoderOutputPtr drawTo(const CLVideoDecoderOutputPtr& frame);
 
 private:
+    void updateTargetImage(const QSize& sourceSize, AVPixelFormat format);
     void updateTargetImage();
 
     void clearImages();
-
+    CLVideoDecoderOutputPtr drawToFfmpeg(const CLVideoDecoderOutputPtr& frame);
+    CLVideoDecoderOutputPtr drawToSse(const CLVideoDecoderOutputPtr& frame);
 private:
     using AlignedBufferPtr = std::shared_ptr<quint8>;
 
@@ -49,6 +55,10 @@ private:
 
     AlignedBufferPtr m_finalImageBytes;
     QImage m_finalImage;
+
+    SwsContext* m_toImageContext = nullptr;
+    SwsContext* m_fromImageContext = nullptr;
+    AVPixelFormat m_pixelFormat = AV_PIX_FMT_NONE;
 };
 
 } // namespace detail

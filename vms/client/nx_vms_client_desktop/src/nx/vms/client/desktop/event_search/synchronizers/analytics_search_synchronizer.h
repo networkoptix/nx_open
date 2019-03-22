@@ -20,7 +20,7 @@ public:
         AnalyticsSearchWidget* analyticsSearchWidget, QObject* parent = nullptr);
 
 private:
-    bool calculateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget) const;
+    bool calculateMediaResourceWidgetAnalyticsEnabled(QnMediaResourceWidget* widget) const;
 
     void updateAreaSelection();
     void updateTimelineDisplay();
