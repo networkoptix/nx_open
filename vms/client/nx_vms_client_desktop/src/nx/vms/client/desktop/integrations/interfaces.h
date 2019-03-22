@@ -20,11 +20,21 @@ public:
 namespace integrations {
 
 /**
+ * Integration interface, allowing to work directly with the server api.
+ */
+struct IServerApiProcessor
+{
+    virtual ~IServerApiProcessor() = default;
+
+    virtual void connectionEstablished(ec2::AbstractECConnectionPtr connection) = 0;
+};
+
+/**
  * Integration interface, allowing to add custom context menu actions.
  */
-struct IActionFactory
+struct IMenuActionFactory
 {
-    virtual ~IActionFactory() = default;
+    virtual ~IMenuActionFactory() = default;
 
     /**
      * Called during actions factory initialization.
