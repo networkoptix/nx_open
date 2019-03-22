@@ -105,7 +105,7 @@ private:
 };
 
 // =====================================================================
-class QnAbstractNetworkResourceSearcher: public QnAbstractResourceSearcher
+class QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
 {
 protected:
     QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
