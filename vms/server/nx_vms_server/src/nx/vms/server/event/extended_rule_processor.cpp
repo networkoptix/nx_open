@@ -74,6 +74,7 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <api/helpers/camera_id_helper.h>
+#include <nx/vms/rules/action_parameters_processing.h>
 #include <nx/utils/app_info.h>
 
 namespace {
@@ -421,7 +422,10 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    const nx::vms::event::ActionParameters& actionParameters=action->getParams();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        action->actionType(),
+        action->getParams(),
+        action->getRuntimeParams());
     nx::network::http::StringType requestType = actionParameters.requestType;
 
     nx::utils::Url url(action->getParams().url);
