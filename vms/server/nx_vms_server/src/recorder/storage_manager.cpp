@@ -2699,12 +2699,16 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
     int storageIndex = storageDbPool()->getStorageIndex(storage);
 
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
+    qint64 newArchiveFirstChunkStartTimeMs = newCatalog->m_chunks.empty()
+        ? std::numeric_limits<qint64>::max()
+        : newCatalog->m_chunks.front().startTimeMs;
+    qint64 newArchiveBorder = qMin(rebuildPeriod.startTimeMs, newArchiveFirstChunkStartTimeMs);
     for (const auto& chunk : ownCatalog->m_chunks)
     {
         if (chunk.storageIndex != storageIndex)
             continue;
 
-        if (chunk.startTimeMs >= rebuildPeriod.startTimeMs)
+        if (chunk.startTimeMs >= newArchiveBorder)
             break;
 
         newCatalog->addChunk(chunk);
