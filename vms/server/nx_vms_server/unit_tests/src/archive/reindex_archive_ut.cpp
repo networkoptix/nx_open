@@ -118,14 +118,8 @@ protected:
 
     void givenSomeArchiveOnHdd()
     {
-        addArchiveDataForCamera("camera1", 10);
-        addArchiveDataForCamera("camera2", 5);
-    }
-
-    void addArchiveDataForCamera(const QString& cameraName, int count)
-    {
         qint64 startTimeMs = 0;
-        for (const auto& catalog: m_generatedArchive)
+        for (const auto& catalog : m_generatedArchive)
         {
             if (!catalog.lowQualityChunks.empty() && startTimeMs < catalog.lowQualityChunks.back().startTimeMs)
                 startTimeMs = catalog.lowQualityChunks.back().startTimeMs;
@@ -138,10 +132,19 @@ protected:
         if (startTimeMs == 0)
         {
             startTimeMs = duration_cast<milliseconds>(
-                (system_clock::now() - hours(24)).time_since_epoch()).count();
+                (system_clock::now() - hours(24 * 10)).time_since_epoch()).count();
+        }
+        else
+        {
+            startTimeMs += duration_cast<milliseconds>(hours(24)).count();
         }
 
-        startTimeMs += 10;
+        addArchiveDataForCamera("camera1", 10, startTimeMs);
+        //addArchiveDataForCamera("camera2", 5, startTimeMs);
+    }
+
+    void addArchiveDataForCamera(const QString& cameraName, int count, qint64 startTimeMs)
+    {
         const auto newCatalog = generateCameraArchive(m_storagePath, cameraName, startTimeMs, count);
 
         std::copy(
@@ -226,9 +229,15 @@ TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
 {
     givenSomeArchiveOnHdd();
     whenServerStarted();
+
     whenServerStopped();
     whenSomeArchiveDataAdded();
     whenServerStarted();
+
+    whenServerStopped();
+    whenSomeArchiveDataAdded();
+    whenServerStarted();
+
     thenAllArchiveShouldBeFastScannedCorreclty();
 }
 

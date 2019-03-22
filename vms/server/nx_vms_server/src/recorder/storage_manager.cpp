@@ -2698,27 +2698,16 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
     QnMutexLocker lock( &m_mutexCatalog );
     int storageIndex = storageDbPool()->getStorageIndex(storage);
 
-    // add new recorded chunks to scan data
-    qint64 scannedDataLastTime = newCatalog->m_chunks.empty() ? 0 : newCatalog->m_chunks[newCatalog->m_chunks.size()-1].startTimeMs;
-    qint64 rebuildLastTime = qMax(rebuildPeriod.endTimeMs(), scannedDataLastTime);
-
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
-    auto itr = std::lower_bound(ownCatalog->m_chunks.begin(), ownCatalog->m_chunks.end(), rebuildLastTime);
-    for (; itr != ownCatalog->m_chunks.end(); ++itr)
+    for (const auto& chunk : ownCatalog->m_chunks)
     {
-        if (itr->storageIndex == storageIndex) {
+        if (chunk.storageIndex != storageIndex)
+            continue;
 
-            if (!newCatalog->isEmpty())
-            {
-                DeviceFileCatalog::Chunk& lastChunk = newCatalog->m_chunks[newCatalog->m_chunks.size()-1];
-                if (lastChunk.startTimeMs == itr->startTimeMs) {
-                    lastChunk.durationMs = qMax(lastChunk.durationMs, itr->durationMs);
-                        continue;
-                }
-            }
+        if (chunk.startTimeMs >= rebuildPeriod.startTimeMs)
+            break;
 
-            newCatalog->addChunk(*itr);
-        }
+        newCatalog->addChunk(chunk);
     }
 
     ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);

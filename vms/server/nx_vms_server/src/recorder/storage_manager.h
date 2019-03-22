@@ -244,7 +244,13 @@ private:
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
-    void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
+    void replaceChunks(
+        const QnTimePeriod& rebuildPeriod,
+        const QnStorageResourcePtr &storage,
+        const DeviceFileCatalogPtr &newCatalog,
+        const QString& cameraUniqueId,
+        QnServer::ChunksCatalog catalog);
+
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
     void clearUnusedMotion();
