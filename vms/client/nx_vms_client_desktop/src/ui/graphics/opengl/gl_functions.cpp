@@ -66,11 +66,10 @@ public:
         locker.unlock();
 
         GLint maxTextureSize = -1;
-
         const auto context = glWidget->context();
         const auto functions = context->functions();
         functions->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-        maxTextureSize = nx::utils::AppInfo::isLinux()
+        m_maxTextureSize = nx::utils::AppInfo::isLinux()
             ? std::min<GLint>(maxTextureSize, LinuxMaxTextureSize)
             : maxTextureSize;
     }
