@@ -29,6 +29,16 @@ then
     service $COMPANY_NAME-root-tool stop || true
 fi
 
+if is_systemd_used
+then
+    systemctl disable $COMPANY_NAME-mediaserver
+
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
+    then
+        systemctl disable $COMPANY_NAME-root-tool
+    fi
+fi
+
 if [ "$1" = "remove" ]
 then
     REMOVE="Remove the Database"
@@ -42,16 +52,6 @@ then
     db_input high @deb.customization.company.name@-mediaserver/removeDatabase || true
     db_go || true
     db_get @deb.customization.company.name@-mediaserver/removeDatabase
-
-    if is_systemd_used
-    then
-        systemctl disable $COMPANY_NAME-mediaserver
-
-        if [[ $WITH_ROOT_TOOL == 'true' ]]
-        then
-            systemctl disable $COMPANY_NAME-root-tool
-        fi
-    fi
 
     $CFG_HELPER sysIdTime -d
 
