@@ -5,6 +5,7 @@
 
 #include "core/resource_management/resource_discovery_manager.h"
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnMServerResourceDiscoveryManager:
     public QnResourceDiscoveryManager
@@ -46,7 +47,7 @@ private:
 
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
-    void updateResourceStatus(const QnNetworkResourcePtr& rpNetRes);
+    void updateResourceStatus(const nx::vms::server::resource::CameraPtr& rpNetRes);
 
     bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource) const;
 

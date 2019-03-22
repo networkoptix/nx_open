@@ -608,6 +608,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
+// TODO: move to inheriting class
 QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetworkResourcePtr& netRes)
 {
     auto camRes = netRes.dynamicCast<QnVirtualCameraResource>();
