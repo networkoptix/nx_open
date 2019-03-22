@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 
 #include <QtGui/QFileOpenEvent>
+#include <QtGui/QWindowStateChangeEvent>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -498,8 +499,9 @@ void MainWindow::setMaximized(bool maximized) {
     }
 }
 
-void MainWindow::setFullScreen(bool fullScreen) {
-    if(fullScreen == isFullScreen())
+void MainWindow::setFullScreen(bool fullScreen)
+{
+    if (fullScreen == isFullScreen())
         return;
 
     /*
@@ -509,17 +511,20 @@ void MainWindow::setFullScreen(bool fullScreen) {
      */
     if (m_inFullscreenTransition)
         return;
+
     QScopedValueRollback<bool> guard(m_inFullscreenTransition, true);
 
-
-    if(fullScreen) {
-#ifndef Q_OS_MACX
+    if (fullScreen)
+    {
+#if !defined(Q_OS_MACX) && !defined(Q_OS_WIN)
         m_storedGeometry = geometry();
 #endif
         showFullScreen();
-    } else if(isFullScreen()) {
+    }
+    else if(isFullScreen())
+    {
         showNormal();
-#ifndef Q_OS_MACX
+#if !defined(Q_OS_MACX) && !defined(Q_OS_WIN)
         setGeometry(m_storedGeometry);
 #endif
     }
@@ -723,9 +728,18 @@ void MainWindow::closeEvent(QCloseEvent* event)
     menu()->trigger(action::ExitAction);
 }
 
-void MainWindow::changeEvent(QEvent *event) {
-    if(event->type() == QEvent::WindowStateChange)
+void MainWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::WindowStateChange)
+    {
+#if defined(Q_OS_WIN) // An additional hack for our custom WM_NCCALCSIZE working correctly.
+        const auto wscEvent = static_cast<QWindowStateChangeEvent*>(event);
+        if (wscEvent->oldState().testFlag(Qt::WindowMinimized) && m_inFullscreen)
+            base_type::showFullScreen();
+#endif
+        m_inFullscreen = windowState().testFlag(Qt::WindowFullScreen);
         updateDecorationsState();
+    }
 
     base_type::changeEvent(event);
 }
@@ -802,6 +816,17 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
 bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
     const auto msg = static_cast<MSG*>(message);
+    const auto isMinimized =
+        [wnd = msg->hwnd]()
+        {
+            WINDOWPLACEMENT p{};
+            p.length = sizeof(p);
+            GetWindowPlacement(wnd, &p);
+            return p.showCmd == SW_MINIMIZE
+                || p.showCmd == SW_SHOWMINIMIZED
+                || p.showCmd == SW_SHOWMINNOACTIVE;
+        };
+
     switch (msg->message)
     {
         // Under Windows, fullscreen OpenGL widgets on the primary screen cause Windows DWM to

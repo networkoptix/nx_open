@@ -133,6 +133,7 @@ private:
     QRect m_storedGeometry;
 #endif
 
+    bool m_inFullscreen = false;
     bool m_inFullscreenTransition = false;
     bool m_initialized = false;
 };
