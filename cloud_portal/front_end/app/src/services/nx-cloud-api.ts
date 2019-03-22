@@ -21,4 +21,12 @@ export class NxCloudApiService {
     getIntegrations(): Observable<any> {
         return this.http.get(this.CONFIG.apiBase + '/integrations');
     }
+
+    getIPVD(): Observable<any> {
+        return this.http.get(this.CONFIG.apiBase + '/ipvd');
+    }
+
+    reloadIPVD(): Observable<any> {
+        return this.http.post(this.CONFIG.apiBase + '/ipvd', {});
+    }
 }
