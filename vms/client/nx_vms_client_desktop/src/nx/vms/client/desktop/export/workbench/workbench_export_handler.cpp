@@ -288,7 +288,7 @@ struct WorkbenchExportHandler::Private
             case FileExtension::exe64:
             case FileExtension::exe86:
             {
-                const auto layout = QnResourceDirectoryBrowser::layoutFromFile(
+                const auto layout = ResourceDirectoryBrowser::layoutFromFile(
                     completeFilename, resourcePool);
                 if (layout)
                     resourcePool->addResource(layout);

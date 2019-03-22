@@ -1,30 +1,29 @@
 #pragma once
 
-#include "core/resource_management/resource_searcher.h"
 #include <core/resource/client_resource_fwd.h>
 #include "local_resources_directory_model.h"
 
 namespace nx::vms::client::desktop {
 
-class QnLocalResourceProducer: public QObject
+class LocalResourceProducer: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    QnLocalResourceProducer(QObject* parent = nullptr);
+    LocalResourceProducer(QObject* parent = nullptr);
     void createLocalResources(const QStringList& pathList);
 };
 
-class QnResourceDirectoryBrowser:
+class ResourceDirectoryBrowser:
     public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    QnResourceDirectoryBrowser(QObject* parent = nullptr);
-    virtual ~QnResourceDirectoryBrowser() override;
+    ResourceDirectoryBrowser(QObject* parent = nullptr);
+    virtual ~ResourceDirectoryBrowser() override;
 
     void setLocalResourcesDirectories(const QStringList& paths);
 
@@ -41,9 +40,9 @@ private:
     void dropResourcesFromDirectory(const QString& path);
 
 private:
-    QnLocalResourcesDirectoryModel* m_localResourceDirectoryModel;
+    LocalResourcesDirectoryModel* m_localResourceDirectoryModel;
     QThread* m_resourceProducerThread;
-    QnLocalResourceProducer* m_resourceProducer;
+    LocalResourceProducer* m_resourceProducer;
 };
 
 } // namespace nx::vms::client::desktop

@@ -15,33 +15,33 @@
 
 namespace nx::vms::client::desktop {
 
-QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent):
+ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
     QObject(parent),
-    m_localResourceDirectoryModel(new QnLocalResourcesDirectoryModel),
+    m_localResourceDirectoryModel(new LocalResourcesDirectoryModel),
     m_resourceProducerThread(new QThread(this)),
-    m_resourceProducer(new QnLocalResourceProducer())
+    m_resourceProducer(new LocalResourceProducer())
 {
-    connect(m_localResourceDirectoryModel, &QnLocalResourcesDirectoryModel::filesAdded,
-        m_resourceProducer, &QnLocalResourceProducer::createLocalResources);
+    connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::filesAdded,
+        m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
-    connect(this, &QnResourceDirectoryBrowser::initLocalResources,
-        m_resourceProducer, &QnLocalResourceProducer::createLocalResources);
+    connect(this, &ResourceDirectoryBrowser::initLocalResources,
+        m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
     connect(m_resourceProducerThread, &QThread::finished,
-        m_resourceProducer, &QnLocalResourceProducer::deleteLater);
+        m_resourceProducer, &LocalResourceProducer::deleteLater);
 
     m_resourceProducer->moveToThread(m_resourceProducerThread);
     m_resourceProducerThread->start(QThread::IdlePriority);
 }
 
-QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
+ResourceDirectoryBrowser::~ResourceDirectoryBrowser()
 {
     m_resourceProducerThread->requestInterruption();
     m_resourceProducerThread->exit();
     m_resourceProducerThread->wait();
 }
 
-void QnResourceDirectoryBrowser::setLocalResourcesDirectories(const QStringList& paths)
+void ResourceDirectoryBrowser::setLocalResourcesDirectories(const QStringList& paths)
 {
     QStringList cleanedPaths;
     for (const auto& path: paths)
@@ -66,7 +66,7 @@ void QnResourceDirectoryBrowser::setLocalResourcesDirectories(const QStringList&
         emit initLocalResources(m_localResourceDirectoryModel->getFilePaths(newDirectory));
 }
 
-QnFileLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
+QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
     const QString layoutUrl = QDir::fromNativeSeparators(filename);
@@ -90,7 +90,7 @@ QnFileLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString
     return layout::layoutFromFile(layoutUrl);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString& filename,
+QnResourcePtr ResourceDirectoryBrowser::resourceFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
     const QString path = QDir::fromNativeSeparators(filename);
@@ -108,7 +108,7 @@ QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString& filena
     return createArchiveResource(path, resourcePool);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename,
+QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(const QString& filename,
     QnResourcePool* resourcePool)
 {
     const QString path = QDir::fromNativeSeparators(filename);
@@ -132,7 +132,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
     return QnResourcePtr();
 }
 
-void QnResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
+void ResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
 {
     QnResourcePool* resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     const QString canonicalDirPath = QDir(path).canonicalPath();
@@ -160,12 +160,12 @@ void QnResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
     resourcePool->removeResources(resourcesToRemove);
 }
 
-QnLocalResourceProducer::QnLocalResourceProducer(QObject* parent):
+LocalResourceProducer::LocalResourceProducer(QObject* parent):
     QObject(parent)
 {
 }
 
-void QnLocalResourceProducer::createLocalResources(const QStringList& pathList)
+void LocalResourceProducer::createLocalResources(const QStringList& pathList)
 {
     if (QThread::currentThread()->isInterruptionRequested())
         return;
@@ -179,7 +179,7 @@ void QnLocalResourceProducer::createLocalResources(const QStringList& pathList)
             return;
 
         QnResourcePtr resource =
-            QnResourceDirectoryBrowser::createArchiveResource(filePath, resourcePool);
+            ResourceDirectoryBrowser::createArchiveResource(filePath, resourcePool);
         if (!resource)
             continue;
         if (resource->getId().isNull() && !resource->getUniqueId().isEmpty())

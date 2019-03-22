@@ -70,7 +70,7 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
 {
     const auto path = fixSeparators(fileName);
     auto pool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto result = QnResourceDirectoryBrowser::resourceFromFile(path, pool);
+    const auto result = ResourceDirectoryBrowser::resourceFromFile(path, pool);
     if (result)
         pool->addResource(result);
     return result;
@@ -83,7 +83,7 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
     for (const auto& fileName: files)
     {
         const auto path = fixSeparators(fileName);
-        QnResourcePtr resource = QnResourceDirectoryBrowser::resourceFromFile(path, pool);
+        QnResourcePtr resource = ResourceDirectoryBrowser::resourceFromFile(path, pool);
         if (resource)
             result << resource;
     }
@@ -113,7 +113,7 @@ QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>&
             mac_saveFileBookmark(url.path());
         #endif
 
-        auto resource = QnResourceDirectoryBrowser::resourceFromFile(filePath, resourcePool);
+        auto resource = ResourceDirectoryBrowser::resourceFromFile(filePath, resourcePool);
         if (resource)
             result << resource;
 
