@@ -11,7 +11,6 @@ import re
 import requests
 from cloud import settings
 from django.shortcuts import redirect
-from functools import reduce
 
 from cms.models import DataStructure, get_cloud_portal_product,\
     cloud_portal_customization_cache, UserGroupsToProductPermissions
@@ -254,91 +253,70 @@ def get_settings(request):
 @permission_classes((AllowAny,))
 @handle_exceptions
 def get_ipvd(request):
-    url = settings.IPVD_CONNECT['url']
+    url = settings.IPVD_CONNECT
 
     if request.method == 'GET':
         # check cache and return cached item if any
         cameras = cache.get("cameras")
         vendors = cache.get("vendors")
+        num_cameras = cache.get("num_cameras")
 
-        if cameras is not None and vendors is not None:
-            return Response({"cameras": cameras, "vendors": vendors})
+        if cameras and vendors and num_cameras:
+            return Response({"cameras": cameras, "vendors": vendors, "num_cameras": num_cameras})
         # ---------------------
 
         # else request and process
-        cameras = requests.get(url, None)
+        cameras = requests.get(url, "[]").json()
 
         # build vendor list
-        vendor_count = {}
-        vendors = []
-        cameras_with_aliases = []
-        all_cameras = []
+        vendors_dict = {}
+        camera_names = []
 
         for camera in cameras:
-            camera.isH265 = (camera.primaryCodec == 'H.265')
+            camera["isH265"] = camera["primaryCodec"] == 'H.265'
 
-            if camera.hardwareType == 'Camera' and camera.isMultiSensor:
-                camera.hardwareType = 'Multi-Sensor Camera'
+            if camera["hardwareType"] == "Camera" and camera["isMultiSensor"]:
+                camera["hardwareType"] = 'Multi-Sensor Camera'
 
-            res = camera.maxResolution.split('x')
-            if res.length == 2:
-                camera.resolutionArea = res[0] * res[1]
+            res = camera["maxResolution"].split('x')
+            if len(res) == 2:
+                camera["resolutionArea"] = int(res[0]) * int(res[1])
             else:
-                camera.resolutionArea = 0
+                camera["resolutionArea"] = 0
 
-            if camera.aliases:
-                cameras_with_aliases.append(camera)
-
-            vendors.append({'name': camera.vendor, 'count': camera.count})
-
-            vm = re.sub(r"\s", "", camera.vendor + camera.model) # camera.vendor.replace(/\s / g, '') + camera.model
-            camera.sortKey = vm
-
-            existing = vendor_count[vm]
-            if existing is not None:
-                if camera.count > existing.count:
-                    vendor_count[vm] = camera
+            vendor = camera["vendor"]
+            if vendor in vendors_dict:
+                vendors_dict[vendor]['count'] += camera["count"]
             else:
-                vendor_count[vm] = camera
+                vendors_dict[vendor] = {'name': vendor, 'count': camera["count"]}
 
-        for key in vendor_count.keys():
-            all_cameras.append(key)
+            vm = camera["vendor"].replace(" ", "") + camera["model"].replace(" ", "")
+            camera["sortKey"] = vm
+            camera_names.append(vm)
 
-        for camera in cameras_with_aliases:
-            for alias in camera.aliases.split(','):
-                alias = alias.trim()
-                vendor_aliases = camera.vendor + alias
+            if camera["aliases"]:
+                for alias in camera["aliases"].split(','):
+                    alias = alias.strip()
+                    camera_names.append(camera["vendor"].replace(" ", "") + alias.replace(" ", ""))
 
-                if vendor_count[vendor_aliases] is None:
-                    aliased_camera = camera
-                    aliased_camera.model = alias
-                    all_cameras.append(aliased_camera)
+        num_cameras = len(set(camera_names))
         # ---------------------
 
-        # Calculate vendor popularity based on vendor's camera model popularity
-        def updatePopularity(a, c):
-            (a[c.vendor] or (a[{"name": c.vendor, "count": 0}])).count += c.count
-            return a
-
-        reduce((lambda a, c: updatePopularity(a, c)), vendors)
-        # this.vendors = Object.values(vendors.reduce((a, c) = > {
-        #    (a[c.vendor] | | (a[c.vendor] = {name: c.vendor, count: 0})).count += c.count;
-        #    return a;
-        # }, {}));
-        # ---------------------
-
+        vendors = vendors_dict.values()
 
         # cache cameras and vendors
         cache.set("cameras", cameras, 60 * 60 * 24) # 24 hours
         cache.set("vendors", vendors, 60 * 60 * 24)  # 24 hours
+        cache.set("num_cameras", num_cameras, 60 * 60 * 24)  # 24 hours
         # ---------------------
 
-        return Response({"cameras": cameras, "vendors": vendors})
+        return Response({"cameras": cameras, "vendors": vendors, "num_cameras": num_cameras})
 
     elif request.method == 'POST':
         # clear cache
         cache.set("cameras", None)
         cache.set("vendors", None)
+        cache.set("num_cameras", None)
         # --------------------
 
         return Response({'IPVD cache cleared'})

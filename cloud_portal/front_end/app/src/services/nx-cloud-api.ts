@@ -14,10 +14,6 @@ export class NxCloudApiService {
         this.CONFIG = config.getConfig();
     }
 
-    getAllCameras(company): Observable<any> {
-        return this.http.get(this.CONFIG.cacamerasUrl, { params: { company }});
-    }
-
     getIntegrations(): Observable<any> {
         return this.http.get(this.CONFIG.apiBase + '/integrations');
     }

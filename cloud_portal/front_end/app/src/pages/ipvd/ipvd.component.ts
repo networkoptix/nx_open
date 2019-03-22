@@ -216,21 +216,20 @@ export class NxIpvdComponent implements OnInit, DoCheck {
     activate() {
         this.resetFilters();
         this.cameraService
-            .getAllCameras(this.company)
+            .getIPVD()
             .subscribe(data => {
-                // LANG and CONFIG are not available till now
+                // LANG and CONFIG are available till now
                 this.CONFIG = this.configService.getConfig();
-                this.lang = this.translate.translations[this.translate.currentLang];
                 this.company = this.CONFIG.companyName;
+                this.lang = this.translate.translations[this.translate.currentLang];
                 this.placeholder = this.lang.search.search_ipvd;
+
                 this.data = data;
 
-                // TODO: sort vendors after switch to API
-                // this.vendors.sort(NxUtilsService.byParam((elm) => {
-                //     return elm.name.toLowerCase();
-                // }, NxUtilsService.sortASC));
-                // TODO : ... and remove the Fn
-                this.camerasSuccessFn(this.data);
+                this.vendors = data.vendors;
+                this.vendors.sort(NxUtilsService.byParam((elm) => {
+                    return elm.name.toLowerCase();
+                }, NxUtilsService.sortASC));
 
                 // add hardware types and tags
                 this.addFilterTags();
@@ -257,71 +256,6 @@ export class NxIpvdComponent implements OnInit, DoCheck {
 
   resetFilters() {
       this.filter = {...this.emptyFilter};
-  }
-
-  camerasSuccessFn(data) {
-       const vendorModelCount = {};
-       const vendors = [];
-       const camerasWithAliases = [];
-
-       data.forEach(camera => {
-           camera.isH265 = (camera.primaryCodec === 'H.265');
-
-           if (camera.hardwareType === 'Camera' && camera.isMultiSensor) {
-               camera.hardwareType = 'Multi-Sensor Camera';
-           }
-
-           const res = camera.maxResolution.split('x');
-           if (res.length === 2) {
-               camera.resolutionArea = res[0] * res[1];
-           } else {
-               camera.resolutionArea = 0;
-           }
-
-           vendors.push({name : camera.vendor, count : camera.count});
-
-           if (camera.aliases) {
-               camerasWithAliases.push(camera);
-           }
-
-           const vm = camera.vendor.replace(/\s/g, '') + camera.model;
-           const existing = vendorModelCount[vm];
-           if (existing !== undefined) {
-               if (camera.count > existing.count) {
-                   vendorModelCount[vm] = camera;
-               }
-           } else {
-               vendorModelCount[vm] = camera;
-           }
-
-           camera.sortKey = vm;
-       });
-
-       this.allCameras = Object.keys(vendorModelCount);
-
-       camerasWithAliases.forEach(camera => {
-           camera.aliases.split(',').forEach(alias => {
-               alias = alias.trim();
-
-               const va = camera.vendor + alias;
-               if (vendorModelCount[va] === undefined) {
-                   const aliasedCamera = {...camera};
-                   aliasedCamera.model = alias;
-
-                   this.allCameras.push(aliasedCamera);
-               }
-           });
-       });
-
-      // Calculate vendor popularity based on vendor's camera model's popularity
-      this.vendors = Object.values(vendors.reduce((a, c) => {
-          (a[c.name] || (a[c.name] = { name: c.name, count: 0 })).count += c.count;
-          return a;
-      }, {}));
-
-      this.vendors.sort(NxUtilsService.byParam((elm) => {
-          return elm.name.toLowerCase();
-      }, NxUtilsService.sortASC));
   }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)

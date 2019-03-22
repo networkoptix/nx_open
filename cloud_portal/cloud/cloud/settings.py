@@ -364,10 +364,6 @@ CLOUD_CONNECT = {
     'password_realm': 'VMS'
 }
 
-IPVD_CONNECT = {
-    'url': 'https://cameras.networkoptix.com/api/v1/cacameras/'
-}
-
 # whitelist for unauthorized IP addresses. Supports addresses with masks
 # read more: https://docs.python.org/3/library/ipaddress.html
 IP_WHITELISTS = {
@@ -459,7 +455,7 @@ NOTIFICATIONS_CONFIG = {
 BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = DEBUG
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
-
+IPVD_CONNECT = 'https://cameras.networkoptix.com/api/v1/cacameras/'
 UPDATE_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/updates.json'
 DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/downloads.json'
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'

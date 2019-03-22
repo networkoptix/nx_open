@@ -10,8 +10,8 @@ export class CamerasService {
     constructor(private api: NxCloudApiService) {
     }
 
-    getAllCameras(company): Observable<any> {
-        return this.api.getAllCameras(company);
+    getIPVD(): Observable<any> {
+        return this.api.getIPVD();
     }
 
     private handleError<T>(operation = 'operation', result?: T) {
