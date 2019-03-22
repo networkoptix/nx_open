@@ -24,6 +24,7 @@ import { TranslateService }                        from '@ngx-translate/core';
 export class NxSearchComponent implements OnInit, ControlValueAccessor {
     @Input() expandable: any;
     @Input() skinny: any;
+    @Input() placeholder: any;
 
     public numberFilters = 0;
     public filterSelected: any;
@@ -50,6 +51,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     ngOnInit() {
+        this.placeholder = this.placeholder || '';  // optional param
         this.skinny = (this.skinny !== undefined);  // optional param
         this.expandable = (this.expandable !== undefined);  // optional param
         this.showAdvancedOptions = !this.expandable;
@@ -161,6 +163,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             return;
         }
 
+        this.placeholder = this.placeholder || this.lang.search.Search;  // optional param
         this.numberFilters = 0;
         this.filterSelected = '';
 

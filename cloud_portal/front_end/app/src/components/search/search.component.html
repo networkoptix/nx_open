@@ -14,14 +14,14 @@
                            class="form-control search-input"
                            name="query"
                            autocomplete="off"
-                           placeholder="Search by model or manufacturer"/>
+                           [placeholder]="placeholder"/>
 
                     <button class="search-clear btn btn-clear" [hidden]="!localFilter.query" (click)="resetQuery()">
                         <span class="glyphicon-close"></span>
                     </button>
                 </div>
                 <button class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
-                        *ngIf="numberFilters != 0">
+                        *ngIf="numberFilters != 0 && !skinny">
 
                     <div class="ml-2 mr-3">
                         {{filterSelected}}
@@ -34,7 +34,8 @@
 
                 <button class="btn btn-arrow btn-big btn-tag ml-lg-3 mt-3 mt-lg-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
-                        (click)="toggleOptions()">
+                        (click)="toggleOptions()"
+                        *ngIf="!skinny">
 
                     <div class="nav-arrow">
                         <span></span>

@@ -161,7 +161,9 @@
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 
     "latest build": "latest build", 
     "search": {
+        "Search": "Search", 
         "filter applied": "filter applied", 
+        "search_ipvd": "Search by model or manufacturer", 
         "filters applied": "filters applied"
     }, 
     "servers in the merged System.": "servers in the merged System."

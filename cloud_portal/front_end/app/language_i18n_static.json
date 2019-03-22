@@ -1,5 +1,7 @@
 {
 	"search": {
+		"Search" : "Search",
+		"search_ipvd": "Search by model or manufacturer",
 		"filter applied" : "filter applied",
 		"filters applied" : "filters applied"
 	},

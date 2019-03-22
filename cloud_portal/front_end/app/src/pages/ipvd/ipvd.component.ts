@@ -12,6 +12,7 @@ import { NxConfigService }                     from '../../services/nx-config';
 import { TranslateService }                    from '@ngx-translate/core';
 import { NxUriService }                        from '../../services/uri.service';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import { NxUtilsService }                      from '../../services/utils.service';
 
 @Component({
     selector     : 'ipvd',
@@ -23,6 +24,7 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 export class NxIpvdComponent implements OnInit, DoCheck {
     lang: any = {};
     CONFIG: any = {};
+    placeholder: string;
     data: any;
     company: any;
     vendors: any = [];
@@ -61,6 +63,7 @@ export class NxIpvdComponent implements OnInit, DoCheck {
           'isFisheye', 'isMdSupported', 'isIoSupported', 'count'
       ];
 
+      this.placeholder = '';
       this.data = undefined;
       this.resolution = '0';
       this.itemsPerPage = 15;
@@ -219,8 +222,14 @@ export class NxIpvdComponent implements OnInit, DoCheck {
                 this.CONFIG = this.configService.getConfig();
                 this.lang = this.translate.translations[this.translate.currentLang];
                 this.company = this.CONFIG.companyName;
-
+                this.placeholder = this.lang.search.search_ipvd;
                 this.data = data;
+
+                // TODO: sort vendors after switch to API
+                // this.vendors.sort(NxUtilsService.byParam((elm) => {
+                //     return elm.name.toLowerCase();
+                // }, NxUtilsService.sortASC));
+                // TODO : ... and remove the Fn
                 this.camerasSuccessFn(this.data);
 
                 // add hardware types and tags
@@ -269,7 +278,7 @@ export class NxIpvdComponent implements OnInit, DoCheck {
                camera.resolutionArea = 0;
            }
 
-           vendors.push({vendor : camera.vendor, count : camera.count});
+           vendors.push({name : camera.vendor, count : camera.count});
 
            if (camera.aliases) {
                camerasWithAliases.push(camera);
@@ -306,22 +315,14 @@ export class NxIpvdComponent implements OnInit, DoCheck {
 
       // Calculate vendor popularity based on vendor's camera model's popularity
       this.vendors = Object.values(vendors.reduce((a, c) => {
-          (a[c.vendor] || (a[c.vendor] = { name: c.vendor, count: 0 })).count += c.count;
+          (a[c.name] || (a[c.name] = { name: c.name, count: 0 })).count += c.count;
           return a;
       }, {}));
 
-      this.vendors.sort((a, b) => this.byParam(a, b, 'name' , this.ASC));
+      this.vendors.sort(NxUtilsService.byParam((elm) => {
+          return elm.name.toLowerCase();
+      }, NxUtilsService.sortASC));
   }
-
-    byParam(a, b, param, order) {
-        if (a[param] < b[param]) {
-            return (order) ? -1 : 1;
-        }
-        if (a[param] > b[param]) {
-            return (order) ? 1 : -1;
-        }
-        return 0;
-    }
 
   // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
   preFilterCameraTable (cameras) {
@@ -352,7 +353,7 @@ export class NxIpvdComponent implements OnInit, DoCheck {
                 .subscribe(cameras => {
                     this.activeCamera = undefined;
                     this.cameras = cameras;
-                    this.camerasSuccessFn(this.cameras);
+                    // this.camerasSuccessFn(this.cameras);
                     this.camerasTable = [];
                     this.camerasTable = (cameras.length !== this.data.length) ? this.preFilterCameraTable(cameras) : [];
 
