@@ -737,12 +737,12 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::downloading:
             m_clientItem->state = StatusCode::downloading;
             m_clientItem->progress = percentComplete;
-            m_clientItem->statusMessage = tr("Downloading an update");
+            m_clientItem->statusMessage = tr("Downloading update");
             break;
         case State::readyInstall:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
-            m_clientItem->statusMessage = tr("Ready to download an update");
+            m_clientItem->statusMessage = tr("Ready to download update");
             break;
         case State::readyRestart:
             m_clientItem->statusMessage = tr("Ready to restart to the new version");
@@ -764,11 +764,11 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             break;
         case State::error:
             m_clientItem->state = StatusCode::error;
-            m_clientItem->statusMessage = tr("Failed to download an update");
+            m_clientItem->statusMessage = tr("Failed to download update");
             break;
         case State::applauncherError:
             m_clientItem->state = StatusCode::error;
-            m_clientItem->statusMessage = tr("Failed to install an update");
+            m_clientItem->statusMessage = tr("Failed to install update");
             break;
         default:
             break;

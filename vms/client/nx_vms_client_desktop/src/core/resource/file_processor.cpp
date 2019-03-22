@@ -25,6 +25,8 @@ QString fixSeparators(const QString& filePath)
 
 } // namespace
 
+using namespace nx::vms::client::desktop;
+
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
     QStringList acceptedFiles;
