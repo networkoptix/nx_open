@@ -364,6 +364,10 @@ CLOUD_CONNECT = {
     'password_realm': 'VMS'
 }
 
+IPVD_CONNECT = {
+    'url': 'https://cameras.networkoptix.com/api/v1/cacameras/'
+}
+
 # whitelist for unauthorized IP addresses. Supports addresses with masks
 # read more: https://docs.python.org/3/library/ipaddress.html
 IP_WHITELISTS = {
