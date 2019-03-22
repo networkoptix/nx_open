@@ -17,7 +17,6 @@ Restart
     ${status}    Run Keyword And Return Status    Validate Log Out
     Register Keyword To Run On Failure    Failure Tasks
     Run Keyword Unless    ${status}    Log Out
-    Validate Log Out
     Go To    ${url}
 
 Open New Browser On Failure
@@ -200,7 +199,6 @@ link works and suggests to log out user, if he was logged in, buttons operate co
     Click Button    ${LOGGED IN CONTINUE BUTTON}
     Validate Log In
     Log Out
-    Validate Log Out
     Log In    ${email1}    ${password}
     Validate Log In
     Go To    ${link2}

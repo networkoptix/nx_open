@@ -44,7 +44,6 @@ allows to log in with existing credentials and to log out
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
-    Validate Log Out
 
 redirects to systems after log In
     [Tags]    Threaded
@@ -143,7 +142,6 @@ logout refreshes page
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
-    Validate Log Out
 
 # We don't actually allow copy of the password field at log in.
 allows copy-paste in input fields
@@ -218,7 +216,6 @@ handles two tabs, updates second tab state if logout is done on first
     Wait Until Page Does Not Contain Element    ${CONTINUE MODAL}
     Validate Log In
     Log Out
-    Validate Log Out
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/systems

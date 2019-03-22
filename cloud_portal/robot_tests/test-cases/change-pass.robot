@@ -82,7 +82,6 @@ password is actually changed, so login works with new password
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
@@ -98,7 +97,6 @@ password with symbols pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} is valid
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
@@ -114,7 +112,6 @@ password with space in the middle is valid
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
@@ -173,6 +170,5 @@ Password can't be changed if current password is not provided or incorrect
     Input Text    ${NEW PASSWORD INPUT}    ${EMPTY}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Log Out
-    Validate Log Out
     Log In    ${email}    ${password}
     Validate Log In

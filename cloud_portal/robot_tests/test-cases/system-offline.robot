@@ -71,7 +71,6 @@ open in nx button should be disabled
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
     Log Out
-    Validate Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
 
@@ -80,7 +79,6 @@ should show offline next to system name
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
     Log Out
-    Validate Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
 
@@ -177,7 +175,6 @@ Your permissions is shown for non-owners
     \    Log in to Auto Tests 2 System    ${user}
     \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
     \    Log Out
-    \    Validate Log Out
 
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    C41881    Threaded
@@ -185,7 +182,6 @@ should show (your system) for owner and (owner's name) for non-owners
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
     Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
     Log Out
-    Validate Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']

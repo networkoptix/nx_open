@@ -15,7 +15,6 @@ Check Systems Text
     [arguments]    ${user}
     Sleep    1
     Log Out
-    Validate Log Out
     Log In    ${user}    ${password}
     Validate Log In
     Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
@@ -83,12 +82,10 @@ should show system name in header with no dropdown if user has only one system
     Delete All Emails
     Close Mailbox
     Log Out
-    Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEM NAME AUTO TESTS HEADER}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
@@ -106,12 +103,10 @@ should show the system page instead of all systems when user only has one
     Delete All Emails
     Close Mailbox
     Log Out
-    Validate Log Out
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEM NAME}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
@@ -183,19 +178,16 @@ Search should only be visible with 9 or more systems
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Remove User Permissions    ${EMAIL VIEWER}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Elements Should Not Be Visible    ${SYSTEMS SEARCH INPUT}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
@@ -206,7 +198,6 @@ Search should only be visible with 9 or more systems
     Delete All Emails
     Close Mailbox
     Log Out
-    Validate Log Out
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${SYSTEMS SEARCH INPUT}
@@ -227,7 +218,6 @@ should update owner name in systems list, if it's changed
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
     Log In    ${EMAIL ADMIN}    ${password}
     Validate Log In
     Go To    ${url}/systems

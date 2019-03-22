@@ -24,7 +24,6 @@ Log in to Auto Tests System
 Check System Text
     [arguments]    ${user}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${user}
     Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
     Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
@@ -126,7 +125,6 @@ correct items are shown for advanced viewer and below
     \    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \    Element Should Not Be Visible    ${USERS LIST}
     \    Log Out
-    \    Validate Log Out
 
 does not display edit and remove for owner row
     [tags]    Threaded
@@ -281,7 +279,6 @@ should display same user data as showed in user account (stress to cyrillic)
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
 
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]

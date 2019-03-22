@@ -50,7 +50,6 @@ can still log in if you don't finish the process
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
-    Validate Log Out
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}

@@ -180,7 +180,6 @@ admin cannot delete or edit other admins
     Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${ADMIN TEXT}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${random email}
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
@@ -189,7 +188,6 @@ admin cannot delete or edit other admins
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Remove User Permissions    ${random email}
 
@@ -230,7 +228,6 @@ Delete user works
     Validate Log Out
     Log in to Auto Tests System    ${random email}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
@@ -240,7 +237,6 @@ Delete user works
     Click Button    ${DELETE USER CANCEL BUTTON}
     Remove User Permissions    ${random email}
     Log Out
-    Validate Log Out
     Log In    ${random email}    ${password}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
@@ -305,7 +301,6 @@ Check share email for registered user
     Validate Log In
     Sleep    1
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
