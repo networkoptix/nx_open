@@ -32,12 +32,23 @@ QnVSyncWorkaround::QnVSyncWorkaround(QWidget* watched, QObject* parent):
 
 bool QnVSyncWorkaround::eventFilter(QObject* object, QEvent* event)
 {
-    if (object != m_watched || event->type() != QEvent::Paint)
+    if (object != m_watched)
         return false;
 
-    if (!m_paintAllowed)
-        return true;
+    switch (event->type())
+    {
+        case QEvent::Paint:
+            if (!m_paintAllowed)
+                return true;
+            m_paintAllowed = false;
+            return false;
 
-    m_paintAllowed = false;
-    return false;
+        case QEvent::Resize:
+            m_paintAllowed = true;
+            return false;
+
+        default:
+            return false;
+    }
+
 }
