@@ -244,7 +244,7 @@ Delete user works
     Log In    ${random email}    ${password}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
-Share with registered user - sends him notification
+Share with registered user works and sends him notification
     [tags]    email    C41888
     #log in as noperm to check language and change its language to the current testing language
     #otherwise it may receive the notification in another language and fail the email subject comparison
@@ -252,18 +252,22 @@ Share with registered user - sends him notification
     Validate Log In
     Sleep    1
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
     Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
-    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
-    Remove User Permissions    ${EMAIL NOPERM}
+    ${emailID}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
+    Check Email Subject    ${emailID}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Delete All Emails
     Close Mailbox
+    Log Out
+    Log in to Auto Tests System    ${EMAIL NO PERM}
+    Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
+    Log Out
+    Log in to Auto Tests System    ${email}
+    Remove User Permissions    ${EMAIL NOPERM}
 
 Share with unregistered user - brings them to registration page with code with correct email locked
     [tags]    email    C41889
