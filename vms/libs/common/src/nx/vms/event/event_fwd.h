@@ -16,9 +16,7 @@
 // TODO: #vkutin Think of a location to put this to
 struct QnCameraConflictList;
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 class AbstractEvent;
 typedef QSharedPointer<AbstractEvent> AbstractEventPtr;
@@ -43,6 +41,7 @@ typedef QList<RulePtr> RuleList;
 
 struct EventParameters;
 struct ActionParameters;
+struct EventMetaData;
 
 class StringsHelper;
 
@@ -51,6 +50,4 @@ using EventState = nx::vms::api::EventState;
 using EventType = nx::vms::api::EventType;
 using ActionType = nx::vms::api::ActionType;
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event

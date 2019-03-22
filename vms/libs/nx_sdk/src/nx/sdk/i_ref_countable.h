@@ -58,7 +58,7 @@ public:
 
         /** Enable initialization with a character array only. */
         template<int len>
-        explicit InterfaceId(const char (&charArray)[len]): value(charArray)
+        explicit constexpr InterfaceId(const char (&charArray)[len]): value(charArray)
         {
             static_assert(len + /*terminating zero*/ 1 >= 16,
                 "Interface id should contain at least 15 chars");

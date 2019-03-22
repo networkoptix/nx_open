@@ -19,7 +19,8 @@ class Storage final: public QObject, public Singleton<Storage>
 public:
     // Keeping raw pointers as all integrations are owned by this class.
     QList<Integration*> allIntegrations;
-    QList<IActionFactory*> actionFactories;
+    QList<IServerApiProcessor*> serverApiProcessors;
+    QList<IMenuActionFactory*> actionFactories;
     QList<IOverlayPainter*> overlayPainters;
 
     explicit Storage(QObject* parent):
@@ -30,7 +31,9 @@ public:
     {
         NX_ASSERT(integration->parent() == this);
         allIntegrations.push_back(integration);
-        if (const auto actionFactory = dynamic_cast<IActionFactory*>(integration))
+        if (const auto serverApiProcessor = dynamic_cast<IServerApiProcessor*>(integration))
+            serverApiProcessors.push_back(serverApiProcessor);
+        if (const auto actionFactory = dynamic_cast<IMenuActionFactory*>(integration))
             actionFactories.push_back(actionFactory);
         if (const auto overlayPainter = dynamic_cast<IOverlayPainter*>(integration))
             overlayPainters.push_back(overlayPainter);
@@ -57,6 +60,16 @@ void initialize(QObject* storageParent)
 
     if (config().enableRoiVisualization)
         storage->addIntegration(new internal::RoiVisualizationIntegration(storage));
+}
+
+void connectionEstablished(ec2::AbstractECConnectionPtr connection)
+{
+    auto storage = Storage::instance();
+    if (!NX_ASSERT(storage))
+        return;
+
+    for (const auto serverApiProcessor: storage->serverApiProcessors)
+        serverApiProcessor->connectionEstablished(connection);
 }
 
 void registerActions(ui::action::MenuFactory* factory)

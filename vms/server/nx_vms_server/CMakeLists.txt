@@ -55,11 +55,6 @@ add_custom_command(
         ${apidoctool_params}
 )
 
-set(private_libs qtservice qtsinglecoreapplication sigar)
-if(NOT targetDevice STREQUAL edge1)
-    list(APPEND private_libs nx_speech_synthesizer)
-endif()
-
 set(static_resources
     ${CMAKE_CURRENT_BINARY_DIR}/api.xml
     ${CMAKE_CURRENT_BINARY_DIR}/api.json
@@ -100,7 +95,10 @@ nx_add_target(nx_vms_server LIBRARY
         nx_plugin_utils
     PRIVATE_LIBS
         Qt5::Qml
-        ${private_libs}
+        qtservice
+        qtsinglecoreapplication
+        sigar
+        nx_speech_synthesizer
 )
 
 nx_add_vendor_macros(nx_vms_server)
