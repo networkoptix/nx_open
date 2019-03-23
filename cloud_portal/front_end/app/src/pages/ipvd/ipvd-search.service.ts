@@ -24,7 +24,7 @@ export class IpvdSearchService {
         this._vendors = list;
     }
 
-    ipvdSearch(allCameras, filter): Observable<any> {
+    ipvdSearch(cameras_data, filter): Observable<any> {
         const query = filter.query.toLowerCase();
         const queryTerms = query.trim().split(' ');
         const preferredVendors = '';
@@ -61,7 +61,7 @@ export class IpvdSearchService {
             }
         }
 
-        const cameras = allCameras.filter(camera => {
+        const cameras = cameras_data.filter(camera => {
             if (filter.tags.some(key => {
                 return key.value === true && camera[key.id] !== true;
             })) {

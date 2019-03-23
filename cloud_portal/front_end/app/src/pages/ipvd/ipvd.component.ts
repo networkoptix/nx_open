@@ -283,7 +283,7 @@ export class NxIpvdComponent implements OnInit, DoCheck {
 
         if (this.data) {
             this.cameraSearchService
-                .ipvdSearch(this.data, this.filter)
+                .ipvdSearch(this.data.cameras, this.filter)
                 .subscribe(cameras => {
                     this.activeCamera = undefined;
                     this.cameras = cameras;

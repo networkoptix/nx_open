@@ -262,7 +262,7 @@ def get_ipvd(request):
         num_cameras = cache.get("num_cameras")
 
         if cameras and vendors and num_cameras:
-            return Response({"cameras": cameras, "vendors": vendors, "num_cameras": num_cameras})
+            return Response({"cameras": cameras, "vendors": vendors, "num_cameras": num_cameras, "cached": True})
         # ---------------------
 
         # else request and process
