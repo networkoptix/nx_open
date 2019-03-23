@@ -101,10 +101,10 @@
                    download>Download Draft</a>
             {% endif %}
             {% if context.product.product_type.can_preview %}
-                <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
+                <button class="btn btn-sm btn-default" type="submit" name="Preview">Save draft & Open preview</button>
             {% endif %}
             <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
-            <button class="btn btn-sm btn-success" type="submit" name="SendReview">Send for Review</button>
+            <button class="btn btn-sm btn-success" type="submit" name="SendReview">Submit & Review</button>
             <button class="btn btn-sm btn-danger" type="reset" name="Reset">Reset</button>
         </div>
     {% endif %}
