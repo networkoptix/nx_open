@@ -80,8 +80,10 @@ public:
         {
             static constexpr int kMaxStaticInterfaceIdSize = 256;
 
-            static_assert(std::is_base_of<IRefCountable, TemplateInstance>::value);
-            static_assert(std::is_base_of<IRefCountable, TemplateArg>::value);
+            static_assert(std::is_base_of<IRefCountable, TemplateInstance>::value,
+                "TemplateInstance should be inherited from IRefCountable");
+            static_assert(std::is_base_of<IRefCountable, TemplateArg>::value,
+                "TemplateArg should be inherited from IRefCountable");
 
             static char id[kMaxStaticInterfaceIdSize];
 
@@ -159,7 +161,8 @@ public:
      */
     int refCountThreadUnsafe() const
     {
-        if (this == nullptr)
+        const void* this_ = this; //< Suppress warning that `this` cannot be null.
+        if (this_ == nullptr)
             return 0;
 
         /*unused*/ (void) addRef();

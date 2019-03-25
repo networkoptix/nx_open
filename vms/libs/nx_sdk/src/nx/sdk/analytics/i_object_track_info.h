@@ -17,7 +17,7 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectTrackInfo"); }
 
     /** @return List of metadata for all objects sharing the same objectId. */
-    virtual IList<ITimestampedObjectMetadata>* track() = 0;
+    virtual IList<ITimestampedObjectMetadata>* track() const = 0;
 
     /**
      * @return Frame defined to be the best shot in the object track by the DeviceAgent that
@@ -25,7 +25,7 @@ public:
      *     object track. Returns null if the required frame is not available, or obtaining such a
      *     frame was not requested by the Engine manifest.
      */
-    virtual IUncompressedVideoFrame* bestShotVideoFrame() = 0;
+    virtual IUncompressedVideoFrame* bestShotVideoFrame() const = 0;
 
     /**
      * @return Metadata for the position in the object track defined to be the best shot by the
@@ -33,7 +33,7 @@ public:
      *     first metadata of the object track. Returns null if the required metadata is not
      *     available, or obtaining such a metadata was not requested by the Engine manifest.
      */
-    virtual ITimestampedObjectMetadata* bestShotObjectMetadata() = 0;
+    virtual ITimestampedObjectMetadata* bestShotObjectMetadata() const = 0;
 };
 
 } // namespace analytics

@@ -673,8 +673,8 @@ bool QnVideoCamera::isLiveCacheForcingUseful(QString* outReasonForLog) const
             *outReasonForLog = "useful because analytics produces objects";
             return true;
         }
-    return false;
     }
+    return false;
 }
 
 /** @param outReasonForLog Filled by this method only when returning `true`. */

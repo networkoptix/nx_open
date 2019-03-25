@@ -12,11 +12,11 @@ namespace analytics {
 class ObjectTrackInfo: public RefCountable<IObjectTrackInfo>
 {
 public:
-    virtual IList<ITimestampedObjectMetadata>* track() override;
+    virtual IList<ITimestampedObjectMetadata>* track() const override;
 
-    virtual IUncompressedVideoFrame* bestShotVideoFrame() override;
+    virtual IUncompressedVideoFrame* bestShotVideoFrame() const override;
 
-    virtual ITimestampedObjectMetadata* bestShotObjectMetadata() override;
+    virtual ITimestampedObjectMetadata* bestShotObjectMetadata() const override;
 
     void setTrack(IList<ITimestampedObjectMetadata>* track);
 

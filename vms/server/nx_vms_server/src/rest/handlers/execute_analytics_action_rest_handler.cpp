@@ -92,13 +92,13 @@ public:
         NX_ASSERT(m_actionResult);
     }
 
-    virtual const char* actionId() override { return m_actionId.c_str(); }
+    virtual const char* actionId() const override { return m_actionId.c_str(); }
 
-    virtual nx::sdk::Uuid objectId() override { return m_objectId; }
+    virtual nx::sdk::Uuid objectId() const override { return m_objectId; }
 
-    virtual nx::sdk::Uuid deviceId() override { return m_deviceId; }
+    virtual nx::sdk::Uuid deviceId() const override { return m_deviceId; }
 
-    virtual nx::sdk::analytics::IObjectTrackInfo* objectTrackInfo() override
+    virtual nx::sdk::analytics::IObjectTrackInfo* objectTrackInfo() const override
     {
         if (!m_objectTrackInfo)
             return nullptr;
@@ -107,12 +107,12 @@ public:
         return m_objectTrackInfo.get();
     }
 
-    virtual int64_t timestampUs()
+    virtual int64_t timestampUs() const
     {
         return m_timestampUs;
     }
 
-    virtual const nx::sdk::IStringMap* params() override
+    virtual const nx::sdk::IStringMap* params() const override
     {
         m_params->addRef();
         return m_params.get();

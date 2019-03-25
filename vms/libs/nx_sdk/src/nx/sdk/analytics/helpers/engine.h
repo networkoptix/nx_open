@@ -71,7 +71,7 @@ protected:
         Uuid /*objectId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
-        nx::sdk::Ptr<IObjectTrackInfo> trackInfo,
+        nx::sdk::Ptr<IObjectTrackInfo> /*trackInfo*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
         std::string* /*outMessageToUser*/,

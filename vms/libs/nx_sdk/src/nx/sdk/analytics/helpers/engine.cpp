@@ -153,7 +153,7 @@ void Engine::executeAction(IAction* action, Error* outError)
         action->objectId(),
         action->deviceId(),
         action->timestampUs(),
-        nx::sdk::Ptr(action->objectTrackInfo()),
+        nx::sdk::toPtr(action->objectTrackInfo()),
         params,
         &actionUrl,
         &messageToUser,

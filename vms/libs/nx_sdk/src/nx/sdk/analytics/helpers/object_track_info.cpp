@@ -6,7 +6,7 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-IList<ITimestampedObjectMetadata>* ObjectTrackInfo::track()
+IList<ITimestampedObjectMetadata>* ObjectTrackInfo::track() const
 {
     if (!m_track)
         return nullptr;
@@ -15,7 +15,7 @@ IList<ITimestampedObjectMetadata>* ObjectTrackInfo::track()
     return m_track.get();
 }
 
-IUncompressedVideoFrame* ObjectTrackInfo::bestShotVideoFrame()
+IUncompressedVideoFrame* ObjectTrackInfo::bestShotVideoFrame() const
 {
     if (!m_bestShotVideoFrame)
         return nullptr;
@@ -24,7 +24,7 @@ IUncompressedVideoFrame* ObjectTrackInfo::bestShotVideoFrame()
     return m_bestShotVideoFrame.get();
 }
 
-ITimestampedObjectMetadata* ObjectTrackInfo::bestShotObjectMetadata()
+ITimestampedObjectMetadata* ObjectTrackInfo::bestShotObjectMetadata() const
 {
     if (!m_bestShotObjectMetadata)
         return nullptr;

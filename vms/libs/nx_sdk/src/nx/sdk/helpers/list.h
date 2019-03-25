@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/kit/debug.h>
+
 #include <nx/sdk/i_list.h>
 
 #include <nx/sdk/helpers/list.h>
