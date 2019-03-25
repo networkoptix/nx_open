@@ -23,7 +23,18 @@ http {
     gzip_vary on;
     gzip_min_length 1024;
     gzip_proxied expired no-cache no-store private auth;
-    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml;
+    gzip_types
+        text/plain
+        text/css
+        text/js
+        text/xml
+        text/javascript
+        application/javascript
+        application/x-javascript
+        application/json
+        application/xml
+        application/rss+xml
+        image/svg+xml;
 
     # don't send the nginx version number in error pages and Server header
     server_tokens off;
