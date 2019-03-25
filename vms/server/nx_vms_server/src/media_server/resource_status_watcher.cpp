@@ -46,7 +46,6 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr& resourc
 
 void QnResourceStatusWatcher::addResourcesImmediatly(const QnVirtualCameraResourceList& cameras) const
 {
-    auto resPool = commonModule()->resourcePool();
     QSet<QString> foreignCameras;
     for (const auto camera: cameras)
         foreignCameras << camera->getPhysicalId();

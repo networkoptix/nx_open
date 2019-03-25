@@ -51,6 +51,9 @@ private:
 
     bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource) const;
 
+    void sendConflictInfo(
+        const std::map<quint32, std::set<nx::vms::server::resource::CameraPtr>>& ipsList);
+
     /**
      * ping resources from time to time to keep OS ARP table updated;
      * speeds up resource (start) time in case if not recorded

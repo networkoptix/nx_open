@@ -332,27 +332,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         it = resources.erase(it); // do not need to investigate OK resources
     }
 
-    // TODO: make function
-    // ========================= send conflict info =====================
-    for (const auto& [ip, cameras]: ipsList)
-    {
-        if (hasIpConflict(cameras))
-        {
-            QHostAddress hostAddr(ip);
-            QStringList conflicts;
-            for (const auto& camRes: cameras)
-            {
-                // Human-readable value to help user identify a camera.
-                QString cameraId = camRes->getMAC().toString();
-                if (cameraId.isEmpty())
-                    cameraId = camRes->getId().toString();
-
-                conflicts << cameraId;
-                camRes->issueOccured();
-            }
-            emit CameraIPConflict(hostAddr, conflicts);
-        }
-    }
+    sendConflictInfo(ipsList);
 
     // If resource is not discovered last minute and we do not record it and do not see live
     // then readers are not running.
@@ -578,6 +558,30 @@ bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
     NX_VERBOSE(this, "Other channels of resource '%1' belong to other servers, do nothing.",
         netResourceString(newCameraResource));
     return false;
+}
+
+void QnMServerResourceDiscoveryManager::sendConflictInfo(
+    const std::map<quint32, std::set<nx::vms::server::resource::CameraPtr> >& ipsList)
+{
+    for (const auto& [ip, cameras]: ipsList)
+    {
+        if (hasIpConflict(cameras))
+        {
+            QHostAddress hostAddr(ip);
+            QStringList conflicts;
+            for (const auto& camRes: cameras)
+            {
+                // Human-readable value to help user identify a camera.
+                QString cameraId = camRes->getMAC().toString();
+                if (cameraId.isEmpty())
+                    cameraId = camRes->getId().toString();
+
+                conflicts << cameraId;
+                camRes->issueOccured();
+            }
+            emit CameraIPConflict(hostAddr, conflicts);
+        }
+    }
 }
 
 void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
