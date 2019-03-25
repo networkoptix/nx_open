@@ -27,6 +27,8 @@ public:
     nx::utils::Url baseApiUrl() const;
 
     void connectTo(const Peer& other);
+    bool isConnectedTo(const Peer& other) const;
+
     Customer addRandomData();
     bool hasData(const std::vector<Customer>& data);
     Customer modifyRandomly(const Customer& data);
@@ -50,7 +52,7 @@ public:
 
     std::string clusterId() const;
 
-    void addPeer(bool startAndWaitUntilStarted = true);
+    Peer& addPeer(bool startAndWaitUntilStarted = true);
     Peer& peer(int index);
     const Peer& peer(int index) const;
     int peerCount() const;

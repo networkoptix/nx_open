@@ -45,6 +45,20 @@ void Peer::connectTo(const Peer& other)
     m_process.moduleInstance()->connectToNode(url);
 }
 
+bool Peer::isConnectedTo(const Peer& other) const
+{
+    const auto connections =
+        process().moduleInstance()->synchronizationEngine().connectionManager().getConnections();
+    const auto& otherEndpoints = other.process().moduleInstance()->httpEndpoints();
+    for (const auto& connection: connections)
+    {
+        if (std::find(otherEndpoints.begin(), otherEndpoints.end(), connection.peerEndpoint) != otherEndpoints.end())
+            return true;
+    }
+
+    return false;
+}
+
 Customer Peer::addRandomData()
 {
     Customer customer;
@@ -116,7 +130,7 @@ std::string ClusterTestFixture::clusterId() const
     return m_clusterId;
 }
 
-void ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
+Peer& ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
 {
     const auto dbFileArg = lm("--db/name=%1/db_%2.sqlite")
         .args(testDataDir(), ++m_peerCounter).toStdString();
@@ -127,10 +141,11 @@ void ClusterTestFixture::addPeer(bool startAndWaitUntilStarted)
 
     if (startAndWaitUntilStarted)
     {
-        ASSERT_TRUE(peer->process().startAndWaitUntilStarted());
+        [this, &peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
     }
 
     m_peers.push_back(std::move(peer));
+    return *m_peers.back();
 }
 
 Peer& ClusterTestFixture::peer(int index)

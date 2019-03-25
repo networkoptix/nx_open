@@ -176,11 +176,16 @@ protected:
 
     void andSyncEnginesAreConnected()
     {
+        // Checking that one node is explicitely connected to another one.
+
         auto& a = m_fixture.nodeContext(0);
         auto& b = m_fixture.nodeContext(1);
 
-        waitForSyncEngineConnection(a, b);
-        waitForSyncEngineConnection(b, a);
+        while (!a.peer().isConnectedTo(b.peer())
+            && !b.peer().isConnectedTo(a.peer()))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
 
     void andSyncEnginesAreSynchronized()
@@ -208,25 +213,6 @@ private:
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             onlineNodes = a.discoveryClient()->onlineNodes();
-        }
-    }
-
-    void waitForSyncEngineConnection(
-        DiscoveryTestFixture::NodeContext& a,
-        DiscoveryTestFixture::NodeContext& b)
-    {
-        // Verify that the sync engine of "b" is in the list of connections of "a"
-        const auto bIsEqual =
-            [&b](const engine::SystemConnectionInfo& other)
-            {
-                return b.endpoint() == other.peerEndpoint;
-            };
-
-        auto connections = a.syncEngine().connectionManager().getConnections();
-        while (std::find_if(connections.begin(), connections.end(), bIsEqual) == connections.end())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            connections = a.syncEngine().connectionManager().getConnections();
         }
     }
 
