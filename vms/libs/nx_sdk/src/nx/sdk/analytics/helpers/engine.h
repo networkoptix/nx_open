@@ -5,6 +5,7 @@
 #include <mutex>
 
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/i_string_map.h>
@@ -70,6 +71,7 @@ protected:
         Uuid /*objectId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
+        nx::sdk::Ptr<IObjectTrackInfo> trackInfo,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
         std::string* /*outMessageToUser*/,

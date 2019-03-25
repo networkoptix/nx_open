@@ -1,29 +1,40 @@
 #pragma once
 
-#include <string>
 #include <vector>
 
-#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/analytics/i_timestamped_object_metadata.h>
 
-#include <nx/sdk/uuid.h>
-#include <nx/sdk/analytics/i_object_metadata.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/attribute.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-class ObjectMetadata: public RefCountable<IObjectMetadata>
+class TimestampedObjectMetadata: public RefCountable<ITimestampedObjectMetadata>
 {
 public:
-    virtual const char* typeId() const override;
-    virtual float confidence() const override;
+    TimestampedObjectMetadata();
+
     virtual Uuid id() const override;
+
     virtual const char* subtype() const override;
+
     virtual const IAttribute* attribute(int index) const override;
+
     virtual int attributeCount() const override;
+
     virtual const char* auxiliaryData() const override;
+
     virtual Rect boundingBox() const override;
+
+    virtual int64_t timestampUs() const override;
+
+    virtual const char* typeId() const override;
+
+    virtual float confidence() const override;
 
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
@@ -33,17 +44,13 @@ public:
     void addAttributes(const std::vector<Attribute>& value);
     void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
+    void setTimestampUs(int64_t timestampUs);
 
 private:
-    std::string m_typeId;
-    float m_confidence = 1.0;
-    Uuid m_id;
-    std::string m_subtype;
-    std::vector<Attribute> m_attributes;
-    std::string m_auxiliaryData;
-    Rect m_rect;
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> m_objectMetadata;
+    int64_t m_timestampUs = 0;
 };
 
-} // namespace nx
+} // namespace analytics
 } // namespace sdk
 } // namespace nx

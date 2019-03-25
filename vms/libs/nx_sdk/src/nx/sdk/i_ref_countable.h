@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstring>
+#include <cstdarg>
+#include <cassert>
 
 namespace nx {
 namespace sdk {
@@ -62,6 +64,37 @@ public:
         {
             static_assert(len + /*terminating zero*/ 1 >= 16,
                 "Interface id should contain at least 15 chars");
+        }
+
+        /**
+         * Makes a compound interface id for interface templates like IList<IItem>. Usage:
+         * ```
+     I   * static IRefCountable::InterfaceId interfaceId()
+         * {
+         *     return InterfaceId::makeForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
+         * }
+         * ```
+         */
+        template<class TemplateInstance, class TemplateArg>
+        static InterfaceId makeForTemplate(const char* templateInterfaceIdBase)
+        {
+            static constexpr int kMaxStaticInterfaceIdSize = 256;
+
+            static_assert(std::is_base_of<IRefCountable, TemplateInstance>::value);
+            static_assert(std::is_base_of<IRefCountable, TemplateArg>::value);
+
+            static char id[kMaxStaticInterfaceIdSize];
+
+            const int result = snprintf(
+                id,
+                kMaxStaticInterfaceIdSize,
+                "%s<%s>",
+                templateInterfaceIdBase,
+                TemplateArg::interfaceId().value);
+
+            assert(result >= 15 && result < kMaxStaticInterfaceIdSize);
+
+            return InterfaceId(id);
         }
 
         InterfaceId() = delete;

@@ -145,6 +145,10 @@ std::string Engine::manifest() const
             "supportedObjectTypeIds": [
                 ")json" + kCarObjectType + R"json("
             ],
+            "requirements": {
+                "capabilities": "needBestShotVideoFrame|needBestShotObjectMetadata|needTrack",
+                "bestShotVideoFramePixelFormat": "yuv420"
+            },
             "parametersModel": {
                 "type": "Settings",
                 "items": [
@@ -283,6 +287,7 @@ void Engine::executeAction(
     Uuid objectId,
     Uuid /*deviceId*/,
     int64_t /*timestampUs*/,
+    nx::sdk::Ptr<IObjectTrackInfo> objectTrackInfo,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,

@@ -9,9 +9,16 @@
 
 #include <nx/sdk/i_plugin_event.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
+#include <nx/sdk/analytics/helpers/object_track_info.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/vms/server/resource/resource_fwd.h>
+
+#include <nx/vms_server_plugins/utils/uuid.h>
+
+#include <nx/sdk/helpers/list.h>
+#include <nx/sdk/analytics/helpers/timestamped_object_metadata.h>
+#include <nx/vms/server/analytics/frame_converter.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -31,6 +38,62 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StringMapItem, (json), (name)(value), (optional
 nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 
 } // namespace
+
+nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
+    nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat)
+{
+    using namespace nx::sdk::analytics;
+    using namespace nx::vms::api::analytics;
+
+    switch (sdkPixelFormat)
+    {
+        case IUncompressedVideoFrame::PixelFormat::yuv420:
+            return PixelFormat::yuv420;
+        case IUncompressedVideoFrame::PixelFormat::argb:
+            return PixelFormat::argb;
+        case IUncompressedVideoFrame::PixelFormat::abgr:
+            return PixelFormat::abgr;
+        case IUncompressedVideoFrame::PixelFormat::rgba:
+            return PixelFormat::rgba;
+        case IUncompressedVideoFrame::PixelFormat::bgra:
+            return PixelFormat::bgra;
+        case IUncompressedVideoFrame::PixelFormat::rgb:
+            return PixelFormat::rgb;
+        case IUncompressedVideoFrame::PixelFormat::bgr:
+            return PixelFormat::bgr;
+        default:
+            NX_ASSERT(false, lm("Wrong pixel format, %1").args((int) sdkPixelFormat));
+            return PixelFormat::undefined;
+    }
+}
+
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
+    nx::vms::api::analytics::PixelFormat pixelFormat)
+{
+    using namespace nx::sdk::analytics;
+    using namespace nx::vms::api::analytics;
+
+    switch (pixelFormat)
+    {
+        case PixelFormat::yuv420:
+            return IUncompressedVideoFrame::PixelFormat::yuv420;
+        case PixelFormat::argb:
+            return IUncompressedVideoFrame::PixelFormat::argb;
+        case PixelFormat::abgr:
+            return IUncompressedVideoFrame::PixelFormat::abgr;
+        case PixelFormat::rgba:
+            return IUncompressedVideoFrame::PixelFormat::rgba;
+        case PixelFormat::bgra:
+            return IUncompressedVideoFrame::PixelFormat::bgra;
+        case PixelFormat::rgb:
+            return IUncompressedVideoFrame::PixelFormat::rgb;
+        case PixelFormat::bgr:
+            return IUncompressedVideoFrame::PixelFormat::bgr;
+        default:
+            NX_ASSERT(false, lm("Wrong pixel format").args((int) pixelFormat));
+            return std::nullopt;
+    }
+}
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule)
 {
@@ -207,6 +270,78 @@ nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
             NX_ASSERT(false, "Wrong plugin event level");
             return EventLevel::UndefinedEventLevel;
     }
+}
+
+nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
+    const nx::analytics::storage::DetectedObject& detectedObject,
+    const nx::analytics::storage::ObjectPosition& objectPosition)
+{
+    auto objectMetadata = nx::sdk::makePtr<nx::sdk::analytics::TimestampedObjectMetadata>();
+    objectMetadata->setId(
+        nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(detectedObject.objectAppearanceId));
+    objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
+    objectMetadata->setTimestampUs(objectPosition.timestampUsec);
+    const auto& boundingBox = objectPosition.boundingBox;
+    objectMetadata->setBoundingBox(
+        nx::sdk::analytics::IObjectMetadata::Rect(
+            boundingBox.x(),
+            boundingBox.y(),
+            boundingBox.width(),
+            boundingBox.height()));
+
+    for (const auto& attribute: detectedObject.attributes)
+    {
+        nx::sdk::analytics::Attribute sdkAttribute(
+            // Information about attribute types isn't stored in the database.
+            nx::sdk::IAttribute::Type::undefined,
+            attribute.name.toStdString(),
+            attribute.value.toStdString());
+
+        objectMetadata->addAttribute(std::move(sdkAttribute));
+    }
+
+    return objectMetadata;
+}
+
+nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
+    const nx::analytics::storage::DetectedObject& detectedObject)
+{
+    auto track = nx::sdk::makePtr<nx::sdk::List<nx::sdk::analytics::ITimestampedObjectMetadata>>();
+    for (const auto& objectPosition : detectedObject.track)
+    {
+        if (auto objectMetadataPtr =
+            createTimestampedObjectMetadata(detectedObject, objectPosition))
+        {
+            track->addItem(objectMetadataPtr.get());
+        }
+    }
+
+    return track;
+}
+
+nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
+    const CLVideoDecoderOutputPtr& frame,
+    nx::vms::api::analytics::PixelFormat pixelFormat)
+{
+    bool compressedFrameWarningIssued = false;
+    nx::vms::server::analytics::FrameConverter frameConverter(
+        /*compressedFrame*/ nullptr,
+        frame,
+        &compressedFrameWarningIssued);
+
+    const auto sdkPixelFormat = toSdkPixelFormat(pixelFormat);
+    if (!NX_ASSERT(sdkPixelFormat, lm("Wrong pixel format %1").args((int) pixelFormat)))
+        return nullptr;
+
+    nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> dataPacket(
+        frameConverter.getDataPacket(sdkPixelFormat));
+
+    if (!dataPacket)
+        return nullptr;
+
+    // To avoid destruction after FrameConverter destruction.
+    dataPacket->addRef();
+    return nx::sdk::queryInterfacePtr<nx::sdk::analytics::IUncompressedVideoFrame>(dataPacket);
 }
 
 } // namespace nx::vms::server::sdk_support

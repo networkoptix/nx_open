@@ -6,6 +6,7 @@
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/analytics/i_object_track_info.h>
 
 namespace nx {
 namespace sdk {
@@ -27,6 +28,9 @@ public:
 
     /** Id of a device from which the action has been triggered. */
     virtual Uuid deviceId() = 0;
+
+    /** Info about an object track this action has been triggered from. */
+    virtual IObjectTrackInfo* objectTrackInfo() = 0;
 
     /** Timestamp of a video frame from which the action has been triggered. */
     virtual int64_t timestampUs() = 0;

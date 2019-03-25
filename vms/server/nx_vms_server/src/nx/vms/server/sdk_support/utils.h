@@ -26,6 +26,8 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
+#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
 #include <nx/sdk/helpers/device_info.h>
@@ -43,14 +45,11 @@ class SdkObjectFactory;
 
 namespace nx::vms::server::sdk_support {
 
-namespace detail {
+nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
+    nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat);
 
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths,
-    std::set<nx::vms::api::analytics::DescriptorScope>);
-NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
-
-} // namespace detail
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
+    nx::vms::api::analytics::PixelFormat pixelFormat);
 
 template<typename Manifest>
 std::optional<Manifest> loadManifestFromFile(const QString& filename)
@@ -215,5 +214,16 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
         const QString& engineLogLabel);
 
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
+
+nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
+    const nx::analytics::storage::DetectedObject& detectedObject,
+    const nx::analytics::storage::ObjectPosition& objectPosition);
+
+nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
+    const nx::analytics::storage::DetectedObject& detectedObject);
+
+nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
+    const CLVideoDecoderOutputPtr& frame,
+    nx::vms::api::analytics::PixelFormat pixelFormat);
 
 } // namespace nx::vms::server::sdk_support
