@@ -139,26 +139,44 @@ static int checkForUpdateInformationRemotely(
     QnMultiserverRequestContext<UpdateInformationRequestData>* context)
 {
     bool done = false;
+    bool valid = false;
     auto mergeFunction =
-        [&done](
-            const QnUuid& /*serverId*/, bool success, const QnJsonRestResult& reply,
+        [&done, &valid, commonModule](
+            const QnUuid& serverId, bool success, const QnJsonRestResult& reply,
             QnJsonRestResult& outputReply)
         {
-            nx::update::Information updateInfo = reply.deserialized<nx::update::Information>();
             if (done)
                 return;
 
-            if (success && updateInfo.isValid() && !done)
+            if (success)
             {
-                outputReply = reply;
-                done = true;
+                if (reply.deserialized<nx::update::Information>().isValid())
+                {
+                    outputReply = reply;
+                    done = true;
+                    valid = true;
+                }
+                else
+                {
+                    outputReply.setError(reply.error, reply.errorString);
+                    const auto remoteServer =
+                        commonModule->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+                    if (remoteServer &&
+                        remoteServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
+                    {
+                        done = true;
+                    }
+                }
             }
         };
 
     QnJsonRestResult outputReply;
     detail::requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 
-    if (done)
+    if (!done)
+        outputReply.errorString = toString(nx::update::InformationError::networkError);
+
+    if (valid)
     {
         QnFusionRestHandlerDetail::serialize(
             outputReply, *result, *contentType, Qn::JsonFormat,
@@ -167,9 +185,9 @@ static int checkForUpdateInformationRemotely(
     }
 
     using namespace nx::update;
-    return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-        toString(InformationError::notFoundError),
-        result, contentType, context->request().format, context->request().extraFormatting,
+    return QnFusionRestHandler::makeError(
+        nx::network::http::StatusCode::ok, outputReply.errorString, result, contentType,
+        context->request().format, context->request().extraFormatting,
         QnRestResult::CantProcessRequest);
 }
 
@@ -187,7 +205,7 @@ static int makeUpdateInformationResponse(
     if (deserializeResult != nx::update::FindPackageResult::ok || !resultUpdateInformation.isValid())
     {
         return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-            toString(nx::update::InformationError::notFoundError), result, contentType,
+            toString(nx::update::InformationError::noNewVersion), result, contentType,
             request.format, request.extraFormatting, QnRestResult::CantProcessRequest);
     }
 
