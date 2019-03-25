@@ -152,7 +152,7 @@ void CommonHttpAcceptor::createConnection(
             connectionSeq,
             commandPipelinePtr),
         connectionRequestAttributes.connectionId,
-        {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
+        {systemId, connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString()},
         network::http::getHeaderValue(requestContext.request.headers, "User-Agent").toStdString()};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
