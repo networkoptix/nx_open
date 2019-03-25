@@ -4,6 +4,7 @@
 #include <cstring>
 #include <memory>
 
+#include <QtCore/QLocale>
 #include <QtCore/QString>
 
 #include <nx/network/socket_common.h>
@@ -25,14 +26,14 @@ namespace {
 QDateTime parseRfc1123Date(const QByteArray& date)
 {
     static constexpr char kRfc1123Template[] = "ddd, dd MMM yyyy hh:mm:ss";
-    return QDateTime::fromString(date, kRfc1123Template);
+    return QLocale(QLocale::C).toDateTime(date, kRfc1123Template);
 }
 
 // Sunday, 06-Nov-94 08:49:37 GMT (RFC 850, obsoleted by RFC 1036)
 QDateTime parseRfc850Date(const QByteArray& date)
 {
     static constexpr char kRfc850Template[] = "dddd, dd-MMM-yy hh:mm:ss";
-    return QDateTime::fromString(date, kRfc850Template);
+    return QLocale(QLocale::C).toDateTime(date, kRfc850Template);
 }
 
 // Sun Nov  6 08:49:37 1994  (ANSI C's asctime() format)
@@ -42,7 +43,9 @@ QDateTime parseAnsiCDate(const QByteArray& date)
     // Non padded if the day of the month is >= 10, and padded if day of the month is < 10
     static constexpr char kAnsiCTemplate[]       = "ddd MMM d hh:mm:ss yyyy";
     static constexpr char kAnsiCTemplatePadded[] = "ddd MMM  d hh:mm:ss yyyy";
-    return QDateTime::fromString(date, date[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
+    return QLocale(QLocale::C).toDateTime(
+        date,
+        date[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
 }
 
 } //namespace
