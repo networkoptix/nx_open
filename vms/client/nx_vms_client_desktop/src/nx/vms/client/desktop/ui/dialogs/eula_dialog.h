@@ -22,7 +22,7 @@ public:
 
     void setEulaHtml(const QString& value);
 
-    virtual bool hasHeightForWidth() const;
+    virtual bool hasHeightForWidth() const override;
 
     static bool acceptEulaHtml(const QString& html, QWidget* parent = nullptr);
     static bool acceptEulaFromFile(const QString& path, QWidget* parent = nullptr);

@@ -694,7 +694,7 @@ void QnClientModule::initLocalResources()
     commonModule->store(new QnLocalResourceStatusWatcher());
     if (!m_startupParameters.skipMediaFolderScan)
     {
-        auto localFilesSearcher = commonModule->store(new QnResourceDirectoryBrowser());
+        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;
         paths.append(qnSettings->mediaFolder());
         paths.append(qnSettings->extraMediaFolders());

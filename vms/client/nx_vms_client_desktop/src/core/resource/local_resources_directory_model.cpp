@@ -6,24 +6,24 @@ using namespace std::literals::chrono_literals;
 
 namespace nx::vms::client::desktop {
 
-QnLocalResourcesDirectoryModel::QnLocalResourcesDirectoryModel(QObject* parent):
+LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
     base_type(parent)
 {
     m_deferredDirectoryChangeHandlerTimer.setSingleShot(true);
 
     connect(&m_fileSystemWatcher, &QFileSystemWatcher::directoryChanged,
-        this, &QnLocalResourcesDirectoryModel::onDirectoryChanged);
+        this, &LocalResourcesDirectoryModel::onDirectoryChanged);
 
     connect(&m_deferredDirectoryChangeHandlerTimer, &QTimer::timeout,
-        this, &QnLocalResourcesDirectoryModel::processPendingDirectoryChanges);
+        this, &LocalResourcesDirectoryModel::processPendingDirectoryChanges);
 }
 
-QStringList QnLocalResourcesDirectoryModel::getLocalResourcesDirectories() const
+QStringList LocalResourcesDirectoryModel::getLocalResourcesDirectories() const
 {
     return m_localResourcesDirectories;
 }
 
-void QnLocalResourcesDirectoryModel::setLocalResourcesDirectories(const QStringList& paths)
+void LocalResourcesDirectoryModel::setLocalResourcesDirectories(const QStringList& paths)
 {
     QStringList cleanedPaths;
     for (const auto& path: paths)
@@ -48,7 +48,7 @@ void QnLocalResourcesDirectoryModel::setLocalResourcesDirectories(const QStringL
         removeWatchedDirectory(removedDirectory);
 }
 
-QStringList QnLocalResourcesDirectoryModel::getAllFilePaths() const
+QStringList LocalResourcesDirectoryModel::getAllFilePaths() const
 {
     QStringList result;
     for (auto i = m_childFiles.cbegin(); i != m_childFiles.cend(); ++i)
@@ -59,7 +59,7 @@ QStringList QnLocalResourcesDirectoryModel::getAllFilePaths() const
     return result;
 }
 
-QStringList QnLocalResourcesDirectoryModel::getFilePaths(const QString& directoryPath)
+QStringList LocalResourcesDirectoryModel::getFilePaths(const QString& directoryPath)
 {
     QStringList result;
     for (auto i = m_childFiles.cbegin(); i != m_childFiles.cend(); ++i)
@@ -72,7 +72,7 @@ QStringList QnLocalResourcesDirectoryModel::getFilePaths(const QString& director
     return result;
 }
 
-void QnLocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
+void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
 {
     QDir dir(path);
     const auto canonicalPath = dir.canonicalPath();
@@ -92,7 +92,7 @@ void QnLocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
 }
 
-void QnLocalResourcesDirectoryModel::removeWatchedDirectory(const QString& path)
+void LocalResourcesDirectoryModel::removeWatchedDirectory(const QString& path)
 {
     for (const auto& key: m_childFiles.keys())
     {
@@ -110,7 +110,7 @@ void QnLocalResourcesDirectoryModel::removeWatchedDirectory(const QString& path)
     }
 }
 
-void QnLocalResourcesDirectoryModel::onDirectoryChanged(const QString& directoryPath)
+void LocalResourcesDirectoryModel::onDirectoryChanged(const QString& directoryPath)
 {
     const auto delay = 100ms;
     m_pendingDirectoryChanges.append(directoryPath);
@@ -119,7 +119,7 @@ void QnLocalResourcesDirectoryModel::onDirectoryChanged(const QString& directory
     m_deferredDirectoryChangeHandlerTimer.start(delay);
 }
 
-void QnLocalResourcesDirectoryModel::processPendingDirectoryChanges()
+void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
 {
     m_pendingDirectoryChanges.removeDuplicates();
 

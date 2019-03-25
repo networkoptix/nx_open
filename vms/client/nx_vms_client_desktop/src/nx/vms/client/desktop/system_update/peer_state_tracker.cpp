@@ -270,7 +270,7 @@ void PeerStateTracker::setVersionInformation(
 
             if (installed != item->installed)
             {
-                item->installed = true;
+                item->installed = installed;
                 NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
             }
             emit itemChanged(item);

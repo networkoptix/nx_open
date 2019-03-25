@@ -39,14 +39,22 @@ EulaDialog::EulaDialog(QWidget* parent):
     ui->titleLabel->setFont(font);
     ui->titleLabel->setForegroundRole(QPalette::Light);
 
-    ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    //ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    // We have replaced standard buttons to keep our own button order and style.
 
-    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setText(tr("I Agree"));
-    setAccentStyle(okButton);
+    connect(ui->accept, &QPushButton::clicked, this,
+        [this]()
+        {
+            done(QDialog::DialogCode::Accepted);
+        });
 
-    const auto cancelButton = ui->buttonBox->button(QDialogButtonBox::Cancel);
-    cancelButton->setText(tr("I Do Not Agree"));
+    connect(ui->reject, &QPushButton::clicked, this,
+        [this]()
+        {
+            done(QDialog::DialogCode::Rejected);
+        });
+
+    setAccentStyle(ui->accept);
 
     NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
 }
@@ -69,6 +77,7 @@ void EulaDialog::setTitle(const QString& value)
 void EulaDialog::setEulaHtml(const QString& value)
 {
     ui->eulaView->setHtml(value);
+    ui->copyToClipboard->setClipboardText(value);
 }
 
 bool EulaDialog::hasHeightForWidth() const
@@ -82,7 +91,7 @@ void EulaDialog::updateSize()
     if (!window)
         return;
 
-    const auto maximumSize = window->screen()->size()
+    const auto maximumSize = window->screen()->availableSize()
         - client::core::Geometry::sizeDelta(window->frameMargins());
 
     setFixedSize(kDesiredSize.boundedTo(maximumSize));
@@ -104,7 +113,7 @@ bool EulaDialog::event(QEvent* event)
 
             updateSize();
             window->setFramePosition(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-                window->frameGeometry().size(), window->screen()->geometry()).topLeft());
+                window->frameGeometry().size(), window->screen()->availableGeometry()).topLeft());
 
             break;
         }

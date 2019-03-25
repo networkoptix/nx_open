@@ -245,6 +245,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << contents.info.version << ") client arch"
                 << systemInfo.arch
                 << "platform" << systemInfo.platform
+                << "variant" << systemInfo.modification
                 << "is missing its update package";
             contents.missingUpdate.insert(clientId);
         }
@@ -298,6 +299,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << server->getId()
                 << "arch" << serverInfo.arch
                 << "platform" << serverInfo.platform
+                << "variant" << serverInfo.modification
                 << "is missing its update package";
             contents.missingUpdate.insert(server->getId());
             continue;

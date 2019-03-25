@@ -5,13 +5,13 @@
 
 namespace nx::vms::client::desktop {
 
-class QnLocalResourcesDirectoryModel : public QObject
+class LocalResourcesDirectoryModel : public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    QnLocalResourcesDirectoryModel(QObject* parent = nullptr);
+    LocalResourcesDirectoryModel(QObject* parent = nullptr);
 
     QStringList getLocalResourcesDirectories() const;
     void setLocalResourcesDirectories(const QStringList& paths);

@@ -1478,7 +1478,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
             loadDataToUi();
 
             auto complete = peersComplete;
-            QScopedPointer<QnMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Success);
 
@@ -1502,6 +1502,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
 
             bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
                 && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
+
             completeInstallation(shouldRestartClient);
         }
         // No servers have installed updates
@@ -1755,8 +1756,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         hasLatestVersion = true;
     else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
         hasLatestVersion = true;
-    //if (m_updateInfo.isValid() && m_updateInfo.sourceType != UpdateSourceType::internet)
-    //    hasLatestVersion = false;
 
     if (m_updateInfo.error != nx::update::InformationError::noNewVersion
         && m_updateInfo.error != nx::update::InformationError::noError)
