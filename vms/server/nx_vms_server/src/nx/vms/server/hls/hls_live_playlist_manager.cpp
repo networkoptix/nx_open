@@ -116,7 +116,8 @@ void LivePlaylistManager::onKeyFrame(quint64 currentPacketTimestampUSec)
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_VERBOSE(this, lm("got key frame %1").arg(currentPacketTimestampUSec));
+    NX_VERBOSE(this, "got key frame %1, chunk mseq: %2, chunk duration %3",
+        currentPacketTimestampUSec, m_currentChunk.mediaSequence, m_currentChunk.duration);
 
     if (m_currentChunk.mediaSequence > 0)
     {

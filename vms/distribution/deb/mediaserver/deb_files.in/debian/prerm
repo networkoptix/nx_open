@@ -20,6 +20,25 @@ BIN_DIR="$BASE_DIR/bin"
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
+WITH_ROOT_TOOL='@withRootTool@'
+
+service $COMPANY_NAME-mediaserver stop || true
+
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    service $COMPANY_NAME-root-tool stop || true
+fi
+
+if is_systemd_used
+then
+    systemctl disable $COMPANY_NAME-mediaserver
+
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
+    then
+        systemctl disable $COMPANY_NAME-root-tool
+    fi
+fi
+
 if [ "$1" = "remove" ]
 then
     REMOVE="Remove the Database"
@@ -34,19 +53,12 @@ then
     db_go || true
     db_get @deb.customization.company.name@-mediaserver/removeDatabase
 
-    if is_systemd_used
-    then
-        systemctl disable $COMPANY_NAME-mediaserver
-        systemctl disable $COMPANY_NAME-root-tool
-    else
-        service $COMPANY_NAME-mediaserver stop || true
-        service $COMPANY_NAME-root-tool stop || true
-    fi
-
     $CFG_HELPER sysIdTime -d
 
     if [ "$RET" = "$REMOVE" ]
     then
-        rm -f /opt/$COMPANY_NAME/mediaserver/var/*.sqlite*
+        find "/opt/$COMPANY_NAME/mediaserver/var" -name "*.sqlite*" \
+            -a ! -name "ecs_static.sqlite*" \
+            |xargs rm -f
     fi
 fi

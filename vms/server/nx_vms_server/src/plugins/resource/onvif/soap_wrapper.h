@@ -348,6 +348,7 @@ NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(DeviceIO,
     _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
 NX_DECLARE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
+NX_DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfiguration)
 NX_DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
 NX_DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
 NX_DECLARE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
@@ -561,6 +562,10 @@ namespace DeviceIO
 
 namespace Media
 {
+    using VideoEncoderConfiguration = RequestWrapper<
+        _onvifMedia__GetVideoEncoderConfiguration,
+        _onvifMedia__GetVideoEncoderConfigurationResponse>;
+
     using VideoEncoderConfigurations = RequestWrapper<
         _onvifMedia__GetVideoEncoderConfigurations,
         _onvifMedia__GetVideoEncoderConfigurationsResponse>;

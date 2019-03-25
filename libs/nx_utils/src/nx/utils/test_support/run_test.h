@@ -102,7 +102,7 @@ public:
     {
         const auto oldValue = *iniField;
         T* mutableField = const_cast<T*>(iniField);
-        m_iniGuards.push_back(makeSharedGuard([=](){ *mutableField = oldValue; }));
+        m_iniGuards.push_back(makeSharedGuard([=]() { *mutableField = oldValue; }));
         *mutableField = newValue;
     }
 

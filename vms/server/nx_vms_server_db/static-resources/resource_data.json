@@ -2289,6 +2289,7 @@
         },
         {
             "keys":["DW|DWC-PB6M4T"],
+            "operationalPtzCapabilities": "NoPtzCapabilities",
             "forcedOnvifParams":
             {
                 "videoEncoders":

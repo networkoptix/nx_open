@@ -286,9 +286,20 @@ void MediaEncoder::fillResolutionList(
 }
 
 int MediaEncoder::getConfiguredLiveStreamReader(
-    nxcip::LiveStreamConfig* /*config*/, nxcip::StreamReader** /*reader*/)
+    nxcip::LiveStreamConfig* config, nxcip::StreamReader** reader)
 {
-    return nxcip::NX_NOT_IMPLEMENTED;
+    if (config)
+    {
+        setResolution({config->width, config->height});
+        int selectedBitrate;
+        setBitrate(config->bitrateKbps, &selectedBitrate);
+        float selectedFps;
+        setFps(config->framerate, &selectedFps);
+        bool audioEnabled = config->flags & nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
+        m_camera->setAudioEnabled(audioEnabled);
+    }
+    *reader = getLiveStreamReader();
+    return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])

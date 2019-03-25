@@ -3934,7 +3934,10 @@ void MediaServerProcess::connectSignals()
 
 void MediaServerProcess::setUpDataFromSettings()
 {
-    QnMulticodecRtpReader::setDefaultTransport(serverModule()->settings().rtspTransport());
+    QnMulticodecRtpReader::setDefaultTransport(QnLexical::deserialized(
+        serverModule()->settings().rtspTransport(),
+        nx::vms::api::RtpTransportType::automatic));
+
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(serverModule()->settings().appserverPassword());
     commonModule()->setUseLowPriorityAdminPasswordHack(
