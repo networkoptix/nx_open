@@ -282,6 +282,67 @@ void Engine::settingsReceived()
     }
 }
 
+static std::string timestampedObjectMetadataToString(const ITimestampedObjectMetadata* metadata)
+{
+    if (!metadata)
+        return "null";
+
+    return nx::kit::utils::format("timestamp: %lld, id: %s",
+        metadata->timestampUs(), UuidHelper::toStdString(metadata->id()).c_str());
+}
+
+static std::string objectTrackToString(
+    const IList<ITimestampedObjectMetadata>* track,
+    Uuid expectedObjectId)
+{
+    using nx::kit::utils::format;
+
+    if (!track)
+        return "null";
+
+    if (track->count() == 0)
+        return "empty";
+
+    std::string result = format("%d metadata items", track->count());
+
+    Uuid objectIdFromTrack;
+    for (int i = 0; i < track->count(); ++i)
+    {
+        const auto timestampedObjectMetadata = track->at(i);
+        objectIdFromTrack = timestampedObjectMetadata->id();
+        if (objectIdFromTrack != track->at(0)->id())
+        {
+            if (!result.empty())
+                result += "; ";
+            result += format("INTERNAL ERROR: Object id #%d %s does not equal object id #0 %s",
+                i,
+                UuidHelper::toStdString(objectIdFromTrack).c_str(),
+                UuidHelper::toStdString(track->at(0)->id()).c_str());
+            break;
+        }
+    }
+
+    if (objectIdFromTrack != expectedObjectId)
+    {
+        if (!result.empty())
+            result += "; ";
+        result += format("INTERNAL ERROR: Object id in the track is %s, but in the action is %s",
+            UuidHelper::toStdString(objectIdFromTrack).c_str(),
+            UuidHelper::toStdString(expectedObjectId).c_str());
+    }
+
+    return result;
+}
+
+static std::string uncompressedVideoFrameToString(const IUncompressedVideoFrame* frame)
+{
+    if (!frame)
+        return "null";
+
+    return nx::kit::utils::format("%dx%d %s",
+        frame->width(), frame->height(), pixelFormatToStdString(frame->pixelFormat()).c_str());
+}
+
 void Engine::executeAction(
     const std::string& actionId,
     Uuid objectId,
@@ -295,9 +356,27 @@ void Engine::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
+        *outMessageToUser =
+            std::string("Object id: ") + UuidHelper::toStdString(objectId) + "\n\n";
+
+        if (!objectTrackInfo)
+        {
+            *outMessageToUser += "No object track info provided.\n\n";
+        }
+        else
+        {
+            *outMessageToUser += std::string("Object track info:\n")
+                + "    Track: " + objectTrackToString(objectTrackInfo->track(), objectId) + "\n"
+                + "    Best shot frame: "
+                    + uncompressedVideoFrameToString(objectTrackInfo->bestShotVideoFrame()) + "\n"
+                + "    Best shot metadata: "
+                    + timestampedObjectMetadataToString(objectTrackInfo->bestShotObjectMetadata())
+                + "\n\n";
+        }
+
         if (!params.empty())
         {
-            *outMessageToUser = std::string("Your param values are:\n");
+            *outMessageToUser += std::string("Your param values are:\n");
             bool first = true;
             for (const auto& entry: params)
             {
@@ -313,16 +392,17 @@ void Engine::executeAction(
         }
         else
         {
-            *outMessageToUser = "No action parameters have been provided";
+            *outMessageToUser += "No param values provided.";
         }
 
-        NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
+        NX_PRINT << __func__ << "(): Returning a message: "
+            << nx::kit::utils::toString(*outMessageToUser);
     }
     else if (actionId == "nx.stub.addPerson")
     {
         *outActionUrl =
             "http://internal.server/addPerson?objectId=" + UuidHelper::toStdString(objectId);
-        NX_PRINT << __func__ << "(): Returning URL: [" << *outActionUrl << "]";
+        NX_PRINT << __func__ << "(): Returning URL: " << nx::kit::utils::toString(*outActionUrl);
     }
     else
     {
