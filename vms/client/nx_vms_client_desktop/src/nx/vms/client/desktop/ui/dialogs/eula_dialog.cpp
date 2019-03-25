@@ -74,10 +74,18 @@ void EulaDialog::setTitle(const QString& value)
     ui->titleLabel->setText(value);
 }
 
-void EulaDialog::setEulaHtml(const QString& value)
+void EulaDialog::setEulaHtml(const QString& html)
 {
-    ui->eulaView->setHtml(value);
-    ui->copyToClipboard->setClipboardText(value);
+    const auto eulaHtmlStyle = NxUi::generateCssStyle();
+
+    auto eulaText = html;
+    eulaText.replace(
+        lit("<head>"),
+        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
+
+    ui->eulaView->setHtml(eulaText);
+    // We do not want to copy embedded style to clipboard.
+    ui->copyToClipboard->setClipboardText(html);
 }
 
 bool EulaDialog::hasHeightForWidth() const
@@ -144,16 +152,10 @@ bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
         eulaHeader = tr("To use the software you must agree with the end user license agreement");
     }
 
-    const auto eulaHtmlStyle = NxUi::generateCssStyle();
-
-    auto eulaText = html;
-    eulaText.replace(
-        lit("<head>"),
-        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
-
     EulaDialog eulaDialog(parent);
     eulaDialog.setTitle(eulaHeader);
-    eulaDialog.setEulaHtml(eulaText);
+    eulaDialog.setEulaHtml(html);
+
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
         qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
