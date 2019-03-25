@@ -205,8 +205,7 @@ bool TimeSynchronizationServersModel::setData(const QModelIndex& index, const QV
     if (state == Qt::Unchecked)
         return false;
 
-    const auto server = m_servers[index.row()];
-    emit serverSelected(server.id);
+    emit serverSelected(index);
     return true;
 }
 

@@ -112,10 +112,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(ui->serversTable->hoverTracker(), &ItemViewHoverTracker::rowEnter, this, setHovered);
     connect(ui->serversTable->hoverTracker(), &ItemViewHoverTracker::rowLeave, this, clearHovered);
 
-    //connect(m_serversModel, &Model::serverSelected, m_store,
-    //    &TimeSynchronizationWidgetStore::selectServer);
-
-    connect(ui->serversTable, &TableView::pressed, this,
+    const auto selectServer =
         [this](const QModelIndex& index)
         {
             const QnUuid& serverId = index.data(Model::ServerIdRole).value<QnUuid>();
@@ -128,7 +125,10 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
                 if (m_store->state().status ==  State::Status::synchronizedWithSelectedServer)
                     m_delegate->setBaseRow(row);
             }
-        });
+        };
+
+    connect(m_serversModel, &Model::serverSelected, this, selectServer);
+    connect(ui->serversTable, &TableView::pressed, this, selectServer);
 
     const auto updateTime =
         [this]

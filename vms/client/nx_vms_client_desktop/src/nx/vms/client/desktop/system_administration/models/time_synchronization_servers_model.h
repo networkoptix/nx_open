@@ -51,7 +51,7 @@ public:
     void loadState(const State& state);
 
 signals:
-    void serverSelected(const QnUuid& id);
+    void serverSelected(const QModelIndex& index);
 
 private:
     bool isValid(const QModelIndex& index) const;
