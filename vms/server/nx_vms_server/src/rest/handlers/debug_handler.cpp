@@ -85,14 +85,14 @@ int QnDebugHandler::executeGet(
                 "Ignoring - unsupported params " + containerString(params));
 
         case Action::delayS:
-            {
-                const auto delayS = value.toInt();
-                if (!delayS)
-                    return result(StatusCode::forbidden, "Ignoring - invalid delay " + value);
+        {
+            const auto delayS = value.toInt();
+            if (!delayS)
+                return result(StatusCode::forbidden, "Ignoring - invalid delay " + value);
 
-                std::this_thread::sleep_for(std::chrono::seconds(delayS));
-                return result(StatusCode::ok, "Delayed reply");
-            }
+            std::this_thread::sleep_for(std::chrono::seconds(delayS));
+            return result(StatusCode::ok, "Delayed reply");
+        }
     }
     const QString message = lm("Unexpected enum value: %1").arg(static_cast<int>(action));
     NX_ASSERT(false, message);

@@ -160,7 +160,7 @@ void ServerConnection::trace(int handle, const QString& message) const
 
 Handle ServerConnection::getStatisticsSettingsAsync(
     Result<QByteArray>::type callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     QnEmptyRequestData emptyRequest;
     emptyRequest.format = Qn::SerializationFormat::UbjsonFormat;
@@ -182,7 +182,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
 Handle ServerConnection::sendStatisticsAsync(
     const QnSendStatisticsRequestData& statisticsData,
     PostCallback callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     static const auto path = lit("/ec2/statistics/send");
 
@@ -725,7 +725,7 @@ Handle ServerConnection::getStatistics(
 
 Handle ServerConnection::getEvents(QnEventLogRequestData request,
     Result<EventLogData>::type callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     request.format = Qn::SerializationFormat::UbjsonFormat;
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
@@ -733,7 +733,7 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
 
 Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& request,
     Result<EventLogData>::type callback,
-    QThread *targetThread)
+    QThread* targetThread)
 {
     return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
 }
@@ -989,7 +989,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
 }
 
 Handle ServerConnection::debug(
-    const QString& action, const QString& value, PostCallback callback, QThread *targetThread)
+    const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
 {
     return executeGet("/api/debug", {{action, value}}, callback, targetThread);
 }
