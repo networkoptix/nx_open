@@ -3992,6 +3992,12 @@ void HanwhaResource::setPtzCalibarionTimer()
         kUpdateTimeout);
 }
 
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
+    HanwhaResource::advancedParametersProviders()
+{
+    return { &m_advancedParametersProvider };
+}
+
 } // namespace plugins
 } // namespace vms::server
 } // namespace nx
