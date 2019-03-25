@@ -28,9 +28,11 @@ enum TunnelMethod
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
+static constexpr char kTunnelTag[] = "/HttpTunnelingTest";
 
+template<typename TunnelMethodMask>
 class HttpTunneling:
-    public ::testing::TestWithParam<int /*Tunnel methods mask*/>,
+    public ::testing::Test,
     private TunnelAuthorizer<>
 {
 public:
@@ -40,12 +42,12 @@ public:
             this)
     {
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
-            [this](const nx::utils::Url& baseUrl)
+            [this](const std::string& tag, const nx::utils::Url& baseUrl)
             {
-                return m_localFactory.create(baseUrl);
+                return m_localFactory.create(tag, baseUrl);
             });
 
-        enableTunnelMethods(GetParam());
+        enableTunnelMethods(TunnelMethodMask::value);
     }
 
     ~HttpTunneling()
@@ -62,9 +64,7 @@ protected:
     {
         startHttpServer();
 
-        m_tunnelingServer.registerRequestHandlers(
-            kBasePath,
-            &m_httpServer->httpMessageDispatcher());
+        m_tunnelingClient = std::make_unique<Client>(m_baseUrl, kTunnelTag);
     }
 
     void stopTunnelingServer()
@@ -82,6 +82,13 @@ protected:
         m_httpConnectionInactivityTimeout = timeout;
     }
 
+    void givenTunnellingServer()
+    {
+        m_tunnelingServer.registerRequestHandlers(
+            kBasePath,
+            &m_httpServer->httpMessageDispatcher());
+    }
+
     void addSomeCustomHttpHeadersToTheClient()
     {
         m_customHeaders.emplace("H1", "V1.1");
@@ -91,9 +98,6 @@ protected:
 
     void givenSilentTunnellingServer()
     {
-        stopTunnelingServer();
-        startHttpServer();
-
         m_httpServer->registerRequestProcessorFunc(
             http::kAnyPath,
             [this](auto&&... args) { leaveRequestWithoutResponse(std::move(args)...); });
@@ -101,7 +105,6 @@ protected:
 
     void whenRequestTunnel()
     {
-        m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
         m_tunnelingClient->setCustomHeaders(m_customHeaders);
 
         if (m_timeout)
@@ -126,6 +129,7 @@ protected:
     {
         m_prevClientTunnelResult = m_clientTunnels.pop();
 
+        ASSERT_EQ(ResultCode::ok, m_prevClientTunnelResult.resultCode);
         ASSERT_EQ(SystemError::noError, m_prevClientTunnelResult.sysError);
         ASSERT_TRUE(StatusCode::isSuccessCode(m_prevClientTunnelResult.httpStatus));
         ASSERT_NE(nullptr, m_prevClientTunnelResult.connection);
@@ -141,13 +145,24 @@ protected:
     {
         m_prevClientTunnelResult = m_clientTunnels.pop();
 
-        ASSERT_NE(SystemError::noError, m_prevClientTunnelResult.sysError);
+        ASSERT_NE(ResultCode::ok, m_prevClientTunnelResult.resultCode);
+        // NOTE: sysError and httpStatus of m_prevClientTunnelResult may be ok.
         ASSERT_EQ(nullptr, m_prevClientTunnelResult.connection);
     }
 
     void andResultCodeIs(SystemError::ErrorCode expected)
     {
         ASSERT_EQ(expected, m_prevClientTunnelResult.sysError);
+    }
+
+    Client& tunnelingClient()
+    {
+        return *m_tunnelingClient;
+    }
+
+    detail::ClientFactory& tunnelClientFactory()
+    {
+        return m_localFactory;
     }
 
     void andCustomHeadersAreReportedToTheServer()
@@ -181,9 +196,9 @@ private:
     std::unique_ptr<Client> m_tunnelingClient;
     detail::ClientFactory m_localFactory;
     detail::ClientFactory::Function m_clientFactoryBak;
-    std::unique_ptr<TestHttpServer> m_httpServer;
     nx::utils::SyncQueue<OpenTunnelResult> m_clientTunnels;
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
+    std::unique_ptr<TestHttpServer> m_httpServer;
     http::HttpHeaders m_customHeaders;
     http::Request m_lastOpenTunnelRequestReceivedByServer;
     OpenTunnelResult m_prevClientTunnelResult;
@@ -210,7 +225,6 @@ private:
         }
 
         ASSERT_TRUE(m_httpServer->bindAndListen());
-
         m_baseUrl = nx::network::url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_httpServer->serverAddress())
             .setPath(kBasePath);
@@ -279,5 +293,7 @@ private:
     {
     }
 };
+
+TYPED_TEST_CASE_P(HttpTunneling);
 
 } // namespace nx::network::http::tunneling::test

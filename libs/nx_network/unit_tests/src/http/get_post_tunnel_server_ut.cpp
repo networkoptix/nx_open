@@ -8,8 +8,9 @@
 
 namespace nx::network::http::tunneling::test {
 
+struct GetPostMethodMask { static constexpr int value = TunnelMethod::getPost; };
 class HttpTunnelingGetPost:
-    public HttpTunneling
+    public HttpTunneling<GetPostMethodMask>
 {
 public:
     HttpTunnelingGetPost()
@@ -66,12 +67,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_tunnelConnection;
 };
 
-INSTANTIATE_TEST_CASE_P(
-    Specific,
-    HttpTunnelingGetPost,
-    ::testing::Values(TunnelMethod::getPost));
-
-TEST_P(HttpTunnelingGetPost, connection_is_closed_by_timeout_if_post_never_comes)
+TEST_F(HttpTunnelingGetPost, connection_is_closed_by_timeout_if_post_never_comes)
 {
     whenSendGetRequest();
     thenTunnelIsClosedByServerEventually();
