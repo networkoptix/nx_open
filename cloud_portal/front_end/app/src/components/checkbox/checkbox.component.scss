@@ -93,9 +93,10 @@ nx-checkbox {
 .tick {
     cursor                      : pointer;
     position                    : relative;
-    margin                      : -1px 0 0 0;
     width                       : 24px;
     height                      : 20px;
+    display                     : flex;
+    align-items                 : center;
     -webkit-tap-highlight-color : transparent;
 
     &.checked {

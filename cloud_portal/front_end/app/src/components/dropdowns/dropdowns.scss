@@ -158,7 +158,8 @@ header {
             nx-checkbox {
                 position : absolute;
                 left     : 10px;
-                top      : 4px;
+                top      : 3px;
+                height   : 20px;
                 
                 & + label {
                     position     : absolute;
@@ -166,6 +167,7 @@ header {
                     margin       : 0;
                     cursor       : pointer;
                     width        : calc(100% - 10px);
+                    line-height  : 20px;
                 }
             }
             
