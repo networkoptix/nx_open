@@ -31,6 +31,8 @@
 #include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
 
+#include <plugins/resource/onvif/onvif_multicast_parameters_provider.h>
+
 #include "soap_wrapper.h"
 #include "video_encoder_config_options.h"
 
@@ -266,6 +268,11 @@ public:
 
     std::string videoSourceToken() const;
     void setVideoSourceToken(std::string token);
+
+    std::string videoEncoderConfigurationToken(nx::vms::api::StreamIndex streamIndex) const;
+    void setVideoEncoderConfigurationToken(
+        nx::vms::api::StreamIndex streamIndex,
+        std::string token);
 
     std::string audioSourceConfigurationToken() const;
     void setAudioSourceConfigurationToken(std::string token);
@@ -598,6 +605,8 @@ private:
     std::string m_ptzConfigurationToken;
     std::string m_ptzProfileToken;
 
+    std::map<nx::vms::api::StreamIndex, std::string> m_videoEncoderConfigurationTokens;
+
     QString m_imagingUrl;
     QString m_ptzUrl;
     mutable int m_timeDrift;
@@ -666,6 +675,7 @@ private:
         _onvifDevice__GetCapabilitiesResponse* response);
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo(const _onvifDevice__GetCapabilitiesResponse& response);
+    void detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response);
     bool getVideoEncoderTokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
         QStringList* tokenList);
@@ -722,6 +732,8 @@ private:
 
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;
+    nx::vms::server::resource::OnvifMulticastParametersProvider m_secondaryMulticastParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };

@@ -423,6 +423,8 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_inputPortCount(0),
     m_videoLayout(nullptr),
     m_advancedParametersProvider(this),
+    m_primaryMulticastParametersProvider(this, StreamIndex::primary),
+    m_secondaryMulticastParametersProvider(this, StreamIndex::secondary),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
@@ -706,11 +708,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         onvifTimeouts(),
         getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     _onvifDevice__GetCapabilitiesResponse capabilitiesResponse;
+
     /*
      Warning! The capabilitiesResponse lifetime must be not more then deviceSoapWrapper lifetime,
      because DeviceSoapWrapper destructor destroys internals of _onvifDevice__GetCapabilitiesResponse.
     */
-
     auto result = initOnvifCapabilitiesAndUrls(deviceSoapWrapper, &capabilitiesResponse); //< step 1
     if (!checkResultAndSetStatus(result))
         return result;
@@ -764,6 +766,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
         return result;
 
     fillFullUrlInfo(*outCapabilitiesResponse);
+    detectCapabilities(*outCapabilitiesResponse);
 
     if (getMediaUrl().isEmpty())
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
@@ -1701,6 +1704,27 @@ void QnPlOnvifResource::setVideoSourceToken(std::string token)
 {
     QnMutexLocker lock(&m_mutex);
     m_videoSourceToken = std::move(token);
+}
+
+std::string QnPlOnvifResource::videoEncoderConfigurationToken(
+    nx::vms::api::StreamIndex streamIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (const auto it = m_videoEncoderConfigurationTokens.find(streamIndex);
+        it != m_videoEncoderConfigurationTokens.cend())
+    {
+        return it->second;
+    }
+
+    return std::string();
+}
+
+void QnPlOnvifResource::setVideoEncoderConfigurationToken(
+    nx::vms::api::StreamIndex streamIndex,
+    std::string token)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_videoEncoderConfigurationTokens[streamIndex] = std::move(token);
 }
 
 std::string QnPlOnvifResource::audioSourceConfigurationToken() const
@@ -3100,7 +3124,11 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
 std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnPlOnvifResource::advancedParametersProviders()
 {
-    return {&m_advancedParametersProvider};
+    return {
+        &m_advancedParametersProvider,
+        &m_primaryMulticastParametersProvider,
+        &m_secondaryMulticastParametersProvider
+    };
 }
 
 QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParameters(const QSet<QString>& ids)
@@ -4558,6 +4586,26 @@ void QnPlOnvifResource::fillFullUrlInfo(const _onvifDevice__GetCapabilitiesRespo
     {
         setDeviceIOUrl(getDeviceOnvifUrl());
     }
+}
+
+void QnPlOnvifResource::detectCapabilities(const _onvifDevice__GetCapabilitiesResponse& response)
+{
+    bool multicastIsSupported = false;
+    const QnResourceData resData = resourceData();
+    if (resData.contains(ResourceDataKey::kMulticastIsSupported))
+    {
+        multicastIsSupported = resData.value<bool>(ResourceDataKey::kMulticastIsSupported);
+    }
+    else
+    {
+        multicastIsSupported = response.Capabilities
+            && response.Capabilities->Media
+            && response.Capabilities->Media->StreamingCapabilities
+            && response.Capabilities->Media->StreamingCapabilities->RTPMulticast
+            && *response.Capabilities->Media->StreamingCapabilities->RTPMulticast;
+    }
+
+    setCameraCapability(Qn::MulticastStreamCapability, multicastIsSupported);
 }
 
 /**
