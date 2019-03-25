@@ -893,7 +893,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula = acceptedEula < newEula;
 
-        if (showEula && !EulaDialog::acceptEulaHtml(m_updateInfo.info.eula, mainWindowWidget()))
+        if (showEula && !EulaDialog::acceptEulaHtml(m_updateInfo.info.eula, newEula, mainWindowWidget()))
             return;
 
         auto targets = m_stateTracker->getAllPeers();

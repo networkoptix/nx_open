@@ -133,7 +133,7 @@ bool EulaDialog::event(QEvent* event)
     return base_type::event(event);
 }
 
-bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
+bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* parent)
 {
     // Regexp to dig out a title from html with EULA.
     QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
@@ -158,13 +158,13 @@ bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
 
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
-        qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+        qnSettings->setAcceptedEulaVersion(version);
         return true;
     }
     return false;
 }
 
-bool EulaDialog::acceptEulaFromFile(const QString& path, QWidget* parent)
+bool EulaDialog::acceptEulaFromFile(const QString& path, int version, QWidget* parent)
 {
     if (!NX_ASSERT(!path.isEmpty()))
         return false;
@@ -177,7 +177,7 @@ bool EulaDialog::acceptEulaFromFile(const QString& path, QWidget* parent)
     }
 
     const auto eulaText = QString::fromUtf8(eula.readAll());
-    return acceptEulaHtml(eulaText, parent);
+    return acceptEulaHtml(eulaText, version, parent);
 }
 
 } // namespace nx::vms::client::desktop
