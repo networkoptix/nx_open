@@ -161,6 +161,16 @@ export class NxConfigService {
                 ],
                 groups: [
                     {
+                        name      : 'arm',
+                        os        : 'arm',
+                        installers: [
+                            {
+                                platform: 'arm',
+                                appType: 'server'
+                            }
+                        ]
+                    },
+                    {
                         name      : 'windows',
                         os        : 'Windows',
                         installers: [

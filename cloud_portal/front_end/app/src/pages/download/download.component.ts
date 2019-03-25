@@ -84,8 +84,23 @@ export class DownloadComponent implements OnInit, OnDestroy {
         return this.platformMatch[ this.deviceService.getDeviceInfo().os ];
     }
 
+    private processArm(platform) {
+        const installer = platform.installers[0];
+        platform.installers = this.downloadsData.installers.filter(existingInstaller => {
+            return installer.appType === existingInstaller.appType && existingInstaller.path.indexOf('arm') > -1;
+        }).map(installer => {
+            installer.formatName =  installer.niceName;
+            installer.url = this.downloadsData.releaseUrl + installer.path;
+            return installer;
+        });
+        return platform.installers.length > 0;
+    }
+
     private getDownloadsInfo() {
         this.downloads.groups.forEach(platform => {
+            if (platform.name === 'arm') {
+                return this.processArm(platform);
+            }
             return platform.installers.filter(installer => {
                 const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
 
@@ -99,7 +114,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     installer.url = this.downloadsData.releaseUrl + installer.path;
                 }
                 return !!targetInstaller;
-            })[ 0 ];
+            })[0];
         });
     }
 
