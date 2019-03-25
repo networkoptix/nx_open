@@ -121,8 +121,13 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     const QnResourcePtr& resource) const
 {
     auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
-    if (!NX_ASSERT(camera != nullptr, lm("Resource %1 is not a camera").args(resource)))
+    if (camera == nullptr)
+    {
+        // NOTE: This method is called for any resource added to resource pool. Therefore, assertion
+        // can't be placed here, but it should be fixed some day.
+        NX_DEBUG(this, "Resource %1 is not a camera", resource);
         return QnPtzControllerPtr();
+    }
 
     NX_DEBUG(this, lm("Attempting to create PTZ controller for resource %1 (%2)")
         .args(camera->getName(), camera->getId()));
