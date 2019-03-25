@@ -111,4 +111,9 @@ SynchronizationEngine& Service::synchronizationEngine()
     return m_controller->synchronizationEngine();
 }
 
+const SynchronizationEngine& Service::synchronizationEngine() const
+{
+    return m_controller->synchronizationEngine();
+}
+
 } // namespace nx::clusterdb::engine

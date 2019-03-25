@@ -38,6 +38,7 @@ public:
     void connectToNode(const nx::utils::Url& url);
 
     SynchronizationEngine& synchronizationEngine();
+    const SynchronizationEngine& synchronizationEngine() const;
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
