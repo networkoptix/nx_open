@@ -69,6 +69,7 @@ private:
 
 TEST_F(HttpTunnelingGetPost, connection_is_closed_by_timeout_if_post_never_comes)
 {
+    givenTunnellingServer();
     whenSendGetRequest();
     thenTunnelIsClosedByServerEventually();
 }
