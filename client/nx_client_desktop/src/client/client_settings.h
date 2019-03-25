@@ -161,6 +161,7 @@ public:
 
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
+        DISABLE_MT_DECODING,
 
         VARIABLE_COUNT
     };
@@ -255,6 +256,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  500)
         QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
+        QN_DECLARE_R_PROPERTY(bool,                         disableMtDecoding,                                  DISABLE_MT_DECODING,        false)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

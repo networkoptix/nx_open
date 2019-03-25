@@ -21,6 +21,7 @@ struct DecoderConfig
     static DecoderConfig fromResource(QnResourcePtr resource);
     static DecoderConfig fromMediaResource(QnMediaResourcePtr resource);
 
+    bool disableMtDecoding = false;
     QStringList disabledCodecsForMtDecoding;
 };
 
