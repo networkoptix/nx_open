@@ -120,7 +120,10 @@ public:
      */
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
+    /** Engine id to Object type ids. */
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
+
+    /** Engine id to Event type ids. */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
     QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
