@@ -3124,11 +3124,15 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
 std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnPlOnvifResource::advancedParametersProviders()
 {
-    return {
-        &m_advancedParametersProvider,
-        &m_primaryMulticastParametersProvider,
-        &m_secondaryMulticastParametersProvider
-    };
+    std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*> providers {
+        &m_advancedParametersProvider };
+
+    if (hasCameraCapabilities(Qn::MulticastStreamCapability))
+    {
+        providers.emplace_back(&m_primaryMulticastParametersProvider);
+        providers.emplace_back(&m_secondaryMulticastParametersProvider);
+    }
+    return providers;
 }
 
 QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParameters(const QSet<QString>& ids)
