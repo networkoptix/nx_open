@@ -172,6 +172,19 @@ private:
     QElapsedTimer m_lastActivityTimer;
 
 private:
+    enum class ForceLiveCacheForPrimaryStream { no, yes, auto_ };
+
+    ForceLiveCacheForPrimaryStream getSettingForceLiveCacheForPrimaryStream(
+        const QnSecurityCamResource* cameraResource) const;
+
+    bool isLiveCacheForcingUseful(QString* outReasonForLog) const;
+
+    bool needToForceLiveCacheForPrimaryStream(
+        const QnSecurityCamResource* cameraResource, QString* outReasonForLog) const;
+
+    bool isLiveCacheNeededForPrimaryStream(
+        const QnSecurityCamResource* cameraResource, QString* outReasonForLog) const;
+
     QnVideoCameraGopKeeper* getGopKeeper(StreamIndex streamIndex) const;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(
@@ -182,7 +195,8 @@ private:
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
         const QnLiveStreamProviderPtr& primaryReader,
-        qint64 targetDurationUSec );
+        qint64 targetDurationUSec,
+        const QString& reasonForLog);
 
 private slots:
     void at_camera_resourceChanged();

@@ -16,7 +16,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, enablePersistentAnalyticsDeviceAgent,
         "Don't recreate analytics DeviceAgents on resource changes (workaround of libtegra_video.so bug).");
 
-    NX_INI_FLAG(0, forceLiveCacheForPrimaryStream, "Always cache primary stream frames in liveCache.");
     NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server");
 };
 

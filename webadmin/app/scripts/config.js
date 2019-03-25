@@ -135,7 +135,9 @@
             hanwhaChunkReaderResponseTimeoutSeconds: {type: 'number'},
             showHanwhaAlternativePtzControlsOnTile: {type: 'checkbox'},
 
-            maxEventLogRecords: {type: 'number'}
+            maxEventLogRecords: {type: 'number'},
+            
+            forceLiveCacheForPrimaryStream: {type: 'text'}
         },
         webclient: {
             useServerTime: true,
