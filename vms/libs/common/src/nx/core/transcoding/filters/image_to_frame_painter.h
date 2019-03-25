@@ -10,7 +10,7 @@
 extern "C"
 {
 #include "libavutil/pixfmt.h"
-}
+} // extern "C"
 
 class QImage;
 struct SwsContext;
