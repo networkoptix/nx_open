@@ -500,8 +500,7 @@ struct ModifyResourceAccess
 
         if (!result)
         {
-            NX_INFO(this, "%1 resource access returned false. User resource: %3. Target resource: %4",
-                "Modify",
+            NX_INFO(this, "Modify resource access returned false. User resource: %1. Target resource: %2",
                 userResource ? userResource->getId().toString() : QString(),
                 target ? target->getId().toString() : QString());
             return ErrorCode::forbidden;
@@ -541,8 +540,7 @@ struct RemoveResourceAccess
         bool result = result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
 
         if (!result)
-            NX_INFO(this, "%1 resource access returned false. User resource: %3. Target resource: %4",
-                "Remove",
+            NX_INFO(this, "Remove resource access returned false. User resource: %1. Target resource: %2",
                 userResource ? userResource->getId().toString() : QString(),
                 target ? target->getId().toString() : QString());
 
