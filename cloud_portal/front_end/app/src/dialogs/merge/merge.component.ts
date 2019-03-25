@@ -164,7 +164,7 @@ export class MergeModalContent {
         });
 
         this.cloudApi.getDownloads().then((res) => {
-            this.latestBuildUrl = `/downloads/${res.data.buildNumber}`;
+            this.latestBuildUrl = '/download';
         });
     }
 

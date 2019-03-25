@@ -31,6 +31,8 @@
                 class="btn btn-primary wide-button" (click)="activeModal.close()">
             {{ 'Ok' | translate}}
         </button>
+        <button *ngIf="config.allowDebugMode" type="button" class="btn btn-danger"
+                (click)="showMergeForm = true; outOfDate = false;">Go to Merge (Debug)</button>
     </div>
 </div>
 

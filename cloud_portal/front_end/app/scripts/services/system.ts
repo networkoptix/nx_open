@@ -105,9 +105,7 @@ import * as angular from 'angular';
 
                             this.isOnline = this.info.stateOfHealth == CONFIG.systemStatuses.onlineStatus;
                             this.isMine = this.info.ownerAccountEmail == this.currentUserEmail;
-                            this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
-                                    || CONFIG.allowDebugMode
-                                    || CONFIG.allowBetaMode);
+                            this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1);
                             this.mergeInfo = result.data[0].mergeInfo;
 
                             this.checkPermissions();
