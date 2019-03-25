@@ -1,4 +1,5 @@
 set(defaultSkin "dark_blue")
+set(enable_hanwha true)
 
 # Components Namings
 set(display.product.name "Piko")
