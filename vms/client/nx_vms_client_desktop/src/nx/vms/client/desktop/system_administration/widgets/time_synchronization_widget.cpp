@@ -176,6 +176,8 @@ void TimeSynchronizationWidget::loadDataToUi()
         qnGlobalSettings->isTimeSynchronizationEnabled(),
         qnGlobalSettings->primaryTimeServer(),
         servers);
+
+    m_store->setBaseTime(milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
 }
 
 void TimeSynchronizationWidget::applyChanges()
@@ -200,6 +202,16 @@ bool TimeSynchronizationWidget::hasChanges() const
 void TimeSynchronizationWidget::setReadOnlyInternal(bool readOnly)
 {
     m_store->setReadOnly(readOnly);
+}
+
+void TimeSynchronizationWidget::showEvent(QShowEvent* event)
+{
+    m_timeWatcher->start();
+}
+
+void TimeSynchronizationWidget::hideEvent(QHideEvent* event)
+{
+    m_timeWatcher->stop();
 }
 
 void TimeSynchronizationWidget::setupUi()

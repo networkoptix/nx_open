@@ -30,11 +30,11 @@ public:
     {
         NX_ASSERT(store);
 
-        auto timer = new QTimer(this);
-        timer->setInterval(1000);
-        timer->setSingleShot(false);
-        connect(timer, &QTimer::timeout, this, &Private::tick);
-        timer->start();
+        m_timer.setInterval(1000);
+        m_timer.setSingleShot(false);
+        connect(&m_timer, &QTimer::timeout, this, &Private::tick);
+
+        m_elapsedTimer.restart();
     }
 
     void tick()
@@ -63,7 +63,7 @@ public:
                     return;
 
                 const auto syncTime = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
-                const auto rtt = m_timer.elapsed();
+                const auto rtt = m_elapsedTimer.elapsed();
                 TimeSynchronizationWidgetStore::TimeOffsetInfoList offsetList;
 
                 for (const auto& record: data.data)
@@ -81,15 +81,22 @@ public:
             });
 
         m_tickCount = 0;
-        m_timer.restart();
+        m_elapsedTimer.restart();
 
         m_currentRequest = apiConnection->getTimeOfServersAsync(callback, thread());
         m_store->setBaseTime(m_store->state().baseTime + m_store->state().elapsedTime);
     }
 
-    milliseconds elapsedTime() const
+    void start()
     {
-        return m_timer.elapsed();
+        m_tickCount = kDelayTickCount; //< Fire request right after the start
+        tick();
+        m_timer.start();
+    }
+
+    void stop()
+    {
+        m_timer.stop();
     }
 
     void forceUpdate()
@@ -98,12 +105,18 @@ public:
         m_currentRequest = rest::Handle();
     }
 
+    milliseconds elapsedTime() const
+    {
+        return m_elapsedTimer.elapsed();
+    }
+
 private:
     QPointer<TimeSynchronizationWidgetStore> m_store;
     rest::Handle m_currentRequest;
     qint64 m_currentRequestStartTime;
-    int m_tickCount = kDelayTickCount; //< Fire request right after creation
-    nx::utils::ElapsedTimer m_timer;
+    int m_tickCount;
+    QTimer m_timer;
+    nx::utils::ElapsedTimer m_elapsedTimer;
 };
 
 TimeSynchronizationServerTimeWatcher::TimeSynchronizationServerTimeWatcher(
@@ -120,14 +133,24 @@ TimeSynchronizationServerTimeWatcher::~TimeSynchronizationServerTimeWatcher()
 {
 }
 
-milliseconds TimeSynchronizationServerTimeWatcher::elapsedTime() const
+void TimeSynchronizationServerTimeWatcher::start()
 {
-    return d->elapsedTime();
+    d->start();
+}
+
+void TimeSynchronizationServerTimeWatcher::stop()
+{
+    d->stop();
 }
 
 void TimeSynchronizationServerTimeWatcher::forceUpdate()
 {
     d->forceUpdate();
+}
+
+milliseconds TimeSynchronizationServerTimeWatcher::elapsedTime() const
+{
+    return d->elapsedTime();
 }
 
 } // namespace nx::vms::client::desktop

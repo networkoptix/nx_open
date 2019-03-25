@@ -27,9 +27,12 @@ public:
         QObject* parent = nullptr);
     virtual ~TimeSynchronizationServerTimeWatcher() override;
 
-    milliseconds elapsedTime() const;
+    void start();
+    void stop();
 
     void forceUpdate();
+
+    milliseconds elapsedTime() const;
 
 private:
     class Private;
