@@ -431,7 +431,7 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
             NX_ASSERT(metadata);
             if (!metadata)
                 return false;
-            switch(metadata->metadataType)
+            switch (metadata->metadataType)
             {
                 case MetadataType::MediaStreamEvent:
                     return true;
