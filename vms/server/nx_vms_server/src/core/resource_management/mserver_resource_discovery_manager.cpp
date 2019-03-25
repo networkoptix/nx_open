@@ -246,8 +246,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
 
         NX_VERBOSE(this, "%1 Processing resource [%2]", __func__, netResourceString(foundCamera));
-        auto existingCamera = QnResourceDiscoveryManager::findSameResource(foundCamera)
-            .dynamicCast<nx::vms::server::resource::Camera>();
+        auto existingCamera = findSameResource(foundCamera);
 
         // Handle newly discovered resources.
         if (!existingCamera)
@@ -458,6 +457,26 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(
     }
 
     return false;
+}
+
+nx::vms::server::resource::CameraPtr QnMServerResourceDiscoveryManager::findSameResource(
+    const nx::vms::server::resource::CameraPtr& camera)
+{
+    const auto& resPool = camera->commonModule()->resourcePool();
+    const auto existResource =
+        resPool->getResourceByUniqueId<nx::vms::server::resource::Camera>(camera->getUniqueId());
+    if (existResource)
+        return existResource;
+
+    for (const auto& existRes: resPool->getResources<nx::vms::server::resource::Camera>())
+    {
+        bool sameChannels = camera->getChannel() == existRes->getChannel();
+        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == camera->getMAC();
+        if (sameChannels && sameMACs)
+            return existRes;
+    }
+
+    return {};
 }
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)

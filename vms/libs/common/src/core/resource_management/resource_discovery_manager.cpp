@@ -608,29 +608,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
-// TODO: move to inheriting class
-QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetworkResourcePtr& netRes)
-{
-    auto camRes = netRes.dynamicCast<QnVirtualCameraResource>();
-    if (!camRes)
-        return QnNetworkResourcePtr();
-
-    const auto& resPool = netRes->commonModule()->resourcePool();
-    auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
-    if (existResource)
-        return existResource;
-
-    for (const auto& existRes: resPool->getResources<QnVirtualCameraResource>())
-    {
-        bool sameChannels = netRes->getChannel() == existRes->getChannel();
-        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
-        if (sameChannels && sameMACs)
-            return existRes;
-    }
-
-    return QnNetworkResourcePtr();
-}
-
 QThreadPool* QnResourceDiscoveryManager::threadPool()
 {
     return &m_threadPool;

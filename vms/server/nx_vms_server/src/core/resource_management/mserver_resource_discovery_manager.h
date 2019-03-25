@@ -26,6 +26,8 @@ public:
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 
+    static nx::vms::server::resource::CameraPtr
+        findSameResource(const nx::vms::server::resource::CameraPtr& camera);
     static bool hasIpConflict(const std::set<nx::vms::server::resource::CameraPtr>& cameras);
 
 signals:
