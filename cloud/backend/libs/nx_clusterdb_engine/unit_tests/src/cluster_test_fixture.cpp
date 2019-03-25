@@ -52,7 +52,13 @@ bool Peer::isConnectedTo(const Peer& other) const
     const auto& otherEndpoints = other.process().moduleInstance()->httpEndpoints();
     for (const auto& connection: connections)
     {
-        if (std::find(otherEndpoints.begin(), otherEndpoints.end(), connection.peerEndpoint) != otherEndpoints.end())
+        auto endpointsEqual =
+            [&connection](const auto& endpoint)
+            {
+                return connection.peerEndpoint.toStdString() == endpoint.toStdString();
+            };
+
+        if (std::any_of(otherEndpoints.begin(), otherEndpoints.end(), endpointsEqual))
             return true;
     }
 
