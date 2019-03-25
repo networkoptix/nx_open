@@ -579,7 +579,10 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     report.statusMessages << tr("Build not found");
                 }
                 else
+                {
+                    report.versionMode = VersionReport::VersionMode::empty;
                     report.statusMessages << tr("Unable to check updates on the internet");
+                }
                 break;
             case Error::jsonError:
                 if (source == SourceType::file)
