@@ -227,10 +227,14 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             item->statusMessage = status.second.message;
             item->state = status.second.code;
             if (item->state == StatusCode::latestUpdateInstalled && item->installing)
+            {
+                NX_DEBUG(this, "removing installation status for %1", item->id);
                 item->installing = false;
+            }
             if (item->statusUnknown)
             {
-                NX_DEBUG(this, "clearing unknown status for peer %1", item->id);
+                NX_DEBUG(this, "clearing unknown status for peer %1, status=%2",
+                    item->id, toString(item->state));
                 item->statusUnknown = false;
             }
             // Ignoring 'offline' status from /ec2/updateStatus.
@@ -555,6 +559,13 @@ void PeerStateTracker::processInstallTaskSet()
             switch (state)
             {
                 case StatusCode::readyToInstall:
+                    if (m_peersActive.contains(id) && !m_peersFailed.contains(id))
+                    {
+                        NX_VERBOSE(this)
+                            << "processInstallTaskSet() - peer"
+                            << id << " is not installing anything";
+                        m_peersFailed.insert(id);
+                    }
                     // Nothing to do here.
                     break;
                 case StatusCode::error:
