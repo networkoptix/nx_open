@@ -32,6 +32,7 @@
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 
@@ -225,7 +226,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QSet<QString> discoveredResources;
 
     // Assemble list of existing ip.
-    QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
+    std::map<quint32, std::set<nx::vms::server::resource::CameraPtr>> ipsList;
 
     NX_VERBOSE(this, "%1 processing %2 resources", __func__, resources.size());
 
@@ -331,15 +332,15 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         it = resources.erase(it); // do not need to investigate OK resources
     }
 
-    // TODO: check for dynamicCasts
+    // TODO: make function
     // ========================= send conflict info =====================
-    for (auto itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (const auto& [ip, cameras]: ipsList)
     {
-        if (hasIpConflict(itr.value()))
+        if (hasIpConflict(cameras))
         {
-            QHostAddress hostAddr(itr.key());
+            QHostAddress hostAddr(ip);
             QStringList conflicts;
-            for (const QnNetworkResourcePtr& camRes: itr.value())
+            for (const auto& camRes: cameras)
             {
                 // Human-readable value to help user identify a camera.
                 QString cameraId = camRes->getMAC().toString();
@@ -347,8 +348,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     cameraId = camRes->getId().toString();
 
                 conflicts << cameraId;
-                if (auto camera = camRes.dynamicCast<QnVirtualCameraResource>())
-                    camera->issueOccured();
+                camRes->issueOccured();
             }
             emit CameraIPConflict(hostAddr, conflicts);
         }
@@ -444,7 +444,8 @@ void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr &
         resource->getUniqueId(), resource->getUrl());
 }
 
-bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)
+bool QnMServerResourceDiscoveryManager::hasIpConflict(
+    const std::set<nx::vms::server::resource::CameraPtr>& cameras)
 {
     if (cameras.size() < 2)
         return false;

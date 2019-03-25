@@ -26,7 +26,7 @@ public:
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 
-    static bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras);
+    static bool hasIpConflict(const std::set<nx::vms::server::resource::CameraPtr>& cameras);
 
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
