@@ -142,7 +142,7 @@ void Acceptor::addWebSocketTransactionTransport(
     ConnectionManager::ConnectionContext context{
         std::move(transactionTransport),
         connectionId,
-        {systemId, remotePeerInfo.id.toByteArray().toStdString()},
+        {systemId, remotePeerInfo.id.toSimpleByteArray().toStdString()},
         userAgent};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))

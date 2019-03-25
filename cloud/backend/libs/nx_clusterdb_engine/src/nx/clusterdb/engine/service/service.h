@@ -59,6 +59,7 @@ private:
     Model* m_model = nullptr;
     Controller* m_controller = nullptr;
     View* m_view = nullptr;
+    std::string m_outgoingConnectionBasePath;
 };
 
 } // namespace nx::clusterdb::engine

@@ -22,7 +22,6 @@ class CommandPipelineAcceptance:
 public:
     CommandPipelineAcceptance()
     {
-        m_systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
         m_nodeId = QnUuid::createUuid().toSimpleByteArray().toStdString();
     }
 
@@ -55,8 +54,8 @@ protected:
     {
         auto connector = std::make_unique<Connector>(
             ProtocolVersionRange::any,
-            getUrlForSystem(m_systemId),
-            m_systemId,
+            getUrlForSystem(m_nodeCluster.clusterId()),
+            m_nodeCluster.clusterId(),
             m_nodeId);
         m_connectors.push_back(std::move(connector));
         m_connectors.back()->connect(
@@ -90,7 +89,7 @@ protected:
     void andConnectionIsKnownOnNode()
     {
         ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->synchronizationEngine()
-            .connectionManager().isSystemConnected(m_systemId));
+            .connectionManager().isSystemConnected(m_nodeCluster.clusterId()));
     }
 
 private:
@@ -113,16 +112,11 @@ private:
     std::vector<std::unique_ptr<AbstractCommandPipelineConnector>> m_connectors;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     std::optional<ConnectResult> m_prevConnectResult;
-    std::string m_systemId;
     std::string m_nodeId;
 
-    nx::utils::Url getUrlForSystem(const std::string& systemId)
+    nx::utils::Url getUrlForSystem(const std::string& /*systemId*/)
     {
-        auto url = m_nodeCluster.peer(0).process().moduleInstance()->synchronizationUrl();
-        url.setPath(nx::network::http::rest::substituteParameters(
-            url.path().toStdString(),
-            {systemId}).c_str());
-        return url;
+        return m_nodeCluster.peer(0).process().moduleInstance()->synchronizationUrl();
     }
 
     void processConnectResult(

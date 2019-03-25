@@ -34,7 +34,7 @@ nx::utils::Url Service::synchronizationUrl() const
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_view->httpEndpoints().front())
-        .setPath(kBaseSynchronizationPath);
+        .setPath(m_outgoingConnectionBasePath);
 }
 
 std::string Service::clusterId() const
@@ -46,10 +46,8 @@ void Service::connectToNode(const nx::utils::Url& url)
 {
     using namespace nx::network;
 
-    const auto syncApiTargetUrl = url::Builder(url).appendPath(
-        http::rest::substituteParameters(
-            kBaseSynchronizationPath,
-            {m_settings->synchronization().clusterId})).toUrl();
+    const auto syncApiTargetUrl =
+        url::Builder(url).appendPath(m_outgoingConnectionBasePath).toUrl();
 
     m_controller->synchronizationEngine().connector().addNodeUrl(
         m_settings->synchronization().clusterId,
@@ -78,8 +76,16 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     Controller controller(m_applicationId, settings, &model);
     m_controller = &controller;
 
-    View view(settings, kBaseSynchronizationPath, &controller);
+    View view(settings, settings.api().baseHttpPath, &controller);
     m_view = &view;
+
+    // TODO: #ak Replace kClusterIdParamName unconditionally.
+    m_outgoingConnectionBasePath = settings.api().baseHttpPath;
+    if (m_outgoingConnectionBasePath.find(kClusterIdParamName) != std::string::npos)
+    {
+        m_outgoingConnectionBasePath = nx::network::http::rest::substituteParameters(
+            m_outgoingConnectionBasePath, {settings.synchronization().clusterId});
+    }
 
     setup(abstractSettings);
     auto customLogicGuard = nx::utils::makeScopeGuard([this]() { teardown(); });
@@ -88,8 +94,7 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
         settings.synchronization().clusterId,
         nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(view.httpEndpoints().front())
-            .setPath(nx::network::http::rest::substituteParameters(
-                kBaseSynchronizationPath, {settings.synchronization().clusterId})).toUrl());
+            .setPath(m_outgoingConnectionBasePath).toUrl());
 
     // Process privilege reduction.
     //nx::utils::CurrentProcess::changeUser(settings.changeUser());

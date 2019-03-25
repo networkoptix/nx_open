@@ -6,14 +6,8 @@
 
 namespace nx::clusterdb::engine::api {
 
-Client::Client(
-    const nx::utils::Url& baseApiUrl,
-    const std::string& systemId)
-    :
-    base_type(nx::network::url::Builder(baseApiUrl)
-        .setPath(nx::network::http::rest::substituteParameters(
-            baseApiUrl.path().toStdString(), {systemId}))),
-    m_systemId(systemId)
+Client::Client(const nx::utils::Url& baseApiUrl):
+    base_type(baseApiUrl)
 {
 }
 
