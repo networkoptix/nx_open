@@ -286,6 +286,14 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
         {
             nxcip::AudioFormat audioFormat;
             Extras extras;
+            auto mediaEncoder5 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder5>(
+                intf, nxcip::IID_CameraMediaEncoder5);
+            if (mediaEncoder5 && mediaEncoder5->audioExtradata() != nullptr)
+            {
+                extras.extradataBlob.resize(mediaEncoder5->audioExtradataSize());
+                memcpy(extras.extradataBlob.data(), mediaEncoder5->audioExtradata(),
+                    mediaEncoder5->audioExtradataSize());
+            }
             if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                 initializeAudioContext( audioFormat, extras );
         }
@@ -635,12 +643,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
         outExtras->extradataBlob.resize(extradataSize);
         memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(),
             mediaDataPacket2->extradataSize());
-    }
-    else if (packet->codecType() == nxcip::AV_CODEC_ID_AAC)
-    {
-        AdtsHeader header;
-        if (header.decodeFromFrame((const uint8_t*)packet->data(), packet->dataSize()))
-            header.encodeToFfmpegExtradata(&outExtras->extradataBlob);
     }
 
     switch( packet->type() )

@@ -128,9 +128,9 @@ public:
     virtual QnUuid getOriginalGuid() const { return getId();  }
 
     /**
-     * Analytics engines (ids), which are actually running on the server.
+     * @return Ids of Analytics Engines which are actually running on the server.
      */
-    QSet<QnUuid> activeAnalyticsEngines() const;
+    QSet<QnUuid> activeAnalyticsEngineIds() const;
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
 

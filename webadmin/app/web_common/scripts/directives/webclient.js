@@ -1,6 +1,8 @@
 /**
  * Created by evgeniybalashov on 20/05/17.
  */
+'use strict';
+
 angular.module('nxCommon')
     .directive('webclient', function () {
         return {

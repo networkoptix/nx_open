@@ -2555,17 +2555,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Cấu hình máy chủ (s)</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Đang cập nhật máy chủ (s)</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -5091,219 +5080,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Máy chủ</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Trạng thái</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Chọn tập tin cập nhật...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Ghi chú Phát hành</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Bạn sẽ phải cập nhật các khách hàng sử dụng một trình cài đặt bằng tay.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Không thể cập nhật từ tập tin này.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Cập nhật mới nhất có sẵn</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>Tải xuống tệp Cập nhật Phiên bản Mới nhất</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Phiên bản đã Chọn</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Tải về bản cập nhật</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Chọn file cập nhật...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Chọn tập tin cập nhật</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Tải xuống trong trình duyệt bên ngoài</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Sao chép liên kết tới Clipboard</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Không thể kiểm tra cập nhật trên Internet.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Không nhận diện được số phiên bản.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Hạ cấp xuống phiên bản trước đó bị cấm.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Cập Nhật cho một hoặc nhiều máy chủ không được tìm thấy.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>Không tìm tháy cập nhật máy trạm.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Không thể trích xuất tệp cập nhật. Không còn khoảng trống trên đĩa.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Cập nhật đã hoàn thành...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Kiểm tra cập nhật...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Đang tải xuống bản Cập Nhật...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Đang cài đặt bản cập nhật...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Đang cài đặt bản cập nhật để tương thích máy chủ...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Đang đẩy cập nhật lên các máy chủ...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Đang cài đặt bản cập nhật...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Phiên bản riêng biệt...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Cập nhật lên phiên bản riêng biệt</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Cập nhật hệ thống</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Đang cập nhật hệ thống</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Hủy cập nhật</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Tiếp tục trong bối cảnh</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>Không đủ không gian trống tại %n Máy chủ:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Cố gắng cập nhật có thể gây lỗi hoặc gây ra sự cố của Máy chủ.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Cập nhật có hiệu lực</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Hoàn tất cập nhật máy chủ</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Cập nhật hoàn tất</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Cập nhật bị hủy</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Tất cả các máy chủ đã được cập nhật</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Cập nhật thất bại</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 sẽ được khởi động lại để cập nhật phiên bản.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Không thể hủy bản cập nhật ở giai đoạn này</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Vui lòng chờ cho đến khi kết thúc.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Tất cả các thành phần trong Hệ thống của bạn được cập nhật.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Tất cả các thành phần trong hệ thống của bạn đã cập nhật cho phiên bản này.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Trường hợp không tương thích %1. Để cập nhật hay ngắt kêt nối hệ thống %1 trước.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Cập nhật tệp</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>Xác nhận bản Cập Nhật...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Kiểm tra miễn phí space...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -5982,10 +5758,6 @@ to %1</source>
       <translation>Đồng bộ hoá lưu trữ từ xa đang được tiến hành</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Đã xảy ra lỗi trong quá trình đồng bộ hoá lưu trữ từ xa</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>Đồng bộ hoá lưu trữ từ xa đã được bắt đầu cho thiết bị sau:</translation>
     </message>
@@ -6034,6 +5806,10 @@ to %1</source>
     <message>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
+    </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6144,79 +5920,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Giữ để nói</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>Cập nhật đã được hoàn tất thành công.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>Cập nhật đã bị hủy bỏ.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Một người nào đó đã bắt đầu cập nhật.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Tất cả các máy chủ đã được cập nhật.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Không thể tải bản cập nhật.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Không gian trống còn lại trên đĩa.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Không thể đẩy bản cập nhật cho các máy chủ.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>Vấn đề là do %n máy chủ:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>Không gian trống còn lại trên %n máy chủ:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n máy chủ không được đáp ứng:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n máy chủ đã đi offline:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>Xác thực không thành cho %n máy chủ:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Không thể cài đặt một bản cập nhật cho khách hàng.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Không thể cài đặt các bản cập nhật trên một hoặc nhiều máy chủ.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6667,25 +6370,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6694,10 +6378,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Máy chủ từ Hệ thống khác sẽ thêm vào trong cây tài nguyên.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Không thể cập nhật Server</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6865,29 +6545,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Ghi chú Phát hành</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>Phiên bản khả dụng %1</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Các vấn đề chính đã được khắc phục. Nên cập nhật ngay.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Cập nhật...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Không thông báo lại về bản cập nhật này</translation>
     </message>
   </context>
   <context>
@@ -7960,16 +7617,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation type="unfinished">Internal error.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8001,6 +7658,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Đã dán</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Cấu hình máy chủ (s)</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Đang cập nhật máy chủ (s)</translation>
     </message>
   </context>
   <context>
@@ -8116,6 +7784,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8185,10 +7872,6 @@ to %1</source>
       <source>No events</source>
       <translation>Không có sự kiện</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation type="unfinished">No events occured</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation type="unfinished">
@@ -8198,6 +7881,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8695,26 +8382,6 @@ to %1</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation type="unfinished">Install now</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation type="unfinished">Later</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation type="unfinished">Updates downloaded</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation type="unfinished">Failed to download update packages</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
     </message>
@@ -8879,6 +8546,14 @@ to %1</source>
     <message>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
   </context>
   <context>
@@ -9436,10 +9111,40 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>Phiên bản khả dụng %1</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Ghi chú Phát hành</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Các vấn đề chính đã được khắc phục. Nên cập nhật ngay.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Cập nhật...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Không thông báo lại về bản cập nhật này</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>nhiều giá trị</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

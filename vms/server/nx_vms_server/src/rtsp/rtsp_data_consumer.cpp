@@ -426,7 +426,24 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::META_V1:
             return m_streamDataFilter.testFlag(StreamDataFilter::motion);
         case QnAbstractMediaData::GENERIC_METADATA:
-            return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+        {
+            auto metadata = std::dynamic_pointer_cast<const QnAbstractCompressedMetadata>(data);
+            NX_ASSERT(metadata);
+            if (!metadata)
+                return false;
+            switch(metadata->metadataType)
+            {
+                case MetadataType::MediaStreamEvent:
+                    return true;
+                case MetadataType::Motion:
+                    return m_streamDataFilter.testFlag(StreamDataFilter::motion);
+                case MetadataType::ObjectDetection:
+                    return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+                default:
+                    NX_WARNING(this, "Unknown generic metadata type %1", (int) metadata->metadataType);
+                    return false;
+            }
+        }
         default:
             NX_ASSERT(false, "Unexpected data type");
             return true;

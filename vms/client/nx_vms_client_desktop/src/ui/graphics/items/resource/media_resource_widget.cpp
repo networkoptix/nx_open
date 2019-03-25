@@ -269,6 +269,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             updateButtonsVisibility();
         });
 
+    connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
+        &QnMediaResourceWidget::analyticsSupportChanged);
+
     if (d->camera)
     {
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
@@ -1202,10 +1205,10 @@ void QnMediaResourceWidget::updateTwoWayAudioWidget()
 {
     const auto user = context()->user();
     const bool twoWayAudioWidgetRequired = !d->isPreviewSearchLayout
+        && user //< Video wall has userInput permission but no actual user.
         && d->camera
         && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput)
-        && NX_ASSERT(user);
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
     if (twoWayAudioWidgetRequired)
     {
@@ -1270,6 +1273,13 @@ bool QnMediaResourceWidget::isMotionSelectionEmpty() const
 
 void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
 {
+    // Just send changed() if gridRect is empty.
+    if (gridRect.isEmpty())
+    {
+        emit motionSelectionChanged();
+        return;
+    }
+
     ensureMotionSensitivity();
 
     bool changed = false;
@@ -1309,7 +1319,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
     }
 }
 
-void QnMediaResourceWidget::clearMotionSelection()
+void QnMediaResourceWidget::clearMotionSelection(bool sendMotionChanged)
 {
     if (isMotionSelectionEmpty())
         return;
@@ -1318,7 +1328,9 @@ void QnMediaResourceWidget::clearMotionSelection()
         m_motionSelection[i] = QRegion();
 
     invalidateMotionSelectionCache();
-    emit motionSelectionChanged();
+
+    if (sendMotionChanged)
+        emit motionSelectionChanged();
 }
 
 void QnMediaResourceWidget::setMotionSelection(const QList<QRegion>& regions)
@@ -2167,7 +2179,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
         // TODO: Code duplication with QnWorkbenchAccessController.
-        if (d->camera->licenseType() == Qn::LC_VMAX && !d->camera->isLicenseUsed())
+        if (d->camera->isDtsBased() && !d->camera->isLicenseUsed())
         {
             const auto requiredPermission = d->isPlayingLive()
                 ? Qn::ViewLivePermission
@@ -2765,7 +2777,8 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
-    if (!isAnalyticsSupported())
+    // We should be able to disable analytics if it is not supported anymore.
+    if (analyticsEnabled && !isAnalyticsSupported())
         return;
 
     if (auto reader = display()->archiveReader())

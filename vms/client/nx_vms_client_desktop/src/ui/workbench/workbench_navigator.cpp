@@ -1396,6 +1396,8 @@ void QnWorkbenchNavigator::timelineCatchUp(qint64 toMs)
 
     m_positionAnimator->setSpeed(catchUpMsPerSecond);
     m_positionAnimator->animateTo(toMs);
+
+    emit positionChanged(); //< We use it for Video Wall sync.
 }
 
 bool QnWorkbenchNavigator::isTimelineCatchingUp() const

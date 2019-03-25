@@ -35,10 +35,7 @@ class QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 
 public:
-    static const QString kUserEnabledAnalyticsEnginesProperty;
     static const QString kCompatibleAnalyticsEnginesProperty;
-    static const QString kDeviceAgentsSettingsValuesProperty;
-    static const QString kDeviceAgentManifestsProperty;
 
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
@@ -84,45 +81,57 @@ public:
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
     /**
-     * Analytics engines (ids) which are actually compatible, enabled and active.
+     * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
+     * the user and active (running on the current server).
      */
     QSet<QnUuid> enabledAnalyticsEngines() const;
 
     /**
-     * Analytics engines which are actually compatible, enabled and active.
+     * @return Analytics Engines which are actually compatible with the Device, enabled by the user
+     * and active (running on the current server).
      */
     const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
 
     /**
-     * Analytics engines (ids) which are explicitly enabled by the user. Not validated against
-     * actually active engines or compatible engines.
+     * @return Ids of Analytics Engines which are explicitly enabled by the user. Not validated for
+     * compatibility with the Device or if the engine is active (running on the current server).
      */
     QSet<QnUuid> userEnabledAnalyticsEngines() const;
 
     /**
-     * Update analytics engines (ids), which should be used with this camera. Not validated against
-     * actually active engines or compatible engines.
+     * Set ids of Analytics Engines which are explicitly enabled by the user. Not validated for
+     * compatibility with the Device or if the engine is active (running on the current server).
      */
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
-     * Analytics engines (ids), which can be potentially used with the camera. Only actually running
-     * on the parent server engines are included.
+     * @return Ids of Analytics Engines, which can be potentially used with the Device. Only active
+     * (running on the current server) Engines are included.
      */
     const QSet<QnUuid> compatibleAnalyticsEngines() const;
 
     /**
-     * Analytics engines, which can be potentially used with the camera. Only actually running
-     * on the parent server engines are included.
+     * @return Analytics Engines, which can be potentially used with the Device. Only active
+     * (running on the current server) Engines are included.
      */
     nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
 
     /**
-     * Update analytics engines (ids), which can be potentially used with the camera.
+     * Set ids of Analytics Engines, which can be potentially used with the Device. Only active
+     * (running on the current server) Engines must be included.
      */
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
+    /**
+     * @return Map of supported event types by the Engine id. Only actually compatible with the
+     * Device, enabled by the user and active (running on the current server) Engines are used.
+     */
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
+
+    /**
+     * @return Map of supported object types by the Engine id. Only actually compatible with the
+     * Device, enabled by the user and active (running on the current server) Engines are used.
+     */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
     QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
@@ -132,7 +141,7 @@ public:
     void setDeviceAgentSettingsValues(const QnUuid& engineId, const QVariantMap& settingsValues);
 
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
-        const QnUuid& engineId);
+        const QnUuid& engineId) const;
 
     void setDeviceAgentManifest(
         const QnUuid& engineId,
@@ -155,16 +164,16 @@ private:
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 
-    QSet<QnUuid> calculateUserEnabledAnalyticsEngines();
+    QSet<QnUuid> calculateUserEnabledAnalyticsEngines() const;
 
-    QSet<QnUuid> calculateCompatibleAnalyticsEngines();
+    QSet<QnUuid> calculateCompatibleAnalyticsEngines() const;
 
     std::map<QnUuid, std::set<QString>> calculateSupportedEntities(
         ManifestItemIdsFetcher fetcher) const;
     std::map<QnUuid, std::set<QString>> calculateSupportedEventTypes() const;
     std::map<QnUuid, std::set<QString>> calculateSupportedObjectTypes() const;
 
-    DeviceAgentManifestMap fetchDeviceAgentManifests();
+    DeviceAgentManifestMap fetchDeviceAgentManifests() const;
 
 private:
     int m_issueCounter;

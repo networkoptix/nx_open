@@ -2317,6 +2317,7 @@ void MediaServerProcess::registerRestHandlers(
      * To modify a settings, it is needed to specify the setting name as a query parameter. Thus,
      * this method doesn't have fixed parameter names. To obtain the full list of possible names,
      * call this method without parameters.
+     * Example: /api/systemSettings?smtpTimeout=30&amp;smtpUser=test
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
@@ -3864,6 +3865,7 @@ void MediaServerProcess::connectSignals()
         [this]()
         {
             Downloader* downloader = this->serverModule()->findInstance<Downloader>();
+            downloader->findExistingDownloads();
             downloader->startDownloads();
         });
 
@@ -4338,6 +4340,7 @@ void MediaServerProcess::run()
         initializeHardwareId();
 
     prepareOsResources();
+    serverModule->initializeP2PDownloader();
 
     updateAllowedInterfaces();
 
@@ -4380,7 +4383,10 @@ void MediaServerProcess::run()
     auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     if (!serverModule->serverDb()->open())
+    {
+        NX_ERROR(this, "Stopping media server because can't open database");
         return;
+    }
 
     auto utils = nx::vms::server::Utils(serverModule.get());
     if (utils.timeToMakeDbBackup())

@@ -25,6 +25,8 @@ public:
     void uninitialize();
     void updateUrl(const std::string& url);
 
+    AVCodecContext* getCodecContext();
+
 private:
     std::string ffmpegUrlPlatformDependent() const;
     int initialize();

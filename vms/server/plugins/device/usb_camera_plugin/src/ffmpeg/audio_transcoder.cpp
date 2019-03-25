@@ -33,6 +33,8 @@ int AudioTranscoder::initializeDecoder(AVStream * stream)
 
 int AudioTranscoder::initializeEncoder()
 {
+    if (m_encoder)
+        return 0;
     int result = 0;
     auto encoder = getDefaultAudioEncoder(&result);
     if (result < 0)
@@ -44,6 +46,20 @@ int AudioTranscoder::initializeEncoder()
 
     m_encoder = std::move(encoder);
     return 0;
+}
+
+AVCodecContext* AudioTranscoder::getCodecContext()
+{
+    if (!m_encoder)
+    {
+        int status = initializeEncoder();
+        if (status < 0)
+        {
+            NX_ERROR(this, "Failed to initialize audio encoder: %1", utils::errorToString(status));
+            return nullptr;
+        }
+    }
+    return m_encoder->codecContext();
 }
 
 int AudioTranscoder::initializeResampledFrame()
@@ -100,15 +116,14 @@ int AudioTranscoder::initialize(AVStream * stream)
     if (status < 0)
         return status;
 
-    status = initializeEncoder();
-    if (status < 0)
-        return status;
+    if (!m_encoder)
+    {
+        status = initializeEncoder();
+        if (status < 0)
+            return status;
+    }
 
     status = initializeResampledFrame();
-    if (status < 0)
-        return status;
-
-    status = m_adtsInjector.initialize(m_encoder.get());
     if (status < 0)
         return status;
 
@@ -128,8 +143,6 @@ void AudioTranscoder::uninitialize()
     if (m_encoder)
         m_encoder->flush();
     m_encoder.reset(nullptr);
-
-    m_adtsInjector.uninitialize();
 }
 
 int AudioTranscoder::sendPacket(const ffmpeg::Packet& packet)
@@ -172,15 +185,6 @@ int AudioTranscoder::receivePacket(std::shared_ptr<ffmpeg::Packet>& result)
     if (status < 0)
         return status;
 
-    // Get duration before injecting into the packet because injection erases other fields.
-    int64_t duration = result->packet()->duration;
-
-    // Inject ADTS header into each packet becuase AAC encoder does not do it.
-    status = m_adtsInjector.inject(result.get());
-    if (status < 0)
-        return status;
-
-    result->packet()->duration = duration;
     return status;
 }
 
