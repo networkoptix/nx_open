@@ -27,6 +27,9 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 
+
+#include <nx/vms/time_sync/time_sync_manager.h>
+
 namespace nx::vms::client::desktop {
 
 using State = TimeSynchronizationWidgetState;
@@ -130,7 +133,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     const auto updateTime =
         [this]
         {
-            m_store->setVmsTime(std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+            m_store->setElapsedTime(m_timeWatcher->elapsedTime());
         };
 
     auto timer = new QTimer(this);
@@ -139,7 +142,11 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(timer, &QTimer::timeout, this, updateTime);
     timer->start();
 
-    connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
+    connect(
+        commonModule()->ec2Connection()->timeSyncManager(),
+        &nx::vms::time_sync::TimeSyncManager::timeChanged,
+        m_timeWatcher,
+        &TimeSynchronizationServerTimeWatcher::forceUpdate);
 
     updateTime();
 }
@@ -251,7 +258,7 @@ void TimeSynchronizationWidget::loadState(const State& state)
     using ::setReadOnly;
 
     const auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(
-        duration_cast<milliseconds>(state.vmsTime).count(),
+        duration_cast<milliseconds>(state.baseTime + state.elapsedTime).count(),
         Qt::OffsetFromUTC,
         duration_cast<seconds>(state.commonTimezoneOffset).count());
 

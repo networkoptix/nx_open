@@ -230,7 +230,7 @@ Qt::ItemFlags TimeSynchronizationServersModel::flags(const QModelIndex& index) c
 void TimeSynchronizationServersModel::loadState(const State& state)
 {
     beginResetModel();
-    m_vmsTime = state.vmsTime;
+    m_vmsTime = state.baseTime + state.elapsedTime;
     m_servers = state.servers;
     m_selectedServer = state.primaryServer;
     endResetModel();

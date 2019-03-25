@@ -1,4 +1,6 @@
-#include "multiserver_time_rest_handler.h"
+#include "server_time_handler.h"
+
+#include <nx/vms/api/data/time_reply.h>
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -11,17 +13,19 @@
 #include <rest/helpers/request_helpers.h>
 #include <api/model/time_reply.h>
 #include <network/tcp_listener.h>
+#include <nx/utils/elapsed_timer.h>
+
+using namespace nx::vms::api;
 
 namespace {
 
-using DummyType = int;
-typedef QnMultiserverRequestContext<DummyType> QnTimeRequestContext;
+typedef QnMultiserverRequestContext<nx::utils::ElapsedTimer> ServerTimeRequestContext;
 
 static void loadRemoteDataAsync(
     QnCommonModule* commonModule,
-    ApiMultiserverServerDateTimeDataList& outputData,
+    ServerTimeReplyList& outputData,
     const QnMediaServerResourcePtr& server,
-    QnTimeRequestContext* context,
+    ServerTimeRequestContext* context,
     const QString& urlPath)
 {
     auto requestCompletionFunc =
@@ -29,8 +33,8 @@ static void loadRemoteDataAsync(
             nx::network::http::BufferType msgBody, nx::network::http::HttpHeaders /*httpHeaders*/)
         {
             bool success = false;
-            ApiServerDateTimeData remoteData;
-            QnTimeReply timeData;
+            TimeReply timeData;
+            ServerTimeReply remoteData;
             if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
             {
                 QnJsonRestResult jsonReply;
@@ -40,9 +44,9 @@ static void loadRemoteDataAsync(
             if (success)
             {
                 remoteData.serverId = server->getId();
-                remoteData.timeSinceEpochMs = timeData.utcTime;
-                remoteData.timeZoneOffsetMs = timeData.timeZoneOffset;
-                remoteData.timeZoneId = timeData.timezoneId;
+                remoteData.osTime = timeData.osTime - context->request().elapsed() / 2;
+                remoteData.vmsTime = timeData.vmsTime - context->request().elapsed() / 2;
+                remoteData.timeZoneOffset = timeData.timeZoneOffset;
             }
             context->executeGuarded(
                 [context, success, &remoteData, &outputData]()
@@ -55,7 +59,6 @@ static void loadRemoteDataAsync(
 
     nx::utils::Url apiUrl(server->getApiUrl());
     apiUrl.setPath(urlPath);
-    apiUrl.setQuery("local"); //< Use device (OS) time.
 
     auto router = commonModule->router();
     runMultiserverDownloadRequest(router, apiUrl, server, requestCompletionFunc, context);
@@ -63,34 +66,42 @@ static void loadRemoteDataAsync(
 
 } // namespace
 
-QnMultiserverTimeRestHandler::QnMultiserverTimeRestHandler(const QString& getTimeApiMethodPath):
-    QnFusionRestHandler(),
-    m_getTimeApiMethodPath(getTimeApiMethodPath)
-{
-}
+namespace nx::vms::server::rest {
 
-int QnMultiserverTimeRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParamList& params,
-    QByteArray& result,
-    QByteArray& contentType,
+ ServerTimeHandler::ServerTimeHandler(const QString &getTimeHandlerPath):
+     m_getTimeHandlerPath(getTimeHandlerPath)
+ {
+ }
+
+int ServerTimeHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    ApiMultiserverServerDateTimeDataList outputData;
+    ServerTimeReplyList outputData;
     const auto ownerPort = owner->owner()->getPort();
-    QnTimeRequestContext context(DummyType(), ownerPort);
+    nx::utils::ElapsedTimer timer;
+    timer.restart();
+    ServerTimeRequestContext context(timer, ownerPort);
 
     auto onlineServers = owner->commonModule()->resourcePool()->getAllServers(Qn::Online);
     for (const auto& server: onlineServers)
     {
         loadRemoteDataAsync(
-            owner->commonModule(), outputData, server, &context, m_getTimeApiMethodPath);
+            owner->commonModule(), outputData, server, &context, m_getTimeHandlerPath);
     }
 
     context.waitForDone();
-    QnRestResult restResult;
-    QnFusionRestHandlerDetail::serializeRestReply(
-        outputData, params, result, contentType, restResult);
 
+    for (auto &record : outputData)
+    {
+        record.osTime += timer.elapsed() / 2;
+        record.vmsTime += timer.elapsed() / 2;
+    }
+
+    result.setReply(outputData);
     return nx::network::http::StatusCode::ok;
 }
+
+} // namespace nx::vms::server::rest

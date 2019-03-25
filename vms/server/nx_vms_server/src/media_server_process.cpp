@@ -162,7 +162,6 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
-#include <rest/handlers/multiserver_time_rest_handler.h>
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
@@ -188,6 +187,9 @@
 #endif
 #include <nx/vms/server/rest/device_analytics_settings_handler.h>
 #include <nx/vms/server/rest/analytics_engine_settings_handler.h>
+
+#include <nx/vms/server/rest/get_time_handler.h>
+#include <nx/vms/server/rest/server_time_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -1675,7 +1677,23 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/createEvent", new QnExternalEventRestHandler(serverModule()));
 
-    static const char kGetTimePath[] = "api/gettime";
+    static const QString kGetTimePath("api/getTime");
+    /**%apidoc GET /api/getTime
+     * Get the Server time, time zone and authentication realm (realm is added for convenience).
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Time-related data.
+     *         %param:string reply.realm Authentication realm.
+     *         %param:string reply.timeZoneOffset Time zone offset, in milliseconds.
+     *         %param:string reply.timeZoneId Identification of the time zone in the text form.
+     *         %param:string reply.osTime Local OS time on the Server, in milliseconds since epoch.
+     *         %param:string reply.vmsTime Synchronized time, in milliseconds since epoch.
+     */
+    reg(kGetTimePath, new nx::vms::server::rest::GetTimeHandler());
+
+    reg("ec2/getTimeOfServers", new nx::vms::server::rest::ServerTimeHandler("/" + kGetTimePath));
+
     /**%apidoc GET /api/gettime
      * Get the Server time, time zone and authentication realm (realm is added for convenience).
      * %// TODO: The name of this method and its timezoneId parameter use wrong case.
@@ -1688,9 +1706,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %param:string reply.timezoneId Identification of the time zone in the text form.
      *         %param:string reply.utcTime Server time, in milliseconds since epoch.
      */
-    reg(kGetTimePath, new QnTimeRestHandler());
-
-    reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
+    reg("api/gettime", new QnTimeRestHandler());
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -4722,6 +4738,7 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + "/api/ping", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/camera_event.*", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/moduleInformation", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getTime", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/gettime", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(
         webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.toStdString(),
