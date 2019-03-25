@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtSql/QSqlDatabase>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::sql {
 
@@ -13,6 +14,10 @@ public:
      * in case of parallel addDatabase calls.
      */
     static QSqlDatabase addDatabase(const QString& type, const QString& connectionName);
+
+    static void removeDatabase(const QString& connectionName);
+private:
+    static QnMutex m_mutex;
 };
 
 } // namespace nx::sql
