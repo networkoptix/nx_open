@@ -990,10 +990,10 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     auto showCancelDialog =
         [this]() -> bool
         {
+            // This will be used at 'downloading', 'readyToInstall' and 'pushing' states.
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-            // 3. All other cases. Some servers have failed
             messageBox->setIcon(QnMessageBoxIcon::Question);
-            messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
+            messageBox->setText(tr("Cancel update and delete all downloaded data?"));
             messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
             messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
             return messageBox->exec() == QDialogButtonBox::Yes;
@@ -1019,7 +1019,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Question);
-        messageBox->setText(tr("Cancel update and delete all downloaded data?"));
+        messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
         messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
         messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
 
