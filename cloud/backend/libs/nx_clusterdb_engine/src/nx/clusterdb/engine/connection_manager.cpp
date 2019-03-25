@@ -195,10 +195,16 @@ void ConnectionManager::closeConnectionsToSystem(
     }
 }
 
-ConnectionManager::SystemStatusChangedSubscription&
-    ConnectionManager::systemStatusChangedSubscription()
+ConnectionManager::ClusterStatusChangedSubscription&
+    ConnectionManager::clusterStatusChangedSubscription()
 {
-    return m_systemStatusChangedSubscription;
+    return m_clusterStatusChangedSubscription;
+}
+
+ConnectionManager::NodeStatusChangedSubscription&
+    ConnectionManager::nodeStatusChangedSubscription()
+{
+    return m_nodeStatusChangedSubscription;
 }
 
 bool ConnectionManager::addNewConnection(ConnectionContext context)
@@ -208,7 +214,6 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     const auto systemWasOffline = getConnectionCountBySystemId(
         lock, context.fullPeerName.systemId) == 0;
 
-    // TODO: #ak "One connection only" logic MUST be configurable.
     removeExistingConnection<
         kConnectionByFullPeerNameIndex,
         decltype(context.fullPeerName)>(lock, context.fullPeerName);
@@ -234,18 +239,25 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     const auto protocolVersion = context.connection->
         commonTransportHeaderOfRemoteTransaction().transactionFormatVersion;
 
+    const auto fullPeerName = context.fullPeerName;
+
     if (!m_connections.insert(std::move(context)).second)
     {
         NX_ASSERT(false);
         return false;
     }
 
+    lock.unlock();
+
+    m_nodeStatusChangedSubscription.notify(
+        {fullPeerName},
+        {true /*online*/, protocolVersion});
+
     if (systemWasOffline)
     {
-        lock.unlock();
-        m_systemStatusChangedSubscription.notify(
+        m_clusterStatusChangedSubscription.notify(
             systemId,
-            { true /*online*/, protocolVersion });
+            {true /*online*/, protocolVersion});
     }
 
     return true;
@@ -365,20 +377,25 @@ void ConnectionManager::removeConnectionByIter(
             completionHandler = std::move(completionHandler)]() mutable
         {
             sendSystemOfflineNotificationIfNeeded(
-                existingConnection->commonTransportHeaderOfRemoteTransaction().systemId);
+                existingConnection->commonTransportHeaderOfRemoteTransaction());
             existingConnection.reset();
             completionHandler();
         });
 }
 
 void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
-    const std::string& systemId)
+    const CommandTransportHeader& transportHeader)
 {
-    if (getConnectionCountBySystemId(systemId) > 0)
-        return;
+    m_nodeStatusChangedSubscription.notify(
+        {FullPeerName{transportHeader.systemId, transportHeader.peerId}},
+        {false /*offline*/, 0});
 
-    m_systemStatusChangedSubscription.notify(
-        systemId, { false /*offline*/, 0 });
+    if (getConnectionCountBySystemId(transportHeader.systemId) == 0)
+    {
+        m_clusterStatusChangedSubscription.notify(
+            transportHeader.systemId,
+            {false /*offline*/, 0});
+    }
 }
 
 void ConnectionManager::onGotTransaction(

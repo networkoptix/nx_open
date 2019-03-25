@@ -45,12 +45,30 @@ class OutgoingCommandDispatcher;
 class CommandLog;
 class CommandTransportHeader;
 
-struct SystemStatusDescriptor
+struct NodeStatusDescriptor
 {
     bool isOnline = false;
     int protoVersion = 0;
 
-    SystemStatusDescriptor() = delete;
+    NodeStatusDescriptor() = delete;
+};
+
+struct FullPeerName
+{
+    std::string systemId;
+    std::string peerId;
+
+    bool operator<(const FullPeerName& rhs) const
+    {
+        return systemId != rhs.systemId
+            ? systemId < rhs.systemId
+            : peerId < rhs.peerId;
+    }
+};
+
+struct NodeDescriptor
+{
+    FullPeerName name;
 };
 
 struct SystemConnectionInfo
@@ -66,19 +84,6 @@ struct SystemConnectionInfo
 class NX_DATA_SYNC_ENGINE_API ConnectionManager
 {
 public:
-    struct FullPeerName
-    {
-        std::string systemId;
-        std::string peerId;
-
-        bool operator<(const FullPeerName& rhs) const
-        {
-            return systemId != rhs.systemId
-                ? systemId < rhs.systemId
-                : peerId < rhs.peerId;
-        }
-    };
-
     struct ConnectionContext
     {
         std::unique_ptr<transport::AbstractConnection> connection;
@@ -87,8 +92,11 @@ public:
         std::string userAgent;
     };
 
-    using SystemStatusChangedSubscription =
-        nx::utils::Subscription<std::string /*systemId*/, SystemStatusDescriptor>;
+    using ClusterStatusChangedSubscription =
+        nx::utils::Subscription<std::string /*clusterId*/, NodeStatusDescriptor>;
+
+    using NodeStatusChangedSubscription =
+        nx::utils::Subscription<NodeDescriptor, NodeStatusDescriptor>;
 
     ConnectionManager(
         const QnUuid& moduleGuid,
@@ -128,7 +136,8 @@ public:
         const std::string& systemId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    SystemStatusChangedSubscription& systemStatusChangedSubscription();
+    ClusterStatusChangedSubscription& clusterStatusChangedSubscription();
+    NodeStatusChangedSubscription& nodeStatusChangedSubscription();
 
 private:
     typedef boost::multi_index::multi_index_container<
@@ -159,7 +168,8 @@ private:
     mutable QnMutex m_mutex;
     nx::utils::Counter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
-    SystemStatusChangedSubscription m_systemStatusChangedSubscription;
+    ClusterStatusChangedSubscription m_clusterStatusChangedSubscription;
+    NodeStatusChangedSubscription m_nodeStatusChangedSubscription;
 
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,
@@ -181,7 +191,7 @@ private:
         Iterator connectionIterator,
         CompletionHandler completionHandler);
 
-    void sendSystemOfflineNotificationIfNeeded(const std::string& systemId);
+    void sendSystemOfflineNotificationIfNeeded(const CommandTransportHeader& transportHeader);
 
     void onGotTransaction(
         const std::string& connectionId,
