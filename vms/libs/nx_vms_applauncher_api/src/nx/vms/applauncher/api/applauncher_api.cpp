@@ -2,9 +2,11 @@
 
 #include <QtCore/QList>
 
+#include <nx/utils/log/log_message.h>
+
 namespace {
 
-const auto kArgumentsDelimiter = lit("@#$%^delim");
+const auto kArgumentsDelimiter = "@#$%^delim";
 
 } // namespace
 
@@ -56,7 +58,7 @@ QByteArray toString(Value val)
 QString launcherPipeName()
 {
     const auto baseName = nx::utils::AppInfo::customizationName()
-        + lit("EC4C367A-FEF0-4fa9-B33D-DF5B0C767788");
+        + "EC4C367A-FEF0-4fa9-B33D-DF5B0C767788";
 
     return nx::utils::AppInfo::isMacOsX()
         ? baseName + QString::fromLatin1(qgetenv("USER").toBase64())
@@ -137,10 +139,10 @@ StartApplicationTask::StartApplicationTask(
 
 QByteArray StartApplicationTask::serialize() const
 {
-    const auto res = lit("%1\n%2\n%3\n\n")
-        .arg(QLatin1String(TaskType::toString(type)))
-        .arg(version.toString())
-        .arg(appArgs.join(kArgumentsDelimiter)).toLatin1();
+    const auto res = lm("%1\n%2\n%3\n\n").args(
+        QLatin1String(TaskType::toString(type)),
+        version.toString(),
+        appArgs.join(kArgumentsDelimiter)).toQString().toLatin1();
     return res;
 }
 
@@ -168,7 +170,7 @@ QuitTask::QuitTask():
 
 QByteArray QuitTask::serialize() const
 {
-    return lit("%1\n\n").arg(QLatin1String(TaskType::toString(type))).toLatin1();
+    return lm("%1\n\n").arg(QLatin1String(TaskType::toString(type))).toQString().toLatin1();
 }
 
 bool QuitTask::deserialize(const QnByteArrayConstRef& data)
@@ -192,8 +194,8 @@ IsVersionInstalledRequest::IsVersionInstalledRequest()
 
 QByteArray IsVersionInstalledRequest::serialize() const
 {
-    return lit("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version.toString()).
-        toLatin1();
+    return lm("%1\n%2\n\n").args(
+        QLatin1String(TaskType::toString(type)), version.toString()).toQString().toLatin1();
 }
 
 bool IsVersionInstalledRequest::deserialize(const QnByteArrayConstRef& data)
@@ -297,15 +299,16 @@ InstallZipTask::InstallZipTask(
 
 QByteArray InstallZipTask::serialize() const
 {
-    return lit("%1\n%2\n%3\n\n")
-        .arg(QString::fromLatin1(TaskType::toString(type)))
-        .arg(version.toString())
-        .arg(zipFileName).toUtf8();
+    return lm("%1\n%2\n%3\n\n").args(
+        QString::fromLatin1(TaskType::toString(type)),
+        version.toString(),
+        zipFileName
+    ).toUtf8();
 }
 
 bool InstallZipTask::deserialize(const QnByteArrayConstRef& data)
 {
-    QStringList list = QString::fromUtf8(data).split(lit("\n"), QString::SkipEmptyParts);
+    QStringList list = QString::fromUtf8(data).split("\n", QString::SkipEmptyParts);
     if (list.size() < 3)
         return false;
     if (TaskType::toString(type) != list[0].toLatin1())
@@ -346,8 +349,8 @@ AddProcessKillTimerRequest::AddProcessKillTimerRequest():
 
 QByteArray AddProcessKillTimerRequest::serialize() const
 {
-    return lit("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(processID).arg(
-        timeoutMillis).toLatin1();
+    return lm("%1\n%2\n%3\n\n").args(QLatin1String(TaskType::toString(type)), processID,
+        timeoutMillis).toQString().toLatin1();
 }
 
 bool AddProcessKillTimerRequest::deserialize(const QnByteArrayConstRef& data)

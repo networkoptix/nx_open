@@ -907,7 +907,7 @@
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Редактировать потоки...</translation>
     </message>
   </context>
   <context>
@@ -1785,7 +1785,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Выберите одного пользователя в строке &quot;Показать&quot; чтобы отобразить его локальные раскладки в этом списке</translation>
     </message>
   </context>
   <context>
@@ -1828,7 +1828,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Время ожидания поиска (сек)</translation>
     </message>
     <message>
       <location/>
@@ -2566,44 +2566,6 @@
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
       <translation>Удаление данного подключения может привести к сбоям системы.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>Отмена</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>Процесс обновления длится чуть дольше чем обычно. Пожалуйста подождите еще немного.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>Автоматически проверять наличие обновлений</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>Обновляется на...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>Ссылка скопирована</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>Установлена последняя версия</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Не рекомендуется обновлять систему в конце недели.</translation>
     </message>
   </context>
   <context>
@@ -3537,7 +3499,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Эта веб-страница предназначена для интеграции C2P</translation>
     </message>
   </context>
   <context>

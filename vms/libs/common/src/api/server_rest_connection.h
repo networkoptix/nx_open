@@ -26,6 +26,7 @@
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace rest {
 
@@ -147,8 +148,21 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-            nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
+    Handle softwareTriggerCommand(
+        const QnUuid& cameraId,
+        const QString& triggerId,
+        nx::vms::api::EventState toggleState,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle createGenericEvent(
+        const QString& source,
+        const QString& caption,
+        const QString& description,
+        const nx::vms::event::EventMetaData& metadata,
+        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined,
+        GetCallback callback = nullptr,
+        QThread* targetThread = nullptr);
 
     Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
         , QThread *targetThread = nullptr);
@@ -475,6 +489,12 @@ public:
         const QJsonObject& settings,
         Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
+
+    Handle debug(
+        const QString& action,
+        const QString& value,
+        PostCallback callback,
+        QThread *targetThread = nullptr);
 
     /**
      * Cancel running request by known requestId. If request is canceled, callback isn't called.

@@ -149,7 +149,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     auto title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     const microseconds timestamp(params.eventTimestampUsec);
-    const qint64 timestampMs = duration_cast<milliseconds>(timestamp).count();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();

@@ -2584,17 +2584,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Sunucu yapılandırma</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Sunucu güncelleniyor</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -5152,220 +5141,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Sunucu</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Durum</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Güncelleme Dosyasını Seç...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Yayıncı Notları</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Client'ı Yükleme Dosyasıyla Elle Güncellemelisiniz.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Bu Dosyadan Güncelleme Yapılamıyor.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Kullanılabilir Son Güncelleme</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>En son sürüm güncelleme dosyasını indir</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Seçilen sürümler</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Güncelleme Dosyasını indir</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Güncelleme dosyasını seç...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Seçilen güncelleme dosyası</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Başka bir tarayıcada aç</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Panoya kopyala</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>İnternet üzerinden güncelleştirme alınamadı.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Bilinmeyen yapı numarası.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Önceki bir versiyona geri düşürme engellendi.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Bir yada daha fazla sunucu için güncelleme bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>İstemci güncellemesi bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Güncelleme dosyası açılamadı. Diskte boş alan yok.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Güncelleme tamamlandı...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Güncellemeler Kontrol Ediliyor...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Güncellemeker indiriliyor...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>İstemci güncellemesi yükleniyor...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Güncellemeler uyumsuz sunucuya yükleniyor...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Güncellemeler sunucuya gönderiliyor...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Güncellemeler yükleniyor...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Özel Yapı...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Özel yapıya Güncelle</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Sistem Güncelleme</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Sistem güncellemesi şu anda yapılıyor</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Güncellemeyi iptal et</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Arka planda devam et</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>%n sunucusunda yeterli alan yok:</numerusform>
-        <numerusform>%n sunucusunda yeterli alan yok:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Güncelleme yapmak sunucu hatalarına sebep olabilir.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Güncellemeye Zorla</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Sunucu güncelleştirme tamamlandı</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Güncelleştirme tamamlandı</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Güncelleme iptal edildi</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Tüm sunucular zaten güncelleştirildi</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Güncelleştirme başarısız</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Güncelleme bu aşamada iptal edilemez</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Lütfen tamamlanana kadar bekleyin.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Sistemindeki tüm bileşenler güncel.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Sistemindeki tüm bileşenler güncel.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 ile uyumsuzluk. Öncelikle %1 in bağlantısını kesin.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Dosyaları Güncelle</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>Güncelleme doğrulanıyor...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Boş alan kontrol ediliyor...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -6045,10 +5820,6 @@ to %1</source>
       <translation>Uzak arşiv senkronizasyonu devam ediyor</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Uzak arşiv senkronizasyonu sırasında hata oluştu</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>Aşağıdaki cihaz için uzak arşiv senkronizasyonu başlatıldı:</translation>
     </message>
@@ -6097,6 +5868,10 @@ to %1</source>
     <message>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
+    </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6207,84 +5982,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Konuşmak için basılı tutun</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>Güncelleştirme başarıyla tamamlandı.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>Güncelleştirme iptal edildi.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Güncelleme zaten başka bir kullanıcı tarafından başlatıldı.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Tüm sunucular zaten güncel.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Güncellemeler karşıdan yüklenemedi.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Diskte boş alan kalmadı.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Güncellemeler sunucuya gönderilemedi.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>%n sunucusu sebebiyle hata oluştu:</numerusform>
-        <numerusform>%n sunucusu sebebiyle hata oluştu:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>%n sunucusunda yeterli boş alan yok:</numerusform>
-        <numerusform>%n sunucusunda yeterli boş alan yok:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n Sunucu yanıt vermiyor:</numerusform>
-        <numerusform>%n Sunucu yanıt vermiyor:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n sunucusu çevrimdışı oldu:</numerusform>
-        <numerusform>%n sunucusu çevrimdışı oldu:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>%n sunucusu çevrimdışı oldu:</numerusform>
-        <numerusform>%n sunucusu çevrimdışı oldu:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Güncelleme istemciye yüklenemedi.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Güncelleme bir veya daha fazla sunucuya yüklenemedi.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6738,25 +6435,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6765,10 +6443,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Diğer sunucular kaynak listesinde görünür.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Sunucu güncelleme başarısız oldu</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6939,29 +6613,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Sürüm Notları</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 versiyonu kullanılabilir</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Büyük sorunlar giderildi. Lütfen güncelleştirme yapın.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Güncelle...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Bu güncelleme hakkında tekrar uyarma</translation>
     </message>
   </context>
   <context>
@@ -8075,16 +7726,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>Dahili hata.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8116,6 +7767,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Yapıştırıldı</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Sunucu yapılandırma</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Sunucu güncelleniyor</translation>
     </message>
   </context>
   <context>
@@ -8234,6 +7896,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8303,10 +7984,6 @@ to %1</source>
       <source>No events</source>
       <translation>Olay yok</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>Hiçbir olay oluşmadı</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8317,6 +7994,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8817,26 +8498,6 @@ to %1</source>
       <translation>Bazı sunucular çevrimdışıdır ve güncellenmez. Onları atla?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>Şimdi yükle</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>Sonra</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>Güncelleme indirildi</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Güncelleme paketleri indirilemedi</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>Yeterli boş alan olduğundan ve ağ bağlantısının kararlı olduğundan emin olun.</translation>
     </message>
@@ -9002,6 +8663,14 @@ to %1</source>
     <message>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
   </context>
   <context>
@@ -9566,10 +9235,40 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 versiyonu kullanılabilir</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Sürüm Notları</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Büyük sorunlar giderildi. Lütfen güncelleştirme yapın.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Güncelle...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Bu güncelleme hakkında tekrar uyarma</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>çoklu değer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

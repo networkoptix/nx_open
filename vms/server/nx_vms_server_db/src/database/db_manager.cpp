@@ -2529,7 +2529,17 @@ ErrorCode QnDbManager::executeTransactionInternal(
     f.write(tran.params.data);
     f.close();
 
-    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerTmp"));
+    QString databaseName = getDatabaseName("QnDbManagerTmp");
+    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", databaseName);
+
+    auto dbCloseGuard = nx::utils::makeScopeGuard(
+        [&]()
+    {
+        testDB.close();
+        testDB = QSqlDatabase();
+        QSqlDatabase::removeDatabase(databaseName);
+    });
+
     testDB.setDatabaseName( f.fileName());
     if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
         QFile::remove(f.fileName());
@@ -2544,7 +2554,6 @@ ErrorCode QnDbManager::executeTransactionInternal(
         qWarning() << "Skipping bad database dump file";
         return ErrorCode::dbError; // invalid back file
     }
-    testDB.close();
     return ErrorCode::ok;
 }
 
@@ -3285,7 +3294,7 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_AnalyticsEngine;
     else
     {
-        NX_ASSERT(false, "Unknown object type");
+        NX_WARNING(this, lm("Unknown object type for object %1").arg(objectId));
         return ApiObject_NotDefined;
     }
 }

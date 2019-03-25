@@ -269,6 +269,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             updateButtonsVisibility();
         });
 
+    connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
+        &QnMediaResourceWidget::analyticsSupportChanged);
+
     if (d->camera)
     {
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
@@ -2175,13 +2178,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
+        // TODO: Code duplication with QnWorkbenchAccessController.
+        if (d->camera->licenseType() == Qn::LC_VMAX && !d->camera->isLicenseUsed())
+        {
+            const auto requiredPermission = d->isPlayingLive()
+                ? Qn::ViewLivePermission
+                : Qn::ViewFootagePermission;
 
-        const Qn::Permission requiredPermission = d->isPlayingLive()
-            ? Qn::ViewLivePermission
-            : Qn::ViewFootagePermission;
-
-        if (!accessController()->hasPermissions(d->camera, requiredPermission))
-            return Qn::AnalogWithoutLicenseOverlay;
+            if (!accessController()->hasPermissions(d->camera, requiredPermission))
+                return Qn::AnalogWithoutLicenseOverlay;
+        }
     }
 
     if (d->isIoModule)
@@ -2771,7 +2777,8 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
-    if (!isAnalyticsSupported())
+    // We should be able to disable analytics if it is not supported anymore.
+    if (analyticsEnabled && !isAnalyticsSupported())
         return;
 
     if (auto reader = display()->archiveReader())

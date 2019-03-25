@@ -83,7 +83,12 @@ int QnGetNonceRestHandler::executeGet(
             return user->getName() == userName;
         });
         if (!users.isEmpty())
-            reply.realm = users.front()->getRealm();
+        {
+            const auto& user = users.front();
+            reply.realm = user->getRealm();
+            if (reply.realm.isEmpty() && !user->isLocal())
+                reply.realm = nx::network::AppInfo::realm();
+        }
     }
 
     result.setReply(reply);

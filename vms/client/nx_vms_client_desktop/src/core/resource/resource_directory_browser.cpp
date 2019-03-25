@@ -2,7 +2,6 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <QtCore/QThread>
 
 #include <common/common_module.h>
 
@@ -11,213 +10,66 @@
 #include <core/resource/layout_reader.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <client_core/client_core_module.h>
-
 #include <nx/core/layout/layout_file_info.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/utils/log/log.h>
 
-#include <nx_ec/data/api_conversion_functions.h>
+namespace nx::vms::client::desktop {
 
-namespace {
-
-static const int kMaxResourceCount = 1024;
-static const int kUnlimited = -1;
-
-QString fixSeparators(const QString& filePath)
-{
-    return QDir::fromNativeSeparators(filePath);
-}
-
-}
-
-QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent):
-    QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
+ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
     QObject(parent),
-    QnAbstractFileResourceSearcher(qnClientCoreModule->commonModule())
+    m_localResourceDirectoryModel(new LocalResourcesDirectoryModel),
+    m_resourceProducerThread(new QThread(this)),
+    m_resourceProducer(new LocalResourceProducer())
 {
-    connect(&m_fsWatcher, &QFileSystemWatcher::directoryChanged,
-        this, &QnResourceDirectoryBrowser::at_filesystemDirectoryChanged);
+    connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::filesAdded,
+        m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
-    connect(&m_fsWatcher, &QFileSystemWatcher::fileChanged,
-        this, &QnResourceDirectoryBrowser::at_filesystemFileChanged);
+    connect(this, &ResourceDirectoryBrowser::initLocalResources,
+        m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
-    connect(this, &QnResourceDirectoryBrowser::startLocalDiscovery,
-        this, &QnResourceDirectoryBrowser::at_startLocalDiscovery, Qt::QueuedConnection);
+    connect(m_resourceProducerThread, &QThread::finished,
+        m_resourceProducer, &LocalResourceProducer::deleteLater);
 
-    connect(this, &QnResourceDirectoryBrowser::trackResources,
-        this, &QnResourceDirectoryBrowser::at_trackResources, Qt::QueuedConnection);
+    m_resourceProducer->moveToThread(m_resourceProducerThread);
+    m_resourceProducerThread->start(QThread::IdlePriority);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid& resourceTypeId,
-    const QnResourceParams& params)
+ResourceDirectoryBrowser::~ResourceDirectoryBrowser()
 {
-    QnResourcePtr result;
-
-    if (!isResourceTypeSupported(resourceTypeId))
-        return result;
-
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    result = createArchiveResource(params.url, resourcePool);
-    result->setTypeId(resourceTypeId);
-
-    return result;
+    m_resourceProducerThread->requestInterruption();
+    m_resourceProducerThread->exit();
+    m_resourceProducerThread->wait();
 }
 
-QString QnResourceDirectoryBrowser::manufacturer() const
+void ResourceDirectoryBrowser::setLocalResourcesDirectories(const QStringList& paths)
 {
-    return lit("DirectoryBrowser");
-}
-
-void QnResourceDirectoryBrowser::cleanup()
-{
-    m_resourceReady = false;
-}
-
-QnResourceList QnResourceDirectoryBrowser::findResources()
-{
-#if 0 // Turned off to make resource discovery work after application has started.
-    if (m_resourceReady)
-        return QnResourceList();
-    setDiscoveryMode( DiscoveryMode::disabled );
-#endif // if 0
-
-    ResourceCache cache;
+    QStringList cleanedPaths;
+    for (const auto& path: paths)
     {
-        QnMutexLocker lock(&m_cacheMutex);
-        cache = this->m_resourceCache;
+        const auto canonicalPath = QDir(path).canonicalPath();
+        if (!canonicalPath.isEmpty())
+            cleanedPaths.append(canonicalPath);
     }
 
-    QThread::currentThread()->setPriority(QThread::IdlePriority);
+    QStringList newDirectories = cleanedPaths.toSet().subtract(
+        m_localResourceDirectoryModel->getLocalResourcesDirectories().toSet()).toList();
 
-    NX_DEBUG(this, lit("Browsing directories..."));
+    QStringList removedDirectories = m_localResourceDirectoryModel->getLocalResourcesDirectories()
+        .toSet().subtract(cleanedPaths.toSet()).toList();
 
-    QTime time;
-    time.restart();
+    m_localResourceDirectoryModel->setLocalResourcesDirectories(cleanedPaths);
 
-    QnResourceList result;
+    for (const auto& removedDirectory: removedDirectories)
+        dropResourcesFromDirectory(removedDirectory);
 
-    QStringList dirs = getPathCheckList();
-
-    int found = 0;
-
-    // List of paths to be tracked by FS watcher. Contains both files and directories.
-    QStringList paths;
-    // Handler creates resource for discovered file and adds it to resource pool.
-    BrowseHandler handler = makeDiscoveryHandler(result, paths);
-
-    // Search through directory list.
-    for (const QString& dir: dirs)
-    {
-        int limit = std::max(kMaxResourceCount - found, 0);
-        if (kMaxResourceCount < 0)
-            limit = kUnlimited;
-        found += findResources(dir, cache, handler, limit);
-        if (shouldStop())
-            break;
-    }
-
-    NX_DEBUG(this, lit("Done(Browsing directories). Time elapsed = %1.").arg(time.elapsed()));
-
-    QThread::currentThread()->setPriority(QThread::LowPriority);
-
-    m_resourceReady = true;
-
-    if( !result.empty())
-    {
-        QGenericReturnArgument ret;
-        emit trackResources(result, paths);
-    }
-
-    return result;
+    for (const auto& newDirectory: newDirectories)
+        emit initLocalResources(m_localResourceDirectoryModel->getFilePaths(newDirectory));
 }
 
-void QnResourceDirectoryBrowser::at_startLocalDiscovery()
-{
-    resourcePool()->addResources(findResources());
-}
-
-QnResourceDirectoryBrowser::BrowseHandler QnResourceDirectoryBrowser::makeDiscoveryHandler(
-    QnResourceList& result, QStringList& paths)
-{
-    return
-        [this, &result, &paths](const QString& path, bool isDir) -> bool
-        {
-            paths.append(path);
-
-            if (!isDir)
-            {
-                QnResourcePtr res = createArchiveResource(path, resourcePool());
-                if (!res)
-                    return false;
-                if (res->getId().isNull() && !res->getUniqueId().isEmpty())
-                    res->setId(guidFromArbitraryData(res->getUniqueId().toUtf8())); //< Create same IDs for the same files.
-                result.append(res);
-            }
-            return true;
-        };
-}
-
-QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename) const
-{
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    return resourceFromFile(filename, resourcePool); // TODO: #GDM #3.1 refactor all the scheme. Adding must not be here
-}
-
-// =============================================================================================
-int QnResourceDirectoryBrowser::findResources(
-    const QString& directory,
-    const ResourceCache& cache,
-    BrowseHandler handler,
-    int maxResources)
-{
-    // Note: This method can be called from a separate thread. Beware!
-    NX_DEBUG(this, lit("Checking %1").arg(directory));
-
-    if (shouldStop() || maxResources == 0)
-        return 0;
-
-    int resourcesFound = 0;
-
-    // We should gather discovered directories to a separate list and then push it to FS watcher
-    handler(directory, true);
-
-    const QList<QFileInfo> files = QDir(directory).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
-    for(const auto& file: files)
-    {
-        if (shouldStop())
-            break;
-
-        if (maxResources != kUnlimited && maxResources <= resourcesFound)
-            break;
-
-        QString absoluteFilePath = file.absoluteFilePath();
-        if (file.isDir())
-        {
-            if (absoluteFilePath != directory)
-            {
-                int found = findResources(absoluteFilePath, cache, handler, std::max<int>(maxResources-resourcesFound, 0));
-                resourcesFound += found;
-            }
-        }
-        else
-        {
-            if (cache.contains(absoluteFilePath))
-                continue;
-
-            if (handler(absoluteFilePath, false))
-                resourcesFound++;
-        }
-    }
-
-    return resourcesFound;
-}
-
-QnFileLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
+QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
-    const QString layoutUrl = fixSeparators(filename);
+    const QString layoutUrl = QDir::fromNativeSeparators(filename);
     NX_ASSERT(layoutUrl == filename);
 
     // Check the file still seems to be valid.
@@ -235,13 +87,13 @@ QnFileLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString
     }
 
     // Read layout from file.
-    return nx::vms::client::desktop::layout::layoutFromFile(layoutUrl);
+    return layout::layoutFromFile(layoutUrl);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString& filename,
+QnResourcePtr ResourceDirectoryBrowser::resourceFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
-    const QString path = fixSeparators(filename);
+    const QString path = QDir::fromNativeSeparators(filename);
     NX_ASSERT(path == filename);
 
     if (resourcePool)
@@ -256,10 +108,10 @@ QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString& filena
     return createArchiveResource(path, resourcePool);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename,
+QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(const QString& filename,
     QnResourcePool* resourcePool)
 {
-    const QString path = fixSeparators(filename);
+    const QString path = QDir::fromNativeSeparators(filename);
     NX_ASSERT(path == filename);
 
     if (FileTypeSupport::isMovieFileExt(path))
@@ -280,132 +132,65 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
     return QnResourcePtr();
 }
 
-void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& path)
+void ResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
 {
-    // We get here if:
-    // - file has been added. Should iterate over all resources from this path.
-    // - file has been removed. This case is handled by at_filesystemFileChanged callback.
-    // - containing folder has been renamed/removed. We should handle this, because at_filesystemFileChanged
-    //   will not be invoked for the contents of this folder
-    QStringList files;
+    QnResourcePool* resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const QString canonicalDirPath = QDir(path).canonicalPath();
 
-    ResourceCache cache;
-    {
-        QnMutexLocker lock(&m_cacheMutex);
-        cache = m_resourceCache;
-    }
-
-    QnResourceList result;
-
-    // Handler creates resource for discovered file and adds it to resource pool.
-    BrowseHandler handler = makeDiscoveryHandler(result, files);
-
-    if (findResources(path, cache, handler, kMaxResourceCount) > 0)
-    {
-        resourcePool()->addResources(result);
-        trackResources(result, files);
-    }
-
-    // This is the case for removed folder.
-    // We need to check all files in our resource cache for existence.
-    for (const auto entry: cache)
-    {
-        QString path = entry->getUrl();
-        if (!QFileInfo::exists(path))
+    QnResourceList resourcesToRemove;
+    const auto shouldBeRemoved =
+        [canonicalDirPath](const QnResourcePtr& resource) -> bool
         {
-            at_filesystemFileChanged(path);
-        }
+            if (!resource->hasFlags(Qn::local))
+                return false;
+            const auto canonicalFilePath = QFileInfo(resource->getUniqueId()).canonicalFilePath();
+            return canonicalFilePath.startsWith(canonicalDirPath);
+        };
+
+    for (const auto& aviResource: resourcePool->getResources<QnAviResource>())
+    {
+        if(shouldBeRemoved(aviResource))
+            resourcesToRemove.append(aviResource);
     }
+    for (const auto& fileLayoutResource: resourcePool->getResources<QnFileLayoutResource>())
+    {
+        if (shouldBeRemoved(fileLayoutResource))
+            resourcesToRemove.append(fileLayoutResource);
+    }
+    resourcePool->removeResources(resourcesToRemove);
 }
 
-void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
+LocalResourceProducer::LocalResourceProducer(QObject* parent):
+    QObject(parent)
 {
-    // We get here if:
-    // - file has been removed
-    // - file has been renamed. Just the same as to be removed
-
-    if (!QFileInfo::exists(path))
-    {
-        QnMutexLocker lock(&m_cacheMutex);
-        m_resourceCache.remove(path);
-        m_fsWatcher.removePath(path);
-    }
 }
 
-void QnResourceDirectoryBrowser::at_trackResources(const QnResourceList& resources,
-    const QStringList& paths)
+void LocalResourceProducer::createLocalResources(const QStringList& pathList)
 {
-    QnMutexLocker lock(&m_cacheMutex);
-    int skipped = 0;
-    for (const auto& ptr: resources)
+    if (QThread::currentThread()->isInterruptionRequested())
+        return;
+
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
+    QnResourceList newResources;
+    for (const auto& filePath: pathList)
     {
-        const QString& url = ptr->getUrl();
-        if (!m_resourceCache.contains(url))
-        {
-            m_resourceCache.insert(url, ptr);
-        }
-        else
-        {
-            skipped++;
-        }
-    }
-    // Add file to watch. It properly handles duplicate paths.
-    m_fsWatcher.addPaths(paths);
-}
+        if (QThread::currentThread()->isInterruptionRequested())
+            return;
 
-void QnResourceDirectoryBrowser::setPathCheckList(const QStringList& paths)
-{
-    QnMutexLocker lock(&m_mutex);
-    // 1. Calculate which folders are removed.
-    for (QString dir: m_pathListToCheck)
-    {
-        if (!paths.contains(dir))
-        {
-            dropResourcesFromFolder(dir);
-        }
-    }
-    // 2. Remove these folders.
-    m_pathListToCheck = paths;
-}
-
-void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& dir)
-{
-    m_cacheMutex.lock();
-    ResourceCache cache = m_resourceCache;
-    m_cacheMutex.unlock();
-    // Getting normalized directory path.
-    QString directory = QDir(dir).absolutePath();
-
-    // Paths to be removed from fs watcher.
-    QStringList paths;
-    // Resources to be removed
-    QnResourceList resources;
-
-    // Finding all the resources in specified directory.
-    for (auto& resource: cache)
-    {
-        if (!resource->hasFlags(Qn::local))
-        {
+        QnResourcePtr resource =
+            ResourceDirectoryBrowser::createArchiveResource(filePath, resourcePool);
+        if (!resource)
             continue;
-        }
+        if (resource->getId().isNull() && !resource->getUniqueId().isEmpty())
+            resource->setId(guidFromArbitraryData(resource->getUniqueId().toUtf8())); //< Create same IDs for the same files.
 
-        QString path = resource->getUniqueId();
-        // We need normalized path to do proper comparison.
-        QString normPath = QFileInfo(path).absoluteFilePath();
-        if (normPath.startsWith(directory))
-        {
-            paths.append(path);
-            resources.append(resource);
-        }
+        newResources.append(resource);
     }
+    if (QThread::currentThread()->isInterruptionRequested())
+        return;
 
-    // Removing files from resource pool.
-    QnResourcePool* pool = resourcePool();
-    pool->removeResources(resources);
-
-    // Removing files from FS watcher and cache.
-    QnMutexLocker lock(&m_cacheMutex);
-    for (QString path: paths)
-        m_resourceCache.remove(path);
-    m_fsWatcher.removePaths(paths);
+    resourcePool->addResources(newResources);
 }
+
+} // namespace nx::vms::client::desktop

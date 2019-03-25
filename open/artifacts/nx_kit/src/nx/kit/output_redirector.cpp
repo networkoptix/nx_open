@@ -6,22 +6,12 @@
 #include <vector>
 #include <string>
 
-#if defined(_WIN32)
-    #include <windows.h>
-    #include <winbase.h>
-    #include <shellapi.h>
-    #include <atlstr.h>
-    #include <codecvt>
-    #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
-#elif defined(__APPLE__)
-    #include <libgen.h>
-    #include <crt_externs.h>
-#else //< Assuming Linux-like OS.
-    #include <libgen.h>
-    #include <memory.h>
-#endif
-
 #include "ini_config.h"
+#include "utils.h"
+
+#if defined(_WIN32)
+    #pragma warning(disable: 4996) //< MSVC: freopen() is unsafe.
+#endif
 
 namespace nx {
 namespace kit {
@@ -68,35 +58,7 @@ OutputRedirector::OutputRedirector()
 
 /*static*/ std::string OutputRedirector::getProcessName()
 {
-    #if defined(_WIN32)
-        int argc;
-        LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-        if (!argv)
-            return "";
-        const std::wstring wPath = argv[0];
-        const size_t lastSeparatorPos = wPath.find_last_of(L"\\/");
-        const std::wstring wNameWithExt =
-            wPath.substr((lastSeparatorPos == std::wstring::npos) ? 0 : (lastSeparatorPos + 1));
-        const std::wstring exeExt = L".exe";
-        const std::wstring wName =
-            (wNameWithExt.substr(wNameWithExt.size() - exeExt.size()) == exeExt)
-            ? wNameWithExt.substr(0, wNameWithExt.size() - exeExt.size())
-            : wNameWithExt;
-        const std::string name =
-            std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wName);
-        LocalFree(argv);
-    #elif defined(__APPLE__)
-        std::string path_s{(*_NSGetArgv())[0]}; //< Needed because basename() changes the string.
-        const std::string name = path_s.empty() ? "" : basename(&path_s[0]);
-    #else //< Assuming Linux-like OS.
-        std::ifstream inputStream("/proc/self/cmdline");
-        std::string path;
-        std::getline(inputStream, path);
-        std::string path_s = path; //< Needed because basename() changes the string.
-        const std::string name = path_s.empty() ? "" : basename(&path_s[0]);
-    #endif
-
-    return name;
+    return nx::kit::utils::baseName(nx::kit::utils::getProcessCmdLineArgs()[0]);
 }
 
 #if !defined(NX_OUTPUT_REDIRECTOR_DISABLED)

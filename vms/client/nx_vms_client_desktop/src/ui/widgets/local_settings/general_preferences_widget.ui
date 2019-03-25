@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
+    <width>385</width>
     <height>378</height>
    </rect>
   </property>
@@ -93,13 +93,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="primaryAudioDeviceComboBox">
-        <item>
-         <property name="text">
-          <string>None</string>
-         </property>
-        </item>
-       </widget>
+       <widget class="QComboBox" name="primaryAudioDeviceComboBox"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="secondaryDeviceTextLabel">
@@ -112,13 +106,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="secondaryAudioDeviceComboBox">
-        <item>
-         <property name="text">
-          <string>None</string>
-         </property>
-        </item>
-       </widget>
+       <widget class="QComboBox" name="secondaryAudioDeviceComboBox"/>
       </item>
      </layout>
     </widget>

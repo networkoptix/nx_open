@@ -24,6 +24,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/webview_style.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/common/html.h>
 
@@ -82,6 +83,13 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     m_updateStateTimer.start(10000);
     connect(&m_updateStateTimer, &QTimer::timeout,
         this, &WorkbenchUpdateWatcher::atUpdateCurrentState);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        [this](const QnUserResourcePtr &user)
+        {
+            m_userLoggedIn = user != nullptr;
+            syncState();
+        });
 }
 
 WorkbenchUpdateWatcher::~WorkbenchUpdateWatcher() {}
@@ -122,18 +130,6 @@ std::future<UpdateContents> WorkbenchUpdateWatcher::takeUpdateCheck()
 {
     NX_ASSERT(m_private);
     return std::move(m_private->m_updateCheck);
-}
-
-void WorkbenchUpdateWatcher::start()
-{
-    m_userLoggedIn = true;
-    syncState();
-}
-
-void WorkbenchUpdateWatcher::stop()
-{
-    m_userLoggedIn = false;
-    syncState();
 }
 
 void WorkbenchUpdateWatcher::atStartCheckUpdate()

@@ -1521,11 +1521,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
     {
         for (const auto& videoWall: resources.filtered<QnVideoWallResource>())
         {
-            // Cleanup registry for the local pc
-            videoWall->setAutorun(false);
-
-            // Cleanup registry for the remote pcs.
-            qnResourcesChangesManager->saveVideoWall(videoWall);
+            // Cleanup registry for the local pc. Remote PCs will cleanup autorun on first run.
+            setVideoWallAutorunEnabled(videoWall->getId(), false);
         }
         qnResourcesChangesManager->deleteResources(resources);
     }

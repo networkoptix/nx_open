@@ -66,6 +66,8 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 
         connect(camera, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged, this,
 			&MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
+        connect(camera, &QnVirtualCameraResource::compatibleAnalyticsEnginesChanged, this,
+			&MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
 
         updateIsAnalyticsSupported();
     }
@@ -244,7 +246,12 @@ bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
 
 void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
 {
-    isAnalyticsSupported = calculateIsAnalyticsSupported();
+    bool isAnalyticsSupported = calculateIsAnalyticsSupported();
+    if (this->isAnalyticsSupported == isAnalyticsSupported)
+        return;
+
+    this->isAnalyticsSupported = isAnalyticsSupported;
+    emit analyticsSupportChanged();
 }
 
 } // namespace nx::vms::client::desktop

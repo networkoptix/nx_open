@@ -39,14 +39,22 @@ EulaDialog::EulaDialog(QWidget* parent):
     ui->titleLabel->setFont(font);
     ui->titleLabel->setForegroundRole(QPalette::Light);
 
-    ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    //ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    // We have replaced standard buttons to keep our own button order and style.
 
-    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setText(tr("I Agree"));
-    setAccentStyle(okButton);
+    connect(ui->accept, &QPushButton::clicked, this,
+        [this]()
+        {
+            done(QDialog::DialogCode::Accepted);
+        });
 
-    const auto cancelButton = ui->buttonBox->button(QDialogButtonBox::Cancel);
-    cancelButton->setText(tr("I Do Not Agree"));
+    connect(ui->reject, &QPushButton::clicked, this,
+        [this]()
+        {
+            done(QDialog::DialogCode::Rejected);
+        });
+
+    setAccentStyle(ui->accept);
 
     NxUi::setupWebViewStyle(ui->eulaView, NxUi::WebViewStyle::eula);
 }
@@ -66,9 +74,18 @@ void EulaDialog::setTitle(const QString& value)
     ui->titleLabel->setText(value);
 }
 
-void EulaDialog::setEulaHtml(const QString& value)
+void EulaDialog::setEulaHtml(const QString& html)
 {
-    ui->eulaView->setHtml(value);
+    const auto eulaHtmlStyle = NxUi::generateCssStyle();
+
+    auto eulaText = html;
+    eulaText.replace(
+        lit("<head>"),
+        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
+
+    ui->eulaView->setHtml(eulaText);
+    // We do not want to copy embedded style to clipboard.
+    ui->copyToClipboard->setClipboardText(html);
 }
 
 bool EulaDialog::hasHeightForWidth() const
@@ -82,7 +99,7 @@ void EulaDialog::updateSize()
     if (!window)
         return;
 
-    const auto maximumSize = window->screen()->size()
+    const auto maximumSize = window->screen()->availableSize()
         - client::core::Geometry::sizeDelta(window->frameMargins());
 
     setFixedSize(kDesiredSize.boundedTo(maximumSize));
@@ -104,7 +121,7 @@ bool EulaDialog::event(QEvent* event)
 
             updateSize();
             window->setFramePosition(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-                window->frameGeometry().size(), window->screen()->geometry()).topLeft());
+                window->frameGeometry().size(), window->screen()->availableGeometry()).topLeft());
 
             break;
         }
@@ -135,16 +152,10 @@ bool EulaDialog::acceptEulaHtml(const QString& html, QWidget* parent)
         eulaHeader = tr("To use the software you must agree with the end user license agreement");
     }
 
-    const auto eulaHtmlStyle = NxUi::generateCssStyle();
-
-    auto eulaText = html;
-    eulaText.replace(
-        lit("<head>"),
-        lit("<head><style>%1</style>").arg(eulaHtmlStyle));
-
     EulaDialog eulaDialog(parent);
     eulaDialog.setTitle(eulaHeader);
-    eulaDialog.setEulaHtml(eulaText);
+    eulaDialog.setEulaHtml(html);
+
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
         qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());

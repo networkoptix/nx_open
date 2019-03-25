@@ -278,10 +278,8 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 
-#if !defined(EDGE_SERVER)
-    #include <nx_speech_synthesizer/text_to_wav.h>
-    #include <nx/utils/file_system.h>
-#endif
+#include <providers/speech_synthesis_data_provider.h>
+#include <nx/utils/file_system.h>
 
 #if defined(__arm__)
     #include "nx/vms/server/system/nx1/info.h"
@@ -332,12 +330,6 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
 } // namespace
 
 std::unique_ptr<QnStaticCommonModule> MediaServerProcess::m_staticCommonModule;
-
-#ifdef EDGE_SERVER
-static const int DEFAULT_MAX_CAMERAS = 1;
-#else
-static const int DEFAULT_MAX_CAMERAS = 128;
-#endif
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -1329,7 +1321,7 @@ void MediaServerProcess::at_connectionOpened()
 
     const auto& resPool = commonModule()->resourcePool();
     const QnUuid serverGuid(serverModule()->settings().serverGuid());
-    qint64 lastRunningTime = serverModule()->lastRunningTime().count();
+    qint64 lastRunningTime = serverModule()->lastRunningTimeBeforeRestart().count();
     if (lastRunningTime)
     {
         serverModule()->eventConnector()->at_serverFailure(
@@ -2312,10 +2304,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/scriptList", new QnScriptListRestHandler(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc GET /api/systemSettings
-     * Get or set global system settings. If called with no arguments, just returns list of all
-     * system settings with their values
-     * %param[opt]:string <param_name> name of system parameter. E.g., ec2AliveUpdateIntervalSec
-     * %param[opt]:string <param_value> New value for the specified parameter
+     * Get or set global system settings. If called with no arguments, just returns the list of all
+     * system settings with their values.
+     * To modify a settings, it is needed to specify the setting name as a query parameter. Thus,
+     * this method doesn't have fixed parameter names. To obtain the full list of possible names,
+     * call this method without parameters.
+     * Example: /api/systemSettings?smtpTimeout=30&amp;smtpUser=test
      */
     reg("api/systemSettings", new QnSystemSettingsHandler());
 
@@ -2637,7 +2631,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
 
-    /**%apidoc POST /api/saveCloudSystemCredentials
+    /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
      * %param[opt]:string cloudSystemId
      * %param[opt]:string cloudAuthenticationKey
@@ -2952,9 +2946,8 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-    #if defined(EDGE_SERVER)
+    if (nx::utils::AppInfo::isEdgeServer())
         serverFlags |= nx::vms::api::SF_Edge;
-    #endif
 
     if (QnAppInfo::isBpi())
     {
@@ -3436,7 +3429,7 @@ bool MediaServerProcess::setUpMediaServerResource(
             server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
             server->setId(serverGuid);
-            server->setMaxCameras(DEFAULT_MAX_CAMERAS);
+            server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
@@ -3863,8 +3856,8 @@ void MediaServerProcess::connectSignals()
         [this]()
         {
             Downloader* downloader = this->serverModule()->findInstance<Downloader>();
-            downloader->startDownloads();
             downloader->findExistingDownloads();
+            downloader->startDownloads();
         });
 
     connect(commonModule()->resourceDiscoveryManager(),
@@ -4335,6 +4328,7 @@ void MediaServerProcess::run()
         initializeHardwareId();
 
     prepareOsResources();
+    serverModule->initializeP2PDownloader();
 
     updateAllowedInterfaces();
 
@@ -4377,7 +4371,10 @@ void MediaServerProcess::run()
     auto stopObjectsGuard = nx::utils::makeScopeGuard([this]() { stopObjects(); });
 
     if (!serverModule->serverDb()->open())
+    {
+        NX_ERROR(this, "Stopping media server because can't open database");
         return;
+    }
 
     auto utils = nx::vms::server::Utils(serverModule.get());
     if (utils.timeToMakeDbBackup())
@@ -4489,12 +4486,13 @@ void MediaServerProcess::run()
 
     updateRootPassword();
 
-    #if !defined(EDGE_SERVER)
-        // TODO: #sivanov Make this the common way with other settings.
+    if (!nx::utils::AppInfo::isEdgeServer())
+    {
+        // TODO: #sivanov Rewrite this consistently with other settings.
         updateDisabledVendorsIfNeeded();
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
-    #endif
+    }
     if (m_setupModuleCallback)
         m_setupModuleCallback(serverModule.get());
 
@@ -4697,17 +4695,12 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     #if defined(__linux__)
-        signal( SIGUSR1, SIGUSR1_handler);
+        signal(SIGUSR1, SIGUSR1_handler);
     #endif
 
-    #if !defined(EDGE_SERVER)
-        // Festival should be initialized before QnVideoService has started because of a bug in
-        // festival.
-        std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
-            nx::utils::file_system::applicationDirPath(argc, argv));
-        textToWaveServer->start();
-        textToWaveServer->waitForStarted();
-    #endif
+    // Festival should be initialized before QnVideoService has started because of a Festival bug.
+    auto speechSynthesisDataProviderBackend = QnSpeechSynthesisDataProvider::backendInstance(
+        nx::utils::file_system::applicationDirPath(argc, argv));
 
     QnVideoService service(argc, argv);
 

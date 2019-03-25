@@ -196,6 +196,7 @@ signals:
     void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
     void ptzControllerChanged();
+    void analyticsSupportChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;

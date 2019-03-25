@@ -2569,44 +2569,6 @@
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>Mégsem</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>Úgy tűnik a frissítési folyamat az átlagosnál több időt vesz igénybe. Kérem várjon.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>Frissítések automatikus ellenőrzése</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>Frissítés...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>Link másolva</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>A legfrissebb verziót használja</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>A rendszer hétvégén történő frissítése nem ajánlott.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>

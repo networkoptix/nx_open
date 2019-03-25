@@ -238,8 +238,16 @@ bool EventSearchListModel::Private::commitInternal(const QnTimePeriod& periodToC
 
             end = iter;
 
-            if (timeUs == lastTimeUs && iter->businessRuleId == last.businessRuleId)
+            // Trying to deduce if we found exactly the same event which is displayed last.
+            const ActionData& data =*iter;
+            if (timeUs == lastTimeUs
+                && data.businessRuleId == last.businessRuleId
+                && data.actionType == last.actionType
+                && data.actionParams.actionResourceId == last.actionParams.actionResourceId
+                && data.eventParams.eventResourceId == last.eventParams.eventResourceId)
+            {
                 break;
+            }
         }
     }
 

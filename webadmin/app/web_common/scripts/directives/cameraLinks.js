@@ -2,6 +2,7 @@
  * Created by evgeniybalashov on 06/02/17.
  */
 
+'use strict';
 
 angular.module('nxCommon')
     .filter('checkProtocol', function(){

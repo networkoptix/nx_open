@@ -3,6 +3,7 @@
 
 #include "eip_cip.h"
 #include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
 
 SimpleEIPClient::SimpleEIPClient(QString addr) :
     m_hostAddress(addr),
@@ -28,6 +29,12 @@ bool SimpleEIPClient::initSocket()
 
 bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteArray& data)
 {
+    if (!socket)
+    {
+        NX_ASSERT(false, "sendAll(): socket is nullptr");
+        return false;
+    }
+
     int totalBytesSent = 0;
     int dataSize = data.size();
     auto rawData = data.data();
@@ -54,8 +61,19 @@ bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteAr
 
 bool SimpleEIPClient::receiveMessage(nx::network::AbstractStreamSocket* socket, char* const buffer)
 {
-    int totalBytesRead = 0;
+    if (!socket)
+    {
+        NX_ASSERT(false, "receiveMessage(): socket is nullptr");
+        return false;
+    }
 
+    if (!buffer)
+    {
+        NX_ASSERT(false, "receiveMessage(): buffer is nullptr");
+        return false;
+    }
+
+    int totalBytesRead = 0;
     while (totalBytesRead < EIPEncapsulationHeader::SIZE)
     {
         auto bytesRead = m_eipSocket->recv(
@@ -248,14 +266,16 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
     if (!connectIfNeeded())
         return MessageRouterResponse();
 
-    bool success = tryGetResponse(request, response, &status);
-    if (!success)
+    if (!tryGetResponse(request, response, &status))
         return MessageRouterResponse();
 
     if(status == EIPStatus::kEipStatusInvalidSessionHandle)
     {
-        registerSessionUnsafe();
-        tryGetResponse(request, response, &status);
+        if (!registerSessionUnsafe())
+            return MessageRouterResponse();
+
+        if (!tryGetResponse(request, response, &status))
+            return MessageRouterResponse();
     }
 
     return getServiceResponseData(response);

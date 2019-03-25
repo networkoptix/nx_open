@@ -82,7 +82,9 @@ bool SimpleMotionSearchListModel::isConstrained() const
 
 bool SimpleMotionSearchListModel::hasAccessRights() const
 {
-    return accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+    // Panel is hidden for live viewers but should be visible when browsing local files offline.
+    return !isOnline()
+        || accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
 }
 
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const

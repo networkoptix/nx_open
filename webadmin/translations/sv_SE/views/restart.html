@@ -4,14 +4,14 @@
 
 <form class="form" role="form" id="restartDialog">
     <div class="modal-body">
-        <p>System restart may take awhile. Afterwards the page will be refreshed automatically.</p>
+        <p>Systemåterstart kan ta ett tag. Efteråt uppdateras sidan automatiskt.</p>
         <uib-progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</uib-progressbar>
 
-        <p>If nothing happens for a while, please refresh the page manually</p>
+        <p>Om det inte händer något, uppdatera sidan manuellt</p>
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh</button>
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Uppdatera</button>
     </div>
 
 </form>

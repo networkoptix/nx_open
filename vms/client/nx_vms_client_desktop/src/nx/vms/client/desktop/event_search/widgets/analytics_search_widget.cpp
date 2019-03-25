@@ -358,7 +358,10 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
     m_areaSelectionButton->hide();
 
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
-        [this]() { setAreaSelectionEnabled(q->selectedCameras() == Cameras::current); });
+        [this](const QnVirtualCameraResourceSet& cameras)
+        {
+            setAreaSelectionEnabled(!cameras.empty());
+        });
 
     connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
         [this](SelectableTextButton::State state)
@@ -373,6 +376,7 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
             m_areaSelectionButton->setText(tr("Select some area on the video..."));
             m_areaSelectionButton->setAccented(true);
             m_areaSelectionButton->setState(SelectableTextButton::State::unselected);
+            q->selectCameras(Cameras::current);
             emit q->areaSelectionRequested({});
         });
 }

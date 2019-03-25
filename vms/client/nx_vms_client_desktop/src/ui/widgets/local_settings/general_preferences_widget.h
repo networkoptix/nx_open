@@ -17,8 +17,9 @@ class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit QnGeneralPreferencesWidget(QnVideoRecorderSettings* settings, QWidget *parent = 0);
-    ~QnGeneralPreferencesWidget();
+    explicit QnGeneralPreferencesWidget(
+        QnVideoRecorderSettings* settings, QWidget* parent = nullptr);
+    virtual ~QnGeneralPreferencesWidget() override;
 
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
@@ -42,6 +43,8 @@ private:
 
     bool autoStart() const;
     void setAutoStart(bool value);
+
+    void initAudioDevices();
 
     QString primaryAudioDeviceName() const;
     void setPrimaryAudioDeviceName(const QString &name);

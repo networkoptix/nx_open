@@ -12,18 +12,21 @@
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
-namespace  {
-    auto kWaitForServerReturn = std::chrono::minutes(10);
-}
+namespace {
+
+auto kWaitForServerReturn = std::chrono::minutes(10);
+
+} // anonymous namespace
 
 namespace nx::vms::client::desktop {
 
 PeerStateTracker::PeerStateTracker(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_dataLock(QnMutex::Recursive)
 {
-    if(ini().massSystemUpdateWaitForServerOnline)
-        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnline);
+    if(ini().massSystemUpdateWaitForServerOnlineOverride)
+        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnlineOverride);
     else
         m_waitForServerReturn = kWaitForServerReturn;
 }
@@ -267,7 +270,7 @@ void PeerStateTracker::setVersionInformation(
 
             if (installed != item->installed)
             {
-                item->installed = true;
+                item->installed = installed;
                 NX_INFO(this, "setVersionInformation() - peer %1 changed installed=%2", item->id, item->installed);
             }
             emit itemChanged(item);
@@ -317,7 +320,15 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
 std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::getActiveServers() const
 {
     QnMutexLocker locker(&m_dataLock);
-    return m_activeServers;
+
+    std::map<QnUuid, QnMediaServerResourcePtr> result;
+    for (const auto& item: m_activeServers)
+    {
+        if (!item.second->isOnline())
+            continue;
+        result[item.first] = item.second;
+    }
+    return result;
 }
 
 QList<UpdateItemPtr> PeerStateTracker::getAllItems() const
@@ -598,7 +609,7 @@ QSet<QnUuid> PeerStateTracker::getPeersFailed() const
     return m_peersFailed;
 }
 
-void PeerStateTracker::setTaskSet(const QSet<QnUuid> &targets)
+void PeerStateTracker::setTask(const QSet<QnUuid> &targets)
 {
     m_peersActive = targets;
     m_peersIssued = targets;
@@ -717,24 +728,24 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
     {
         case State::initial:
             m_clientItem->state = StatusCode::idle;
-            m_clientItem->statusMessage = "Client has no update task";
+            m_clientItem->statusMessage = tr("No update task");
             break;
         case State::readyDownload:
             m_clientItem->state = StatusCode::idle;
-            m_clientItem->statusMessage = "Client is ready to download update";
+            m_clientItem->statusMessage = tr("Ready to download update");
             break;
         case State::downloading:
             m_clientItem->state = StatusCode::downloading;
             m_clientItem->progress = percentComplete;
-            m_clientItem->statusMessage = "Client is downloading an update";
+            m_clientItem->statusMessage = tr("Downloading update");
             break;
         case State::readyInstall:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
-            m_clientItem->statusMessage = "Client is ready to download update";
+            m_clientItem->statusMessage = tr("Ready to download update");
             break;
         case State::readyRestart:
-            m_clientItem->statusMessage = "Client is ready to install and restart";
+            m_clientItem->statusMessage = tr("Ready to restart to the new version");
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
@@ -742,22 +753,22 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::installing:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->installing = true;
-            m_clientItem->statusMessage = "Client is installing update";
+            m_clientItem->statusMessage = tr("Installing update");
             break;
         case State::complete:
             m_clientItem->state = StatusCode::latestUpdateInstalled;
             m_clientItem->installing = false;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
-            m_clientItem->statusMessage = "Client has installed an update";
+            m_clientItem->statusMessage = tr("Installed");
             break;
         case State::error:
             m_clientItem->state = StatusCode::error;
-            m_clientItem->statusMessage = "Client has failed to download an update";
+            m_clientItem->statusMessage = tr("Failed to download update");
             break;
         case State::applauncherError:
             m_clientItem->state = StatusCode::error;
-            m_clientItem->statusMessage = "Client has failed to install an update";
+            m_clientItem->statusMessage = tr("Failed to install update");
             break;
         default:
             break;
@@ -853,6 +864,8 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
             //  - peersFailed
         }
         item->offline = viewAsOffline;
+        // TODO: Should take this away, out of mutex scope.
+        emit itemOnlineStatusChanged(item);
         changed = true;
     }
 

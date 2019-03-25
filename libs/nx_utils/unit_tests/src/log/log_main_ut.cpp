@@ -8,8 +8,8 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/run_test.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/unused.h>
 
@@ -79,17 +79,9 @@ public:
         }
     }
 
-    void setIniValue(const int* iniField, int newValue)
-    {
-        const auto oldValue = *iniField;
-        int* mutableField = const_cast<int*>(iniField);
-        iniGuards.push_back(makeSharedGuard([=](){ *mutableField = oldValue; }));
-        *mutableField = newValue;
-    }
-
     Buffer* buffer = nullptr;
     const Level initialLevel;
-    std::vector<SharedGuardPtr> iniGuards;
+    nx::utils::test::IniConfigTweaks iniTweaks;
 };
 
 TEST_F(LogMainTest, ExplicitTag)
@@ -164,8 +156,8 @@ TEST_F(LogMainTest, LevelReducer)
     const auto logWarning = [this]() { NX_WARNING(this, "Warning"); };
     const auto logInfo = [this]() { NX_INFO(this, "Info"); };
 
-    setIniValue(&ini().logLevelReducerPassLimit, 2);
-    setIniValue(&ini().logLevelReducerWindowSizeS, 60);
+    iniTweaks.set(&ini().logLevelReducerPassLimit, 2);
+    iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
 
     for (int i = 0; i != 4; ++i)
         logWarning();
@@ -207,8 +199,8 @@ TEST_F(LogMainTest, LevelReducerWithStream)
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
     const auto logWarning = [this]() { NX_WARNING(this) << "Warn"; };
 
-    setIniValue(&ini().logLevelReducerPassLimit, 1);
-    setIniValue(&ini().logLevelReducerWindowSizeS, 60);
+    iniTweaks.set(&ini().logLevelReducerPassLimit, 1);
+    iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
 
     logWarning();
     logWarning();

@@ -200,7 +200,7 @@ APPLY(201, removeResource, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -222,7 +222,7 @@ APPLY(213, removeResourceStatus, nx::vms::api::IdData, /* Remove records from vm
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper("status"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -328,7 +328,7 @@ APPLY(212, removeResources, nx::vms::api::IdDataList, \
                        &apiIdDataListTriggerNotificationHelper, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(true), /* Filter save func */ \
+                       FilterListByAccess<RemoveResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -339,7 +339,7 @@ APPLY(300, getCameras, nx::vms::api::CameraDataList, \
                        CameraNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -364,7 +364,7 @@ APPLY(302, saveCameras, nx::vms::api::CameraDataList, \
                          }, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -373,7 +373,7 @@ APPLY(303, removeCamera, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -452,7 +452,7 @@ APPLY(313, getCamerasEx, nx::vms::api::CameraDataExList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -461,7 +461,7 @@ APPLY(314, removeCameraUserAttributes, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper("camera_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -474,7 +474,7 @@ APPLY(400, getMediaServers, nx::vms::api::MediaServerDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -494,7 +494,7 @@ APPLY(402, removeMediaServer, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -538,7 +538,7 @@ APPLY(406, removeServerUserAttributes, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper("server_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -549,7 +549,7 @@ APPLY(407, saveStorage, nx::vms::api::StorageData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -562,7 +562,7 @@ APPLY(408, saveStorages, nx::vms::api::StorageDataList, \
                        MediaServerNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -571,7 +571,7 @@ APPLY(409, removeStorage, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -584,7 +584,7 @@ APPLY(410, removeStorages, nx::vms::api::IdDataList, \
                        &apiIdDataListTriggerNotificationHelper, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(true), /* Filter save func */ \
+                       FilterListByAccess<RemoveResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -595,7 +595,7 @@ APPLY(411, getMediaServersEx, nx::vms::api::MediaServerDataExList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -606,7 +606,7 @@ APPLY(412, getStorages, nx::vms::api::StorageDataList, \
                        MediaServerNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -617,7 +617,7 @@ APPLY(500, getUsers, nx::vms::api::UserDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -637,7 +637,7 @@ APPLY(502, removeUser, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -670,7 +670,7 @@ APPLY(509, removeAccessRights, nx::vms::api::IdData, /* Remove records from vms_
                        false, /* system*/ \
                        CreateHashByIdRfc4122Helper("access_rights"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -727,7 +727,7 @@ APPLY(510, saveUsers,  nx::vms::api::UserDataList, \
                        UserNotificationManagerHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -747,7 +747,7 @@ APPLY(601, saveLayout, nx::vms::api::LayoutData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        LayoutNotificationManagerHelper(), /* trigger notification*/ \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -760,7 +760,7 @@ APPLY(602, saveLayouts, nx::vms::api::LayoutDataList, \
                        LayoutNotificationManagerHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -769,7 +769,7 @@ APPLY(603, removeLayout, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -815,7 +815,7 @@ APPLY(700, getVideowalls, nx::vms::api::VideowallDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -824,7 +824,7 @@ APPLY(701, saveVideowall, nx::vms::api::VideowallData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        VideowallNotificationManagerHelper(), /* trigger notification*/ \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -835,7 +835,7 @@ APPLY(702, removeVideowall, nx::vms::api::IdData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1138,7 +1138,7 @@ APPLY(1500, getWebPages, nx::vms::api::WebPageDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -1147,7 +1147,7 @@ APPLY(1501, saveWebPage, nx::vms::api::WebPageData, \
                        false, \
                        CreateHashByIdHelper(), \
                        WebPageNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1158,7 +1158,7 @@ APPLY(1502, removeWebPage, nx::vms::api::IdData, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       ModifyResourceAccess(true), /* save permission checker */ \
+                       RemoveResourceAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1385,7 +1385,7 @@ APPLY(10300, getAnalyticsPlugins, nx::vms::api::AnalyticsPluginDataList, \
                         InvalidTriggerNotificationHelper(), \
                         InvalidAccess(), /* save permission checker */ \
                         InvalidAccess(), /* read permission checker */ \
-                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                        FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                         FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                         ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                         RegularTransactionType()) /* regular transaction type */ \
@@ -1394,7 +1394,7 @@ APPLY(10301, saveAnalyticsPlugin, nx::vms::api::AnalyticsPluginData, \
                         false, \
                         CreateHashByIdHelper(), \
                         AnalyticsNotificationManagerHelper(), \
-                        ModifyResourceAccess(false), /* save permission checker */ \
+                        ModifyResourceAccess(), /* save permission checker */ \
                         ReadResourceAccess(), /* read permission checker */ \
                         InvalidFilterFunc(), /* Filter save func */ \
                         InvalidFilterFunc(), /* Filter read func */ \
@@ -1405,7 +1405,7 @@ APPLY(10302, removeAnalyticsPlugin, nx::vms::api::IdData, \
                         false, \
                         CreateHashByIdHelper(), \
                         &apiIdDataTriggerNotificationHelper, \
-                        ModifyResourceAccess(true), /* save permission checker */ \
+                        RemoveResourceAccess(), /* save permission checker */ \
                         ReadResourceAccess(), /* read permission checker */ \
                         InvalidFilterFunc(), /* Filter save func */ \
                         InvalidFilterFunc(), /* Filter read func */ \
@@ -1418,7 +1418,7 @@ APPLY(10400, getAnalyticsEngines, nx::vms::api::AnalyticsEngineDataList, \
                         InvalidTriggerNotificationHelper(), \
                         InvalidAccess(), /* save permission checker */ \
                         InvalidAccess(), /* read permission checker */ \
-                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                        FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
                         FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                         ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                         RegularTransactionType()) /* regular transaction type */ \
@@ -1427,7 +1427,7 @@ APPLY(10401, saveAnalyticsEngine, nx::vms::api::AnalyticsEngineData, \
                         false, \
                         CreateHashByIdHelper(), \
                         AnalyticsNotificationManagerHelper(), \
-                        ModifyResourceAccess(false), /* save permission checker */ \
+                        ModifyResourceAccess(), /* save permission checker */ \
                         ReadResourceAccess(), /* read permission checker */ \
                         InvalidFilterFunc(), /* Filter save func */ \
                         InvalidFilterFunc(), /* Filter read func */ \
@@ -1438,7 +1438,7 @@ APPLY(10402, removeAnalyticsEngine, nx::vms::api::IdData, \
                         false, \
                         CreateHashByIdHelper(), \
                         &apiIdDataTriggerNotificationHelper, \
-                        ModifyResourceAccess(true), /* save permission checker */ \
+                        RemoveResourceAccess(), /* save permission checker */ \
                         ReadResourceAccess(), /* read permission checker */ \
                         InvalidFilterFunc(), /* Filter save func */ \
                         InvalidFilterFunc(), /* Filter read func */ \
