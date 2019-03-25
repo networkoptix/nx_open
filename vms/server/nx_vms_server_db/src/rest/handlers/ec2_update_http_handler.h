@@ -459,27 +459,6 @@ private:
         QString* outErrorMessage,
         const QString& fieldName = QString())
     {
-        auto toString = [](QJsonValue::Type jsonType)
-        {
-            switch(jsonType)
-            {
-                case QJsonValue::Null:
-                    return "Null";
-                case QJsonValue::Bool:
-                    return "Bool";
-                case QJsonValue::Double:
-                    return "Double";
-                case QJsonValue::String:
-                    return "String";
-                case QJsonValue::Array:
-                    return "Array";
-                case QJsonValue::Object:
-                    return "Object";
-                default:
-                    return "Undefined";
-            }
-        };
-
         if (incompleteValue.type() == QJsonValue::Undefined //< Missing field type, as per Qt doc.
             || incompleteValue.type() == QJsonValue::Null) //< Missing field type, actual.
         {
