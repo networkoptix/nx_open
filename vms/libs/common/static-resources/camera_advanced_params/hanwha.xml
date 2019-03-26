@@ -1022,7 +1022,7 @@
                             <conditional-show>
                                 <condition
                                     watch="image/camera/DayNightMode"
-                                    condition="value=External"/>
+                                    condition="valueContains=External"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>
@@ -1047,17 +1047,17 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                <param id="image/imageenhacements/Gamma"
+                <param id="image/imageenhancements/Gamma"
                         name="Gamma"
                         dataType="Number"/>
-                <param id="image/imageenhacements/Saturation"
+                <param id="image/imageenhancements/Saturation"
                         name="ColorLevel"
                         dataType="Number"/>
-                <param id="image/imageenhacements/LDCEnable"
+                <param id="image/imageenhancements/LDCEnable"
                         name="LDC"
                         dataType="Bool"
                         aux="groupLead=ldc"/>
-                <param id="image/imageenhacements/LDCLevel"
+                <param id="image/imageenhancements/LDCLevel"
                         name="LDC Level"
                         dataType="Number"
                         aux="group=ldc;groupInclude=true">
