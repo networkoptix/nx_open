@@ -1,5 +1,7 @@
 #include "director.h"
 
+#include <utils/common/delayed.h>
+
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -7,27 +9,35 @@ namespace nx::vmx::client::desktop {
 
 using namespace vms::client::desktop::ui;
 
-QScopedPointer<Director> Director::m_director;
+namespace {
 
-Director* Director::instance()
+int kQuitDelay = 2000; //< 2s.
+
+} // namespace
+
+void Director::quit(bool force)
 {
-    NX_ASSERT(m_director);
-    return m_director.data();
+    if (force)
+    {
+        executeDelayedParented(
+            [this] { context()->action(action::DelayedForcedExitAction)->trigger(); },
+            kQuitDelay, this);
+    }
+    else
+    {
+        executeDelayedParented(
+            [this] { context()->action(action::ExitAction)->trigger(); },
+            kQuitDelay, this);
+    }
 }
 
-void Director::quit()
+Director::Director(QObject* parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
-    m_context->action(action::ExitAction)->trigger();
 }
 
-void Director::createInstance(QnWorkbenchContext* context)
-{
-    NX_ASSERT(!m_director, "Attempted to create duplicate Director");
-    m_director.reset(new Director(context));
-}
-
-Director::Director(QnWorkbenchContext* context):
-    m_context(context)
+Director::~Director()
 {
 }
 

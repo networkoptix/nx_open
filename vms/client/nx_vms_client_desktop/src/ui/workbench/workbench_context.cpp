@@ -17,6 +17,7 @@
 
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -118,6 +119,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         statisticsManager, &QnStatisticsManager::sendStatistics);
 
     instance<nx::vms::client::desktop::SystemHealthState>();
+
+    instance<nx::vmx::client::desktop::Director>();
 
     initWorkarounds();
 }

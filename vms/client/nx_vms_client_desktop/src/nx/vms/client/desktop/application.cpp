@@ -183,9 +183,6 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
         new QnWorkbenchAccessController(client.clientCoreModule()->commonModule()));
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
 
-    // Create client Director.
-    vmx::client::desktop::Director::createInstance(context.data());
-
     #if defined(Q_OS_LINUX)
         qputenv("RESOURCE_NAME", QnAppInfo::productNameShort().toUtf8());
     #endif

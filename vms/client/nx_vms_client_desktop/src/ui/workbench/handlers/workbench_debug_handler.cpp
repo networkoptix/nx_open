@@ -1,5 +1,4 @@
 #include "workbench_debug_handler.h"
-#include "workbench_debug_handler.h"
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -23,7 +22,6 @@
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/style/webview_style.h>
@@ -31,6 +29,9 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/widgets/main_window.h>
 
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/webserver/client_webserver.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
 #include <nx/vms/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
@@ -441,6 +442,9 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
             &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
     #endif
+
+    if (const int port = ini().clientWebServerPort)
+        context()->instance<nx::vmx::client::desktop::ClientWebserver>()->start(port);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

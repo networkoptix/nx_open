@@ -1,29 +1,32 @@
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+
+#include <nx/utils/singleton.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchContext;
 
 namespace nx::vmx::client::desktop {
 
-class Director
+/**
+ * Director provides API for high-level operational control of NX client.
+ * It is used (or to be used) for functional testing, video wall remote etc.
+ */
+
+class Director:
+    public QObject,
+    public QnWorkbenchContextAware,
+    public Singleton<Director>
 {
+    Q_OBJECT
 public:
-    /** Returns pointer to pre-created singleton Director. */
-    Director* instance();
+    explicit Director(QObject* parent);
+    virtual ~Director();
 
     /** Closes client application. */
-    void quit();
-
-    /** Creates singleton Director object (called only from application.cpp). */
-    static void createInstance(QnWorkbenchContext* context);
-
-private:
-    explicit Director(QnWorkbenchContext* context);
-
-    static QScopedPointer<Director> m_director;
-
-    QnWorkbenchContext* m_context = nullptr;
+    void quit(bool force = true);
 };
 
 } // namespace nx::vmx::client::desktop
