@@ -33,6 +33,7 @@ namespace {
 
 static constexpr microseconds kFutureMetadataLength = 2s;
 static constexpr int kMaxFutureMetadataPackets = 4;
+static constexpr QRectF kWidgetBounds(0.0, 0.0, 1.0, 1.0);
 
 QString objectDescription(const std::vector<Attribute>& attributes)
 {
@@ -338,6 +339,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         {
             areaInfo.rectangle = objectInfo.rectangle;
         }
+        areaInfo.rectangle = Geometry::movedInto(areaInfo.rectangle, kWidgetBounds);
 
         if (!objectInfo.zoomWindowItemUuid.isNull())
         {
