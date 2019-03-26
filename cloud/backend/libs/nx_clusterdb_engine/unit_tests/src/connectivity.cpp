@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/clusterdb/engine/transport/transport_manager.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "cluster_test_fixture.h"
@@ -10,6 +11,13 @@ class Connectivity:
     public ::testing::Test,
     public ClusterTestFixture
 {
+public:
+    ~Connectivity()
+    {
+        if (m_connector)
+            m_connector->pleaseStopSync();
+    }
+
 protected:
     virtual void SetUp() override
     {
@@ -52,6 +60,18 @@ protected:
         peer(0).disconnectFrom(peer(1));
     }
 
+    void whenEstablishDuplicateConnectionExplicitely()
+    {
+        m_connector = peer(0).process().moduleInstance()->synchronizationEngine()
+            .transportManager().createConnector(
+                clusterId(),
+                "connection_id",
+                peer(1).process().moduleInstance()->synchronizationUrl());
+
+        m_connector->connect(
+            [this](auto&&... args) { saveConnectResult(std::forward<decltype(args)>(args)...); });
+    }
+
     void thenPeerConnectedEventIsDelivered(std::vector<std::string> nodeIds)
     {
         assertPeerEventIsDelivered(std::move(nodeIds), true);
@@ -62,9 +82,24 @@ protected:
         assertPeerEventIsDelivered(std::move(nodeIds), false);
     }
 
+    void thenConnectionIsEstablishedSuccessfully()
+    {
+        auto [result, connection] = m_connectResults.pop();
+        ASSERT_TRUE(result.ok());
+
+        if (connection)
+            connection->pleaseStopSync();
+    }
+
 private:
+    using ConnectResult = std::tuple<
+        transport::ConnectResultDescriptor,
+        std::unique_ptr<transport::AbstractConnection>>;
+
     std::vector<std::tuple<Peer*, nx::utils::SubscriptionId>> m_nodeSubscriptions;
     nx::utils::SyncQueue<std::tuple<NodeDescriptor, NodeStatusDescriptor>> m_events;
+    std::unique_ptr<transport::AbstractTransactionTransportConnector> m_connector;
+    nx::utils::SyncQueue<ConnectResult> m_connectResults;
 
     void saveEvent(const NodeDescriptor& node, const NodeStatusDescriptor& nodeStatus)
     {
@@ -91,6 +126,15 @@ private:
                 break;
         }
     }
+
+    void saveConnectResult(
+        transport::ConnectResultDescriptor connectResultDescriptor,
+        std::unique_ptr<transport::AbstractConnection> connection)
+    {
+        m_connectResults.push({
+            std::move(connectResultDescriptor),
+            std::move(connection)});
+    }
 };
 
 TEST_F(Connectivity, node_connected_event_is_delivered)
@@ -104,6 +148,13 @@ TEST_F(Connectivity, node_disconnected_event_is_delivered)
     givenConnectedNodes();
     whenDisconnectNodes();
     thenPeerDisconnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
+}
+
+TEST_F(Connectivity, new_connection_from_already_connected_node_overrides_existing_one)
+{
+    givenConnectedNodes();
+    whenEstablishDuplicateConnectionExplicitely();
+    thenConnectionIsEstablishedSuccessfully();
 }
 
 } // namespace nx::clusterdb::engine::test

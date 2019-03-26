@@ -55,6 +55,7 @@ public:
     const ConnectionManager& connectionManager() const;
 
     Connector& connector();
+    transport::TransportManager& transportManager();
 
     const statistics::Provider& statisticsProvider() const;
 

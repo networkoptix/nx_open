@@ -129,6 +129,11 @@ Connector& SynchronizationEngine::connector()
     return m_connector;
 }
 
+transport::TransportManager& SynchronizationEngine::transportManager()
+{
+    return m_transportManager;
+}
+
 const statistics::Provider& SynchronizationEngine::statisticsProvider() const
 {
     return m_statisticsProvider;

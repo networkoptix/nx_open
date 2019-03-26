@@ -22,7 +22,7 @@ TransportManager::TransportManager(
 }
 
 std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createConnector(
-    const std::string& systemId,
+    const std::string& clusterId,
     const std::string& /*connectionId*/,
     const nx::utils::Url& targetUrl)
 {
@@ -35,7 +35,7 @@ std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createC
         m_commandLog,
         m_outgoingCommandFilter,
         targetUrl,
-        systemId,
+        clusterId,
         m_nodeId);
 }
 
