@@ -48,7 +48,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
     NX_INI_FLAG(1, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(1, enableCaseExport, "Enable case export.");
-    NX_INI_FLAG(0, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
+    NX_INI_FLAG(1, enableSessionTimeout,
+        "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
     NX_INI_FLAG(1, redesignedTimeSynchronization, "Redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(1, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
