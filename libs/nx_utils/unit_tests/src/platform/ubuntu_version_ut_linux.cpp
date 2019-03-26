@@ -1,8 +1,8 @@
 #include <array>
 #include <gtest/gtest.h>
-#include <nx/vms/api/helpers/system_information_helper_linux.h>
+#include <nx/utils/platform/ubuntu_version_linux.h>
 
-namespace nx::vms::api::test {
+namespace nx::utils::test {
 
 TEST(ubuntuVersion, fromCodeName_success)
 {
@@ -169,5 +169,5 @@ BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
     ASSERT_EQ("14.04", versionIdValue);
 }
 
-} // namespace nx::vms::api::test
+} // namespace nx::utils::test
 

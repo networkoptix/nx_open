@@ -2,9 +2,9 @@
 
 #include <QtCore/QString>
 
-namespace nx::vms::api {
+namespace nx::utils {
 
 QString ubuntuVersionFromCodeName(const QString& codeName);
 QString osReleaseContentsValueByKey(const QByteArray& osReleaseContents, const QString& key);
 
-} // namespace nx::vms::api
+} // namespace nx::utils
