@@ -285,6 +285,8 @@ Sharing system with a user who is already in the list updates their permissions
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${random email}    ${ADMIN TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Run Keyword And Expect Error    *    Wait For Email    recipient=${EMAIL ADMIN}    timeout=30
     Delete All Emails
     Check User Permissions    ${random email}    ${ADMIN TEXT}
     Share To    ${random email}    ${VIEWER TEXT}
