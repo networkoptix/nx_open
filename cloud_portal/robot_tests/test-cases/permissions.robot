@@ -223,7 +223,7 @@ Delete user works
     Activate    ${random email}
     Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${ADMIN TEXT}
-    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${random email}

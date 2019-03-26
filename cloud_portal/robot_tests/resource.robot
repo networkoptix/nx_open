@@ -197,8 +197,7 @@ Edit User Permissions In Systems
 
 Check User Permissions
     [arguments]    ${user email}    ${permissions}
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
-    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span[contains(text(),"${permissions}")]
 
 Remove User Permissions
     [arguments]    ${user email}
