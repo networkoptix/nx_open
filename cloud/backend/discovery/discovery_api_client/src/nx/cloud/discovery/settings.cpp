@@ -7,18 +7,21 @@ namespace nx::cloud::discovery {
 
 namespace {
 
-static const QLatin1String kDiscoveryServiceUrl("discovery/discoveryServiceUrl");
-static const QLatin1String kDefaultDiscoveryServiceUrl("https://discovery.vmsproxy.com");
+static constexpr char kDiscoveryEnabled[] = "discovery/enabled";
+static constexpr char kDefaultDiscoveryEnabled[] = "false";
 
-static const QLatin1String kRoundTripPadding("discovery/roundTripPadding");
+static constexpr char kDiscoveryServiceUrl[] = "discovery/discoveryServiceUrl";
+static constexpr char kDefaultDiscoveryServiceUrl[] = "https://discovery.vmsproxy.com";
+
+static constexpr char kRoundTripPadding[] = "discovery/roundTripPadding";
 static const std::chrono::milliseconds kDefaultRoundTripPadding =
     std::chrono::seconds(3);
 
-static const QLatin1String kRegistrationErrorDelay("discovery/registrationErrorDelay");
+static constexpr char kRegistrationErrorDelay[] = "discovery/registrationErrorDelay";
 static const std::chrono::milliseconds kDefaultRegistrationErrorDelay =
     std::chrono::minutes(1);
 
-static const QLatin1String kOnlineNodesRequestDelay("discovery/onlineNodesRequestDelay");
+static constexpr char kOnlineNodesRequestDelay[] = "discovery/onlineNodesRequestDelay";
 static const std::chrono::milliseconds kDefaultOnlineNodesRequestDelay =
     std::chrono::seconds(30);
 
@@ -34,6 +37,8 @@ Settings::Settings():
 
 void Settings::load(const QnSettings& settings)
 {
+    enabled = settings.value(kDiscoveryEnabled, kDefaultDiscoveryEnabled).toString() == "true";
+
     discoveryServiceUrl =
         settings.value(kDiscoveryServiceUrl, kDefaultDiscoveryServiceUrl).toString();
 

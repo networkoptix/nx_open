@@ -12,6 +12,8 @@ namespace nx::cloud::discovery {
  */
 struct NX_DISCOVERY_CLIENT_API Settings
 {
+    bool enabled = false;
+
     /**
      * The base url that the discovery client uses to connect to the discovery service.
      * The default value is https://discovery.vmsproxy.com

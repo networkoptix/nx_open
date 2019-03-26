@@ -102,11 +102,14 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     setup(abstractSettings);
     auto customLogicGuard = nx::utils::makeScopeGuard([this]() { teardown(); });
 
-    controller.synchronizationEngine().discoveryManager().start(
-        settings.synchronization().clusterId,
-        nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(view.httpEndpoints().front())
-            .setPath(m_outgoingConnectionBasePath).toUrl());
+    if (settings.discovery().enabled)
+    {
+        controller.synchronizationEngine().discoveryManager().start(
+            settings.synchronization().clusterId,
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(view.httpEndpoints().front())
+                .setPath(m_outgoingConnectionBasePath).toUrl());
+    }
 
     // Process privilege reduction.
     //nx::utils::CurrentProcess::changeUser(settings.changeUser());

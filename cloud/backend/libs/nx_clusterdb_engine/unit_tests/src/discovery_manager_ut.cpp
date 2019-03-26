@@ -78,6 +78,7 @@ public:
         m_fixture.addPeer(/*startAndWaitUntilStarted*/ false);
         Peer& peer = m_fixture.peer(m_fixture.peerCount() - 1);
 
+        peer.process().addArg("-discovery/enabled", "true");
         peer.process().addArg(
             "-discovery/discoveryServiceUrl",
             discoveryServiceUrl.toStdString().c_str());
