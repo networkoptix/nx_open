@@ -128,7 +128,7 @@ correct items are shown for advanced viewer and below
     \    Log Out
 
 does not display edit and remove for owner row
-    [tags]    Threaded
+    [tags]    Threaded    C41905
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
