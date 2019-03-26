@@ -1,10 +1,14 @@
+<nx-pre-loader type="page" *ngIf="!cameras.length"></nx-pre-loader>
+
 <div class="ipvd">
     <div class="row p-3 m-0" [style.display]="mobileDetailMode ? 'none' : 'block'">
         <nx-search
                 name="filterModel"
                 [(ngModel)]="filterModel"
+                (ngModelChange)="modelChanged($event)"
                 expandable
                 [placeholder]="placeholder"
+
                 ngDefaultControl>
         </nx-search>
     </div>
@@ -47,18 +51,19 @@
     </div>
 
     <div class="col ml-2 mb-3 text-placeholder d-flex align-items-center"
-         *ngIf="!camerasTable.length && vendors && !vendors.length"
+         *ngIf="noResult"
          translate>
         Nothing Found
     </div>
 
     <div class="row pl-3 pr-3 m-0"
-         *ngIf="allCameras.length && !camerasTable.length">
+         *ngIf="vendors && !camerasTable.length && !noResult">
 
         <nx-vendor-list
                 [vendors]="vendors"
-                [cameras]="allCameras.length"
-                [(ngModel)]="filterModel">
+                [cameras]="cameras.length"
+                [(ngModel)]="filterModel"
+                (ngModelChange)="modelChanged($event)">
         </nx-vendor-list>
     </div>
 

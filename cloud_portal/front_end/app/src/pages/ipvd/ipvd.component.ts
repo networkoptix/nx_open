@@ -1,10 +1,8 @@
 import {
     Component,
     OnInit,
-    DoCheck,
-    KeyValueDiffers,
     ViewEncapsulation
-}                                              from '@angular/core';
+} from '@angular/core';
 import { CamerasService }                      from '../../services/cameras.service';
 import { IpvdSearchService }                   from './ipvd-search.service';
 import { NxModalMessageComponent }             from '../../dialogs/message/message.component';
@@ -21,7 +19,7 @@ import { NxUtilsService }                      from '../../services/utils.servic
     encapsulation: ViewEncapsulation.None
 })
 
-export class NxIpvdComponent implements OnInit, DoCheck {
+export class NxIpvdComponent implements OnInit {
     lang: any = {};
     CONFIG: any = {};
     placeholder: string;
@@ -31,7 +29,6 @@ export class NxIpvdComponent implements OnInit, DoCheck {
     resolution: string;
     itemsPerPage: number;
     query: string;
-    allCameras: any;
     cameras: any;
     activeCamera: any;
     showAll: boolean;
@@ -42,18 +39,10 @@ export class NxIpvdComponent implements OnInit, DoCheck {
     camerasTable: any;
     allowedParameters: string[];
     filterModel: any;
-    differ: any;
-    tagDiffer: any;
-    resolutionDiffer: any;
-    vendorDiffer: any;
-    hardwareDiffer: any;
     toggleCamview: boolean;
     params: any;
     mobileDetailMode: boolean;
-
-    hwtypes: any;
-    private ASC = true;
-    private DESC = false;
+    noResult: boolean;
 
   private setupDefaults() {
       this.allowedParameters = [
@@ -68,8 +57,8 @@ export class NxIpvdComponent implements OnInit, DoCheck {
       this.resolution = '0';
       this.itemsPerPage = 15;
       this.query = '';
+      this.noResult = false;
 
-      this.allCameras = [];
       this.cameras = [];
       this.camerasTable = [];
       this.vendors = undefined;
@@ -79,25 +68,15 @@ export class NxIpvdComponent implements OnInit, DoCheck {
       this.toggleCamview = false;
 
       this.filter = {};
-      this.emptyFilter = {
-            query: '',
-            isPtzSupported: false,
-            isAptzSupported: false,
-            isAudioSupported: false,
-            isTwAudioSupported: false,
-            isIoSupported: false,
-            isMdSupported: false,
-            isFisheye: false,
-            isH265: false,
-            isMultiSensor: false
-        };
-      this.filterModel = this.emptyFilter;
-
-      this.resolutions = [];
-      this.hardwareTypes = [];
+      this.filterModel = {
+          query: ''
+      };
       this.filterModel.tags = [];
       this.filterModel.selects = [];
       this.filterModel.multiselects = [];
+
+      this.resolutions = [];
+      this.hardwareTypes = [];
   }
 
     constructor(private configService: NxConfigService,
@@ -106,16 +85,10 @@ export class NxIpvdComponent implements OnInit, DoCheck {
                 private cameraSearchService: IpvdSearchService,
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
-                private differs: KeyValueDiffers,
                 private uri: NxUriService,
                 private breakpointObserver: BreakpointObserver) {
 
         this.setupDefaults();
-        this.differ = this.differs.find({}).create();
-        this.tagDiffer = this.differs.find([]).create();
-        this.resolutionDiffer = this.differs.find([]).create();
-        this.vendorDiffer = this.differs.find([]).create();
-        this.hardwareDiffer = this.differs.find([]).create();
     }
 
     ngOnInit() {
@@ -179,38 +152,8 @@ export class NxIpvdComponent implements OnInit, DoCheck {
         ];
     }
 
-    ngDoCheck() {
-        const filterChanges = this.differ.diff(this.filterModel);
-        let vendorChanges;
-        let hardwareChanges;
-        let resolutionChanges;
-
-        if (this.filterModel.multiselects.find(x => x.id === 'vendors') !== undefined) {
-            vendorChanges = this.vendorDiffer.diff(this.filterModel.multiselects.find(x => {
-                return x.id === 'vendors';
-            }).selected);
-        }
-
-        const tagChanges = this.tagDiffer.diff(this.filterModel.tags.map(tag => tag.value));
-
-        if (this.filterModel.selects.find(x => x.id === 'resolution') !== undefined) {
-            resolutionChanges = this.resolutionDiffer.diff(this.filterModel.selects.find(x => {
-                return x.id === 'resolution';
-            }).selected);
-        }
-
-        if (this.filterModel.multiselects.find(x => x.id === 'hardwareTypes') !== undefined) {
-            hardwareChanges = this.hardwareDiffer.diff(this.filterModel.multiselects.find(x => {
-                return x.id === 'hardwareTypes';
-            }).selected);
-            this.hwtypes = this.filterModel.multiselects.find(x => {
-                return x.id === 'hardwareTypes';
-            }).selected;
-        }
-
-        if (filterChanges || tagChanges || resolutionChanges || vendorChanges || hardwareChanges) {
-            this.searchVendor(this.filterModel);
-        }
+    modelChanged(model) {
+       this.searchVendor();
     }
 
     activate() {
@@ -226,6 +169,7 @@ export class NxIpvdComponent implements OnInit, DoCheck {
 
                 this.data = data;
 
+                this.cameras = data.cameras;
                 this.vendors = data.vendors;
                 this.vendors.sort(NxUtilsService.byParam((elm) => {
                     return elm.name.toLowerCase();
@@ -274,31 +218,53 @@ export class NxIpvdComponent implements OnInit, DoCheck {
     return filteredCameras;
   }
 
-    searchVendor(filter) {
+    filterEmpty() {
+        // query
+        const tags = this.filterModel.tags.find(tag => tag.value === true);
+
+        let multiselect = false;
+        this.filterModel.multiselects.forEach(select => {
+            multiselect = multiselect || (select.selected.length > 0);
+        });
+
+        let singleselect = false;
+        this.filterModel.selects.forEach(select => {
+            singleselect = singleselect || (select.selected.value > 0); // 0 is default choice
+        });
+
+        return !!tags || multiselect || singleselect || this.filterModel.query !== '';
+    }
+
+    searchVendor() {
         if (!this.params.camera) {
             this.resetActiveCamera();
         }
 
-        this.filter = filter;
+        if (this.cameras) {
+            if (this.filterEmpty()) {
+                this.cameraSearchService
+                    .ipvdSearch(this.cameras, this.filterModel)
+                    .subscribe(cameras => {
+                        this.activeCamera = undefined;
 
-        if (this.data) {
-            this.cameraSearchService
-                .ipvdSearch(this.data.cameras, this.filter)
-                .subscribe(cameras => {
-                    this.activeCamera = undefined;
-                    this.cameras = cameras;
-                    // this.camerasSuccessFn(this.cameras);
-                    this.camerasTable = [];
-                    this.camerasTable = (cameras.length !== this.data.length) ? this.preFilterCameraTable(cameras) : [];
-
-                    this.setActiveCamera();
-                });
+                        this.noResult = (cameras.length === 0);
+                        if (cameras.length) {
+                            this.camerasTable = this.preFilterCameraTable(cameras);
+                            this.setActiveCamera();
+                        } else {
+                            this.camerasTable = [];
+                        }
+                    });
+            } else {
+                this.noResult = false;
+                this.camerasTable = [];
+            }
         }
     }
 
   setVendor(vendor) {
       this.filterModel.query = vendor;
-      this.searchVendor(this.filterModel);
+      this.searchVendor();
       return false;
   }
 

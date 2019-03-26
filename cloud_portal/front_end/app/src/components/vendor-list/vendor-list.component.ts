@@ -30,13 +30,13 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
     CONFIG: any;
 
-    private debug: boolean;
-    private filters: any = [];
-    private filter: any = {};
+    public debug: boolean;
+    public filters: any = [];
+    public remainingVendors: number;
 
+    private filter: any = {};
     private ASC = true;
     private DESC = false;
-    private remainingVendors: number;
 
     constructor(CONFIG: NxConfigService,
                 private uri: NxUriService,
@@ -142,10 +142,16 @@ export class NxVendorListComponent implements OnInit, OnChanges {
             this.filter.selects.find((select) => {
                 if (select.id === 'resolution') {
                     queryParams.resolution = select.items[select.items.length - 1].name;
+                    select.selected = select.items[select.items.length - 1];
                 }
             });
         } else {
             queryParams.tags = filter.id;
+            this.filter.tags.find(tag => {
+                if (tag.id === filter.id) {
+                    tag.value = true;
+                }
+            });
         }
 
         this.uri.updateURI('/ipvd', queryParams, true);
@@ -172,6 +178,7 @@ export class NxVendorListComponent implements OnInit, OnChanges {
                 this.uri.updateURI('/ipvd', queryParams, true);
             }
         });
+
         // Propagate component's value attribute (model)
         this.propagateChange({ ...this.filter });
 
