@@ -242,11 +242,11 @@ TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
     whenServerStopped();
     whenSomeArchiveDataAdded();
     whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
 
     whenServerStopped();
     whenSomeArchiveDataAdded();
     whenServerStarted();
-
     thenArchiveShouldBeScannedCorreclty();
 }
 
