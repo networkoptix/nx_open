@@ -171,6 +171,38 @@ admin cannot delete or edit self
     Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
     Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
 
+Admin cannot edit self via share
+    [tags]    C41904    Threaded
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Enabled    ${OPEN IN NX BUTTON}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${CHANGING OWN PERMISSIONS IS NOT ALLOWED}
+    Wait Until Element Is Visible    ${SHARE CANCEL}
+    Click Button    ${SHARE CANCEL}
+
+Owner cannot edit self via share
+    [tags]    C41904    Threaded
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Enabled    ${OPEN IN NX BUTTON}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${CHANGING OWN PERMISSIONS IS NOT ALLOWED}
+
 admin cannot delete or edit other admins
     [tags]    C41905
     Go To    ${url}/register
@@ -202,6 +234,8 @@ admin cannot invite another admin
     Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE CANCEL}
+
+
 
 Edit permission works
     [tags]    C41900
