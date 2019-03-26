@@ -9,9 +9,11 @@
 
 
 #include <nx/vms/client/desktop/director/director_json_interface.h>
+#include <qdnslookup.h>
 
 namespace {
 const QString kServerName = "NX Client HTTP Server";
+const auto kServerBinding = QHostAddress::LocalHost;
 
 QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
 {
@@ -57,7 +59,7 @@ bool ClientWebserver::start(int port)
     if (port != 0)
         m_port = port;
 
-    m_server->start(m_port);
+    m_server->start(m_port, kServerBinding);
     return m_active;
 }
 

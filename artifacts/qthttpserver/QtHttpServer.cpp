@@ -52,8 +52,8 @@ QString QtHttpServer::getErrorString (void) const {
     return m_sockServer->errorString ();
 }
 
-void QtHttpServer::start (quint16 port) {
-    if (m_sockServer->listen (QHostAddress::Any, port)) {
+void QtHttpServer::start (quint16 port,  const QHostAddress &address) {
+    if (m_sockServer->listen (address, port)) {
         emit started (m_sockServer->serverPort ());
     }
     else {

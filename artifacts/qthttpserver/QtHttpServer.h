@@ -50,7 +50,7 @@ public:
     QString getErrorString (void) const;
 
 public slots:
-    void start           (quint16 port = 0);
+    void start           (quint16 port = 0, const QHostAddress &address = QHostAddress::Any);
     void stop            (void);
     void setServerName   (const QString & serverName);
     void setUseSecure    (const bool ssl = true);
