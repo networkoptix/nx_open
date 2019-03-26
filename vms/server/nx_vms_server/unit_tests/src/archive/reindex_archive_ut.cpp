@@ -10,6 +10,8 @@
 #include <core/resource/storage_plugin_factory.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <api/test_api_requests.h>
+#include <rest/server/json_rest_result.h>
 
 namespace nx::vms::server::test {
 
@@ -113,7 +115,6 @@ protected:
     void whenServerStopped()
     {
         ASSERT_TRUE(m_server->stop());
-        m_reindexFinished = false;
     }
 
     void givenSomeArchiveOnHdd()
@@ -140,7 +141,7 @@ protected:
         }
 
         addArchiveDataForCamera("camera1", 10, startTimeMs);
-        //addArchiveDataForCamera("camera2", 5, startTimeMs);
+        addArchiveDataForCamera("camera2", 5, startTimeMs);
     }
 
     void addArchiveDataForCamera(const QString& cameraName, int count, qint64 startTimeMs)
@@ -156,7 +157,7 @@ protected:
             std::back_inserter(m_generatedArchive[cameraName].highQualityChunks));
     }
 
-    void thenAllArchiveShouldBeFastScannedCorreclty()
+    void thenArchiveShouldBeScannedCorreclty()
     {
         NX_MUTEX_LOCKER lock(&m_reindexMutex);
         while (!m_reindexFinished)
@@ -167,11 +168,20 @@ protected:
             assertDataEquality(QnServer::LowQualityCatalog, it.key(), it.value().lowQualityChunks);
             assertDataEquality(QnServer::HiQualityCatalog, it.key(), it.value().highQualityChunks);
         }
+
+        m_reindexFinished = false;
     }
 
     void whenSomeArchiveDataAdded()
     {
         givenSomeArchiveOnHdd();
+    }
+
+    void whenReindexRequestIssued()
+    {
+        using namespace nx::test;
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_server.get(), "/api/rebuildArchive?action=start", &result);
     }
 
 private:
@@ -214,7 +224,6 @@ private:
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
         for (int i = 0; i < serverChunks.size(); ++i)
             ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].startTimeMs);
-
     }
 };
 
@@ -222,7 +231,7 @@ TEST_F(Reindex, FastArchiveScan_AllDataRetrieved)
 {
     givenSomeArchiveOnHdd();
     whenServerStarted();
-    thenAllArchiveShouldBeFastScannedCorreclty();
+    thenArchiveShouldBeScannedCorreclty();
 }
 
 TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
@@ -238,7 +247,23 @@ TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
     whenSomeArchiveDataAdded();
     whenServerStarted();
 
-    thenAllArchiveShouldBeFastScannedCorreclty();
+    thenArchiveShouldBeScannedCorreclty();
+}
+
+TEST_F(Reindex, FullArchiveScan_AllDataRetrieved)
+{
+    whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenSomeArchiveDataAdded();
+    whenReindexRequestIssued();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenServerStopped();
+    whenServerStarted();
+    whenSomeArchiveDataAdded();
+    whenReindexRequestIssued();
+    thenArchiveShouldBeScannedCorreclty();
 }
 
 } // nx::vms::server::test
