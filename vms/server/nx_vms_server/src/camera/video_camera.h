@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
 #include <QScopedPointer>
 
@@ -189,6 +190,8 @@ private:
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(
         QnServer::ChunksCatalog catalog, bool ensureInitialized);
+
+    std::pair<int, int> getMinMaxLiveCacheSizeMs(MediaQuality streamQuality) const;
 
     void startLiveCacheIfNeeded();
 

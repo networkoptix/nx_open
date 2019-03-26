@@ -26,6 +26,7 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <nx/vms/server/settings.h>
+#include <mediaserver_ini.h>
 
 class QnDataProviderFactory;
 
@@ -37,7 +38,6 @@ static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static const qint64 MSEC_PER_SEC = 1000;
 static const qint64 USEC_PER_MSEC = 1000;
-static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10 * MSEC_PER_SEC;
 static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 static const int kMaxGopSize = 260;
 
@@ -997,6 +997,32 @@ static QString mediaQualityToStreamName(MediaQuality mediaQuality)
     }
 }
 
+std::pair<int, int> QnVideoCamera::getMinMaxLiveCacheSizeMs(MediaQuality streamQuality) const
+{
+    // Here we treat streams other than MEDIA_Quality_High as secondary, because currently
+    // there is only one such stream: MEDIA_Quality_Low.
+
+    // NOTE: Hls spec requires 7 last chunks to be in memory, adding extra 3 just in case,
+    //     thus, the lowest recommended min cache size is 10.
+
+    const int minSizeMs = (streamQuality == MEDIA_Quality_High)
+        ? ini().liveStreamCacheForPrimaryStreamMinSizeMs
+        : ini().liveStreamCacheForSecondaryStreamMinSizeMs;
+
+    const int maxSizeMs = (streamQuality == MEDIA_Quality_High)
+        ? ini().liveStreamCacheForPrimaryStreamMaxSizeMs
+        : ini().liveStreamCacheForSecondaryStreamMaxSizeMs;
+
+    if (minSizeMs < 0 || minSizeMs > maxSizeMs)
+    {
+        NX_WARNING(this, "Invalid min/max size for Live Cache for %1 stream in %2; assuming 0..0",
+            mediaQualityToStreamName(streamQuality), ini().iniFile());
+        return std::pair(0, 0);
+    }
+
+    return std::pair(minSizeMs, maxSizeMs);
+}
+
 /**
  * Starts caching live stream, if not started.
  * @return True if started, false if failed to start.
@@ -1007,21 +1033,30 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     qint64 targetDurationUSec,
     const QString& reasonForLog)
 {
+    if (!NX_ASSERT(streamQuality >= 0) || !NX_ASSERT(streamQuality < m_liveCache.size()))
+        return false;
+
     primaryReader->startIfNotRunning();
 
     m_cameraUsers.insert(this);
 
     if (!m_liveCache[streamQuality].get())
     {
-        NX_INFO(this, "Enabling Live Cache for %1 stream: %2",
-            mediaQualityToStreamName(streamQuality), reasonForLog);
+        const auto minMaxSizeMs = getMinMaxLiveCacheSizeMs(streamQuality);
 
-        m_liveCache[streamQuality].reset(new MediaStreamCache(
-            /*cacheSizeMillis*/ MEDIA_CACHE_SIZE_MILLIS,
-            // Hls spec requires 7 last chunks to be in memory, adding extra 3 just in case.
-            /*maxCacheSizeMillis*/ MEDIA_CACHE_SIZE_MILLIS * 10));
+        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 seconds): %4",
+            mediaQualityToStreamName(streamQuality),
+            minMaxSizeMs.first,
+            minMaxSizeMs.second,
+            reasonForLog);
 
-        int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
+        m_liveCache[streamQuality].reset(
+            new MediaStreamCache(
+                minMaxSizeMs.first,
+                minMaxSizeMs.second));
+
+        const int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
+
         m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx::vms::server::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
