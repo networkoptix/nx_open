@@ -16,9 +16,9 @@ int pluginIndex(const State& state, const QString& libraryName)
 
     const auto iter = std::find_if(state.plugins.modules.cbegin(), state.plugins.modules.cend(),
         [libraryName](const nx::vms::api::PluginModuleData& data)
-    {
-        return data.libraryName == libraryName;
-    });
+        {
+            return data.libraryName == libraryName;
+        });
 
     return iter != state.plugins.modules.cend()
         ? std::distance(state.plugins.modules.cbegin(), iter)
