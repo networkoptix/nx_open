@@ -103,9 +103,7 @@ void BaseAuthenticationManager::passwordLookupDone(
     const bool authenticationResult =
         validateAuthorization(
             method,
-            authorizationHeader.userid(),
-            passwordLookupResult.password(),
-            passwordLookupResult.ha1(),
+            Credentials(authorizationHeader.userid(), passwordLookupResult.authToken),
             authorizationHeader);
     if (!authenticationResult)
         return reportAuthenticationFailure(std::move(completionHandler));
