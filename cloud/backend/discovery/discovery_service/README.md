@@ -54,7 +54,7 @@ https://docs.aws.amazon.com/lambda/latest/dg/lambda-go-how-to-create-deployment-
     - `%USERPROFILE%\go\bin\build-lambda-zip.exe -o node_discovery.zip node_discovery`
 
 
-## Deployment
+## Deployment to AWS
 Install AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html  
 
 Having config and credentials and files simplifies deployment: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html.
@@ -68,9 +68,6 @@ Having config and credentials and files simplifies deployment: https://docs.aws.
     `[default]`  
     `aws_access_key_id = <YOUR ACCESS KEY ID>`  
     `aws_secret_access_key = <YOUR ACCESS KEY>`
-
-
-## Upload to AWS
 
 In the following command, `<NODE_DISCOVERY_LAMBDA>` is a place holder. Replace with the name of your lambda. `node_discovery.zip` is the name of the zip file created during building:  
 `aws lambda update-function-code --function-name <NODE_DISCOVERY_LAMBDA> --zip-file fileb://node_discovery.zip`
