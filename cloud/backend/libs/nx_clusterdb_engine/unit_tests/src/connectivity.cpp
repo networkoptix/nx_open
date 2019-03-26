@@ -49,7 +49,7 @@ protected:
 
     void whenDisconnectNodes()
     {
-        // TODO
+        peer(0).disconnectFrom(peer(1));
     }
 
     void thenPeerConnectedEventIsDelivered(std::vector<std::string> nodeIds)
@@ -97,6 +97,13 @@ TEST_F(Connectivity, node_connected_event_is_delivered)
 {
     whenConnectNodes();
     thenPeerConnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
+}
+
+TEST_F(Connectivity, node_disconnected_event_is_delivered)
+{
+    givenConnectedNodes();
+    whenDisconnectNodes();
+    thenPeerDisconnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
 }
 
 } // namespace nx::clusterdb::engine::test

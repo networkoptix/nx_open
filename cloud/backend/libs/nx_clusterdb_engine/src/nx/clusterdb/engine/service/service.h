@@ -36,6 +36,7 @@ public:
     std::string clusterId() const;
 
     void connectToNode(const nx::utils::Url& url);
+    void disconnectFromNode(const nx::utils::Url& url);
 
     SynchronizationEngine& synchronizationEngine();
     const SynchronizationEngine& synchronizationEngine() const;

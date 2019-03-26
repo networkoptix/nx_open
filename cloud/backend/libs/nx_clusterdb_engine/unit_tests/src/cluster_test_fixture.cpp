@@ -65,6 +65,15 @@ bool Peer::isConnectedTo(const Peer& other) const
     return false;
 }
 
+void Peer::disconnectFrom(const Peer& other)
+{
+    const auto url = network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
+        .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
+
+    m_process.moduleInstance()->disconnectFromNode(url);
+}
+
 Customer Peer::addRandomData()
 {
     Customer customer;

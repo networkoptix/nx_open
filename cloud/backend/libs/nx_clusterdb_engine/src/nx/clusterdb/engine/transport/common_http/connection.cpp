@@ -175,6 +175,7 @@ void CommonHttpConnection::setOutgoingConnection(
     std::unique_ptr<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport->setOutgoingConnection(std::move(socket));
+    m_baseTransactionTransport->monitorConnectionForClosure();
 }
 
 nx::vms::api::PeerData CommonHttpConnection::localPeer() const

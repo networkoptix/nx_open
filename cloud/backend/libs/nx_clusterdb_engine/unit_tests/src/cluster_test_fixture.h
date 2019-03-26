@@ -28,6 +28,7 @@ public:
 
     void connectTo(const Peer& other);
     bool isConnectedTo(const Peer& other) const;
+    void disconnectFrom(const Peer& other);
 
     Customer addRandomData();
     bool hasData(const std::vector<Customer>& data);

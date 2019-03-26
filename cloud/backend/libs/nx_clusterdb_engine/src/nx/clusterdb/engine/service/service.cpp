@@ -54,6 +54,18 @@ void Service::connectToNode(const nx::utils::Url& url)
         syncApiTargetUrl);
 }
 
+void Service::disconnectFromNode(const nx::utils::Url& url)
+{
+    using namespace nx::network;
+
+    const auto syncApiTargetUrl =
+        url::Builder(url).appendPath(m_outgoingConnectionBasePath).toUrl();
+
+    m_controller->synchronizationEngine().connector().removeNodeUrl(
+        m_settings->synchronization().clusterId,
+        syncApiTargetUrl);
+}
+
 nx::sql::AsyncSqlQueryExecutor& Service::sqlQueryExecutor()
 {
     return m_model->queryExecutor();
