@@ -267,8 +267,11 @@ private:
         else
         {
             QnJsonRestResult result;
-            NX_TEST_API_GET(m_peers[0].get(), path, &result);
-            ASSERT_EQ(m_updateInformation.version, result.deserialized<nx::update::Information>().version);
+            do
+            {
+                NX_TEST_API_GET(m_peers[0].get(), path, &result);
+            }
+            while (m_updateInformation.version != result.deserialized<nx::update::Information>().version);
         }
     }
 
