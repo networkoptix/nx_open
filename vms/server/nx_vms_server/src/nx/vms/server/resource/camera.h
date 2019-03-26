@@ -240,6 +240,7 @@ protected:
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
+    void handlePtzConfigurationChange(const QString& key);
 
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
