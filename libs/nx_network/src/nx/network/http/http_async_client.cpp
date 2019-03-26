@@ -320,7 +320,10 @@ void AsyncClient::doConnect(
     m_requestUrl = proxyUrl;
     m_contentLocationUrl = proxyUrl;
     composeRequest(Method::connect);
+
+    // TODO: #ak Setting request-target to authority form ([rfc7231#4.3.6]).
     m_request.requestLine.url = nx::network::url::Builder().setPath(targetHost);
+
     initiateHttpMessageDelivery();
 }
 
@@ -1531,10 +1534,15 @@ bool AsyncClient::resendRequestWithAuthorization(
     else if (wwwAuthenticateHeader->authScheme == header::AuthScheme::digest)
     {
         header::DigestAuthorization digestAuthorizationHeader;
+        // TODO: #ak This is incorrect value for "uri" actually. See [rfc7616#3.4] and [rfc7230#5.5].
+        // The proper fix may be incompatible with some buggy cameras.
+        // But, without a proper fix we can run into incompatibility with some HTTP servers.
+        const auto effectiveRequestUri = m_request.requestLine.url.toString(
+            QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8();
         if (!calcDigestResponse(
                 m_request.requestLine.method,
                 credentials,
-                m_request.requestLine.url.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8(),
+                effectiveRequestUri,
                 *wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
         {
@@ -1549,7 +1557,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         // TODO: #ak MUST add to cache only after OK response.
         // TODO: #ak It seems cache key is not correct because don't take uri into account
         m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
-            m_contentLocationUrl,
+            m_contentLocationUrl, //< TODO: #ak MUST be a VALID effectiveRequestUri.
             m_request.requestLine.method,
             credentials,
             std::move(*wwwAuthenticateHeader),
