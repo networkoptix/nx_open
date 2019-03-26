@@ -52,6 +52,6 @@ ${DIFFERENT OWNER TITLE}              //div[@ng-repeat='system in systems | filt
 ${AUTO TESTS 2}                       Auto Tests 2
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), "${AUTOTESTS OFFLINE TEXT}")]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                aee1df1e-ea9d-43c8-9c04-0463758d3616
+${AUTOTESTS OFFLINE SYSTEM ID}                326c738d-3454-4163-9827-d650e0103234
 
 ${OUTLINE ERROR COLOR}                rgb(217, 42, 42)

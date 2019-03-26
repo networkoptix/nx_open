@@ -178,7 +178,7 @@ Should respond to tab and go in the correct order
     Element Should Be Focused    ${ACCOUNT SAVE}
     Press Key    ${ACCOUNT SAVE}    ${ENTER}
     Sleep    2    #wait for the language to change
-    Check For Alert    Your account is successfully saved
+    Check For Alert    Váš účet byl úspěšně uložen
 
 Langauge is changeable on the account page
     [tags]    C41574
