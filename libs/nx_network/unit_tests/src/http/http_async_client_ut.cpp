@@ -58,20 +58,6 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class MalformedBody:
-    public BufferSource
-{
-public:
-    using BufferSource::BufferSource;
-
-    virtual boost::optional<uint64_t> contentLength() const override
-    {
-        return 0;
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
-
 static constexpr char kExtraResponseHandlerPath[] = "/HttpClientTest/extraResponseMessage/";
 
 class HttpAsyncClient:
