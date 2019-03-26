@@ -139,7 +139,7 @@
         "setupTestFrameworkScriptFile": "<rootDir>/src/setupJest.ts"
     },
     "scripts": {
-        "serve": "npm run update-lang; npm run merge-lang; webpack-dev-server --config webpack.dev.js --open --hot --inline --compress",
+        "serve": "npm run update-lang; npm run merge-lang; webpack-dev-server --config webpack.dev.js --open --hot --inline",
         "build": "npm run update-lang; npm run merge-lang; webpack --config webpack.prod.js --progress --profile --bail",
         "setSkin": "node setSkin.js --skin",
         "merge-lang": "python merge-lang.py",

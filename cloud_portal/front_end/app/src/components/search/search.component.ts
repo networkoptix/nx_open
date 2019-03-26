@@ -1,7 +1,7 @@
 import {
     Component, OnInit, Input, ElementRef,
     forwardRef, Renderer2, ViewEncapsulation
-}                                                  from '@angular/core';
+} from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, Router }                  from '@angular/router';
 import { NxConfigService }                         from '../../services/nx-config';
@@ -25,6 +25,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     @Input() expandable: any;
     @Input() skinny: any;
     @Input() placeholder: any;
+    @Input() dataLoaded: boolean;
 
     public numberFilters = 0;
     public filterSelected: any;
@@ -51,6 +52,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     }
 
     ngOnInit() {
+        this.dataLoaded = this.dataLoaded === undefined ? true : this.dataLoaded;
         this.placeholder = this.placeholder || '';  // optional param
         this.skinny = (this.skinny !== undefined);  // optional param
         this.expandable = (this.expandable !== undefined);  // optional param
@@ -262,7 +264,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.numberFilters = 0;
         this.filterSelected = '';
         this.setRouteParams();
-        this.onChangeCallback(this.localFilter);
+        this.onChangeCallback({...this.localFilter});
 
         return false;
     }
@@ -270,7 +272,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     resetQuery() {
         this.localFilter.query = '';
         this.setRouteParams();
-        this.onChangeCallback(this.localFilter);
+        this.onChangeCallback({ ...this.localFilter });
         this.numberOfOptionsSelected();
     }
 
@@ -280,7 +282,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         }
 
         const queryParams: Params = {};
-
         queryParams.search = undefined;
         if (this.localFilter.query !== '') {
             queryParams.search = this.localFilter.query;
@@ -313,18 +314,22 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
             });
         }
 
+        if (!this.numberFilters) {
+            queryParams.page = undefined;
+        }
+
         this.uri.updateURI(this.uriPath, queryParams, true);
     }
 
     selectBooleanFilter() {
         this.setRouteParams();
-        this.onChangeCallback(this.localFilter);
+        this.onChangeCallback({ ...this.localFilter });
         this.numberOfOptionsSelected();
     }
 
     modelChanged() {
         this.setRouteParams();
-        this.onChangeCallback(this.localFilter);
+        this.onChangeCallback({ ...this.localFilter });
         this.numberOfOptionsSelected();
     }
 }

@@ -12,6 +12,10 @@ import { NxUriService }                        from '../../services/uri.service'
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { NxUtilsService }                      from '../../services/utils.service';
 
+interface Params {
+    [key: string]: any;
+}
+
 @Component({
     selector     : 'ipvd',
     templateUrl  : 'ipvd.component.html',
@@ -43,8 +47,9 @@ export class NxIpvdComponent implements OnInit {
     params: any;
     mobileDetailMode: boolean;
     noResult: boolean;
+    hasNoSearch: boolean;
 
-  private setupDefaults() {
+private setupDefaults() {
       this.allowedParameters = [
           'vendor', 'model', 'hardwareType',
           'maxResolution', 'maxFps', 'primaryCodec', 'isAudioSupported',
@@ -58,7 +63,7 @@ export class NxIpvdComponent implements OnInit {
       this.itemsPerPage = 15;
       this.query = '';
       this.noResult = false;
-
+      this.hasNoSearch = true;
       this.cameras = [];
       this.camerasTable = [];
       this.vendors = undefined;
@@ -98,6 +103,9 @@ export class NxIpvdComponent implements OnInit {
             .getURI()
             .subscribe(params => {
                 this.params = { ...params };
+                if (this.params.tags) {
+                    this.hasNoSearch = false;
+                }
             });
 
         this.activate();
@@ -123,8 +131,8 @@ export class NxIpvdComponent implements OnInit {
     }
 
     setActiveCamera() {
-        if (this.params.camera && this.cameras.length) {
-            const selectedCamera = this.cameras.find((camera) => camera.model === this.params.camera);
+        if (this.params.camera && this.camerasTable.length) {
+            const selectedCamera = this.camerasTable.find((camera) => camera.model === this.params.camera);
             this.activateCamera(selectedCamera);
         }
     }
@@ -236,7 +244,7 @@ export class NxIpvdComponent implements OnInit {
     }
 
     searchVendor() {
-        if (!this.params.camera) {
+        if (!this.params.camera && this.activeCamera) {
             this.resetActiveCamera();
         }
 
@@ -256,6 +264,7 @@ export class NxIpvdComponent implements OnInit {
                         }
                     });
             } else {
+                this.hasNoSearch = true;
                 this.noResult = false;
                 this.camerasTable = [];
             }
@@ -274,7 +283,7 @@ export class NxIpvdComponent implements OnInit {
       }
       if (Object.keys(elementSelected).length === 0 || elementSelected.key === -1) {
           // call was not initiated by linking the element in HTML
-          this.resetActiveCamera();
+          // this.resetActiveCamera();
           return;
       }
 
@@ -341,7 +350,10 @@ export class NxIpvdComponent implements OnInit {
     }
 
   resetActiveCamera() {
-      this.uri.updateURI('/ipvd', [{ key: 'camera', value: undefined }]);
+      const queryParams: Params = {};
+      queryParams.camera = undefined;
+      this.uri.updateURI('/ipvd', queryParams, true);
+
       this.activeCamera = undefined;
       this.toggleCamview = false;
       this.mobileDetailMode = false;

@@ -35,7 +35,7 @@
                 <button class="btn btn-arrow btn-big btn-tag ml-lg-3 mt-3 mt-lg-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
                         (click)="toggleOptions()"
-                        *ngIf="!skinny">
+                        *ngIf="!skinny" [disabled]="!dataLoaded">
 
                     <div class="nav-arrow">
                         <span></span>
@@ -85,8 +85,8 @@
                                     <nx-tag
                                             [name]="tag.label"
                                             [(ngModel)]="tag.value"
-                                            (onClick)="selectBooleanFilter()"
-                                            [value]="tag.value === null ? false : tag.value">
+                                            (ngModelChange)="selectBooleanFilter()"
+                                            [value]="tag.value">
                                         {{ tag.label }}
                                     </nx-tag>
                                 </li>

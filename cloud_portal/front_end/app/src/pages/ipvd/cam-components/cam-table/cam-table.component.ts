@@ -209,18 +209,6 @@ export class CamTableComponent implements OnChanges, OnInit {
     }
 
     ngOnInit() {
-        this.uri
-            .getURI()
-            .subscribe(params => {
-                this.debug = true;
-                if (params.debug === undefined) {
-                    this.debug = false;
-                    this.filterAllowedParams();
-                }
-
-                this.showHeaders = this.cameraHeaders;
-            });
-
         this.results = this._elements.length;
         this.csvFilename = Date.now();
         this.csvCameraData = this.getCsvData();
@@ -229,6 +217,13 @@ export class CamTableComponent implements OnChanges, OnInit {
             .getURI()
             .subscribe(params => {
                 this.params = { ...params };
+                this.debug = true;
+                if (params.debug === undefined) {
+                    this.debug = false;
+                    this.filterAllowedParams();
+                }
+
+                this.showHeaders = this.cameraHeaders;
 
                 if (this.params.page) {
                     this.setPage(+this.params.page, true);
