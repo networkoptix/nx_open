@@ -13,11 +13,6 @@ import (
 
 type Item map[string]*dynamodb.AttributeValue
 
-type nodeKey struct {
-	nodeId    string
-	clusterId string
-}
-
 func tableName() *string {
 	return aws.String(os.Getenv("DISCOVERY_TABLE_NAME"))
 }
@@ -43,7 +38,7 @@ func toUnixStr(t time.Time) *string {
 	return &str
 }
 
-func (dao *DAO) getExpiredNodes(clusterId string) ([]nodeKey, error) {
+func (dao *DAO) getExpiredNodes(clusterId string) ([]map[string]*dynamodb.AttributeValue, error) {
 	input := &dynamodb.QueryInput{
 		TableName:              tableName(),
 		IndexName:              aws.String("clusterId-expirationTime-index"),
@@ -52,9 +47,10 @@ func (dao *DAO) getExpiredNodes(clusterId string) ([]nodeKey, error) {
 			":clusterId": &dynamodb.AttributeValue{S: &clusterId},
 			":now":       &dynamodb.AttributeValue{N: toUnixStr(time.Now())},
 		},
+		ProjectionExpression: aws.String("nodeId, clusterId"),
 	}
 
-	var expiredNodes []nodeKey
+	var expiredNodes []map[string]*dynamodb.AttributeValue
 	doScan := true
 	for doScan {
 		output, err := dao.db.Query(input)
@@ -62,13 +58,7 @@ func (dao *DAO) getExpiredNodes(clusterId string) ([]nodeKey, error) {
 			return nil, err
 		}
 
-		for _, item := range output.Items {
-			key := nodeKey{
-				nodeId:    *item["nodeId"].S,
-				clusterId: *item["clusterId"].S,
-			}
-			expiredNodes = append(expiredNodes, key)
-		}
+		expiredNodes = append(expiredNodes, output.Items...)
 
 		input.ExclusiveStartKey = output.LastEvaluatedKey
 		doScan = len(output.LastEvaluatedKey) > 0
@@ -119,11 +109,11 @@ func (dao *DAO) InsertOrUpdate(node *Node, clusterId string) error {
 // GetOnlineNodes that have the given clusterId
 func (dao *DAO) GetOnlineNodes(clusterId string) ([]Node, error) {
 	dao.removeExpiredNodes(clusterId)
+
 	queryInput := &dynamodb.QueryInput{
 		TableName:              tableName(),
-		IndexName:              aws.String("clusterId-nodeId-index"),
-		KeyConditionExpression: aws.String("clusterId = :clusterId"),
-		FilterExpression:       aws.String("expirationTime > :now"),
+		IndexName:              aws.String("clusterId-expirationTime-index"),
+		KeyConditionExpression: aws.String("clusterId = :clusterId AND expirationTime > :now"),
 		ExpressionAttributeValues: Item{
 			":clusterId": &dynamodb.AttributeValue{S: &clusterId},
 			":now":       &dynamodb.AttributeValue{N: toUnixStr(time.Now())},
@@ -163,22 +153,15 @@ func (dao *DAO) removeExpiredNodes(clusterId string) error {
 		return err
 	}
 
-	log.Println("expiredNodes len:", len(expiredNodes))
-
-	table := *tableName()
 	requestItems := make(map[string][]*dynamodb.WriteRequest)
-	for _, n := range expiredNodes {
-		key := Item{
-			"nodeId":    &dynamodb.AttributeValue{S: aws.String(n.nodeId)},
-			"clusterId": &dynamodb.AttributeValue{S: aws.String(n.clusterId)},
-		}
-		requestItems[table] = append(
-			requestItems[table],
-			&dynamodb.WriteRequest{DeleteRequest: &dynamodb.DeleteRequest{Key: key}})
+	for _, item := range expiredNodes {
+		requestItems[*tableName()] = append(
+			requestItems[*tableName()],
+			&dynamodb.WriteRequest{DeleteRequest: &dynamodb.DeleteRequest{Key: item}})
 	}
 
 	input := &dynamodb.BatchWriteItemInput{RequestItems: requestItems}
-	for len(expiredNodes) > 0 {
+	for len(input.RequestItems) > 0 {
 		output, err := dao.db.BatchWriteItem(input)
 		if err != nil {
 			log.Println("RemoveExpiredNodes: db.BatchWriteItem error:", err)

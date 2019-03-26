@@ -12,24 +12,27 @@ import (
 
 func calculateExpirationTime(request *http.Request) Date {
 	now := time.Now().UTC()
-	var date Date
-
-	date.Time = now.Add(time.Minute * 5)
+	minutes := 5
+	date := Date{Time: now.Add(time.Minute * time.Duration(minutes))}
 
 	requestDate := request.Header.Get("Date")
 	if len(requestDate) == 0 {
-		log.Println("Http request missing \"Date\" header, returning 5 minute expire time")
+		log.Println(
+			"Http request missing \"Date\" header, returning %d minute expire time",
+			minutes)
 		return date
 	}
 	requestTime, err := ParseDate(requestDate)
 	if err != nil {
-		log.Println("Failed to parse \"Date\" header, returning 5 minute expire time:", err)
+		log.Println(
+			"Failed to parse \"Date\" header, returning %d minute expire time: %s",
+			minutes, err)
 		return date
 	}
 	travelTime := now.Sub(requestTime)
 	if travelTime < 0 {
 		const nsecToMsec = 1000000
-		log.Println("Expected positive travel time, got: ", travelTime/nsecToMsec, "ms")
+		log.Println("Expected positive travel time, got: ", travelTime/nsecToMsec, "millieconds")
 		return date
 	}
 	date.Time = date.Time.Add(-travelTime)
