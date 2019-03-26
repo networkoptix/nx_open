@@ -1,10 +1,9 @@
 import QtQuick 2.11
-import QtQuick.Layouts 1.11
+import QtQuick.Controls 1.4
 import Nx 1.0
 import Nx.Utils 1.0
 import Nx.Controls 1.0
 import Nx.Controls.NavigationMenu 1.0
-import Nx.InteractiveSettings 1.0
 
 Item
 {
@@ -12,107 +11,155 @@ Item
 
     property var store: null
 
-    property var pluginModules: []
-    property var currentModule
+    property var plugins: []
+    property var currentPlugin
+    property var currentPluginDetails
 
+    property bool online: false
     property bool loading: false
+    property bool hasPlugins: plugins && plugins.length > 0
 
-    Connections
+    Item 
     {
-        target: store
-        onStateChanged:
-        {
-            loading = store.pluginsInformationLoading()
-            pluginModules = store.pluginModules()
-            currentModule = undefined
-
-            for (var i = 0; i < pluginModules.length; ++i)
-            {
-                const moduleInfo = pluginModules[i]
-                if (moduleInfo.libraryName === store.currentPluginLibraryName())
-                {
-                    //settingsView.loadModel(
-                    //    engineInfo.settingsModel,
-                    //    store.deviceAgentSettingsValues(currentEngineId))
-
-                    break;
-                }
-            }
-        }
-    }
-
-    NavigationMenu
-    {
-        id: menu
-
-        width: 240
-        height: parent.height
-
-        Repeater
-        {
-            model: pluginModules
-
-            MenuItem
-            {
-                text: modelData.name
-                onClicked: store.setCurrentLibraryName(modelData.libraryName)
-            }
-        }
-    }
-
-    Panel
-    {
+        visible: online && !loading && hasPlugins
         anchors.fill: parent
-        anchors.margins: 16
-        anchors.leftMargin: menu.width + 16
-        spacing: 16
 
-        //visible: currentLibraryName != null
-
-/*
-        SwitchButton
+        Connections
         {
-            id: enableSwitch
-            text: qsTr("Enable")
-            Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: menu.currentItemId
-
-            Binding
+            target: store
+            onStateChanged:
             {
-                target: enableSwitch
-                property: "checked"
-                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
-                when: currentEngineId !== undefined
-            }
-
-            onClicked:
-            {
-                var engines = enabledAnalyticsEngines.slice(0)
-                if (checked)
-                {
-                    engines.push(currentEngineId)
-                }
-                else
-                {
-                    const index = engines.indexOf(currentEngineId)
-                    if (index !== -1)
-                        engines.splice(index, 1)
-                }
-                store.setEnabledAnalyticsEngines(engines)
+                online = store.isOnline()
+                loading = store.pluginsInformationLoading()
+                plugins = store.pluginModules()
+                menu.currentItemId = null
+                currentPlugin = store.currentPlugin()
+                currentPluginDetails = store.currentPluginDetails()
             }
         }
 
-        SettingsView
+        NavigationMenu
         {
-            id: settingsView
+            id: menu
 
-            width: parent.width
-            Layout.fillHeight: true
+            width: 240
+            height: parent.height
 
-            onValuesEdited: store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+            Repeater
+            {
+                model: plugins
 
-            enabled: enableSwitch.checked
+                MenuItem
+                {
+                    id: thisItem
+                    text: modelData.name
+                    onClicked: store.selectCurrentPlugin(modelData.libraryName)
+
+                    Connections
+                    {
+                        target: pluginsInformation
+                        onCurrentPluginChanged:
+                        {
+                            if (currentPlugin && modelData.libraryName == currentPlugin.libraryName)
+                                menu.currentItemId = thisItem
+                        }
+                    }
+                }
+            }
         }
-*/
+
+        Panel
+        {
+            anchors.fill: parent
+            anchors.margins: 16
+            anchors.leftMargin: menu.width + 16
+            spacing: 16
+            visible: currentPlugin !== undefined
+            title: currentPlugin ? currentPlugin.name : ""
+
+            Text
+            {
+                id: descriptionText
+                width: parent.width
+                text: currentPlugin ? currentPlugin.description : ""
+                wrapMode: Text.Wrap
+                color: ColorTheme.windowText
+                topPadding: 8
+                bottomPadding: 8
+            }
+
+            Row
+            {
+                width: parent.width
+                spacing: 16
+                anchors.top: descriptionText.bottom
+                anchors.topMargin: 8
+
+                Column
+                {       
+                    width: Math.max(implicitWidth, 64)
+    
+                    Repeater
+                    {
+                        model: currentPluginDetails
+
+                        Label
+                        {
+                            text: modelData.name
+                            color: ColorTheme.windowText
+                            height: 20
+                        }
+                    }
+                }
+
+                Column
+                {           
+                    Repeater
+                    {
+                        model: currentPluginDetails
+
+                        Label
+                        {
+                            text: modelData.value
+                            color: ColorTheme.light
+                            height: 20
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Text
+    {
+        id: noPluginsMessage
+
+        anchors.centerIn: parent
+        visible: online && !loading && !hasPlugins
+        text: qsTr("No plugins installed")
+        color: ColorTheme.light
+        font.weight: Font.Light
+        font.pixelSize: 20
+    }
+
+    Text
+    {
+        id: offlineMessage
+
+        anchors.centerIn: parent
+        visible: !online
+        text: qsTr("Server is offline")
+        color: ColorTheme.light
+        font.weight: Font.Light
+        font.pixelSize: 20
+    }
+
+    NxDotPreloader
+    {
+        id: loadingIndicator
+
+        visible: online && loading
+        anchors.centerIn: parent
+        color: ColorTheme.windowText
     }
 }

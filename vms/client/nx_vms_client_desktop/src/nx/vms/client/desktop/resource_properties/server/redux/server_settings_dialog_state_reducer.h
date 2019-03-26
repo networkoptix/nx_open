@@ -13,9 +13,11 @@ public:
 
     static State loadServer(State state, const QnMediaServerResourcePtr& server);
 
+    static State setOnline(State state, bool value);
+
     static State setPluginModules(
         State state, const nx::vms::api::PluginModuleDataList& value);
-    static State setCurrentPluginLibraryName(State state, const QString& value);
+    static State selectCurrentPlugin(State state, const QString& libraryName);
     static State setPluginsInformationLoading(State state, bool value);
 };
 

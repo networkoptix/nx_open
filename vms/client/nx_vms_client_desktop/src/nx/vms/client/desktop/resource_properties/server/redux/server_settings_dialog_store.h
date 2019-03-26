@@ -5,7 +5,10 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data_fwd.h>
+
+class QAbstractItemModel;
 
 namespace nx::vms::client::desktop {
 
@@ -25,10 +28,16 @@ public:
     void loadServer(const QnMediaServerResourcePtr& server);
 
     // Actions.
+    Q_INVOKABLE bool isOnline() const;
+    void setOnline(bool value);
+
     Q_INVOKABLE QVariantList pluginModules() const;
     void setPluginModules(const nx::vms::api::PluginModuleDataList& value);
-    Q_INVOKABLE QString currentPluginLibraryName() const;
-    Q_INVOKABLE void setCurrentPluginLibraryName(const QString& value);
+
+    Q_INVOKABLE QVariant currentPlugin() const;
+    Q_INVOKABLE QVariantList currentPluginDetails() const;
+    Q_INVOKABLE void selectCurrentPlugin(const QString& libraryName);
+
     Q_INVOKABLE bool pluginsInformationLoading() const;
     void setPluginsInformationLoading(bool value);
 
@@ -37,7 +46,7 @@ signals:
 
 private:
     struct Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

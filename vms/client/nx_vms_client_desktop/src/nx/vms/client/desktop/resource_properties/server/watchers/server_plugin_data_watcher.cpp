@@ -38,50 +38,97 @@ public:
             m_server->disconnect(this);
 
         m_server = value;
+        handleStateChange();
 
-        // TODO: #vkutin Request data from the server if it's online.
-        // Watch online/offline server transitions.
+        if (m_server)
+            connect(m_server.get(), &QnResource::statusChanged, this, &Private::handleStateChange);
+    }
 
-        // This is a debug stub:
+private:
+    void handleStateChange()
+    {
+        if (!m_store)
+            return;
+
+        cancelActiveRequest();
+
+        const bool isOnline = m_server && m_server->isOnline();
+        m_store->setOnline(isOnline);
+        if (isOnline)
+            requestData();
+    }
+
+    // TODO: FIXME: #vkutin The following 3 methods are a debug stub.
+    // Replace them with actual request when it's implemented.
+
+    void requestData()
+    {
+        m_requestTimerDEBUG = new QTimer(this);
+        m_requestTimerDEBUG->setSingleShot(true);
+        m_requestTimerDEBUG->start(3000);
+
+        connect(m_requestTimerDEBUG.data(), &QTimer::timeout, this,
+            [this]()
+            {
+                m_requestTimerDEBUG->deleteLater();
+                handleDataReceived();
+            });
+
         if (m_store)
-        {
-            const auto makePluginData =
-                [](QString name, QString desc, QString libraryName, QString vendor, QString ver)
-                {
-                    nx::vms::api::PluginModuleData data;
-                    data.name = name;
-                    data.description = desc;
-                    data.libraryName = libraryName;
-                    data.vendor = vendor;
-                    data.version = ver;
-                    return data;
-                };
+            m_store->setPluginsInformationLoading(true);
+    }
 
-            m_store->setPluginModules(nx::vms::api::PluginModuleDataList{
-                makePluginData(
-                    "Plugin 1",
-                    "This is test plugin 1 description",
-                    "plugin_1.dll",
-                    "Vendor 1",
-                    "1.0.1"),
-                makePluginData(
-                    "Plugin 2",
-                    "This is test plugin 2 description",
-                    "plugin_2.dll",
-                    "Vendor 2",
-                    "1.0.2"),
-                makePluginData(
-                    "Plugin 3",
-                    "This is test plugin 3 description",
-                    "plugin_3.dll",
-                    "Vendor 3",
-                    "3.0")});
-        }
+    void handleDataReceived()
+    {
+        if (!m_store)
+            return;
+
+        const auto makePluginData =
+            [](QString name, QString desc, QString libraryName, QString vendor, QString ver)
+            {
+                nx::vms::api::PluginModuleData data;
+                data.name = name;
+                data.description = desc;
+                data.libraryName = libraryName;
+                data.vendor = vendor;
+                data.version = ver;
+                return data;
+            };
+
+        m_store->setPluginModules(nx::vms::api::PluginModuleDataList{
+            makePluginData(
+                "Plugin 1",
+                "This is test plugin 1 description",
+                "plugin_1.dll",
+                "Vendor 1",
+                "1.0.1"),
+            makePluginData(
+                "Plugin 2",
+                "This is test plugin 2 description",
+                "plugin_2.dll",
+                "Vendor 2",
+                "1.0.2"),
+            makePluginData(
+                "Plugin 3",
+                "This is test plugin 3 description",
+                "plugin_3.dll",
+                "Vendor 3",
+                "3.0")});
+
+        m_store->setPluginsInformationLoading(false);
+    }
+
+    void cancelActiveRequest()
+    {
+        delete m_requestTimerDEBUG;
     }
 
 private:
     QPointer<ServerSettingsDialogStore> m_store;
     QnMediaServerResourcePtr m_server;
+
+    // TODO: FIXME: #vkutin As a debug stub here is a timer instead of a request handle.
+    QPointer<QTimer> m_requestTimerDEBUG;
 };
 
 // ------------------------------------------------------------------------------------------------
