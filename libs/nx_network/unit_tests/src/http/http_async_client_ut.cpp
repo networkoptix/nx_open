@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
@@ -14,7 +16,7 @@ namespace network {
 namespace http {
 namespace test {
 
-static const QString kTestPath("/HttpAsyncClient_upgrade");
+static constexpr char kTestPath[] = "/HttpAsyncClient_upgrade";
 static const nx::network::http::StringType kUpgradeTo("NXRELAY/0.1");
 static const nx::Buffer kNewProtocolMessage("Hello, Http Client!");
 
@@ -56,6 +58,22 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+class MalformedBody:
+    public BufferSource
+{
+public:
+    using BufferSource::BufferSource;
+
+    virtual boost::optional<uint64_t> contentLength() const override
+    {
+        return 0;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr char kExtraResponseHandlerPath[] = "/HttpClientTest/extraResponseMessage/";
+
 class HttpAsyncClient:
     public ::testing::Test
 {
@@ -63,6 +81,8 @@ public:
     HttpAsyncClient():
         m_proxyHost(lm("%1.com").args(QnUuid::createUuid().toSimpleString()).toStdString())
     {
+        m_httpClient.setResponseReadTimeout(kNoTimeout);
+        m_httpClient.setMessageBodyReadTimeout(kNoTimeout);
     }
 
     ~HttpAsyncClient()
@@ -83,16 +103,40 @@ protected:
             "",
             std::bind(&HttpAsyncClient::processHttpRequest, this, _1, _2));
 
+        m_httpServer.registerRequestProcessorFunc(
+            kExtraResponseHandlerPath,
+            [this](auto&&... args)
+            {
+                handleExtraResponseMessageRequest(std::forward<decltype(args)>(args)...);
+            });
+
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
-    nx::utils::Url prepareUrl()
+    nx::utils::Url prepareUrl(const std::string& requestPath = std::string())
     {
         const auto serverAddress = m_synchronousServer
             ? m_synchronousServer->endpoint()
             : m_httpServer.serverAddress();
         return nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(serverAddress).setPath(kTestPath);
+            .setEndpoint(serverAddress).setPath(requestPath);
+    }
+
+    void enableAuthentication()
+    {
+        // TODO: #ak TestHttpServer: add a way to disable authentication for specific path
+        // and disable for kExtraResponseHandlerPath.
+        //m_httpServer.setAuthenticationEnabled(true);
+        //m_httpServer.registerUserCredentials("username", "password");
+
+        m_credentials = Credentials("username", PasswordAuthToken("password"));
+
+        m_httpClient.setCredentials(*m_credentials);
+    }
+
+    void disablePersistentServerConnections()
+    {
+        m_httpServer.server().setPersistentConnectionEnabled(false);
     }
 
     void givenSynchronousServer()
@@ -105,9 +149,16 @@ protected:
     void whenSendConnectRequest()
     {
         m_httpClient.doConnect(
-            prepareUrl(),
+            prepareUrl("/test"),
             m_proxyHost.c_str(),
-            std::bind(&HttpAsyncClient::saveResponse, this));
+            [this]() { saveResponse(); });
+    }
+
+    void whenSendToBrokenHttpServerThatSendsExtraResponseMessages()
+    {
+        m_httpClient.doGet(
+            prepareUrl(kExtraResponseHandlerPath),
+            [this]() { saveResponse(); });
     }
 
     void thenCorrectConnectRequestIsReceived()
@@ -119,9 +170,24 @@ protected:
         ASSERT_EQ(m_proxyHost, requestReceived.requestLine.url.toString().toStdString());
     }
 
+    void thenRequestSucceeded()
+    {
+        const auto requestResult = m_responses.pop();
+        ASSERT_EQ(SystemError::noError, requestResult.systemResultCode);
+        ASSERT_EQ(StatusCode::ok, requestResult.response.statusLine.statusCode);
+    }
+
 private:
+    struct RequestResult
+    {
+        SystemError::ErrorCode systemResultCode = SystemError::noError;
+        nx::network::http::Response response;
+    };
+
     std::unique_ptr<UpgradableHttpServer> m_synchronousServer;
     std::string m_proxyHost;
+    nx::utils::SyncQueue<RequestResult> m_responses;
+    std::optional<Credentials> m_credentials;
 
     void processHttpRequest(
         nx::network::http::RequestContext requestContext,
@@ -131,9 +197,52 @@ private:
         completionHandler(nx::network::http::StatusCode::ok);
     }
 
+    void handleExtraResponseMessageRequest(
+        nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        const auto authHeaderIter =
+            requestContext.request.headers.find(header::Authorization::NAME);
+        if (authHeaderIter != requestContext.request.headers.end())
+        {
+            if (header::DigestAuthorization authorizationHeader;
+                authorizationHeader.parse(authHeaderIter->second))
+            {
+                if (validateAuthorization(
+                        requestContext.request.requestLine.method,
+                        *m_credentials,
+                        authorizationHeader))
+                {
+                    completionHandler(http::StatusCode::ok);
+                    return;
+                }
+            }
+        }
+
+        header::WWWAuthenticate wwwAuthenticate;
+        wwwAuthenticate.authScheme = header::AuthScheme::digest;
+        wwwAuthenticate.params.emplace("nonce", "not_random_nonce");
+        wwwAuthenticate.params.emplace("realm", "realm_of_possibility");
+        wwwAuthenticate.params.emplace("algorithm", "MD5");
+
+        requestContext.response->headers.emplace(
+            header::WWWAuthenticate::NAME,
+            wwwAuthenticate.serialized());
+
+        requestContext.response->headers.emplace("Content-Type", "text/plain");
+        requestContext.response->headers.emplace("Content-Length", "0");
+        requestContext.response->headers.emplace("Connection", "close");
+        requestContext.response->messageBody =
+            "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\n\r\n";
+
+        completionHandler(StatusCode::unauthorized);
+    }
+
     void saveResponse()
     {
-        // TODO
+        m_responses.push(RequestResult{
+            m_httpClient.lastSysErrorCode(),
+            m_httpClient.response() ? *m_httpClient.response() : http::Response()});
     }
 };
 
@@ -141,6 +250,14 @@ TEST_F(HttpAsyncClient, connect_method)
 {
     whenSendConnectRequest();
     thenCorrectConnectRequestIsReceived();
+}
+
+TEST_F(HttpAsyncClient, clears_receive_buffer_when_opening_new_connection)
+{
+    enableAuthentication();
+
+    whenSendToBrokenHttpServerThatSendsExtraResponseMessages();
+    thenRequestSucceeded();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -159,7 +276,7 @@ protected:
     void whenPerformedUpgrade()
     {
         m_httpClient.doUpgrade(
-            prepareUrl(),
+            prepareUrl(kTestPath),
             kUpgradeTo,
             std::bind(&HttpAsyncClientConnectionUpgrade::onUpgradeDone, this));
     }

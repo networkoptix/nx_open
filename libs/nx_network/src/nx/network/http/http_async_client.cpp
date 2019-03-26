@@ -740,6 +740,7 @@ void AsyncClient::initiateHttpMessageDelivery()
     if (!canUseExistingConnection)
     {
         m_httpStreamReader.resetState();
+        m_receivedBytesLeft.clear();
         m_awaitedMessageNumber = 0;
         m_lastSysErrorCode = SystemError::noError;
         m_totalRequestsSentViaCurrentConnection = 0;
