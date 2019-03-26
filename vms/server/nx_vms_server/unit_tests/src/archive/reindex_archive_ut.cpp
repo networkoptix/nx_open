@@ -84,7 +84,7 @@ static Catalog generateCameraArchive(
 
 } // namespace
 
-class Reindex: public QObject, public ::testing::Test
+class FtReindex: public QObject, public ::testing::Test
 {
 protected:
     virtual void SetUp() override
@@ -107,7 +107,7 @@ protected:
         ASSERT_TRUE(m_server->start());
         QObject::connect(
             m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
-            this, &Reindex::onReindexFinished, Qt::DirectConnection);
+            this, &FtReindex::onReindexFinished, Qt::DirectConnection);
 
         ut::utils::addTestStorage(m_server.get(), m_storagePath);
     }
@@ -227,17 +227,18 @@ private:
     }
 };
 
-TEST_F(Reindex, FastArchiveScan_AllDataRetrieved)
+TEST_F(FtReindex, FastArchiveScan_AllDataRetrieved)
 {
     givenSomeArchiveOnHdd();
     whenServerStarted();
     thenArchiveShouldBeScannedCorreclty();
 }
 
-TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
+TEST_F(FtReindex, FastArchiveScan_PartialDataRetrieved)
 {
     givenSomeArchiveOnHdd();
     whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
 
     whenServerStopped();
     whenSomeArchiveDataAdded();
@@ -250,7 +251,7 @@ TEST_F(Reindex, FastArchiveScan_PartialDataRetrieved)
     thenArchiveShouldBeScannedCorreclty();
 }
 
-TEST_F(Reindex, FullArchiveScan_AllDataRetrieved)
+TEST_F(FtReindex, FullArchiveScan_AllDataRetrieved)
 {
     whenServerStarted();
     thenArchiveShouldBeScannedCorreclty();
@@ -261,6 +262,8 @@ TEST_F(Reindex, FullArchiveScan_AllDataRetrieved)
 
     whenServerStopped();
     whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
+
     whenSomeArchiveDataAdded();
     whenReindexRequestIssued();
     thenArchiveShouldBeScannedCorreclty();
