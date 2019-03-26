@@ -57,6 +57,7 @@ void BaseAuthenticationManager::authenticate(
         [this,
             completionHandler = std::move(completionHandler),
             method = request.requestLine.method,
+            url = request.requestLine.url,
             authzHeader = std::move(authzHeader),
             locker = m_startedAsyncCallsCounter.getScopedIncrement()](
                 PasswordLookupResult passwordLookupResult) mutable
@@ -64,6 +65,7 @@ void BaseAuthenticationManager::authenticate(
             passwordLookupDone(
                 std::move(passwordLookupResult),
                 method,
+                url,
                 std::move(*authzHeader),
                 std::move(completionHandler));
         });
@@ -94,6 +96,7 @@ header::WWWAuthenticate BaseAuthenticationManager::generateWwwAuthenticateHeader
 void BaseAuthenticationManager::passwordLookupDone(
     PasswordLookupResult passwordLookupResult,
     const nx::String& method,
+    const nx::utils::Url& requestUrl,
     const header::DigestAuthorization& authorizationHeader,
     AuthenticationCompletionHandler completionHandler)
 {
@@ -107,6 +110,14 @@ void BaseAuthenticationManager::passwordLookupDone(
             authorizationHeader);
     if (!authenticationResult)
         return reportAuthenticationFailure(std::move(completionHandler));
+
+    // Validating request URL.
+    if (const auto uriIter = authorizationHeader.digest->params.find("uri");
+        uriIter != authorizationHeader.digest->params.end())
+    {
+        if (requestUrl.path() != nx::utils::Url(uriIter->second).path())
+            return reportAuthenticationFailure(std::move(completionHandler));
+    }
 
     reportSuccess(std::move(completionHandler));
 }
