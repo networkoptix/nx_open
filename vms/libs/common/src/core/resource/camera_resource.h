@@ -17,6 +17,7 @@
 #include <nx/utils/url.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/types/rtp_types.h>
 
 class CameraMediaStreams;
 class CameraBitrates;
@@ -56,6 +57,7 @@ public:
     void issueOccured();
     void cleanCameraIssues();
 
+    nx::vms::api::RtpTransportType preferredRtpTransport() const;
     CameraMediaStreams mediaStreams() const;
     CameraMediaStreamInfo streamInfo(StreamIndex index = StreamIndex::primary) const;
 

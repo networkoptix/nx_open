@@ -365,7 +365,7 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 bool QnMediaServerResource::isSslAllowed() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_sslAllowed;
+    return m_sslAllowed || commonModule()->globalSettings()->isTrafficEncriptionForced();
 }
 
 void QnMediaServerResource::setSslAllowed(bool sslAllowed)

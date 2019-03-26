@@ -28,25 +28,22 @@ extern "C"
 #include <utils/camera/camera_diagnostics.h>
 #include <network/client_authenticate_helper.h>
 
+#include <nx/vms/api/types/rtp_types.h>
+
 class QnRtspClient;
 
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
-enum class RtspTransport
-{
-    notDefined,
-    udp,
-    tcp,
-    multicast
-};
-RtspTransport rtspTransportFromString(const QString& value);
-QString toString(const RtspTransport& value);
-
 class QnRtspIoDevice
 {
 public:
-    explicit QnRtspIoDevice(QnRtspClient* owner, RtspTransport rtspTransport, quint16 mediaPort = 0, quint16 rtcpPort = 0);
+    explicit QnRtspIoDevice(
+        QnRtspClient* owner,
+        nx::vms::api::RtpTransportType rtpTransport,
+        quint16 mediaPort = 0,
+        quint16 rtcpPort = 0);
+
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
     const nx::streaming::rtp::RtcpSenderReport& getSenderReport() { return m_senderReport; }
@@ -54,11 +51,13 @@ public:
     nx::network::AbstractCommunicatingSocket* getMediaSocket();
     nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket.get(); }
     void shutdown();
-    void setTransport(RtspTransport rtspTransport);
+    void setTransport(nx::vms::api::RtpTransportType rtpTransport);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteRtcpPort = rtcpPort;}
+
+    void updateRemoteMulticastPorts(quint16 mediaPort, quint16 rtcpPort);
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
@@ -66,10 +65,11 @@ public:
     void bindToMulticastAddress(const QHostAddress& address, const QString& interfaceAddress);
 private:
     void processRtcpData();
+    void updateSockets();
 
 private:
     QnRtspClient* m_owner = nullptr;
-    RtspTransport m_transport = RtspTransport::notDefined;
+    nx::vms::api::RtpTransportType m_transport = nx::vms::api::RtpTransportType::automatic;
 
     nx::streaming::rtp::RtcpSenderReport m_senderReport;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_mediaSocket;
@@ -111,7 +111,12 @@ public:
     struct SDPTrackInfo
     {
         SDPTrackInfo() = default;
-        SDPTrackInfo(const nx::streaming::Sdp::Media& sdpMedia, QnRtspClient* owner, RtspTransport transport, int serverPort):
+        SDPTrackInfo(
+            const nx::streaming::Sdp::Media& sdpMedia,
+            QnRtspClient* owner,
+            nx::vms::api::RtpTransportType transport,
+            int serverPort)
+            :
             sdpMedia(sdpMedia)
         {
             ioDevice = std::make_shared<QnRtspIoDevice>(owner, transport, serverPort);
@@ -155,10 +160,10 @@ public:
 
     bool sendKeepAliveIfNeeded();
 
-    void setTransport(RtspTransport transport);
-    RtspTransport getTransport() const { return m_transport; }
+    void setTransport(nx::vms::api::RtpTransportType transport);
+    nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
 
-    RtspTransport getPreferedTransport() const { return m_prefferedTransport; }
+    nx::vms::api::RtpTransportType getPreferedTransport() const { return m_prefferedTransport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
@@ -275,7 +280,7 @@ private:
 
     // 'initialization in order' block
     unsigned int m_csec;
-    RtspTransport m_transport;
+    nx::vms::api::RtpTransportType m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
     qint64 m_openedTime;
@@ -306,7 +311,7 @@ private:
     QAuthenticator m_auth;
     boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    RtspTransport m_prefferedTransport;
+    nx::vms::api::RtpTransportType m_prefferedTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;

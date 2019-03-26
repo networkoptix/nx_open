@@ -169,7 +169,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
     }
 
-    const QByteArray data = (url.path() + url.query() + url.fragment()).toUtf8();
+    const QByteArray data = url.toString(QUrl::RemoveAuthority | QUrl::RemoveScheme).toUtf8();
     if (!m_tcpSock->send(data.data(), data.size() + 1))
     {
        closeStream();

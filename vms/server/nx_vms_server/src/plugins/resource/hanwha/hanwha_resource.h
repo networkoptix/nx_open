@@ -163,6 +163,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
 
 private:
     CameraDiagnostics::Result initDevice();

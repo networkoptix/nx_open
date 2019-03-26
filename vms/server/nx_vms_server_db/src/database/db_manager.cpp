@@ -57,6 +57,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/time_sync/legacy/time_manager.h>
+#include <nx/sql/database.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -386,7 +387,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     }
 
     const static QString buildNumberConnectionName = "GetBuildNumberDB";
-    auto sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
+    auto sdb = nx::sql::Database::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
     sdb.setDatabaseName(dbFileName);
     if (!sdb.open())
     {
@@ -446,7 +447,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             }
         }
 
-        m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
+        m_sdbStatic = nx::sql::Database::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
         QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
         m_sdbStatic.setDatabaseName(closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
 
@@ -2530,7 +2531,7 @@ ErrorCode QnDbManager::executeTransactionInternal(
     f.close();
 
     QString databaseName = getDatabaseName("QnDbManagerTmp");
-    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", databaseName);
+    QSqlDatabase testDB = nx::sql::Database::addDatabase("QSQLITE", databaseName);
 
     auto dbCloseGuard = nx::utils::makeScopeGuard(
         [&]()
