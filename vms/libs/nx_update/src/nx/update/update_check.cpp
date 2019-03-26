@@ -86,7 +86,7 @@ static InformationError makeHttpRequest(
                 error = InformationError::httpError;
                 NX_WARNING(
                     typeid(Information),
-                    lm("Http client http error: %1, url: %2").args(statusCode, url));
+                    lm("Http client error: %1, url: %2").args(statusCode, url));
             }
 
             readyPomise.set_value();

@@ -27,6 +27,9 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 
+
+#include <nx/vms/time_sync/time_sync_manager.h>
+
 namespace nx::vms::client::desktop {
 
 using State = TimeSynchronizationWidgetState;
@@ -109,10 +112,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(ui->serversTable->hoverTracker(), &ItemViewHoverTracker::rowEnter, this, setHovered);
     connect(ui->serversTable->hoverTracker(), &ItemViewHoverTracker::rowLeave, this, clearHovered);
 
-    //connect(m_serversModel, &Model::serverSelected, m_store,
-    //    &TimeSynchronizationWidgetStore::selectServer);
-
-    connect(ui->serversTable, &TableView::pressed, this,
+    const auto selectServer =
         [this](const QModelIndex& index)
         {
             const QnUuid& serverId = index.data(Model::ServerIdRole).value<QnUuid>();
@@ -125,12 +125,15 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
                 if (m_store->state().status ==  State::Status::synchronizedWithSelectedServer)
                     m_delegate->setBaseRow(row);
             }
-        });
+        };
+
+    connect(m_serversModel, &Model::serverSelected, this, selectServer);
+    connect(ui->serversTable, &TableView::pressed, this, selectServer);
 
     const auto updateTime =
         [this]
         {
-            m_store->setVmsTime(std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+            m_store->setElapsedTime(m_timeWatcher->elapsedTime());
         };
 
     auto timer = new QTimer(this);
@@ -139,7 +142,11 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(timer, &QTimer::timeout, this, updateTime);
     timer->start();
 
-    connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
+    connect(
+        commonModule()->ec2Connection()->timeSyncManager(),
+        &nx::vms::time_sync::TimeSyncManager::timeChanged,
+        m_timeWatcher,
+        &TimeSynchronizationServerTimeWatcher::forceUpdate);
 
     updateTime();
 }
@@ -169,6 +176,8 @@ void TimeSynchronizationWidget::loadDataToUi()
         qnGlobalSettings->isTimeSynchronizationEnabled(),
         qnGlobalSettings->primaryTimeServer(),
         servers);
+
+    m_store->setBaseTime(milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
 }
 
 void TimeSynchronizationWidget::applyChanges()
@@ -193,6 +202,16 @@ bool TimeSynchronizationWidget::hasChanges() const
 void TimeSynchronizationWidget::setReadOnlyInternal(bool readOnly)
 {
     m_store->setReadOnly(readOnly);
+}
+
+void TimeSynchronizationWidget::showEvent(QShowEvent* event)
+{
+    m_timeWatcher->start();
+}
+
+void TimeSynchronizationWidget::hideEvent(QHideEvent* event)
+{
+    m_timeWatcher->stop();
 }
 
 void TimeSynchronizationWidget::setupUi()
@@ -251,7 +270,7 @@ void TimeSynchronizationWidget::loadState(const State& state)
     using ::setReadOnly;
 
     const auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(
-        duration_cast<milliseconds>(state.vmsTime).count(),
+        duration_cast<milliseconds>(state.baseTime + state.elapsedTime).count(),
         Qt::OffsetFromUTC,
         duration_cast<seconds>(state.commonTimezoneOffset).count());
 

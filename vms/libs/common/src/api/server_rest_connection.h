@@ -27,6 +27,7 @@
 
 #include <nx/vms/api/analytics/settings_response.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/api/data/time_reply.h>
 
 namespace rest {
 
@@ -56,7 +57,7 @@ struct RestResultWithData: public RestResultWithDataBase
 };
 
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
-using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
+using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
 using UpdateStatusAllData = RestResultWithData<std::vector<nx::update::Status>>;
 using UpdateInformationData = RestResultWithData<nx::update::Information>;
 

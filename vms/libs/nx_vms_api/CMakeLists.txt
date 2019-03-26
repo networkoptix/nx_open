@@ -1,10 +1,15 @@
+nx_configure_file(
+    protocol_version.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/protocol_version.cpp)
+
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_target(nx_vms_api
-    LIBRARY ${library_type}
+nx_add_target(nx_vms_api LIBRARY ${library_type}
+    ADDITIONAL_SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/protocol_version.cpp"
     PUBLIC_LIBS
         nx_utils nx_fusion)
 

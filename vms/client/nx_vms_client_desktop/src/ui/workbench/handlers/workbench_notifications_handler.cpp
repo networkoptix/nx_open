@@ -315,6 +315,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
 void QnWorkbenchNotificationsHandler::at_context_userChanged()
 {
     m_adaptor->setResource(context()->user());
+    clear();
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(

@@ -579,7 +579,10 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     report.statusMessages << tr("Build not found");
                 }
                 else
+                {
+                    report.versionMode = VersionReport::VersionMode::empty;
                     report.statusMessages << tr("Unable to check updates on the internet");
+                }
                 break;
             case Error::jsonError:
                 if (source == SourceType::file)
@@ -890,7 +893,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula = acceptedEula < newEula;
 
-        if (showEula && !EulaDialog::acceptEulaHtml(m_updateInfo.info.eula, mainWindowWidget()))
+        if (showEula && !EulaDialog::acceptEulaHtml(m_updateInfo.info.eula, newEula, mainWindowWidget()))
             return;
 
         auto targets = m_stateTracker->getAllPeers();
@@ -990,10 +993,10 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     auto showCancelDialog =
         [this]() -> bool
         {
+            // This will be used at 'downloading', 'readyToInstall' and 'pushing' states.
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-            // 3. All other cases. Some servers have failed
             messageBox->setIcon(QnMessageBoxIcon::Question);
-            messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
+            messageBox->setText(tr("Cancel update and delete all downloaded data?"));
             messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
             messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
             return messageBox->exec() == QDialogButtonBox::Yes;
@@ -1019,7 +1022,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Question);
-        messageBox->setText(tr("Cancel update and delete all downloaded data?"));
+        messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
         messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
         messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
 
