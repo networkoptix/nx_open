@@ -31,7 +31,7 @@ private:
     QnVideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool: public  QObject
+class QnVideoCameraPool: public QObject
 {
     Q_OBJECT
 public:

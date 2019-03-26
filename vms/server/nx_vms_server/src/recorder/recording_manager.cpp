@@ -23,6 +23,7 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/server/event/rule_processor.h>
 #include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/resource/camera.h>
 #include <media_server/serverutil.h>
 #include "licensing/license.h"
 #include "mutex/camera_data_handler.h"
@@ -148,19 +149,14 @@ void QnRecordingManager::stop()
     exit();
     wait(); // stop QT event loop
 
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     for(const Recorders& recorders: m_recordMap.values())
-    {
         beforeDeleteRecorder(recorders);
-    }
-    for( QMap<QnResourcePtr, Recorders>::const_iterator
-        it = m_recordMap.cbegin();
-        it != m_recordMap.cend();
-        ++it )
-    {
+
+    for (auto it = m_recordMap.cbegin(); it != m_recordMap.cend(); ++it)
         deleteRecorder(it.value(), it.key());
-    }
+
     m_recordMap.clear();
     m_scheduleWatchingTimer.stop();
 
@@ -168,7 +164,7 @@ void QnRecordingManager::stop()
     m_delayedStop.clear();
 }
 
-Recorders QnRecordingManager::findRecorders(const QnResourcePtr& res) const
+Recorders QnRecordingManager::findRecorders(const QnNetworkResourcePtr &res) const
 {
     QnMutexLocker lock( &m_mutex );
     return m_recordMap.value(res);
@@ -211,7 +207,7 @@ bool QnRecordingManager::startForcedRecording(
 
     QnMutexLocker lock( &m_mutex );
 
-    QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constFind(camRes);
+    auto itrRec = m_recordMap.constFind(camRes);
     if (itrRec == m_recordMap.constEnd())
         return false;
 
@@ -240,7 +236,7 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 
     QnMutexLocker lock( &m_mutex );
 
-    QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constFind(camRes);
+    auto itrRec = m_recordMap.constFind(camRes);
     if (itrRec == m_recordMap.constEnd())
         return false;
 
@@ -270,7 +266,8 @@ bool QnRecordingManager::startOrStopRecording(
     const QnResourcePtr& res, const QnVideoCameraPtr& camera,
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
+    auto cameraRes = res.dynamicCast<nx::vms::server::resource::Camera>();
+    NX_CRITICAL(cameraRes != nullptr);
     bool needRecordCamera =
         !isResourceDisabled(res) &&
         !cameraRes->isDtsBased() &&
@@ -402,13 +399,12 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     startOrStopRecording(cameraRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 }
 
-void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resource*/)
+void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& resource)
 {
-    QnVirtualCameraResource* cameraPtr = dynamic_cast<QnVirtualCameraResource*>(sender());
-    if( !cameraPtr )
+    const auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
+    if (!NX_ASSERT(camera != nullptr))
         return;
 
-    const QnVirtualCameraResourcePtr& camera = cameraPtr->toSharedPointer().staticCast<QnVirtualCameraResource>();
     const bool ownResource = !camera->hasFlags(Qn::foreigner);
     if (ownResource && !camera->isInitialized())
     {
@@ -422,7 +418,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr& /*resour
     // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread
     //QnMutexLocker lock( &m_mutex );
 
-    QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
+    auto itr = m_recordMap.constFind(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
     if (itr != m_recordMap.constEnd() && ownResource)
     {
         if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled())
@@ -488,7 +484,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     Recorders recorders;
     {
         QnMutexLocker lock( &m_mutex );
-        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(resource);
+        auto itr = m_recordMap.constFind(resource);
         if (itr == m_recordMap.constEnd())
             return;
         recorders = itr.value();
@@ -504,7 +500,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const
 {
     QnMutexLocker lock( &m_mutex );
-    QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(camera);
+    auto itr = m_recordMap.constFind(camera);
     if (itr == m_recordMap.constEnd())
         return false;
     return (itr.value().recorderHiRes && itr.value().recorderHiRes->isRunning()) ||
@@ -519,7 +515,7 @@ void QnRecordingManager::onTimer()
     //QnMutexLocker lock( &m_mutex );
 
     bool someRecordingIsPresent = false;
-    for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
+    for (auto itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
         if (!resourcePool()->getResourceById(itrRec.key()->getId()))
             continue; //< resource just deleted. will be removed from m_recordMap soon
