@@ -420,6 +420,7 @@ private:
         if (m_currentStorage)
             m_currentStorage->removeFlags(Qn::storage_fastscan);
         m_currentStorage.reset();
+        m_storageToProgress.clear();
     }
 
     virtual void run() override
