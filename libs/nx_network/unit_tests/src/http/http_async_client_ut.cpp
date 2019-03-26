@@ -69,6 +69,10 @@ public:
     {
         m_httpClient.setResponseReadTimeout(kNoTimeout);
         m_httpClient.setMessageBodyReadTimeout(kNoTimeout);
+
+        m_credentials = Credentials("username", PasswordAuthToken("password"));
+
+        m_httpClient.setCredentials(m_credentials);
     }
 
     ~HttpAsyncClient()
@@ -110,14 +114,8 @@ protected:
 
     void enableAuthentication()
     {
-        // TODO: #ak TestHttpServer: add a way to disable authentication for specific path
-        // and disable for kExtraResponseHandlerPath.
-        //m_httpServer.setAuthenticationEnabled(true);
-        //m_httpServer.registerUserCredentials("username", "password");
-
-        m_credentials = Credentials("username", PasswordAuthToken("password"));
-
-        m_httpClient.setCredentials(*m_credentials);
+        m_httpServer.setAuthenticationEnabled(true);
+        m_httpServer.registerUserCredentials(m_credentials);
     }
 
     void disablePersistentServerConnections()
@@ -135,7 +133,7 @@ protected:
     void whenSendConnectRequest()
     {
         m_httpClient.doConnect(
-            prepareUrl("/test"),
+            prepareUrl("/connect_test"),
             m_proxyHost.c_str(),
             [this]() { saveResponse(); });
     }
@@ -173,7 +171,7 @@ private:
     std::unique_ptr<UpgradableHttpServer> m_synchronousServer;
     std::string m_proxyHost;
     nx::utils::SyncQueue<RequestResult> m_responses;
-    std::optional<Credentials> m_credentials;
+    Credentials m_credentials;
 
     void processHttpRequest(
         nx::network::http::RequestContext requestContext,
@@ -196,7 +194,7 @@ private:
             {
                 if (validateAuthorization(
                         requestContext.request.requestLine.method,
-                        *m_credentials,
+                        m_credentials,
                         authorizationHeader))
                 {
                     completionHandler(http::StatusCode::ok);
@@ -238,10 +236,16 @@ TEST_F(HttpAsyncClient, connect_method)
     thenCorrectConnectRequestIsReceived();
 }
 
-TEST_F(HttpAsyncClient, clears_receive_buffer_when_opening_new_connection)
+TEST_F(HttpAsyncClient, connect_with_authentication)
 {
     enableAuthentication();
 
+    whenSendConnectRequest();
+    thenRequestSucceeded();
+}
+
+TEST_F(HttpAsyncClient, clears_receive_buffer_when_opening_new_connection)
+{
     whenSendToBrokenHttpServerThatSendsExtraResponseMessages();
     thenRequestSucceeded();
 }
