@@ -1017,9 +1017,9 @@ bool QnVideoCamera::ensureLiveCacheStarted(
             mediaQualityToStreamName(streamQuality), reasonForLog);
 
         m_liveCache[streamQuality].reset(new MediaStreamCache(
-            MEDIA_CACHE_SIZE_MILLIS,
+            /*cacheSizeMillis*/ MEDIA_CACHE_SIZE_MILLIS,
             // Hls spec requires 7 last chunks to be in memory, adding extra 3 just in case.
-            MEDIA_CACHE_SIZE_MILLIS * 10));
+            /*maxCacheSizeMillis*/ MEDIA_CACHE_SIZE_MILLIS * 10));
 
         int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
         m_hlsLivePlaylistManager[streamQuality] =
