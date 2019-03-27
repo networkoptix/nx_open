@@ -76,9 +76,7 @@ Item
         readonly property bool loadingChunks:
             cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
-        property bool playbackStarted: false
-        property bool controlsNeeded:
-            !cameraChunkProvider.loading || (playbackStarted && loaded)
+        property bool controlsNeeded: !cameraChunkProvider.loading || loaded
 
         property real controlsOpacity:
             Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
