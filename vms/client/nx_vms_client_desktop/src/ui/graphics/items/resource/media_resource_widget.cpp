@@ -750,48 +750,6 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
         : QString();
 }
 
-void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
-{
-    if (!NX_ASSERT(rule))
-        return;
-
-    const auto ruleId = rule->id();
-    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
-        [ruleId](const auto& val) { return val.ruleId == ruleId; });
-
-    if (it == m_triggers.end())
-        return;
-
-    const auto button = qobject_cast<SoftwareTriggerButton*>(
-        m_triggersContainer->item(it->overlayItemId));
-
-    if (!button)
-        return;
-
-    const bool buttonEnabled = (rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
-        || !button->isLive();
-
-    if (button->isEnabled() == buttonEnabled)
-        return;
-
-    if (!buttonEnabled)
-    {
-        const bool longPressed = it->info.prolonged &&
-            button->state() == SoftwareTriggerButton::State::Waiting;
-        if (longPressed)
-            button->setState(SoftwareTriggerButton::State::Failure);
-    }
-
-    button->setEnabled(buttonEnabled);
-    updateTriggerButtonTooltip(button, it->info, buttonEnabled);
-}
-
-void QnMediaResourceWidget::updateTriggersAvailability()
-{
-    for (auto data: m_triggers)
-        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(data.ruleId));
-}
-
 void QnMediaResourceWidget::createButtons()
 {
     auto screenshotButton = createStatisticAwareButton(lit("media_widget_screenshot"));
@@ -2810,117 +2768,6 @@ nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
     return d->analyticsMetadataProvider;
 }
 
-/*
-* Soft Triggers
-*/
-
-QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInfo(
-    const nx::vms::event::RulePtr& rule) const
-{
-    return SoftwareTriggerInfo({
-        rule->eventParams().inputPortId,
-        rule->eventParams().caption,
-        rule->eventParams().description,
-        rule->isActionProlonged() });
-}
-
-void QnMediaResourceWidget::createTriggerIfRelevant(
-    const vms::event::RulePtr& rule)
-{
-    if (!isRelevantTriggerRule(rule))
-        return;
-
-    const auto ruleId = rule->id();
-    const auto it = triggerInsertPosition(rule);
-
-    const auto info = makeTriggerInfo(rule);
-
-    std::function<void()> clientSideHandler;
-
-    if (rule->actionType() == nx::vms::api::ActionType::bookmarkAction)
-    {
-        clientSideHandler =
-            [this] { action(action::BookmarksModeAction)->setChecked(true); };
-    }
-
-    const auto button = new SoftwareTriggerButton(this);
-    configureTriggerButton(button, info, clientSideHandler);
-
-    connect(button, &SoftwareTriggerButton::isLiveChanged, this,
-        [this, rule]()
-        {
-            updateTriggerAvailability(rule);
-        });
-
-    const int index = std::distance(m_triggers.begin(), it);
-    const auto overlayItemId = m_triggersContainer->insertItem(index, button);
-    m_triggers.insert(it, SoftwareTrigger{ruleId, info, overlayItemId});
-}
-
-QnMediaResourceWidget::TriggerDataList::iterator
-    QnMediaResourceWidget::triggerInsertPosition(const nx::vms::event::RulePtr& rule)
-{
-    static const auto compareFunction =
-        [](const SoftwareTrigger& left, const SoftwareTrigger& right)
-        {
-            return left.info.name < right.info.name
-                || (left.info.name == right.info.name
-                    && left.info.icon < right.info.icon);
-        };
-
-    const auto idValue = SoftwareTrigger{rule->id(), makeTriggerInfo(rule), QnUuid()};
-    return std::lower_bound(m_triggers.begin(), m_triggers.end(), idValue, compareFunction);
-}
-
-bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
-{
-    if (rule->isDisabled() || rule->eventType() != vms::api::EventType::softwareTriggerEvent)
-        return false;
-
-    const auto resourceId = d->resource->getId();
-    if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
-        return false;
-
-    if (rule->eventParams().metadata.allUsers)
-        return true;
-
-    const auto currentUser = accessController()->user();
-    if (!currentUser)
-        return false; //< All triggers will be added when user is set up.
-
-    const auto subjects = rule->eventParams().metadata.instigators;
-    if (::contains(subjects, currentUser->getId()))
-        return true;
-
-    return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
-}
-
-void QnMediaResourceWidget::updateTriggerButtonTooltip(
-    SoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info,
-    bool enabledBySchedule)
-{
-    if (!button)
-    {
-        NX_ASSERT(false, "Trigger button is null");
-        return;
-    }
-
-    if (enabledBySchedule)
-    {
-        const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
-        button->setToolTip(info.prolonged
-            ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
-            : name);
-        return;
-    }
-    else
-    {
-        button->setToolTip(tr("Disabled by schedule"));
-    }
-
-}
-
 void QnMediaResourceWidget::updateWatermark()
 {
     // Ini guard; remove on release. Default watermark is invisible.
@@ -2993,6 +2840,106 @@ void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     auto button = createStatisticAwareButton(buttonName);
     button->setDefaultAction(action);
     titleBar()->rightButtonsBar()->addButton(buttonId, button);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Soft Triggers
+
+QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInfo(
+    const nx::vms::event::RulePtr& rule) const
+{
+    return SoftwareTriggerInfo({
+        rule->eventParams().inputPortId,
+        rule->eventParams().caption,
+        rule->eventParams().description,
+        rule->isActionProlonged() });
+}
+
+void QnMediaResourceWidget::createTriggerIfRelevant(
+    const vms::event::RulePtr& rule)
+{
+    if (!isRelevantTriggerRule(rule))
+        return;
+
+    const auto info = makeTriggerInfo(rule);
+
+    const auto lowerBoundPredicate =
+        [](const SoftwareTrigger& left, const SoftwareTriggerInfo& right)
+        {
+            return left.info.name < right.name
+                || (left.info.name == right.name
+                    && left.info.icon < right.icon);
+        };
+
+    const int index = std::lower_bound(m_triggers.cbegin(), m_triggers.cend(), info,
+        lowerBoundPredicate) - m_triggers.cbegin();
+
+    std::function<void()> clientSideHandler;
+    if (rule->actionType() == nx::vms::api::ActionType::bookmarkAction)
+    {
+        clientSideHandler =
+            [this] { action(action::BookmarksModeAction)->setChecked(true); };
+    }
+
+    const auto button = new SoftwareTriggerButton(this);
+    configureTriggerButton(button, info, clientSideHandler);
+
+    connect(button, &SoftwareTriggerButton::isLiveChanged, this,
+        [this, rule]()
+        {
+            updateTriggerAvailability(rule);
+        });
+
+    const auto overlayItemId = m_triggersContainer->insertItem(index, button);
+    m_triggers.insert(index, SoftwareTrigger{rule->id(), info, overlayItemId});
+}
+
+bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
+{
+    if (rule->isDisabled() || rule->eventType() != vms::api::EventType::softwareTriggerEvent)
+        return false;
+
+    const auto resourceId = d->resource->getId();
+    if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
+        return false;
+
+    if (rule->eventParams().metadata.allUsers)
+        return true;
+
+    const auto currentUser = accessController()->user();
+    if (!currentUser)
+        return false; //< All triggers will be added when user is set up.
+
+    const auto subjects = rule->eventParams().metadata.instigators;
+    if (::contains(subjects, currentUser->getId()))
+        return true;
+
+    return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
+}
+
+void QnMediaResourceWidget::updateTriggerButtonTooltip(
+    SoftwareTriggerButton* button,
+    const SoftwareTriggerInfo& info,
+    bool enabledBySchedule)
+{
+    if (!button)
+    {
+        NX_ASSERT(false, "Trigger button is null");
+        return;
+    }
+
+    if (enabledBySchedule)
+    {
+        const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
+        button->setToolTip(info.prolonged
+            ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
+            : name);
+        return;
+    }
+    else
+    {
+        button->setToolTip(tr("Disabled by schedule"));
+    }
 }
 
 void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button,
@@ -3121,25 +3068,34 @@ void QnMediaResourceWidget::resetTriggers()
     updateTriggersAvailability();
 }
 
-void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
+int QnMediaResourceWidget::triggerIndex(const QnUuid& ruleId) const
 {
-    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
-        [id](const auto& val) { return val.ruleId == id; });
+    const auto it = std::find_if(m_triggers.cbegin(), m_triggers.cend(),
+        [ruleId](const auto& val) { return val.ruleId == ruleId; });
 
-    if (it == m_triggers.end())
+    return (it != m_triggers.end()) ? (it - m_triggers.cbegin()) : -1;
+}
+
+void QnMediaResourceWidget::removeTrigger(int index)
+{
+    if (!NX_ASSERT(index >= 0 && index < m_triggers.size()))
         return;
 
-    m_triggersContainer->deleteItem(it->overlayItemId);
-    m_triggers.erase(it);
+    m_triggersContainer->deleteItem(m_triggers[index].overlayItemId);
+    m_triggers.removeAt(index);
+}
+
+void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& ruleId)
+{
+    const int index = triggerIndex(ruleId);
+    if (index >= 0)
+        removeTrigger(index);
 }
 
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
-    const auto ruleId = rule->id();
-    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
-        [ruleId](const auto& val) { return val.ruleId == ruleId; });
-
-    if (it == m_triggers.end())
+    const int index = triggerIndex(rule->id());
+    if (index < 0)
     {
         // Create a new trigger if the rule is relevant.
         createTriggerIfRelevant(rule);
@@ -3147,7 +3103,7 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
     else
     {
         // Delete the trigger.
-        at_eventRuleRemoved(ruleId);
+        removeTrigger(index);
 
         // Create a new trigger if the rule is still relevant.
         createTriggerIfRelevant(rule);
@@ -3184,4 +3140,45 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
     return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         d->resource->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
+}
+
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+{
+    if (!NX_ASSERT(rule))
+        return;
+
+    const int index = triggerIndex(rule->id());
+    if (index < 0)
+        return;
+
+    const auto& trigger = m_triggers[index];
+
+    const auto button = qobject_cast<SoftwareTriggerButton*>(
+        m_triggersContainer->item(trigger.overlayItemId));
+
+    if (!button)
+        return;
+
+    const bool buttonEnabled = rule->isScheduleMatchTime(qnSyncTime->currentDateTime())
+        || !button->isLive();
+
+    if (button->isEnabled() == buttonEnabled)
+        return;
+
+    if (!buttonEnabled)
+    {
+        const bool longPressed = trigger.info.prolonged &&
+            button->state() == SoftwareTriggerButton::State::Waiting;
+        if (longPressed)
+            button->setState(SoftwareTriggerButton::State::Failure);
+    }
+
+    button->setEnabled(buttonEnabled);
+    updateTriggerButtonTooltip(button, trigger.info, buttonEnabled);
+}
+
+void QnMediaResourceWidget::updateTriggersAvailability()
+{
+    for (auto data: m_triggers)
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(data.ruleId));
 }
