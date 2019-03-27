@@ -752,18 +752,18 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {
-    const auto ruleId = rule->id();
-    const auto triggerIt = lowerBoundbyTriggerName(rule);
-
-    if (triggerIt == m_triggers.end())
+    if (!NX_ASSERT(rule))
         return;
 
-    // Do not update data for the same rule, until we force it
-    if (triggerIt->ruleId != ruleId)
+    const auto ruleId = rule->id();
+    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
+        [ruleId](const auto& val) { return val.ruleId == ruleId; });
+
+    if (it == m_triggers.end())
         return;
 
     const auto button = qobject_cast<SoftwareTriggerButton*>(
-        m_triggersContainer->item(triggerIt->overlayItemId));
+        m_triggersContainer->item(it->overlayItemId));
 
     if (!button)
         return;
@@ -774,17 +774,16 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (button->isEnabled() == buttonEnabled)
         return;
 
-    const auto info = triggerIt->info;
     if (!buttonEnabled)
     {
-        const bool longPressed = info.prolonged &&
+        const bool longPressed = it->info.prolonged &&
             button->state() == SoftwareTriggerButton::State::Waiting;
         if (longPressed)
             button->setState(SoftwareTriggerButton::State::Failure);
     }
 
     button->setEnabled(buttonEnabled);
-    updateTriggerButtonTooltip(button, info, buttonEnabled);
+    updateTriggerButtonTooltip(button, it->info, buttonEnabled);
 }
 
 void QnMediaResourceWidget::updateTriggersAvailability()
@@ -2828,15 +2827,13 @@ QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInf
 void QnMediaResourceWidget::createTriggerIfRelevant(
     const vms::event::RulePtr& rule)
 {
-    const auto ruleId = rule->id();
-    const auto it = lowerBoundbyTriggerName(rule);
-
-    NX_ASSERT(it == m_triggers.end() || it->ruleId != ruleId);
-
     if (!isRelevantTriggerRule(rule))
         return;
 
-    const SoftwareTriggerInfo info = makeTriggerInfo(rule);
+    const auto ruleId = rule->id();
+    const auto it = triggerInsertPosition(rule);
+
+    const auto info = makeTriggerInfo(rule);
 
     std::function<void()> clientSideHandler;
 
@@ -2861,7 +2858,7 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
 }
 
 QnMediaResourceWidget::TriggerDataList::iterator
-    QnMediaResourceWidget::lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule)
+    QnMediaResourceWidget::triggerInsertPosition(const nx::vms::event::RulePtr& rule)
 {
     static const auto compareFunction =
         [](const SoftwareTrigger& left, const SoftwareTrigger& right)
@@ -2963,6 +2960,14 @@ void QnMediaResourceWidget::updateWatermark()
 
     m_watermarkPainter->setWatermark(watermark);
 }
+
+void QnMediaResourceWidget::clearEntropixEnhancedImage()
+{
+    if (m_entropixEnhancer)
+        m_entropixEnhancer->cancelRequest();
+    if (!m_entropixEnhancedImage.isNull())
+        m_entropixEnhancedImage = QImage();
+};
 
 void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     bool checked,
@@ -3099,19 +3104,19 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
 
 void QnMediaResourceWidget::resetTriggers()
 {
-    /* Delete all buttons: */
+    // Delete all trigger buttons.
     for (const auto& data: m_triggers)
         m_triggersContainer->deleteItem(data.overlayItemId);
 
-    /* Clear triggers information: */
+    // Clear triggers information.
     m_triggers.clear();
 
     if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return;
 
-    /* Create new relevant triggers: */
+    // Create new relevant triggers.
     for (const auto& rule: commonModule()->eventRuleManager()->rules())
-        createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
+        createTriggerIfRelevant(rule); //< Creates a trigger only if the rule is relevant.
 
     updateTriggersAvailability();
 }
@@ -3120,40 +3125,35 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 {
     const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
         [id](const auto& val) { return val.ruleId == id; });
-    if (it == m_triggers.end() || it->ruleId != id)
+
+    if (it == m_triggers.end())
         return;
 
     m_triggersContainer->deleteItem(it->overlayItemId);
     m_triggers.erase(it);
 }
 
-void QnMediaResourceWidget::clearEntropixEnhancedImage()
-{
-    if (m_entropixEnhancer)
-        m_entropixEnhancer->cancelRequest();
-    if (!m_entropixEnhancedImage.isNull())
-        m_entropixEnhancedImage = QImage();
-};
-
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto it = lowerBoundbyTriggerName(rule);
-    if (it == m_triggers.end() || it->ruleId != ruleId)
+    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
+        [ruleId](const auto& val) { return val.ruleId == ruleId; });
+
+    if (it == m_triggers.end())
     {
-        /* Create trigger if the rule is relevant: */
+        // Create a new trigger if the rule is relevant.
         createTriggerIfRelevant(rule);
     }
     else
     {
-        /* Delete trigger: */
+        // Delete the trigger.
         at_eventRuleRemoved(ruleId);
 
-        /* Recreate trigger if the rule is still relevant: */
+        // Create a new trigger if the rule is still relevant.
         createTriggerIfRelevant(rule);
     }
 
-    // Forcing update of trigger button
+    // Forcing update of the trigger button.
     updateTriggerAvailability(rule);
 };
 

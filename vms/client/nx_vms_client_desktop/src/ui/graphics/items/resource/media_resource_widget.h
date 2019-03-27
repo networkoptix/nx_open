@@ -413,7 +413,7 @@ private:
         ButtonHandler executor);
 
     using TriggerDataList = QList<SoftwareTrigger>;
-    TriggerDataList::iterator lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule);
+    TriggerDataList::iterator triggerInsertPosition(const nx::vms::event::RulePtr& rule);
 
     void updateSelectedArea();
     void handleSelectedAreaChanged();
