@@ -22,6 +22,54 @@ namespace cloud {
 namespace relay {
 namespace test {
 
+
+namespace {
+
+class TestRemoteRelayPeerPool:
+    public model::RemoteRelayPeerPool
+{
+    using base_type = model::RemoteRelayPeerPool;
+
+public:
+    TestRemoteRelayPeerPool(
+        const conf::Settings& settings,
+        nx::utils::SyncQueue<bool>* initEvents,
+        const bool* const forceConnectionFailure)
+        :
+        base_type(settings),
+        m_initEvents(initEvents),
+        m_forceConnectionFailure(forceConnectionFailure)
+    {
+    }
+
+    virtual bool connectToDb() override
+    {
+        if (*m_forceConnectionFailure)
+        {
+            m_initEvents->push(false);
+            return false;
+        }
+
+        bool connected = base_type::connectToDb();
+        m_initEvents->push(connected);
+        return connected;
+    }
+
+    virtual bool isConnected() const override
+    {
+        if (*m_forceConnectionFailure)
+            return false;
+
+        return base_type::isConnected();
+    }
+
+private:
+    nx::utils::SyncQueue<bool>* m_initEvents;
+    const bool* const m_forceConnectionFailure = nullptr;
+};
+
+} // namespace
+
 class RelayService:
     public ::testing::Test,
     public BasicComponentTest
@@ -36,10 +84,10 @@ public:
     {
         stopAllInstances();
 
-        if (m_cassandraConnectionFactoryBak)
+        if (m_factoryFunctionBak)
         {
-            nx::cassandra::AsyncConnectionFactory::instance().setCustomFunc(
-                std::move(*m_cassandraConnectionFactoryBak));
+            model::RemoteRelayPeerPoolFactory::instance().setCustomFunc(
+                std::move(*m_factoryFunctionBak));
         }
     }
 
@@ -48,18 +96,20 @@ protected:
     {
         using namespace std::placeholders;
 
-        m_isCassandraOnline = false;
-        m_cassandraConnectionFactoryBak =
-            nx::cassandra::AsyncConnectionFactory::instance().setCustomFunc(
-                std::bind(&RelayService::createCassandraConnectionStub, this, _1));
+        m_forceConnectionFailure = true;
 
-        addRelayInstance({
-            "--cassandra/host=testHost",
-            "--cassandra/delayBeforeRetryingInitialConnect=1ms"},
-            false);
+        m_factoryFunctionBak = model::RemoteRelayPeerPoolFactory::instance().setCustomFunc(
+            [this](const conf::Settings& settings)
+            {
+                return std::make_unique<TestRemoteRelayPeerPool>(
+                    settings,
+                    &m_initEvents,
+                    &m_forceConnectionFailure);
+            });
 
-        // Waiting for cassandra connect to fail.
-        ASSERT_FALSE(m_cassandraConnectionInitializationEvents.pop());
+        addRelayInstance({"-clusterDbMap/connectionRetryDelay", "10ms"}, false);
+
+        ASSERT_FALSE(m_initEvents.pop());
     }
 
     void givenStartedRelay(std::vector<const char*> args = {})
@@ -69,12 +119,12 @@ protected:
 
     void whenStartDb()
     {
-        m_isCassandraOnline = true;
+        m_forceConnectionFailure = false;
     }
 
     void thenRelayHasConnectedToDb()
     {
-        while (!m_cassandraConnectionInitializationEvents.pop()) {}
+        while (!m_initEvents.pop()) {}
     }
 
     void andRelayHasStarted()
@@ -88,22 +138,12 @@ protected:
     }
 
 private:
-    std::optional<nx::cassandra::AsyncConnectionFactory::Function>
-        m_cassandraConnectionFactoryBak;
-    bool m_isCassandraOnline = true;
-    nx::utils::SyncQueue<bool> m_cassandraConnectionInitializationEvents;
-
-    std::unique_ptr<nx::cassandra::AbstractAsyncConnection>
-        createCassandraConnectionStub(const std::string& /*dbHostName*/)
-    {
-        auto connection = std::make_unique<CassandraConnectionStub>();
-        connection->setDbHostAvailable(m_isCassandraOnline);
-        connection->setInitializationDoneEventQueue(
-            &m_cassandraConnectionInitializationEvents);
-        return std::move(connection);
-    }
+    bool m_forceConnectionFailure = false;
+    nx::utils::SyncQueue<bool> m_initEvents;
+    std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;
 };
 
+// cassandra specific functionality that doesn't apply to sync engine
 TEST_F(RelayService, waits_for_db_availability_if_db_host_is_specified)
 {
     givenRelayThatFailedToConnectToDb();
@@ -114,6 +154,7 @@ TEST_F(RelayService, waits_for_db_availability_if_db_host_is_specified)
     andRelayHasStarted();
 }
 
+// cassandra specific functionality that doesn't apply to sync engine
 TEST_F(RelayService, can_be_stopped_regardless_of_db_host_availability)
 {
     givenRelayThatFailedToConnectToDb();

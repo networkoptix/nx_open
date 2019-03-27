@@ -1,6 +1,8 @@
 <div [ngSwitch]="value">
-    <span class="icon-positive" *ngSwitchCase="true">&#9679;</span>
-    <span class="icon-negative" *ngSwitchCase="false">&#9675;</span>
-    <span class="icon-negative" *ngSwitchCase="null">&#63;</span>
-    <span *ngSwitchDefault>{{value}}</span>
+    <div class="icon-positive" *ngSwitchCase="true">
+        &#9679; <div *ngIf="additional" class="icon-additional">{{additional}}</div>
+    </div>
+    <div class="icon-negative" *ngSwitchCase="false">&#9675;</div>
+    <div class="icon-unknown" *ngSwitchCase="null">&#63;</div>
+    <div *ngSwitchDefault [innerHTML]="value"></div>
 </div>

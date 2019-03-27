@@ -13,12 +13,13 @@
 #include <nx/network/aio/timer.h>
 
 #include "node.h"
+#include "settings.h"
 
 namespace nx::cloud::discovery {
 
 using NodeDiscoveredHandler = nx::utils::MoveOnlyFunc<void(Node)>;
 
-using NodeLostHandler = nx::utils::MoveOnlyFunc<void(std::string /*nodeId*/)>;
+using NodeLostHandler = nx::utils::MoveOnlyFunc<void(Node)>;
 
 /**
   * Updating node registration based on expiration timer is handled by this class.
@@ -32,10 +33,9 @@ class NX_DISCOVERY_CLIENT_API DiscoveryClient:
 
 public:
     DiscoveryClient(
-        const nx::utils::Url& discoveryServiceUrl,
+        const Settings& discoverySettings,
         const std::string& clusterId,
-        const std::string& nodeId,
-        const std::string& infoJson);
+        const NodeInfo& nodeInfo);
     ~DiscoveryClient();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -65,16 +65,24 @@ private:
     virtual void stopWhileInAioThread() override;
 
     void setupDiscoveryServiceUrl(const std::string& clusterId);
+    const nx::utils::Url& discoveryServiceUrl() const;
+
     void setupRegisterNodeRequest();
     void setupOnlineNodesRequest();
 
-    void startRegisterNodeRequest();
-    void startOnlineNodesRequest();
+    void startRegisterNodeRequest(const std::chrono::milliseconds& delay);
+    void startOnlineNodesRequest(const std::chrono::milliseconds& delay);
 
-    void updateOnlineNodes(std::vector<Node>& discoveredNodes);
+    void updateOnlineNodes(std::vector<Node> discoveredNodes);
 
     void emitNodeDiscovered(const Node& node);
-    void emitNodeLost(const std::string& nodeId);
+    void emitNodeLost(const Node& nodeId);
+
+    void updateRequestSentTime(const nx::network::http::Request& request);
+    std::optional<QDateTime> getServerResponseTime(
+        const nx::network::http::Response* response) const;
+
+    std::optional<std::chrono::milliseconds> calculateRegistrationDelay(const nx::network::http::Response* response);
 
 private:
     using ResponseReceivedHandler =
@@ -98,6 +106,9 @@ private:
         void doPost(const nx::utils::Url& url, const nx::network::http::BufferType& messagBody);
 
         bool failed() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
+
+        const nx::network::http::Request& request() const;
         const nx::network::http::Response* response() const;
 
     private:
@@ -106,8 +117,9 @@ private:
     };
 
 private:
-    nx::utils::Url m_discoveryServiceUrl;
+    const Settings& m_settings;
     NodeInfo m_thisNodeInfo;
+    nx::utils::Url m_discoveryServiceUrl;
 
     NodeDiscoveredHandler m_nodeDiscoveredHandler;
     NodeLostHandler m_nodeLostHandler;
@@ -119,6 +131,8 @@ private:
     Node m_thisNode;
 
     mutable QnMutex m_mutex;
+
+    QDateTime m_requestSent;
 };
 
 } // namespace nx::cloud::discovery

@@ -18,7 +18,7 @@
 #include "stree/cdb_ns.h"
 #include "statistics/provider.h"
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -86,7 +86,7 @@ private:
         AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
-        clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine,
+        clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine,
         MaintenanceManager* const maintenanceManager,
         const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
         const CloudModuleUrlProvider& cloudModuleUrlProvider);

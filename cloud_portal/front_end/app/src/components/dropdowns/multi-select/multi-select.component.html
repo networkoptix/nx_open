@@ -16,10 +16,27 @@
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="multiSelect">
 
+        <ul class="dropdown-menu--header" *ngIf="canSearch">
+            <li class="dropdown-item-container">
+                <span class="glyphicon glyphicon-search icon-search"></span>
+                <input id="localFilter"
+                       class="form-control search-input inset"
+                       autocomplete="off"
+                       placeholder="Search"
+                       [ngModel]="filter"
+                       [ngModelOptions]="{debounceTime : 500}"
+                       (ngModelChange)="applyLocalFilter($event)">
+                <span class="glyphicon close-icon search-clear"
+                      [hidden]="filter == ''" (click)="applyLocalFilter('')"></span>
+            </li>
+            <li role="separator" class="dropdown-divider"></li>
+        </ul>
+
         <ul class="dropdown-menu--header" *ngIf="canSelectAll">
             <li class="dropdown-item-container">
-                <a class="dropdown-item inset" (click)="selectAll(); show = false;"
-                   href translate>All</a>
+                <a class="dropdown-item dropdown-item--non-checkbox inset"
+                   (click)="clearSelected(); show = false;"
+                   href translate>Any</a>
             </li>
             <li role="separator" class="dropdown-divider"></li>
         </ul>

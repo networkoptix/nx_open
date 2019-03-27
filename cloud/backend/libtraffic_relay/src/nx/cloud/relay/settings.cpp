@@ -67,15 +67,9 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
     std::chrono::minutes(10);
 
 //-------------------------------------------------------------------------------------------------
-// ConnectingPeer
 
-static const QString kCassandraHost("cassandra/host");
-static const QString kDefaultCassandraHost;
-
-static const QString kDelayBeforeRetryingInitialConnect(
-    "cassandra/delayBeforeRetryingInitialConnect");
-static constexpr std::chrono::seconds kDefaultDelayBeforeRetryingInitialConnect =
-    std::chrono::seconds(10);
+static constexpr char kConnectionRetryDelay[] = "clusterDbMap/connectionRetryDelay";
+static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
 
 } // namespace
 
@@ -98,11 +92,6 @@ ConnectingPeer::ConnectingPeer():
 
 Proxy::Proxy():
     unusedAliasExpirationPeriod(kDefaultProxyUnusedAliasExpirationPeriod)
-{
-}
-
-CassandraConnection::CassandraConnection():
-    delayBeforeRetryingInitialConnect(kDefaultDelayBeforeRetryingInitialConnect)
 {
 }
 
@@ -170,9 +159,9 @@ const Proxy& Settings::proxy() const
     return m_proxy;
 }
 
-const CassandraConnection& Settings::cassandraConnection() const
+const ClusterDbMap& Settings::clusterDbMap() const
 {
-    return m_cassandraConnection;
+    return m_clusterDbMap;
 }
 
 void Settings::loadSettings()
@@ -183,7 +172,7 @@ void Settings::loadSettings()
     loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
-    loadCassandraHost();
+    m_clusterDbMap.load(settings());
 }
 
 void Settings::loadServer()
@@ -263,16 +252,18 @@ void Settings::loadConnectingPeer()
             kDefaultConnectSessionIdleTimeout);
 }
 
-void Settings::loadCassandraHost()
+ClusterDbMap::ClusterDbMap():
+    connectionRetryDelay(kDefaultConnectionRetryDelay)
 {
-    using namespace std::chrono;
+}
 
-    m_cassandraConnection.host =
-        settings().value(kCassandraHost, kDefaultCassandraHost).toString().toStdString();
-    m_cassandraConnection.delayBeforeRetryingInitialConnect =
-        nx::utils::parseTimerDuration(
-            settings().value(kDelayBeforeRetryingInitialConnect).toString(),
-            kDefaultDelayBeforeRetryingInitialConnect);
+void ClusterDbMap::load(const QnSettings& settings)
+{
+    connectionRetryDelay = nx::utils::parseTimerDuration(
+        settings.value(kConnectionRetryDelay).toString(),
+        kDefaultConnectionRetryDelay);
+    sql.loadFromSettings(settings);
+    map.load(settings);
 }
 
 } // namespace conf

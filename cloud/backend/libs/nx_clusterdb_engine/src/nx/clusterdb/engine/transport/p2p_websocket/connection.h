@@ -32,6 +32,7 @@ public:
         nx::p2p::P2pTransportPtr p2pTransport,
         vms::api::PeerDataEx localPeerData,
         vms::api::PeerDataEx remotePeerData);
+    ~Connection();
 
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
@@ -73,6 +74,7 @@ private:
     ConnectionClosedSubscription m_connectionClosedSubscription;
     CommandHandler m_gotTransactionEventHandler;
     std::unique_ptr<CommandLogReader> m_transactionLogReader;
+    bool m_closed = false;
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;

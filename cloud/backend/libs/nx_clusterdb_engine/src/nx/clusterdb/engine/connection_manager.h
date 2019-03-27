@@ -45,17 +45,41 @@ class OutgoingCommandDispatcher;
 class CommandLog;
 class CommandTransportHeader;
 
-struct SystemStatusDescriptor
+struct NodeStatusDescriptor
 {
     bool isOnline = false;
     int protoVersion = 0;
 
-    SystemStatusDescriptor() = delete;
+    NodeStatusDescriptor() = delete;
 };
 
-struct SystemConnectionInfo
+struct FullPeerName
 {
     std::string systemId;
+    std::string peerId;
+
+    bool operator<(const FullPeerName& rhs) const
+    {
+        return systemId != rhs.systemId
+            ? systemId < rhs.systemId
+            : peerId < rhs.peerId;
+    }
+
+    std::string toString() const
+    {
+        return peerId + "." + systemId;
+    }
+};
+
+struct NodeDescriptor
+{
+    FullPeerName name;
+};
+
+struct ConnectionInfo
+{
+    std::string systemId;
+    std::string nodeId;
     nx::network::SocketAddress peerEndpoint;
     std::string userAgent;
 };
@@ -66,39 +90,34 @@ struct SystemConnectionInfo
 class NX_DATA_SYNC_ENGINE_API ConnectionManager
 {
 public:
-    struct FullPeerName
-    {
-        std::string systemId;
-        std::string peerId;
-
-        bool operator<(const FullPeerName& rhs) const
-        {
-            return systemId != rhs.systemId
-                ? systemId < rhs.systemId
-                : peerId < rhs.peerId;
-        }
-    };
-
     struct ConnectionContext
     {
         std::unique_ptr<transport::AbstractConnection> connection;
+        std::string originatingNodeId;
         std::string connectionId;
         FullPeerName fullPeerName;
         std::string userAgent;
     };
 
-    using SystemStatusChangedSubscription =
-        nx::utils::Subscription<std::string /*systemId*/, SystemStatusDescriptor>;
+    using ClusterStatusChangedSubscription =
+        nx::utils::Subscription<std::string /*clusterId*/, NodeStatusDescriptor>;
+
+    using NodeStatusChangedSubscription =
+        nx::utils::Subscription<NodeDescriptor, NodeStatusDescriptor>;
 
     ConnectionManager(
-        const QnUuid& moduleGuid,
+        const std::string& nodeId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& protocolVersionRange,
         IncomingCommandDispatcher* const transactionDispatcher,
         OutgoingCommandDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
 
+    void pleaseStopSync();
+
     bool addNewConnection(ConnectionContext connectionContext);
+
+    void removeConnection(const std::string& connectionId);
 
     /**
      * @return false If connectionId does not refer to an existing connection.
@@ -114,7 +133,7 @@ public:
         const std::string& systemId,
         std::shared_ptr<const SerializableAbstractCommand> transactionSerializer);
 
-    std::vector<SystemConnectionInfo> getConnections() const;
+    std::vector<ConnectionInfo> getConnections() const;
     std::size_t getConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
 
@@ -124,7 +143,8 @@ public:
         const std::string& systemId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    SystemStatusChangedSubscription& systemStatusChangedSubscription();
+    ClusterStatusChangedSubscription& clusterStatusChangedSubscription();
+    NodeStatusChangedSubscription& nodeStatusChangedSubscription();
 
 private:
     typedef boost::multi_index::multi_index_container<
@@ -146,6 +166,7 @@ private:
     constexpr static const int kConnectionByIdIndex = 0;
     constexpr static const int kConnectionByFullPeerNameIndex = 1;
 
+    const std::string m_nodeId;
     const SynchronizationSettings& m_settings;
     const ProtocolVersionRange m_protocolVersionRange;
     IncomingCommandDispatcher* const m_transactionDispatcher;
@@ -155,7 +176,12 @@ private:
     mutable QnMutex m_mutex;
     nx::utils::Counter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
-    SystemStatusChangedSubscription m_systemStatusChangedSubscription;
+    ClusterStatusChangedSubscription m_clusterStatusChangedSubscription;
+    NodeStatusChangedSubscription m_nodeStatusChangedSubscription;
+
+    bool authorizeNewConnection(
+        const QnMutexLockerBase& lk,
+        const ConnectionContext& context);
 
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,
@@ -177,9 +203,7 @@ private:
         Iterator connectionIterator,
         CompletionHandler completionHandler);
 
-    void sendSystemOfflineNotificationIfNeeded(const std::string& systemId);
-
-    void removeConnection(const std::string& connectionId);
+    void sendSystemOfflineNotificationIfNeeded(const CommandTransportHeader& transportHeader);
 
     void onGotTransaction(
         const std::string& connectionId,

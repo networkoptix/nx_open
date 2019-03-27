@@ -7,9 +7,9 @@ namespace nx::cloud::db {
 namespace ec2 {
 
 VmsP2pCommandBus::VmsP2pCommandBus(
-    clusterdb::engine::SyncronizationEngine* syncronizationEngine)
+    clusterdb::engine::SynchronizationEngine* synchronizationEngine)
     :
-    m_syncronizationEngine(syncronizationEngine)
+    m_synchronizationEngine(synchronizationEngine)
 {
 }
 
@@ -18,7 +18,7 @@ nx::sql::DBResult VmsP2pCommandBus::saveResourceAttribute(
     const std::string& systemId,
     nx::vms::api::ResourceParamWithRefData data)
 {
-    return m_syncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_synchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <command::SetResourceParam>(
             queryContext,
             systemId.c_str(),

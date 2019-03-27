@@ -52,7 +52,7 @@ public:
 
     EventManager& eventManager();
 
-    clusterdb::engine::SyncronizationEngine& ec2SyncronizationEngine();
+    clusterdb::engine::SynchronizationEngine& ec2SynchronizationEngine();
 
     AbstractSystemHealthInfoProvider& systemHealthInfoProvider();
 
@@ -78,7 +78,7 @@ private:
     TemporaryAccountPasswordManager m_tempPasswordManager;
     AccountManager m_accountManager;
     EventManager m_eventManager;
-    clusterdb::engine::SyncronizationEngine m_ec2SyncronizationEngine;
+    clusterdb::engine::SynchronizationEngine m_ec2SynchronizationEngine;
     ec2::VmsP2pCommandBus m_vmsP2pCommandBus;
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;

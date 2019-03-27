@@ -131,6 +131,11 @@ angular.module('cloudApp')
                         $scope.loading = false;
                         return false;
                     },
+                    accountActivated: function() {
+                        $scope.activationSuccess = false;
+                        $scope.loading = false;
+                        return false;
+                    }
                 },
                 errorPrefix:L.errorCodes.cantActivatePrefix
             }).then(function(){

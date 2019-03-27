@@ -8,12 +8,14 @@
             <span ng-if="system.isOnline&&!system.isAvailable" class="badge badge-info"
                   ng-class="$root.C.systemStatuses.unavailable.style">
                   {{$root.L.systemStatuses.unavailable}}</span>
+            <span ng-if="currentlyMerging && !isMaster" class="badge badge-info"
+                  ng-class="$root.C.systemStatuses.merging.style">{{$root.L.systemStatuses.merging}}</span>
         </h1>
     </div>
     <div class="col-sm-6">
         <div class="buttons-panel">
             <button class="btn btn-default"
-                    ng-disabled="!system.isAvailable"
+                    ng-disabled="!system.isAvailable || currentlyMerging"
                     title="{{system.stateMessage}}"
                     ng-click="share()" ng-if="system.permissions.editUsers">
                 <span class="glyphicon glyphicon-share"></span> Share</button>

@@ -79,7 +79,8 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                 continue
 
             for global_context in global_contexts:
-                process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
+                process_context_structure(cloud_portal, global_context, integration_dict,
+                                          None, current_version, False, False)
 
             integration_dict['id'] = integration.id
             integrations_json.append(integration_dict)
@@ -111,12 +112,13 @@ def get_integrations(request):
                contentversion__productcustomizationreview__state=PENDING,
                contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
 
-    # Users with manager permissions all accepted products and pending drafts
-    if UserGroupsToProductPermissions.\
-            check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-        integration_list = make_integrations_json(drafts, show_pending=True)
-    elif drafts.filter(created_by=request.user).exists():
-        integration_list = make_integrations_json(drafts.filter(created_by=request.user), show_pending=True)
+    if not request.user.is_anonymous():
+        # Users with manager permissions all accepted products and pending drafts
+        if UserGroupsToProductPermissions.\
+                check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
+            integration_list = make_integrations_json(drafts, show_pending=True)
+        elif drafts.filter(created_by=request.user).exists():
+            integration_list = make_integrations_json(drafts.filter(created_by=request.user), show_pending=True)
 
     integration_list.extend(make_integrations_json(integrations))
     return api_success({'data': integration_list})

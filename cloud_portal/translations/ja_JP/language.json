@@ -10,7 +10,15 @@
     "loginButton": "ログイン",
     "logoutAuthorisedTitle": "すでにログインしています",
     "logoutAuthorisedContinueButton": "続行",
-    "logoutAuthorisedLogoutButton": "ログアウト"
+    "logoutAuthorisedLogoutButton": "ログアウト",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "ページが見つかりません"
   },
   "systemStatuses": {
-    "notActivated": "アクティベートされていません",
     "activated": "アクティベート済",
+    "merging": "merging",
+    "notActivated": "アクティベートされていません",
     "online": "オンライン",
     "offline": "オフライン",
     "unavailable": "利用できません"
@@ -138,8 +147,9 @@
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム",
     "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "重複するサーバーが見つかりました。<br>統合する各システムから古いサーバーを削除してからやり直してください",
+    "mergedSystemIsOffline": "統合されているシステムの1つがオフラインです　それらがオンラインであることを確認してからやり直してください",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "良い",
@@ -185,8 +195,9 @@
     "confirmUnshareAction": "削除",
     "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
+    "successMerge": "システムが統合されました",
+    "permissionsRemoved": "{{email}} からアクセス権限が削除されました",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "あなたのアカウントは正常に保存されました",

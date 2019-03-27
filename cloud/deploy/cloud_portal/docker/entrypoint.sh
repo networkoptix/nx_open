@@ -1,4 +1,4 @@
-#!/usr/local/bin/dumb-init /bin/bash
+#!/bin/bash
 set -ex
 
 echo "Running with args: $@"
@@ -20,7 +20,7 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
-    mkdir --parents $CLOUD_PORTAL_CONF_DIR
+    mkdir -p $CLOUD_PORTAL_CONF_DIR
 
     local CLOUD_PORTAL_CONF_TEMPLATE=$CLOUD_PORTAL_BASE_CONF_DIR/_source/cloud_portal.yaml
     local CLOUD_PORTAL_CONF=$CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
@@ -31,7 +31,7 @@ function instantiate_config()
 
     (
         flock -n 9 || exit 1
-        tmp=$(tempfile)
+        tmp=$(mktemp)
 
         envsubst < $CLOUD_PORTAL_CONF_TEMPLATE > $tmp
         mv $tmp $CLOUD_PORTAL_CONF

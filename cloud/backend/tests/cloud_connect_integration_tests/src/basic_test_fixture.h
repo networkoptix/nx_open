@@ -50,22 +50,30 @@ using RelayPtrList = std::vector<RelayPtr>;
 
 class BasicTestFixture;
 
-class MemoryRemoteRelayPeerPool: public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+class MemoryRemoteRelayPeerPool:
+    public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
 {
 public:
-    MemoryRemoteRelayPeerPool(BasicTestFixture* relayTest) :
+    MemoryRemoteRelayPeerPool(BasicTestFixture* relayTest):
         m_relayTest(relayTest)
     {}
 
     virtual bool connectToDb() override;
     virtual bool isConnected() const override;
 
-    virtual cf::future<std::string> findRelayByDomain(
-        const std::string& /*domainName*/) const override;
+    virtual void findRelayByDomain(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override;
 
-    virtual cf::future<bool> addPeer( const std::string& domainName) override;
-    virtual cf::future<bool> removePeer(const std::string& domainName) override;
-    virtual void setNodeId(const std::string& /*nodeId*/) override {}
+    virtual void addPeer(
+        const std::string& domainName,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
+
+    virtual void removePeer(
+        const std::string& domainName,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
+
+    virtual void setPublicUrl(const nx::utils::Url& /*publicUrl*/) override {}
 
 private:
     BasicTestFixture* m_relayTest;
