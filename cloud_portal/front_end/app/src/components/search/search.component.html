@@ -21,7 +21,7 @@
                     </button>
                 </div>
                 <button class="float-left btn btn-big btn-tag-selected ml-lg-3 mt-3 mt-lg-0 mr-1 mr-lg-0"
-                        *ngIf="numberFilters != 0 && !skinny">
+                        *ngIf="numberFilters != 0 && !searchOnly">
 
                     <div class="ml-2 mr-3">
                         {{filterSelected}}
@@ -35,7 +35,7 @@
                 <button class="btn btn-arrow btn-big btn-tag ml-lg-3 mt-3 mt-lg-0"
                         [ngClass]="{'selected' : showAdvancedOptions}"
                         (click)="toggleOptions()"
-                        *ngIf="!skinny" [disabled]="!dataLoaded">
+                        *ngIf="!searchOnly" [disabled]="!dataLoaded">
 
                     <div class="nav-arrow">
                         <span></span>
@@ -73,12 +73,12 @@
             </div>
 
             <div class="col-xxl-6 mb-2 m-0 p-0"
-                 [ngClass]="{'mt-2' : skinny, 'mt-3 mb-2': !skinny}"
+                 [ngClass]="{'mt-2' : searchOnly, 'mt-3 mb-2': !searchOnly}"
                  [hidden]="!showAdvancedOptions && localFilter.tags && localFilter.tags.length">
 
                 <div class="col-12 p-0">
                     <div class="form-group m-0">
-                        <label *ngIf="!skinny">Features</label>
+                        <label *ngIf="!searchOnly">Features</label>
                         <nav aria-label="Cameras table navigation">
                             <ul class="pagination m-0">
                                 <li class="tags ml-0" *ngFor="let tag of localFilter.tags">

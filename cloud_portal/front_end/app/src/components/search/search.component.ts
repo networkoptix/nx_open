@@ -23,7 +23,7 @@ import { TranslateService }                        from '@ngx-translate/core';
 
 export class NxSearchComponent implements OnInit, ControlValueAccessor {
     @Input() expandable: any;
-    @Input() skinny: any;
+    @Input() searchOnly: any;
     @Input() placeholder: any;
     @Input() dataLoaded: boolean;
 
@@ -54,7 +54,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
     ngOnInit() {
         this.dataLoaded = this.dataLoaded === undefined ? true : this.dataLoaded;
         this.placeholder = this.placeholder || '';  // optional param
-        this.skinny = (this.skinny !== undefined);  // optional param
+        this.searchOnly = (this.searchOnly !== undefined);  // optional param
         this.expandable = (this.expandable !== undefined);  // optional param
         this.showAdvancedOptions = !this.expandable;
         this.filterSelected = '';
