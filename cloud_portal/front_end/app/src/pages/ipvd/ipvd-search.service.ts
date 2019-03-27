@@ -10,6 +10,9 @@ import 'rxjs/add/operator/switchMap';
 })
 export class IpvdSearchService {
 
+    private elmResolution = 'resolution';
+    private elmVendors = 'vendors';
+    private elmHardwareTypes = 'hardwareTypes';
     private _vendors: any;
 
     constructor() {
@@ -24,7 +27,7 @@ export class IpvdSearchService {
         this._vendors = list;
     }
 
-    ipvdSearch(cameras_data, filter): Observable<any> {
+    ipvdSearch(camerasData, filter): Observable<any> {
         const query = filter.query.toLowerCase();
         const queryTerms = query.trim().split(' ');
         const preferredVendors = '';
@@ -46,22 +49,22 @@ export class IpvdSearchService {
         let vendors;
         let types;
 
-        if (filter.selects.find(x => x.id === 'resolution') !== undefined) {
-            resolution = filter.selects.find(x => x.id === 'resolution').selected;
+        if (filter.selects.find(x => x.id === this.elmResolution) !== undefined) {
+            resolution = filter.selects.find(x => x.id === this.elmResolution).selected;
         }
 
-        if (filter.multiselects.find(x => x.id === 'vendors') !== undefined) {
-            vendors = filter.multiselects.find(x => x.id === 'vendors').selected;
+        if (filter.multiselects.find(x => x.id === this.elmVendors) !== undefined) {
+            vendors = filter.multiselects.find(x => x.id === this.elmVendors).selected;
         }
 
-        if (filter.multiselects.find(x => x.id === 'hardwareTypes') !== undefined) {
-            const hardwareType = filter.multiselects.find(x => x.id === 'hardwareTypes');
+        if (filter.multiselects.find(x => x.id === this.elmHardwareTypes) !== undefined) {
+            const hardwareType = filter.multiselects.find(x => x.id === this.elmHardwareTypes);
             if (hardwareType.selected.length) {
                 types = hardwareType.items.filter(x => !hardwareType.selected.includes(x.id));
             }
         }
 
-        const cameras = cameras_data.filter(camera => {
+        const cameras = camerasData.filter(camera => {
             if (filter.tags.some(key => {
                 return key.value === true && camera[key.id] !== true;
             })) {

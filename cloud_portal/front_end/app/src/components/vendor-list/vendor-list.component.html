@@ -2,7 +2,7 @@
 
 <nx-block *ngIf="vendors">
     <header>
-        {{ vendors.length + remainingVendors }} manufacturers
+        {{ vendors.length + remainingVendors }} <span translate>manufacturers</span>
     </header>
 
     <nx-section>
@@ -13,14 +13,14 @@
             </nx-tag>
         </div>
         <div class="manufacture-info">
-            <span>... and {{remainingVendors}} more</span>
+            <span [translate]="'and_x_more'" [translateParams]="{value: remainingVendors}"></span>
         </div>
     </nx-section>
 </nx-block>
 
 <nx-block *ngIf="cameras">
     <header>
-        {{ cameras }} devices
+        {{ cameras }} <span translate>devices</span>
     </header>
 
     <nx-section>

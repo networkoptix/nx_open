@@ -114,7 +114,19 @@
     "You can only merge Systems in which you have owner permissions.": "You can only merge Systems in which you have owner permissions.", 
     "Your Name": "Your Name", 
     "Your browser is not supported": "Your browser is not supported", 
+    "and_x_more": "... and {{value}} more", 
     "before proceeding.": "before proceeding.", 
+    "cameraFilters": {
+        "TwWayAudio": "Cameras with 2-way audio", 
+        "H265": "Cameras supporting H.265", 
+        "multiSensor": "Multi-sensor Cameras", 
+        "ptz": "PTZ cameras", 
+        "IO": "I / O modules", 
+        "highRes": "Extra high resolution cameras", 
+        "aptz": "Advanced PTZ cameras", 
+        "fisheye": "Fisheye cameras"
+    }, 
+    "devices": "devices", 
     "integration": {
         "backToEditText": "Back to the editing interfaces", 
         "Access Control": "Access Control", 
@@ -160,11 +172,14 @@
     "is incompatible and cannot be merged with the current one.": "is incompatible and cannot be merged with the current one.", 
     "is offline and cannot be merged with the current one.": "is offline and cannot be merged with the current one.", 
     "latest build": "latest build", 
+    "manufacturers": "manufacturers", 
     "search": {
         "Search": "Search", 
         "filter applied": "filter applied", 
+        "selected": "selected", 
         "search_ipvd": "Search by model or manufacturer", 
-        "filters applied": "filters applied"
+        "filters applied": "filters applied", 
+        "Any": "Any"
     }, 
     "servers in the merged System.": "servers in the merged System."
 }

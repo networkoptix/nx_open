@@ -44,6 +44,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     public show: boolean;
     public textSelected: any = {};
     private innerValue: any;
+    private lang: any = {};
 
     // Placeholders for the callbacks which are later provided
     // by the Control Value Accessor
@@ -53,6 +54,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     constructor(private translate: TranslateService) {
         this.show = false;
         this.filter = '';
+        this.lang = this.translate.translations[this.translate.currentLang];
     }
 
     // TODO: Bind ngModel to the component and eliminate EventEmitter
@@ -123,11 +125,11 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
             }
             case 0:
             case this.items.length: {
-                this.textSelected = 'Any';
+                this.textSelected = this.lang.search.Any;
                 break;
             }
             default: {
-                this.textSelected = this.innerValue.length + ' Selected';
+                this.textSelected = this.innerValue.length + ' ' + this.lang.search.selected;
                 break;
             }
         }

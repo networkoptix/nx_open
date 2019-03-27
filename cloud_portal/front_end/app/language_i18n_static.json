@@ -3,7 +3,19 @@
 		"Search" : "Search",
 		"search_ipvd": "Search by model or manufacturer",
 		"filter applied" : "filter applied",
-		"filters applied" : "filters applied"
+		"filters applied" : "filters applied",
+		"Any": "Any",
+		"selected": "selected"
+	},
+	"cameraFilters": {
+		"ptz": "PTZ cameras",
+		"aptz": "Advanced PTZ cameras",
+		"fisheye": "Fisheye cameras",
+		"H265": "Cameras supporting H.265",
+		"IO": "I / O modules",
+		"multiSensor": "Multi-sensor Cameras",
+		"TwWayAudio": "Cameras with 2-way audio",
+		"highRes": "Extra high resolution cameras"
 	},
 	"ipvd" : {
 		"count" : "Count",

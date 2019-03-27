@@ -1,10 +1,11 @@
 import {
     Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges
-} from '@angular/core';
+}                                 from '@angular/core';
 import { NxConfigService }        from '../../services/nx-config';
 import { NG_VALUE_ACCESSOR }      from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NxUriService }           from '../../services/uri.service';
+import { TranslateService }       from '@ngx-translate/core';
 
 /* USAGE
  <nx-vendor-list
@@ -34,43 +35,46 @@ export class NxVendorListComponent implements OnInit, OnChanges {
     public filters: any = [];
     public remainingVendors: number;
 
+    private lang: any = {};
     private uriPath: string;
     private filter: any = {};
     private ASC = true;
     private DESC = false;
 
     constructor(CONFIG: NxConfigService,
+                private translate: TranslateService,
                 private uri: NxUriService,
                 private _route: ActivatedRoute) {
 
         this.CONFIG = CONFIG.getConfig();
         this.debug = false;
         this.uriPath = '/' + this._route.snapshot.url[0].path;
+        this.lang = this.translate.translations[this.translate.currentLang];
 
         this.filters = [
             {
-                label: 'PTZ cameras', id: 'isPtzSupported'
+                label: this.lang.cameraFilters.ptz, id: 'isPtzSupported'
             },
             {
-                label: 'Advanced PTZ cameras', id: 'isAptzSupported'
+                label: this.lang.cameraFilters.aptz, id: 'isAptzSupported'
             },
             {
-                label: 'Fisheye Cameras', id: 'isFisheye'
+                label: this.lang.cameraFilters.fisheye, id: 'isFisheye'
             },
             {
-                label: 'Cameras supporting H.265', id: 'isH265'
+                label: this.lang.cameraFilters.H265, id: 'isH265'
             },
             {
-                label: 'I / O modules', id: 'isIoSupported'
+                label: this.lang.cameraFilters.IO, id: 'isIoSupported'
             },
             {
-                label: 'Multi-sensor Cameras', id: 'isMultiSensor'
+                label: this.lang.cameraFilters.multiSensor, id: 'isMultiSensor'
             },
             {
-                label: 'Cameras with 2-way audio', id: 'isTwAudioSupported'
+                label: this.lang.cameraFilters.TwWayAudio, id: 'isTwAudioSupported'
             },
             {
-                label: 'Extra high resolution cameras', id: 'maxResolution'
+                label: this.lang.cameraFilters.highRes, id: 'maxResolution'
             }
         ];
     }
