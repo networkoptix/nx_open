@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <test_support/mediaserver_launcher.h>
-#include <test_support/utils.h>
+#include <test_support/storage_utils.h>
 #include <health/system_health.h>
 #include <recorder/storage_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -109,7 +109,7 @@ protected:
             m_server->serverModule()->normalStorageManager(), &QnStorageManager::rebuildFinished,
             this, &FtReindex::onReindexFinished, Qt::DirectConnection);
 
-        ut::utils::addTestStorage(m_server.get(), m_storagePath);
+        test_support::addTestStorage(m_server.get(), m_storagePath);
     }
 
     void whenServerStopped()

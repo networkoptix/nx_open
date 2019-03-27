@@ -4,8 +4,6 @@
 
 #include <QtCore>
 
-class MediaServerLauncher;
-
 namespace nx {
 namespace ut {
 namespace cfg {
@@ -48,7 +46,6 @@ private:
 };
 
 bool validateAndOrCreatePath(const QString &path);
-void addTestStorage(MediaServerLauncher* server, const QString& path);
 
 } // namespace utils
 } // namespace ut
