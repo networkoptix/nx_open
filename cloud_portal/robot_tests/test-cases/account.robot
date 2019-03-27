@@ -7,6 +7,7 @@ Suite Teardown    Close Browser
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
+${CZECH ALERT}    Váš účet byl úspěšně uložen
 ${FIRST NAME IS REQUIRED}      //span[@ng-if='accountForm.firstName.$touched && accountForm.firstName.$error.required' and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
 ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && accountForm.lastName.$error.required' and contains(text(),"${LAST NAME IS REQUIRED TEXT}")]
 
@@ -179,7 +180,7 @@ Should respond to tab and go in the correct order
     Element Should Be Focused    ${ACCOUNT SAVE}
     Press Key    ${ACCOUNT SAVE}    ${ENTER}
     Sleep    2    #wait for the language to change
-    Check For Alert    Váš účet byl úspěšně uložen
+    Check For Alert    ${CZECH ALERT}
 
 Langauge is changeable on the account page
     [tags]    C41574
