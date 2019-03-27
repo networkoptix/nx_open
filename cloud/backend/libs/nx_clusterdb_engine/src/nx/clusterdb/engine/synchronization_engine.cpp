@@ -26,7 +26,7 @@ SynchronizationEngine::SynchronizationEngine(
         &m_outgoingTransactionDispatcher),
     m_incomingTransactionDispatcher(&m_commandLog),
     m_connectionManager(
-        m_peerId,
+        m_peerId.toSimpleByteArray().toStdString(),
         settings,
         m_supportedProtocolRange,
         &m_incomingTransactionDispatcher,
@@ -37,6 +37,7 @@ SynchronizationEngine::SynchronizationEngine(
         m_outgoingCommandFilter,
         m_peerId.toSimpleByteArray().toStdString()),
     m_connector(
+        m_peerId.toSimpleByteArray().toStdString(),
         &m_transportManager,
         &m_connectionManager),
     m_httpTransportAcceptor(

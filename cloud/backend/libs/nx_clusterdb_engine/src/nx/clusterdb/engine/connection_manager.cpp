@@ -16,18 +16,19 @@
 namespace nx::clusterdb::engine {
 
 ConnectionManager::ConnectionManager(
-    const QnUuid& moduleGuid,
+    const std::string& nodeId,
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& protocolVersionRange,
     IncomingCommandDispatcher* const transactionDispatcher,
     OutgoingCommandDispatcher* const outgoingTransactionDispatcher)
 :
+    m_nodeId(nodeId),
     m_settings(settings),
     m_protocolVersionRange(protocolVersionRange),
     m_transactionDispatcher(transactionDispatcher),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_localPeerData(
-        moduleGuid,
+        QnUuid::fromStringSafe(nodeId),
         QnUuid::createUuid(),
         vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat),
@@ -124,16 +125,17 @@ void ConnectionManager::dispatchTransaction(
     }
 }
 
-std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
+std::vector<ConnectionInfo> ConnectionManager::getConnections() const
 {
     QnMutexLocker lk(&m_mutex);
 
-    std::vector<SystemConnectionInfo> result;
+    std::vector<ConnectionInfo> result;
     result.reserve(m_connections.size());
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
         result.push_back({
             it->fullPeerName.systemId,
+            it->fullPeerName.peerId,
             it->connection->remotePeerEndpoint(),
             it->userAgent});
     }
@@ -214,11 +216,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     const auto systemWasOffline = getConnectionCountBySystemId(
         lock, context.fullPeerName.systemId) == 0;
 
-    removeExistingConnection<
-        kConnectionByFullPeerNameIndex,
-        decltype(context.fullPeerName)>(lock, context.fullPeerName);
-
-    if (!isOneMoreConnectionFromSystemAllowed(lock, context))
+    if (!authorizeNewConnection(lock, context))
         return false;
 
     nx::utils::SubscriptionId subscriptionId;
@@ -285,6 +283,35 @@ bool ConnectionManager::modifyConnectionByIdSafe(
 
     func(connectionIter->connection.get());
     return true;
+}
+
+bool ConnectionManager::authorizeNewConnection(
+    const QnMutexLockerBase& lock,
+    const ConnectionContext& context)
+{
+    auto& connectionIndex = m_connections.get<kConnectionByFullPeerNameIndex>();
+    const auto existingConnectionIter = connectionIndex.find(context.fullPeerName);
+    if (existingConnectionIter == connectionIndex.end())
+        return isOneMoreConnectionFromSystemAllowed(lock, context);
+
+    // An existing connection is being overridden by the same node.
+    if (existingConnectionIter->originatingNodeId == context.originatingNodeId ||
+        // New connection originating node id is greater than that of the existing connection.
+        context.originatingNodeId > existingConnectionIter->originatingNodeId)
+    {
+        NX_DEBUG(this, "Preferring new connection to %1 from node %2 over existing connection from %3",
+            context.fullPeerName, context.originatingNodeId,
+            existingConnectionIter->originatingNodeId);
+
+        removeConnectionByIter(
+            lock,
+            connectionIndex,
+            existingConnectionIter,
+            []() {});
+        return true;
+    }
+
+    return false;
 }
 
 bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(

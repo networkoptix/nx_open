@@ -64,6 +64,11 @@ struct FullPeerName
             ? systemId < rhs.systemId
             : peerId < rhs.peerId;
     }
+
+    std::string toString() const
+    {
+        return peerId + "." + systemId;
+    }
 };
 
 struct NodeDescriptor
@@ -71,9 +76,10 @@ struct NodeDescriptor
     FullPeerName name;
 };
 
-struct SystemConnectionInfo
+struct ConnectionInfo
 {
     std::string systemId;
+    std::string nodeId;
     nx::network::SocketAddress peerEndpoint;
     std::string userAgent;
 };
@@ -87,6 +93,7 @@ public:
     struct ConnectionContext
     {
         std::unique_ptr<transport::AbstractConnection> connection;
+        std::string originatingNodeId;
         std::string connectionId;
         FullPeerName fullPeerName;
         std::string userAgent;
@@ -99,7 +106,7 @@ public:
         nx::utils::Subscription<NodeDescriptor, NodeStatusDescriptor>;
 
     ConnectionManager(
-        const QnUuid& moduleGuid,
+        const std::string& nodeId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& protocolVersionRange,
         IncomingCommandDispatcher* const transactionDispatcher,
@@ -126,7 +133,7 @@ public:
         const std::string& systemId,
         std::shared_ptr<const SerializableAbstractCommand> transactionSerializer);
 
-    std::vector<SystemConnectionInfo> getConnections() const;
+    std::vector<ConnectionInfo> getConnections() const;
     std::size_t getConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
 
@@ -159,6 +166,7 @@ private:
     constexpr static const int kConnectionByIdIndex = 0;
     constexpr static const int kConnectionByFullPeerNameIndex = 1;
 
+    const std::string m_nodeId;
     const SynchronizationSettings& m_settings;
     const ProtocolVersionRange m_protocolVersionRange;
     IncomingCommandDispatcher* const m_transactionDispatcher;
@@ -170,6 +178,10 @@ private:
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
     ClusterStatusChangedSubscription m_clusterStatusChangedSubscription;
     NodeStatusChangedSubscription m_nodeStatusChangedSubscription;
+
+    bool authorizeNewConnection(
+        const QnMutexLockerBase& lk,
+        const ConnectionContext& context);
 
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,

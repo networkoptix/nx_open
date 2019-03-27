@@ -12,9 +12,11 @@ namespace nx::clusterdb::engine {
 static constexpr std::chrono::seconds kRetryConnectTimeout(7);
 
 Connector::Connector(
+    const std::string& nodeId,
     transport::TransportManager* transportManager,
     ConnectionManager* connectionManager)
     :
+    m_nodeId(nodeId),
     m_transportManager(transportManager),
     m_connectionManager(connectionManager)
 {
@@ -134,6 +136,7 @@ void Connector::registerConnection(
     nodeContext->connection = connection.get();
 
     ConnectionManager::ConnectionContext connectionContext;
+    connectionContext.originatingNodeId = m_nodeId;
     connectionContext.connectionId = nodeContext->connectionId;
     connectionContext.fullPeerName.systemId = nodeContext->systemId;
     connectionContext.fullPeerName.peerId =

@@ -24,6 +24,7 @@ class Connector:
 {
 public:
     Connector(
+        const std::string& nodeId,
         transport::TransportManager* transportManager,
         ConnectionManager* connectionManager);
 
@@ -52,6 +53,7 @@ private:
         transport::AbstractConnection* connection = nullptr;
     };
 
+    const std::string m_nodeId;
     transport::TransportManager* m_transportManager = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     std::map<nx::utils::Url, NodeContext> m_nodes;

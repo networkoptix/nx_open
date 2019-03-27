@@ -146,13 +146,16 @@ void CommonHttpAcceptor::createConnection(
         std::move(commandPipeline));
 
     const int connectionSeq = ++m_connectionSeq;
+    const auto remoteNodeId =
+        connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString();
     ConnectionManager::ConnectionContext context{
         std::make_unique<AcceptedCommonHttpConnection>(
             std::move(newTransport),
             connectionSeq,
             commandPipelinePtr),
+        remoteNodeId,
         connectionRequestAttributes.connectionId,
-        {systemId, connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString()},
+        {systemId, remoteNodeId},
         network::http::getHeaderValue(requestContext.request.headers, "User-Agent").toStdString()};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))

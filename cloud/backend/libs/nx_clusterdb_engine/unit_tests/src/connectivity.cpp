@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/clusterdb/engine/transport/transport_manager.h>
+#include <nx/utils/math/graph.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "cluster_test_fixture.h"
@@ -72,6 +73,18 @@ protected:
             [this](auto&&... args) { saveConnectResult(std::forward<decltype(args)>(args)...); });
     }
 
+    void whenConnectNodesToEachOther()
+    {
+        for (int i = 0; i < peerCount(); ++i)
+        {
+            for (int j = 0; j < peerCount(); ++j)
+            {
+                if (i != j)
+                    peer(i).connectTo(peer(j));
+            }
+        }
+    }
+
     void thenPeerConnectedEventIsDelivered(std::vector<std::string> nodeIds)
     {
         assertPeerEventIsDelivered(std::move(nodeIds), true);
@@ -89,6 +102,34 @@ protected:
 
         if (connection)
             connection->pleaseStopSync();
+    }
+
+    void thenNodesAreConnected()
+    {
+        thenPeerConnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
+    }
+
+    void andPeersAreConnected()
+    {
+        nx::utils::math::Graph<std::string /*nodeId*/> nodes;
+
+        for (int i = 0; i < peerCount(); ++i)
+        {
+            nodes.addVertex(peer(i).nodeId());
+
+            const auto connections = peer(i).process().moduleInstance()->synchronizationEngine()
+                .connectionManager().getConnections();
+            for (const auto& connection: connections)
+                nodes.addEdge(peer(i).nodeId(), connection.nodeId);
+        }
+
+        ASSERT_TRUE(nodes.connected());
+    }
+
+    void andConnectivityIsReliable()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        andPeersAreConnected();
     }
 
 private:
@@ -155,6 +196,15 @@ TEST_F(Connectivity, new_connection_from_already_connected_node_overrides_existi
     givenConnectedNodes();
     whenEstablishDuplicateConnectionExplicitely();
     thenConnectionIsEstablishedSuccessfully();
+}
+
+TEST_F(Connectivity, nodes_can_be_connected_to_each_other_simultaneously)
+{
+    whenConnectNodesToEachOther();
+
+    thenPeerConnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
+    andPeersAreConnected();
+    andConnectivityIsReliable();
 }
 
 } // namespace nx::clusterdb::engine::test
