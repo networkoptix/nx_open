@@ -34,7 +34,7 @@ QnAudioStreamerPool::QnAudioStreamerPool(QnMediaServerModule* serverModule):
 
 QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId) const
 {
-    if (auto camera = resourcePool()->getResourceByUniqueId(sourceId))
+    if (auto camera = serverModule()->resourcePool()->getResourceByUniqueId(sourceId))
     {
         NX_ASSERT(camera->hasFlags(Qn::desktop_camera));
         if (camera->hasFlags(Qn::desktop_camera))
@@ -45,7 +45,8 @@ QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId)
 
 nx::vms::server::resource::CameraPtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
 {
-    auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(resourceId);
+    auto resource = serverModule()->resourcePool()
+        ->getResourceById<nx::vms::server::resource::Camera>(resourceId);
     if (!resource)
         return nx::vms::server::resource::CameraPtr();
     if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))

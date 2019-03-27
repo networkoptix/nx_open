@@ -75,7 +75,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         }
 
         QString uniqueId = camera->getUniqueId();
-        if (camera->hasFlags(Qn::search_upd_only) && !resourcePool()->getResourceByUniqueId(uniqueId))
+        if (camera->hasFlags(Qn::search_upd_only) &&
+            !serverModule()->resourcePool()->getResourceByUniqueId(uniqueId))
             continue;   //< ignoring newly discovered camera
 
         addNewCamera(camera);
@@ -86,7 +87,8 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change)
         && cameraResource->preferredServerId() == moduleGUID(); // return camera back without mutex
-    QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
+    QnMediaServerResourcePtr ownServer =
+        serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && ownServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !ownServer->isRedundancy()) ||
         globalSettings()->takeCameraOwnershipWithoutLock() ||
@@ -110,7 +112,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 
     if (!cameraResource->hasFlags(Qn::parent_change))
     {
-        if (resourcePool()->getNetResourceByPhysicalId(name))
+        if (serverModule()->resourcePool()->getNetResourceByPhysicalId(name))
             return; //< Already added. Camera has been found twice.
     }
 
@@ -133,7 +135,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     {
         // Add camera if and only if it absent on the other server.
         NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change)
-            || !resourcePool()->getNetResourceByPhysicalId(mutex->name()));
+            || !serverModule()->resourcePool()->getNetResourceByPhysicalId(mutex->name()));
         addNewCameraInternal(data.cameraResource);
     }
 
@@ -193,7 +195,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 {
     QString uniqueId = cameraResource->getUniqueId();
     bool resourceExists = static_cast<bool>(
-        resourcePool()->getResourceByUniqueId(uniqueId)
+        serverModule()->resourcePool()->getResourceByUniqueId(uniqueId)
     );
     if (cameraResource->hasFlags(Qn::search_upd_only) && !resourceExists)
         return;   //ignoring newly discovered camera
@@ -237,12 +239,13 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
             QnCameraUserAttributePool::ScopedLock userAttributesLock(cameraUserAttributesPool(), userAttrCopy->cameraId );
             (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
-        const QnResourcePtr& res = resourcePool()->getResourceById(userAttrCopy->cameraId);
-        if( res )   //it is OK if resource is missing
+        const QnResourcePtr& res =
+            serverModule()->resourcePool()->getResourceById(userAttrCopy->cameraId);
+        if (res)   //it is OK if resource is missing
             res->emitModificationSignals( modifiedFields );
     }
 
-    QnResourcePtr rpRes = resourcePool()->getResourceById(apiCameraData.id);
+    QnResourcePtr rpRes = serverModule()->resourcePool()->getResourceById(apiCameraData.id);
     if (rpRes)
     {
         // TODO: Should be changed to reinitAsync() call?

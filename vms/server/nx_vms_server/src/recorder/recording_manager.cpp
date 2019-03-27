@@ -58,8 +58,10 @@ QnRecordingManager::QnRecordingManager(
     m_recordingStopTimeMs = serverModule->settings().forceStopRecordingTime();
     m_recordingStopTimeMs *= 1000;
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnRecordingManager::onNewResource, Qt::QueuedConnection);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnRecordingManager::onRemoveResource, Qt::QueuedConnection);
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
+        this, &QnRecordingManager::onNewResource, Qt::QueuedConnection);
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
+        this, &QnRecordingManager::onRemoveResource, Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, &QTimer::timeout, this, &QnRecordingManager::onTimer);
     connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
 }
@@ -68,7 +70,7 @@ QnRecordingManager::~QnRecordingManager()
 {
     QnMutexLocker lock(&m_resourceConnectionMutex);
     // We shouldn't receive any new recording orders if the destructor is called
-    for (auto& camera: resourcePool()->getResources<QnVirtualCameraResource>())
+    for (auto& camera: serverModule()->resourcePool()->getResources<QnVirtualCameraResource>())
         camera->disconnect(camera.data(), nullptr, this, nullptr);
 
     stop();
@@ -514,7 +516,7 @@ void QnRecordingManager::onTimer()
     bool someRecordingIsPresent = false;
     for (auto itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
-        if (!resourcePool()->getResourceById(itrRec.key()->getId()))
+        if (!serverModule()->resourcePool()->getResourceById(itrRec.key()->getId()))
             continue; //< resource just deleted. will be removed from m_recordMap soon
         auto camera = videoCameraPool()->getVideoCamera(itrRec.key());
 
@@ -544,7 +546,8 @@ void QnRecordingManager::onTimer()
 QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() const
 {
     // return own cameras + cameras from servers without DB (remote connected servers)
-    QnVirtualCameraResourceList cameras = resourcePool()->getAllCameras(QnResourcePtr());
+    QnVirtualCameraResourceList cameras =
+        serverModule()->resourcePool()->getAllCameras(QnResourcePtr());
     QnVirtualCameraResourceList result;
     for(const QnVirtualCameraResourcePtr &camRes: cameras)
     {
@@ -667,7 +670,7 @@ void QnRecordingManager::disableLicensesIfNeed()
     }
 
     if (!disabledCameras.isEmpty()) {
-        QnResourcePtr resource = resourcePool()->getResourceById(moduleGUID());
+        QnResourcePtr resource = serverModule()->resourcePool()->getResourceById(moduleGUID());
         // TODO: #gdm move (de)serializing of encoded reason params to common place
         emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::api::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }

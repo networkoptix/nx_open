@@ -64,8 +64,8 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    const auto engineResource =
-        resourcePool()->getResourceById<resource::AnalyticsEngineResource>(actionData.engineId);
+    const auto engineResource = serverModule()->resourcePool()
+        ->getResourceById<resource::AnalyticsEngineResource>(actionData.engineId);
 
     if (!engineResource)
     {

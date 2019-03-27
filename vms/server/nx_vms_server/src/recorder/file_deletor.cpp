@@ -149,7 +149,7 @@ void QnFileDeletor::processPostponedFiles()
             internalDeleteFile(itr->fileName);
         else
         {
-            auto storage = resourcePool()->getResourceById(itr->storageId);
+            auto storage = serverModule()->resourcePool()->getResourceById(itr->storageId);
             bool needToPostpone = !storage || storage->getStatus() == Qn::ResourceStatus::Offline;
 
             if (!storage)

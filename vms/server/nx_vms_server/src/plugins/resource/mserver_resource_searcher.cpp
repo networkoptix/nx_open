@@ -246,7 +246,8 @@ void QnMServerResourceSearcher::readDataFromSocket()
     if (!conflicts.camerasByServer.isEmpty())
     {
         conflicts.sourceServer = localAppServerHost(serverModule());
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(commonModule->moduleGUID()));
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(
+            serverModule()->resourcePool()->getResourceById(commonModule->moduleGUID()));
         if (mediaServer)
             serverModule()->eventConnector()->at_serverConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }

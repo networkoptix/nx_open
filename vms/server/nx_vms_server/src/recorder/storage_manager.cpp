@@ -727,8 +727,10 @@ QnStorageManager::QnStorageManager(
 
     m_oldStorageIndexes = deserializeStorageFile();
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
+        this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
+        this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
     connect(this, &QnStorageManager::rebuildFinished,
         [this] (QnSystemHealth::MessageType message)
@@ -868,7 +870,7 @@ void QnStorageManager::readCameraInfo(
             return QByteArray();
         };
 
-    nx::caminfo::ServerReaderHandler readerHandler(moduleGUID(), resourcePool());
+    nx::caminfo::ServerReaderHandler readerHandler(moduleGUID(), serverModule()->resourcePool());
     nx::caminfo::Reader(
         &readerHandler,
         QnAbstractStorageResource::FileInfo(cameraPath, true),
@@ -2132,7 +2134,8 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     }
 
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
-        QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
+        QnSecurityCamResourcePtr camera = serverModule()->resourcePool()
+            ->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
@@ -2216,7 +2219,8 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
-                QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
+                QnSecurityCamResourcePtr camera = serverModule()->resourcePool()
+                    ->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
                 if (camera && camera->minDays() > 0) {
                     qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
                     if (threshold < curMinTime)
@@ -3085,7 +3089,7 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
     for(const QString& uniqueId: internalData)
     {
-        const QnResourcePtr cam = resourcePool()->getResourceByUniqueId(uniqueId);
+        const QnResourcePtr cam = serverModule()->resourcePool()->getResourceByUniqueId(uniqueId);
         if (cam)
             result.push_back(cam->getId());
     }

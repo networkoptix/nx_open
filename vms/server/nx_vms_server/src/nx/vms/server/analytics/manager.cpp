@@ -65,11 +65,11 @@ void Manager::init()
     NX_DEBUG(this, "Initializing");
 
     connect(
-        resourcePool(), &QnResourcePool::resourceAdded,
+        serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
         this, &Manager::at_resourceAdded);
 
     connect(
-        resourcePool(), &QnResourcePool::resourceRemoved,
+        serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
         this, &Manager::at_resourceRemoved);
 
     QMetaObject::invokeMethod(this, "initExistingResources");
@@ -77,13 +77,15 @@ void Manager::init()
 
 void Manager::initExistingResources()
 {
-    const auto mediaServer = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
-    const auto devices = resourcePool()->getAllCameras(mediaServer, /*ignoreDesktopCamera*/ true);
+    const auto mediaServer =
+        serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
+    const auto devices =
+        serverModule()->resourcePool()->getAllCameras(mediaServer, /*ignoreDesktopCamera*/ true);
     for (const auto& device: devices)
         at_deviceAdded(device);
 
     const auto engines =
-        resourcePool()->getResources<AnalyticsEngineResource>();
+        serverModule()->resourcePool()->getResources<AnalyticsEngineResource>();
     for (const auto& engine: engines)
         at_engineAdded(engine);
 }
@@ -420,13 +422,13 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId
 nx::vms::server::resource::AnalyticsEngineResourceList Manager::localEngines() const
 {
     using namespace nx::vms::server::resource;
-    return resourcePool()->getResources<AnalyticsEngineResource>(
+    return serverModule()->resourcePool()->getResources<AnalyticsEngineResource>(
             [](const AnalyticsEngineResourcePtr& engine) { return engine->sdkEngine(); });
 }
 
 QnVirtualCameraResourceList Manager::localDevices() const
 {
-    return resourcePool()->getAllCameras(
+    return serverModule()->resourcePool()->getAllCameras(
         serverModule()->commonModule()->currentServer(),
         /*ignoreDesktopCamera*/ true);
 }
@@ -481,7 +483,7 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
     }
 
     const auto engineId = engine->getId();
-    auto devices = resourcePool()->getAllCameras(
+    auto devices = serverModule()->resourcePool()->getAllCameras(
         /*any server*/ QnResourcePtr(),
         /*ignoreDesktopCamera*/ true);
 

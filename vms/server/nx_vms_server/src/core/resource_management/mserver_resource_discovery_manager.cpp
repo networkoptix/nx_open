@@ -290,7 +290,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 const bool isDiscoveredManually = foundCamera->isManuallyAdded();
                 foundCamera->update(existingCamera);
                 foundCamera->setManuallyAdded(isDiscoveredManually);
-                NX_ASSERT(foundCamera->serverModule()->resourcePool() == nullptr); // TODO: May be wrong
+                NX_ASSERT(foundCamera->resourcePool() == nullptr);
                 foundCamera->setParentId(commonModule()->moduleGUID());
                 foundCamera->setFlags(existingCamera->flags() & ~Qn::foreigner);
                 foundCamera->setId(existingCamera->getId());
