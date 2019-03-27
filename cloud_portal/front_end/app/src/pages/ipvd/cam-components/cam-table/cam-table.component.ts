@@ -105,7 +105,16 @@ export class CamTableComponent implements OnChanges, OnInit {
         if (param === 'maxResolution') {
             byParam = NxUtilsService.byResolution((elm) => {
                 return elm[param].split('x');
-            }, this.sortOrderASC);
+            }, !this.sortOrderASC);
+
+        } else if (param === 'maxFps' ||
+                param === 'isFisheye' ||
+                param === 'isMdSupported' ||
+                param === 'isIoSupported') {
+
+            byParam = NxUtilsService.byParam((elm) => {
+                return elm[param];
+            }, !this.sortOrderASC);
 
         } else if (param === 'isPtzSupported') {
             byParam = NxUtilsService.byParam((elm) => {
