@@ -96,10 +96,10 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         this.sortOrderASC = (this.lang.ipvd[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
-        this.toggleSort(filter);
+        this.toggleSort(filter, false /* reset camera and page params in uri */);
     }
 
-    toggleSort(param) {
+    toggleSort(param, keepURI) {
         let byParam;
 
         if (param === 'maxResolution') {
@@ -155,7 +155,7 @@ export class CamTableComponent implements OnChanges, OnInit {
         }
 
         this._elements.sort(byParam);
-        this.setPage(1, false /* do not keep uri */);
+        this.setPage(1, keepURI);
 
         this.selectedHeader = this.cameraHeaders.find(x => {
             return x === this.lang.ipvd[param];
@@ -195,10 +195,10 @@ export class CamTableComponent implements OnChanges, OnInit {
         return showParameters;
     }
 
-    sortElements() {
+    private sortElements(keepURI) {
         // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
         const sortBy = (this.CONFIG.ipvd.sortSupportedDevices) ? 'count' : 'sortKey';
-        this.toggleSort(sortBy);
+        this.toggleSort(sortBy, keepURI);
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -207,7 +207,7 @@ export class CamTableComponent implements OnChanges, OnInit {
             this._elements = changes.elements.currentValue;
             this.results = this._elements.length;
 
-            this.sortElements();
+            this.sortElements(true /* keep uri params */);
         }
 
         if (changes.activeCamera) {

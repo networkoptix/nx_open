@@ -263,7 +263,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
         this.numberFilters = 0;
         this.filterSelected = '';
-        this.setRouteParams();
+        this.uri.resetURI(this.uriPath);
         this.onChangeCallback({...this.localFilter});
 
         return false;

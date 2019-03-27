@@ -11,6 +11,7 @@ import { TranslateService }                    from '@ngx-translate/core';
 import { NxUriService }                        from '../../services/uri.service';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { NxUtilsService }                      from '../../services/utils.service';
+import { ActivatedRoute }                      from '@angular/router';
 
 interface Params {
     [key: string]: any;
@@ -48,6 +49,7 @@ export class NxIpvdComponent implements OnInit {
     mobileDetailMode: boolean;
     noResult: boolean;
     hasNoSearch: boolean;
+    uriPath: string;
 
 private setupDefaults() {
       this.allowedParameters = [
@@ -82,6 +84,8 @@ private setupDefaults() {
 
       this.resolutions = [];
       this.hardwareTypes = [];
+
+      this.uriPath = '/' + this.route.snapshot.url[0].path;
   }
 
     constructor(private configService: NxConfigService,
@@ -91,6 +95,7 @@ private setupDefaults() {
                 // TODO: Use dialog service when it is not being downgraded
                 private messageDialog: NxModalMessageComponent,
                 private uri: NxUriService,
+                private route: ActivatedRoute,
                 private breakpointObserver: BreakpointObserver) {
 
         this.setupDefaults();
@@ -102,8 +107,9 @@ private setupDefaults() {
         this.uri
             .getURI()
             .subscribe(params => {
-                this.params = { ...params };
-                if (this.params.tags) {
+                this.params = params;
+
+                if (Object.keys(this.params).length !== 0) {
                     this.hasNoSearch = false;
                 }
             });
@@ -267,6 +273,8 @@ private setupDefaults() {
                 this.hasNoSearch = true;
                 this.noResult = false;
                 this.camerasTable = [];
+                this.resetActiveCamera();
+                this.uri.resetURI(this.uriPath);
             }
         }
     }
@@ -287,17 +295,15 @@ private setupDefaults() {
           return;
       }
 
-      this.uri.updateURI('/ipvd', [
-          {
-              key: 'camera', value: elementSelected.model || elementSelected.value.model
-          }
-      ]);
+      const queryParams: Params = {};
+      queryParams.camera = elementSelected.model || elementSelected.value.model;
+      this.uri.updateURI(this.uriPath, queryParams, true);
 
       const selectedCamera = this.cameras.find((camera) => {
           return camera.sortKey === (elementSelected.sortKey || elementSelected.value.sortKey);
       });
 
-      if (this.activeCamera === selectedCamera) {
+      if (this.activeCamera && this.activeCamera.sortKey === selectedCamera.sortKey) {
           return;
       }
 
@@ -352,7 +358,7 @@ private setupDefaults() {
   resetActiveCamera() {
       const queryParams: Params = {};
       queryParams.camera = undefined;
-      this.uri.updateURI('/ipvd', queryParams, true);
+      this.uri.updateURI(this.uriPath, queryParams, true);
 
       this.activeCamera = undefined;
       this.toggleCamview = false;

@@ -34,17 +34,18 @@ export class NxVendorListComponent implements OnInit, OnChanges {
     public filters: any = [];
     public remainingVendors: number;
 
+    private uriPath: string;
     private filter: any = {};
     private ASC = true;
     private DESC = false;
 
     constructor(CONFIG: NxConfigService,
                 private uri: NxUriService,
-                private _router: Router,
                 private _route: ActivatedRoute) {
 
         this.CONFIG = CONFIG.getConfig();
         this.debug = false;
+        this.uriPath = '/' + this._route.snapshot.url[0].path;
 
         this.filters = [
             {
@@ -175,7 +176,7 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
                 queryParams[select.id] = select.selected;
 
-                this.uri.updateURI('/ipvd', queryParams, true);
+                this.uri.updateURI(this.uriPath, queryParams, true);
             }
         });
 

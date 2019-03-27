@@ -53,4 +53,10 @@ export class NxUriService {
             });
         }
     }
+
+    resetURI(navigateTo: string) {
+        this.router.navigate([navigateTo], {
+            queryParams: {}
+        });
+    }
 }
