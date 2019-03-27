@@ -142,6 +142,7 @@ public:
 
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
+        DISABLE_MT_DECODING,
 
         ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
@@ -240,6 +241,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
         QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
+        QN_DECLARE_R_PROPERTY(bool,                         disableMtDecoding,                                  DISABLE_MT_DECODING,        false)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();
