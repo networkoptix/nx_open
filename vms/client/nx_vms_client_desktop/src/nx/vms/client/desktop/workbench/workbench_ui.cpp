@@ -115,24 +115,14 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
 
-    m_debugInfoInstrument = new DebugInfoInstrument(this);
-
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
-    m_instrumentManager->installInstrument(m_debugInfoInstrument, InstallationMode::InstallBefore,
-        display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this,
         &WorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this,
         &WorkbenchUi::at_activityStarted);
-    connect(m_debugInfoInstrument, &DebugInfoInstrument::debugInfoChanged, this,
-        [this](const QString& text)
-        {
-            m_fpsItem->setText(text);
-            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
-        });
 
     /* Create controls. */
     createControlsWidget();
@@ -1459,6 +1449,13 @@ void WorkbenchUi::createFpsWidget()
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
     setFpsVisible(qnRuntime->isProfilerMode());
+
+    connect(display()->debugInfoInstrument(), &DebugInfoInstrument::debugInfoChanged, this,
+        [this](const QString& text)
+        {
+            m_fpsItem->setText(text);
+            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
+        });
 }
 
 #pragma endregion Fps widget methods

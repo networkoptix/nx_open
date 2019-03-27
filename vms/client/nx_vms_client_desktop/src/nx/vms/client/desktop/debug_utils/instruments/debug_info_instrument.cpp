@@ -4,6 +4,7 @@
 
 #include <client/client_runtime_settings.h>
 
+#include <utils/memory/circular_buffer.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/log/log.h>
 
@@ -19,6 +20,7 @@ using namespace std::chrono;
 
 static constexpr milliseconds kHandlesInterval = 500ms;
 static constexpr milliseconds kLogInterval = 1min;
+static constexpr size_t kFrameTimePoints = 200;
 
 } // namespace
 
@@ -30,10 +32,13 @@ struct DebugInfoInstrument::Private
     QElapsedTimer fpsTimer;
     QElapsedTimer handlesTimer;
     QElapsedTimer logTimer;
+    QElapsedTimer totalTimer;
 
     int frameCount = 0;
+
     QString fps = "----";
     qint64 frameTimeMs = 0;
+    nx::utils::circular_buffer<qint64> frameTimePoints{ kFrameTimePoints };
     QString handles;
 
     void updateHandles()
@@ -67,11 +72,17 @@ DebugInfoInstrument::DebugInfoInstrument(QObject* parent):
     Instrument(Viewport, makeSet(QEvent::Paint), parent),
     d(new Private())
 {
+    d->totalTimer.start();
 }
 
 DebugInfoInstrument::~DebugInfoInstrument()
 {
     ensureUninstalled();
+}
+
+QVector<quint64> DebugInfoInstrument::getFrameTimePoints()
+{
+    return QVector<quint64>();
 }
 
 void DebugInfoInstrument::enabledNotify()
@@ -96,6 +107,7 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
         return false;
 
     ++d->frameCount;
+    d->frameTimePoints.push_back(d->totalTimer.elapsed());
 
     bool changed = false;
     if (d->fpsTimer.hasExpired(d->updateIntervalMs))
