@@ -853,7 +853,6 @@ Item
         {
             timeline.autoReturnToBounds = false
             timeline.jumpTo(position)
-            d.playbackStarted = true
         }
     }
 
