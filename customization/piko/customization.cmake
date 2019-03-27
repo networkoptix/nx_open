@@ -1,3 +1,5 @@
+set(enable_hanwha true)
+
 # Components Namings
 set(display.product.name "Piko")
 set(display.mobile.name "Piko")
