@@ -441,19 +441,16 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     if (serverModule()->commonModule()->isNeedToStop())
         return;
 
-    QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
-    Q_ASSERT(!videoCameraPool()->getVideoCamera(resource));
-    if (videoCameraPool()->getVideoCamera(resource))
-        NX_WARNING(this, lit("%1: VideoCamera for this resource %2 already exists")
-                .arg(Q_FUNC_INFO)
-                .arg(resource->getUrl()));
-    videoCameraPool()->addVideoCamera(resource);
+    auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
+    NX_ASSERT_HEAVY_CONDITION(!videoCameraPool()->getVideoCamera(resource));
     if (camera)
     {
+        videoCameraPool()->addVideoCamera(camera);
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         connect(camera.data(), &QnVirtualCameraResource::recordingActionChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         updateCamera(camera);
+        return;
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
