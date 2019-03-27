@@ -32,6 +32,7 @@
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
