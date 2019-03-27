@@ -351,6 +351,13 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getFrameSequence
     NX_VERBOSE(this, "%1(%2 us, channel: %3, %4) BEGIN", __func__, timeUs, channel, roundMethod);
     if (roundMethod == ImageRequest::RoundMethod::precise)
     {
+        QnLiveStreamProviderPtr provider = m_camera->getLiveReader(m_catalog);
+        if (!provider || !provider->isRunning())
+        {
+            NX_VERBOSE(this, "%1() END -> null: Provider for quality %2 is not running.", __func__, m_catalog);
+            return nullptr;
+        }
+
         auto frames = getGopTillTime(timeUs, channel);
         if (frames->isEmpty())
         {
@@ -631,6 +638,13 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
                 else
                     m_secondaryGopKeeper = gopKeeper;
                 reader->addDataProcessor(gopKeeper);
+
+                connect(reader.get(), &QThread::started, this,
+                    [gopKeeper]()
+                    {
+                        gopKeeper->clearVideoData();
+                    },
+                    Qt::DirectConnection);
             }
         }
     }
