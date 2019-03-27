@@ -46,12 +46,12 @@ void MemoryRemoteRelayPeerPool::addPeer(
 
 bool MemoryRemoteRelayPeerPool::connectToDb()
 {
-    return false;
+    return true;
 }
 
 bool MemoryRemoteRelayPeerPool::isConnected() const
 {
-    return false;
+    return true;
 }
 
 void MemoryRemoteRelayPeerPool::removePeer(
