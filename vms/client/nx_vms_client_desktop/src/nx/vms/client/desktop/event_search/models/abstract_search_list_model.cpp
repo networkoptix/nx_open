@@ -351,7 +351,7 @@ void AbstractSearchListModel::clear()
 {
     NX_VERBOSE(this, "Clear model");
 
-    setFetchDirection(FetchDirection::earlier);
+    setFetchDirection(FetchDirection::later);
     setFetchedTimeWindow({});
     cancelFetch();
     clearData();

@@ -186,7 +186,7 @@ private:
     bool m_isOnline = false; //< Whether connection with server is fully established.
     bool m_offlineAllowed = false; //< Whether the model can work without server connection.
 
-    FetchDirection m_fetchDirection = FetchDirection::earlier; //< Direction for next fetch.
+    FetchDirection m_fetchDirection = FetchDirection::later; //< Direction for next fetch.
 
     QnTimePeriod m_fetchedTimeWindow; //< Time window of currently fetched data.
 
