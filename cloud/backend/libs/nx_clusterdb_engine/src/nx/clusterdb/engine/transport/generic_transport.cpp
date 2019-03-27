@@ -57,6 +57,9 @@ GenericTransport::~GenericTransport()
 {
     NX_DEBUG(this, lm("systemId %1. Closing connection to %2")
         .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
+
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 void GenericTransport::bindToAioThread(

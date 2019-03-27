@@ -8,6 +8,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/url.h>
 
 #include "transport/abstract_transaction_transport_connector.h"
@@ -46,6 +47,9 @@ private:
         std::string connectionId;
         std::unique_ptr<transport::AbstractTransactionTransportConnector> connector;
         std::unique_ptr<nx::network::aio::Timer> retryTimer;
+        nx::utils::SubscriptionId connectionClosedSubscriptionId =
+            nx::utils::kInvalidSubscriptionId;
+        transport::AbstractConnection* connection = nullptr;
     };
 
     transport::TransportManager* m_transportManager = nullptr;
@@ -62,7 +66,7 @@ private:
 
     void registerConnection(
         const nx::utils::Url& url,
-        const NodeContext& nodeContext,
+        NodeContext* nodeContext,
         std::unique_ptr<transport::AbstractConnection> connection);
 
     void onConnectionClosed(

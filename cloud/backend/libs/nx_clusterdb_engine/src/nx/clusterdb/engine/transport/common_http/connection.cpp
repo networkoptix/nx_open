@@ -93,7 +93,8 @@ CommonHttpConnection::CommonHttpConnection(
 
 CommonHttpConnection::~CommonHttpConnection()
 {
-    stopWhileInAioThread();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 void CommonHttpConnection::bindToAioThread(
@@ -108,6 +109,9 @@ void CommonHttpConnection::bindToAioThread(
 void CommonHttpConnection::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
+
+    if (!m_closed)
+        forwardStateChangedEvent(::ec2::QnTransactionTransportBase::Closed);
 
     m_baseTransactionTransport->stopWhileInAioThread();
     m_inactivityTimer.reset();
