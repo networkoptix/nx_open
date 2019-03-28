@@ -80,9 +80,9 @@ DebugInfoInstrument::~DebugInfoInstrument()
     ensureUninstalled();
 }
 
-QVector<quint64> DebugInfoInstrument::getFrameTimePoints()
+std::vector<qint64> DebugInfoInstrument::getFrameTimePoints()
 {
-    return QVector<quint64>();
+    return d->frameTimePoints.get_vector();
 }
 
 void DebugInfoInstrument::enabledNotify()

@@ -34,15 +34,15 @@ public:
     size_type max_size() const;
 
 private:
-    size_type m_max_size = 0; //< Cached to avoid extra calls.
+    size_type m_buf_size = 0; //< Cached to avoid extra calls.
     size_type m_begin = 0;
     size_type m_end = 0;
 };
 
 template<class T>
 circular_buffer<T>::circular_buffer(size_type buffer_capacity):
-    std::vector<T>(buffer_capacity),
-    m_max_size(buffer_capacity)
+    std::vector<T>(buffer_capacity + 1), //< One extra element is always free to simplify buffer logic.
+    m_buf_size(buffer_capacity + 1)
 {
 }
 
@@ -50,10 +50,10 @@ template<class T>
 void circular_buffer<T>::push_back(const T& value)
 {
     (*this)[m_end] = value;
-    m_end = (m_end + 1) % m_max_size;
+    m_end = (m_end + 1) % m_buf_size;
 
     if (m_end == m_begin)
-        m_begin = (m_begin + 1) % m_max_size;
+        m_begin = (m_begin + 1) % m_buf_size;
 }
 
 template<class T>
@@ -64,7 +64,7 @@ std::vector<T> circular_buffer<T>::get_vector() const
 
     if (m_begin > m_end)
     {
-        result.insert(result.end(), data() + m_begin, data() + m_max_size);
+        result.insert(result.end(), data() + m_begin, data() + m_buf_size);
         result.insert(result.end(), data(), data() + m_end);
     }
     else
@@ -77,13 +77,13 @@ std::vector<T> circular_buffer<T>::get_vector() const
 template<class T>
 typename circular_buffer<T>::size_type circular_buffer<T>::size() const
 {
-    return (m_end + m_max_size - m_begin) % m_max_size;
+    return (m_end + m_buf_size - m_begin) % m_buf_size;
 }
 
 template<class T>
 typename circular_buffer<T>::size_type circular_buffer<T>::max_size() const
 {
-    return m_max_size;
+    return m_buf_size - 1;
 }
 
 } // namespace nx::utils

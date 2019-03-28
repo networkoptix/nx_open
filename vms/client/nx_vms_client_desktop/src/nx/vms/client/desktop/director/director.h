@@ -27,6 +27,9 @@ public:
 
     /** Closes client application. */
     void quit(bool force = true);
+
+    /** Returns a list of time points when client scene frames were rendered (in ms) */
+    std::vector<qint64> getFrameTimePoints();
 };
 
 } // namespace nx::vmx::client::desktop

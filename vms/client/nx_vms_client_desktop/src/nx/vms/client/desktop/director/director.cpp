@@ -4,6 +4,8 @@
 
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
 
 namespace nx::vmx::client::desktop {
 
@@ -15,8 +17,20 @@ int kQuitDelay = 2000; //< 2s.
 
 } // namespace
 
+Director::Director(QObject* parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
+{
+}
+
+Director::~Director()
+{
+}
+
 void Director::quit(bool force)
 {
+    NX_ASSERT(context());
+
     if (force)
     {
         executeDelayedParented(
@@ -31,14 +45,10 @@ void Director::quit(bool force)
     }
 }
 
-Director::Director(QObject* parent):
-    QObject(parent),
-    QnWorkbenchContextAware(parent)
+std::vector<qint64> Director::getFrameTimePoints()
 {
-}
-
-Director::~Director()
-{
+    NX_ASSERT(context());
+    return context()->display()->debugInfoInstrument()->getFrameTimePoints();
 }
 
 } // namespace nx::vmx::client::desktop

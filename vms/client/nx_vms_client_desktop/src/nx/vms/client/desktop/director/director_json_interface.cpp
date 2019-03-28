@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
@@ -19,13 +20,13 @@ const QMap<DirectorJsonInterface::ErrorCodes, QString> errorStrings = {
 { DirectorJsonInterface::BadParameters, "Bad command parameters"},
 };
 
-QJsonDocument formResponse(DirectorJsonInterface::ErrorCodes code)
+QJsonObject formResponseBase(DirectorJsonInterface::ErrorCodes code, const QString& errorString = {})
 {
     QJsonObject response;
     response.insert("error", int(code));
-    response.insert("errorString", errorStrings[code]);
+    response.insert("errorString", errorString.isEmpty() ? errorStrings[code] : errorString);
 
-    return QJsonDocument(response);
+    return response;
 }
 
 // JSON value converters. JSON that comes from HTTP parameter values may have
@@ -57,13 +58,55 @@ pair<bool, bool> treatAsBool(const QJsonValue& value, bool defaultValue)
     return {defaultValue, false};
 }
 
+pair<qint64, bool> treatAsInt(const QJsonValue& value, qint64 defaultValue)
+{
+    if (value.isDouble())
+        return {value.toInt(), true};
+
+    if (value.isString())
+    {
+        const auto str = value.toString();
+        bool isNumber;
+        const int number = str.toInt(&isNumber);
+        if (isNumber)
+            return {number, true};
+    }
+
+    return {defaultValue, false};
+}
+
 // Command parsers & executors.
+// Quit command
 QJsonDocument executeQuit(QJsonObject request)
 {
-    auto force = treatAsBool(request.value("force"), true).first;
+    auto [force, isOK] = treatAsBool(request.value("force"), true);
+    if (request.contains("force") && !isOK)
+        return QJsonDocument(formResponseBase(DirectorJsonInterface::BadParameters,
+            "Incorrect \"force\" parameter value."));
+
     Director::instance()->quit(force);
-    return formResponse(DirectorJsonInterface::Ok);
+    return QJsonDocument(formResponseBase(DirectorJsonInterface::Ok));
 }
+
+// Return frame stats command
+QJsonDocument executeGetFrameTimePoints(QJsonObject request)
+{
+    auto [from, isOK] = treatAsInt(request.value("from"), 0);
+    if (request.contains("from") && !isOK)
+        return QJsonDocument(formResponseBase(DirectorJsonInterface::BadParameters,
+            "Incorrect \"from\" parameter value."));
+
+    const auto framePoints = Director::instance()->getFrameTimePoints();
+    QJsonArray jsonFramePoints;
+    for (auto timePoint: framePoints)
+        if (timePoint >= from)
+            jsonFramePoints.push_back(timePoint);
+
+    auto response = formResponseBase(DirectorJsonInterface::Ok);
+    response.insert("framePoints", jsonFramePoints);
+    return QJsonDocument(response);
+}
+
 } // namespace
 
 namespace nx::vmx::client::desktop {
@@ -77,13 +120,15 @@ QJsonDocument DirectorJsonInterface::process(const QJsonDocument& jsonRequest)
     const auto& jsonObject = jsonRequest.object();
     const auto command = jsonObject.value("command").toString();
     if (command.isEmpty())
-        return formResponse(BadCommand);
+        return QJsonDocument(formResponseBase(BadCommand));
 
     // Main command dispatcher.
     if (command == "quit")
         return executeQuit(jsonObject);
+    if (command == "getFrameTimePoints")
+        return executeGetFrameTimePoints(jsonObject);
 
-    return formResponse(BadCommand);
+    return QJsonDocument(formResponseBase(BadCommand));
 }
 
 } // namespace nx::vmx::client::desktop

@@ -18,7 +18,7 @@ public:
     explicit DebugInfoInstrument(QObject* parent = nullptr);
     virtual ~DebugInfoInstrument() override;
 
-    QVector<quint64> getFrameTimePoints();
+    std::vector<qint64> getFrameTimePoints();
 
 signals:
     void debugInfoChanged(const QString& text);
