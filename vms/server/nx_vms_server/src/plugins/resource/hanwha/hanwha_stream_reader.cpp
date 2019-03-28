@@ -8,7 +8,7 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 #include "hanwha_chunk_loader.h"
-#include "hanwha_ini_config.h"
+#include "vms_server_hanwha_ini.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>

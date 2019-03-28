@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 #include <ostream>
 
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <common/common_globals.h>
 #include <camera/get_image_helper.h>
 #include <core/resource/camera_resource.h>

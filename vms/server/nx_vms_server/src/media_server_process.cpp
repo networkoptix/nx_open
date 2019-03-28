@@ -267,7 +267,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx/vms/server/server_update_manager.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 #include <local_connection_factory.h>
 #include <core/resource/resource_command_processor.h>
@@ -2653,7 +2653,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc[proprietary] GET /api/debug
      * Intended for debugging and experimenting.
-     * <br/>ATTENTION: Works only if enabled by mediaserver.ini.
+     * <br/>ATTENTION: Works only if enabled by nx_vms_server.ini.
      * %param[opt]:option crash Intentionally crashes the Server.
      * %param[opt]:option fullDump If specified together with "crash", creates full crash dump.
      * %param[opt]:option exit Terminates the Server normally, via "exit(64)".

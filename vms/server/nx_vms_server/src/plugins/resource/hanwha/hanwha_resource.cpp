@@ -9,7 +9,7 @@
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_loader.h"
 #include "hanwha_firmware.h"
-#include "hanwha_ini_config.h"
+#include "vms_server_hanwha_ini.h"
 
 #include <QtCore/QMap>
 
