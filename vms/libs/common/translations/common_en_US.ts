@@ -1056,6 +1056,17 @@
     </message>
 </context>
 <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+        <source>Wrong crypted stream size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Damaged crypted stream header.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::event::StringsHelper</name>
     <message>
         <source>Bookmark</source>
