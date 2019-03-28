@@ -287,7 +287,7 @@ public:
     void addStorageToScan(const QnStorageResourcePtr& storage, bool partialScan)
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        addStorageToScanUnsafe(storage, partialScan, &lock);
+        addStorageToScanUnsafe(storage, partialScan);
         m_waitCondition.wakeOne();
     }
 
@@ -295,7 +295,7 @@ public:
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         for (auto storage : storages)
-            addStorageToScanUnsafe(storage, partialScan, &lock);
+            addStorageToScanUnsafe(storage, partialScan);
         m_waitCondition.wakeOne();
     }
 
@@ -319,6 +319,10 @@ private:
             catalog(catalog),
             storage(storage)
         {}
+
+        ScanTask() = default;
+
+        bool isDummy() const { return !storage; }
     };
 
     struct PartialScanTask: ScanTask
@@ -333,6 +337,8 @@ private:
             ScanTask(catalog, storage),
             scanFilter(scanFilter)
         {}
+
+        PartialScanTask() = default;
     };
 
     struct StorageProgress
@@ -353,8 +359,7 @@ private:
     std::atomic<bool> m_cancelled = false;
     QnStorageResourcePtr m_currentStorage;
 
-    void addStorageToScanUnsafe(
-        const QnStorageResourcePtr& storage, bool partialScan, nx::utils::MutexLocker* lock)
+    void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
         const auto storageUrl = storage->getUrl();
         if (m_beingProcessedStoragesUrls.contains(storageUrl))
@@ -384,8 +389,7 @@ private:
         m_totalCatalogs += catalogsToScan.size();
         if (m_totalCatalogs == 0)
         {
-            lock->unlock();
-            emitSignal(newTaskType);
+            addDummyTask(newTaskType);
             return;
         }
 
@@ -394,6 +398,21 @@ private:
             addPartialScanTasks(storage, catalogsToScan);
         else
             addFullScanTasks(storage, catalogsToScan);
+    }
+
+    void addDummyTask(Qn::RebuildState taskType)
+    {
+        switch (taskType)
+        {
+            case Qn::RebuildState_FullScan:
+                m_fullScanTasks.push_back(ScanTask());
+                break;
+            case Qn::RebuildState_PartialScan:
+                m_partialScanTasks.push_back(PartialScanTask());
+                break;
+            default:
+                NX_ASSERT(false);
+        }
     }
 
     Qn::RebuildState currentlyBeingProcessingTasksType()
@@ -407,7 +426,7 @@ private:
         return Qn::RebuildState_None;
     }
 
-    void resetScanData()
+    void resetState()
     {
         m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
         m_totalCatalogs = 0;
@@ -436,16 +455,22 @@ private:
 
             if (m_cancelled)
             {
-                emitSignal();
-                resetScanData();
+                {
+                    QnMutexUnlocker unlocker(&lock);
+                    emitSignal();
+                }
+                resetState();
                 continue;
             }
 
             const auto taskType = processNextTask(&lock);
             if (!hasTasksToProcess())
             {
-                emitSignal(taskType);
-                resetScanData();
+                {
+                    QnMutexUnlocker unlocker(&lock);
+                    emitSignal(taskType);
+                }
+                resetState();
                 updateBackupSyncPosition();
             }
         }
@@ -485,10 +510,13 @@ private:
     }
 
    void processNextFullTask(nx::utils::MutexLocker* lock)
-    {
+   {
         nx::caminfo::ArchiveCameraDataList archiveCameras;
         const auto scanTask = m_fullScanTasks.front();
         m_fullScanTasks.pop_front();
+
+        if (scanTask.isDummy())
+            return;
 
         ArchiveScanPosition totalScanPos(m_owner->serverModule(), m_owner->m_role);
         totalScanPos.load();
@@ -534,6 +562,10 @@ private:
     {
         const auto scanTask = m_partialScanTasks.front();
         m_partialScanTasks.pop_front();
+
+        if (scanTask.isDummy())
+            return;
+
         if (m_currentStorage != scanTask.storage)
         {
             if (m_currentStorage)
