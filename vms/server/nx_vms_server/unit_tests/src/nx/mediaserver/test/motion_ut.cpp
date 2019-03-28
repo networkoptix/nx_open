@@ -21,14 +21,17 @@ public:
 
 class MotionArchive: public MediaServerModuleFixture
 {
-  public:
-      MotionArchive(): MediaServerModuleFixture()
-      {
-          m_camera.reset(new resource::test::CameraMock(&serverModule()));
-          m_camera->setPhysicalId("motion archive test");
-          m_dataProviderStub.reset(new DataProviderStub(m_camera));
-      }
+protected:
+    virtual void SetUp() override
+    {
+        MediaServerModuleFixture::SetUp();
 
+        m_camera.reset(new resource::test::CameraMock(&serverModule()));
+        m_camera->setPhysicalId("motion archive test");
+        m_dataProviderStub.reset(new DataProviderStub(m_camera));
+    }
+
+public:
       void createTestData()
       {
           QnMetaDataV1Ptr motion(new QnMetaDataV1());

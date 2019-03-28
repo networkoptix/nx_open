@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include <ostream>
 
+#include <media_server/media_server_module.h>
 #include <mediaserver_ini.h>
 #include <common/common_globals.h>
 #include <camera/get_image_helper.h>
@@ -125,7 +126,8 @@ TEST(GetImageHelper, determineStreamIndex)
 {
     using StreamIndex = nx::vms::api::StreamIndex;
 
-    QnGetImageHelper helper(nullptr);
+    QnMediaServerModule serverModule;
+    QnGetImageHelper helper(&serverModule);
     nx::api::CameraImageRequest request;
     auto camera = QnSharedResourcePointer(new MockCameraResource());
     request.camera = camera;
