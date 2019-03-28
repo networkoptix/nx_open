@@ -60,6 +60,25 @@ std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
 
 } // namespace
 
+const char * toString(ResultCode result)
+{
+    switch (result)
+    {
+        case ok:
+            return "ok";
+        case notFound:
+            return "not found";
+        case logicError:
+            return "logic error";
+        case unknownError:
+        default:
+            return "unknown error";
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+// DataManager
+
 DataManager::DataManager(
     nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor,
