@@ -2,11 +2,8 @@
 
 #include <sstream>
 
-#include <boost/algorithm/string.hpp>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/utils/std/cpp14.h>
 
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/rest/http_rest_client.h>
@@ -91,26 +88,26 @@ void RemoteRelayPeerPool::findRelayByDomain(
         toLowerReversed(domainName),
         [this, domainName, handler = std::move(handler)](
             ResultCode result, std::map<std::string, std::string> map)
-    {
-        if (result != ResultCode::ok)
         {
-            NX_WARNING(
+            if (result != ResultCode::ok)
+            {
+                NX_WARNING(
+                    this,
+                    "getRangeWithPrefix returned error: %1 for key: %2",
+                    toString(result), domainName);
+                return handler(std::string());
+            }
+
+            NX_VERBOSE(
                 this,
-                "getRangeWithPrefix returned error: %1 for key: %2",
-                toString(result), domainName);
-            return handler(std::string());
-        }
+                "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for domainName: %3",
+                toString(result), containerString(map), domainName);
 
-        NX_VERBOSE(
-            this,
-            "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for domainName: %3",
-            toString(result), containerString(map), domainName);
-
-        if (map.empty())
-            handler(std::string());
-        else
-            handler(map.begin()->second);
-    });
+            if (map.empty())
+                handler(std::string());
+            else
+                handler(map.begin()->second);
+        });
 }
 
 void RemoteRelayPeerPool::addPeer(
@@ -126,16 +123,16 @@ void RemoteRelayPeerPool::addPeer(
         toLowerReversed(domainName),
         m_domainName,
         [this, domainName, handler = std::move(handler)](ResultCode result)
-    {
-        if (result != ResultCode::ok)
         {
-            NX_WARNING(
-                this,
-                "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
-                toString(result), domainName, m_domainName);
-        }
-        handler(result == ResultCode::ok);
-    });
+            if (result != ResultCode::ok)
+            {
+                NX_WARNING(
+                    this,
+                    "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
+                    toString(result), domainName, m_domainName);
+            }
+            handler(result == ResultCode::ok);
+        });
 }
 
 void RemoteRelayPeerPool::removePeer(
@@ -150,16 +147,16 @@ void RemoteRelayPeerPool::removePeer(
     m_map->database().dataManager().remove(
         toLowerReversed(domainName),
         [this, domainName, handler = std::move(handler)](ResultCode result)
-    {
-        if (result != ResultCode::ok)
         {
-            NX_VERBOSE(
-                this,
-                "remove returned error: %1, for args: key: %2, value: %3",
-                toString(result), domainName, m_domainName);
-        }
-        handler(result == ResultCode::ok);
-    });
+            if (result != ResultCode::ok)
+            {
+                NX_VERBOSE(
+                    this,
+                    "remove returned error: %1, for args: key: %2, value: %3",
+                    toString(result), domainName, m_domainName);
+            }
+            handler(result == ResultCode::ok);
+        });
 }
 
 void RemoteRelayPeerPool::setPublicUrl(

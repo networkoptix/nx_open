@@ -521,9 +521,9 @@ void Settings::loadServer()
 void Settings::loadClusterDbMap()
 {
     const auto str =
-        std::string(cluster_db_map::kGroupName) + "/" + cluster_db_map::kConnectionRetryDelay;
+        lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
     m_clusterDbMap.connectionRetryDelay = nx::utils::parseTimerDuration(
-        settings().value(str.c_str()).toString(),
+        settings().value(str).toString(),
         cluster_db_map::kDefaultConnectionRetryDelay);
 
     m_clusterDbMap.sql.loadFromSettings(settings(), cluster_db_map::kGroupName);
