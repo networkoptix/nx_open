@@ -47,7 +47,7 @@ nx::utils::Url DiscoveryServer::url() const
 {
     return nx::network::url::Builder().
         setScheme(nx::network::http::kUrlSchemeName)
-        .setEndpoint(m_httpServer.serverAddress());
+        .setEndpoint(m_httpServer.serverAddress()).toUrl();
 }
 
 int DiscoveryServer::onlineNodesCount() const
