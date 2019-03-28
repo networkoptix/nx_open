@@ -513,6 +513,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
     state.analytics.settingsValuesByEngineId = {};
+    state.analytics.currentEngineId = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
