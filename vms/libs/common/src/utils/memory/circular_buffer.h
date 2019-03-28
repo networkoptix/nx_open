@@ -34,6 +34,7 @@ public:
     size_type max_size() const;
 
 private:
+    using std::vector<T>::data;
     size_type m_buf_size = 0; //< Cached to avoid extra calls.
     size_type m_begin = 0;
     size_type m_end = 0;
