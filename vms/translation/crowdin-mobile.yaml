@@ -5,22 +5,23 @@ preserve_hierarchy: true
 
 files:
   -
-    source: '/common/translations/qtbase.ts'
     dest: '/Common/qtbase.ts'
-    translation: '/common/translations/qtbase_%locale_with_underscore%.ts'
+    source: '/libs/common/translations/qtbase.ts'
+    translation: '/libs/common/translations/qtbase_%locale_with_underscore%.ts'
   -
-    source: '/common/translations/common_en_US.ts'
     dest: '/Common/common.ts'
+    source: '/libs/common/translations/common_en_US.ts'
     translation: '/common/translations/common_%locale_with_underscore%.ts'
   -
-    source: '/vms/client/nx_vms_client_core/translations/client_core_en_US.ts'
     dest: '/Client/client_core.ts'
-    translation: '/vms/client/nx_vms_client_core/translations/client_core_%locale_with_underscore%.ts'
-  -
-    source: '/client/mobile_client/translations/mobile_client_base_en_US.ts'
+    source: '/client/nx_vms_client_core/translations/client_core_en_US.ts'
+    translation: '/client/nx_vms_client_core/translations/client_core_%locale_with_underscore%.ts'
+
     dest: '/Mobile/mobile_client_base.ts'
+    source: '/client/mobile_client/translations/mobile_client_base_en_US.ts'
     translation: '/client/mobile_client/translations/mobile_client_base_%locale_with_underscore%.ts'
   -
-    source: '/client/mobile_client/translations/mobile_client_qml_en_US.ts'
     dest: '/Mobile/mobile_client_qml.ts'
+    source: '/client/mobile_client/translations/mobile_client_qml_en_US.ts'
     translation: '/client/mobile_client/translations/mobile_client_qml_%locale_with_underscore%.ts'
+
