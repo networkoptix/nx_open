@@ -53,19 +53,6 @@ static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
 //static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
 static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
-static const QString kRtspConsumerMetadataLogPattern(
-    "Sending metadata to the client. Metadata timestamp (ms): {:metadata_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
-    "diff from current time (ms): {:metadata_time_difference_from_current_time}, "
-    "diff from the last frame (ms): {:metadata_time_difference_from_last_frame}");
-
-static const QString kRtspConsumerFrameLogPattern(
-    "Sending a frame to the client. Frame timestamp (ms): {:frame_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
-    "diff from current time (ms): {:frame_time_difference_from_current_time}");
-
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     QnAbstractDataConsumer(MAX_QUEUE_SIZE),
     m_owner(owner),
@@ -111,11 +98,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     if (nx::analytics::loggingIni().isLoggingEnabled())
     {
         m_logger = std::make_unique<nx::analytics::MetadataLogger>(
-            "rtsp_consumer_",
-            kRtspConsumerFrameLogPattern,
-            kRtspConsumerMetadataLogPattern,
-            camera->getId(),
-            QnUuid());
+            "rtsp_consumer_", camera->getId(), QnUuid());
     }
 
     auto videoLayout = camera->getVideoLayout();

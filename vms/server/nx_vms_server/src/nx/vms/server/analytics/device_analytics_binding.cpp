@@ -36,16 +36,7 @@ using namespace nx::vms::api::analytics;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-namespace {
-
-static const QString kIncomingFrameLogPattern(
-    "Pushing frame to the DeviceAgent. Current time (ms): {:current_time}, "
-    "frame timestamp (ms): {:frame_timestamp}, "
-    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
-    "diff from current time (ms): {:frame_time_difference_from_current_time}");
 static const int kMaxQueueSize = 100;
-
-} // namespace
 
 DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     QnMediaServerModule* serverModule,
@@ -56,12 +47,7 @@ DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     nx::vms::server::ServerModuleAware(serverModule),
     m_device(std::move(device)),
     m_engine(std::move(engine)),
-    m_incomingFrameLogger(
-        "incoming_frame_",
-        kIncomingFrameLogPattern,
-        QString(),
-        m_device->getId(),
-        m_engine->getId())
+    m_incomingFrameLogger("incoming_frame_", m_device->getId(), m_engine->getId())
 {
 }
 

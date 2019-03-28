@@ -12,26 +12,18 @@
 
 namespace nx::analytics {
 
-using PlaceholderName = QString;
-using PlaceholderValue = QString;
-
-using PlaceholderMap = std::map<PlaceholderName, PlaceholderValue>;
-
 class MetadataLogger
 {
 public:
-    MetadataLogger(
-        const QString& logFilePrefix,
-        const QString& frameLogPattern,
-        const QString& metadataLogPattern,
-        QnUuid deviceId,
-        QnUuid engineId);
+    MetadataLogger(const QString& logFilePrefix, QnUuid deviceId, QnUuid engineId);
 
     void pushFrameInfo(std::unique_ptr<IFrameInfo> frameInfo);
 
-    void pushObjectMetadata(const nx::common::metadata::DetectionMetadataPacket& metadataPacket);
+    void pushObjectMetadata(nx::common::metadata::DetectionMetadataPacket metadataPacket);
 
 private:
+    using PlaceholderMap = std::map</*PlaceholderName*/ QString, /*PlaceholderValue*/ QString>;
+
     PlaceholderMap placeholderMap() const;
     void doLogging(const QString& logPattern);
     QString makeLogFileName(
@@ -42,14 +34,12 @@ private:
 
 private:
     QFile m_outputFile;
-    QString m_frameLogPattern;
-    QString m_metadataLogPattern;
 
-    nx::common::metadata::DetectionMetadataPacket m_lastObjectMetadataPacket;
-    nx::common::metadata::DetectionMetadataPacket m_previousObjectMetadataPacket;
+    nx::common::metadata::DetectionMetadataPacket m_currentObjectMetadataPacket;
+    nx::common::metadata::DetectionMetadataPacket m_prevObjectMetadataPacket;
 
-    std::chrono::microseconds m_lastFrameTimestamp{0};
-    std::chrono::microseconds m_previousFrameTimestamp{0};
+    std::chrono::microseconds m_currentFrameTimestamp{0};
+    std::chrono::microseconds m_prevFrameTimestamp{0};
 };
 
 } // namespace nx::analytics

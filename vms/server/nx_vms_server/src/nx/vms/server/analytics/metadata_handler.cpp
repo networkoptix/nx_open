@@ -23,16 +23,6 @@ namespace nx {
 namespace vms::server {
 namespace analytics {
 
-namespace  {
-
-const QString kOutgoingObjectMetadataLogPattern(
-    "Received metadata from DeviceAgent. Metadata timestamp (ms): {:metadata_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
-    "diff from current time (ms): {:metadata_time_difference_from_current_time}");
-
-} // namespace
-
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::vms::api::analytics;
@@ -45,12 +35,7 @@ MetadataHandler::MetadataHandler(
     ServerModuleAware(serverModule),
     m_resource(device),
     m_engineId(engineId),
-    m_metadataLogger(
-        "outgoing_metadata_",
-        QString(),
-        kOutgoingObjectMetadataLogPattern,
-        m_resource->getId(),
-        m_engineId)
+    m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId)
 {
     connect(this, &MetadataHandler::sdkEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_analyticsSdkEvent,

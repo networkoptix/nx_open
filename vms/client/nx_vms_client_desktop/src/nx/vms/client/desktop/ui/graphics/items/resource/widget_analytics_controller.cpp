@@ -39,19 +39,6 @@ static constexpr microseconds kFutureMetadataLength = 2s;
 static constexpr int kMaxFutureMetadataPackets = 4;
 static constexpr QRectF kWidgetBounds(0.0, 0.0, 1.0, 1.0);
 
-const QString kWidgetAnalyticsControllerFrameLogPattern(
-    "Displaying frame in the client. Frame timestamp (ms): {:frame_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
-    "diff from current time (ms): {:frame_time_difference_from_current_time}");
-
-const QString kWidgetAnalyticsControllerMetadataLogPattern(
-    "Displaying metadata in the client. Metadata timestamp (ms): {:metadata_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
-    "diff from current time (ms): {:metadata_time_difference_from_current_time}, "
-    "diff from the last frame (ms): {:metadata_time_difference_from_last_frame}");
-
 QString objectDescription(const std::vector<Attribute>& attributes)
 {
     QString result;
@@ -395,8 +382,6 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
     {
         d->logger = std::make_unique<nx::analytics::MetadataLogger>(
             "widget_analytics_controller_",
-            kWidgetAnalyticsControllerFrameLogPattern,
-            kWidgetAnalyticsControllerMetadataLogPattern,
             d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
             /*engineId*/ QnUuid());
     }

@@ -27,19 +27,6 @@ static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
 
-static const QString kNxRtpParserMetadataLogPattern(
-    "Received metadata from the server. Metadata timestamp (ms): {:metadata_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
-    "diff from current time (ms): {:metadata_time_difference_from_current_time}, "
-    "diff from the last frame (ms): {:metadata_time_difference_from_last_frame}");
-
-static const QString kNxRtpParserFrameLogPattern(
-    "Received a frame from the Server. Frame timestamp (ms): {:frame_timestamp}, "
-    "current time (ms): {:current_time}, "
-    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
-    "diff from current time (ms): {:frame_time_difference_from_current_time}");
-
 QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     VideoStreamParser(),
     m_deviceId(deviceId),
@@ -49,8 +36,6 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser)),
     m_logger(
         "rtp_parser_",
-        kNxRtpParserFrameLogPattern,
-        kNxRtpParserMetadataLogPattern,
         m_deviceId,
         /*engineId*/ QnUuid())
 {
