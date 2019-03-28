@@ -200,7 +200,9 @@ void RemoteMediatorPeerPool::findMediatorByPeerDomain(
             auto endpoint = toMediatorEndpoint(map.begin()->second);
             if (!endpoint.has_value())
             {
-                NX_WARNING(this, "Failed to deserialize MediatorEndpoint");
+                NX_WARNING(this,
+                    "Failed to deserialize MediatorEndpoint. string was: %1",
+                    map.begin()->second);
                 return handler(MediatorEndpoint());
             }
 
