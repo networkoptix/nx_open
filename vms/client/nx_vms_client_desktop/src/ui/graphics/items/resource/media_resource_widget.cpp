@@ -551,6 +551,9 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
         this, &QnMediaResourceWidget::handleSelectedAreaChanged);
+
+    connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectionStarted, this,
+        [this]() { selectThisWidget(true); });
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
