@@ -19,7 +19,6 @@ export class MergeModalContent {
     @Input() closable;
 
     config: any;
-    latestBuildUrl: string;
     masterId: string;
     merging: any;
     multipleSystems: boolean;
@@ -167,10 +166,6 @@ export class MergeModalContent {
                         this.config.systemStatuses.master :
                         this.config.systemStatuses.slave
             });
-        });
-
-        this.cloudApi.getDownloads().then((res) => {
-            this.latestBuildUrl = `/downloads/${res.data.buildNumber}`;
         });
     }
 

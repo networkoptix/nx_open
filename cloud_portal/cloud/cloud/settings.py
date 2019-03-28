@@ -381,8 +381,21 @@ AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
-CORS_ORIGIN_ALLOW_ALL = DEBUG
-CORS_ALLOW_CREDENTIALS = DEBUG
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+"""
+A regex which restricts the URL's for which the CORS headers will be sent.
+Defaults to r'^.*$', i.e. match all URL's. Useful when you only need CORS
+on a part of your site, e.g. an API at /api/.
+
+Regex allows cors for the following api calls:
+1) /api/ping
+2) /api/login
+3) /api/systems/connect
+4) /api/systems/disconnect
+These urls need to be whitelisted because mediaserver use them.
+"""
+CORS_URLS_REGEX = r'^/api/(?:login|ping|systems/(?:dis)?connect)'
 
 SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT

@@ -9,6 +9,7 @@ angular.module('cloudApp')
             var systemId = $routeParams.systemId;
             $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
+            $scope.betaMode = Config.allowBetaMode;
 
             authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
@@ -65,7 +66,7 @@ angular.module('cloudApp')
                 },
                 errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
             }).then(function () {
-                $scope.canMerge = $scope.system.isOnline;
+                $scope.canMerge = $scope.system.canMerge && $scope.system.isOnline;
                 if ($scope.system.mergeInfo) {
                     setMergeStatus($scope.system.mergeInfo);
                 }

@@ -22,7 +22,7 @@
                 Some of your servers don't support cloud System merge because of outdated software version.
             </p>
             <p class="help-block-no-height" translate>
-                Update them to the <a [href]="latestBuildUrl" target="_blank" translate>latest build</a>
+                Update them to the <a href="/download" target="_blank" translate>latest build</a>
             </p>
         </div>
     </div>
@@ -31,6 +31,8 @@
                 class="btn btn-primary wide-button" (click)="activeModal.close()">
             {{ 'Ok' | translate}}
         </button>
+        <button *ngIf="config.allowDebugMode" type="button" class="btn btn-danger"
+                (click)="showMergeForm = true; outOfDate = false;">Go to Merge (Debug)</button>
     </div>
 </div>
 
