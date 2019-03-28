@@ -901,7 +901,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     return result;
 }
 

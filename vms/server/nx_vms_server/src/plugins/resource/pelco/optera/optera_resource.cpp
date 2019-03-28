@@ -127,6 +127,7 @@ CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
 
     setOnvifRequestsRecieveTimeout(kSoapRecieveTimeout);
     setOnvifRequestsSendTimeout(kSoapSendTimeout);
+    setCameraCapability(Qn::CameraTimeCapability, true);
 
     return CameraDiagnostics::InitializationInProgress();
 }
