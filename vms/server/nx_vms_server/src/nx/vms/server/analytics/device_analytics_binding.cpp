@@ -291,7 +291,7 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
 
 void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* frame)
 {
-    if (!nx::analytics::loggingIni().enableLogging)
+    if (!nx::analytics::loggingIni().isLoggingEnabled())
         return;
 
     auto frameInfo = std::make_unique<nx::analytics::FrameInfo>(frame->timestampUs());

@@ -108,7 +108,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     if (!camera)
         return;
 
-    if (nx::analytics::loggingIni().enableLogging)
+    if (nx::analytics::loggingIni().isLoggingEnabled())
     {
         m_logger = std::make_unique<nx::analytics::MetadataLogger>(
             "rtsp_consumer_",

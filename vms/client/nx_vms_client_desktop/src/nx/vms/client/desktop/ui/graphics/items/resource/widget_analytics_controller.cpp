@@ -391,7 +391,7 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
     d->findExistingItems();
 
 
-    if (nx::analytics::loggingIni().enableLogging)
+    if (nx::analytics::loggingIni().isLoggingEnabled())
     {
         d->logger = std::make_unique<nx::analytics::MetadataLogger>(
             "widget_analytics_controller_",

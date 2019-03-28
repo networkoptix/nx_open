@@ -2,7 +2,7 @@
 
 #include <utils/common/synctime.h>
 #include <nx/utils/placeholder_binder.h>
-#include <nx/utils/member_detector.h>
+#include <nx/utils/debug_helpers/debug_helpers.h>
 #include <nx/analytics/analytics_logging_ini.h>
 
 namespace nx::analytics {
@@ -28,24 +28,6 @@ const PlaceholderName kMetadataTimeDifferenceFromPreviousMetadata(
 const PlaceholderName kMetadataTimeDifferenceFromLastFrame(
         "metadata_time_difference_from_last_frame");
 
-QString makeFileName(const QString& prefix, QnUuid deviceId, QnUuid engineId)
-{
-    QString fileName = prefix;
-    if (!deviceId.isNull())
-        fileName += QString("device_") + deviceId.toString();
-
-    if (!engineId.isNull())
-    {
-        if (!deviceId.isNull())
-            fileName.append("_");
-
-        fileName += QString("engine_") + engineId.toString();
-    }
-
-    fileName.append(".log");
-    return fileName;
-}
-
 } // namespace
 
 MetadataLogger::MetadataLogger(
@@ -55,25 +37,29 @@ MetadataLogger::MetadataLogger(
     QnUuid deviceId,
     QnUuid engineId)
     :
-    // TODO: #dmishin don't forget to add real path from ini file.
-    m_outputFile(QString("/home/fp/metadata_logs/") + makeFileName(logFilePrefix, deviceId, engineId)),
     m_frameLogPattern(frameLogPattern),
     m_metadataLogPattern(metadataLogPattern)
-
 {
-    if (!loggingIni().enableLogging)
+    if (!loggingIni().isLoggingEnabled())
         return;
 
+    const QString logFileName = makeLogFileName(
+        loggingIni().analyticsLogPath,
+        logFilePrefix,
+        deviceId,
+        engineId);
+
+    if (logFileName.isEmpty())
+        return;
+
+    m_outputFile.setFileName(logFileName);
     if (!m_outputFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        NX_WARNING(this, "Unable to open output file %1 for logging",
-            makeFileName(logFilePrefix, deviceId, engineId));
-    }
+        NX_WARNING(this, "Unable to open output file %1 for logging", logFileName);
 }
 
 void MetadataLogger::pushFrameInfo(std::unique_ptr<IFrameInfo> frameInfo)
 {
-    if (!loggingIni().enableLogging)
+    if (!loggingIni().isLoggingEnabled())
         return;
 
     m_previousFrameTimestamp = m_lastFrameTimestamp;
@@ -85,7 +71,7 @@ void MetadataLogger::pushFrameInfo(std::unique_ptr<IFrameInfo> frameInfo)
 void MetadataLogger::pushObjectMetadata(
         const nx::common::metadata::DetectionMetadataPacket& metadataPacket)
 {
-    if (!loggingIni().enableLogging)
+    if (!loggingIni().isLoggingEnabled())
         return;
 
     m_previousObjectMetadataPacket = std::move(m_lastObjectMetadataPacket);
@@ -155,6 +141,41 @@ void MetadataLogger::doLogging(const QString& logPattern)
         logLine.append('\n');
 
     m_outputFile.write(logLine.toUtf8());
+}
+
+QString MetadataLogger::makeLogFileName(
+    const QString& analyticsLoggingPath,
+    const QString& logFilePrefix,
+    QnUuid deviceId,
+    QnUuid engineId)
+{
+    if (analyticsLoggingPath.isEmpty())
+        return QString();
+
+    QString fileName = logFilePrefix;
+    if (!deviceId.isNull())
+        fileName += QString("device_") + deviceId.toSimpleString();
+
+    if (!engineId.isNull())
+    {
+        if (!deviceId.isNull())
+            fileName.append("_");
+
+        fileName += QString("engine_") + engineId.toSimpleString();
+    }
+
+    fileName.append("_");
+    fileName.append(QString::number((std::uintptr_t) this));
+    fileName.append(".log");
+
+    const QString logDirectoryPath = nx::utils::debug_helpers::debugFilesDirectoryPath(
+        loggingIni().analyticsLogPath);
+
+    if (logDirectoryPath.isEmpty())
+        return QString();
+
+    const QDir dir(logDirectoryPath);
+    return dir.absoluteFilePath(fileName);
 }
 
 } // namespace nx::analytics

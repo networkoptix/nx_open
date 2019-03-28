@@ -34,6 +34,11 @@ public:
 private:
     PlaceholderMap placeholderMap() const;
     void doLogging(const QString& logPattern);
+    QString makeLogFileName(
+        const QString& analyticsLoggingPath,
+        const QString& logFilePrefix,
+        QnUuid deviceId,
+        QnUuid engineId);
 
 private:
     QFile m_outputFile;

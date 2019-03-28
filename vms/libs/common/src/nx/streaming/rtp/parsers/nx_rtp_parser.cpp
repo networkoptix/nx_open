@@ -58,7 +58,7 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
 
 void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
 {
-    if (!nx::analytics::loggingIni().enableLogging)
+    if (!nx::analytics::loggingIni().isLoggingEnabled())
         return;
 
     if (data->dataType == QnAbstractMediaData::VIDEO)

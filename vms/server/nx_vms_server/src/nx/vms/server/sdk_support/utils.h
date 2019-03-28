@@ -11,6 +11,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/member_detector.h>
+#include <nx/utils/debug_helpers/debug_helpers.h>
 
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -68,7 +69,7 @@ std::optional<Manifest> loadManifestFromFile(const QString& filename)
     if (!NX_ASSERT(pluginsIni().analyticsManifestSubstitutePath[0]))
         return std::nullopt;
 
-    const QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
         pluginsIni().analyticsManifestSubstitutePath));
 
     const QString fileData = analytics::debug_helpers::loadStringFromFile(

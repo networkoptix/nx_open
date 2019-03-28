@@ -8,9 +8,13 @@ struct LoggingIni: public nx::kit::IniConfig
 {
     LoggingIni(): IniConfig("analytics_logging.ini") { reload(); }
 
-    NX_INI_FLAG(0, enableLogging,
-        "Enable logging of video frame info and metadata packets in multiple places in the\n"
-        "Server and Client");
+    NX_INI_STRING("", analyticsLogPath, "Path where all analytics logs will be written. If\n"
+        "no logging is performed.");
+
+    bool isLoggingEnabled() const
+    {
+        return analyticsLogPath[0] != '\0';
+    }
 };
 
 inline LoggingIni& loggingIni()
