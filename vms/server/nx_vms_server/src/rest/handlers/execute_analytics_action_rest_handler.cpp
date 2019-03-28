@@ -69,8 +69,6 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
         if (!bestShotVideoFrame)
             return nullptr;
 
-        auto refCount = bestShotVideoFrame->refCountThreadUnsafe();
-
         objectTrackInfo->setBestShotVideoFrame(bestShotVideoFrame.get());
     }
 
