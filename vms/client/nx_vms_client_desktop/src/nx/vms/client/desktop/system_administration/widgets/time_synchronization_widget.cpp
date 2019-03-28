@@ -206,11 +206,13 @@ void TimeSynchronizationWidget::setReadOnlyInternal(bool readOnly)
 
 void TimeSynchronizationWidget::showEvent(QShowEvent* event)
 {
+    base_type::showEvent(event);
     m_timeWatcher->start();
 }
 
 void TimeSynchronizationWidget::hideEvent(QHideEvent* event)
 {
+    base_type::hideEvent(event);
     m_timeWatcher->stop();
 }
 
