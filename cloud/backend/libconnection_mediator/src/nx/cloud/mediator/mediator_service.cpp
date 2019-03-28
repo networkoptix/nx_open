@@ -15,6 +15,7 @@
 
 #include "controller.h"
 #include "libconnection_mediator_app_info.h"
+#include "public_ip_discovery.h"
 #include "settings.h"
 #include "statistics/statistics_provider.h"
 #include "statistics/stats_manager.h"
@@ -77,6 +78,11 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     NX_INFO(this, lm("Initializating controller"));
 
     Controller controller(settings);
+    while (!controller.doMandatoryInitialization())
+    {
+        NX_INFO(this, lm("Retrying controller initialization after delay"));
+        std::this_thread::sleep_for(settings.clusterDbMap().connectionRetryDelay);
+    }
     m_controller = &controller;
 
     NX_INFO(this, lm("Initializating view"));
@@ -105,6 +111,9 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Initialization completed. Running..."));
 
+    if (!registerThisInstanceNameInCluster(settings))
+        return -1;
+
     const int result = runMainLoop();
 
     view.stop();
@@ -114,6 +123,40 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
         .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()));
 
     return result;
+}
+
+bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
+{
+    MediatorEndpoint endpoint;
+    if (settings.server().name.empty())
+    {
+        const auto publicIp = m_controller->discoverPublicAddress();
+        if (!publicIp)
+        {
+            NX_ERROR(this, "Failed to discover public address. Terminating.");
+            return false;
+        }
+        endpoint.domainName = publicIp->toString().toStdString();
+
+        if (!httpEndpoints().empty())
+            endpoint.httpPort = httpEndpoints().front().port;
+        else
+            endpoint.httpsPort = httpsEndpoints().front().port;
+    }
+    else
+    {
+        endpoint.domainName = settings.server().name;
+    }
+
+    m_controller->remoteMediatorPeerPool().setEndpoint(endpoint);
+
+    if (settings.clusterDbMap().map.synchronizationSettings.discovery.enabled)
+    {
+        m_controller->remoteMediatorPeerPool().startDiscovery(
+            &m_view->httpServer().messageDispatcher());
+    }
+
+    return true;
 }
 
 } // namespace hpm
