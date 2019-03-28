@@ -75,11 +75,6 @@ public:
      */
     void startDiscovery(
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
-
-private:
-    std::string toString(const MediatorEndpoint& endpoint) const;
-    std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointStr) const;
-
 private:
     const conf::ClusterDbMap& m_settings;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;

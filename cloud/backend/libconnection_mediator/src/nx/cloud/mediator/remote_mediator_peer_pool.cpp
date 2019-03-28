@@ -32,6 +32,41 @@ int toInt(const std::string& integer)
     }
 }
 
+std::string toString(const MediatorEndpoint& endpoint)
+{
+    std::string s = endpoint.domainName;
+    s += ";";
+    s += std::to_string(endpoint.httpPort.has_value() ? *endpoint.httpPort : -1);
+    s += ";";
+    s += std::to_string(endpoint.httpsPort.has_value() ? *endpoint.httpsPort : -1);
+    s += ";";
+    s += std::to_string(endpoint.stunUdpPort.has_value() ? *endpoint.stunUdpPort : -1);
+    return s;
+}
+
+
+std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointStr)
+{
+    std::vector<std::string> values;
+    boost::split(values, endpointStr, boost::is_any_of(";"));
+    if (values.size() != 4)
+        return std::nullopt;
+
+    MediatorEndpoint endpoint;
+    endpoint.domainName = values[0];
+
+    if (int httpPort = toInt(values[1]); httpPort != -1)
+        endpoint.domainName = httpPort;
+
+    if (int httpsPort = toInt(values[2]); httpsPort != -1)
+        endpoint.httpsPort = httpsPort;
+
+    if (int stunUdpPort = toInt(values[3]); stunUdpPort != -1)
+        endpoint.stunUdpPort = stunUdpPort;
+
+    return endpoint;
+}
+
 } //namespace
 
 RemoteMediatorPeerPool::RemoteMediatorPeerPool(const conf::ClusterDbMap& settings)
@@ -186,43 +221,6 @@ void RemoteMediatorPeerPool::startDiscovery(
     m_map->synchronizationEngine().discoveryManager().start(
         m_settings.map.synchronizationSettings.clusterId,
         m_syncEngineUrl);
-}
-
-std::string RemoteMediatorPeerPool::toString(
-    const MediatorEndpoint& endpoint) const
-{
-    std::string s = endpoint.domainName;
-    s += ";";
-    s += std::to_string(endpoint.httpPort.has_value() ? *endpoint.httpPort : -1);
-    s += ";";
-    s += std::to_string(endpoint.httpsPort.has_value() ? *endpoint.httpsPort : -1);
-    s += ";";
-    s += std::to_string(endpoint.stunUdpPort.has_value() ? *endpoint.stunUdpPort : -1);
-    return s;
-}
-
-
-std::optional<MediatorEndpoint> RemoteMediatorPeerPool::toMediatorEndpoint(
-    const std::string& endpointStr) const
-{
-    std::vector<std::string> values;
-    boost::split(values, endpointStr, boost::is_any_of(";"));
-    if (values.size() != 4)
-        return std::nullopt;
-
-    MediatorEndpoint endpoint;
-    endpoint.domainName = values[0];
-
-    if (int httpPort = toInt(values[1]); httpPort != -1)
-        endpoint.domainName = httpPort;
-
-    if (int httpsPort = toInt(values[2]); httpsPort != -1)
-        endpoint.httpsPort = httpsPort;
-
-    if (int stunUdpPort = toInt(values[3]); stunUdpPort != -1)
-        endpoint.stunUdpPort = stunUdpPort;
-
-    return endpoint;
 }
 
 } // namespace nx::hpm
