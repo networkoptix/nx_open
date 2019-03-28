@@ -390,12 +390,16 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
 
     d->findExistingItems();
 
-    d->logger = std::make_unique<nx::analytics::MetadataLogger>(
-        "widget_analytics_controller_",
-        kWidgetAnalyticsControllerFrameLogPattern,
-        kWidgetAnalyticsControllerMetadataLogPattern,
-        d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
-        /*engineId*/ QnUuid());
+
+    if (nx::analytics::loggingIni().enableLogging)
+    {
+        d->logger = std::make_unique<nx::analytics::MetadataLogger>(
+            "widget_analytics_controller_",
+            kWidgetAnalyticsControllerFrameLogPattern,
+            kWidgetAnalyticsControllerMetadataLogPattern,
+            d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
+            /*engineId*/ QnUuid());
+    }
 }
 
 WidgetAnalyticsController::~WidgetAnalyticsController()
@@ -415,7 +419,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (!d->metadataProvider || !d->areaHighlightWidget)
         return;
 
-    if (nx::analytics::loggingIni().enableLogging)
+    if (d->logger)
         d->logger->pushFrameInfo(std::make_unique<nx::analytics::FrameInfo>(timestamp));
 
     auto metadataList = d->metadataProvider->metadataRange(
@@ -436,7 +440,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         if (const auto& metadata = metadataList.first();
             metadata->timestampUsec <= timestamp.count())
         {
-            if (nx::analytics::loggingIni().enableLogging)
+            if (d->logger)
                 d->logger->pushObjectMetadata(*metadata);
 
             for (const auto& object: metadata->objects)
