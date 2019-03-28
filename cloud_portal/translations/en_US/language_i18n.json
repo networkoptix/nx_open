@@ -176,10 +176,15 @@
     "search": {
         "Search": "Search", 
         "filter applied": "filter applied", 
+        "vendor": "Manufacturer", 
         "selected": "selected", 
+        "hardwareType": "Type", 
         "search_ipvd": "Search by model or manufacturer", 
+        "vendors": "manufacturers", 
         "filters applied": "filters applied", 
-        "Any": "Any"
+        "Any": "Any", 
+        "hardwareTypes": "types", 
+        "minResolution": "Minimum Resolution"
     }, 
     "servers in the merged System.": "servers in the merged System."
 }

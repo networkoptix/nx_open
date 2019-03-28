@@ -5,7 +5,12 @@
 		"filter applied" : "filter applied",
 		"filters applied" : "filters applied",
 		"Any": "Any",
-		"selected": "selected"
+		"selected": "selected",
+		"vendor": "Manufacturer",
+		"vendors": "manufacturers",
+		"hardwareType": "Type",
+		"hardwareTypes": "types",
+		"minResolution": "Minimum Resolution"
 	},
 	"cameraFilters": {
 		"ptz": "PTZ cameras",

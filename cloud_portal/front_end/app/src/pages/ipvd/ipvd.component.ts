@@ -129,7 +129,7 @@ private setupDefaults() {
         this.filterModel.selects = [
             {
                 id      : 'resolution',
-                label   : 'Minimum Resolution',
+                label   : this.lang.search.minResolution,
                 items   : this.resolutions,
                 selected: this.resolutions[0]
             }
@@ -157,8 +157,8 @@ private setupDefaults() {
         this.filterModel.multiselects = [
             {
                 id      : 'hardwareTypes',
-                label   : 'Types',
-                singular: 'Type',
+                label   : this.lang.search.hardwareTypes,
+                singular: this.lang.search.hardwareType,
                 items   : this.hardwareTypes,
                 selected: []
             }
@@ -199,8 +199,8 @@ private setupDefaults() {
                     .multiselects.unshift(
                         {
                             id      : 'vendors',
-                            label   : 'Manufacturers',
-                            singular: 'Manufacturer',
+                            label   : this.lang.search.vendors,
+                            singular: this.lang.search.vendor,
                             items   : this.vendors.map(v => (
                                     { id: v.name, label: v.name }
                             )),

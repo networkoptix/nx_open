@@ -39,10 +39,8 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
 
     public advSearch = false;
 
-    constructor(private _elementRef: ElementRef,
-                private _router: Router,
+    constructor(private _router: Router,
                 private _route: ActivatedRoute,
-                private _renderer: Renderer2,
                 private uri: NxUriService,
                 private configService: NxConfigService,
                 private translate: TranslateService) {
@@ -83,10 +81,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         this.onTouchedCallback();
     }
 
-    isBlank(x) {
-        return !x;
-    }
-
     writeValue(value: any): void {
         if (value) {
             this.localFilter = value;
@@ -119,8 +113,7 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                         .selects
                         .find((select) => {
                             if (select.id === key) {
-                                const selectedItem = select.items.find((item) => item.name === this.params[key]);
-                                select.selected = selectedItem;
+                                select.selected = select.items.find((item) => item.name === this.params[key]);
                             }
                         });
                 }
@@ -138,8 +131,6 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
         }
 
         this.numberOfOptionsSelected();
-        const normalizedValue = this.isBlank(value) ? '' : value;
-        this._renderer.setProperty(this._elementRef.nativeElement, 'value', normalizedValue);
     }
 
     // From ControlValueAccessor interface
@@ -210,15 +201,13 @@ export class NxSearchComponent implements OnInit, ControlValueAccessor {
                 if (select.selected.length > 0) {
                     flag++;
 
-                    switch (select.selected.length) {
-                        case 1 :
-                            const label = select.singular || select.label;
-                            multiSelectsSelected = label + ' - ' + select.items.find(item => {
-                                return (item.label.name || item.id) === select.selected[0];
-                            }).label;
-                            break;
-                        default :
-                            multiSelectsSelected = select.selected.length + ' ' + select.label.toLowerCase();
+                    if (select.selected.length === 1) {
+                        const label = select.singular || select.label;
+                        multiSelectsSelected = label + ' - ' + select.items.find(item => {
+                            return (item.label.name || item.id) === select.selected[0];
+                        }).label;
+                    } else {
+                        multiSelectsSelected = select.selected.length + ' ' + select.label.toLowerCase();
                     }
                 }
             });
