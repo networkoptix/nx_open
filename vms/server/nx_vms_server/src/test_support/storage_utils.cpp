@@ -100,6 +100,9 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
     waitForStorageToAppear(server, storagePath);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Test data generation
+
 static ChunkDataList generateChunksForQuality(
     const QString& baseDir, const QString& cameraName, const QString& quality, qint64 startTimeMs,
     int count, const QByteArray& payload)
@@ -167,6 +170,7 @@ public:
         setupStream();
         setupFrame();
         setupIoContext();
+        av_log_set_level(AV_LOG_QUIET);
     }
 
     std::vector<char> create(int lengthSec)
@@ -247,7 +251,7 @@ private:
         m_frame->format = m_codecContext->pix_fmt;
         m_frame->width = m_codecContext->width;
         m_frame->height = m_codecContext->height;
-        if (av_frame_get_buffer(m_frame, 0) < 0)
+        if (av_frame_get_buffer(m_frame, 64) < 0)
             throw std::runtime_error("Failed to initialize ffmpeg: av_frame_get_buffer");
     }
 
@@ -277,7 +281,6 @@ private:
         {
             avio_flush(m_formatContext->pb);
             m_formatContext->pb->opaque = 0;
-
             av_freep(&m_formatContext->pb->buffer);
             av_opt_free(m_formatContext->pb);
             av_free(m_formatContext->pb);
