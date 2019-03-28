@@ -75,7 +75,7 @@ void ClientWebserver::makeReply(QtHttpRequest* request, QtHttpReply* reply)
 
     const auto jsonRequest = convertHttpToJsonRequest(*request);
     auto jsonReply = m_directorInterface->process(jsonRequest);
-    reply->appendRawData(jsonReply.toJson());
+    reply->appendRawData(jsonReply.toJson(QJsonDocument::Compact));
 }
 
 } // namespace nx::vmx::client::desktop

@@ -8,6 +8,8 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/log/log.h>
 
+#include <nx/vms/client/desktop/ini.h>
+
 #if defined(Q_OS_WIN)
     #include "windows.h"
 #endif
@@ -20,7 +22,6 @@ using namespace std::chrono;
 
 static constexpr milliseconds kHandlesInterval = 500ms;
 static constexpr milliseconds kLogInterval = 1min;
-static constexpr size_t kFrameTimePoints = 200;
 
 } // namespace
 
@@ -38,7 +39,7 @@ struct DebugInfoInstrument::Private
 
     QString fps = "----";
     qint64 frameTimeMs = 0;
-    nx::utils::circular_buffer<qint64> frameTimePoints{ kFrameTimePoints };
+    nx::utils::circular_buffer<qint64> frameTimePoints{ini().storeFrameTimePoints};
     QString handles;
 
     void updateHandles()

@@ -63,6 +63,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", autoUpdatesCheckChangesetOverride, "Background updates check will use this changeset instead of \"latest\"");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnline, "Period to wait until server goes online, in seconds. Set to zero to use built-in value.");
     NX_INI_INT(0, clientWebServerPort, "Enables web server to remote control NX client operation. Set non-zero port value to enable.");
+    NX_INI_INT(1000, storeFrameTimePoints, "Makes client to remember this number of last frame paint time points for using in FT.");
 };
 
 inline Ini& ini()

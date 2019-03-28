@@ -99,8 +99,10 @@ QJsonDocument executeGetFrameTimePoints(QJsonObject request)
     const auto framePoints = Director::instance()->getFrameTimePoints();
     QJsonArray jsonFramePoints;
     for (auto timePoint: framePoints)
+    {
         if (timePoint >= from)
             jsonFramePoints.push_back(timePoint);
+    }
 
     auto response = formResponseBase(DirectorJsonInterface::Ok);
     response.insert("framePoints", jsonFramePoints);
