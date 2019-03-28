@@ -27,6 +27,9 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 
+#include <nx/analytics/analytics_logging_ini.h>
+#include <nx/analytics/frame_info.h>
+
 namespace nx::vms::server::analytics {
 
 using namespace nx::vms::api::analytics;
@@ -35,6 +38,11 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
+static const QString kIncomingFrameLogPattern(
+    "Pushing frame to the DeviceAgent. Current time (ms): {:current_time}, "
+    "frame timestamp (ms): {:frame_timestamp}, "
+    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
+    "diff from current time (ms): {:frame_time_difference_from_current_time}");
 static const int kMaxQueueSize = 100;
 
 } // namespace
@@ -47,7 +55,13 @@ DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     base_type(kMaxQueueSize),
     nx::vms::server::ServerModuleAware(serverModule),
     m_device(std::move(device)),
-    m_engine(std::move(engine))
+    m_engine(std::move(engine)),
+    m_incomingFrameLogger(
+        "incoming_frame_",
+        kIncomingFrameLogPattern,
+        QString(),
+        m_device->getId(),
+        m_engine->getId())
 {
 }
 
@@ -273,6 +287,15 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
         sdk_support::fromIStringMap(effectiveSettings.get()));
 
     return true;
+}
+
+void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* frame)
+{
+    if (!nx::analytics::loggingIni().enableLogging)
+        return;
+
+    auto frameInfo = std::make_unique<nx::analytics::FrameInfo>(frame->timestampUs());
+    m_incomingFrameLogger.pushFrameInfo(std::move(frameInfo));
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
@@ -515,6 +538,8 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
     auto packetAdapter = std::dynamic_pointer_cast<DataPacketAdapter>(data);
     if (!NX_ASSERT(packetAdapter))
         return true;
+
+    logIncomingFrame(packetAdapter->packet());
 
     const Error error = consumingDeviceAgent->pushDataPacket(packetAdapter->packet());
     if (error != Error::noError)

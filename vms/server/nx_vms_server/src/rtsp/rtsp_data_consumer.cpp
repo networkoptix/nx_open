@@ -19,6 +19,9 @@
 #include <nx/streaming/rtp/rtp.h>
 #include <media_server/media_server_module.h>
 
+#include <nx/analytics/frame_info.h>
+#include <nx/analytics/analytics_logging_ini.h>
+
 using namespace nx::vms::api;
 
 namespace {
@@ -49,6 +52,19 @@ static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
 //static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 //static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
 static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
+
+static const QString kRtspConsumerMetadataLogPattern(
+    "Sending metadata to the client. Metadata timestamp (ms): {:metadata_timestamp}, "
+    "current time (ms): {:current_time}, "
+    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
+    "diff from current time (ms): {:metadata_time_difference_from_current_time}, "
+    "diff from the last frame (ms): {:metadata_time_difference_from_last_frame}");
+
+static const QString kRtspConsumerFrameLogPattern(
+    "Sending a frame to the client. Frame timestamp (ms): {:frame_timestamp}, "
+    "current time (ms): {:current_time}, "
+    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
+    "diff from current time (ms): {:frame_time_difference_from_current_time}");
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     QnAbstractDataConsumer(MAX_QUEUE_SIZE),
@@ -91,6 +107,17 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+
+    if (nx::analytics::loggingIni().enableLogging)
+    {
+        m_logger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            kRtspConsumerFrameLogPattern,
+            kRtspConsumerMetadataLogPattern,
+            camera->getId(),
+            QnUuid());
+    }
+
     auto videoLayout = camera->getVideoLayout();
     if (!videoLayout)
         return;
@@ -468,9 +495,13 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    bool isMetadata = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
 
     if (isVideo || isAudio)
     {
+        if (m_logger)
+            m_logger->pushFrameInfo(std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
@@ -541,6 +572,15 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             m_isLive = false;
         }
+    }
+
+    if (isMetadata && m_logger)
+    {
+        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata
+            = nx::common::metadata::fromMetadataPacket(
+                    std::dynamic_pointer_cast<const QnCompressedMetadata>(media));
+
+        m_logger->pushObjectMetadata(*detectionMetadata);
     }
 
     int trackNum = media->channelNumber;

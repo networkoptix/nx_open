@@ -10,6 +10,8 @@
 #include <utils/common/adaptive_sleep.h>
 #include <camera/video_camera.h>
 
+#include <nx/analytics/metadata_logger.h>
+
 class QnRtspConnectionProcessor;
 
 static const int MAX_RTP_CHANNELS = 32;
@@ -159,4 +161,6 @@ private:
      */
     int64_t m_lastLiveFrameTime[CL_MAX_CHANNELS][2]{{0}};
     bool m_isLive = false;
+
+    std::unique_ptr<nx::analytics::MetadataLogger> m_logger;
 };
