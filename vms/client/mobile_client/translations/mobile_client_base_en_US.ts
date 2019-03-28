@@ -2,16 +2,16 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
-    <name>QnLayoutsModelUnsorted</name>
+    <name>ActionButtonsModel</name>
     <message>
-        <source>All Cameras</source>
+        <source>Press and hold to speak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>nx::client::mobile::ActionButtonsModel</name>
+    <name>QnLayoutsModelUnsorted</name>
     <message>
-        <source>Press and hold to speak</source>
+        <source>All Cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
