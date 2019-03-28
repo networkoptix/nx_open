@@ -151,7 +151,7 @@ void RemoteMediatorPeerPool::findMediatorByPeerDomain(
                     this,
                     "getRangeWithPrefix with peerDomainName: %1 failed error: %1 for",
                     nx::clusterdb::map::toString(result), peerDomainName);
-                return handler(std::string());
+                return handler(MediatorEndpoint());
             }
 
             NX_VERBOSE(
@@ -159,9 +159,17 @@ void RemoteMediatorPeerPool::findMediatorByPeerDomain(
                 "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for peerDomainName: %3",
                 nx::clusterdb::map::toString(result), containerString(map), peerDomainName);
 
-            return map.empty()
-                ? handler(MediatorEndpoint{})
-                : handler(toMediatorEndpoint(map.begin()->second));
+            if (map.empty())
+                return handler(MediatorEndpoint());
+
+            auto endpoint = toMediatorEndpoint(map.begin()->second);
+            if (!endpoint.has_value())
+            {
+                NX_WARNING(this, "Failed to deserialize MediatorEndpoint");
+                return handler(MediatorEndpoint());
+            }
+
+            return handler(*endpoint);
         });
 }
 
