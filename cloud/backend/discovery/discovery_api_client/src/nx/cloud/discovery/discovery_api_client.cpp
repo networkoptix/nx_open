@@ -1,3 +1,4 @@
+
 #include "discovery_api_client.h"
 
 #include <nx/utils/timer_holder.h>
@@ -283,8 +284,8 @@ void DiscoveryClient::startRegisterNodeRequest(const std::chrono::milliseconds& 
             QString expirationTime = dt.isValid() ? dt.toString() : "now";
 
             NX_VERBOSE(this, lm(kRequestMessageTemplate)
-                    .arg(m_requestSent.toString())
-                    .arg(expirationTime));
+                .arg(m_requestSent.toString())
+                .arg(expirationTime));
         });
 }
 
@@ -414,7 +415,8 @@ DiscoveryClient::calculateRegistrationDelay(const nx::network::http::Response* r
         "node expiration time ET (msec since epoch) = %1,  "
         "request travel time to server RTT (in msecs) = %2,  "
         "time at which request delay was calculated N (msec since epoch) = %3,  "
-        "ET - N - RTT = %4. Using zero instead.";
+        "round trip padding used to buffer request RTP(in msecs) = %4,  "
+        "ET - N - RTT - RTP= %5. Using zero instead.";
 
     auto serverResponseTime = getServerResponseTime(response);
     if (!serverResponseTime.has_value())
@@ -434,8 +436,8 @@ DiscoveryClient::calculateRegistrationDelay(const nx::network::http::Response* r
 
     auto now = system_clock::now();
 
-    auto registrationDelay =
-        duration_cast<milliseconds>(m_thisNode.expirationTime - now - travelTime);
+    auto registrationDelay = duration_cast<milliseconds>(
+            m_thisNode.expirationTime - now - travelTime - m_settings.roundTripPadding);
 
     if (registrationDelay < milliseconds::zero())
     {
@@ -444,6 +446,7 @@ DiscoveryClient::calculateRegistrationDelay(const nx::network::http::Response* r
                 m_thisNode.expirationTime.time_since_epoch()).count())
             .arg(travelTime.count())
             .arg(duration_cast<milliseconds>(now.time_since_epoch()).count())
+            .arg(m_settings.roundTripPadding.count())
             .arg(registrationDelay.count()));
         return std::nullopt;
     }
