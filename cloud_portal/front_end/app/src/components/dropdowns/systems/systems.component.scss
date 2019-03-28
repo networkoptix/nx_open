@@ -130,6 +130,7 @@
         display : none;
         @media (min-width : $collapse-second-width + 1) {
             display : block;
+            bottom  : 14px;
         }
     }
 
