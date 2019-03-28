@@ -22,7 +22,7 @@ extern "C" {
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
-#include "ios_device_info.h"
+#include <nx/utils/ios_device_info.h>
 #endif
 
 #include <QtMultimedia/QAbstractVideoBuffer>
@@ -320,6 +320,7 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     static const QSize kFullHdResolution(1920, 1080);
     static const QSize kDci4kResolution(4096, 2160);
 
+    using IosDeviceInformation = nx::utils::IosDeviceInformation;
     const auto& deviceInfo = IosDeviceInformation::currentInformation();
     switch (codec)
     {

@@ -23,6 +23,7 @@ void alc_deinit(void);
 
 #include <utils/common/app_info.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/ios_device_info.h>
 
 namespace nx {
 namespace audio {
@@ -53,7 +54,12 @@ void fixVolumeLevel()
     if (nx::utils::SoftwareVersion(QSysInfo::productVersion()) < nx::utils::SoftwareVersion(11, 4))
         return;
 
-    static constexpr int kTimesGain = 64;
+
+    const auto& deviceInfo = nx::utils::IosDeviceInformation::currentInformation();
+    const bool isIPhone6 = deviceInfo.majorVersion == nx::utils::IosDeviceInformation::iPhone6;
+    static const int kTimesGain = isIPhone6
+        ? 3 //< Prevents volume overload in iPhone 6.
+        : 48;
     alListenerf(AL_GAIN, kTimesGain);
 }
 
