@@ -15,75 +15,6 @@
 
 namespace nx::vms::server::test {
 
-namespace {
-
-struct ChunkData
-{
-    qint64 startTimeMs;
-    qint64 durationsMs;
-};
-
-using ChunkDataList = std::vector<ChunkData>;
-
-struct Catalog
-{
-    ChunkDataList lowQualityChunks;
-    ChunkDataList highQualityChunks;
-};
-
-using Archive = QMap<QString, Catalog>;
-
-static ChunkDataList generateChunksForQuality(
-    const QString& baseDir,
-    const QString& cameraName,
-    const QString& quality,
-    qint64 startTimeMs,
-    int count)
-{
-    using namespace std::chrono;
-
-    const int durationMs = 70000;
-    ChunkDataList result;
-
-    for (int i = 0; i < count; ++i)
-    {
-        QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(durationMs);
-        QString pathString = QnStorageManager::dateTimeStr(
-            startTimeMs, currentTimeZone() / 60,  "/");
-
-        pathString = lit("%2/%1/%3").arg(cameraName).arg(quality).arg(pathString);
-        auto fullDirPath = QDir(baseDir).absoluteFilePath(pathString);
-        QString fullFileName =
-            closeDirPath(baseDir) + closeDirPath(pathString) + fileName;
-
-        NX_ASSERT(QDir().mkpath(fullDirPath));
-        NX_ASSERT(QFile(fullFileName).open(QIODevice::WriteOnly));
-
-        result.push_back(ChunkData{startTimeMs, durationMs});
-        startTimeMs += durationMs + 5;
-    }
-
-    return result;
-}
-
-static Catalog generateCameraArchive(
-    const QString& baseDir,
-    const QString& cameraName,
-    qint64 startTimeMs,
-    int count)
-{
-    Catalog result;
-    result.lowQualityChunks = generateChunksForQuality(
-        baseDir, cameraName, "low_quality", startTimeMs, count);
-
-    result.highQualityChunks = generateChunksForQuality(
-        baseDir, cameraName, "hi_quality", startTimeMs, count);
-
-    return result;
-}
-
-} // namespace
-
 class FtReindex: public QObject, public ::testing::Test
 {
 protected:
@@ -146,7 +77,8 @@ protected:
 
     void addArchiveDataForCamera(const QString& cameraName, int count, qint64 startTimeMs)
     {
-        const auto newCatalog = generateCameraArchive(m_storagePath, cameraName, startTimeMs, count);
+        const auto newCatalog = test_support::generateCameraArchive(
+            m_storagePath, cameraName, startTimeMs, count);
 
         std::copy(
             newCatalog.lowQualityChunks.cbegin(), newCatalog.lowQualityChunks.cend(),
@@ -186,7 +118,7 @@ protected:
 
 private:
     std::unique_ptr<MediaServerLauncher> m_server;
-    Archive m_generatedArchive;
+    test_support::Archive m_generatedArchive;
     QString m_storagePath;
     QMap<QString, DeviceFileCatalogPtr> m_serverCatalog[QnServer::ChunksCatalogCount];
     QnMutex m_reindexMutex;
@@ -215,7 +147,7 @@ private:
     void assertDataEquality(
         QnServer::ChunksCatalog quality,
         const QString& cameraName,
-        const ChunkDataList& generatedChunks)
+        const test_support::ChunkDataList& generatedChunks)
     {
         const auto serverCatalogIt = m_serverCatalog[QnServer::LowQualityCatalog].find(cameraName);
         ASSERT_NE(m_serverCatalog[quality].cend(), serverCatalogIt);

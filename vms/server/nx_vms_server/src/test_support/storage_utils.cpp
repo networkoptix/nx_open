@@ -90,4 +90,50 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
     waitForStorageToAppear(server, storagePath);
 }
 
+static ChunkDataList generateChunksForQuality(
+    const QString& baseDir, const QString& cameraName, const QString& quality, qint64 startTimeMs,
+    int count)
+{
+    using namespace std::chrono;
+
+    const int durationMs = 70000;
+    ChunkDataList result;
+
+    for (int i = 0; i < count; ++i)
+    {
+        QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(durationMs);
+        QString pathString = QnStorageManager::dateTimeStr(
+            startTimeMs, currentTimeZone() / 60, "/");
+
+        pathString = lit("%2/%1/%3").arg(cameraName).arg(quality).arg(pathString);
+        auto fullDirPath = QDir(baseDir).absoluteFilePath(pathString);
+        QString fullFileName =
+            closeDirPath(baseDir) + closeDirPath(pathString) + fileName;
+
+        NX_ASSERT(QDir().mkpath(fullDirPath));
+        NX_ASSERT(QFile(fullFileName).open(QIODevice::WriteOnly));
+
+        result.push_back(ChunkData{ startTimeMs, durationMs });
+        startTimeMs += durationMs + 5;
+    }
+
+    return result;
+}
+
+Catalog generateCameraArchive(
+    const QString& baseDir,
+    const QString& cameraName,
+    qint64 startTimeMs,
+    int count)
+{
+    Catalog result;
+    result.lowQualityChunks = generateChunksForQuality(
+        baseDir, cameraName, "low_quality", startTimeMs, count);
+
+    result.highQualityChunks = generateChunksForQuality(
+        baseDir, cameraName, "hi_quality", startTimeMs, count);
+
+    return result;
+}
+
 } // namespace nx::test_support
