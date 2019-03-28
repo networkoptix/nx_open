@@ -178,7 +178,8 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
         [this]()
         {
             return std::make_unique<InitiateConnectionRequestHandler>(
-                m_holePunchingProcessor);
+                m_holePunchingProcessor,
+                m_remoteMediatorPeerPool);
         },
         network::http::Method::post);
 }
@@ -201,9 +202,11 @@ void Server::registerApiHandler(
 //-------------------------------------------------------------------------------------------------
 
 InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
-    HolePunchingProcessor* holePunchingProcessor)
+    HolePunchingProcessor* holePunchingProcessor,
+    RemoteMediatorPeerPool* remoteMediatorPeerPool)
     :
-    m_holePunchingProcessor(holePunchingProcessor)
+    m_holePunchingProcessor(holePunchingProcessor),
+    m_remoteMediatorPeerPool(remoteMediatorPeerPool)
 {
 }
 

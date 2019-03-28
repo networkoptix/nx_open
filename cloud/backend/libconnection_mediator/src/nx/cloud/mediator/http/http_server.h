@@ -95,7 +95,8 @@ class InitiateConnectionRequestHandler:
 {
 public:
     InitiateConnectionRequestHandler(
-        HolePunchingProcessor* holePunchingProcessor);
+        HolePunchingProcessor* holePunchingProcessor,
+        RemoteMediatorPeerPool* remoteMediatorPeerPool);
 
 protected:
     virtual void processRequest(
@@ -104,6 +105,7 @@ protected:
 
 private:
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+    RemoteMediatorPeerPool* m_remoteMediatorPeerPool = nullptr;
 
     void reportResult(
         api::ResultCode resultCode,
