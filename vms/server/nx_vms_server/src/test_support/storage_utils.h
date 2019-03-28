@@ -22,7 +22,14 @@ struct Catalog
 
 using Archive = QMap<QString, Catalog>;
 
+static const int kHiQualityFileWidth = 640;
+static const int kHiQualityFileHeight = 480;
+static const int kLowQualityFileWidth = 320;
+static const int kLowQualityFileHeight = 240;
+
 Catalog generateCameraArchive(
-    const QString& baseDir,const QString& cameraName, qint64 startTimeMs, int count);
+    const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count);
+
+QByteArray createTestMkvFile(int lengthSec, int width, int height);
 
 } // namespace nx::test_support
