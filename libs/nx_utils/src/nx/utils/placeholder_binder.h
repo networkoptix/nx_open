@@ -8,7 +8,7 @@
 namespace nx::utils {
 
 // TODO: #dmishin currently there is no way to escape placeholders.
-class PlaceholderBinder
+class NX_UTILS_API PlaceholderBinder
 {
 public:
     PlaceholderBinder(QString stringTemplate);
