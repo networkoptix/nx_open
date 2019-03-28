@@ -38,6 +38,8 @@ export class DownloadComponent implements OnInit, OnDestroy {
     @ViewChild('tabs')
     public tabs: NgbTabset;
 
+    // TODO: Fix arm supported. It says the same thing as linux
+
     private setupDefaults() {
 
         this.config = this.configService.getConfig();
@@ -84,27 +86,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
         return this.platformMatch[ this.deviceService.getDeviceInfo().os ];
     }
 
-    private getDownloadsInfo() {
-        this.downloads.groups.forEach(platform => {
-            platform.installers = this.downloadsData.installers.filter((installer) => {
-                return platform.appTypes.includes(installer.appType);
-            }).filter((installer) => {
-                switch (platform.name) {
-                    case 'arm':
-                        return installer.path.indexOf('arm') > -1;
-                    case 'sdk':
-                        return 1;
-                    default:
-                        return platform.installerTypes.includes(installer.platform);
-                }
-            }).map((installer) => {
-                installer.formatName = `${this.language.lang.downloads.platforms[installer.platform ]} - ${this.language.lang.downloads.appTypes[installer.appType]}`;
-                installer.url = this.downloadsData.releaseUrl + installer.path;
-                return installer;
-            });
-        });
-    }
-
     public beforeChange($event: NgbTabChangeEvent) {
         this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + $event.nextId);
         this.locationProxy.path('/download/' + $event.nextId, false);
@@ -138,20 +119,46 @@ export class DownloadComponent implements OnInit, OnDestroy {
             .getDownloads()
             .then(data => {
                 this.downloadsData = data.data;
-
-                this.downloads.groups = this.downloads.groups.filter(platform => {
-                    return !this.downloadsData.platforms.every(avail => {
-                        return avail.name !== platform.name;
+                console.log(this.downloadsData);
+                this.downloadsData.platforms.forEach((platform) => {
+                    platform.files = platform.files.filter((installer) => {
+                        switch (platform.name) {
+                            case 'arm':
+                                return installer.path.indexOf('arm') > -1;
+                            case 'sdk':
+                                return installer.path.indexOf('sdk') > -1;
+                            default:
+                                return this.downloads.groups[platform.name].appTypes.includes(installer.appType);
+                        }
+                    }).map((installer) => {
+                        const translatedPlatform = this.language.lang.downloads.platforms[installer.platform];
+                        const translatedAppType = this.language.lang.downloads.appTypes[installer.appType];
+                        installer.formatName = `${translatedPlatform} - ${translatedAppType}`;
+                        installer.url = `${this.downloadsData.releaseUrl}${installer.path}`;
+                        return installer;
                     });
                 });
+                // this.downloadsData.installers.push({
+                //     platform: 'sdk',
+                //     path: 'sdk/nxw.zip',
+                //     fileName: 'nxw.zip',
+                //     appType: ''
+                // })
+                // this.downloadsData.platforms.push({name: 'sdk'});
 
-                this.foundPlatform = this.downloads.groups.some(platform => {
-                    return ((platform.os || platform.name) === this.activeOs);
-                });
+                // this.downloads.groups = this.downloads.groups.filter(platform => {
+                //     return !this.downloadsData.platforms.every(avail => {
+                //         return avail.name !== platform.name;
+                //     });
+                // });
+
+                // this.foundPlatform = this.downloads.groups.some(platform => {
+                //     return ((platform.os || platform.name) === this.activeOs);
+                // });
 
                 if (!this.foundPlatform) {
-                    this.downloads.groups[0].active = true;
-                    this.platform = this.downloads.groups[0].os;
+                    this.downloads.groups[Object.keys(this.downloads.groups)[0]].active = true;
+                    this.platform = this.downloads.groups[Object.keys(this.downloads.groups)[0]].os;
                 }
 
                 this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
@@ -159,11 +166,9 @@ export class DownloadComponent implements OnInit, OnDestroy {
                 setTimeout(() => {
                     this.tabsVisible = true;
                     if (this.tabs) {
-                        this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[0].name);
+                        this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[Object.keys(this.downloads.groups)[0]].name);
                     }
                 });
-
-                this.getDownloadsInfo();
             });
     }
 

@@ -159,37 +159,33 @@ export class NxConfigService {
                         os  : 'Android'
                     }
                 ],
-                groups: [
-                    {
-                        name          : 'windows',
-                        os            : 'Windows',
-                        installerTypes: ['win64', 'win86'],
-                        appTypes      : ['bundle', 'client', 'server'],
-                        installers    : []
+                groups: {
+                    windows: {
+                        name: 'windows',
+                        os: 'windows',
+                        appTypes: ['bundle', 'client', 'server'],
                     },
-                    {
-                        name          : 'linux',
-                        os            : 'Linux',
-                        installerTypes: ['linux64', 'linux86'],
-                        appTypes      : ['bundle', 'client', 'server'],
-                        installers    : []
-
+                    linux: {
+                        name: 'linux',
+                        os: 'linux',
+                        appTypes: ['bundle', 'client', 'server']
                     },
-                    {
-                        name          : 'macos',
-                        os            : 'MacOS',
-                        installerTypes: ['mac'],
-                        appTypes      : ['client'],
-                        installers    : []
+                    macos: {
+                        name: 'macos',
+                        os: 'MacOS',
+                        appTypes: ['client']
                     },
-                    {
-                        name          : 'arm',
-                        os            : 'arm',
-                        installerTypes: ['arm'],
-                        appTypes      : ['server'],
-                        installers    : []
+                    arm: {
+                        name: 'arm',
+                        os: '',
+                        appTypes: ['server']
+                    },
+                    sdk: {
+                        name: 'sdk',
+                        os: '',
+                        appTypes: []
                     }
-                ]
+                }
             },
             icons : {
                 default : '/static/icons/integration_tile_preview_plugin.svg',

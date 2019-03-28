@@ -248,7 +248,12 @@
       "arm": {
         "label": "ARM",
         "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+        "supported": ""
+      },
+      "sdk": {
+        "label": "SDK",
+        "shortLabel": "SDK",
+        "supported": ""
       }
     },
     "platforms": {
