@@ -88,5 +88,19 @@ done
 cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
 
 
+echo "Checking files for mentions of nx"
+branding=$(grep -iE "(nx witness client|nx cloud)" --exclude=*.png -rl ${TARGET_DIR})
+if [[ -z ${branding} ]]
+then
+    echo "No mentions were found"
+else
+    echo "Error found mentions of Nx in the following files:"
+    for mention in ${branding}
+    do
+        echo ${mention}
+    done
+    echo -e "\nPlease notify Boris and Web Team!"
+    exit 1
+fi
+
 echo "Cloud portal build is finished"
-# say "Cloud portal build is finished"
