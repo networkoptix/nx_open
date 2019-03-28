@@ -821,8 +821,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     auto itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
     {
-        auto parser = new nx::streaming::rtp::QnNxRtpParser(
-            lm("%1-%2").args(m_camera->getUserDefinedName(), channelNum));
+        auto parser = new nx::streaming::rtp::QnNxRtpParser(m_camera->getId());
         // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());

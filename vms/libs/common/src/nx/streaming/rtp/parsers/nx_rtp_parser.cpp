@@ -13,6 +13,9 @@
 
 #include <nx/debugging/visual_metadata_debugger_factory.h>
 
+#include <nx/analytics/frame_info.h>
+#include <nx/analytics/analytics_logging_ini.h>
+
 #include <motion/motion_detection.h>
 #include <nx/utils/log/log_main.h>
 
@@ -24,56 +27,59 @@ static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
 
-QnNxRtpParser::QnNxRtpParser(const QString& debugSourceId):
+static const QString kNxRtpParserMetadataLogPattern(
+    "Received metadata from the server. Metadata timestamp (ms): {:metadata_timestamp}, "
+    "current time (ms): {:current_time}, "
+    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
+    "diff from current time (ms): {:metadata_time_difference_from_current_time}, "
+    "diff from the last frame (ms): {:metadata_time_difference_from_last_frame}");
+
+static const QString kNxRtpParserFrameLogPattern(
+    "Received a frame from the Server. Frame timestamp (ms): {:frame_timestamp}, "
+    "current time (ms): {:current_time}, "
+    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
+    "diff from current time (ms): {:frame_time_difference_from_current_time}");
+
+QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     VideoStreamParser(),
-    m_debugSourceId(debugSourceId),
+    m_deviceId(deviceId),
     m_nextDataPacketBuffer(nullptr),
     m_position(AV_NOPTS_VALUE),
     m_isAudioEnabled(true),
-    m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser))
+    m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser)),
+    m_logger(
+        "rtp_parser_",
+        kNxRtpParserFrameLogPattern,
+        kNxRtpParserMetadataLogPattern,
+        m_deviceId,
+        /*engineId*/ QnUuid())
 {
-    if (nxStreamingIni().analyticsMetadataLogFilePrefix[0])
-    {
-        m_analyticsMetadataLogFile.setFileName(
-            QLatin1String(nxStreamingIni().analyticsMetadataLogFilePrefix)
-                + m_debugSourceId + lit(".log"));
-        if (!m_analyticsMetadataLogFile.open(QIODevice::WriteOnly))
-        {
-            NX_ERROR(this) << lm("Unable to create analytics metadata log file \"%1\".")
-                .arg(m_analyticsMetadataLogFile.fileName());
-        }
-        else
-        {
-            NX_WARNING(this) << lm("Created analytics metadata log file \"%1\".")
-                .arg(m_analyticsMetadataLogFile.fileName());
-            m_isAnalyticsMetadataLogFileOpened = true;
-        }
-    }
 }
 
-QnNxRtpParser::~QnNxRtpParser()
+void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
 {
-    if (m_isAnalyticsMetadataLogFileOpened)
-        m_analyticsMetadataLogFile.close();
-}
-
-void QnNxRtpParser::writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata)
-{
-    nx::common::metadata::DetectionMetadataPacketPtr data =
-        nx::common::metadata::fromMetadataPacket(
-            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
-    if (!data)
-    {
-        NX_ERROR(this) << "Unable to deserialize analytics metadata.";
+    if (!nx::analytics::loggingIni().enableLogging)
         return;
-    }
 
-    const QString metadataStr = toString(*data);
-    const qint64 dPtsUs = m_nextDataPacket->timestamp - m_lastFramePtsUs;
-    m_analyticsMetadataLogFile.write(
-        lm("dPts %1%2 ms\n").args(dPtsUs >= 0 ? "+" : "", (500 + dPtsUs) / 1000).toUtf8());
-    m_analyticsMetadataLogFile.write(metadataStr.toUtf8());
-    m_analyticsMetadataLogFile.flush();
+    if (data->dataType == QnAbstractMediaData::VIDEO)
+    {
+        m_logger.pushFrameInfo(
+            std::make_unique<nx::analytics::FrameInfo>(data->timestamp));
+    }
+    else if (data->dataType == QnAbstractMediaData::GENERIC_METADATA)
+    {
+        nx::common::metadata::DetectionMetadataPacketPtr objectMetadata =
+            nx::common::metadata::fromMetadataPacket(
+                std::dynamic_pointer_cast<QnCompressedMetadata>(data));
+
+        if (!objectMetadata)
+        {
+            NX_ERROR(this, "Unable to deserialize metadata");
+            return;
+        }
+
+        m_logger.pushObjectMetadata(*objectMetadata);
+    }
 }
 
 bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)
@@ -257,11 +263,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
                 m_lastFramePtsUs = m_nextDataPacket->timestamp;
 
-            if (nxStreamingIni().analyticsMetadataLogFilePrefix[0]
-                && m_nextDataPacket->dataType == QnAbstractMediaData::GENERIC_METADATA)
-            {
-                writeAnalyticsMetadataToLogFile(m_nextDataPacket);
-            }
+            logMediaData(m_nextDataPacket);
         }
 
         if (rtpHeader->marker)

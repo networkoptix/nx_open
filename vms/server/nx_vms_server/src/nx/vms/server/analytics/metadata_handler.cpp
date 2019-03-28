@@ -164,7 +164,7 @@ void MetadataHandler::handleObjectMetadataPacket(
         m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
 
     if (nx::analytics::loggingIni().enableLogging)
-        ;//m_metadataLogger.pushObjectMetadata(data);
+        m_metadataLogger.pushObjectMetadata(data);
 }
 
 void MetadataHandler::handleEventMetadata(

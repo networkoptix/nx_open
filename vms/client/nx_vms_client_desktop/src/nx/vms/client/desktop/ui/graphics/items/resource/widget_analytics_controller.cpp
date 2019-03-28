@@ -23,6 +23,10 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/analytics/frame_info.h>
+#include <nx/analytics/metadata_logger.h>
+#include <nx/analytics/analytics_logging_ini.h>
+
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
@@ -34,6 +38,19 @@ namespace {
 static constexpr microseconds kFutureMetadataLength = 2s;
 static constexpr int kMaxFutureMetadataPackets = 4;
 static constexpr QRectF kWidgetBounds(0.0, 0.0, 1.0, 1.0);
+
+const QString kWidgetAnalyticsControllerFrameLogPattern(
+    "Displaying frame in the client. Frame timestamp (ms): {:frame_timestamp}, "
+    "current time (ms): {:current_time}, "
+    "diff from prev frame (ms): {:frame_time_difference_from_previous_frame}, "
+    "diff from current time (ms): {:frame_time_difference_from_current_time}");
+
+const QString kWidgetAnalyticsControllerMetadataLogPattern(
+    "Displaying metadata in the client. Metadata timestamp (ms): {:metadata_timestamp}, "
+    "current time (ms): {:current_time}, "
+    "diff from prev metadata (ms): {:metadata_time_differnce_from_previous_metadata}, "
+    "diff from current time (ms): {:metadata_time_difference_from_current_time}, "
+    "diff from the last frame (ms): {:metadata_time_difference_from_last_frame}");
 
 QString objectDescription(const std::vector<Attribute>& attributes)
 {
@@ -153,6 +170,7 @@ public:
     QHash<QnUuid, ObjectInfo> objectInfoById;
 
     microseconds averageMetadataPeriod = 1s;
+    std::unique_ptr<nx::analytics::MetadataLogger> logger;
 };
 
 WidgetAnalyticsController::Private::ObjectInfo
@@ -371,6 +389,13 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
         mediaResourceWidget->item()->uuid(), Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
 
     d->findExistingItems();
+
+    d->logger = std::make_unique<nx::analytics::MetadataLogger>(
+        "widget_analytics_controller_",
+        kWidgetAnalyticsControllerFrameLogPattern,
+        kWidgetAnalyticsControllerMetadataLogPattern,
+        d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
+        /*engineId*/ QnUuid());
 }
 
 WidgetAnalyticsController::~WidgetAnalyticsController()
@@ -390,6 +415,9 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (!d->metadataProvider || !d->areaHighlightWidget)
         return;
 
+    if (nx::analytics::loggingIni().enableLogging)
+        d->logger->pushFrameInfo(std::make_unique<nx::analytics::FrameInfo>(timestamp));
+
     auto metadataList = d->metadataProvider->metadataRange(
         timestamp,
         timestamp + kFutureMetadataLength,
@@ -399,11 +427,18 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (microseconds period = calculateAverageMetadataPeriod(metadataList); period > 0us)
         d->averageMetadataPeriod = period;
 
+    NX_VERBOSE(this, "Size of metadata list for resource %1: %2",
+        d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
+        metadataList.size());
+
     if (!metadataList.isEmpty())
     {
         if (const auto& metadata = metadataList.first();
             metadata->timestampUsec <= timestamp.count())
         {
+            if (nx::analytics::loggingIni().enableLogging)
+                d->logger->pushObjectMetadata(*metadata);
+
             for (const auto& object: metadata->objects)
             {
                 auto& objectInfo = d->addOrUpdateObject(object);
