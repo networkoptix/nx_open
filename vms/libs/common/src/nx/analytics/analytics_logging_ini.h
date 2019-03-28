@@ -8,8 +8,9 @@ struct LoggingIni: public nx::kit::IniConfig
 {
     LoggingIni(): IniConfig("analytics_logging.ini") { reload(); }
 
-    NX_INI_STRING("", analyticsLogPath, "Path where all analytics logs will be written. If\n"
-        "no logging is performed.");
+    NX_INI_STRING("", analyticsLogPath,
+        "Path (absolute or relative to .ini dir) to a dir where all analytics logs will be\n"
+        "written. If empty, no logging is performed.");
 
     bool isLoggingEnabled() const
     {
