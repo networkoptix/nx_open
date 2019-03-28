@@ -34,10 +34,16 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     m_position(AV_NOPTS_VALUE),
     m_isAudioEnabled(true),
     m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser)),
-    m_logger(
+    m_primaryLogger(
         "rtp_parser_",
         m_deviceId,
-        /*engineId*/ QnUuid())
+        /*engineId*/ QnUuid(),
+        nx::vms::api::StreamIndex::primary),
+    m_secondaryLogger(
+        "rtp_parser_",
+        m_deviceId,
+        /*engineId*/ QnUuid(),
+        nx::vms::api::StreamIndex::secondary)
 {
 }
 
@@ -46,9 +52,12 @@ void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
     if (!nx::analytics::loggingIni().isLoggingEnabled())
         return;
 
+    const bool isSecondaryProvider = data->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+    auto logger = isSecondaryProvider ? &m_secondaryLogger : &m_primaryLogger;
+
     if (data->dataType == QnAbstractMediaData::VIDEO)
     {
-        m_logger.pushFrameInfo(
+        logger->pushFrameInfo(
             std::make_unique<nx::analytics::FrameInfo>(data->timestamp));
     }
     else if (data->dataType == QnAbstractMediaData::GENERIC_METADATA)
@@ -63,7 +72,7 @@ void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
             return;
         }
 
-        m_logger.pushObjectMetadata(*objectMetadata);
+        logger->pushObjectMetadata(*objectMetadata);
     }
 }
 

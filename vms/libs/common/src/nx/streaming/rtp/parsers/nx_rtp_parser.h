@@ -39,7 +39,8 @@ private:
     bool m_isAudioEnabled;
     qint64 m_lastFramePtsUs; //< Intended for debug.
     nx::debugging::VisualMetadataDebuggerPtr m_visualDebugger;
-    nx::analytics::MetadataLogger m_logger;
+    nx::analytics::MetadataLogger m_primaryLogger;
+    nx::analytics::MetadataLogger m_secondaryLogger;
 };
 
 using QnNxRtpParserPtr = QSharedPointer<QnNxRtpParser>;

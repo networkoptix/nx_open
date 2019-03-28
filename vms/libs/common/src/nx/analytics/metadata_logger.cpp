@@ -67,7 +67,13 @@ static QString makeObjectsLogLines(
 
 } // namespace
 
-MetadataLogger::MetadataLogger(const QString& logFilePrefix, QnUuid deviceId, QnUuid engineId)
+MetadataLogger::MetadataLogger(
+    const QString& logFilePrefix,
+    QnUuid deviceId,
+    QnUuid engineId,
+    nx::vms::api::StreamIndex streamIndex)
+    :
+    m_streamIndex(streamIndex)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
@@ -76,13 +82,14 @@ MetadataLogger::MetadataLogger(const QString& logFilePrefix, QnUuid deviceId, Qn
         loggingIni().analyticsLogPath,
         logFilePrefix,
         deviceId,
-        engineId);
+        engineId,
+        streamIndex);
 
     if (logFileName.isEmpty())
         return;
 
     m_outputFile.setFileName(logFileName);
-    if (!m_outputFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    if (!m_outputFile.open(QIODevice::WriteOnly | QIODevice::Append))
         NX_WARNING(this, "Unable to open output file %1 for logging", logFileName);
 }
 
@@ -178,7 +185,8 @@ QString MetadataLogger::makeLogFileName(
     const QString& analyticsLoggingPath,
     const QString& logFilePrefix,
     QnUuid deviceId,
-    QnUuid engineId)
+    QnUuid engineId,
+    nx::vms::api::StreamIndex streamIndex)
 {
     if (analyticsLoggingPath.isEmpty())
         return QString();
@@ -195,8 +203,12 @@ QString MetadataLogger::makeLogFileName(
         fileName += QString("engine_") + engineId.toSimpleString();
     }
 
-    fileName.append("_");
-    fileName.append(QString::number((std::uintptr_t) this));
+    if (streamIndex != nx::vms::api::StreamIndex::undefined)
+    {
+        fileName.append("_");
+        fileName.append(streamIndex == nx::vms::api::StreamIndex::primary ? "high" : "low");
+    }
+
     fileName.append(".log");
 
     const QString logDirectoryPath = nx::utils::debug_helpers::debugFilesDirectoryPath(

@@ -162,5 +162,6 @@ private:
     int64_t m_lastLiveFrameTime[CL_MAX_CHANNELS][2]{{0}};
     bool m_isLive = false;
 
-    std::unique_ptr<nx::analytics::MetadataLogger> m_logger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_primaryLogger;
+    std::unique_ptr<nx::analytics::MetadataLogger> m_secondaryLogger;
 };

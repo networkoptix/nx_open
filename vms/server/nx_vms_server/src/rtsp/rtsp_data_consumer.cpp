@@ -21,6 +21,7 @@
 
 #include <nx/analytics/frame_info.h>
 #include <nx/analytics/analytics_logging_ini.h>
+#include <mediaserver_ini.h>
 
 using namespace nx::vms::api;
 
@@ -97,8 +98,17 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
     {
-        m_logger = std::make_unique<nx::analytics::MetadataLogger>(
-            "rtsp_consumer_", camera->getId(), QnUuid());
+        m_primaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::primary);
+
+        m_secondaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::secondary);
     }
 
     auto videoLayout = camera->getVideoLayout();
@@ -482,11 +492,20 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (isVideo || isAudio)
     {
-        if (m_logger)
-            m_logger->pushFrameInfo(std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
-
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+
+        if (isSecondaryProvider && m_secondaryLogger)
+        {
+            m_secondaryLogger->pushFrameInfo(
+                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+        }
+        else if (m_primaryLogger)
+        {
+            m_primaryLogger->pushFrameInfo(
+                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
+        }
+
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
@@ -557,13 +576,16 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    if (isMetadata && m_logger)
-    {
-        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata
-            = nx::common::metadata::fromMetadataPacket(
-                    std::dynamic_pointer_cast<const QnCompressedMetadata>(media));
+    const auto logger =
+        ini().analyzeSecondaryStream ? m_secondaryLogger.get() : m_primaryLogger.get();
 
-        m_logger->pushObjectMetadata(*detectionMetadata);
+    if (isMetadata && logger)
+    {
+        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata =
+            nx::common::metadata::fromMetadataPacket(
+                std::dynamic_pointer_cast<const QnCompressedMetadata>(media));
+
+        logger->pushObjectMetadata(*detectionMetadata);
     }
 
     int trackNum = media->channelNumber;
