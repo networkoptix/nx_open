@@ -161,76 +161,33 @@ export class NxConfigService {
                 ],
                 groups: [
                     {
-                        name      : 'arm',
-                        os        : 'arm',
-                        installers: [
-                            {
-                                platform: 'arm',
-                                appType: 'server'
-                            }
-                        ]
+                        name          : 'windows',
+                        os            : 'Windows',
+                        installerTypes: ['win64', 'win86'],
+                        appTypes      : ['bundle', 'client', 'server'],
+                        installers    : []
                     },
                     {
-                        name      : 'windows',
-                        os        : 'Windows',
-                        installers: [
-                            {
-                                platform: 'win64',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'win64',
-                                appType : 'server'
-                            },
-                            {
-                                platform: 'win64',
-                                appType : 'bundle'
-                            },
-                            {
-                                platform: 'win86',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'win86',
-                                appType : 'server'
-                            },
-                            {
-                                platform: 'win86',
-                                appType : 'bundle'
-                            }
-                        ]
+                        name          : 'linux',
+                        os            : 'Linux',
+                        installerTypes: ['linux64', 'linux86'],
+                        appTypes      : ['bundle', 'client', 'server'],
+                        installers    : []
+
                     },
                     {
-                        name      : 'linux',
-                        os        : 'Linux',
-                        installers: [
-                            {
-                                platform: 'linux64',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'linux64',
-                                appType : 'server'
-                            },
-                            {
-                                platform: 'linux86',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'linux86',
-                                appType : 'server'
-                            }
-                        ]
+                        name          : 'macos',
+                        os            : 'MacOS',
+                        installerTypes: ['mac'],
+                        appTypes      : ['client'],
+                        installers    : []
                     },
                     {
-                        name      : 'macos',
-                        os        : 'MacOS',
-                        installers: [
-                            {
-                                platform: 'mac',
-                                appType : 'client'
-                            }
-                        ]
+                        name          : 'arm',
+                        os            : 'arm',
+                        installerTypes: ['arm'],
+                        appTypes      : ['server'],
+                        installers    : []
                     }
                 ]
             },

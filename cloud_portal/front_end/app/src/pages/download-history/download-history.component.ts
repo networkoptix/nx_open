@@ -111,8 +111,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.downloads = this.config.downloads;
-
         this.sub = this.route.params.subscribe(params => {
             // this.build = params['build'];
 

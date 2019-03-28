@@ -45,7 +45,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.foundPlatform = false;
         this.canViewDownloads = false;
         this.tabsVisible = false;
-        this.downloads = this.config.downloads;
+        this.downloads = {... this.config.downloads};
 
         this.downloadsData = {
             version   : '',
@@ -84,42 +84,28 @@ export class DownloadComponent implements OnInit, OnDestroy {
         return this.platformMatch[ this.deviceService.getDeviceInfo().os ];
     }
 
-    private processArm(platform) {
-        const installer = platform.installers[0];
-        platform.installers = this.downloadsData.installers.filter(existingInstaller => {
-            return installer.appType === existingInstaller.appType && existingInstaller.path.indexOf('arm') > -1;
-        }).map(installer => {
-            installer.formatName =  installer.niceName;
-            installer.url = this.downloadsData.releaseUrl + installer.path;
-            return installer;
-        });
-        return platform.installers.length > 0;
-    }
-
     private getDownloadsInfo() {
         this.downloads.groups.forEach(platform => {
-            if (platform.name === 'arm') {
-                return this.processArm(platform);
-            }
-            return platform.installers.filter(installer => {
-                const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
-
-                    return installer.platform === existingInstaller.platform &&
-                        installer.appType === existingInstaller.appType;
-                });
-
-                if (targetInstaller) {
-                    Object.assign(installer, targetInstaller);
-                    installer.formatName = this.language.lang.downloads.platforms[ installer.platform ] + ' - ' + this.language.lang.downloads.appTypes[ installer.appType ];
-                    installer.url = this.downloadsData.releaseUrl + installer.path;
+            platform.installers = this.downloadsData.installers.filter((installer) => {
+                return platform.appTypes.includes(installer.appType);
+            }).filter((installer) => {
+                switch (platform.name) {
+                    case 'arm':
+                        return installer.path.indexOf('arm') > -1;
+                    case 'sdk':
+                        return 1;
+                    default:
+                        return platform.installerTypes.includes(installer.platform);
                 }
-                return !!targetInstaller;
-            })[0];
+            }).map((installer) => {
+                installer.formatName = `${this.language.lang.downloads.platforms[installer.platform ]} - ${this.language.lang.downloads.appTypes[installer.appType]}`;
+                installer.url = this.downloadsData.releaseUrl + installer.path;
+                return installer;
+            });
         });
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
-        this.getDownloadsInfo();
         this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + $event.nextId);
         this.locationProxy.path('/download/' + $event.nextId, false);
     }

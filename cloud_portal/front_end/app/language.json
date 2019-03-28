@@ -256,7 +256,10 @@
       "win86": "x86",
       "linux64": "x64",
       "linux86": "x86",
-      "mac": "X"
+      "mac": "X",
+      "bananapi": "Banana Pi",
+      "bpi": "Nx1",
+      "rpi": " Raspberry Pi"
     },
     "appTypes": {
       "client": "Client only",

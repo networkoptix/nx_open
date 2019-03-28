@@ -26,6 +26,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <a class="media btn btn-default download-button"
+                                           *ngIf="platform.installers.length"
                                            [href]="platform.installers[0].url">
                                             <div class="media-left">
                                                 <span class="download-link"></span>
