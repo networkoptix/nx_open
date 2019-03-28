@@ -4,7 +4,7 @@
     <div class="p-0">
         <ngb-tabset (tabChange)="beforeChange($event)" #tabs [style.visibility]="tabsVisible ? 'visible' : 'hidden'">
 
-            <ngb-tab *ngFor="let platform of downloadsData.platforms"
+            <ngb-tab *ngFor="let platform of sortedPlatforms"
                      [id]="platform.os || platform.name" >
 
                 <ng-template ngbTabTitle>

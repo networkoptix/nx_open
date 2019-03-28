@@ -248,12 +248,12 @@
       "arm": {
         "label": "ARM",
         "shortLabel": "ARM",
-        "supported": ""
+        "supported": "Debian/Ubuntu based"
       },
       "sdk": {
         "label": "SDK",
         "shortLabel": "SDK",
-        "supported": ""
+        "supported": "C++ cross platform SDK"
       }
     },
     "platforms": {
@@ -270,7 +270,8 @@
       "client": "Client only",
       "server": "Server only",
       "bundle": "Client and Server",
-      "servertool": "Configuration tool"
+      "servertool": "Configuration tool",
+      "package": "Package"
     },
     "releasesTypes": {
       "beta": "Beta",

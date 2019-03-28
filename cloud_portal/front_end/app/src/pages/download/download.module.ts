@@ -30,7 +30,9 @@ export class OsResolver implements Resolve<Observable<string>> {
             'unix': 'Linux',
             'linux': 'Linux',
             'mac': 'MacOS',
-            'windows': 'Windows'
+            'windows': 'Windows',
+            'arm': 'ARM',
+            'skd': 'SDK'
         };
     }
 
