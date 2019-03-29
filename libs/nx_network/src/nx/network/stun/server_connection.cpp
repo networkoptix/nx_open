@@ -16,7 +16,7 @@ ServerConnection::ServerConnection(
     m_peerAddress(base_type::getForeignAddress()),
     m_dispatcher(dispatcher)
 {
-    ++SocketGlobals::instance().debugCounters().stunConnectionCount;
+    ++SocketGlobals::instance().debugCounters().stunServerConnectionCount;
 }
 
 ServerConnection::~ServerConnection()
@@ -27,7 +27,7 @@ ServerConnection::~ServerConnection()
     if (m_destructHandler)
         m_destructHandler();
 
-    --SocketGlobals::instance().debugCounters().stunConnectionCount;
+    --SocketGlobals::instance().debugCounters().stunServerConnectionCount;
 }
 
 void ServerConnection::sendMessage(

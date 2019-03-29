@@ -43,8 +43,10 @@ bool Model::doMandatoryInitialization()
     // TODO: #ak Refactor here. E.g., if DB connection parameters are specified,
     // we can create some dummy RemoteRelayPeerPool so that we keep real RemoteRelayPeerPool
     // implementation clear (free of DB needed/not needed checks).
-    if (m_settings.cassandraConnection().host.empty())
-        return true;
+
+    //if (m_settings.cassandraConnection().host.empty())
+    //    return true;
+
     return m_remoteRelayPeerPool->connectToDb();
 }
 
@@ -98,23 +100,15 @@ void Model::subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId)
     m_listeningPeerPool.peerConnectedSubscription().subscribe(
         [this](std::string peer)
         {
-            m_remoteRelayPeerPool->addPeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> addPeerFuture)
-                    {
-                        if (addPeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
+            m_remoteRelayPeerPool->addPeer(
+                peer,
+                [this, peer](bool resultCode)
+                {
+                    if (resultCode)
+                        NX_VERBOSE(this, "Successfully added peer %1 to RemoteRelayPool", peer);
+                    else
+                        NX_VERBOSE(this, "Failed to add peer %1 to RemoteRelayPool", peer);
+                });
         },
         subscriptionId);
 }
@@ -124,23 +118,19 @@ void Model::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscription
     m_listeningPeerPool.peerDisconnectedSubscription().subscribe(
         [this](std::string peer)
         {
-            m_remoteRelayPeerPool->removePeer(peer)
-                .then(
-                    [this, peer](cf::future<bool> removePeerFuture)
+            m_remoteRelayPeerPool->removePeer(
+                peer,
+                [this, peer](bool resultCode)
+                {
+                    if (resultCode)
                     {
-                        if (removePeerFuture.get())
-                        {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 from RemoteRelayPool")
-                                .arg(peer));
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 from RemoteRelayPool")
-                                .arg(peer));
-                        }
-
-                        return cf::unit();
-                    });
+                        NX_VERBOSE(this, "Successfully removed peer %1 from RemoteRelayPool", peer);
+                    }
+                    else
+                    {
+                        NX_VERBOSE(this, "Failed to remove peer %1 from RemoteRelayPool", peer);
+                    }
+                });
         },
         subscriptionId);
 }

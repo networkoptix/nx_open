@@ -42,7 +42,8 @@ void HttpCommandPipelineConnector::bindToAioThread(
 {
     base_type::bindToAioThread(aioThread);
 
-    m_connection->bindToAioThread(aioThread);
+    if (m_connection)
+        m_connection->bindToAioThread(aioThread);
 }
 
 void HttpCommandPipelineConnector::connect(Handler completionHandler)
@@ -154,6 +155,7 @@ HttpTransportConnector::HttpTransportConnector(
         systemId,
         nodeId)
 {
+    bindToAioThread(getAioThread());
 }
 
 void HttpTransportConnector::bindToAioThread(

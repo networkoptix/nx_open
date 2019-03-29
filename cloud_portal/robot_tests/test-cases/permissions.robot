@@ -153,7 +153,7 @@ displays pencil and cross links for each user only on hover
     ${random email}    Get Random Email    ${BASE EMAIL}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
-    Share To    ${random email}    ${VIEWER TEXT}
+    Share To    ${random email}    ${CUSTOM TEXT}
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[contains(text(),'${DELETE USER BUTTON TEXT}')]
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
@@ -262,6 +262,8 @@ Share with registered user - sends him notification
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
     Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Remove User Permissions    ${EMAIL NOPERM}
+    Delete All Emails
+    Close Mailbox
 
 Share with unregistered user - brings them to registration page with code with correct email locked
     [tags]    email    C41889
@@ -285,6 +287,9 @@ Sharing system with a user who is already in the list updates their permissions
     Share To    ${random email}    ${ADMIN TEXT}
     Check User Permissions    ${random email}    ${ADMIN TEXT}
     Share To    ${random email}    ${VIEWER TEXT}
+    ${email ID}    Wait For Email    recipient=${email}    timeout=120    status=UNSEEN
+    Delete All Emails
+    Close Mailbox
     Check User Permissions    ${random email}    ${VIEWER TEXT}
     Remove User Permissions    ${random email}
 
@@ -311,7 +316,7 @@ Check share email for registered user
     @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${OWNER EMAIL}
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}
-    Delete Email    ${email}
+    Delete All Emails
     Close Mailbox
     Remove User Permissions    ${EMAIL NOPERM}
 
@@ -328,3 +333,5 @@ User can be invited with client custom permissions
     Check User Permissions    ${random email}    Client Custom
     Sleep    2
     Remove User Permissions    ${random email}
+    Delete All Emails
+    Close Mailbox

@@ -221,10 +221,12 @@ bool Acceptor::registerNewConnection(
         localPeer,
         remotePeer);
 
+    const auto remoteNodeId = remotePeer.id.toSimpleByteArray().toStdString();
     ConnectionManager::ConnectionContext context{
         std::move(connection),
+        remoteNodeId,
         connectionId,
-        {systemId, remotePeer.id.toByteArray().toStdString()},
+        {systemId, remoteNodeId},
         userAgent};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))

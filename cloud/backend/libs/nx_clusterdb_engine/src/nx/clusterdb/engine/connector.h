@@ -8,6 +8,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/url.h>
 
 #include "transport/abstract_transaction_transport_connector.h"
@@ -23,6 +24,7 @@ class Connector:
 {
 public:
     Connector(
+        const std::string& nodeId,
         transport::TransportManager* transportManager,
         ConnectionManager* connectionManager);
 
@@ -30,6 +32,10 @@ public:
 
     void addNodeUrl(
         const std::string& systemId,
+        const nx::utils::Url& url);
+
+    void removeNodeUrl(
+        const::std::string& systemId,
         const nx::utils::Url& url);
 
 protected:
@@ -42,8 +48,12 @@ private:
         std::string connectionId;
         std::unique_ptr<transport::AbstractTransactionTransportConnector> connector;
         std::unique_ptr<nx::network::aio::Timer> retryTimer;
+        nx::utils::SubscriptionId connectionClosedSubscriptionId =
+            nx::utils::kInvalidSubscriptionId;
+        transport::AbstractConnection* connection = nullptr;
     };
 
+    const std::string m_nodeId;
     transport::TransportManager* m_transportManager = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     std::map<nx::utils::Url, NodeContext> m_nodes;
@@ -58,7 +68,7 @@ private:
 
     void registerConnection(
         const nx::utils::Url& url,
-        const NodeContext& nodeContext,
+        NodeContext* nodeContext,
         std::unique_ptr<transport::AbstractConnection> connection);
 
     void onConnectionClosed(

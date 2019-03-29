@@ -24,7 +24,7 @@ ${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
 ${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
 ${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
 ${EMAIL CLIENT CUSTOM}                noptixautoqa+clientcustom@gmail.com
-@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
+@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}    ${EMAIL CLIENT CUSTOM}
 ${ADMIN FIRST NAME}                   mark
 ${ADMIN LAST NAME}                    hamil
 ${EMAIL UNREGISTERED}                 noptixautoqa+unregistered1@gmail.com

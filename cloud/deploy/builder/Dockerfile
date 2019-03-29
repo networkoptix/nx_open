@@ -1,4 +1,4 @@
-FROM base:latest
+FROM 009544449203.dkr.ecr.us-west-1.amazonaws.com/cloud/base:latest
 
 # keep upstart quiet
 RUN dpkg-divert --local --rename --add /sbin/initctl

@@ -63,6 +63,12 @@ Connection::Connection(
     startReading();
 }
 
+Connection::~Connection()
+{
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
+}
+
 void Connection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     AbstractConnection::bindToAioThread(aioThread);
@@ -74,7 +80,11 @@ void Connection::stopWhileInAioThread()
 {
     AbstractConnection::stopWhileInAioThread();
     nx::p2p::ConnectionBase::stopWhileInAioThread();
+
     m_transactionLogReader.reset();
+
+    if (!m_closed)
+        setState(State::Error);
 }
 
 void Connection::onGotMessage(
@@ -205,13 +215,15 @@ ConnectionClosedSubscription& Connection::connectionClosedSubscription()
 
 void Connection::setState(State state)
 {
-    if (state == State::Error)
+    if (state == State::Error && !m_closed)
     {
         SystemError::ErrorCode errorCode = SystemError::connectionAbort;
         // TODO: pass correct error code here
         //p2pTransport().socket()->getLastError(&errorCode);
+        m_closed = true;
         m_connectionClosedSubscription.notify(errorCode);
     }
+
     nx::p2p::ConnectionBase::setState(state);
 }
 

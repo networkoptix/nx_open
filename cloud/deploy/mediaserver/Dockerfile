@@ -1,12 +1,12 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
 MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 COPY stage/mediaserver /opt/networkoptix/mediaserver
 
 COPY docker/entrypoint.sh /opt/networkoptix/mediaserver/bin
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/mediaserver/bin
-ENV LD_LIBRARY_PATH /opt/networkoptix/mediaserver/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/mediaserver/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/mediaserver/lib
 
 VOLUME ["/opt/networkoptix/mediaserver/etc", "/opt/networkoptix/mediaserver/var"]
 

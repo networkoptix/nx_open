@@ -62,7 +62,7 @@ Can be accessed via dropdown or direct link
     Wait Until Element Is Visible    ${AUTO TESTS TITLE}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Click Button    ${ACCOUNT DROPDOWN}
-    Wait Until Element Is Visible    ${CHANGE PASSWORD BUTTON DROPDOWN}
+    Wait Until Elements Are Visible    ${CHANGE PASSWORD BUTTON DROPDOWN}    ${ACCOUNT SETTINGS BUTTON}    ${LOG OUT BUTTON}
     Click Link    ${CHANGE PASSWORD BUTTON DROPDOWN}
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
     Location Should Be    ${url}/account/password

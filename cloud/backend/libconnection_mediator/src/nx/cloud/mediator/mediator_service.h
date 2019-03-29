@@ -53,6 +53,9 @@ protected:
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
+    bool registerThisInstanceNameInCluster(const conf::Settings& settings);
+
+private:
     Controller* m_controller = nullptr;
     View* m_view = nullptr;
 };

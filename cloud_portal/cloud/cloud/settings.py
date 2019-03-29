@@ -438,7 +438,10 @@ NOTIFICATIONS_CONFIG = {
     'cloud_invite':{
         'engine': 'email'
     },
-    'ipvd_feedback': {
+    'ipvd_feedback_page': {
+        'engine': 'email'
+    },
+    'ipvd_feedback_detail': {
         'engine': 'email'
     },
     'sales_inquiry': {

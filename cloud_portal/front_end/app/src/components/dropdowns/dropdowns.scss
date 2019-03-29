@@ -1,5 +1,6 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
+@import 'variables';
 
 .dropdown, .dropup {
     .lang-sm {
@@ -93,13 +94,15 @@ header {
         padding          : 4px 0;
         
         &--list {
-            max-height      : 312px;
+            max-height      : $dropdown-list-height;
             overflow        : auto;
             padding         : 0;
             list-style-type : none;
+            margin-bottom   : 0;
         }
         
         &--footer, &--header {
+            height          : $dropdown-header-height;
             padding         : 0;
             margin          : 0;
             list-style-type : none;
@@ -165,6 +168,19 @@ header {
                     width        : calc(100% - 10px);
                 }
             }
+            
+            .icon-search {
+                margin : 10px 0 0 24px !important;
+            }
+            
+            .search-clear {
+                right : 24px;
+            }
+            
+            .search-input {
+                width  : calc(100% - 24px);
+                margin : 0 12px !important;
+            }
         }
     }
     
@@ -210,3 +226,7 @@ nx-select.ng-invalid:not(.ng-untouched) {
         border-color : #d65029;
     }
 }
+.btn-dropdown-toggle {
+    justify-content: unset;
+}
+

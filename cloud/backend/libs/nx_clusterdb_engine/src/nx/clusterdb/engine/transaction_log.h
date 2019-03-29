@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <nx/network/buffer.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/data_structures/safe_map.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
@@ -238,6 +239,8 @@ public:
 
     void setOnTransactionReceived(OnTransactionReceivedHandler handler);
 
+    void pleaseStopSync();
+
 private:
     struct DbTransactionContext
     {
@@ -286,6 +289,7 @@ private:
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
     std::list<std::string> m_systemsMarkedForDeletion;
     OnTransactionReceivedHandler m_onTransactionReceivedHandler;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     /** Fills transaction state cache. */
     nx::sql::DBResult fillCache();

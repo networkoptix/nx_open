@@ -26,7 +26,7 @@ mv $tmp /opt/networkoptix/cloud_db/etc/cloud_modules_new_template.xml
 
 if [ -n "$MODULE_CONFIGURATION" ]
 then
-    config_helper.py /opt/networkoptix/cloud_db/etc/cloud_db.conf "$MODULE_CONFIGURATION"
+    config_helper /opt/networkoptix/cloud_db/etc/cloud_db.conf "$MODULE_CONFIGURATION"
 fi
 
 exec /opt/networkoptix/cloud_db/bin/cloud_db -e

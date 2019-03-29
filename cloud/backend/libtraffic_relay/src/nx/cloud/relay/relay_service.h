@@ -17,6 +17,7 @@ namespace relaying { class AbstractListeningPeerPool; }
 namespace relay {
 
 namespace conf { class Settings; }
+namespace model { class AbstractRemoteRelayPeerPool; }
 
 class Model;
 class Controller;
@@ -34,6 +35,7 @@ public:
     std::vector<network::SocketAddress> httpsEndpoints() const;
 
     const relaying::AbstractListeningPeerPool& listeningPeerPool() const;
+    const model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool() const;
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;

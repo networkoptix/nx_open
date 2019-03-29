@@ -1,7 +1,7 @@
 Welkom bij %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) nodigt u uit om gebruik te maken van %PRODUCT_NAME% en heeft zijn {{message.system_name}} systeem met u gedeeld.
+{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %PRODUCT_NAME% and shared the system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}

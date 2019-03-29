@@ -40,19 +40,177 @@
     .nx-table-wrapper {
         margin : 0;
         
+        .nx-table-header {
+            padding : .5rem .75rem;
+        }
+        
         .nx-table {
             th {
-                &:nth-child(n+7) {
-                    width : 5%;
+                display : inline-block;
+                white-space: normal;
+    
+                @include media-breakpoint-up(lg) {
+                    padding : .5rem .25rem;
+                }
+    
+                @include media-breakpoint-up(xxl) {
+                    padding : .5rem .25rem .5rem .75rem;
+                }
+                
+                &:nth-child(1) {
+                    padding-left : .75rem;
+    
+                    width : 175px;
+                    @include media-breakpoint-up(xxl) {
+                        width : 240px;
+                    }
+                }
+
+                &:nth-child(2) {
+                    width : 160px;
+                    @include media-breakpoint-up(xxl) {
+                        width : 225px;
+                    }
+                }
+                
+                &:nth-child(3) {
+                    width : 110px;
+                    @include media-breakpoint-up(xxl) {
+                        width : 220px;
+                    }
+                }
+    
+                &:nth-child(4) {
+                    width : 105px;
+    
+                    .caption {
+                        div:first-of-type {
+                            width : 65px;
+                        }
+                        
+                        .sort-dir {
+                            margin-top : 18px;
+                        }
+                    }
+                }
+    
+                &:nth-child(5) {
+                    width : 75px;
+    
+                    .caption {
+                        div:first-of-type {
+                            width : 26px;
+                        }
+        
+                        .sort-dir {
+                            margin-top : 18px;
+                        }
+                    }
+                }
+    
+                &:nth-child(n+5) {
+                    .caption {
+                        justify-content : center;
+                    }
+                }
+    
+                &:nth-child(n+6) {
+                    width : 80px;
+                }
+    
+                &:last-of-type {
+                    width : 65px;
                 }
             }
             
             td {
-                &:nth-child(n+7) {
-                    width      : 5%;
+                display : inline-block;
+    
+                @include media-breakpoint-up(lg) {
+                    padding : .5rem .25rem;
+                }
+    
+                @include media-breakpoint-up(xxl) {
+                    padding : .5rem .25rem .5rem .75rem;
+                }
+    
+                &:nth-child(n+1) > div {
+                    text-overflow : ellipsis;
+                    overflow      : hidden;
+                }
+    
+                &:nth-child(1) {
+                    padding-left : .75rem;
+                    width : 175px;
+                    @include media-breakpoint-up(xxl) {
+                        width : 240px;
+                    }
+                }
+    
+                &:nth-child(2) {
+                    width : 160px;
+                    @include media-breakpoint-up(xxl) {
+                        width : 225px;
+                    }
+                }
+    
+                &:nth-child(3) {
+                    width : 110px;
+                    @include media-breakpoint-up(xxl) {
+                        width : 220px;
+                    }
+                }
+    
+                &:nth-child(4) {
+                    width : 105px;
+                }
+    
+                &:nth-child(5) {
+                    width : 75px;
+                    padding-right : 22px;
+                }
+                
+                &:nth-child(n+5) {
                     text-align : center !important;
+                    padding-right: 20px;
+                }
+    
+                
+                &:nth-child(n+6) {
+                    width : 80px;
+                }
+    
+                &:last-of-type {
+                    width : 65px;
                 }
             }
         }
     }
+    
+    .toggle {
+        .nx-table {
+            th, td {
+                @include media-breakpoint-up(xxl) {
+                    padding : .5rem .25rem;
+                    
+                    &:nth-child(1) {
+                        width : 130px;
+                    }
+    
+                    &:nth-child(2) {
+                        width : 130px;
+                    }
+    
+                    &:nth-child(3) {
+                        width : 100px;
+                    }
+                    
+                    &:last-of-type {
+                        width : 50px;
+                    }
+                }
+            }
+        }
+    }
+    /*** END overwrite default table of component cam-table ***/
 }

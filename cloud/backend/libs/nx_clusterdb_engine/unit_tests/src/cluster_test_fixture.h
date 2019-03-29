@@ -22,10 +22,14 @@ public:
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
+    std::string nodeId() const;
+
     nx::utils::Url baseApiUrl() const;
-    nx::utils::Url syncronizationUrl() const;
 
     void connectTo(const Peer& other);
+    bool isConnectedTo(const Peer& other) const;
+    void disconnectFrom(const Peer& other);
+
     Customer addRandomData();
     bool hasData(const std::vector<Customer>& data);
     Customer modifyRandomly(const Customer& data);
@@ -47,7 +51,9 @@ class ClusterTestFixture:
 public:
     ClusterTestFixture();
 
-    void addPeer();
+    std::string clusterId() const;
+
+    Peer& addPeer(bool startAndWaitUntilStarted = true);
     Peer& peer(int index);
     const Peer& peer(int index) const;
     int peerCount() const;
@@ -56,6 +62,7 @@ public:
     bool peersAreSynchronized(std::vector<int> ids) const;
 
 private:
+    const std::string m_clusterId;
     std::vector<std::unique_ptr<Peer>> m_peers;
     std::atomic<int> m_peerCounter{0};
 };

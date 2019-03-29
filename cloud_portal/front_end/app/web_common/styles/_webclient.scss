@@ -344,11 +344,11 @@ table.webclient-window>tbody>tr>td{
     }
 
     .ip-info{
-      font-size: 12px;
+      font-size: rem(12px);
       font-weight: 400;
       color: $light16;
-      line-height: 18px;
-      margin-right: 5px;
+      line-height: rem(22px);
+      margin: 0 .5rem;
     }
   }
 

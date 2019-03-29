@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include "public_ip_discovery.h"
 #include "relay/relay_cluster_client_factory.h"
 
 namespace nx {
@@ -33,7 +34,8 @@ Controller::Controller(const conf::Settings& settings):
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
-    m_discoveredPeerPool(settings.discovery())
+    m_discoveredPeerPool(settings.discovery()),
+    m_remoteMediatorPeerPool(settings.clusterDbMap())
 {
     if (!m_cloudDataProvider)
     {
@@ -76,9 +78,33 @@ const nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
     return m_discoveredPeerPool;
 }
 
+RemoteMediatorPeerPool& Controller::remoteMediatorPeerPool()
+{
+    return m_remoteMediatorPeerPool;
+}
+
+const RemoteMediatorPeerPool& Controller::remoteMediatorPeerPool() const
+{
+    return m_remoteMediatorPeerPool;
+}
+
 const stats::StatsManager& Controller::statisticsManager() const
 {
     return m_statsManager;
+}
+
+bool Controller::doMandatoryInitialization()
+{
+    return m_remoteMediatorPeerPool.initialize();
+}
+
+std::optional<network::HostAddress> Controller::discoverPublicAddress()
+{
+    auto publicHostAddress = PublicIpDiscovery::get();
+    if (!(bool)publicHostAddress)
+        return std::nullopt;
+
+    return *publicHostAddress;
 }
 
 void Controller::stop()

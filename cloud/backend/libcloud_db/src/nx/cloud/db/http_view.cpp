@@ -34,7 +34,7 @@ HttpView::HttpView(
         &controller->systemHealthInfoProvider(),
         &controller->authProvider(),
         &controller->eventManager(),
-        &controller->ec2SyncronizationEngine(),
+        &controller->ec2SynchronizationEngine(),
         &controller->maintenanceManager(),
         controller->cloudModuleUrlProviderDeprecated(),
         controller->cloudModuleUrlProvider());
@@ -138,7 +138,7 @@ void HttpView::registerApiHandlers(
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine,
+    clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine,
     MaintenanceManager* const maintenanceManager,
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
@@ -272,10 +272,10 @@ void HttpView::registerApiHandlers(
         EntityType::account, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
-    ec2SyncronizationEngine->registerHttpApi(
+    ec2SynchronizationEngine->registerHttpApi(
         kEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
-    ec2SyncronizationEngine->registerHttpApi(
+    ec2SynchronizationEngine->registerHttpApi(
         kDeprecatedEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
     //---------------------------------------------------------------------------------------------

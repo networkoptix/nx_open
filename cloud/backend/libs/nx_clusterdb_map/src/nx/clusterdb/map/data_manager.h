@@ -14,7 +14,7 @@ class AsyncSqlQueryExecutor;
 
 }
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::clusterdb::map {
 
@@ -27,6 +27,8 @@ enum ResultCode
     logicError,
     unknownError
 };
+
+NX_KEY_VALUE_DB_API const char * toString(ResultCode result);
 
 using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 
@@ -43,9 +45,9 @@ class NX_KEY_VALUE_DB_API DataManager
 {
 public:
     DataManager(
-        nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
+        nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine,
         nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-        const std::string& systemId,
+        const std::string& clusterId,
         EventProvider* eventProvider);
     ~DataManager();
 
@@ -148,7 +150,7 @@ private:
     /**
      * Retrieves the key/value pairs in the range[keyLowerBound, keyUpperBound]
      */
-    std::map<std::string, std::string> getRangeFromDb(
+    std::optional<std::map<std::string, std::string>> getRangeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound,
         const std::string& keyUpperBound);
@@ -156,7 +158,7 @@ private:
     /**
      * Retrieves the key/value pairs >= keyLowerBound.
      */
-    std::map<std::string, std::string> getRangeFromDb(
+    std::optional<std::map<std::string, std::string>> getRangeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound);
 
@@ -181,7 +183,7 @@ private:
      */
     void insertOrUpdateReceivedRecord(
         nx::sql::QueryContext* queryContext,
-        const std::string& systemId,
+        const std::string& clusterId,
         nx::clusterdb::engine::Command<KeyValuePair> command);
 
     /**
@@ -189,14 +191,14 @@ private:
      */
     void removeReceivedRecord(
         nx::sql::QueryContext* queryContext,
-        const std::string& systemId,
+        const std::string& clusterId,
         nx::clusterdb::engine::Command<Key> command);
 
 private:
-    nx::clusterdb::engine::SyncronizationEngine* m_syncEngine = nullptr;
+    nx::clusterdb::engine::SynchronizationEngine* m_syncEngine = nullptr;
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
-    std::string m_systemId;
-    EventProvider * m_eventProvider;
+    std::string m_clusterId;
+    EventProvider* m_eventProvider;
 
     dao::KeyValueDao m_keyValueDao;
 };

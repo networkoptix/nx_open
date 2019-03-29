@@ -53,34 +53,38 @@ bool RemoteRelayPeerPool::isConnected() const
     return true;
 }
 
-cf::future<std::string /*relay hostname/ip*/> RemoteRelayPeerPool::findRelayByDomain(
-    const std::string& domainName) const
+void RemoteRelayPeerPool::findRelayByDomain(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const
 {
-    cf::promise<std::string> p;
-    auto f = p.get_future();
     m_asyncCallProvider.post(
-        [this, domainName, p = std::move(p)]() mutable
+        [this, domainName, handler = std::move(handler)]() mutable
         {
-            p.set_value(m_peerPool->findRelay(domainName));
+            handler(m_peerPool->findRelay(domainName));
         });
-    return f;
 }
 
-cf::future<bool> RemoteRelayPeerPool::addPeer(const std::string& domainName)
+void RemoteRelayPeerPool::addPeer(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     m_peerPool->add(domainName, m_endpoint);
-    return cf::make_ready_future(true);
+    return handler(true);
 }
 
-cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
+void RemoteRelayPeerPool::removePeer(
+    const std::string& domainName,
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     m_peerPool->remove(domainName);
-    return cf::make_ready_future(true);
+    return handler(true);
 }
 
-void RemoteRelayPeerPool::setNodeId(const std::string& nodeId)
+void RemoteRelayPeerPool::setPublicUrl(const nx::utils::Url& publicUrl)
 {
-    m_endpoint = nodeId;
+    m_endpoint = publicUrl.port() <= 0
+        ? publicUrl.host().toStdString()
+        : nx::network::SocketAddress(publicUrl.host(), publicUrl.port()).toStdString();
 }
 
 } // namespace test

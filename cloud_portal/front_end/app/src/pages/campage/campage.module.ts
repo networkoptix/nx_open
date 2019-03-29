@@ -12,7 +12,6 @@ import { NxCampageComponent } from './campage.component';
 import { ComponentsModule }   from '../../components/components.module';
 import { CamTableComponent }  from './cam-components/cam-table/cam-table.component';
 import { CamViewComponent }   from './cam-components/cam-view/cam-view.component';
-import { SearchComponent }    from './cam-components/search/search.component';
 import { CsvButtonComponent } from './cam-components/csv-button/csv-button.component';
 import { BoolIconComponent }  from './cam-components/bool-icon/bool-icon.component';
 
@@ -39,7 +38,6 @@ const appRoutes: Routes = [
         NxCampageComponent,
         CamTableComponent,
         CamViewComponent,
-        SearchComponent,
         CsvButtonComponent,
         BoolIconComponent,
     ],

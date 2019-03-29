@@ -25,7 +25,7 @@ public:
     CustomerManager& customerManager();
 
 protected:
-    virtual void setup() override;
+    virtual void setup(const nx::utils::AbstractServiceSettings& settings) override;
     virtual void teardown() override;
 
 private:
