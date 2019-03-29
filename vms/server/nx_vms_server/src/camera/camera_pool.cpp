@@ -6,6 +6,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <camera/video_camera.h>
 
 #if defined(Q_OS_WIN)
     #include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"

@@ -4,7 +4,9 @@
 #include <nx/utils/random.h>
 #include <utils/memory/cyclic_allocator.h>
 #include <utils/common/synctime.h>
+#include <utils/common/util.h>
 #include <common/common_module.h>
+
 #include <camera/video_camera.h>
 
 namespace {
