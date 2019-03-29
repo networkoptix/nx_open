@@ -20,11 +20,13 @@
 #include <nx/vms/server/hls/hls_live_playlist_manager.h>
 #include <api/helpers/thumbnail_request_data.h>
 
-class QnVideoCameraGopKeeper;
 class QnDataProviderFactory;
 class MediaStreamCache;
 
-namespace nx { namespace vms::server { class Settings; } }
+namespace nx::vms::server {
+class Settings;
+class GopKeeper;
+} // namespace nx::vms::server
 
 /**
  * TODO: #ak Have to introduce this class since QnAbstractVideoCamera
@@ -157,8 +159,8 @@ private:
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;
 
-    QnVideoCameraGopKeeper* m_primaryGopKeeper;
-    QnVideoCameraGopKeeper* m_secondaryGopKeeper;
+    nx::vms::server::GopKeeper* m_primaryGopKeeper;
+    nx::vms::server::GopKeeper* m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     //!index - is a \a MediaQuality element
@@ -172,7 +174,7 @@ private:
     QElapsedTimer m_lastActivityTimer;
 
 private:
-    QnVideoCameraGopKeeper* getGopKeeper(StreamIndex streamIndex) const;
+    nx::vms::server::GopKeeper* getGopKeeper(StreamIndex streamIndex) const;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(
         QnServer::ChunksCatalog catalog, bool ensureInitialized);
