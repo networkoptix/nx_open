@@ -174,18 +174,25 @@ void QnRestConnectionProcessor::run()
     }
 
     QByteArray contentEncoding;
-    if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip")
-        && response.content
-        && response.statusCode == nx::network::http::StatusCode::ok
-        && !response.content->type.contains("image"))
+    if (response.content)
     {
-        contentEncoding = "gzip";
-        d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(
-            response.content->body);
+        if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding")
+                .toLower().contains("gzip")
+            && response.statusCode == nx::network::http::StatusCode::ok
+            && !response.content->type.contains("image"))
+        {
+            contentEncoding = "gzip";
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(
+                response.content->body);
+        }
+        else
+        {
+            d->response.messageBody = response.content->body;
+        }
     }
     else
     {
-        d->response.messageBody = response.content->body;
+        d->response.messageBody = {};
     }
 
     d->response.headers.insert(
