@@ -215,7 +215,7 @@ void InitiateConnectionRequestHandler::processRequest(
     nx::network::http::RequestContext requestContext,
     api::ConnectRequest inputData)
 {
-    RequestContext cachedRequestContext{
+    CachedRequestContext cachedRequestContext{
         requestContext.connection->isSsl(),
         requestContext.response
     };
@@ -239,9 +239,7 @@ void InitiateConnectionRequestHandler::processRequest(
                     std::move(response));
             }
 
-            reportResult(
-                std::move(resultCode),
-                std::move(response));
+            reportResult(std::move(resultCode), std::move(response));
         });
 }
 
@@ -276,7 +274,7 @@ void InitiateConnectionRequestHandler::reportResult(
 
 
 void InitiateConnectionRequestHandler::redirectToRemoteMediator(
-    nx::network::http::Response* ,
+    CachedRequestContext requestContext,
     const nx::String& targetServer,
     api::ResultCode resultCode,
     api::ConnectResponse response)
@@ -290,13 +288,13 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
             if (endpoint.domainName.empty())
             {
                 NX_WARNING(this, "Redirect to remote mediator failed.");
-                return reportResult(resultCode, std::move(response));
+                return reportResult(api::ResultCode::notFound, std::move(response));
             }
 
             if (endpoint == m_remoteMediatorPeerPool->thisEndpoint())
             {
                 NX_WARNING(this, "Redirecting to this mediator but connection already failed");
-                return reportResult(resultCode, std::move(response));
+                return reportResult(api::ResultCode::notFound, std::move(response));
             }
 
             auto location = buildMediatorUrl(endpoint, requestContext.isSsl);
@@ -306,7 +304,7 @@ void InitiateConnectionRequestHandler::redirectToRemoteMediator(
                 nx::network::http::HttpHeader("Location", location.toStdString().c_str()));
 
             reportResult(
-                resultCode,
+                api::ResultCode::notFound,
                 std::move(response),
                 nx::network::http::StatusCode::temporaryRedirect);
         });

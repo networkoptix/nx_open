@@ -99,7 +99,8 @@ public:
         RemoteMediatorPeerPool* remoteMediatorPeerPool);
 
 protected:
-    struct RequestContext
+    /** Used to cache needed info from nx::network::http::RequestContext*/
+    struct CachedRequestContext
     {
         bool isSsl = false;
         nx::network::http::Response* response;
@@ -115,7 +116,7 @@ protected:
         const std::optional<nx::network::http::StatusCode::Value>& httpStatusCode = std::nullopt);
 
     void redirectToRemoteMediator(
-        RequestContext requestContext,
+        CachedRequestContext requestContext,
         const nx::String& targetServer,
         api::ResultCode resultCode,
         api::ConnectResponse response);
