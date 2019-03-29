@@ -24,6 +24,7 @@ static const QString kStreamsToReopenAux = lit("streamsToReopen");
 static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 static const QString kDeviceTypesAux = lit("deviceTypes");
 static const QString kAssociatedParametersAux = lit("associatedWith");
+static const QString kAssociationCondition = lit("associationCondition");
 static const QString kPtzTraitsAux = lit("ptzTraits");
 static const QString kPtzCapabilitiesAux = lit("ptzCapabilities");
 
@@ -71,7 +72,8 @@ HanwhaAdavancedParameterInfo::kStringAuxes = {
     {kSortingAux, &HanwhaAdavancedParameterInfo::m_sorting},
     {kGroupAux, &HanwhaAdavancedParameterInfo::m_group},
     {kGropupIncludeAux, &HanwhaAdavancedParameterInfo::m_groupIncludeCondition},
-    {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group}
+    {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group},
+    {kAssociationCondition, &HanwhaAdavancedParameterInfo::m_associationCondition},
 };
 
 const std::map<QString, bool HanwhaAdavancedParameterInfo::*>
@@ -79,7 +81,7 @@ HanwhaAdavancedParameterInfo::kBoolAuxes = {
     {kSpecificAux, &HanwhaAdavancedParameterInfo::m_isSpecific},
     {kNoChannelAux, &HanwhaAdavancedParameterInfo::m_channelIndependent},
     {kCodecAux, &HanwhaAdavancedParameterInfo::m_isCodecDependent},
-    {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels}
+    {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels},
 };
 
 const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*>
@@ -223,6 +225,11 @@ bool HanwhaAdavancedParameterInfo::isDeviceTypeSupported(HanwhaDeviceType device
 QSet<QString> HanwhaAdavancedParameterInfo::associatedParameters() const
 {
     return m_associatedParameters;
+}
+
+QString HanwhaAdavancedParameterInfo::associationCondition() const
+{
+    return m_associationCondition;
 }
 
 QSet<QString> HanwhaAdavancedParameterInfo::ptzTraits() const

@@ -1061,7 +1061,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
         {
             NX_VERBOSE(this,
-                "Trying to initialise resource if it was not initialised on some unknown reason");
+                "Trying to initialise resource if it was not initialised for some unknown reason");
             cameraRes->initAsync(true);
         }
     }

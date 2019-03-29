@@ -149,7 +149,7 @@ int VideoStream::initialize()
         return AVERROR(ENODEV);
 
     m_codecParams = getDefaultVideoParameters();
-    return true;
+    return 0;
 }
 
 void VideoStream::uninitializeInput()

@@ -65,8 +65,8 @@ public:
     virtual const char* subtype() const = 0;
 
     /**
-     * Provides values of so-called Object Attributes - typically, some object properties (e.g. age or
-     * color), represented as a name-value map.
+     * Provides values of so-called Object Attributes - typically, some object properties (e.g. age
+     * or color), represented as a name-value map.
      * @param index 0-based index of the attribute.
      * @return Item of an attribute array, or null if index is out of range.
      */

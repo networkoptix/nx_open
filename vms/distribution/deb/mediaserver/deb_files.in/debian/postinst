@@ -30,6 +30,8 @@ CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
 SYSTEM_USER=$COMPANY_NAME
 
+WITH_ROOT_TOOL='@withRootTool@'
+
 is_systemd_used() {
     [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
 }
@@ -93,7 +95,11 @@ function display_complete_setup_hint {
 # immediately.
 
 service $COMPANY_NAME-mediaserver stop || true
-service $COMPANY_NAME-root-tool stop || true
+
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    service $COMPANY_NAME-root-tool stop || true
+fi
 
 case "$1" in
     configure)
@@ -154,7 +160,7 @@ case "$1" in
         # Allow core dumps creation.
         chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
 
-        if [ '@withRootTool@' = 'true' ]
+        if [[ $WITH_ROOT_TOOL == 'true' ]]
         then
             chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
             chmod u+s "${BIN_DIR}/root-tool-bin"
@@ -182,7 +188,7 @@ service apport stop >/dev/null 2>&1 || true
 if is_systemd_used
 then
     # Systemd requires explicit enabling of the service to start it on boot.
-    if [[ '@withRootTool@' == 'true' ]]
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
     then
         systemctl enable $COMPANY_NAME-root-tool || exit $?
     fi
@@ -192,7 +198,7 @@ fi
 
 startServer()
 {
-    if [[ '@withRootTool@' = 'true' ]]
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
     then
         service $COMPANY_NAME-root-tool start || return $?
     fi

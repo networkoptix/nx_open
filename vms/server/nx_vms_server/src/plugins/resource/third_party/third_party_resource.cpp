@@ -420,8 +420,6 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(StreamIn
 
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
 {
-    NX_VERBOSE(this, "Initialising camera driver...");
-
     updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
     QAuthenticator auth = getAuth();
 
@@ -429,7 +427,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     {
         QnMutexLocker lk( &m_mutex );
 
-        NX_VERBOSE(this, "Restoring camera parameters...");
+        NX_VERBOSE(this, "Restoring camera parameters");
         if( strlen(m_camInfo.uid) == 0 )
         {
             memset( m_camInfo.uid, 0, sizeof(m_camInfo.uid) );

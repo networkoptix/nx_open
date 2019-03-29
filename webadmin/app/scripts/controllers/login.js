@@ -34,11 +34,14 @@ angular.module('webadminApp')
                 $scope.authorizing = true;
                 mediaserver.login(login,password).then(reload,function(error){
                     $scope.authorizing = false;
-                    if (error.error !== '3') {
+                    if (error.errorString === Config.errors.login.wrongPassword) {
                         dialogs.alert(L.login.incorrectPassword);
                     }
-                    else{
+                    else if (error.errorString === Config.errors.login.accountLockout) {
                         dialogs.alert(L.login.authLockout);
+                    }
+                    else {
+                        dialogs.alert(L.join.unknownError);
                     }
                 }).then(function(){
                     nativeClient.updateCredentials(login,password,false,false);

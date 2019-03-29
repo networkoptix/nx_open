@@ -605,7 +605,8 @@ bool ServerUpdateTool::verifyUpdateManifest(
 {
     NX_ASSERT(m_stateTracker);
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions, checkClient);
+    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions,
+        checkClient ? m_stateTracker->getClientPeerId() : QnUuid());
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
@@ -860,8 +861,8 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                 if (response.error != QnRestResult::NoError)
                 {
                     NX_DEBUG(this,
-                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: %1",
-                        response.errorString);
+                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: code=%1, err=%2",
+                        response.error, response.errorString);
                 }
 
                 if (tool)

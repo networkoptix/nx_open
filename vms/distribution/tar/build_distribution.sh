@@ -74,6 +74,7 @@ copyBuildLibs()
         libcommon
         libnx_vms_server
         libnx_vms_server_db
+        libnx_speech_synthesizer
         libnx_email
         libnx_fusion
         libnx_kit
@@ -103,13 +104,6 @@ copyBuildLibs()
     local OPTIONAL_LIBS_TO_COPY=(
         libvpx
     )
-
-    if [ "$BOX" != "edge1" ]
-    then
-        LIBS_TO_COPY+=(
-            libnx_speech_synthesizer
-        )
-    fi
 
     # Libs for BananaPi-based Nx1 platform.
     if [ "$BOX" = "bpi" ] && [ $LITE_CLIENT_SUPPORTED = 1 ]

@@ -10,9 +10,11 @@ namespace time_sync {
 class ClientTimeSyncManager: public TimeSyncManager
 {
     Q_OBJECT
+    using base_type = TimeSyncManager;
 public:
-    using TimeSyncManager::TimeSyncManager;
+    ClientTimeSyncManager(QnCommonModule* commonModule);
     virtual ~ClientTimeSyncManager() override { stop(); }
+    void forceUpdate();
 protected:
     virtual void updateTime() override;
 private:

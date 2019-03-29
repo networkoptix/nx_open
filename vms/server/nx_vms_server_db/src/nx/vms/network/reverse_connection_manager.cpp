@@ -116,10 +116,24 @@ void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* 
             }
             else
             {
-                auto socket = httpClient->takeSocket();
-                socket->setRecvTimeout(kReverseConnectionTimeout);
-                socket->setNonBlockingMode(false);
-                m_tcpListener->processNewConnection(std::move(socket));
+                if (!httpClient->response())
+                {
+                    NX_WARNING(this,
+                        "Failed to establish reverse connection to the target server=%1. No HTTP response", httpClient->url());
+                }
+                else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
+                {
+                    NX_WARNING(this,
+                        "Failed to establish reverse connection to the target server=%1. HTTP error code %2",
+                        httpClient->url(), httpClient->response()->statusLine.statusCode);
+                }
+                else
+                {
+                    auto socket = httpClient->takeSocket();
+                    socket->setRecvTimeout(kReverseConnectionTimeout);
+                    socket->setNonBlockingMode(false);
+                    m_tcpListener->processNewConnection(std::move(socket));
+                }
             }
             m_runningHttpClients.erase(itr);
             break;
@@ -176,6 +190,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
         }
         m_proxyCondition.wait(&m_mutex, std::chrono::milliseconds(kReverseConnectionTimeout).count());
     }
+    NX_WARNING(this, lit("Can't establish proxy connection to the remote host %1"), guid);
     return std::unique_ptr<nx::network::AbstractStreamSocket>();
 }
 

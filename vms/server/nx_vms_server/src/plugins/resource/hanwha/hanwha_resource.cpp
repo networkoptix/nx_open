@@ -1094,6 +1094,13 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (!ini().initMedia)
         return CameraDiagnostics::NoErrorResult();
 
+    const auto multicastSupportAttribute = attributes().attribute<bool>(
+        lm("Media/Stream.Multicast/%1").arg(getChannel()));
+
+    setCameraCapability(
+        Qn::CameraCapability::MulticastStreamCapability,
+        multicastSupportAttribute && *multicastSupportAttribute);
+
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -3337,7 +3344,17 @@ QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
 {
     std::map<QString, QString> parameterValues;
     for (const auto& value: values)
+    {
+        const auto info = advancedParameterInfo(value.id);
+        if (!info)
+            continue;
+
+        const auto associationCondition = info->associationCondition();
+        if (!associationCondition.isEmpty() && associationCondition != value.value)
+            continue;
+
         parameterValues[value.id] = value.value;
+    }
 
     QSet<QString> parametersToFetch;
     for (const auto& entry: parameterValues)
@@ -3973,6 +3990,12 @@ void HanwhaResource::setPtzCalibarionTimer()
             setPtzCalibarionTimer();
         },
         kUpdateTimeout);
+}
+
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
+    HanwhaResource::advancedParametersProviders()
+{
+    return { &m_advancedParametersProvider };
 }
 
 } // namespace plugins

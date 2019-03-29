@@ -61,12 +61,11 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
     {
         const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
-        QStandardItem* parentItem = nullptr;
 
         if (!engineDescriptor)
             continue;
 
-        parentItem = addItem(
+        QStandardItem* engineRootItem = addItem(
             nullptr,
             engineDescriptor->name,
             engineId,
@@ -75,6 +74,8 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
 
         for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
         {
+            QStandardItem* parentItem = engineRootItem;
+
             const auto groupDescriptor = groupDescriptorManager.descriptor(groupId);
             if (groupDescriptor)
             {

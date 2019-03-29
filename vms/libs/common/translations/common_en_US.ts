@@ -106,6 +106,11 @@
         <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Cloud systems have different owners. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1283,10 +1288,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Multiple %1 events have occured</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation></translation>
     </message>
@@ -1371,10 +1372,6 @@
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation></translation>
     </message>
     <message>
@@ -1567,6 +1564,10 @@
     <message>
         <source>Camera time is back to normal</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Multiple %1 events have occurred</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

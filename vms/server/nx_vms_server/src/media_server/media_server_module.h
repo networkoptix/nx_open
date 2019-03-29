@@ -156,8 +156,15 @@ public:
     QnMdnsListener* mdnsListener() const;
     nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
     nx::vms::server::hls::SessionPool* hlsSessionPool() const;
+
+    void initializeP2PDownloader();
+
 private:
     void registerResourceDataProviders();
+    /**
+     * Returns abosolute path to downloads directory.
+     * It will create this directory if does not exist.
+     */
     QDir downloadsDirectory() const;
     void stopLongRunnables();
 

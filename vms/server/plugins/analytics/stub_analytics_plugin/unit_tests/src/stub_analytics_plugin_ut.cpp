@@ -337,7 +337,7 @@ TEST(stub_analytics_plugin, test)
 } // namespace vms_server_plugins
 } // namespace nx
 
-int main(int argc, const char* const argv[])
+int main()
 {
-    return nx::kit::test::runAllTests("stub_analytics_plugin", argc, argv);
+    return nx::kit::test::runAllTests("stub_analytics_plugin");
 }

@@ -689,20 +689,17 @@ void QnClientModule::initLocalResources()
     resourceProcessor->moveToThread(resourceDiscoveryManager);
     resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
 
-    if (!m_startupParameters.skipMediaFolderScan)
-    {
-        auto localFilesSearcher = commonModule->store(new QnResourceDirectoryBrowser());
-
-        localFilesSearcher->setLocal(true);
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        localFilesSearcher->setPathCheckList(dirs);
-        resourceDiscoveryManager->addDeviceServer(localFilesSearcher);
-    }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
+    if (!m_startupParameters.skipMediaFolderScan)
+    {
+        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
+        QStringList paths;
+        paths.append(qnSettings->mediaFolder());
+        paths.append(qnSettings->extraMediaFolders());
+        localFilesSearcher->setLocalResourcesDirectories(paths);
+    }
 }
 
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const

@@ -1533,7 +1533,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         if (!calcDigestResponse(
                 m_request.requestLine.method,
                 credentials,
-                m_contentLocationUrl.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8(),
+                m_request.requestLine.url.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8(),
                 *wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
         {
@@ -1546,6 +1546,7 @@ bool AsyncClient::resendRequestWithAuthorization(
             &m_request.headers,
             nx::network::http::HttpHeader(authorizationHeaderName, authorizationStr));
         // TODO: #ak MUST add to cache only after OK response.
+        // TODO: #ak It seems cache key is not correct because don't take uri into account
         m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
             m_contentLocationUrl,
             m_request.requestLine.method,

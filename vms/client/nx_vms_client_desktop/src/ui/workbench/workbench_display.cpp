@@ -1200,8 +1200,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             if (!mediaWidget->isZoomWindow())
                 qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
 
-            integrations::registerWidget(mediaWidget);
         }
+
+        integrations::registerWidget(mediaWidget);
     }
 
     return true;

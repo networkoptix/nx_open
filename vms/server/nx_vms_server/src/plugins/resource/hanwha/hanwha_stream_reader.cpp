@@ -22,9 +22,39 @@ namespace plugins {
 namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
+static const QString kTooManyConnectionsMessagePattern("maximum");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
 static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
+
+static const QString kHanwhaTcp("TCP");
+static const QString kHanwhaUdp("UDP");
+
+QString toHanwhaStreamingType(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
+        return kHanwhaRtpMulticast;
+
+    return kHanwhaRtpUnicast;
+}
+
+QString toHanwhaTransportProtocol(nx::vms::api::RtpTransportType rtpTransport)
+{
+    using namespace nx::vms::api;
+    switch (rtpTransport)
+    {
+        case RtpTransportType::automatic:
+        case RtpTransportType::tcp:
+            return kHanwhaTcp;
+        case RtpTransportType::udp:
+        case RtpTransportType::multicast:
+            return kHanwhaUdp;
+        default:
+            NX_ASSERT(false, "Invalid RTP transport");
+            return kHanwhaTcp;
+    }
+}
 
 } // namespace
 
@@ -90,7 +120,11 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     const auto openResult = m_rtpReader.openStream();
     NX_DEBUG(this, lm("Open RTSP %1 for device %2").args(
         streamUrlString, m_resource->getUniqueId()));
-
+    if (!openResult &&
+        openResult.toString(resourcePool()).toLower().contains(kTooManyConnectionsMessagePattern))
+    {
+        return CameraDiagnostics::TooManyOpenedConnectionsResult();
+    }
     return openResult;
 }
 
@@ -173,13 +207,16 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         return CameraDiagnostics::NoErrorResult();
     }
 
+    const nx::vms::api::RtpTransportType preferredRtpTransport =
+        m_hanwhaResource->preferredRtpTransport();
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaStreamingModeProperty, kHanwhaFullMode},
-        {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
-        {kHanwhaTransportProtocolProperty, rtpTransport()},
+        {kHanwhaStreamingTypeProperty, toHanwhaStreamingType(preferredRtpTransport)},
+        {kHanwhaTransportProtocolProperty, toHanwhaTransportProtocol(preferredRtpTransport)},
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 

@@ -277,3 +277,17 @@ QJsonObject::const_iterator QJsonDetail::findField(
     }
     return deprecatedFieldPos;
 }
+
+QString toString(QJsonValue::Type jsonType)
+{
+    switch (jsonType)
+    {
+        case QJsonValue::Null: return "Null";
+        case QJsonValue::Bool: return "Bool";
+        case QJsonValue::Double: return "Double";
+        case QJsonValue::String: return "String";
+        case QJsonValue::Array: return "Array";
+        case QJsonValue::Object: return "Object";
+        default: return "Undefined";
+    }
+}

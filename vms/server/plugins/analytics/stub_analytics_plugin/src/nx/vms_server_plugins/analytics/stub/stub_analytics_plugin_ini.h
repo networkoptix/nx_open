@@ -31,6 +31,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(1, throwPluginEventsFromDeviceAgent,
         "Periodically throw plugin events from DeviceAgent to Server.");
+
+    NX_INI_INT(-1, crashDeviceAgentOnFrameN,
+        "If >= 0, intentionally crash DeviceAgent on processing a frame with this index.");
 };
 
 inline Ini& ini()

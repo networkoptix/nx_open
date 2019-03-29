@@ -295,7 +295,7 @@ bool QnServerDb::open()
     }
     else
     {
-        qWarning() << "Cannot initialize sqlLite database. Actions log is not created.";
+        NX_WARNING(this, "Cannot create sqlLite database %1", fileName);
         return false;
     }
 
