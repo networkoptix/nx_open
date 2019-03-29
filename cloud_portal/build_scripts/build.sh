@@ -89,12 +89,12 @@ cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
 
 
 echo "Checking files for mentions of nx"
-branding=$(grep -iE "(nx witness client|nx cloud)" --exclude=*.png -rl ${TARGET_DIR})
+branding=$(grep -iE "(nx witness client|nx cloud)" --exclude=*.png -rl ${TARGET_DIR}) || true
 if [[ -z ${branding} ]]
 then
     echo "No mentions were found"
 else
-    echo "Error found mentions of Nx in the following files:"
+    echo -e "\nError found mentions of Nx in the following files:"
     for mention in ${branding}
     do
         echo ${mention}
