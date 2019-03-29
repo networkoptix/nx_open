@@ -47,6 +47,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         [this](int state)
         {
             m_watermarkSettings.useWatermark = (state == Qt::Checked);
+            ui->watermarkExplanationLabel->setVisible(state == Qt::Checked);
             ui->watermarkSettingsButton->setVisible(state == Qt::Checked);
         };
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged,
