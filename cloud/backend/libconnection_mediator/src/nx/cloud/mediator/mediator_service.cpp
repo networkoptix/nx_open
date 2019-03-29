@@ -132,6 +132,12 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
 bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
 {
+    const auto assignPort =
+        [](const std::vector<network::SocketAddress>& endpoints, int* outPort)
+        {
+            *outPort = endpoints.empty() ? -1 : endpoints.front().port;
+        };
+
     MediatorEndpoint endpoint;
     if (settings.server().name.empty())
     {
@@ -148,9 +154,9 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
         endpoint.domainName = settings.server().name;
     }
 
-    endpoint.httpPort = httpEndpoints().front().port;
-    endpoint.httpsPort = httpsEndpoints().front().port;
-    endpoint.stunUdpPort = stunUdpEndpoints().front().port;
+    assignPort(httpEndpoints(), &endpoint.httpPort);
+    assignPort(httpsEndpoints(), &endpoint.httpsPort);
+    assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
 
     m_controller->remoteMediatorPeerPool().setEndpoint(endpoint);
 

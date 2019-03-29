@@ -97,7 +97,8 @@ bool RemoteMediatorPeerPool::initialize()
             m_settings.map,
             sqlExecutor.get());
 
-        m_sqlExecutor = std::move(sqlExecutor);        m_map = std::move(map);
+        m_sqlExecutor = std::move(sqlExecutor);
+        m_map = std::move(map);
     }
     catch (const std::exception& e)
     {

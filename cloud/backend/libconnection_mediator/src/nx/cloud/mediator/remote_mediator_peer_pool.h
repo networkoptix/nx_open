@@ -8,7 +8,7 @@ namespace nx::hpm {
 
 /**
  * Represents the endpoint that a mediator instance listens on,
- * including http(or https) and stun udp ports.
+ * including http(or https) and stun udp ports. A given port is set to -1 if unused.
  */
 struct MediatorEndpoint
 {
