@@ -73,7 +73,7 @@
                 }
     
                 &:nth-child(4) {
-                    width : 105px;
+                    width : 100px;
     
                     .caption {
                         div:first-of-type {
@@ -111,15 +111,19 @@
                 }
     
                 &:nth-child(7) {
-                    width : 80px;
+                    width : 75px;
                 }
                 
                 &:nth-child(8) {
-                    width : 80px;
+                    width : 75px;
                 }
     
-                &:nth-child(n+8) {
+                &:nth-child(n+9) {
                     width : 75px;
+                }
+    
+                &:nth-child(9) {
+                    width : 80px;
                 }
     
                 &:nth-child(11) { // I/O last column
@@ -161,7 +165,7 @@
                 }
     
                 &:nth-child(4) {
-                    width : 105px;
+                    width : 100px;
                 }
     
                 &:nth-child(5) {
@@ -179,17 +183,21 @@
                 }
                 
                 &:nth-child(7) {
-                    width : 80px;
+                    width : 75px;
                 }
                 
                 &:nth-child(8) {
-                    width : 80px;
-                }
-    
-                &:nth-child(n+8) {
                     width : 75px;
                 }
     
+                &:nth-child(n+9) {
+                    width : 75px;
+                }
+    
+                &:nth-child(9) {
+                    width : 80px;
+                }
+                
                 &:nth-child(11) { // I/O last column
                     width : 60px;
                 }
