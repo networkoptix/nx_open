@@ -73,7 +73,7 @@ protected:
         if (m_allowedIpRanges.size() == 0 && m_localInterfacesToListen.size() > 0)
         {
             qWarning() << "ERROR: Unable to listen for discovery on requested addresses";
-            return;
+            abort();  // TODO: Should not be so radical. Better to exit gracefully...
         }
 #else
         // Linux doesn't support binding to specified interface and receiving broadcast packets at the same time.
