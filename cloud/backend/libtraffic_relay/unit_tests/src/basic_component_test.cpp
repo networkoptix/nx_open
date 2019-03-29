@@ -39,8 +39,7 @@ nx::utils::Url Relay::basicUrl() const
 //-------------------------------------------------------------------------------------------------
 
 BasicComponentTest::BasicComponentTest(Mode /*mode*/):
-    base_type("traffic_relay", QString()),
-    m_discoveryServer(kClusterId)
+    base_type("traffic_relay", QString())
 {
     using namespace std::placeholders;
 
