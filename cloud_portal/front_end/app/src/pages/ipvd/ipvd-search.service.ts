@@ -10,9 +10,10 @@ import 'rxjs/add/operator/switchMap';
 })
 export class IpvdSearchService {
 
-    private elmResolution = 'resolution';
-    private elmVendors = 'vendors';
-    private elmHardwareTypes = 'hardwareTypes';
+    private static RESOLUTION = 'resolution';
+    private static VENDORS = 'vendors';
+    private static const TYPES = 'hardwareTypes';
+
     private _vendors: any;
 
     constructor() {
@@ -49,16 +50,16 @@ export class IpvdSearchService {
         let vendors;
         let types;
 
-        if (filter.selects.find(x => x.id === this.elmResolution) !== undefined) {
-            resolution = filter.selects.find(x => x.id === this.elmResolution).selected;
+        if (filter.selects.find(x => x.id === IpvdSearchService.RESOLUTION) !== undefined) {
+            resolution = filter.selects.find(x => x.id === IpvdSearchService.RESOLUTION).selected;
         }
 
-        if (filter.multiselects.find(x => x.id === this.elmVendors) !== undefined) {
-            vendors = filter.multiselects.find(x => x.id === this.elmVendors).selected;
+        if (filter.multiselects.find(x => x.id === IpvdSearchService.VENDORS) !== undefined) {
+            vendors = filter.multiselects.find(x => x.id === IpvdSearchService.VENDORS).selected;
         }
 
-        if (filter.multiselects.find(x => x.id === this.elmHardwareTypes) !== undefined) {
-            const hardwareType = filter.multiselects.find(x => x.id === this.elmHardwareTypes);
+        if (filter.multiselects.find(x => x.id === IpvdSearchService.TYPES) !== undefined) {
+            const hardwareType = filter.multiselects.find(x => x.id === IpvdSearchService.TYPES);
             if (hardwareType.selected.length) {
                 types = hardwareType.items.filter(x => !hardwareType.selected.includes(x.id));
             }
