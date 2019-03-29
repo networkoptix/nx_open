@@ -3,14 +3,13 @@
 #include <network/universal_tcp_listener.h>
 #include <rest/server/rest_connection_processor.h>
 
-JsonRestResponse QnCookieLogoutRestHandler::executeGet(const JsonRestRequest& request)
+RestResponse QnCookieLogoutRestHandler::executeGet(const RestRequest& request)
 {
     logout(request.owner);
     return {nx::network::http::StatusCode::ok};
 }
 
-JsonRestResponse QnCookieLogoutRestHandler::executePost(
-    const JsonRestRequest& request, const QByteArray& /*body*/)
+RestResponse QnCookieLogoutRestHandler::executePost(const RestRequest& request)
 {
     logout(request.owner);
     return {nx::network::http::StatusCode::ok};

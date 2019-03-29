@@ -87,63 +87,61 @@ void QnModuleInformationRestHandler::clear(Connections* connections)
     connections->clear();
 }
 
-JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestRequest& request)
+RestResponse QnModuleInformationRestHandler::executeGet(const RestRequest& request)
 {
-    if (checkOwnerPermissionsMode(request.params)
+    if (checkOwnerPermissionsMode(request.params())
         && !QnPermissionsHelper::hasOwnerPermissions(
             request.owner->resourcePool(), request.owner->accessRights()))
     {
-        JsonRestResponse response;
-        response.statusCode = (nx::network::http::StatusCode::Value)
-            QnPermissionsHelper::notOwnerError(response.json);
-        return response;
+        QnJsonRestResult result;
+        QnPermissionsHelper::notOwnerError(result);
+        return RestResponse::result(result);
     }
 
-    JsonRestResponse response(nx::network::http::StatusCode::ok, {},
-        (bool) updateStreamTime(request.params));
-    if (allModulesMode(request.params))
+    RestResponse response;
+    if (allModulesMode(request.params()))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
-        if (showAddressesMode(request.params))
+        if (showAddressesMode(request.params()))
         {
             QList<nx::vms::api::ModuleInformationWithAddresses> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(std::move(server->getModuleInformationWithAddresses()));
 
-            response.json.setReply(modules);
+            response = RestResponse::reply(modules);
         }
         else
         {
             QList<nx::vms::api::ModuleInformation> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(server->getModuleInformation());
-            response.json.setReply(modules);
+
+            response = RestResponse::reply(modules);
         }
     }
-    else if (showAddressesMode(request.params))
+    else if (showAddressesMode(request.params()))
     {
         const auto id = request.owner->commonModule()->moduleGUID();
         if (const auto s = request.owner->resourcePool()->getResourceById<QnMediaServerResource>(id))
-            response.json.setReply(s->getModuleInformationWithAddresses());
+            response = RestResponse::reply(s->getModuleInformationWithAddresses());
         else
-            response.json.setReply(request.owner->commonModule()->moduleInformation());
+            response = RestResponse::reply(request.owner->commonModule()->moduleInformation());
     }
     else
     {
-        response.json.setReply(request.owner->commonModule()->moduleInformation());
+        response = RestResponse::reply(request.owner->commonModule()->moduleInformation());
     }
 
-    response.statusCode = nx::network::http::StatusCode::ok;
-    if (updateStreamTime(request.params))
+    if (updateStreamTime(request.params()))
         response.isUndefinedContentLength = true;
 
     return response;
 }
 
 void QnModuleInformationRestHandler::afterExecute(
-    const RestRequest& request, const QByteArray& /*response*/)
+    const RestRequest& request, const RestResponse& /*response*/)
 {
-    if (!keepConnectionOpenMode(request.params) && !updateStreamTime(request.params))
+    if (!keepConnectionOpenMode(request.params()) && !updateStreamTime(request.params()))
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
@@ -162,7 +160,7 @@ void QnModuleInformationRestHandler::afterExecute(
     }
 
     m_pollable.post(
-        [this, socket = std::move(socket), updateStreamTime = updateStreamTime(request.params)
+        [this, socket = std::move(socket), updateStreamTime = updateStreamTime(request.params())
             ]() mutable
         {
             if (updateStreamTime)
@@ -222,16 +220,6 @@ void QnModuleInformationRestHandler::changeModuleInformation()
             for (auto it = m_connectionsToUpdate.begin(); it != m_connectionsToUpdate.end(); ++it)
                 sendModuleImformation(it);
         });
-}
-
-int QnModuleInformationRestHandler::executeGet(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    QnJsonRestResult& /*result*/,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 void QnModuleInformationRestHandler::updateModuleImformation()

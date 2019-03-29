@@ -8,12 +8,10 @@
 #include <common/common_globals.h>
 #include <utils/common/request_param.h>
 
+#include <rest/server/json_rest_result.h>
+
 class TCPSocket;
 class QnRestConnectionProcessor;
-
-// TODO: #MSAPI header-class naming inconsistency. As all derived classes are named XyzRestHandler,
-// I suggest to rename this one to either QnAbstractRestHandler or simply to QnRestHandler. And
-// rename the header.
 
 enum class RestPermissions
 {
@@ -21,37 +19,81 @@ enum class RestPermissions
     adminOnly,
 };
 
-struct RestRequest
-{
-    QString path;
-    QnRequestParamList params; //< Should be QnRequestParams
-    const QnRestConnectionProcessor* owner = nullptr; //< Better to pass data instead of owner
-    const nx::network::http::Request* httpRequest = nullptr;
-
-    RestRequest(
-        QString path = {},
-        QnRequestParamList params = {},
-        const QnRestConnectionProcessor* owner = nullptr,
-        const nx::network::http::Request* httpRequest = nullptr);
-};
-
 struct RestContent
 {
     QByteArray type;
     QByteArray body;
 
-    RestContent(QByteArray type = {}, QByteArray body = {});
+    std::optional<QJsonValue> parse() const;
+};
+
+struct RestRequest
+{
+    // TODO: These should be private, all data should be avalible by getters.
+    const nx::network::http::Request* httpRequest = nullptr;
+    const QnRestConnectionProcessor* owner = nullptr;
+
+    std::optional<RestContent> content;
+
+    RestRequest(
+        const nx::network::http::Request* httpRequest,
+        const QnRestConnectionProcessor* owner);
+
+    /**
+     * Method from request, may be overwritten by:
+     * - X-Method-Override header.
+     * - method_ URL param if ini config allows it.
+     */
+    const nx::network::http::Method::ValueType& method() const;
+    QString path() const;
+
+    /**
+     * If method may not provide message body, uses URL params.
+     * If method provides message body, parses message body instead (url params may be merged into
+     * it if ini config permits so).
+     */
+    const RequestParams& params() const;
+    std::optional<QString> param(const QString& key) const;
+    QString paramOr(const QString& key, const QString& defaultValue = {}) const;
+
+    /**
+     * If method may not provide message body, parses URL params.
+     * If method provides message body, parses message body instead.
+     */
+    template <typename T>
+    std::optional<T> parseContent() const;
+
+    bool isExtraFormattingRequired() const;
+
+private:
+    nx::network::http::Method::ValueType calculateMethod() const;
+    std::optional<QJsonValue> parseMessageBody() const;
+    RequestParams calculateParams() const;
+    std::optional<QJsonValue> calculateContent() const;
+
+private:
+    const RequestParams m_urlParams;
+    const nx::network::http::Method::ValueType m_method;
+    mutable std::optional<RequestParams> m_paramsCache;
 };
 
 struct RestResponse
 {
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
-    RestContent content;
+    std::optional<RestContent> content;
     bool isUndefinedContentLength = false;
     nx::network::http::HttpHeaders httpHeaders;
 
-    RestResponse(nx::network::http::StatusCode::Value statusCode= nx::network::http::StatusCode::undefined,
-        RestContent content = {}, bool isUndefinedContentLength = false);
+    RestResponse(
+        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined);
+
+    static RestResponse result(const QnJsonRestResult& result);
+
+    template<typename T>
+    static RestResponse reply(const T& data);
+
+    template<typename... Args>
+    static RestResponse error(QnRestResult::Error errorCode, Args... args);
 };
 
 /**
@@ -61,23 +103,9 @@ struct RestResponse
  */
 class QnRestRequestHandler: public QObject
 {
-    Q_OBJECT
-
 public:
-    QnRestRequestHandler();
-
-    virtual RestResponse executeRequest(
-        nx::network::http::Method::ValueType method,
-        const RestRequest& request,
-        const RestContent& content);
-
-    // TODO: By default these methods use protected virtual functions, which should be removed.
-    // Only new functions are supposed to be used in future
-    virtual RestResponse executeGet(const RestRequest& request);
-    virtual RestResponse executeDelete(const RestRequest& request);
-    virtual RestResponse executePost(const RestRequest& request, const RestContent& content);
-    virtual RestResponse executePut(const RestRequest& request, const RestContent& content);
-    virtual void afterExecute(const RestRequest& request, const QByteArray& response);
+    virtual RestResponse executeRequest(const RestRequest& request);
+    virtual void afterExecute(const RestRequest& request, const RestResponse& response);
 
     friend class QnRestProcessorPool;
 
@@ -87,9 +115,12 @@ public:
     virtual QStringList cameraIdUrlParams() const { return {}; }
 
 protected:
-    /**
-     * @return Http status code.
-     */
+    virtual RestResponse executeGet(const RestRequest& request);
+    virtual RestResponse executeDelete(const RestRequest& request);
+    virtual RestResponse executePost(const RestRequest& request);
+    virtual RestResponse executePut(const RestRequest& request);
+
+    // TODO: Remove and reimplement by generic executeRequest.
     virtual int executeGet(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
@@ -99,20 +130,15 @@ protected:
     {
         return nx::network::http::StatusCode::notImplemented;
     }
-
-    /**
-     * @return HTTP status code.
-     */
     virtual int executeDelete(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& result,
-        QByteArray& contentType,
-        const QnRestConnectionProcessor* owner);
-
-    /**
-     * @return HTTP status code.
-     */
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        QByteArray& /*result*/,
+        QByteArray& /*contentType*/,
+        const QnRestConnectionProcessor* /*owner*/)
+    {
+        return nx::network::http::StatusCode::notImplemented;
+    }
     virtual int executePost(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
@@ -124,24 +150,24 @@ protected:
     {
         return nx::network::http::StatusCode::notImplemented;
     }
-
-    /**
-     * @return HTTP status code.
-     */
     virtual int executePut(
-            const QString& path,
-            const QnRequestParamList& params,
-            const QByteArray& body,
-            const QByteArray& srcBodyContentType,
-            QByteArray& result,
-            QByteArray& resultContentType,
-            const QnRestConnectionProcessor* owner);
-
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        const QByteArray& /*body*/,
+        const QByteArray& /*srcBodyContentType*/,
+        QByteArray& /*result*/,
+        QByteArray& /*resultContentType*/,
+        const QnRestConnectionProcessor* /*owner*/)
+    {
+        return nx::network::http::StatusCode::notImplemented;
+    }
     virtual void afterExecute(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QnRestConnectionProcessor* owner);
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        const QByteArray& /*body*/,
+        const QnRestConnectionProcessor* /*owner*/)
+    {
+    }
 
 protected:
     void setPath(const QString& path) { m_path = path; }
@@ -155,49 +181,47 @@ protected:
 
 typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
 
-class QnRestGUIRequestHandlerPrivate;
+//--------------------------------------------------------------------------------------------------
 
-class QnRestGUIRequestHandler: public QnRestRequestHandler
+template<typename T>
+std::optional<T> RestRequest::parseContent() const
 {
-    Q_OBJECT
+    const auto value = calculateContent();
+    if (!value)
+        return std::nullopt;
 
-public:
-    QnRestGUIRequestHandler();
-    virtual ~QnRestGUIRequestHandler();
+    T result;
+    if (!QJson::deserialize(*value, &result))
+        return std::nullopt;
 
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& result,
-        QByteArray& contentType,
-        const QnRestConnectionProcessor* /*owner*/) override;
+    return result;
+}
 
-    virtual int executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& result,
-        QByteArray& contentType,
-        const QnRestConnectionProcessor* /*owner*/) override;
+template<typename T>
+RestResponse RestResponse::reply(const T& data)
+{
+    // TODO: Add support for other then JSON results?
+    QnJsonRestResult json;
+    json.setReply(data);
+    return result(json);
+}
 
-protected:
-    virtual int executeGetGUI(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& result) = 0;
+inline void qStringListAdd(QStringList* /*list*/) {}
 
-    virtual int executePostGUI(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& body,
-        QByteArray& result) = 0;
+template<typename... Args>
+void qStringListAdd(QStringList* list, QString arg, Args... args)
+{
+    list->append(std::move(arg));
+    qStringListAdd(list, std::forward<Args>(args)...);
+}
 
-private:
-    Q_INVOKABLE void methodExecutor();
+template<typename... Args>
+RestResponse RestResponse::error(QnRestResult::Error errorCode, Args... args)
+{
+    QStringList argList;
+    qStringListAdd(&argList, args...);
 
-protected:
-    Q_DECLARE_PRIVATE(QnRestGUIRequestHandler);
-
-    QnRestGUIRequestHandlerPrivate* d_ptr;
-};
+    QnRestResult rest;
+    rest.setError(QnRestResult::ErrorDescriptor{errorCode, std::move(argList)});
+    return result(rest);
+}

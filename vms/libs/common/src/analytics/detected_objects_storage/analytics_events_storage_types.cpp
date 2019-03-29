@@ -96,10 +96,10 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
-    for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
+    for (const auto& deviceIdStr: params.values(lit("deviceId")))
         filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
 
-    for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
+    for (const auto& objectTypeId: params.values(lit("objectTypeId")))
         filter->objectTypeId.push_back(objectTypeId);
 
     if (params.contains(lit("objectAppearanceId")))

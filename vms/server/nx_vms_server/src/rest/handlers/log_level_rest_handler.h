@@ -5,8 +5,8 @@
 class QnLogLevelRestHandler: public QnJsonRestHandler
 {
 public:
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
+    RestResponse executeGet(const RestRequest& request) override;
 
 private:
-    virtual JsonRestResponse manageLogLevelById(const JsonRestRequest& request);
+    virtual RestResponse manageLogLevelById(const RestRequest& request);
 };

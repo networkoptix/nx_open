@@ -4,76 +4,222 @@
 
 #include <nx/utils/log/log.h>
 
+static const QString kExtraFormatting("extraFormatting");
+static const QByteArray kJsonContetnType("application/json");
+
+// TODO: Make it an INI config.
+struct RestIni
+{
+    // Should be false by default.
+    const bool allowGetMethodReplacement = true;
+
+    // Should be disabled as soon as these methods are deprecated.
+    const bool allowUrlParamitersForAnyMethod = true;
+};
+
+static const RestIni& restIni()
+{
+    static RestIni ini_;
+    return ini_;
+}
+
+std::optional<QJsonValue> RestContent::parse() const
+{
+    if (type == kJsonContetnType)
+    {
+        QJsonValue value;
+        if (!QJson::deserialize(body, &value))
+            return std::nullopt;
+
+        return value;
+    }
+
+    // TODO: Other content types should go there when supported.
+    return std::nullopt;
+}
+
 RestRequest::RestRequest(
-    QString path, 
-    QnRequestParamList params,
-    const QnRestConnectionProcessor* owner,
-    const nx::network::http::Request* httpRequest)
+    const nx::network::http::Request* httpRequest,
+    const QnRestConnectionProcessor* owner)
 :
-    path(std::move(path)),
-    params(std::move(params)),
+    httpRequest(httpRequest),
     owner(owner),
-    httpRequest(httpRequest)
+    m_urlParams(RequestParams::fromUrlQuery(QUrlQuery(httpRequest->requestLine.url.toQUrl()))),
+    m_method(calculateMethod().toUpper())
 {
 }
 
-RestContent::RestContent(QByteArray type, QByteArray body):
-    type(std::move(type)), body(std::move(body))
+const nx::network::http::Method::ValueType& RestRequest::method() const
+{
+    return m_method;
+}
 
+QString RestRequest::path() const
+{
+    return httpRequest->requestLine.url.path();
+}
+
+const RequestParams& RestRequest::params() const
+{
+    if (!m_paramsCache)
+        m_paramsCache = calculateParams();
+
+    return *m_paramsCache;
+}
+
+std::optional<QString> RestRequest::param(const QString& key) const
+{
+    const auto& params_ = params();
+    const auto it = params_.find(key);
+    if (it == params_.end())
+        return std::nullopt;
+
+    return it.value();
+}
+
+QString RestRequest::paramOr(const QString& key, const QString& defaultValue) const
+{
+    auto p = param(key);
+    return p ? *p : defaultValue;
+}
+
+bool RestRequest::isExtraFormattingRequired() const
+{
+    return (bool) param(kExtraFormatting);
+}
+
+nx::network::http::Method::ValueType RestRequest::calculateMethod() const
+{
+    if (restIni().allowGetMethodReplacement)
+    {
+        const auto p = m_urlParams.value("method_");
+        if (!p.isEmpty())
+            return p.toUtf8();
+    }
+
+    const auto h = nx::network::http::getHeaderValue(httpRequest->headers, "X-Method-Override");
+    if (!h.isEmpty())
+        return h;
+
+    return httpRequest->requestLine.method;
+}
+
+RequestParams RestRequest::calculateParams() const
+{
+    const auto method = httpRequest->requestLine.method.toUpper();
+    if (!nx::network::http::Method::isMessageBodyAllowed(method))
+        return m_urlParams;
+
+    RequestParams params;
+    if (restIni().allowUrlParamitersForAnyMethod)
+        params.unite(m_urlParams);
+
+    if (content)
+    {
+        auto json = content->parse();
+        if (json && json->type() == QJsonValue::Object)
+            params.unite(RequestParams::fromJson(json->toObject()));
+    }
+
+    return params;
+}
+
+std::optional<QJsonValue> RestRequest::calculateContent() const
+{
+    if (!nx::network::http::Method::isMessageBodyAllowed(httpRequest->requestLine.method))
+        return m_urlParams.toJson();
+
+    std::optional<QJsonValue> parsedContent;
+    if (content)
+    {
+        parsedContent = content->parse();
+        if (!restIni().allowUrlParamitersForAnyMethod)
+            return parsedContent;
+    }
+
+    if (m_urlParams.isEmpty() || (parsedContent && parsedContent->type() != QJsonValue::Object))
+        return parsedContent; //< Impossible to merge with URL params.
+
+    QJsonObject object;
+    if (parsedContent)
+        object = parsedContent->toObject();
+
+    const auto urlObject = m_urlParams.toJson();
+    for (auto it = urlObject.begin(); it != urlObject.end(); ++it)
+        object.insert(it.key(), it.value());
+
+    return object;
+}
+
+RestResponse::RestResponse(nx::network::http::StatusCode::Value statusCode):
+    statusCode(statusCode)
 {
 }
 
-RestResponse::RestResponse(
-    nx::network::http::StatusCode::Value statusCode, RestContent content, bool isUndefinedContentLength)
-:
-    statusCode(statusCode), content(std::move(content)),
-    isUndefinedContentLength(isUndefinedContentLength)
+RestResponse RestResponse::result(const QnJsonRestResult& result)
 {
-}
-
-QnRestRequestHandler::QnRestRequestHandler()
-{
+    RestResponse response;
+    response.statusCode = QnRestResult::toHttpStatus(result.error);
+    response.content = RestContent{kJsonContetnType, QJson::serialized(result)};
+    return response;
 }
 
 RestResponse QnRestRequestHandler::executeRequest(
-    nx::network::http::Method::ValueType method,
-    const RestRequest& request,
-    const RestContent& content)
+    const RestRequest& request)
 {
     RestResponse response;
 
-    if (method == nx::network::http::Method::get)
+    if (request.method() == nx::network::http::Method::get)
     {
         response = executeGet(request);
     }
-    else if (method == nx::network::http::Method::post)
+    else if (request.method() == nx::network::http::Method::post)
     {
-        response = executePost(request, content);
+        response = executePost(request);
     }
-    else if (method == nx::network::http::Method::put)
+    else if (request.method() == nx::network::http::Method::put)
     {
-        response = executePut(request, content);
+        response = executePut(request);
     }
-    else if (method == nx::network::http::Method::delete_)
+    else if (request.method() == nx::network::http::Method::delete_)
     {
         response = executeDelete(request);
     }
     else
     {
-        NX_WARNING(this, lm("Unknown REST method %1").arg(method));
+        NX_WARNING(this, lm("Unknown REST method %1").arg(request.method()));
         response.statusCode = nx::network::http::StatusCode::notFound;
-        response.content.type = "text/plain";
-        response.content.body = "Invalid HTTP method";
+        response.content = {"text/plain", "Invalid HTTP method"};
+    }
+
+    if (response.content && response.content->type == kJsonContetnType
+        && request.isExtraFormattingRequired())
+    {
+        response.content->body = nx::utils::formatJsonString(response.content->body);
     }
 
     return response;
 }
 
+void QnRestRequestHandler::afterExecute(const RestRequest& request, const RestResponse& response)
+{
+    afterExecute(
+        request.path(), request.params(),
+        response.content ? response.content->body : QByteArray(),
+        request.owner);
+}
+
 RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
 {
     RestResponse result;
+    RestContent content;
     result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executeGet(
-        request.path, request.params, result.content.body, result.content.type, request.owner));
+        request.path(), request.params(),
+        content.body, content.type,
+        request.owner));
+
+    if (!content.type.isEmpty() || !content.body.isEmpty())
+        result.content = std::move(content);
 
     return result;
 }
@@ -81,37 +227,50 @@ RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
 RestResponse QnRestRequestHandler::executeDelete(const RestRequest& request)
 {
     RestResponse result;
+    RestContent content;
     result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executeDelete(
-        request.path, request.params, result.content.body, result.content.type, request.owner));
+        request.path(), request.params(),
+        content.body, content.type,
+        request.owner));
+
+    if (!content.type.isEmpty() || !content.body.isEmpty())
+        result.content = std::move(content);
 
     return result;
 }
 
-RestResponse QnRestRequestHandler::executePost(
-    const RestRequest& request, const RestContent& content)
+RestResponse QnRestRequestHandler::executePost(const RestRequest& request)
 {
     RestResponse result;
+    RestContent content;
     result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executePost(
-        request.path, request.params, content.body, content.type,
-        result.content.body, result.content.type, request.owner));
+        request.path(), request.params(),
+        request.content ? request.content->body : QByteArray(),
+        request.content ? request.content->type : QByteArray(),
+        content.body, content.type,
+        request.owner));
+
+    if (!content.type.isEmpty() || !content.body.isEmpty())
+        result.content = std::move(content);
 
     return result;
 }
 
-RestResponse QnRestRequestHandler::executePut(
-    const RestRequest& request, const RestContent& content)
+RestResponse QnRestRequestHandler::executePut(const RestRequest& request)
 {
     RestResponse result;
+    RestContent content;
     result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executePost(
-        request.path, request.params, content.body, content.type,
-        result.content.body, result.content.type, request.owner));
+        request.path(), request.params(),
+        request.content ? request.content->body : QByteArray(),
+        request.content ? request.content->type : QByteArray(),
+        content.body, content.type,
+        request.owner));
+
+    if (!content.type.isEmpty() || !content.body.isEmpty())
+        result.content = std::move(content);
 
     return result;
-}
-
-void QnRestRequestHandler::afterExecute(const RestRequest& request, const QByteArray& response)
-{
-    afterExecute(request.path, request.params, response, request.owner);
 }
 
 QString QnRestRequestHandler::extractAction(const QString& path) const
@@ -120,105 +279,4 @@ QString QnRestRequestHandler::extractAction(const QString& path) const
     while(localPath.endsWith(L'/'))
         localPath.chop(1);
     return localPath.mid(localPath.lastIndexOf(L'/') + 1);
-}
-
-class QnRestGUIRequestHandlerPrivate
-{
-public:
-    QnRestGUIRequestHandlerPrivate(): result(0), body(0), code(0) {}
-
-    QnRequestParamList params;
-    QByteArray* result;
-    const QByteArray* body;
-    QString path;
-    int code;
-    QString method;
-    QByteArray contentType;
-};
-
-QnRestGUIRequestHandler::QnRestGUIRequestHandler(): d_ptr(new QnRestGUIRequestHandlerPrivate)
-{
-}
-
-QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
-{
-    delete d_ptr;
-}
-
-int QnRestGUIRequestHandler::executeGet(
-    const QString& path,
-    const QnRequestParamList& params,
-    QByteArray& result, QByteArray& contentType,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    Q_D(QnRestGUIRequestHandler);
-    d->path = path;
-    d->params = params;
-    d->result = &result;
-    d->method = QLatin1String("GET");
-    d->contentType = contentType;
-    QMetaObject::invokeMethod(this, "methodExecutor", Qt::BlockingQueuedConnection);
-    return d->code;
-}
-
-int QnRestRequestHandler::executeDelete(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
-    QByteArray& /*result*/,
-    QByteArray& /*contentType*/,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    return nx::network::http::StatusCode::notImplemented;
-}
-
-int QnRestGUIRequestHandler::executePost(
-    const QString& path,
-    const QnRequestParamList& params,
-    const QByteArray& body,
-    const QByteArray& /*srcBodyContentType*/,
-    QByteArray& result,
-    QByteArray& contentType,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    Q_D(QnRestGUIRequestHandler);
-    d->params = params;
-    d->result = &result;
-    d->body = &body;
-    d->path = path;
-    d->method = QLatin1String("POST");
-    d->contentType = contentType;
-    QMetaObject::invokeMethod(this, "methodExecutor", Qt::BlockingQueuedConnection);
-    return d->code;
-}
-
-int QnRestRequestHandler::executePut(
-    const QString& path,
-    const QnRequestParamList& params,
-    const QByteArray& body,
-    const QByteArray& srcBodyContentType,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* owner)
-{
-    return executePost(
-        path, params, body, srcBodyContentType, result, resultContentType, owner);
-}
-
-void QnRestRequestHandler::afterExecute(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
-    const QByteArray& /*body*/,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-}
-
-void QnRestGUIRequestHandler::methodExecutor()
-{
-    Q_D(QnRestGUIRequestHandler);
-    if (d->method == QLatin1String("GET"))
-        d->code = executeGetGUI(d->path, d->params, *d->result);
-    else if (d->method == QLatin1String("POST"))
-        d->code = executePostGUI(d->path, d->params, *d->body, *d->result);
-    else
-        qWarning() << "Unknown execute method " << d->method;
 }

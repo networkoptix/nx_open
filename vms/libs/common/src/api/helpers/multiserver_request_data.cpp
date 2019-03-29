@@ -12,24 +12,12 @@ static const QString kExtraFormattingParam(lit("extraFormatting"));
 
 const Qn::SerializationFormat QnBaseMultiserverRequestData::kDefaultFormat = Qn::JsonFormat;
 
-QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const QnRequestParamList& params)
+QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const RequestParams& params)
 {
     loadFromParams(params);
 }
 
-QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const QnRequestParams& params)
-{
-    loadFromParams(params);
-}
-
-void QnBaseMultiserverRequestData::loadFromParams(const QnRequestParamList& params)
-{
-    isLocal = params.contains(kLocalParam);
-    extraFormatting = params.contains(kExtraFormattingParam);
-    format = QnLexical::deserialized(params.value(kFormatParam), kDefaultFormat);
-}
-
-void QnBaseMultiserverRequestData::loadFromParams(const QnRequestParams& params)
+void QnBaseMultiserverRequestData::loadFromParams(const RequestParams& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
@@ -41,20 +29,14 @@ QnMultiserverRequestData::~QnMultiserverRequestData()
 }
 
 void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
-    const QnRequestParamList& params)
+    const RequestParams& params)
 {
     QnBaseMultiserverRequestData::loadFromParams(params);
 }
 
-void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
-    const QnRequestParams& params)
+RequestParams QnMultiserverRequestData::toParams() const
 {
-    QnBaseMultiserverRequestData::loadFromParams(params);
-}
-
-QnRequestParamList QnMultiserverRequestData::toParams() const
-{
-    QnRequestParamList result;
+    RequestParams result;
     if (isLocal)
         result.insert(kLocalParam, QString());
     if (extraFormatting)
@@ -65,10 +47,7 @@ QnRequestParamList QnMultiserverRequestData::toParams() const
 
 QUrlQuery QnMultiserverRequestData::toUrlQuery() const
 {
-    QUrlQuery urlQuery;
-    for (const auto& param: toParams())
-        urlQuery.addQueryItem(param.first, param.second);
-    return urlQuery;
+    return toParams().toUrlQuery();
 }
 
 bool QnMultiserverRequestData::isValid() const

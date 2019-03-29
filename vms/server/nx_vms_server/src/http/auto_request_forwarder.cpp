@@ -333,7 +333,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
 
     NX_VERBOSE(this) << lm("Looking for camera id in url params [%1]").args(paramNames);
 
-    const QnRequestParams params = requestParamsFromUrl(request.requestLine.url);
+    const auto params = QnRequestParams::fromUrlQuery(QUrlQuery(request.requestLine.url.query()));
     QString notFoundCameraId;
     *outCamera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool(), &notFoundCameraId, params, paramNames);

@@ -189,10 +189,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();
 
-    qRegisterMetaType<QnRequestParamList>();
-    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
-    /* The underlying type is identical to QnRequestParamList. */
-    qRegisterMetaType<QnReplyHeaderList>();
+    qRegisterMetaType<RequestParams>();
     qRegisterMetaType<QnHTTPRawResponse>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();

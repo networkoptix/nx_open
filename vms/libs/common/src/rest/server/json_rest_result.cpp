@@ -17,6 +17,27 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_REST_RESULT_TYPES, (ubjson)(json), _Fields)
 
+nx::network::http::StatusCode::Value QnRestResult::toHttpStatus(Error code)
+{
+    using namespace nx::network;
+    switch (code)
+    {
+        case QnRestResult::Error::NoError:
+            return http::StatusCode::ok;
+
+        case QnRestResult::Error::InvalidParameter:
+        case QnRestResult::Error::MissingParameter:
+        case QnRestResult::Error::CantProcessRequest:
+            return http::StatusCode::unprocessableEntity;
+
+        case QnRestResult::Error::Forbidden:
+            return http::StatusCode::forbidden;
+
+        default:
+            return http::StatusCode::badRequest;
+    }
+}
+
 QnRestResult::ErrorDescriptor::ErrorDescriptor(
     QnRestResult::Error errorCode,
     QString argument)

@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/http/http_types.h>
 
 // TODO: #MSAPI rename module to rest_result
 // Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
@@ -26,6 +27,8 @@ public:
         BadRequest = 5,
         InternalServerError = 6,
     };
+
+    static nx::network::http::StatusCode::Value toHttpStatus(Error code);
 
     /** Presents error as corresponding text with some arguments.
         E.g., ErrorDescriptor(MissingParameter, "id").text()

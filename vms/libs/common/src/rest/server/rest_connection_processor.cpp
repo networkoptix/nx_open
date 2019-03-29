@@ -137,16 +137,10 @@ void QnRestConnectionProcessor::run()
 
     d->response.messageBody.clear();
 
-    nx::utils::Url url = getDecodedUrl();
-    RestRequest request{
-        url.path(),
-        QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded),
-        this,
-        &d->request};
+    RestRequest request(&d->request, this);
     RestResponse response;
-
     QnRestRequestHandlerPtr handler = static_cast<QnHttpConnectionListener*>(d->owner)
-        ->processorPool()->findHandler(d->request.requestLine.method, request.path);
+        ->processorPool()->findHandler(request.method(), request.path());
     if (handler)
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
@@ -166,46 +160,54 @@ void QnRestConnectionProcessor::run()
 
         const auto requestContentType =
             nx::network::http::getHeaderValue(d->request.headers, "Content-Type");
-        const auto method = d->request.requestLine.method.toUpper();
 
-        response = handler->executeRequest(
-            method,
-            request,
-            {requestContentType, d->requestBody});
+        if (!requestContentType.isEmpty() || d->requestBody.isEmpty())
+            request.content = RestContent{requestContentType, d->requestBody};
+
+        response = handler->executeRequest(request);
     }
     else
     {
-        response.statusCode = (nx::network::http::StatusCode::Value)
-            notFound(response.content.type);
-        response.content.body = d->response.messageBody;
+        QByteArray type;
+        response.statusCode = (nx::network::http::StatusCode::Value) notFound(type);
+        response.content = RestContent{type, d->response.messageBody};
     }
 
     QByteArray contentEncoding;
     if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip")
-        && !response.content.body.isEmpty() && response.statusCode == nx::network::http::StatusCode::ok
-        && !response.content.type.contains("image"))
+        && response.content
+        && response.statusCode == nx::network::http::StatusCode::ok
+        && !response.content->type.contains("image"))
     {
-            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(response.content.body);
-            contentEncoding = "gzip";
+        contentEncoding = "gzip";
+        d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(
+            response.content->body);
     }
     else
     {
-        d->response.messageBody = response.content.body;
+        d->response.messageBody = response.content->body;
     }
 
     d->response.headers.insert(
         response.httpHeaders.begin(), response.httpHeaders.end());
 
-    nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
-    nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
-    nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Pragma", "no-cache"));
+    nx::network::http::insertHeader(&d->response.headers,
+        {"Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"});
+    nx::network::http::insertHeader(&d->response.headers,
+        {"Cache-Control", "post-check=0, pre-check=0"});
+    nx::network::http::insertHeader(&d->response.headers,
+        {"Pragma", "no-cache"});
 
-    sendResponse(response.statusCode, response.content.type, contentEncoding,
-        /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
+    sendResponse(
+        response.statusCode,
+        response.content ? response.content->type : QByteArray(),
+        contentEncoding,
+        /*multipartBoundary*/ QByteArray(),
+        /*displayDebug*/ false,
         response.isUndefinedContentLength);
 
     if (handler && nx::network::http::StatusCode::isSuccessCode(response.statusCode))
-        handler->afterExecute(request, response.content.body);
+        handler->afterExecute(request, response);
 }
 
 Qn::UserAccessData QnRestConnectionProcessor::accessRights() const

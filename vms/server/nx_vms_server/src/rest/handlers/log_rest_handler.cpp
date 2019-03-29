@@ -28,14 +28,8 @@ int QnLogRestHandler::executeGet(
     }
 
     qint64 linesToRead = 100;
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "lines")
-        {
-            linesToRead = params[i].second.toLongLong();
-            break;
-        }
-    }
+    if (const auto lines = params.value(lit("lines")); !lines.isEmpty())
+        linesToRead = lines.toLongLong();
 
     std::optional<QString> logFilePath;
     {

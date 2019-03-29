@@ -7,7 +7,6 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/server/rest/parameter_names.h>
-#include <nx/vms/server/rest/utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
@@ -23,9 +22,9 @@ DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModu
 {
 }
 
-JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestRequest& request)
+RestResponse DeviceAnalyticsSettingsHandler::executeGet(const RestRequest& request)
 {
-    if (const auto& error = checkCommonInputParameters(request.params))
+    if (const auto& error = checkCommonInputParameters(request.params()))
         return *error;
 
     const auto analyticsManager = serverModule()->analyticsManager();
@@ -33,29 +32,26 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestReques
     {
         const QString message("Unable to access analytics manager");
         NX_ERROR(this, message);
-        return makeResponse(QnRestResult::InternalServerError, message);
+        return RestResponse::error(QnRestResult::InternalServerError, message);
     }
 
-    const QString& deviceId = request.params[kDeviceIdParameter];
-    const QString& engineId = request.params[kAnalyticsEngineIdParameter];
+    const QString& deviceId = request.paramOr(kDeviceIdParameter);
+    const QString& engineId = request.paramOr(kAnalyticsEngineIdParameter);
 
     return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
 
-JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
-    const JsonRestRequest& request,
-    const QByteArray& body)
+RestResponse DeviceAnalyticsSettingsHandler::executePost(const RestRequest& request)
 {
-    if (const auto& error = checkCommonInputParameters(request.params))
+    if (const auto& error = checkCommonInputParameters(request.params()))
         return *error;
 
-    bool success = false;
-    const auto& settings = QJson::deserialized(body, QJsonObject(), &success);
-    if (!success)
+    const auto& settings = request.parseContent<QJsonObject>();
+    if (!settings)
     {
         const QString message("Unable to deserialize request");
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::BadRequest, message);
+        return RestResponse::error(QnRestResult::Error::BadRequest, message);
     }
 
     auto analyticsManager = serverModule()->analyticsManager();
@@ -63,33 +59,31 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
     {
         const QString message("Unable to access analytics manager");
         NX_ERROR(this, message);
-        return makeResponse(QnRestResult::InternalServerError, message);
+        return RestResponse::error(QnRestResult::InternalServerError, message);
     }
 
-    const QString& deviceId = request.params[kDeviceIdParameter];
-    const QString& engineId = request.params[kAnalyticsEngineIdParameter];
+    const QString& deviceId = request.paramOr(kDeviceIdParameter);
+    const QString& engineId = request.paramOr(kAnalyticsEngineIdParameter);
 
-    analyticsManager->setSettings(deviceId, engineId, settings.toVariantMap());
+    analyticsManager->setSettings(deviceId, engineId, settings->toVariantMap());
     return makeSettingsResponse(analyticsManager, engineId, deviceId);
 }
 
-std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputParameters(
+std::optional<RestResponse> DeviceAnalyticsSettingsHandler::checkCommonInputParameters(
     const QnRequestParams& parameters) const
 {
     if (!parameters.contains(kDeviceIdParameter))
     {
         NX_WARNING(this, "Missing parameter %1", kDeviceIdParameter);
-        return makeResponse(
-            QnRestResult::Error::MissingParameter,
-            QStringList{kDeviceIdParameter});
+        return RestResponse::error(
+            QnRestResult::Error::MissingParameter, kDeviceIdParameter);
     }
 
     if (!parameters.contains(kAnalyticsEngineIdParameter))
     {
         NX_WARNING(this, "Missing parameter %1", kAnalyticsEngineIdParameter);
-        return makeResponse(
-            QnRestResult::Error::MissingParameter,
-            QStringList{kAnalyticsEngineIdParameter});
+        return RestResponse::error(
+            QnRestResult::Error::MissingParameter, kAnalyticsEngineIdParameter);
     }
 
     const QString& deviceId = parameters[kDeviceIdParameter];
@@ -103,7 +97,7 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
     {
         const auto message = lm("Unable to find device by id %1").args(deviceId);
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
     if (device->flags().testFlag(Qn::foreigner))
@@ -113,7 +107,7 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
                 device->getParentId(), moduleGUID());
 
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
     const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
@@ -123,7 +117,7 @@ std::optional<JsonRestResponse> DeviceAnalyticsSettingsHandler::checkCommonInput
     {
         const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
         NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
     return std::nullopt;
@@ -144,7 +138,7 @@ std::optional<QJsonObject> DeviceAnalyticsSettingsHandler::deviceAgentSettingsMo
     return engine->manifest().deviceAgentSettingsModel;
 }
 
-JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
+RestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     const nx::vms::server::analytics::Manager* analyticsManager,
     const QString& engineId,
     const QString& deviceId) const
@@ -152,12 +146,11 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
     NX_ASSERT(analyticsManager);
     if (!analyticsManager)
     {
-        return makeResponse(
+        return RestResponse::error(
             QnRestResult::InternalServerError,
             "Unable to access an analytics manager");
     }
 
-    JsonRestResponse result(http::StatusCode::ok);
     nx::vms::api::analytics::SettingsResponse response;
 
     const QVariantMap& settings = analyticsManager->getSettings(deviceId, engineId);
@@ -170,13 +163,11 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeSettingsResponse(
             lm("Unable to find DeviceAgent settings model for the Engine with id %1")
             .args(engineId);
 
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
+        return RestResponse::error(QnRestResult::Error::CantProcessRequest, message);
     }
 
     response.model = *settingsModel;
-    result.json.setReply(response);
-
-    return result;
+    return RestResponse::reply(response);
 }
 
 } // namespace nx::vms::server::rest

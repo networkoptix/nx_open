@@ -19,8 +19,8 @@ public:
     QnModuleInformationRestHandler(QnCommonModule* commonModule);
     virtual ~QnModuleInformationRestHandler() override;
 
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
-    virtual void afterExecute(const RestRequest& request, const QByteArray& response) override;
+    virtual RestResponse executeGet(const RestRequest& request) override;
+    virtual void afterExecute(const RestRequest& request, const RestResponse& response) override;
 
 private slots:
     void changeModuleInformation();
@@ -36,12 +36,6 @@ private:
     using Connections = std::list<Connection>;
 
     static void clear(Connections* connections);
-
-    virtual int executeGet(
-        const QString& /*path*/,
-        const QnRequestParams& /*params*/,
-        QnJsonRestResult& /*result*/,
-        const QnRestConnectionProcessor* /*owner*/);
 
     void updateModuleImformation();
     void send(Connections::iterator socket, nx::Buffer buffer = {});

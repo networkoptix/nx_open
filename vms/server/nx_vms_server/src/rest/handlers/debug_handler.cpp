@@ -16,7 +16,7 @@ static Action actionFromParams(const QnRequestParamList& params)
     Action action = Action::invalid;
     for (const auto& param: params)
     {
-        const Action paramAction = nx::utils::switch_(param.first,
+        const Action paramAction = nx::utils::switch_(param,
             "crash", [](){ return Action::crash; },
             "exit", [](){ return Action::exit; },
             nx::utils::default_, [](){ return Action::invalid; });

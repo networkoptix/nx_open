@@ -6,8 +6,8 @@ class QnCookieLogoutRestHandler : public QnJsonRestHandler
 {
     Q_OBJECT
 public:
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
-    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+    virtual RestResponse executeGet(const RestRequest& request);
+    virtual RestResponse executePost(const RestRequest& request);
 
     static void logout(const QnRestConnectionProcessor* connection);
 };

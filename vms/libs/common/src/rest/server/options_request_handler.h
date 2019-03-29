@@ -6,8 +6,5 @@ class OptionsRequestHandler:
     public QnRestRequestHandler
 {
 public:
-    virtual RestResponse executeRequest(
-        nx::network::http::Method::ValueType method,
-        const RestRequest& request,
-        const RestContent& content) override;
+    virtual RestResponse executeRequest(const RestRequest& request) override;
 };

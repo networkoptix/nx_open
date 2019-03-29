@@ -13,16 +13,14 @@ class DeviceAnalyticsSettingsHandler: public QnJsonRestHandler, public ServerMod
 {
 public:
     DeviceAnalyticsSettingsHandler(QnMediaServerModule* serverModule);
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
-    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+    virtual RestResponse executeGet(const RestRequest& request);
+    virtual RestResponse executePost(const RestRequest& request);
 
 private:
-    std::optional<JsonRestResponse> checkCommonInputParameters(
-        const QnRequestParams& parameters) const;
-
+    std::optional<RestResponse> checkCommonInputParameters(const QnRequestParams& parameters) const;
     std::optional<QJsonObject> deviceAgentSettingsModel(const QString& engineId) const;
 
-    JsonRestResponse makeSettingsResponse(
+    RestResponse makeSettingsResponse(
         const nx::vms::server::analytics::Manager* analyticsManager,
         const QString& engineId,
         const QString& deviceId) const;
