@@ -26,6 +26,8 @@
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/api/data/time_reply.h>
 
 namespace rest {
 
@@ -55,7 +57,7 @@ struct RestResultWithData: public RestResultWithDataBase
 };
 
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
-using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
+using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
 using UpdateStatusAllData = RestResultWithData<std::vector<nx::update::Status>>;
 using UpdateInformationData = RestResultWithData<nx::update::Information>;
 
@@ -147,8 +149,21 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-            nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
+    Handle softwareTriggerCommand(
+        const QnUuid& cameraId,
+        const QString& triggerId,
+        nx::vms::api::EventState toggleState,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle createGenericEvent(
+        const QString& source,
+        const QString& caption,
+        const QString& description,
+        const nx::vms::event::EventMetaData& metadata,
+        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined,
+        GetCallback callback = nullptr,
+        QThread* targetThread = nullptr);
 
     Handle getStatisticsSettingsAsync(
         Result<QByteArray>::type callback, QThread* targetThread = nullptr);

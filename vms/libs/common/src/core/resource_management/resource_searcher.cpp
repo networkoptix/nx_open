@@ -65,44 +65,7 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
     return resourceType->getManufacturer() == manufacturer();
 }
 
-QnAbstractFileResourceSearcher::QnAbstractFileResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule)
-{
-
-}
-
-// =============================================================================
-
-QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
-{
-    QnMutexLocker locker(&m_mutex);
-    return m_pathListToCheck;
-}
-
-void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
-{
-    QnMutexLocker locker(&m_mutex);
-    m_pathListToCheck = paths;
-}
-
-void QnAbstractFileResourceSearcher::clearPathCheckList()
-{
-    setPathCheckList(QStringList());
-}
-
-QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &files) const
-{
-    QnResourceList result;
-    for (const QString &file: files) {
-        if (QnResourcePtr res = checkFile(file))
-            result.append(res);
-    }
-
-    return result;
-}
-
 QnAbstractNetworkResourceSearcher::QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule)
 {
-
 }

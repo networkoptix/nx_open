@@ -33,6 +33,9 @@ add_definitions(
     -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
+set(enableSpeechSynthesizer "true")
+set(isEdgeServer "false")
+
 if(WINDOWS)
     add_definitions(
         -D_CRT_RAND_S
@@ -46,15 +49,10 @@ if(ANDROID OR IOS)
     )
 endif()
 
-if(box MATCHES "isd")
+if(box MATCHES "isd|edge1")
     set(enableAllVendors OFF)
-    remove_definitions(-DENABLE_MOTION_DETECTION)
-    add_definitions(-DEDGE_SERVER)
-endif()
-
-if(box MATCHES "edge1")
-    set(enableAllVendors OFF)
-    add_definitions(-DEDGE_SERVER)
+    set(isEdgeServer "true")
+    set(enableSpeechSynthesizer "false")
 endif()
 
 if(WINDOWS)

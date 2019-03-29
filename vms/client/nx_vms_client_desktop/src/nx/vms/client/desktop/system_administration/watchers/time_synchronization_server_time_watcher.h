@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
@@ -9,6 +10,8 @@
 
 namespace nx::vms::client::desktop
 {
+
+using namespace std::chrono;
 
 class TimeSynchronizationWidgetStore;
 
@@ -23,6 +26,13 @@ public:
     explicit TimeSynchronizationServerTimeWatcher(TimeSynchronizationWidgetStore* store,
         QObject* parent = nullptr);
     virtual ~TimeSynchronizationServerTimeWatcher() override;
+
+    void start();
+    void stop();
+
+    void forceUpdate();
+
+    milliseconds elapsedTime() const;
 
 private:
     class Private;

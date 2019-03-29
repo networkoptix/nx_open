@@ -70,27 +70,6 @@ class Rdep:
     SYNC_FAILED = 1
     SYNC_SUCCESS = 2
 
-    def init_repository(path, url):
-        if not os.path.isdir(path):
-            print >> sys.stderr, "Directory does not exists: {0}".format(path)
-            return False
-
-        if not url:
-            print >> sys.stderr, "Url cannot be empty"
-            return False
-
-        try:
-            config = RepositoryConfig(os.path.join(path, ROOT_CONFIG_NAME))
-            config.set_url(url)
-        except Exception:
-            print >> sys.stderr, "Could not init repository at {0}".format(path)
-            return False
-
-        print("Initialized repository at {0}".format(path))
-        print("The repository will use URL = {0}".format(url))
-
-        return True
-
     def __init__(self, root):
         self._config = RdepConfig()
         self._repo_config = RepositoryConfig(root)
@@ -275,10 +254,10 @@ class Rdep:
                 break
 
         if ret == self.SYNC_FAILED:
-            print >> sys.stderr, "Sync failed for {0}".format(package)
+            print("Sync failed for {0}".format(package), file=sys.stderr)
             return False
         elif ret == self.SYNC_NOT_FOUND:
-            print >> sys.stderr, "Could not find {0}".format(package)
+            print("Could not find {0}".format(package), file=sys.stderr)
             return False
 
         for path in to_remove:
@@ -300,17 +279,19 @@ class Rdep:
     def upload_package(self, package):
         if len(self.targets) != 1:
             if len(self.targets) > 1:
-                print >> sys.stderr, "Multiple targets for upload is not supported."
+                print("Multiple targets for upload is not supported.", file=sys.stderr)
             else:
-                print >> sys.stderr, "Please specify target for upload."
+                print("Please specify target for upload.", file=sys.stderr)
             return False
 
         target = self.targets[0]
 
         uploader_name = self._config.get_name()
         if not uploader_name:
-            print >> sys.stderr, "Please specify your name in {0}".format(self._config.get_file_name())
-            print >> sys.stderr, "Add \"name = Nx User <nxuser@networkoptix.com>\" to the section [General]."
+            print("Please specify your name in {0}".format(self._config.get_file_name()),
+                  file=sys.stderr)
+            print("Add \"name = Nx User <nxuser@networkoptix.com>\" to the section [General].",
+                  file=sys.stderr)
             return False
 
         print("Uploading {0}...".format(package))
@@ -335,9 +316,9 @@ class Rdep:
                 os.remove(config_file)
                 time = PackageConfig(local).get_timestamp()
                 if newtime and time != newtime:
-                    print >> sys.stderr, "Somebody has already updated this package."
+                    print("Somebody has already updated this package.", file=sys.stderr)
                     if not self.force:
-                        print >> sys.stderr, "Please make sure you are updating the latest version of the package."
+                        print("Please make sure you are updating the latest version of the package.", file=sys.stderr)
                         return False
 
         url = self._repo_config.get_push_url(url)
@@ -356,7 +337,7 @@ class Rdep:
         self._verbose_rsync(command)
 
         if subprocess.call(command) != 0:
-            print >> sys.stderr, "Could not upload {0}".format(package)
+            print("Could not upload {0}".format(package), file=sys.stderr)
             return False
 
         command = self._get_rsync_command(
@@ -393,9 +374,9 @@ class Rdep:
 
     def list_packages(self):
         if not self.targets:
-            print >> sys.stderr, "Please specify target"
+            print("Please specify target", file=sys.stderr)
         elif len(self.targets) > 1:
-            print >> sys.stderr, "Please specify only one target to list"
+            print("Please specify only one target to list", file=sys.stderr)
 
         target = self.targets[0]
 
@@ -423,7 +404,7 @@ class Rdep:
     def print_path(self, package):
         path = self.locate_package(package)
         if not path:
-            print >> sys.stderr, "Package {0} not found.".format(package)
+            print("Package {0} not found.".format(package), file=sys.stderr)
         print(path)
 
     def sync_timestamps(self):
@@ -450,25 +431,22 @@ def main():
     parser.add_argument("-l", "--list",         help="List packages for target.",           action="store_true")
     parser.add_argument("-t", "--target",       help="Target.")
     parser.add_argument("--print-path",         help="Print package dir and exit.",         action="store_true")
-    parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.")
     parser.add_argument("--sync-timestamps", help="Sync timestamps file.", action="store_true")
     parser.add_argument(
         "--fast-check",
         action="store_true",
         help="Use timestamps file to check if package is outdated.")
 
-    parser.add_argument("packages", nargs='*',  help="Packages to sync.")
+    parser.add_argument("packages", nargs='*', help="Packages to sync.")
 
     args = parser.parse_args()
-
-    if args.init:
-        return Rdep.init_repository(os.getcwd(), args.init)
 
     root = args.root
     if not root:
         root = _find_root(os.getcwd(), RepositoryConfig.FILE_NAME)
     if not root:
-        print >> sys.stderr, "Repository root not found. Please specify it with --root or by setting working directory."
+        print("Repository root not found. Please specify it with --root or by setting working directory.",
+              file=sys.stderr)
         return False
 
     rdep = Rdep(root)
@@ -491,14 +469,14 @@ def main():
             packages = [package]
 
     if not rdep.targets:
-        print >> sys.stderr, "Please specify target."
+        print("Please specify target.", file=sys.stderr)
         return False
 
     if args.list:
         return rdep.list_packages()
 
     if not packages:
-        print >> sys.stderr, "No packages specified"
+        print("No packages specified", file=sys.stderr)
         return False
 
     if args.print_path:

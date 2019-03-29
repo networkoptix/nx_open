@@ -82,15 +82,15 @@ NX_KIT_API const char* staticTempDir();
  * Usage: call from main():
  * <pre><code>
  *
- *     int main(int argc, const char* const argv[])
+ *     int main()
  *     {
- *         return nx::kit::test::runAllTests("myTests", argc, argv);
+ *         return nx::kit::test::runAllTests("myTests");
  *     }
  *
  * </code></pre>
  * @return Number of failed tests.
  */
-NX_KIT_API int runAllTests(const char* testSuiteName, int argc, const char* const argv[]);
+NX_KIT_API int runAllTests(const char *testSuiteName);
 
 NX_KIT_API void createFile(const char* filename, const char* content);
 

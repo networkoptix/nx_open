@@ -1,14 +1,32 @@
 #pragma once
 
-#if !defined(EDGE_SERVER)
-
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/audio_data_packet.h>
 
-class QnSpeechSynthesisDataProvider : public QnAbstractStreamDataProvider
+namespace nx::speech_synthesizer { class TextToWaveServer; }
+
+class QnSpeechSynthesisDataProvider: public QnAbstractStreamDataProvider
 {
-Q_OBJECT
+    Q_OBJECT
+
+private:
+    using OpaqueBackend = nx::speech_synthesizer::TextToWaveServer;
+
 public:
+    /**
+     * Whether the speech synthesis backend is available - if not, the instance of this class
+     * should not be created.
+     */
+    static bool isEnabled();
+
+    /**
+     * Creates a singleton instance of the backend and performs its initialization. Should be
+     * called before creating the instance of this class, and moved to some context where it will
+     * be destroyed after all instances of this class. Can be called if not isEnabled() - returns
+     * an empty pointer.
+     */
+    static std::shared_ptr<OpaqueBackend> backendInstance(const QString& applicationDirPath);
+
     explicit QnSpeechSynthesisDataProvider(const QString& text);
     virtual ~QnSpeechSynthesisDataProvider();
 
@@ -32,4 +50,3 @@ private:
     QByteArray m_rawBuffer;
     size_t m_curPos;
 };
-#endif

@@ -4,8 +4,6 @@
 
 #include <QtCore/QList>
 
-#include <api/app_server_connection.h>
-
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
@@ -25,7 +23,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_history.h>
-
+#include <core/resource/resource_command_processor.h>
 #include <core/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
@@ -54,9 +52,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <utils/common/delayed.h>
 
-#if !defined(EDGE_SERVER)
 #include <providers/speech_synthesis_data_provider.h>
-#endif
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
@@ -71,7 +67,6 @@
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
 #include <common/common_module.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
-#include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
@@ -79,6 +74,8 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <api/helpers/camera_id_helper.h>
+#include <nx/vms/rules/action_parameters_processing.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -378,7 +375,12 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
 {
-#if !defined(EDGE_SERVER) && !defined(__aarch64__)
+    if (!QnSpeechSynthesisDataProvider::isEnabled())
+    {
+        NX_WARNING(this, "Speech synthesizer is absent on this Server.");
+        return true;
+    }
+
     const auto params = action->getParams();
     const auto text = params.sayText;
     const auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(
@@ -394,12 +396,10 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
         return false;
 
     QnAbstractStreamDataProviderPtr speechProvider(new QnSpeechSynthesisDataProvider(text));
-    transmitter->subscribe(speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+    transmitter->subscribe(
+        speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
     speechProvider->startIfNotRunning();
     return true;
-#else
-    return true;
-#endif
 }
 
 bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr& action)
@@ -422,7 +422,10 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    const nx::vms::event::ActionParameters& actionParameters=action->getParams();
+    const auto actionParameters = nx::vms::rules::actualActionParameters(
+        action->actionType(),
+        action->getParams(),
+        action->getRuntimeParams());
     nx::network::http::StringType requestType = actionParameters.requestType;
 
     nx::utils::Url url(action->getParams().url);
@@ -862,7 +865,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             if (camRes->hasVideo(nullptr))
             {
                 const qint64 eventTimeUs = action->getRuntimeParams().eventTimestampUsec;
-                const qint64 currentTimeBeforeGetUs = qnSyncTime->currentUSecsSinceEpoch();
 
                 TimespampedFrame timestempedFrame = getEventScreenshotEncoded(
                     action->getRuntimeParams().eventResourceId, eventTimeUs, SCREENSHOT_SIZE);

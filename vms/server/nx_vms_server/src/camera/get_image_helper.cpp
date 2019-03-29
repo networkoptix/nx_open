@@ -6,6 +6,7 @@
 
 #include <nx/streaming/config.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/app_info.h>
 #include <nx_vms_server_ini.h>
 
 #include "utils/media/frame_info.h"
@@ -527,10 +528,11 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
     {
         case StreamSelectionMode::auto_:
         {
-            #if defined(EDGE_SERVER)
+            if (nx::utils::AppInfo::isEdgeServer())
+            {
                 // On edge, we always try to use the secondary stream first.
                 return StreamIndex::secondary;
-            #endif
+            }
 
             const auto secondaryResolution =
                 request.camera->streamInfo(StreamIndex::secondary).getResolution();
