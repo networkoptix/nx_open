@@ -476,6 +476,14 @@
                 "windows"
               ]
             }
+          },
+          {
+            "label": "Reveal cloud merge",
+            "name": "%CLOUD_MERGE%",
+            "description": "Shows the cloud merge button for all systems.",
+            "type": "check_box",
+            "value": "false",
+            "optional": true
           }
         ]
       },

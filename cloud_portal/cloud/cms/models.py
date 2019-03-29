@@ -69,6 +69,7 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
                 'smtp_tls': product.read_global_value('%SMTP_TLS%')
             },
             'config': {
+                'cloud_merge': product.read_global_value("%CLOUD_MERGE%"),
                 'copyright_year': product.read_global_value("%COPYRIGHT_YEAR%"),
                 'company_name': product.read_global_value("%COMPANY_NAME%"),
                 'company_link': product.read_global_value("%COMPANY_LINK%"),

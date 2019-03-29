@@ -100,6 +100,10 @@ window.L = {};
                     appState.supportLink = response.supportLink;
                     appState.productName = response.productName;
                     appState.vmsName = response.vmsName;
+
+                    if (response.cloudMerge) {
+                        appState.cloudMerge = response.cloudMerge;
+                    }
                     
                     angular.extend(CONFIG, appState);
                     

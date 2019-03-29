@@ -23,6 +23,7 @@ def get_settings_from_cache():
     return {
         'productName': customization_cache['product_name'],
         'vmsName': customization_cache['vms_name'],
+        'cloudMerge': customization_cache['cloud_merge'],
         'copyrightYear': customization_cache['copyright_year'],
         'companyName': customization_cache['company_name'],
         'companyLink': customization_cache['company_link'],
@@ -246,6 +247,10 @@ def get_settings(request):
     settings_object = get_settings_from_cache()
     if 'version_id' in settings_object:
         del settings_object['version_id']
+
+    # Hide cloud merge setting if its disabled to not reveal this feature to users.
+    if 'cloudMerge' in settings_object and not settings_object['cloudMerge']:
+        del settings_object['cloudMerge']
     return Response(settings_object)
 
 
