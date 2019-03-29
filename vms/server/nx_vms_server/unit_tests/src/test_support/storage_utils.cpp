@@ -3,9 +3,13 @@
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <recorder/storage_manager.h>
+#include <recorder/archive_integrity_watcher.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management//resource_pool.h>
+#include <core/resource/avi/avi_archive_metadata.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -103,9 +107,46 @@ void addTestStorage(MediaServerLauncher* server, const QString& storagePath)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test data generation
 
+static void writeHeaderTimestamp(const QString &fileName, int64_t timestamp)
+{
+    QFile file(fileName);
+    const auto filePermissions =
+        QFile::ReadOther | QFile::WriteOther | QFile::ReadOwner | QFile::WriteOwner
+        | QFile::ReadGroup | QFile::WriteGroup;
+
+    NX_ASSERT(file.setPermissions(filePermissions));
+    file.open(QIODevice::ReadWrite);
+    NX_ASSERT(file.isOpen());
+
+    file.seek(0x219);
+    auto buf = file.read(11);
+    NX_ASSERT(memcmp(buf.constData(), "START_TIMED", 11) == 0);
+
+    file.seek(0x219 + 0xd);
+    file.write(QString::number(timestamp).toLatin1().constData());
+    file.close();
+};
+
+void replaceValue(QByteArray& payload, const QByteArray& key, const QByteArray& newValue)
+{
+    const int keyPos = payload.indexOf(key);
+    NX_ASSERT(keyPos != -1);
+
+    const int replacePos = keyPos + key.size() + 4;
+    memcpy(payload.data() + replacePos, newValue.constData(), newValue.size());
+}
+
+static void updateMetaData(QByteArray& payload, int64_t startTimeMs)
+{
+    replaceValue(payload, "startTimeMs", QByteArray::number(startTimeMs));
+    replaceValue(
+        payload, "integrityHash",
+        vms::server::IntegrityHashHelper::generateIntegrityHash(QByteArray::number(startTimeMs)));
+}
+
 static ChunkDataList generateChunksForQuality(
     const QString& baseDir, const QString& cameraName, const QString& quality, qint64 startTimeMs,
-    int count, const QByteArray& payload)
+    int count, QByteArray& payload)
 {
     using namespace std::chrono;
 
@@ -123,12 +164,14 @@ static ChunkDataList generateChunksForQuality(
         QString fullFileName =
             closeDirPath(baseDir) + closeDirPath(pathString) + fileName;
 
+        updateMetaData(payload, startTimeMs);
+
         NX_ASSERT(QDir().mkpath(fullDirPath));
         QFile dataFile(fullFileName);
         NX_ASSERT(dataFile.open(QIODevice::WriteOnly));
         NX_ASSERT(dataFile.write(payload));
 
-        result.push_back(ChunkData{ startTimeMs, durationMs });
+        result.push_back(ChunkData{ startTimeMs, durationMs, fullFileName });
         startTimeMs += durationMs + 5;
     }
 
@@ -170,6 +213,7 @@ public:
         setupStream();
         setupFrame();
         setupIoContext();
+        setupMetadata();
         av_log_set_level(AV_LOG_QUIET);
     }
 
@@ -230,6 +274,15 @@ private:
 
         if (avformat_alloc_output_context2(&m_formatContext, nullptr, "matroska", nullptr) < 0)
             throw std::runtime_error("Failed to initialize ffmpeg: alloc_output_context");
+    }
+
+    void setupMetadata()
+    {
+        QnAviArchiveMetadata metadata;
+        metadata.version = QnAviArchiveMetadata::kIntegrityCheckVersion;
+        metadata.integrityHash =
+            vms::server::IntegrityHashHelper::generateIntegrityHash("1553604378060");
+        metadata.saveToFile(m_formatContext, QnAviArchiveMetadata::Format::custom);
     }
 
     void setupCodecContext(int width, int height)
@@ -396,6 +449,25 @@ QByteArray createTestMkvFile(int lengthSec, int width, int height)
         qWarning() << "createTestMkvFile failed:" << e.what();
         return QByteArray();
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Camera archive RTSP reader
+
+std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
+    const QnVirtualCameraResourcePtr& camera)
+{
+    std::unique_ptr<QnArchiveStreamReader> archiveReader =
+        std::make_unique<QnArchiveStreamReader>(camera);
+
+    const auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+    rtspArchiveDelegate->setStreamDataFilter(vms::api::StreamDataFilter::media);
+    rtspArchiveDelegate->setCamera(camera);
+
+    archiveReader->setArchiveDelegate(rtspArchiveDelegate);
+    archiveReader->setPlaybackRange(QnTimePeriod(0, std::numeric_limits<int64_t>::max()));
+
+    return archiveReader;
 }
 
 } // namespace nx::test_support
