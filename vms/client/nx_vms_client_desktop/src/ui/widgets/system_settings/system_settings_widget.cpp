@@ -50,8 +50,8 @@ void QnSystemSettingsWidget::retranslateUi()
 {
     ui->autoDiscoveryCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),
-        tr("Enable devices and servers auto discovery"),
-        tr("Enable cameras and servers auto discovery")));
+        tr("Enable devices and servers autodiscovery and automated device status check"),
+        tr("Enable cameras and servers autodiscovery and automated camera status check")));
 
     ui->autoSettingsCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),
