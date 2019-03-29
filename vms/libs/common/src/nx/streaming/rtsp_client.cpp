@@ -706,7 +706,7 @@ bool QnRtspClient::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == nx::vms::api::RtpTransportType::tcp
+            if (m_transport == nx::vms::api::RtpTransportType::automatic
                 && m_prefferedTransport == nx::vms::api::RtpTransportType::tcp)
             {
                 m_prefferedTransport = nx::vms::api::RtpTransportType::udp;

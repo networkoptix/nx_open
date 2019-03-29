@@ -162,7 +162,13 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
+
+    // RTP transport configured by user
     nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
+
+    /* Actual session RTP transport. If user set 'automatic', it can be 'tcp' or 'udp',
+     * otherwise it should be equal to result of getTransport().
+     */
     nx::vms::api::RtpTransportType getActualTransport() const { return m_prefferedTransport; }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
