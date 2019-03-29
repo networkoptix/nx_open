@@ -178,7 +178,7 @@ export class NxConfigService {
                     arm: {
                         name: 'arm',
                         os: '',
-                        appTypes: ['server']
+                        appTypes: ['client', 'server']
                     },
                     sdk: {
                         name: 'sdk',

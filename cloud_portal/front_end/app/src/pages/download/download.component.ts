@@ -121,33 +121,35 @@ export class DownloadComponent implements OnInit, OnDestroy {
                 this.downloadsData = data.data;
                 // Sorts platforms based on order defined in nx-config service
                 Object.keys(this.config.downloads.groups).forEach((key) => {
-                    const platform = this.config.downloads.groups[key];
-                    const foundPlatform = this.downloadsData.platforms.find((downloadsPlatform) => {
-                        return downloadsPlatform.name === platform.name;
+                    const checkPlatform = this.config.downloads.groups[key];
+                    const platform = this.downloadsData.platforms.find((downloadsPlatform) => {
+                        return downloadsPlatform.name === checkPlatform.name;
                     });
-                    if (foundPlatform) {
-                        this.sortedPlatforms.push(foundPlatform);
+                    if (platform) {
+                        platform.files = platform.files.filter((installer) => {
+                            switch (platform.name) {
+                                case 'sdk':
+                                    return installer.path.indexOf('sdk') > -1;
+                                default:
+                                    return this.downloads.groups[platform.name].appTypes.includes(installer.appType);
+                            }
+                        }).map((installer) => {
+                            const translatedPlatform = this.language.lang.downloads.platforms[installer.platform] || installer.platform;
+                            const translatedAppType = this.language.lang.downloads.appTypes[installer.appType] || this.language.lang.appTypes.package;
+                            installer.formatName = `${translatedPlatform} - ${translatedAppType}`;
+                            installer.url = `${this.downloadsData.releaseUrl}${installer.path}`;
+                            return installer;
+                        });
+
+                        if (platform.files.length > 0) {
+                            this.sortedPlatforms.push(platform);
+                        }
                     }
                 });
 
-                this.sortedPlatforms.forEach((platform) => {
-                    platform.files = platform.files.filter((installer) => {
-                        switch (platform.name) {
-                            case 'arm':
-                                return installer.path.indexOf('arm') > -1;
-                            case 'sdk':
-                                return installer.path.indexOf('sdk') > -1;
-                            default:
-                                return this.downloads.groups[platform.name].appTypes.includes(installer.appType);
-                        }
-                    }).map((installer) => {
-                        const translatedPlatform = this.language.lang.downloads.platforms[installer.platform] || installer.platform;
-                        const translatedAppType = this.language.lang.downloads.appTypes[installer.appType] || this.language.lang.appTypes.package;
-                        installer.formatName = `${translatedPlatform} - ${translatedAppType}`;
-                        installer.url = `${this.downloadsData.releaseUrl}${installer.path}`;
-                        return installer;
-                    });
-                });
+                if (!this.sortedPlatforms.some(platform => platform.name === this.platform)) {
+                    this.platform = this.detectOS().toLowerCase();
+                }
 
                 this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
 
