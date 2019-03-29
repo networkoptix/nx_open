@@ -12,7 +12,7 @@ export class IpvdSearchService {
 
     private static RESOLUTION = 'resolution';
     private static VENDORS = 'vendors';
-    private static const TYPES = 'hardwareTypes';
+    private static TYPES = 'hardwareTypes';
 
     private _vendors: any;
 
