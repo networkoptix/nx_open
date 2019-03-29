@@ -328,7 +328,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         discoveredResources.insert(existingCamera->getUniqueId());
         existingCamera->setLastDiscoveredTime(qnSyncTime->currentDateTime());
         if (!nx::utils::AppInfo::isEdgeServer())
-            pingResources(rpNetRes);
+            pingResources(existingCamera);
         it = resources.erase(it); // do not need to investigate OK resources
     }
 

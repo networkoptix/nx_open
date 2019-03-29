@@ -121,7 +121,8 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     NX_DEBUG(this, lm("Open RTSP %1 for device %2").args(
         streamUrlString, m_resource->getUniqueId()));
     if (!openResult &&
-        openResult.toString(resourcePool()).toLower().contains(kTooManyConnectionsMessagePattern))
+        openResult.toString(serverModule()->resourcePool()).toLower()
+            .contains(kTooManyConnectionsMessagePattern))
     {
         return CameraDiagnostics::TooManyOpenedConnectionsResult();
     }
