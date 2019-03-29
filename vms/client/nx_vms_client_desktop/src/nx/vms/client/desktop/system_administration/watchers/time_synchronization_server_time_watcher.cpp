@@ -89,7 +89,7 @@ public:
 
     void start()
     {
-        m_tickCount = kDelayTickCount; //< Fire request right after the start
+        m_tickCount = kDelayTickCount; //< Fire request right after the start.
         tick();
         m_timer.start();
     }
@@ -113,8 +113,8 @@ public:
 private:
     QPointer<TimeSynchronizationWidgetStore> m_store;
     rest::Handle m_currentRequest;
-    qint64 m_currentRequestStartTime;
-    int m_tickCount;
+    qint64 m_currentRequestStartTime = 0;
+    int m_tickCount = 0;
     QTimer m_timer;
     nx::utils::ElapsedTimer m_elapsedTimer;
 };
