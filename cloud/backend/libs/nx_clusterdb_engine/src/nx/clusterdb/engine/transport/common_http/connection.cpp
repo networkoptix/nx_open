@@ -250,6 +250,7 @@ void CommonHttpConnection::forwardTransactionToProcessor(
     }
     m_prevReceivedTransportSequence = transportHeader.sequence;
 
+    NX_ASSERT(m_gotTransactionEventHandler);
     if (!m_gotTransactionEventHandler)
         return;
 

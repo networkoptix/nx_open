@@ -2,6 +2,7 @@
 
 #include <future>
 
+#include <nx/clusterdb/engine/transaction_log.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
@@ -191,9 +192,25 @@ bool ClusterTestFixture::allPeersAreSynchronized() const
 bool ClusterTestFixture::peersAreSynchronized(std::vector<int> ids) const
 {
     std::optional<Customers> firstPeerCustomers;
+    std::vector<std::vector<engine::dao::TransactionLogRecord>> commandLogs;
+
     for (const auto& peerIndex: ids)
     {
         const auto& peer = m_peers[peerIndex];
+
+        std::promise<void> commandLogRead;
+        peer->process().moduleInstance()->synchronizationEngine().transactionLog().readTransactions(
+            m_clusterId,
+            ReadCommandsFilter::kEmptyFilter,
+            [&commandLogs, &commandLogRead](
+                nx::clusterdb::engine::ResultCode /*resultCode*/,
+                std::vector<nx::clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
+                nx::vms::api::TranState /*readedUpTo*/)
+            {
+                commandLogs.push_back(std::move(serializedTransactions));
+                commandLogRead.set_value();
+            });
+        commandLogRead.get_future().wait();
 
         std::promise<std::tuple<ResultCode, Customers>> done;
         peer->process().moduleInstance()->customerManager().getCustomers(
