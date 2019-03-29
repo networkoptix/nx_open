@@ -25,7 +25,7 @@ int toInt(const std::string& integer)
     catch (const std::exception& /*e*/)
     {
         NX_WARNING(
-            nx::utils::log::Tag(typeid(RemoteMediatorPeerPool)),
+            typeid(RemoteMediatorPeerPool),
             "error converting string to int: %1",
             integer);
         return -1;
