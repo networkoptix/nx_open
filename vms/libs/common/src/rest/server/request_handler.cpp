@@ -27,6 +27,13 @@ std::optional<QJsonValue> RestContent::parse() const
     return std::nullopt;
 }
 
+const char* RestException::what() const noexcept
+{
+    if (!m_what)
+        m_what = descriptor.text().toStdString();
+    return m_what->c_str();
+}
+
 RestRequest::RestRequest(
     const nx::network::http::Request* httpRequest,
     const QnRestConnectionProcessor* owner)
@@ -70,6 +77,14 @@ QString RestRequest::paramOr(const QString& key, const QString& defaultValue) co
 {
     auto p = param(key);
     return p ? *p : defaultValue;
+}
+
+QString RestRequest::paramOrThrow(const QString& key) const
+{
+    auto p = param(key);
+    if (!p)
+        throw RestException(QnRestResult::MissingParameter, key);
+    return *p;
 }
 
 bool RestRequest::isExtraFormattingRequired() const
@@ -153,32 +168,33 @@ RestResponse RestResponse::result(const QnJsonRestResult& result)
     return response;
 }
 
+RestResponse RestResponse::error(const QnRestResult::ErrorDescriptor& descriptor)
+{
+    QnRestResult rest;
+    rest.setError(descriptor);
+    return result(rest);
+}
+
 RestResponse QnRestRequestHandler::executeRequest(
     const RestRequest& request)
 {
     RestResponse response;
-
-    if (request.method() == nx::network::http::Method::get)
+    try
     {
-        response = executeGet(request);
+        if (request.method() == nx::network::http::Method::get)
+            response = executeGet(request);
+        else if (request.method() == nx::network::http::Method::post)
+            response = executePost(request);
+        else if (request.method() == nx::network::http::Method::put)
+            response = executePut(request);
+        else if (request.method() == nx::network::http::Method::delete_)
+            response = executeDelete(request);
+        else
+            throw RestException(QnRestResult::CantProcessRequest, "Invalid HTTP method");
     }
-    else if (request.method() == nx::network::http::Method::post)
+    catch (const RestException& error)
     {
-        response = executePost(request);
-    }
-    else if (request.method() == nx::network::http::Method::put)
-    {
-        response = executePut(request);
-    }
-    else if (request.method() == nx::network::http::Method::delete_)
-    {
-        response = executeDelete(request);
-    }
-    else
-    {
-        NX_WARNING(this, lm("Unknown REST method %1").arg(request.method()));
-        response.statusCode = nx::network::http::StatusCode::notFound;
-        response.content = {"text/plain", "Invalid HTTP method"};
+        return RestResponse::error(error.descriptor);
     }
 
     if (response.content && response.content->type == kJsonContentType

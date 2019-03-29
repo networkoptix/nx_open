@@ -29,6 +29,21 @@ struct RestContent
     std::optional<QJsonValue> parse() const;
 };
 
+class RestException:
+    public std::exception
+{
+public:
+    const QnRestResult::ErrorDescriptor descriptor;
+
+    template<typename... Args>
+    RestException(Args... args): descriptor(std::forward<Args>(args)...) {}
+
+    virtual const char* what() const noexcept override;
+
+private:
+    mutable std::optional<std::string> m_what;
+};
+
 struct RestRequest
 {
     // TODO: These should be private, all data should be avalible by getters.
@@ -57,6 +72,7 @@ struct RestRequest
     const RequestParams& params() const;
     std::optional<QString> param(const QString& key) const;
     QString paramOr(const QString& key, const QString& defaultValue = {}) const;
+    QString paramOrThrow(const QString& key) const;
 
     /**
      * If method may not provide message body, parses URL params.
@@ -64,6 +80,8 @@ struct RestRequest
      */
     template <typename T>
     std::optional<T> parseContent() const;
+    template <typename T>
+    T parseContentOrThrow() const;
 
     bool isExtraFormattingRequired() const;
 
@@ -93,6 +111,8 @@ struct RestResponse
 
     template<typename T>
     static RestResponse reply(const T& data);
+
+    static RestResponse error(const QnRestResult::ErrorDescriptor& descriptor);
 
     template<typename... Args>
     static RestResponse error(QnRestResult::Error errorCode, Args... args);
@@ -199,6 +219,18 @@ std::optional<T> RestRequest::parseContent() const
     return result;
 }
 
+template <typename T>
+T RestRequest::parseContentOrThrow() const
+{
+    auto value = parseContent<T>();
+    if (value)
+        return *value;
+
+    throw RestException(
+        QnRestResult::CantProcessRequest,
+        lm("Unable to parse request of %1").args(typeid(T)));
+}
+
 template<typename T>
 RestResponse RestResponse::reply(const T& data)
 {
@@ -222,8 +254,5 @@ RestResponse RestResponse::error(QnRestResult::Error errorCode, Args... args)
 {
     QStringList argList;
     qStringListAdd(&argList, args...);
-
-    QnRestResult rest;
-    rest.setError(QnRestResult::ErrorDescriptor{errorCode, std::move(argList)});
-    return result(rest);
+    return error(QnRestResult::ErrorDescriptor{errorCode, std::move(argList)});
 }

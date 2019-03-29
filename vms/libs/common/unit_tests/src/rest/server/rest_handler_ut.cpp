@@ -361,6 +361,42 @@ TEST_F(RestRequestTest, Delete)
     EXPECT_EQ(RequestParams({{"id", "ID"}}), request->params());
 }
 
+TEST_F(RestRequestTest, RestException)
+{
+    const auto request = restRequest({
+        "PUT /some/path HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 10",
+        "",
+        "trash data"
+    });
+    ASSERT_TRUE(request);
+
+    try
+    {
+        request->paramOrThrow("id");
+        FAIL() << "did not throw";
+    }
+    catch (const RestException& error)
+    {
+        EXPECT_EQ(
+            "Missing required parameter 'id'",
+            error.descriptor.text());
+    }
+
+    try
+    {
+        request->parseContentOrThrow<SomeData>();
+        FAIL() << "did not throw";
+    }
+    catch (const RestException& error)
+    {
+        EXPECT_EQ(
+            "Failed to process request 'Unable to parse request of SomeData'",
+            error.descriptor.text());
+    }
+}
+
 class RestResponseTest:
     public ::testing::Test
 {
