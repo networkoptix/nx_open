@@ -13,6 +13,8 @@
 class TCPSocket;
 class QnRestConnectionProcessor;
 
+// TODO: This should go into nx::network::rest and placed in common/src/nx/network/rest.
+
 enum class RestPermissions
 {
     anyUser,

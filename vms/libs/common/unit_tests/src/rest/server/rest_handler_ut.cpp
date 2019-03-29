@@ -161,8 +161,7 @@ TEST_F(RestRequestTest, GetToPostByHeader)
 
 TEST_F(RestRequestTest, GetToPutByParam)
 {
-    // TODO: restIni().allowGetMethodReplacement = true
-    // TODO: Add counter test.
+    // TODO: setIniValue(&nx::network::rest::ini().allowGetMethodReplacement, true);
 
     const auto request = restRequest({
         "GET /some/path?s=someData&method_=put HTTP/1.1",
@@ -172,6 +171,27 @@ TEST_F(RestRequestTest, GetToPutByParam)
     ASSERT_FALSE(request->content);
 
     EXPECT_EQ("PUT", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(RequestParams({{"method_", "put"}, {"s", "someData"}}), request->params());
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+    EXPECT_EQ((SomeData{false, 0, "someData"}), *data);
+}
+
+// TODO: Enable when ini config works properly.
+TEST_F(RestRequestTest, DISABLED_GetToPutByParamFailure)
+{
+    // TODO: setIniValue(&nx::network::rest::ini().allowGetMethodReplacement, false);
+
+    const auto request = restRequest({
+        "GET /some/path?s=someData&method_=put HTTP/1.1",
+        ""
+    });
+    ASSERT_TRUE(request);
+    ASSERT_FALSE(request->content);
+
+    EXPECT_EQ("GET", request->method());
     EXPECT_EQ("/some/path", request->path());
     EXPECT_EQ(RequestParams({{"method_", "put"}, {"s", "someData"}}), request->params());
 
@@ -220,6 +240,29 @@ TEST_F(RestRequestTest, PostJson)
     EXPECT_EQ((SomeData{true, 222, "data"}), *data);
 }
 
+TEST_F(RestRequestTest, PostForm)
+{
+    const auto request = restRequest({
+        "POST /some/path HTTP/1.1",
+        "Content-Type: application/x-www-form-urlencoded",
+        "Content-Length: 27",
+        "",
+        "b=false&i=123&s=some%20text"
+    });
+    ASSERT_TRUE(request);
+    ASSERT_TRUE(request->content);
+    EXPECT_EQ("application/x-www-form-urlencoded", request->content->type);
+    EXPECT_EQ("b=false&i=123&s=some%20text", request->content->body);
+
+    EXPECT_EQ("POST", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(RequestParams({{"b", "false"}, {"i", "123"}, {"s", "some text"}}), request->params());
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+    EXPECT_EQ((SomeData{false, 123, "some text"}), *data);
+}
+
 TEST_F(RestRequestTest, PostBadJson)
 {
     const auto request = restRequest({
@@ -243,8 +286,7 @@ TEST_F(RestRequestTest, PostBadJson)
 
 TEST_F(RestRequestTest, PostWithUrlParams)
 {
-    // TODO: restIni().allowUrlParamitersForAnyMethod = true
-    // TODO: Add counter test.
+    // TODO: setIniValue(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, true);
 
     const auto request = restRequest({
         "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
@@ -261,6 +303,62 @@ TEST_F(RestRequestTest, PostWithUrlParams)
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
     EXPECT_EQ((SomeData{true, 42, "hi"}), *data);
+}
+
+// TODO: Enable when ini config works properly.
+TEST_F(RestRequestTest, DISABLED_PostWithUrlParamsFailure)
+{
+    // TODO: setIniValue(&nx::network::rest::ini().allowUrlParamitersForAnyMethod, false);
+
+    const auto request = restRequest({
+        "POST /some/path?b=true&i=42&s=hi HTTP/1.1",
+        "Content-Length: 0",
+        ""
+    });
+    ASSERT_TRUE(request);
+    ASSERT_FALSE(request->content);
+
+    EXPECT_EQ("POST", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(RequestParams(), request->params());
+    ASSERT_FALSE(request->parseContent<SomeData>());
+}
+
+TEST_F(RestRequestTest, PutJson)
+{
+    const auto request = restRequest({
+        "PUT /some/path HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 17",
+        "",
+        R"json({"s":"some text"})json"
+    });
+    ASSERT_TRUE(request);
+    ASSERT_TRUE(request->content);
+    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(R"json({"s":"some text"})json", request->content->body);
+
+    EXPECT_EQ("PUT", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(RequestParams({{"s", "some text"}}), request->params());
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+    EXPECT_EQ((SomeData{false, 0, "some text"}), *data);
+}
+
+TEST_F(RestRequestTest, Delete)
+{
+    const auto request = restRequest({
+        "DELETE /some/path?id=ID HTTP/1.1",
+        "",
+    });
+    ASSERT_TRUE(request);
+    ASSERT_FALSE(request->content);
+
+    EXPECT_EQ("DELETE", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(RequestParams({{"id", "ID"}}), request->params());
 }
 
 class RestResponseTest:

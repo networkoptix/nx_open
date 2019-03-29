@@ -2,30 +2,19 @@
 
 #include <QtCore/QDebug>
 
+#include <nx/network/rest/nx_network_rest_ini.h>
 #include <nx/utils/log/log.h>
 
 static const QString kExtraFormatting("extraFormatting");
-static const QByteArray kJsonContetnType("application/json");
-
-// TODO: Make it an INI config.
-struct RestIni
-{
-    // Should be false by default.
-    const bool allowGetMethodReplacement = true;
-
-    // Should be disabled as soon as these methods are deprecated.
-    const bool allowUrlParamitersForAnyMethod = true;
-};
-
-static const RestIni& restIni()
-{
-    static RestIni ini_;
-    return ini_;
-}
+static const QByteArray kFormContentType("application/x-www-form-urlencoded");
+static const QByteArray kJsonContentType("application/json");
 
 std::optional<QJsonValue> RestContent::parse() const
 {
-    if (type == kJsonContetnType)
+    if (type == kFormContentType)
+        return RequestParams::fromUrlQuery(QUrlQuery(body)).toJson();
+
+    if (type == kJsonContentType)
     {
         QJsonValue value;
         if (!QJson::deserialize(body, &value))
@@ -90,7 +79,7 @@ bool RestRequest::isExtraFormattingRequired() const
 
 nx::network::http::Method::ValueType RestRequest::calculateMethod() const
 {
-    if (restIni().allowGetMethodReplacement)
+    if (nx::network::rest::ini().allowGetMethodReplacement)
     {
         const auto p = m_urlParams.value("method_");
         if (!p.isEmpty())
@@ -111,7 +100,7 @@ RequestParams RestRequest::calculateParams() const
         return m_urlParams;
 
     RequestParams params;
-    if (restIni().allowUrlParamitersForAnyMethod)
+    if (nx::network::rest::ini().allowUrlParamitersForAnyMethod)
         params.unite(m_urlParams);
 
     if (content)
@@ -133,7 +122,7 @@ std::optional<QJsonValue> RestRequest::calculateContent() const
     if (content)
     {
         parsedContent = content->parse();
-        if (!restIni().allowUrlParamitersForAnyMethod)
+        if (!nx::network::rest::ini().allowUrlParamitersForAnyMethod)
             return parsedContent;
     }
 
@@ -160,7 +149,7 @@ RestResponse RestResponse::result(const QnJsonRestResult& result)
 {
     RestResponse response;
     response.statusCode = QnRestResult::toHttpStatus(result.error);
-    response.content = RestContent{kJsonContetnType, QJson::serialized(result)};
+    response.content = RestContent{kJsonContentType, QJson::serialized(result)};
     return response;
 }
 
@@ -192,7 +181,7 @@ RestResponse QnRestRequestHandler::executeRequest(
         response.content = {"text/plain", "Invalid HTTP method"};
     }
 
-    if (response.content && response.content->type == kJsonContetnType
+    if (response.content && response.content->type == kJsonContentType
         && request.isExtraFormattingRequired())
     {
         response.content->body = nx::utils::formatJsonString(response.content->body);
