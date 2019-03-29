@@ -32,11 +32,16 @@ FileMetadata FileMetadata::fromFileInformation(
         info.chunkSize = kDefaultChunkSize;
 
     if (info.absoluteDirectoryPath.isEmpty())
+    {
         info.fullFilePath = defaultDownloadsDirectory.absoluteFilePath(info.name);
-    else
-        info.fullFilePath = QDir(info.absoluteDirectoryPath).absoluteFilePath(info.name);
+        info.absoluteDirectoryPath = QFileInfo(info.fullFilePath).absolutePath();
+    }
+    else if (info.fullFilePath.isEmpty())
+    {
+        info.fullFilePath =
+            QDir(info.absoluteDirectoryPath).absoluteFilePath(QFileInfo(info.name).fileName());
+    }
 
-    info.absoluteDirectoryPath = QFileInfo(info.fullFilePath).absolutePath();
     return info;
 }
 
@@ -107,7 +112,12 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
 
     FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
     if (!QFile(info.fullFilePath).exists())
+    {
+        NX_WARNING(
+            this,
+            "Add downloaded file (%1) failed. File not found.", info.fullFilePath);
         return ResultCode::fileDoesNotExist;
+    }
 
     const auto md5 = calculateMd5(info.fullFilePath);
     if (md5.isEmpty())
@@ -143,6 +153,7 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
 
     emit fileAdded(info);
 
+    NX_DEBUG(this, "Add downloaded file (%1) succeeded", info.fullFilePath);
     return ResultCode::ok;
 }
 
@@ -574,17 +585,29 @@ void Storage::findDownloadsImpl()
     for (const auto& entry: QDir(metadataDirectoryPath()).entryInfoList(QDir::Files))
     {
         auto fileName = entry.absoluteFilePath();
+        NX_DEBUG(this, "Find downloads: Processing metadata file %1", fileName);
         if (!fileName.endsWith(kMetadataSuffix))
             continue;
 
-        fileName.truncate(fileName.size() - kMetadataSuffix.size());
+        const auto fileInfo = loadMetadata(fileName);
+        if (!fileInfo.isValid())
+        {
+            NX_DEBUG(
+                this,
+                "Find downloads: Load metadata file (%1) failed", fileName);
+            continue;
+        }
+
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            if (m_fileInformationByName.contains(fileName))
+            if (m_fileInformationByName.contains(fileInfo.name))
                 continue;
         }
 
-        loadDownload(fileName);
+        const auto resultCode = addFile(fileInfo, /*updateTouchTime*/ false);
+        NX_DEBUG(
+            this,
+            "Find downloads: Add file (%1) result = %2", fileInfo.name, resultCode);
     }
 }
 
@@ -687,7 +710,11 @@ FileMetadata Storage::loadMetadata(const QString& fileName)
         return fileInfo;
 
     const auto data = file.readAll();
-    QJson::deserialize(data, &fileInfo);
+    const bool deserializeResult = QJson::deserialize(data, &fileInfo);
+    NX_DEBUG(
+        this,
+        "load metadata (%1). Deserialize result: %2. File information valid: %3",
+            fileName, deserializeResult ? "success" : "fail", fileInfo.isValid());
 
     const auto previousStatus = fileInfo.status;
     checkDownloadCompleted(fileInfo);

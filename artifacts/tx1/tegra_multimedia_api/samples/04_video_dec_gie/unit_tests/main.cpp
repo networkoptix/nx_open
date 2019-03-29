@@ -1,6 +1,6 @@
 #include <nx/kit/test.h>
 
-int main(int argc, const char* const argv[])
+int main()
 {
-    return nx::kit::test::runAllTests("tegra_video", argc, argv);
+    return nx::kit::test::runAllTests("tegra_video");
 }

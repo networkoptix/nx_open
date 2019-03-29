@@ -27,9 +27,6 @@ public:
     WorkbenchUpdateWatcher(QObject* parent = nullptr);
     virtual ~WorkbenchUpdateWatcher() override;
 
-    void start();
-    void stop();
-
     /** Get cached update information. */
     const UpdateContents& getUpdateContents() const;
     std::shared_ptr<ServerUpdateTool> getServerUpdateTool();

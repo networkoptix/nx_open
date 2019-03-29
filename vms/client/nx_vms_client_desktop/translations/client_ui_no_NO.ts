@@ -2569,44 +2569,6 @@
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation type="unfinished">Check for updates automatically</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>

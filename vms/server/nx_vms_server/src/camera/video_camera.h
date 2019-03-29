@@ -104,7 +104,7 @@ public:
     QnVideoCamera(
         const nx::vms::server::Settings& settings,
         QnDataProviderFactory* dataProviderFactory,
-        const QnResourcePtr& resource);
+        const nx::vms::server::resource::CameraPtr& camera);
     virtual ~QnVideoCamera() override;
 
     virtual QnLiveStreamProviderPtr getLiveReader(
@@ -153,7 +153,7 @@ private:
     QnMutex m_getReaderMutex;
     const nx::vms::server::Settings& m_settings;
     QnDataProviderFactory* m_dataProviderFactory = nullptr;
-    QnResourcePtr m_resource;
+    nx::vms::server::resource::CameraPtr m_camera;
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;
 

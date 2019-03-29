@@ -168,7 +168,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     QnRtspClient rtspClient(rtspConfig);
     rtspClient.setTCPTimeout(config.timeout);
     rtspClient.setAuth(auth, nx::network::http::header::AuthScheme::basic);
-    rtspClient.setTransport(RtspTransport::tcp);
+    rtspClient.setTransport(nx::vms::api::RtpTransportType::tcp);
     rtspClient.setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)

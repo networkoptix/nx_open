@@ -92,7 +92,7 @@ public:
     void stop();
     bool isCameraRecoring(const QnResourcePtr& camera) const;
 
-    Recorders findRecorders(const QnResourcePtr& res) const;
+    Recorders findRecorders(const QnNetworkResourcePtr& res) const;
 
     bool startForcedRecording(
         const QnSecurityCamResourcePtr& camRes,

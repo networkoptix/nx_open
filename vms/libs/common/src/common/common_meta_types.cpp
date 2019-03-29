@@ -220,7 +220,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
-    qRegisterMetaType<ApiMultiserverServerDateTimeDataList>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();

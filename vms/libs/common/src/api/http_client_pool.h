@@ -60,6 +60,12 @@ public:
 
     /** Returns amount of requests which are running or awaiting to be run */
     int size() const;
+
+    void setDefaultTimeouts(
+        std::chrono::milliseconds request,
+        std::chrono::milliseconds response,
+        std::chrono::milliseconds messageBody);
+
 signals:
     void done(int requestId, AsyncHttpClientPtr httpClient);
 private slots:
@@ -93,6 +99,9 @@ private:
     //std::map<AsyncHttpClientPtr, RequestInternal> m_requestInProgress;
     int m_maxPoolSize;
     int m_requestId;
+    std::chrono::milliseconds m_defaultRequestTimeout{std::chrono::minutes(1)};
+    std::chrono::milliseconds m_defaultResponseTimeout{std::chrono::minutes(1)};
+    std::chrono::milliseconds m_defaultMessageBodyTimeout{std::chrono::minutes(10)};
 };
 
 } // namespace nx

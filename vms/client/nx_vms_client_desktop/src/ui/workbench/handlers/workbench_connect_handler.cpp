@@ -51,6 +51,7 @@
 #include <platform/hardware_information.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
@@ -511,6 +512,8 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
         connectionInfo.effectiveUserName.isEmpty()
         ? url.userName()
         : connectionInfo.effectiveUserName);
+
+    integrations::connectionEstablished(connection);
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(

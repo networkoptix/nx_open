@@ -75,16 +75,17 @@ QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
 int QnDesktopDataProvider::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
-    QString name;
-    int devNum = 1;
-    m_audioDevice.splitFullName(name, devNum);
-    for(int i = 0; i < iNumDevs; ++i)
+    QString name = m_audioDevice.name();
+    int devNum = m_audioDevice.deviceNumber();
+    for (int i = 0; i < iNumDevs; ++i)
     {
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
+            // This may look like "Microphone (Realtec Hi".
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name.startsWith(tmp)) {
+            if (name.startsWith(tmp))
+            {
                 if (--devNum == 0)
                     return i;
             }

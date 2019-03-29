@@ -413,11 +413,10 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    setCameraCapability(Qn::CameraTimeCapability, true);
-
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
+    NX_VERBOSE(this, "Initialising camera driver");
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;

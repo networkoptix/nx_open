@@ -2,6 +2,7 @@
 
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -72,19 +73,16 @@ QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) con
     return itr == m_cameras.cend() ? QnVideoCameraPtr() : itr.value();
 }
 
-QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
+QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const nx::vms::server::resource::CameraPtr& res)
 {
-    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
     return m_cameras.insert(
         res, QnVideoCameraPtr(new QnVideoCamera(m_settings, m_dataProviderFactory, res))).value();
 }
 
-bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)
+bool QnVideoCameraPool::addVideoCamera(
+    const nx::vms::server::resource::CameraPtr& res, QnVideoCameraPtr camera)
 {
-    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return false;
     QnMutexLocker lock(&m_mutex);
     m_cameras.insert(res, camera);
     return true;

@@ -52,7 +52,7 @@ extern "C" {
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
-class ScanMediaFilesTask;
+class ArchiveIndexer;
 class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
@@ -133,7 +133,6 @@ public:
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalyzePeriodMs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
-    void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(
         std::function<bool(const QnStorageResourcePtr &)> pred =
@@ -245,10 +244,13 @@ private:
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
-    void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                      nx::caminfo::ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
+    void replaceChunks(
+        const QnTimePeriod& rebuildPeriod,
+        const QnStorageResourcePtr &storage,
+        const DeviceFileCatalogPtr &newCatalog,
+        const QString& cameraUniqueId,
+        QnServer::ChunksCatalog catalog);
 
-    void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
     void clearUnusedMotion();
@@ -289,6 +291,17 @@ private:
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
     Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
+    QMap<DeviceFileCatalogPtr, qint64> catalogsToScan(int storageIndex);
+    void scanMediaCatalog(
+        const QnStorageResourcePtr& storage,
+        const DeviceFileCatalogPtr& catalog,
+        const DeviceFileCatalog::ScanFilter& filter,
+        nx::caminfo::ArchiveCameraDataList* outArchiveCameras);
+
+    void readCameraInfo(
+        const QnStorageResourcePtr& storage,
+        const QString& cameraPath,
+        nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const;
 
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
@@ -298,8 +311,7 @@ private:
 
     mutable QnMutex m_mutexStorages;
     mutable QnMutex m_mutexCatalog;
-    mutable QnMutex m_mutexRebuild;
-    mutable QnMutex m_rebuildStateMtx;
+    mutable QnMutex m_rebuildInfoMutex;
     mutable QnMutex m_localPatches;
     mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
@@ -315,13 +327,12 @@ private:
     QSet<QnUuid> m_fullDisksIds;
 
     QnStorageScanData m_archiveRebuildInfo;
-    std::atomic<bool> m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
-    friend class ScanMediaFilesTask;
     friend class AuxiliaryTask;
+    friend class ArchiveIndexer;
 
-    ScanMediaFilesTask* m_rebuildArchiveThread;
+    std::unique_ptr<ArchiveIndexer> m_archiveIndexer;
 
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;

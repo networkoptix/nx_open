@@ -25,7 +25,8 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 signals:
-    void selectedAreaChanged(const QRectF& selectedArea);
+    void selectionStarted(QPrivateSignal);
+    void selectedAreaChanged(const QRectF& selectedArea, QPrivateSignal);
 
 protected:
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;

@@ -1,8 +1,8 @@
-#include "system_information_helper_linux.h"
+#include "ubuntu_version_linux.h"
 
 #include <QtCore/QTextStream>
 
-namespace nx::vms::api {
+namespace nx::utils {
 
 QString ubuntuVersionFromCodeName(const QString& codeName)
 {
@@ -77,4 +77,4 @@ QString osReleaseContentsValueByKey(const QByteArray& osReleaseContents, const Q
     return QString();
 }
 
-} // namespace nx::vms::api
+} // namespace nx::utils

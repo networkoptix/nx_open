@@ -26,6 +26,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
@@ -605,7 +606,8 @@ bool ServerUpdateTool::verifyUpdateManifest(
 {
     NX_ASSERT(m_stateTracker);
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->getActiveServers();
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions, checkClient);
+    return verifyUpdateContents(commonModule(), contents, activeServers, clientVersions,
+        checkClient ? m_stateTracker->getClientPeerId() : QnUuid());
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
@@ -683,21 +685,6 @@ bool ServerUpdateTool::haveActiveUpdate() const
     return m_updateManifest.isValid();
 }
 
-nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
-{
-    UpdateContents contents;
-    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
-    contents.source = "mediaservers";
-    contents.info = m_updateManifest;
-    QString errorMessage;
-
-    nx::update::findPackage(
-        *commonModule(), m_updateManifest, &contents.clientPackage, &errorMessage);
-    // TODO: Should move this to Widget somehow.
-    verifyUpdateManifest(contents, {});
-    return contents;
-}
-
 void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
@@ -710,11 +697,27 @@ ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() con
     return std::chrono::milliseconds(delta);
 }
 
-void ServerUpdateTool::requestStopAction()
+bool ServerUpdateTool::requestStopAction()
 {
-    m_updateManifest = nx::update::Information();
+    if (m_requestingStop)
+    {
+        NX_WARNING(this, "requestStopAction() - previous request is not complete");
+        return false;
+    }
+
     if (auto connection = getServerConnection(commonModule()->currentServer()))
-        connection->updateActionStop({});
+    {
+        NX_INFO(this, "requestStopAction() - sending request");
+        connection->updateActionStop(nx::utils::guarded(this,
+            [this](bool success, rest::Handle /*handle*/)
+            {
+                // This will be called in outer
+                NX_VERBOSE(this, "requestStopAction() - success=%1", success);
+                m_updateManifest = nx::update::Information();
+                m_requestingStop = false;
+                emit cancelUpdateComplete(success);
+            }), thread());
+    }
 
     if (!m_activeRequests.empty())
     {
@@ -726,14 +729,35 @@ void ServerUpdateTool::requestStopAction()
         m_downloader->deleteFile(file.first);
     m_activeDownloads.clear();
     m_stateTracker->clearState();
+    return true;
 }
 
-void ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
+bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 {
-    NX_WARNING(this, "requestFinishUpdate(%1)", skipActivePeers);
+    if (m_requestingFinish)
+    {
+        NX_WARNING(this, "requestFinishUpdate(%1) - previous request is not complete",
+            skipActivePeers);
+        return false;
+    }
+
+    m_requestingFinish = true;
     if (auto connection = getServerConnection(commonModule()->currentServer()))
-        connection->updateActionFinish(skipActivePeers, {});
-    m_stateTracker->clearState();
+    {
+        NX_VERBOSE(this, "requestFinishUpdate(%1) - sending request", skipActivePeers);
+        connection->updateActionFinish(skipActivePeers, nx::utils::guarded(this,
+            [this, skipActivePeers](bool success, rest::Handle /*handle*/)
+            {
+                NX_VERBOSE(this, "requestFinishUpdate(%1) - got response", skipActivePeers);
+                m_requestingFinish = false;
+                emit finishUpdateComplete(success);
+            }), thread());
+        m_stateTracker->clearState();
+        return true;
+    }
+
+    NX_VERBOSE(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+    return false;
 }
 
 void ServerUpdateTool::requestStartUpdate(
@@ -860,8 +884,8 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                 if (response.error != QnRestResult::NoError)
                 {
                     NX_DEBUG(this,
-                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: %1",
-                        response.errorString);
+                        "requestRemoteUpdateStateAsync: An error in response to the /ec2/updateStatus request: code=%1, err=%2",
+                        response.error, response.errorString);
                 }
 
                 if (tool)

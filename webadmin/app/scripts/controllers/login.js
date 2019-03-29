@@ -37,7 +37,7 @@ angular.module('webadminApp')
                     if (error.error !== '3') {
                         dialogs.alert(L.login.incorrectPassword);
                     }
-                    else{
+                    else {
                         dialogs.alert(L.login.authLockout);
                     }
                 }).then(function(){

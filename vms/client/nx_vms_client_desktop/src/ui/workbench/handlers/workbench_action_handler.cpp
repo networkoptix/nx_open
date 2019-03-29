@@ -609,14 +609,8 @@ QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const 
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-    if (qnRuntime->isDesktopMode())
-    {
-        if (user)
-            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->start();
-        else
-            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->stop();
-    }
+void ActionHandler::at_context_userChanged(const QnUserResourcePtr& /*user*/)
+{
     m_serverRequests.clear();
 }
 

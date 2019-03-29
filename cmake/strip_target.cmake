@@ -19,6 +19,7 @@ function(nx_strip_target target)
 
         set(strip_flags --strip-debug)
 
+        # TODO: Investigate why STRIP_ONLY_DEBUG_INFO is not used anywhere else.
         if(NOT STRIP_ONLY_DEBUG_INFO)
             list(APPEND strip_flags --strip-unneeded)
         endif()

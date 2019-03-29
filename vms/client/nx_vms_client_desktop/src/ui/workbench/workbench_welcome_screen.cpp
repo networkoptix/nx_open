@@ -525,6 +525,9 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString
     if (localSystemUuid.isNull())
         return;
 
+    qnForgottenSystemsManager->forgetSystem(systemId);
+    qnForgottenSystemsManager->forgetSystem(localSystemId);
+
     qnSystemWeightsManager->setWeight(localSystemUuid, 0); //< Moves system to the end of tile's list.
     nx::vms::client::core::helpers::removeCredentials(localSystemUuid);
     nx::vms::client::core::helpers::removeConnection(localSystemUuid);

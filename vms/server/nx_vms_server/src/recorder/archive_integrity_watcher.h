@@ -19,8 +19,8 @@ private:
     static QByteArray hashWithSalt(const QByteArray& value);
 };
 
-class ServerArchiveIntegrityWatcher: 
-    public QObject, 
+class ServerArchiveIntegrityWatcher:
+    public QObject,
     public AbstractArchiveIntegrityWatcher,
     public ServerModuleAware
 {

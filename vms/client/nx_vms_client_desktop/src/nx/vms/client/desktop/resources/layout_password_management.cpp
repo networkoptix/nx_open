@@ -1,6 +1,6 @@
 #include "layout_password_management.h"
 
-#include <QtCore/QCoreApplication>
+#include <QtGui/QGuiApplication>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -66,6 +66,17 @@ QString password(const QnLayoutResourcePtr& layout)
 
 QString askPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 {
+    // This is to prevent strange cursors, e.g. when called from drop actions.
+    bool forceNormalCursor = QGuiApplication::overrideCursor() != nullptr;
+    if (forceNormalCursor)
+        QGuiApplication::setOverrideCursor(Qt::ArrowCursor);
+    auto cursorGuard = nx::utils::makeScopeGuard(
+        [forceNormalCursor]()
+        {
+            if(forceNormalCursor)
+                QGuiApplication::restoreOverrideCursor();
+        });
+
     auto fileLayout = layout.dynamicCast<QnFileLayoutResource>();
     if (!NX_ASSERT(fileLayout))
         return QString();

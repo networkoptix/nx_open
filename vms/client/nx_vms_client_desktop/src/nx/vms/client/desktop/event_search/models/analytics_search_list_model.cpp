@@ -49,7 +49,7 @@ bool AnalyticsSearchListModel::isConstrained() const
 
 bool AnalyticsSearchListModel::hasAccessRights() const
 {
-    return accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
+    return accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
 }
 
 bool AnalyticsSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const

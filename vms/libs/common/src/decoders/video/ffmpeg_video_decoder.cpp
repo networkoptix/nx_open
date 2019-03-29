@@ -100,14 +100,19 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_prevTimestamp(AV_NOPTS_VALUE),
     m_spsFound(false)
 {
-    for (auto& codecName: config.disabledCodecsForMtDecoding)
+    if (config.disableMtDecoding)
+        m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
+    else
     {
-        const AVCodecDescriptor* codecDescr =
-            avcodec_descriptor_get_by_name(codecName.toLatin1().data());
-        if (codecDescr && codecDescr->id == m_codecId)
+        for (auto& codecName: config.disabledCodecsForMtDecoding)
         {
-            m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
-            break;
+            const AVCodecDescriptor* codecDescr =
+                avcodec_descriptor_get_by_name(codecName.toLatin1().data());
+            if (codecDescr && codecDescr->id == m_codecId)
+            {
+                m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
+                break;
+            }
         }
     }
     setMTDecoding(mtDecoding);

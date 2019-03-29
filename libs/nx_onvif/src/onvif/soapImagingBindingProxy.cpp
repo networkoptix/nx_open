@@ -97,7 +97,7 @@ void ImagingBindingProxy::ImagingBindingProxy_init(soap_mode imode, soap_mode om
         // ONVIF schema.
         {"onvifXsd", "http://www.onvif.org/ver10/schema", NULL, NULL},
         // ONVIF Imaging.
-        {"onvifImg", "http://www.onvif.org/ver10/imaging/wsdl", NULL, NULL},
+        {"onvifImg", "http://www.onvif.org/ver20/imaging/wsdl", NULL, NULL},
 
         {NULL, NULL, NULL, NULL}
     };

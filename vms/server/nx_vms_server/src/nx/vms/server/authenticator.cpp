@@ -546,7 +546,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
             *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
         authResult = tryHttpBasic(request.requestLine.method, authorizationHeader, response, accessRights);
 
-        if (authResult == Qn::Auth_OK && userResource &&
+        if (authResult == Qn::Auth_OK && userResource && userResource->isLocal() &&
             (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
         {
             updateUserHashes(userResource, QString::fromUtf8(authorizationHeader.basic->password));
@@ -831,6 +831,18 @@ Qn::AuthResult Authenticator::tryAuthRecord(
         method,
         authorization,
         &response.headers);
+
+    if (errorCode == Qn::AuthResult::Auth_OK)
+    {
+        NX_VERBOSE(this, "Auth record authenticated. User %1, nonce %2",
+            authorization.digest->userid, authorization.digest->params["nonce"]);
+    }
+    else
+    {
+        NX_DEBUG(this, "Failed to authenticate auth record. User %1, nonce %2, realm %3. %4",
+            authorization.digest->userid, authorization.digest->params["nonce"],
+            authorization.digest->params["realm"], toString(errorCode));
+    }
 
     if (const auto user = resource.dynamicCast<QnUserResource>())
     {

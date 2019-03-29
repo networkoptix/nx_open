@@ -19,9 +19,8 @@ struct EventType: nx::vms::api::analytics::EventType
     QString internalName;
     QString alarmName;
     int group = 0;
-    bool unsupported = false;
 };
-#define DwMttEventType_Fields EventType_Fields(internalName)(alarmName)(group)(unsupported)
+#define DwMttEventType_Fields EventType_Fields(internalName)(alarmName)(group)
 
 struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
 {

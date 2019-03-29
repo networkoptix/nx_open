@@ -9,25 +9,18 @@ RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/
 installDeb()
 {
     local -r DEB="$1"
-    local -r FORCE="$2"
-    local ARGS="-i"
-
-    if [ $FORCE = "force-conflicts" ]
-    then
-        ARGS="$ARGS --auto-deconfigure --force-conflicts"
-    fi
 
     if [ "$WITH_ROOT_TOOL" = true ]
     then
         local -r ROOT_TOOL_BINARY="/opt/$COMPANY_NAME/mediaserver/bin/root-tool-bin"
         if [ -f "${ROOT_TOOL_BINARY}" ]
         then #< It must be (4.0+) update.
-            ${ROOT_TOOL_BINARY} install "$DEB" "$FORCE"
+            ${ROOT_TOOL_BINARY} install "$DEB"
         else #< It must be (<=3.2)  --> (4.0+) update.
-            dpkg $ARGS "$DEB"
+            dpkg -i "$DEB"
         fi
     else
-        dpkg $ARGS "$DEB"
+        dpkg -i "$DEB"
     fi
 }
 
@@ -39,7 +32,7 @@ update()
     then
         [ -d "ubuntu${RELEASE_YEAR}" ] && installDeb ubuntu${RELEASE_YEAR}/cifs-utils/*.deb
     fi
-    installDeb "$DISTRIB" force-conflicts
+    installDeb "$DISTRIB"
 }
 
 if [ "$1" != "" ]

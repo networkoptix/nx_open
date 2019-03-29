@@ -32,9 +32,11 @@
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -289,7 +291,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 const bool isDiscoveredManually = foundCamera->isManuallyAdded();
                 foundCamera->update(existingCamera);
                 foundCamera->setManuallyAdded(isDiscoveredManually);
-                NX_ASSERT(foundCamera->serverModule()->resourcePool() == nullptr); // TODO: May be wrong
+                NX_ASSERT(foundCamera->resourcePool() == nullptr);
                 foundCamera->setParentId(commonModule()->moduleGUID());
                 foundCamera->setFlags(existingCamera->flags() & ~Qn::foreigner);
                 foundCamera->setId(existingCamera->getId());
@@ -325,9 +327,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         discoveredResources.insert(existingCamera->getUniqueId());
         existingCamera->setLastDiscoveredTime(qnSyncTime->currentDateTime());
-#ifndef EDGE_SERVER
-        pingResources(existingCamera);
-#endif
+        if (!nx::utils::AppInfo::isEdgeServer())
+            pingResources(existingCamera);
         it = resources.erase(it); // do not need to investigate OK resources
     }
 

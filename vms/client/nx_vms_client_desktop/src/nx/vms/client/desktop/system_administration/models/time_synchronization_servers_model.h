@@ -10,6 +10,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 class TimeSynchronizationServersModel:
     public ScopedModelOperations<QAbstractTableModel>
 {
@@ -49,13 +51,13 @@ public:
     void loadState(const State& state);
 
 signals:
-    void serverSelected(const QnUuid& id);
+    void serverSelected(const QModelIndex& index);
 
 private:
     bool isValid(const QModelIndex& index) const;
 
 private:
-    std::chrono::milliseconds m_vmsTime = std::chrono::milliseconds(0);
+    milliseconds m_vmsTime = milliseconds(0);
     QList<State::ServerInfo> m_servers;
     QnUuid m_selectedServer;
 };

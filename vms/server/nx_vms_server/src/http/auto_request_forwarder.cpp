@@ -20,7 +20,7 @@
 #include <network/universal_request_processor.h>
 #include <common/common_module.h>
 
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <nx/vms/network/proxy_connection.h>
 
 static const qint64 kUsPerMs = 1000;
