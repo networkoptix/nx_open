@@ -14,6 +14,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace vms::server {
@@ -98,6 +99,21 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         // QUrl isn't used here intentionally, since session parameter works correct
         // if it added to the end of URL only.
         streamUrlString.append(lit("/session=%1").arg(m_sessionContext->sessionId));
+    }
+    else
+    {
+        // If multicast transport used, ensure that camera configured accordingly.
+        const auto rtpTransportString =
+            m_hanwhaResource->getProperty(QnMediaResource::rtpTransportKey());
+        const auto transport = QnLexical::deserialized<nx::vms::api::RtpTransportType>(
+            rtpTransportString,
+            nx::vms::api::RtpTransportType::automatic);
+        if (transport == nx::vms::api::RtpTransportType::multicast)
+        {
+            auto result = m_hanwhaResource->ensureMulticastEnabled(getRole());
+            if (!result)
+                return result;
+        }
     }
 
     const auto role = getRole();

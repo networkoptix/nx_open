@@ -281,19 +281,20 @@
                 
                 <param id="PRIMARY%SERVICE%multicastSeparator"
                     dataType="Separator"
-                    name="sep"/>
+                    name="sep"
+                    aux="multicast=true"/>
                     
                 <param id="PRIMARY%media/videoprofile/RTPMulticastEnable"
                     name="Enable Multicast"
                     dataType="Bool"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=primary;groupLead=primaryStreamMulticast;associatedWith=PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;associationCondition=true"/>
+                    aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=primary;groupLead=primaryStreamMulticast;associatedWith=PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;associationCondition=true;multicast=true"/>
                     
                 <param id="PRIMARY%media/videoprofile/RTPMulticastAddress"
                     name="Multicast Address"
                     dataType="String"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort">
+                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -309,7 +310,7 @@
                     name="Port"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL">
+                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -325,7 +326,7 @@
                     name="TTL"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastTTL;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastPort">
+                    aux="range=media/videoprofile/add_update/RTPMulticastTTL;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastPort;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -565,19 +566,20 @@
                 
                 <param id="SECONDARY%SERVICE%multicastSeparator"
                     dataType="Separator"
-                    name="sep"/>
+                    name="sep"
+                    aux="multicast=true"/>
                     
                 <param id="SECONDARY%media/videoprofile/RTPMulticastEnable"
                     name="Enable Multicast"
                     dataType="Bool"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=secondary;groupLead=secondaryStreamMulticast;associatedWith=SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;associationCondition=true"/>
+                    aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=secondary;groupLead=secondaryStreamMulticast;associatedWith=SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;associationCondition=true;multicast=true"/>
                     
                 <param id="SECONDARY%media/videoprofile/RTPMulticastAddress"
                     name="Multicast Address"
                     dataType="String"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort">
+                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -593,7 +595,7 @@
                     name="Port"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL">
+                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -609,7 +611,7 @@
                     name="TTL"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastTTL;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastPort">
+                    aux="range=media/videoprofile/add_update/RTPMulticastTTL;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastPort;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
