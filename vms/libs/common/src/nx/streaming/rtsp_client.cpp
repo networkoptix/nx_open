@@ -218,6 +218,7 @@ void QnRtspIoDevice::updateSockets()
     {
         m_mediaSocket.reset();
         m_rtcpSocket.reset();
+        m_owner->m_tcpSock->setRecvBufferSize(kSocketBufferSize);
         return;
     }
 
@@ -405,7 +406,6 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
-    m_tcpSock->setRecvBufferSize(kSocketBufferSize);
     m_tcpSock->setRecvTimeout(m_tcpTimeout);
     m_tcpSock->setSendTimeout(m_tcpTimeout);
 

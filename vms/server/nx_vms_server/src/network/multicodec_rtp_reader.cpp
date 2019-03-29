@@ -167,7 +167,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     QnAbstractMediaDataPtr result;
     do {
-        if (m_RtpSession.getTransport() == nx::vms::api::RtpTransportType::tcp)
+        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
             result = getNextDataTCP();
         else
             result = getNextDataUDP();
@@ -733,7 +733,7 @@ void QnMulticodecRtpReader::createTrackParsers()
         else
             trackParser.logicalChannelNum = m_numberOfVideoChannels;
 
-        if (m_RtpSession.getTransport() == nx::vms::api::RtpTransportType::tcp)
+        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
             m_trackIndices[track.interleaved.first] = m_tracks.size();
 
         m_tracks.push_back(trackParser);

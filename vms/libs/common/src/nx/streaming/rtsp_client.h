@@ -162,7 +162,9 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
-    nx::vms::api::RtpTransportType getTransport() const { return m_prefferedTransport; }
+    nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
+    nx::vms::api::RtpTransportType getActualTransport() const { return m_prefferedTransport; }
+
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
     int getTrackNum(int rtpChannelNum);
