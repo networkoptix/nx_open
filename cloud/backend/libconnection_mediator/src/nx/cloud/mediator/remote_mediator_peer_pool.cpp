@@ -235,4 +235,9 @@ const MediatorEndpoint& RemoteMediatorPeerPool::thisEndpoint() const
     return m_mediatorEndpoint;
 }
 
+std::string RemoteMediatorPeerPool::nodeId() const
+{
+    return m_map ? m_map->synchronizationEngine().nodeId() : std::string();
+}
+
 } // namespace nx::hpm

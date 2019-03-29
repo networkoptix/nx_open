@@ -83,6 +83,12 @@ public:
      */
     const MediatorEndpoint& thisEndpoint() const;
 
+    /**
+     * Get the node id of the underlying synchronizationEngine or an empty string if initialize()
+     * failed.
+     */
+    std::string nodeId() const;
+
 private:
     const conf::ClusterDbMap& m_settings;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;

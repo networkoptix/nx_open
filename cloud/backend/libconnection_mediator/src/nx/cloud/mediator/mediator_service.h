@@ -48,6 +48,8 @@ public:
     Controller& controller();
     const Controller& controller() const;
 
+    std::string nodeId() const;
+
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
