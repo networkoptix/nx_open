@@ -129,6 +129,81 @@
         "fisheye": "Fisheye cameras"
     }, 
     "devices": "devices", 
+    "downloads": {
+        "platforms": {
+            "win86": "x86", 
+            "bananapi": "Banana Pi", 
+            "bpi": "Nx1", 
+            "win64": "x64", 
+            "mac": "X", 
+            "linux64": "x64", 
+            "rpi": " Raspberry Pi", 
+            "linux86": "x86"
+        }, 
+        "mobile": {
+            "android": {
+                "link": "%ANDROID_APPLICATION_LINK%"
+            }, 
+            "ios": {
+                "link": "%IOS_APPLICATION_LINK%"
+            }
+        }, 
+        "noClientDetectedTitle": "Install %VMS_NAME% to view your System", 
+        "appTypes": {
+            "package": "Package", 
+            "client": "Client only", 
+            "servertool": "Configuration tool", 
+            "bundle": "Client and Server", 
+            "server": "Server only"
+        }, 
+        "releasesTypes": {
+            "patches": "Patches", 
+            "releases": "Releases", 
+            "patch": "Patch", 
+            "beta": "Beta", 
+            "betas": "Betas", 
+            "rc": "Release Candidate", 
+            "release": "Release"
+        }, 
+        "groups": {
+            "macos": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra", 
+                "label": "Mac OS"
+            }, 
+            "windows": {
+                "supported": "7, 8, 8.1, 10, Server 2008, Server 2012", 
+                "label": "Windows"
+            }, 
+            "ios": {
+                "shortLabel": "iOS", 
+                "label": "iOS"
+            }, 
+            "mac": {
+                "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra", 
+                "label": "Mac OS"
+            }, 
+            "linux": {
+                "shortLabel": "Ubuntu", 
+                "supported": "Ubuntu 14.04 LTS, 16.04 LTS", 
+                "label": "Ubuntu Linux"
+            }, 
+            "android": {
+                "shortLabel": "Android", 
+                "label": "Android"
+            }, 
+            "arm": {
+                "shortLabel": "ARM", 
+                "supported": "Debian/Ubuntu based", 
+                "label": "ARM"
+            }, 
+            "sdk": {
+                "shortLabel": "SDK", 
+                "supported": "C++ cross platform SDK", 
+                "label": "SDK"
+            }
+        }, 
+        "action": "Download %VMS_NAME%"
+    }, 
     "integration": {
         "backToEditText": "Back to the editing interfaces", 
         "Access Control": "Access Control", 
