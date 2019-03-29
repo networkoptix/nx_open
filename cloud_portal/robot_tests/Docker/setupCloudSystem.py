@@ -1,6 +1,7 @@
 #This file is for setting up and adding a new system to cloud
 
 import requests
+import time
 
 SERVER_URL = "http://localhost:7001"
 CLOUD_URL = "https://cloud-test.hdw.mx"
@@ -43,6 +44,7 @@ t = requests.post("{}/ec2/saveUserRole".format(SERVER_URL),
 	    },
 	auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
 print t.status_code
+jsonDataT = t.json()
 
 
 userList = {"viewer":"viewer",
@@ -51,9 +53,8 @@ userList = {"viewer":"viewer",
 			"notowner":"viewer",
 			"admin":"cloudAdmin",
 			"custom":"Custom",
-			"clientcustom":"Client%20Custom"}
+			"clientcustom":"Custom"}
 for user, permission in userList.iteritems():
-	print user + " : " + permission
 	u = requests.post("{}/cdb/system/share".format(CLOUD_URL, jsonData["id"]),
 		json={
 			"systemId" : jsonData["id"],
@@ -61,4 +62,22 @@ for user, permission in userList.iteritems():
 			"accountEmail"  : "noptixautoqa+{}@gmail.com".format(user),
 			},
 		auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
-	print u.text
+	print u.status_code
+
+vLen = 0
+while vLen < 9:
+	v = requests.get("{}/ec2/getUsers".format(SERVER_URL),
+		auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
+	jsonDataV = v.json()
+	vLen = len(jsonDataV)
+	print "Waiting for user list to update..."
+	time.sleep(1)
+
+w = requests.post("{}/ec2/saveUser".format(SERVER_URL),
+	json={
+		"isCloud": True,
+		"id": jsonDataV[7]["id"],
+		"userRoleId": jsonDataT["id"]
+		},
+	auth=requests.auth.HTTPDigestAuth(CLOUD_USER, CLOUD_PASS))
+print w.status_code
