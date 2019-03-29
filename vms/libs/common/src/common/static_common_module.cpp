@@ -40,6 +40,8 @@ QnStaticCommonModule::QnStaticCommonModule(
     instance<QnLongRunnablePool>();
     instance<QnFfmpegInitializer>();
     nx::network::SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost);
+    nx::network::SocketGlobals::addressResolver().addFixedAddress(
+        "localhost", nx::network::SocketAddress(nx::network::HostAddress::localhost, 0));
 
     // Providing mediaserver-specific way of validating peer id.
     m_private->endpointVerificatorFactoryBak =

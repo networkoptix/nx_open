@@ -52,6 +52,7 @@ public:
     QSet<QString> ptzTraits() const;
     Ptz::Capabilities ptzCapabilities() const;
 
+    bool isMulticastParameter() const;
     bool isValid() const;
 
 private:
@@ -78,6 +79,7 @@ private:
     QString m_groupIncludeCondition;
     bool m_isGroupLead = false;
     bool m_shouldAffectAllChannels = false;
+    bool m_isMulticast = false;
     std::set<HanwhaDeviceType> m_deviceTypes;
 
     QString m_cgi;

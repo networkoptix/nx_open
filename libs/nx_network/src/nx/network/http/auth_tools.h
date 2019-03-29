@@ -131,6 +131,11 @@ bool NX_NETWORK_API validateAuthorization(
     const boost::optional<BufferType>& predefinedHA1,
     const header::DigestAuthorization& digestAuthorizationHeader);
 
+bool NX_NETWORK_API validateAuthorization(
+    const StringType& method,
+    const Credentials& credentials,
+    const header::DigestAuthorization& digestAuthorizationHeader);
+
 /**
  * @param ha1 That's what calcHa1 has returned.
  * WARNING: ha1.size() + 1 + nonce.size() MUST be divisible by 64!

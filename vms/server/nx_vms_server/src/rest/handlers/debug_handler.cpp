@@ -5,7 +5,7 @@
 #include <nx/utils/switch.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/network/http/http_types.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 
 namespace {
 
@@ -67,7 +67,7 @@ int QnDebugHandler::executeGet(
 
     ini().reload();
     if (!ini().enableApiDebug)
-        return result(StatusCode::forbidden, "Ignoring - not enabled via mediaserver.ini");
+        return result(StatusCode::forbidden, lm("Ignoring - not enabled via %1").arg(ini().iniFile()));
 
     const auto [action, value] = actionFromParams(params);
     switch (action)

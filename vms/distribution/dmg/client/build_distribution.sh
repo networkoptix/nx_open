@@ -41,7 +41,10 @@ patchDsStore()
 
 hardDetachDmg() # file.dmg
 {
-    lsof -t "$1" |xargs kill -9
+    if [ -f "$1" ]
+    then
+        lsof -t "$1" |xargs kill -9
+    fi
 }
 
 setDmgIcon()

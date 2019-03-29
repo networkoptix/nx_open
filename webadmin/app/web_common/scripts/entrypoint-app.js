@@ -3,6 +3,7 @@ import 'screenfull';
 import 'bootstrap-sass';
 import 'angular-ui-bootstrap';
 import 'angular-clipboard';
+import 'jquery';
 import 'jquery-mousewheel';
 
 // Polyfill

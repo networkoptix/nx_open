@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.23",
+    "version": "1.0.1.26",
     "data": [
         {
             "keys": [
@@ -822,7 +822,19 @@
                 "dahua|dhi-nvr4216-4ks2",
                 "DW-ENHD16|DW-ENHD16-*",
                 "DW|DW-ENHD16*",
-                "DW-ENHD16|DW-ENCODWER"
+                "DW-ENHD16|DW-ENCODWER",
+                "dahua|dhi-nvr4216-4ks2",
+                "dahua|hcvr5104h-s2",
+                "hangzhou hikvision digital technology co., ltd|ds-8116hghi*",
+                "dahua|n52b3p",
+                "ds-7208hqhi-k2|embedded net dvr",
+                "tr2116a|embedded net dvr",
+                "vlr-enc-16|vlr-enc-16",
+                "dahua|dh-xvr5104c-x1",
+                "dahua|dhi-nvr5432-16p-4ks2e",
+                "dahua|dhi-nvr4104hs-4ks2",
+                "hangzhou hikvision digital technology co., ltd|ds-9016huhi*",
+                "uniview|nvr308-32r-b"
             ],
             "analogEncoder": true
         },
@@ -3067,7 +3079,7 @@
         {
             "keys": [
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*"
+                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"

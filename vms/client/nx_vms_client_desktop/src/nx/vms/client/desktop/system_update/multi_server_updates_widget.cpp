@@ -304,6 +304,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             }
         });
 
+    connect(m_serverUpdateTool.get(), &ServerUpdateTool::finishUpdateComplete,
+        this, &MultiServerUpdatesWidget::atFinishUpdateComplete);
+
+    connect(m_serverUpdateTool.get(), &ServerUpdateTool::cancelUpdateComplete,
+        this, &MultiServerUpdatesWidget::atCancelUpdateComplete);
+
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
         {
@@ -1007,9 +1013,8 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         if (showCancelDialog())
         {
             NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
+            setTargetState(WidgetUpdateState::cancelingDownload, {});
             m_serverUpdateTool->requestStopAction();
-            m_clientUpdateTool->resetState();
-            setTargetState(WidgetUpdateState::ready, {});
         }
     }
     else if (m_widgetState == WidgetUpdateState::installingStalled)
@@ -1028,39 +1033,33 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
 
         if (messageBox->exec() == QDialogButtonBox::Yes)
         {
+            setTargetState(WidgetUpdateState::finishingInstall, {});
             m_serverUpdateTool->requestFinishUpdate(true);
-            m_clientUpdateTool->resetState();
             qnClientMessageProcessor->setHoldConnection(false);
-            setTargetState(WidgetUpdateState::initial, {});
         }
     }
     else if (m_widgetState == WidgetUpdateState::complete)
     {
         // Should send 'cancel' command to all the servers?
         NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
-
-        auto serversToCancel = m_stateTracker->getPeersInstalling();
+        setTargetState(WidgetUpdateState::finishingInstall, {});
         m_serverUpdateTool->requestFinishUpdate(false);
-        m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::initial, {});
     }
     else if (m_widgetState == WidgetUpdateState::readyInstall)
     {
         if (showCancelDialog())
         {
             NX_VERBOSE(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
-            auto serversToCancel = m_stateTracker->getPeersInState(StatusCode::readyToInstall);
             m_serverUpdateTool->requestStopAction();
-            m_clientUpdateTool->resetState();
-            setTargetState(WidgetUpdateState::ready, {});
+            setTargetState(WidgetUpdateState::cancelingReadyInstall, {});
         }
     }
     else if (m_widgetState == WidgetUpdateState::pushing)
     {
         if (showCancelDialog())
         {
-            setTargetState(WidgetUpdateState::ready, {});
             m_serverUpdateTool->stopUpload();
+            setTargetState(WidgetUpdateState::cancelingDownload, {});
             m_serverUpdateTool->requestStopAction();
         }
     }
@@ -1078,6 +1077,25 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
 
     // Spec says that we can not cancel anything when we began installing stuff.
     return true;
+}
+
+void MultiServerUpdatesWidget::atCancelUpdateComplete(bool /*success*/)
+{
+    if (m_widgetState == WidgetUpdateState::cancelingDownload
+        || m_widgetState == WidgetUpdateState::cancelingReadyInstall)
+    {
+        m_clientUpdateTool->resetState();
+        setTargetState(WidgetUpdateState::ready, {});
+    }
+}
+
+void MultiServerUpdatesWidget::atFinishUpdateComplete(bool /*success*/)
+{
+    if (m_widgetState == WidgetUpdateState::finishingInstall)
+    {
+        m_clientUpdateTool->resetState();
+        setTargetState(WidgetUpdateState::initial, {});
+    }
 }
 
 void MultiServerUpdatesWidget::repeatUpdateValidation()
@@ -1346,7 +1364,7 @@ void MultiServerUpdatesWidget::processRemoteUpdateInformation()
             // TODO: Should check if we need client update
             if (hasClientUpdate)
                 peersAreInstalling.insert(m_stateTracker->getClientPeerId());
-            setTargetState(WidgetUpdateState::installing, peersAreInstalling);
+            setTargetState(WidgetUpdateState::installing, peersAreInstalling, false);
         }
         else if (!serversAreDownloading.empty() || !serversWithError.empty())
         {
@@ -1637,7 +1655,7 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
 }
 
 void MultiServerUpdatesWidget::setTargetState(
-    WidgetUpdateState state, const QSet<QnUuid>& targets)
+    WidgetUpdateState state, const QSet<QnUuid>& targets, bool runCommands)
 {
     if (state != m_widgetState)
     {
@@ -1672,14 +1690,17 @@ void MultiServerUpdatesWidget::setTargetState(
             case WidgetUpdateState::installingStalled:
                 break;
             case WidgetUpdateState::installing:
-                if (!targets.empty())
+                if (runCommands)
                 {
-                    m_stateTracker->setPeersInstalling(targets, true);
-                    QSet<QnUuid> servers = targets;
-                    servers.remove(m_stateTracker->getClientPeerId());
-                    if (!servers.empty())
-                        qnClientMessageProcessor->setHoldConnection(true);
-                    m_serverUpdateTool->requestInstallAction(servers);
+                    if (!targets.empty())
+                    {
+                        m_stateTracker->setPeersInstalling(targets, true);
+                        QSet<QnUuid> servers = targets;
+                        servers.remove(m_stateTracker->getClientPeerId());
+                        if (!servers.empty())
+                            qnClientMessageProcessor->setHoldConnection(true);
+                        m_serverUpdateTool->requestInstallAction(servers);
+                    }
                 }
 
                 if (m_clientUpdateTool->hasUpdate())
@@ -1891,11 +1912,14 @@ bool MultiServerUpdatesWidget::stateHasProgress(WidgetUpdateState state)
         case WidgetUpdateState::checkingServers:
         case WidgetUpdateState::ready:
         case WidgetUpdateState::readyInstall:
+        case WidgetUpdateState::cancelingReadyInstall:
         case WidgetUpdateState::complete:
             return false;
         case WidgetUpdateState::downloading:
+        case WidgetUpdateState::cancelingDownload:
         case WidgetUpdateState::installing:
         case WidgetUpdateState::installingStalled:
+        case WidgetUpdateState::finishingInstall:
         case WidgetUpdateState::pushing:
             return true;
     }
@@ -2258,12 +2282,18 @@ QString MultiServerUpdatesWidget::toString(WidgetUpdateState state)
             return "RemoteDownloading";
         case WidgetUpdateState::pushing:
             return "LocalPushing";
+        case WidgetUpdateState::cancelingDownload:
+            return "CancelingDownload";
         case WidgetUpdateState::readyInstall:
             return "ReadyInstall";
+        case WidgetUpdateState::cancelingReadyInstall:
+            return "CancelingReadyInstall";
         case WidgetUpdateState::installing:
             return "Installing";
         case WidgetUpdateState::installingStalled:
             return "InstallationStalled";
+        case WidgetUpdateState::finishingInstall:
+            return "FinishingInstall";
         case WidgetUpdateState::complete:
             return "Complete";
         default:

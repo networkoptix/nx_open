@@ -413,8 +413,6 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    setCameraCapability(Qn::CameraTimeCapability, true);
-
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 

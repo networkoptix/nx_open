@@ -64,6 +64,8 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
                 m_devices.append(device);
                 m_deviceRowState.insert(id, {presentedState, isChecked});
                 incrementDeviceCount({presentedState, isChecked});
+                emit headerDataChanged(Qt::Horizontal, FoundDevicesModel::presentedStateColumn,
+                    FoundDevicesModel::presentedStateColumn);
             }
         }
     }

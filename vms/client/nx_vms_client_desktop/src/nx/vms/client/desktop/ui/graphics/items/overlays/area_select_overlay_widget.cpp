@@ -78,7 +78,7 @@ void AreaSelectOverlayWidget::Private::dragMove(DragInfo* info)
 void AreaSelectOverlayWidget::Private::finishDrag(DragInfo* info)
 {
     updateRect(info);
-    emit q->selectedAreaChanged(relativeRect);
+    emit q->selectedAreaChanged(relativeRect, {});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ void AreaSelectOverlayWidget::setSelectedArea(const QRectF& value)
         return;
 
     d->relativeRect = value;
-    emit selectedAreaChanged(d->relativeRect);
+    emit selectedAreaChanged(d->relativeRect, {});
 
     update();
 }
@@ -160,6 +160,7 @@ void AreaSelectOverlayWidget::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void AreaSelectOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+    emit selectionStarted({});
     d->dragProcessor->mousePressEvent(this, event);
 }
 

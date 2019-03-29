@@ -11,7 +11,7 @@
 
 #include <nx/fusion//model_functions.h>
 
-#include "mediaserver_ini.h"
+#include <nx_vms_server_ini.h>
 
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;

@@ -112,13 +112,13 @@ void AuthenticationManager::authenticate(
     }
 
     const auto userID = authzHeader->userid();
-    std::function<bool(const nx::Buffer&)> validateHa1Func = std::bind(
-        &validateAuthorization,
-        request.requestLine.method,
-        userID,
-        boost::none,
-        std::placeholders::_1,
-        std::move(authzHeader.get()));
+
+    auto validateHa1Func =
+        [&request, &userID, &authzHeader](const nx::Buffer& buffer) -> bool
+        {
+            return validateAuthorization(request.requestLine.method, userID, {}, buffer,
+                std::move(authzHeader.get()));
+        };
 
     //analyzing authSearchResult for password or ha1 pesence
     if (auto foundHa1 = authTraversalResult.get(attr::ha1))

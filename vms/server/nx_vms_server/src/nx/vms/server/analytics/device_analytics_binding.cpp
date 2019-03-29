@@ -1,6 +1,6 @@
 #include "device_analytics_binding.h"
 
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
 #include <media_server/media_server_module.h>

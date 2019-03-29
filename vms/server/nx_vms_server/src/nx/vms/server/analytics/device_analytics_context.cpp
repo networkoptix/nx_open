@@ -2,7 +2,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>

@@ -94,14 +94,14 @@ public:
      * Asks mediaservers to stop the update process.
      * Client expects all mediaservers to return to nx::update::Status::Code::idle state.
      */
-    void requestStopAction();
+    bool requestStopAction();
 
     /**
      * Asks mediaservers to finish update process.
      * @param skipActivePeers - will force update completion even if there are
      *     some servers installing.
      */
-    void requestFinishUpdate(bool skipActivePeers);
+    bool requestFinishUpdate(bool skipActivePeers);
 
     /**
      * Asks mediaservers to start installation process.
@@ -185,9 +185,6 @@ public:
 
     OfflineUpdateState getUploaderState() const;
 
-    // Get information about current update from mediaservers.
-    UpdateContents getRemoteUpdateContents() const;
-
     bool haveActiveUpdate() const;
 
     /** Get authentication string for current connection to mediaserver. */
@@ -239,6 +236,11 @@ signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
     void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
+
+    /** Called when /ec2/cancelUpdate request is complete. */
+    void cancelUpdateComplete(bool success);
+    /** Called when /ec2/finishUpdate request is complete. */
+    void finishUpdateComplete(bool success);
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
@@ -305,6 +307,8 @@ private:
 
     QSet<rest::Handle> m_activeRequests;
     QSet<rest::Handle> m_skippedRequests;
+    std::atomic_bool m_requestingStop = false;
+    std::atomic_bool m_requestingFinish = false;
 
     std::shared_ptr<PeerStateTracker> m_stateTracker;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;

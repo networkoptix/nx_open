@@ -3,7 +3,7 @@
 #include <ostream>
 
 #include <media_server/media_server_module.h>
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <common/common_globals.h>
 #include <camera/get_image_helper.h>
 #include <core/resource/camera_resource.h>
@@ -125,7 +125,7 @@ TEST(GetImageHelper, determineStreamIndex)
     using StreamIndex = nx::vms::api::StreamIndex;
     using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
 
-    QnGetImageHelper helper(nullptr);
+    QnGetImageHelper helper(/*serverModule*/ nullptr);
     nx::api::CameraImageRequest request;
     const auto camera = QnSharedResourcePointer(new MockCameraResource());
     request.camera = camera;

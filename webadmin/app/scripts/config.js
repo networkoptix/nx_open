@@ -223,12 +223,6 @@
                 warning: 50 // Warning level - more that 50% usage
             },
             liveMetricsUpdate: 10000 // Every 10 seconds
-        },
-        errors: {
-            login: {
-                wrongPassword: 'Wrong username or password.',
-                accountLockout: 'The user is locked out due to several failed attempts. Please, try again later.'
-            }
         }
     };
 })();
