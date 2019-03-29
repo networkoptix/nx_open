@@ -26,7 +26,9 @@ QByteArray QnRtspClient::m_guid;
 QnMutex QnRtspClient::m_guidMutex;
 
 namespace {
+
 const QString METADATA_STR(lit("ffmpeg-metadata"));
+constexpr int kSocketBufferSize = 512 * 1024;
 
 struct RtspPorts
 {
@@ -107,13 +109,10 @@ qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
 {
     int bytesRead;
     if (m_transport == nx::vms::api::RtpTransportType::tcp)
-    {
         bytesRead = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
-    }
     else
-    {
         bytesRead = m_mediaSocket->recv(data, maxSize);
-    }
+
     m_owner->sendKeepAliveIfNeeded();
     if (m_transport == nx::vms::api::RtpTransportType::udp)
         processRtcpData();
@@ -231,6 +230,8 @@ void QnRtspIoDevice::updateSockets()
 
             const auto res = result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
             result->setRecvTimeout(500);
+            result->setRecvBufferSize(kSocketBufferSize);
+            result->setNonBlockingMode(true);
             return result;
         };
 
@@ -404,7 +405,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
-
+    m_tcpSock->setRecvBufferSize(kSocketBufferSize);
     m_tcpSock->setRecvTimeout(m_tcpTimeout);
     m_tcpSock->setSendTimeout(m_tcpTimeout);
 
@@ -715,6 +716,7 @@ bool QnRtspClient::sendSetup()
             else
                 return false;
         }
+        track.setupSuccess = true;
 
         QString sessionParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
         if (sessionParam.size() > 0)
@@ -1356,11 +1358,6 @@ void QnRtspClient::setPlayNowModeAllowed(bool value)
 void QnRtspClient::setUserAgent(const QString& value)
 {
     m_userAgent = value.toUtf8();
-}
-
-bool QnRtspClient::setTCPReadBufferSize(int value)
-{
-    return m_tcpSock->setRecvBufferSize(value);
 }
 
 QString QnRtspClient::getVideoLayout() const

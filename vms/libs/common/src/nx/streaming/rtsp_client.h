@@ -124,6 +124,7 @@ public:
         }
         void setRemoteEndpointRtcpPort(quint16 rtcpPort) { ioDevice->setRemoteEndpointRtcpPort(rtcpPort); };
 
+        bool setupSuccess = false;
         nx::streaming::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
@@ -161,10 +162,7 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(nx::vms::api::RtpTransportType transport);
-    nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
-
-    nx::vms::api::RtpTransportType getPreferedTransport() const { return m_prefferedTransport; }
-
+    nx::vms::api::RtpTransportType getTransport() const { return m_prefferedTransport; }
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
     int getTrackNum(int rtpChannelNum);
@@ -228,7 +226,6 @@ public:
     void sendBynaryResponse(const quint8* buffer, int size);
     void setPlayNowModeAllowed(bool value);
     static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
-    bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
     nx::network::AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
