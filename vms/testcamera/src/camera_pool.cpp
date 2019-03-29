@@ -46,7 +46,7 @@ protected:
             {
                 IpRangeV4 netRange;
                 netRange.firstIp = QHostAddress("127.0.0.0").toIPv4Address();
-                netRange.firstIp = QHostAddress("127.255.255.255").toIPv4Address();
+                netRange.lastIp = QHostAddress("127.255.255.255").toIPv4Address();
                 m_allowedIpRanges.push_back(netRange);
                 qDebug() << "Listening for discovery from range ("
                          << "127.0.0.0" << ", "
