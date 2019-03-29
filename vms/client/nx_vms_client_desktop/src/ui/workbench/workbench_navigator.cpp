@@ -1540,7 +1540,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
-    if (!m_currentWidgetLoaded && widgetLoaded
+    if (!m_currentWidgetLoaded && widgetLoaded && !isSearch
         && display()->widgets().size() == 1
         && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
     {
@@ -1704,7 +1704,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (camera->isDtsBased())
                 updateHasArchive();
         }
-        updateTimelineRelevancy();
+        updateTimelineRelevancy(); //< TODO: #vbreus check if this update really needed
     }
 }
 
@@ -2004,11 +2004,9 @@ bool QnWorkbenchNavigator::calculateTimelineRelevancy() const
     if (resource->flags().testFlag(Qn::local))
         return true;
 
-    const bool rtspStreamIsOpen = m_currentWidgetLoaded;
-
     return isRecording()
         || hasArchive()
-        || rtspStreamIsOpen;
+        || workbench()->currentLayout()->isSearchLayout();
 }
 
 void QnWorkbenchNavigator::updateTimelineRelevancy()
