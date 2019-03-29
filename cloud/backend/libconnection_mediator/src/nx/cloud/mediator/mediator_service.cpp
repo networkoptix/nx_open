@@ -137,16 +137,15 @@ bool MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
             return false;
         }
         endpoint.domainName = publicIp->toString().toStdString();
-
-        if (!httpEndpoints().empty())
-            endpoint.httpPort = httpEndpoints().front().port;
-        else
-            endpoint.httpsPort = httpsEndpoints().front().port;
     }
     else
     {
         endpoint.domainName = settings.server().name;
     }
+
+    endpoint.httpPort = httpEndpoints().front().port;
+    endpoint.httpsPort = httpsEndpoints().front().port;
+    endpoint.stunUdpPort = stunUdpEndpoints().front().port;
 
     m_controller->remoteMediatorPeerPool().setEndpoint(endpoint);
 

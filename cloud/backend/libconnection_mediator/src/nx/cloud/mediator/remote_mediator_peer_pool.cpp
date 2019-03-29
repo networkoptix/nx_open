@@ -36,11 +36,11 @@ std::string toString(const MediatorEndpoint& endpoint)
 {
     std::string s = endpoint.domainName;
     s += ";";
-    s += std::to_string(endpoint.httpPort.has_value() ? *endpoint.httpPort : -1);
+    s += std::to_string(endpoint.httpPort);
     s += ";";
-    s += std::to_string(endpoint.httpsPort.has_value() ? *endpoint.httpsPort : -1);
+    s += std::to_string(endpoint.httpsPort);
     s += ";";
-    s += std::to_string(endpoint.stunUdpPort.has_value() ? *endpoint.stunUdpPort : -1);
+    s += std::to_string(endpoint.stunUdpPort);
     return s;
 }
 
@@ -52,22 +52,31 @@ std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointSt
     if (values.size() != 4)
         return std::nullopt;
 
-    MediatorEndpoint endpoint;
-    endpoint.domainName = values[0];
-
-    if (int httpPort = toInt(values[1]); httpPort != -1)
-        endpoint.domainName = httpPort;
-
-    if (int httpsPort = toInt(values[2]); httpsPort != -1)
-        endpoint.httpsPort = httpsPort;
-
-    if (int stunUdpPort = toInt(values[3]); stunUdpPort != -1)
-        endpoint.stunUdpPort = stunUdpPort;
-
-    return endpoint;
+    return MediatorEndpoint
+    {
+        values[0],
+        toInt(values[1]),
+        toInt(values[2]),
+        toInt(values[3]),
+    };
 }
 
 } //namespace
+
+//-------------------------------------------------------------------------------------------------
+// MediatorEndpoint
+
+bool MediatorEndpoint::operator==(const MediatorEndpoint &other) const
+{
+    return
+        domainName == other.domainName
+        && httpPort == other.httpPort
+        && httpsPort == other.httpsPort
+        && stunUdpPort == other.stunUdpPort;
+}
+
+//-------------------------------------------------------------------------------------------------
+// RemoteMediatorPeerPool
 
 RemoteMediatorPeerPool::RemoteMediatorPeerPool(const conf::ClusterDbMap& settings)
     :
@@ -100,22 +109,16 @@ bool RemoteMediatorPeerPool::initialize()
 
 void RemoteMediatorPeerPool::setEndpoint(const MediatorEndpoint& endpoint)
 {
+    m_mediatorEndpoint = endpoint;
     m_mediatorEndpointString = toString(endpoint);
 
-    m_syncEngineUrl.setHost(endpoint.domainName.c_str());
-    if (endpoint.httpsPort.has_value())
-    {
-        m_syncEngineUrl.setPort(*endpoint.httpsPort);
-        m_syncEngineUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
-    }
-    else if (endpoint.httpPort.has_value())
-    {
-        m_syncEngineUrl.setPort(*endpoint.httpPort);
-        m_syncEngineUrl.setScheme(nx::network::http::kUrlSchemeName);
-    }
-    m_syncEngineUrl.setPath(nx::network::http::rest::substituteParameters(
-        nx::clusterdb::engine::kBaseSynchronizationPath,
-        {m_settings.map.synchronizationSettings.clusterId}).c_str());
+    m_syncEngineUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(endpoint.domainName.c_str())
+        .setPath(nx::network::http::rest::substituteParameters(
+            nx::clusterdb::engine::kBaseSynchronizationPath,
+            {m_settings.map.synchronizationSettings.clusterId}).c_str())
+        .setPort(endpoint.httpPort).toUrl();
 }
 
 void RemoteMediatorPeerPool::addPeer(
@@ -225,6 +228,11 @@ void RemoteMediatorPeerPool::startDiscovery(
     m_map->synchronizationEngine().discoveryManager().start(
         m_settings.map.synchronizationSettings.clusterId,
         m_syncEngineUrl);
+}
+
+const MediatorEndpoint& RemoteMediatorPeerPool::thisEndpoint() const
+{
+    return m_mediatorEndpoint;
 }
 
 } // namespace nx::hpm

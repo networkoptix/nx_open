@@ -99,17 +99,34 @@ public:
         RemoteMediatorPeerPool* remoteMediatorPeerPool);
 
 protected:
+    struct RequestContext
+    {
+        bool isSsl = false;
+        nx::network::http::Response* response;
+    };
+
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         api::ConnectRequest inputData) override;
 
+    void reportResult(
+        api::ResultCode resultCode,
+        api::ConnectResponse response,
+        const std::optional<nx::network::http::StatusCode::Value>& httpStatusCode = std::nullopt);
+
+    void redirectToRemoteMediator(
+        RequestContext requestContext,
+        const nx::String& targetServer,
+        api::ResultCode resultCode,
+        api::ConnectResponse response);
+
+    nx::utils::Url buildMediatorUrl(
+        const MediatorEndpoint& endpoint,
+        bool useHttps);
+
 private:
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
     RemoteMediatorPeerPool* m_remoteMediatorPeerPool = nullptr;
-
-    void reportResult(
-        api::ResultCode resultCode,
-        api::ConnectResponse response);
 };
 
 } // namespace http

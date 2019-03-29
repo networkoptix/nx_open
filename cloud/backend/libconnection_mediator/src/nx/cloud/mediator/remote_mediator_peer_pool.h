@@ -13,9 +13,11 @@ namespace nx::hpm {
 struct MediatorEndpoint
 {
     std::string domainName; //< Ip address without port or domain name to be resolved by dns
-    std::optional<int> httpPort;
-    std::optional<int> httpsPort;
-    std::optional<int> stunUdpPort;
+    int httpPort;
+    int httpsPort;
+    int stunUdpPort;
+
+    bool operator ==(const MediatorEndpoint& other) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -75,11 +77,18 @@ public:
      */
     void startDiscovery(
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
+
+    /**
+     * Get this mediator instance's endpoint.
+     */
+    const MediatorEndpoint& thisEndpoint() const;
+
 private:
     const conf::ClusterDbMap& m_settings;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;
     std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;
 
+    MediatorEndpoint m_mediatorEndpoint;
     std::string m_mediatorEndpointString;
     nx::utils::Url m_syncEngineUrl;
 };
