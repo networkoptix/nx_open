@@ -25,9 +25,9 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Renszer átnevezése</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Leválasztás a fiókomról</button>
+        <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Leválasztás a fiókomról</button>
     </div>
 </div>
 <div class="mt-3 card card-default" ng-if="currentlyMerging">

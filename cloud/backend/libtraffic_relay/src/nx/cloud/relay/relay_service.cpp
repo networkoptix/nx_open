@@ -31,6 +31,11 @@ const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() con
     return m_model->listeningPeerPool();
 }
 
+const model::AbstractRemoteRelayPeerPool& RelayService::remoteRelayPeerPool() const
+{
+    return m_model->remoteRelayPeerPool();
+}
+
 std::unique_ptr<utils::AbstractServiceSettings> RelayService::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -47,8 +52,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
             return -1;
 
         NX_INFO(this, lm("Retrying model initialization after delay"));
-        std::this_thread::sleep_for(
-            settings.cassandraConnection().delayBeforeRetryingInitialConnect);
+        std::this_thread::sleep_for(settings.clusterDbMap().connectionRetryDelay);
     }
     m_model = &model;
 
@@ -76,8 +80,8 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 
 bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& settings)
 {
-    std::string externalHostName = settings.server().name;
-    if (externalHostName.empty())
+    nx::utils::Url publicUrl;
+    if (settings.server().name.empty())
     {
         const auto publicIp = m_controller->discoverPublicAddress();
         if (!publicIp)
@@ -85,17 +89,30 @@ bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& setti
             NX_ERROR(this, "Failed to discover public address. Terminating.");
             return false;
         }
+        publicUrl.setHost(publicIp->toString());
 
-        int port = 0;
         if (!m_view->httpEndpoints().empty())
-            port = m_view->httpEndpoints().front().port;
+        {
+            publicUrl.setPort(m_view->httpEndpoints().front().port);
+            publicUrl.setScheme(nx::network::http::kUrlSchemeName);
+        }
         else
-            port = m_view->httpsEndpoints().front().port;
-
-        externalHostName = network::SocketAddress(*publicIp, port).toStdString();
+        {
+            publicUrl.setPort(m_view->httpsEndpoints().front().port);
+            publicUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
+        }
+    }
+    else
+    {
+        publicUrl.setHost(settings.server().name.c_str());
+        if (!m_view->httpEndpoints().empty())
+            publicUrl.setScheme(nx::network::http::kUrlSchemeName);
+        else
+            publicUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
     }
 
-    m_model->remoteRelayPeerPool().setNodeId(externalHostName);
+    m_model->remoteRelayPeerPool().registerHttpApi(&m_view->messageDispatcher());
+    m_model->remoteRelayPeerPool().setPublicUrl(publicUrl);
 
     return true;
 }

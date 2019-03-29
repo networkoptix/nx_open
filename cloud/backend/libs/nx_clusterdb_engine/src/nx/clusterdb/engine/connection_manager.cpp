@@ -16,18 +16,19 @@
 namespace nx::clusterdb::engine {
 
 ConnectionManager::ConnectionManager(
-    const QnUuid& moduleGuid,
+    const std::string& nodeId,
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& protocolVersionRange,
     IncomingCommandDispatcher* const transactionDispatcher,
     OutgoingCommandDispatcher* const outgoingTransactionDispatcher)
 :
+    m_nodeId(nodeId),
     m_settings(settings),
     m_protocolVersionRange(protocolVersionRange),
     m_transactionDispatcher(transactionDispatcher),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_localPeerData(
-        moduleGuid,
+        QnUuid::fromStringSafe(nodeId),
         QnUuid::createUuid(),
         vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat),
@@ -43,6 +44,11 @@ ConnectionManager::~ConnectionManager()
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()
         .removeSubscription(m_onNewTransactionSubscriptionId);
 
+    pleaseStopSync();
+}
+
+void ConnectionManager::pleaseStopSync()
+{
     ConnectionDict localConnections;
     {
         QnMutexLocker lk(&m_mutex);
@@ -119,16 +125,17 @@ void ConnectionManager::dispatchTransaction(
     }
 }
 
-std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
+std::vector<ConnectionInfo> ConnectionManager::getConnections() const
 {
     QnMutexLocker lk(&m_mutex);
 
-    std::vector<SystemConnectionInfo> result;
+    std::vector<ConnectionInfo> result;
     result.reserve(m_connections.size());
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
         result.push_back({
             it->fullPeerName.systemId,
+            it->fullPeerName.peerId,
             it->connection->remotePeerEndpoint(),
             it->userAgent});
     }
@@ -190,10 +197,16 @@ void ConnectionManager::closeConnectionsToSystem(
     }
 }
 
-ConnectionManager::SystemStatusChangedSubscription&
-    ConnectionManager::systemStatusChangedSubscription()
+ConnectionManager::ClusterStatusChangedSubscription&
+    ConnectionManager::clusterStatusChangedSubscription()
 {
-    return m_systemStatusChangedSubscription;
+    return m_clusterStatusChangedSubscription;
+}
+
+ConnectionManager::NodeStatusChangedSubscription&
+    ConnectionManager::nodeStatusChangedSubscription()
+{
+    return m_nodeStatusChangedSubscription;
 }
 
 bool ConnectionManager::addNewConnection(ConnectionContext context)
@@ -203,12 +216,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     const auto systemWasOffline = getConnectionCountBySystemId(
         lock, context.fullPeerName.systemId) == 0;
 
-    // TODO: #ak "One connection only" logic MUST be configurable.
-    removeExistingConnection<
-        kConnectionByFullPeerNameIndex,
-        decltype(context.fullPeerName)>(lock, context.fullPeerName);
-
-    if (!isOneMoreConnectionFromSystemAllowed(lock, context))
+    if (!authorizeNewConnection(lock, context))
         return false;
 
     nx::utils::SubscriptionId subscriptionId;
@@ -229,21 +237,37 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     const auto protocolVersion = context.connection->
         commonTransportHeaderOfRemoteTransaction().transactionFormatVersion;
 
+    const auto fullPeerName = context.fullPeerName;
+
     if (!m_connections.insert(std::move(context)).second)
     {
         NX_ASSERT(false);
         return false;
     }
 
+    lock.unlock();
+
+    m_nodeStatusChangedSubscription.notify(
+        {fullPeerName},
+        {true /*online*/, protocolVersion});
+
     if (systemWasOffline)
     {
-        lock.unlock();
-        m_systemStatusChangedSubscription.notify(
+        m_clusterStatusChangedSubscription.notify(
             systemId,
-            { true /*online*/, protocolVersion });
+            {true /*online*/, protocolVersion});
     }
 
     return true;
+}
+
+void ConnectionManager::removeConnection(const std::string& connectionId)
+{
+    NX_VERBOSE(this,
+        lm("Removing connection %1").args(connectionId));
+
+    QnMutexLocker lock(&m_mutex);
+    removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
 }
 
 bool ConnectionManager::modifyConnectionByIdSafe(
@@ -259,6 +283,35 @@ bool ConnectionManager::modifyConnectionByIdSafe(
 
     func(connectionIter->connection.get());
     return true;
+}
+
+bool ConnectionManager::authorizeNewConnection(
+    const QnMutexLockerBase& lock,
+    const ConnectionContext& context)
+{
+    auto& connectionIndex = m_connections.get<kConnectionByFullPeerNameIndex>();
+    const auto existingConnectionIter = connectionIndex.find(context.fullPeerName);
+    if (existingConnectionIter == connectionIndex.end())
+        return isOneMoreConnectionFromSystemAllowed(lock, context);
+
+    // An existing connection is being overridden by the same node.
+    if (existingConnectionIter->originatingNodeId == context.originatingNodeId ||
+        // New connection originating node id is greater than that of the existing connection.
+        context.originatingNodeId > existingConnectionIter->originatingNodeId)
+    {
+        NX_DEBUG(this, "Preferring new connection to %1 from node %2 over existing connection from %3",
+            context.fullPeerName, context.originatingNodeId,
+            existingConnectionIter->originatingNodeId);
+
+        removeConnectionByIter(
+            lock,
+            connectionIndex,
+            existingConnectionIter,
+            []() {});
+        return true;
+    }
+
+    return false;
 }
 
 bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
@@ -351,29 +404,25 @@ void ConnectionManager::removeConnectionByIter(
             completionHandler = std::move(completionHandler)]() mutable
         {
             sendSystemOfflineNotificationIfNeeded(
-                existingConnection->commonTransportHeaderOfRemoteTransaction().systemId);
+                existingConnection->commonTransportHeaderOfRemoteTransaction());
             existingConnection.reset();
             completionHandler();
         });
 }
 
 void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
-    const std::string& systemId)
+    const CommandTransportHeader& transportHeader)
 {
-    if (getConnectionCountBySystemId(systemId) > 0)
-        return;
+    m_nodeStatusChangedSubscription.notify(
+        {FullPeerName{transportHeader.systemId, transportHeader.peerId}},
+        {false /*offline*/, 0});
 
-    m_systemStatusChangedSubscription.notify(
-        systemId, { false /*offline*/, 0 });
-}
-
-void ConnectionManager::removeConnection(const std::string& connectionId)
-{
-    NX_VERBOSE(this,
-        lm("Removing connection %1").args(connectionId));
-
-    QnMutexLocker lock(&m_mutex);
-    removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
+    if (getConnectionCountBySystemId(transportHeader.systemId) == 0)
+    {
+        m_clusterStatusChangedSubscription.notify(
+            transportHeader.systemId,
+            {false /*offline*/, 0});
+    }
 }
 
 void ConnectionManager::onGotTransaction(

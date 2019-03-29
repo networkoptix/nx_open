@@ -10,7 +10,15 @@
     "loginButton": "로그인",
     "logoutAuthorisedTitle": "이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton": "계속",
-    "logoutAuthorisedLogoutButton": "로그 아웃"
+    "logoutAuthorisedLogoutButton": "로그 아웃",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "페이지를 찾을 수 없음"
   },
   "systemStatuses": {
-    "notActivated": "활성화되지 않음",
     "activated": "활성화 됨",
+    "merging": "merging",
+    "notActivated": "활성화되지 않음",
     "online": "온라인",
     "offline": "오프라인",
     "unavailable": "사용할 수 없음"
@@ -139,7 +148,8 @@
     "thisSystem": "시스템",
     "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다.",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "좋음",
@@ -186,7 +196,8 @@
     "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
+    "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다.",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "계정이 성공적으로 저장되었습니다.",

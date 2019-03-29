@@ -17,10 +17,10 @@ public:
         const Settings& settings,
         Model* model);
 
-    SyncronizationEngine& syncronizationEngine();
+    SynchronizationEngine& synchronizationEngine();
 
 private:
-    SyncronizationEngine m_syncronizationEngine;
+    SynchronizationEngine m_synchronizationEngine;
 };
 
 } // namespace nx::clusterdb::engine

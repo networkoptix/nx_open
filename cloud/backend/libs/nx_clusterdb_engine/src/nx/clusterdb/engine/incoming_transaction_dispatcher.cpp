@@ -33,6 +33,8 @@ void IncomingCommandDispatcher::dispatchTransaction(
     std::unique_ptr<DeserializableCommandData> commandData,
     CommandProcessedHandler completionHandler)
 {
+    NX_VERBOSE(this, "Dispatching command %1", engine::toString(commandData->header()));
+
     m_watchTransactionSubscription.notify(
         transportHeader,
         commandData->header());

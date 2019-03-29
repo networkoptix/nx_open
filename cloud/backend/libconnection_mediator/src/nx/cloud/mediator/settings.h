@@ -13,6 +13,7 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/std/optional.h>
+#include <nx/clusterdb/map/settings.h>
 
 #include "discovery/discovery_settings.h"
 
@@ -74,6 +75,20 @@ struct ListeningPeer
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
+struct Server
+{
+    std::string name;
+};
+
+struct ClusterDbMap
+{
+    std::chrono::milliseconds connectionRetryDelay;
+    nx::sql::ConnectionOptions sql;
+    nx::clusterdb::map::Settings map;
+
+    ClusterDbMap();
+};
+
 /**
  * Extends api::ConnectionParameters with mediator-only parameters.
  */
@@ -112,6 +127,8 @@ public:
     const TrafficRelay& trafficRelay() const;
     const nx::cloud::discovery::conf::Discovery& discovery() const;
     const ListeningPeer& listeningPeer() const;
+    const Server& server() const;
+    const ClusterDbMap& clusterDbMap() const;
 
 private:
     General m_general;
@@ -126,6 +143,8 @@ private:
     TrafficRelay m_trafficRelay;
     nx::cloud::discovery::conf::Discovery m_discovery;
     ListeningPeer m_listeningPeer;
+    Server m_server;
+    ClusterDbMap m_clusterDbMap;
 
     virtual void loadSettings() override;
 
@@ -140,6 +159,8 @@ private:
     void loadListeningPeer();
     void loadHttp();
     void loadHttps();
+    void loadServer();
+    void loadClusterDbMap();
 };
 
 } // namespace conf

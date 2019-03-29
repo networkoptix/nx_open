@@ -1,48 +1,40 @@
-FROM ubuntu:16.04
 
-# no tty
+# We need more recent systemd version, so we take ubuntu 18.04. There are some problems with starting systemd from ubuntu:16.04
+FROM ubuntu:18.04
+MAINTAINER "Dmitry Kargin" <dkargin@networkoptix.com>
+
+# This Dockerfile was based on the knowledge from the following sources:
+#  - some words about systemd problems inside docker https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container/
+#  - some parts from https://github.com/defn/docker-systemd
+
+# This string is necessary for systemd to know we are working inside container environment
+ENV container docker
+
+# This will override our EULA check.
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN dpkg-divert --local --rename --add /sbin/initctl \
-        && ln -sf /bin/true /sbin/initctl \
-        && apt-get update \
-        && apt-get install -y --no-install-recommends software-properties-common \
-        && apt-get install -y --no-install-recommends wget psmisc \
-            libsm6 libice6 libaudio2 libogg0 libxfixes3 libxrender1 libfontconfig1 libgl1-mesa-glx libglib2.0-0 \
-            dnsutils strace gdb ca-certificates \
-            libpython2.7 \
-            libmysqlclient20 openssh-client apache2-utils libltdl7 gettext-base \
-            python nginx-extras libncurses5 \
-            inetutils-ping net-tools vim-nox \
-        && /usr/bin/wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.0.2/dumb-init_1.0.2_amd64 \
-        && chmod +x /usr/local/bin/dumb-init \
-        && mkdir /dock \
-        && chown -R $USER: /dock \
-        && chmod -R 777 /dock
+# This is the deb file used to install mediaserver
+ARG mediaserver_deb
 
-# Set the locale
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+RUN ["/bin/bash", "-c", ": ${mediaserver_deb:?Missing source deb file. You should set --build-arg mediaserver_deb=path_to_mediaserver.deb!}"]
 
-ARG VERSION
-ARG REVISION
-ARG BUILD_DATE
-ARG BUILD_HOST
-ARG BUILD_USER
-LABEL version="$VERSION" \
-      revision="$REVISION" \
-      build-date="$BUILD_DATE" \
-      build-host="$BUILD_HOST" \
-      build-user="$BUILD_USER"
+RUN apt-get update && apt-get install -y dbus systemd && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY stage/mediaserver /opt/networkoptix/mediaserver
+RUN find /etc/systemd -name '*.timer' | xargs rm -v
 
-COPY entrypoint.sh /opt/networkoptix/mediaserver/bin
-COPY build/etc /opt/networkoptix/mediaserver/etc/
-COPY stage/var /opt/networkoptix/mediaserver/var/
+RUN systemctl set-default multi-user.target
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/mediaserver/bin
-ENV LD_LIBRARY_PATH /opt/networkoptix/mediaserver/lib
+STOPSIGNAL SIGRTMIN+3
 
-CMD ["/opt/networkoptix/mediaserver/bin/entrypoint.sh"]
+# Using systemd as an entry point. It will launch mediaserver according to systemd scripts.
+ENTRYPOINT ["/sbin/init", "--log-target=journal"]
+
+# This is strange workaround for systemd stdout problem. Not sure what is going on, actually.
+CMD []
+
+RUN mkdir /debs
+
+COPY "${mediaserver_deb}" /debs/
+
+# Installing the mediaserver
+RUN apt-get update -qq && apt install -y -qq --no-install-recommends /debs/${mediaserver_deb}

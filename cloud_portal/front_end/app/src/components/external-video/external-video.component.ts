@@ -14,8 +14,8 @@ export class NxExternalVideoComponent implements OnInit {
     constructor(private sanitizer: DomSanitizer,
                 private config: NxConfigService) {}
 
-    private FormatSrc(link){
-        for (let videoType in this.config.config.embedInfo) {
+    private FormatSrc(link) {
+        for (const videoType in this.config.config.embedInfo) {
             const videoRegex = link.match(this.config.config.embedInfo[videoType].regex);
             if (videoRegex && videoRegex[1]) {
                 return `${this.config.config.embedInfo[videoType].link}${videoRegex[1]}`;

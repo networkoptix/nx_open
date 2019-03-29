@@ -1,5 +1,7 @@
 #include "ssl_stream_socket.h"
 
+#include <nx/network/socket_global.h>
+
 #include "../aio/async_channel_adapter.h"
 
 namespace nx {
@@ -85,6 +87,8 @@ StreamSocket::StreamSocket(
     m_delegate(std::move(delegate)),
     m_proxyConverter(nullptr)
 {
+    ++nx::network::SocketGlobals::instance().debugCounters().sslSocketCount;
+
     if (isServerSide)
         m_sslPipeline = std::make_unique<ssl::AcceptingPipeline>();
     else
@@ -104,6 +108,7 @@ StreamSocket::StreamSocket(
 
 StreamSocket::~StreamSocket()
 {
+    --nx::network::SocketGlobals::instance().debugCounters().sslSocketCount;
 }
 
 void StreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)

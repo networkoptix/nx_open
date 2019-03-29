@@ -1,16 +1,11 @@
 import {
     Component, Input, Output, EventEmitter,
-    OnChanges, SimpleChanges, SimpleChange,
-    OnInit, ViewEncapsulation } from '@angular/core';
-import { PagerService }         from '../../../../services/pager-service.service';
-import { NxConfigService }      from '../../../../services/nx-config';
-import { TranslateService }     from '@ngx-translate/core';
-import { _ }                    from '@biesbjerg/ngx-translate-extract';
-
-// _('Unknown');
-// _('Yes');
-// _('No');
-// _('Camera List');
+    OnChanges, SimpleChanges,
+    OnInit, ViewEncapsulation }   from '@angular/core';
+import { NxPagerService }         from '../../../../services/pager.service';
+import { NxConfigService }        from '../../../../services/nx-config';
+import { TranslateService }       from '@ngx-translate/core';
+import { NxUriService }           from '../../../../services/uri.service';
 
 @Component({
   selector: 'nx-cam-table',
@@ -32,15 +27,15 @@ export class CamTableComponent implements OnChanges, OnInit {
   private selectedHeader;
   private sortOrderASC: boolean;
   private results;
-  private cameraHeaders;
-  private showParameters;
+  private readonly cameraHeaders;
   private showHeaders;
   private paramsShown;
   private lang;
-  private sortables;
+  private params: any;
 
   pager: any = {};
   pagedItems: any[];
+  pagerMaxSize: number;
   CONFIG: any = {};
 
   // Options for the Excel export
@@ -58,8 +53,9 @@ export class CamTableComponent implements OnChanges, OnInit {
     removeNewLines: true
   };
 
-  constructor(private pagerService: PagerService,
+  constructor(private pagerService: NxPagerService,
               private translate: TranslateService,
+              private uri: NxUriService,
               config: NxConfigService) {
 
       this.lang = this.translate.translations[this.translate.currentLang];
@@ -70,25 +66,20 @@ export class CamTableComponent implements OnChanges, OnInit {
 
       this.paramsShown = 6;
       this.cameraHeaders = [
-          this.lang.vendor,
-          this.lang.model,
-          this.lang.hardwareType,
-          this.lang.maxResolution,
-          this.lang.maxFps,
-          this.lang.primaryCodecamera,
-          this.lang.isAudioSupported,
-          this.lang.isPtzSupportedShort,
-          this.lang.isFisheye,
-          this.lang.isMdSupported,
-          this.lang.isIoSupported
+          this.lang.campage.vendor,
+          this.lang.campage.model,
+          this.lang.campage.hardwareType,
+          this.lang.campage.maxResolution,
+          this.lang.campage.maxFps,
+          this.lang.campage.primaryCodec,
+          this.lang.campage.isAudioSupported,
+          this.lang.campage.isPtzSupported,
+          this.lang.campage.isFisheye,
+          this.lang.campage.isMdSupported,
+          this.lang.campage.isIoSupported
       ];
 
-      this.sortables = [
-          this.lang.vendor,
-          this.lang.model,
-          this.lang.hardwareType,
-          this.lang.maxResolution
-      ];
+      this.pagerMaxSize = this.CONFIG.campage.pagerMaxSize;
   }
 
     byKey(a, b) {
@@ -129,24 +120,16 @@ export class CamTableComponent implements OnChanges, OnInit {
         };
     }
 
-    isSortable(header) {
-        return this.sortables.indexOf(header) > -1;
-    }
-
     toggleHeaderSort(param) {
-        if (!this.isSortable(param)) {
-            return;
-        }
-
         let filter;
-        for (const [key, value] of Object.entries(this.lang)) {
+        for (const [key, value] of Object.entries(this.lang.campage)) {
             if (value === param) {
                 filter = key;
                 break;
             }
         }
 
-        this.sortOrderASC = (this.lang[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
+        this.sortOrderASC = (this.lang.campage[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
         this.toggleSort(filter);
     }
 
@@ -159,25 +142,15 @@ export class CamTableComponent implements OnChanges, OnInit {
             });
         } else {
             byParam = this.sortBy((elm) => {
-                return elm[param];
+                return (typeof elm[param] === 'string') ? elm[param].toLowerCase() : elm[param];
             });
         }
         this._elements.sort(byParam);
-        this.setPage(1);
+        this.setPage(1, true /* keep uri intact */);
 
         this.selectedHeader = this.cameraHeaders.find(x => {
-            return x === this.lang[param];
+            return x === this.lang.campage[param];
         });
-    }
-
-    toggleHeaderCaption(param, label1, label2) {
-        const paramLookup = this.allowedParameters.find(x => x === param);
-        const paramLabel = this.cameraHeaders.findIndex(x => x === label1 || x === label2);
-        if (paramLookup) {
-            this.cameraHeaders[paramLabel] = label2;
-        } else {
-            this.cameraHeaders[paramLabel] = label1;
-        }
     }
 
     filterAllowedParams() {
@@ -190,54 +163,118 @@ export class CamTableComponent implements OnChanges, OnInit {
         });
     }
 
+    showParametersFor(item) {
+         const showParameters = [...this.allowedParameters];
+        // adjust PTZ and Audio params
+        let idxToBeRemoved;
+        let param;
+
+        param = (item.value.isAptzSupported) ? 'isPtzSupported' : 'isAptzSupported';
+        idxToBeRemoved = showParameters.indexOf(param);
+        showParameters.splice(idxToBeRemoved, 1);
+
+        param = (item.value.isTwAudioSupported) ? 'isAudioSupported' : 'isTwAudioSupported';
+        idxToBeRemoved = showParameters.indexOf(param);
+        showParameters.splice(idxToBeRemoved, 1);
+
+        return showParameters;
+    }
+
+    sortElements() {
+        // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
+        const sortBy = (this.CONFIG.campage.sortSupportedDevices) ? 'count' : 'sortKey';
+        this.toggleSort(sortBy);
+    }
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes.elements) {
-            // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
-            const sortBy = (this.CONFIG.sortSupportedDevices) ? 'count' : 'sortKey';
-            this.sortOrderASC = !this.CONFIG.sortSupportedDevices;
+            this.sortOrderASC = !this.CONFIG.campage.sortSupportedDevices;
             this._elements = changes.elements.currentValue;
-            this.toggleSort(sortBy);
-
             this.results = this._elements.length;
+
+            this.sortElements();
         }
 
         if (changes.activeCamera) {
-            this.showParameters = (changes.activeCamera.currentValue) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
-            this.showHeaders = (changes.activeCamera.currentValue) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
+            if (!changes.activeCamera.currentValue) {
+                this.selectedRow = undefined;
+            }
         }
 
         if (changes.allowedParameters) {
             this.filterAllowedParams();
-            this.toggleHeaderCaption('isTwAudioSupported', this.lang.isAudioSupported, this.lang.isTwAudioSupported);
-            this.toggleHeaderCaption('isAptzSupported', this.lang.isPtzSupported, this.lang.isAptzSupported);
-
-            this.showParameters = (this.activeCamera) ? this.allowedParameters.slice(0, this.paramsShown) : this.allowedParameters;
-            this.showHeaders = (this.activeCamera) ? this.cameraHeaders.slice(0, this.paramsShown) : this.cameraHeaders;
         }
     }
 
-  ngOnInit() {
-      this.showParameters = this.allowedParameters;
-      this.results = this._elements.length;
-      this.setPage(1);
-      this.csvFilename = this.getCurrentDate();
-      this.csvCameraData = this.getCsvData();
-  }
+    ngOnInit() {
+        this.showHeaders = this.cameraHeaders;
 
-  setClickedRow (index, element) {
-      this.selectedRow = index;
-      this.onRowClick.emit(element);
-  }
+        this.results = this._elements.length;
+        this.csvFilename = CamTableComponent.getCurrentDate();
+        this.csvCameraData = this.getCsvData();
 
-  setPage(page: number) {
-      // get pager object from service
-      this.pager = this.pagerService.getPager(this._elements.length, page, this.CONFIG.layout.tableLarge.rows);
+        this.uri
+            .getURI()
+            .subscribe(params => {
+                this.params = { ...params };
 
-      // get current page of items
-      this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
-  }
+                if (this.params.page) {
+                    this.setPage(+this.params.page, true);
+                }
 
-  yesNo (bVal) {
+                if (this.params.camera) {
+                    const row = this.pagedItems.findIndex((camera) => {
+                        return camera.model === this.params.camera;
+                    });
+
+                    const camera = this.pagedItems.find((camera) => {
+                        return camera.model === this.params.camera;
+                    });
+
+                    this.setClickedRow(row, { key: row, value: camera });
+                }
+            });
+    }
+
+    setClickedRow(index, element) {
+        this.selectedRow = index;
+        this.onRowClick.emit(element);
+    }
+
+    setPage(page: number, keep?: boolean) {
+        // get pager object from service
+        this.pager = this.pagerService.getPager(this._elements.length, page, this.CONFIG.layout.tableLarge.rows);
+
+        // get current page of items
+        this.pagedItems = this._elements.slice(this.pager.startIndex, this.pager.endIndex + 1);
+
+        if (this.params && +this.params.page > this.pager.pages.length) {
+            this.uri.updateURI('/campage', [
+                {
+                    key: 'page', value: this.pager.currentPage
+                }
+            ]);
+        }
+
+        if (!keep) {
+            // clear selected camera
+            this.setClickedRow(-1, {});
+            this.uri.updateURI('/campage', [
+                {
+                    key: 'page', value: this.pager.currentPage
+                }, {
+                    key  : 'camera', value: undefined
+                }]);
+            // this.uri.updateURI('camera', undefined);
+        }
+
+        // set look'n'feel for pagination element - don't ellipsize 1 page
+        if (this.pager.pages.length - 3 < this.pagerMaxSize) {
+            this.pagerMaxSize = this.pager.pages.length;
+        }
+    }
+
+  static yesNo (bVal) {
       if (bVal === undefined || bVal === null) {
           return 'Unknown';
       }
@@ -251,17 +288,17 @@ export class CamTableComponent implements OnChanges, OnInit {
                     'Model': camera.model,
                     'Max Resolution': camera.maxResolution,
                     'Max FPS': camera.maxFps,
-                    'Codecamera': camera.primaryCodecamera,
-                    '2-Way Audio': this.yesNo(camera.isTwAudioSupported),
-                    'Advancameraed PTZ': this.yesNo(camera.isAptzSupported),
-                    'Fisheye': this.yesNo(camera.isFisheye),
-                    'Motion': this.yesNo(camera.isMdSupported),
-                    'I/O': this.yesNo(camera.isIoSupported)
+                    'Codec': camera.primaryCodec,
+                    '2-Way Audio': CamTableComponent.yesNo(camera.isTwAudioSupported),
+                    'Advanced PTZ': CamTableComponent.yesNo(camera.isAptzSupported),
+                    'Fisheye': CamTableComponent.yesNo(camera.isFisheye),
+                    'Motion': CamTableComponent.yesNo(camera.isMdSupported),
+                    'I/O': CamTableComponent.yesNo(camera.isIoSupported)
                })
         );
   }
 
-  getCurrentDate() {
+  static getCurrentDate() {
       return Date.now();
   }
 

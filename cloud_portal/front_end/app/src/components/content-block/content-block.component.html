@@ -5,9 +5,9 @@
         'mb-3' : hasMargins}">
 
     <div class="card--header" #headerWrapper [hidden]="!haveHeader">
-        <h3>
+        <h4>
             <ng-content select="header"></ng-content>
-        </h3>
+        </h4>
     </div>
 
     <ng-content></ng-content>

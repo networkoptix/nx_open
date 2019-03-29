@@ -35,7 +35,7 @@ export class DisconnectModalContent {
         this.auth.password = '';
 
         this.disconnect = this.process.init(() => {
-            this.disconnectForm.controls['password'].setErrors(null);
+            this.disconnectForm.controls.password.setErrors(null);
             this.wrongPassword = false;
 
             return this.cloudApi.disconnect(this.systemId, this.auth.password);
@@ -44,7 +44,6 @@ export class DisconnectModalContent {
             errorCodes: {
                 wrongPassword: () => {
                     this.wrongPassword = true;
-                    this.disconnectForm.controls['password'].setErrors({'nx_wrong_password': true});
                     this.auth.password = '';
 
                     this.renderer.selectRootElement('#password').focus();

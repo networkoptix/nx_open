@@ -221,6 +221,11 @@ public:
             removeInactivityTimer();
     }
 
+    std::optional<std::chrono::milliseconds> inactivityTimeout() const
+    {
+        return m_inactivityTimeout;
+    }
+
 protected:
     virtual void stopWhileInAioThread() override
     {

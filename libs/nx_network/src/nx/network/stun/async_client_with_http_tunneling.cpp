@@ -1,5 +1,6 @@
 #include "async_client_with_http_tunneling.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/network/stun/stun_over_http_server.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -17,7 +18,14 @@ AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     m_settings(settings),
     m_reconnectTimer(m_settings.reconnectPolicy)
 {
+    ++SocketGlobals::instance().debugCounters().stunOverHttpClientConnectionCount;
+
     bindToAioThread(getAioThread());
+}
+
+AsyncClientWithHttpTunneling::~AsyncClientWithHttpTunneling()
+{
+    --SocketGlobals::instance().debugCounters().stunOverHttpClientConnectionCount;
 }
 
 void AsyncClientWithHttpTunneling::bindToAioThread(

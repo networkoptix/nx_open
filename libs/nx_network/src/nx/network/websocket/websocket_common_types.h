@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
@@ -43,6 +44,8 @@ enum class Error
     connectionAbort,
     timedOut,
 };
+
+NX_NETWORK_API std::string toString(Error);
 
 enum class SendMode
 {

@@ -10,7 +10,15 @@
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
-    "logoutAuthorisedLogoutButton": "Uitloggen"
+    "logoutAuthorisedLogoutButton": "Uitloggen",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Pagina niet gevonden"
   },
   "systemStatuses": {
-    "notActivated": "niet geactiveerd",
     "activated": "geactiveerd",
+    "merging": "merging",
+    "notActivated": "niet geactiveerd",
     "online": "online",
     "offline": "offline",
     "unavailable": "niet beschikbaar"
@@ -139,7 +148,8 @@
     "thisSystem": "het systeem",
     "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "goed",
@@ -186,7 +196,8 @@
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
+    "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Uw account is succesvol opgeslagen",

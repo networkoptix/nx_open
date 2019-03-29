@@ -67,6 +67,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Element Is Visible    ${DISCONNECT MODAL WARNING}
+    Click Element    ${DISCONNECT MODAL WARNING}
     Click Button    ${DISCONNECT MODAL CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
@@ -246,6 +247,9 @@ should display same user data as user provided during registration (stress to cy
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Delete All Emails
+    Close Mailbox
 
 should display same user data as showed in user account (stress to cyrillic)
     [tags]    email    C41573    C41842    Threaded
@@ -284,8 +288,11 @@ should display same user data as showed in user account (stress to cyrillic)
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
     Remove User Permissions    ${random email}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Delete All Emails
+    Close Mailbox
 
-should show "your system" for owner and "owner's name" for non-owners
+should show (your system) for owner and (owner's name) for non-owners
     [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']

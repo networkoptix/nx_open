@@ -43,6 +43,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
 
     addArg("/path/to/bin");
     addArg("-e");
+    addArg("-server/name", "127.0.0.1");
     addArg("-stun/addrToListenList", "127.0.0.1:0");
     addArg("-stun/udpAddrToListenList", "127.0.0.1:0");
     addArg("-http/addrToListenList", "127.0.0.1:0");

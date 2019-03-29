@@ -20,7 +20,6 @@ export class NxDialogsService {
                 private messageModel: NxModalMessageComponent,
                 private embedModal: NxModalEmbedComponent,
                 private shareModal: NxModalShareComponent) {
-
     }
 
     dismiss() {

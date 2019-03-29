@@ -3,24 +3,15 @@
 #include <memory>
 
 #include <nx/utils/random.h>
+#include <nx/cloud/discovery/settings.h>
 #include <nx/cloud/discovery/discovery_api_client.h>
-
-#include "discovery_server.h"
+#include <nx/cloud/discovery/test_support/discovery_server.h>
 
 namespace nx::cloud::discovery::test {
 
 namespace {
 
 static constexpr char kClusterId[] = "TestCluster";
-
-static std::string generateInfoJson(const std::string& nodeId)
-{
-    std::string random = nx::utils::random::generateName(16).toStdString();
-    return std::string("{")
-            + "\"nodeId\": \"" + nodeId + "\","
-            "\"random\": \"" + random + "\""
-        "}";
-}
 
 void sleep()
 {
@@ -43,16 +34,22 @@ protected:
         std::string nodeId = std::string("node") + std::to_string((int)m_clients.size());
 
         auto context = std::make_unique<ClientContext>();
+        context->settings = settings();
         context->nodeId = nodeId;
         context->infoJson = generateInfoJson(nodeId);
 
         context->clusterId = kClusterId;
 
+        // simulate a service url to be provided.
+        std::string url = std::string("http://127.0.0.1:") + std::to_string(rand() % 65536 + 1024);
+
         context->client = std::make_unique<discovery::DiscoveryClient>(
-            m_server->url(),
+            context->settings,
             context->clusterId,
-            context->nodeId,
-            context->infoJson);
+            NodeInfo{
+                context->nodeId,
+                {url},
+                context->infoJson});
 
         m_clients.emplace_back(std::move(context));
     }
@@ -84,10 +81,10 @@ protected:
     void givenSubscriptionToNodeLostEvent()
     {
         clientContext(/*clientIndex*/ 0)->client->setOnNodeLost(
-            [this](const std::string& nodeId)
+            [this](const Node& node)
             {
                 m_nodeLostWasTriggered = true;
-                m_lostNodeId = nodeId;
+                m_lostNodeId = node.nodeId;
                 callbackFired();
             });
     }
@@ -123,7 +120,8 @@ protected:
 
     void whenWaitForNodeDiscoveredEvent()
     {
-        whenClientRegistersWithServer(/*clientIndex*/ 0);
+        for (size_t clientIndex = 0; clientIndex < 2; ++clientIndex)
+            whenClientRegistersWithServer(clientIndex);
         waitForCallback();
     }
 
@@ -195,9 +193,8 @@ protected:
 
     void andDiscoveredNodeMatchesExpectedNode()
     {
-        // discovery client emits discovery event when it finds itself for the first time,
-        // so compare discovered node with itself
-        compareNodeAndContext(clientContext(/*clientIndex*/ 0), m_discoveredNode);
+        // Subscription was to node 0's discovery event, so compare node 1 to discovered node.
+        compareNodeAndContext(clientContext(/*clientIndex*/ 1), m_discoveredNode);
     }
 
     void andOnlineNodesContainsClientNode()
@@ -221,6 +218,7 @@ protected:
 private:
     struct ClientContext
     {
+        discovery::Settings settings;
         std::string clusterId;
         std::string nodeId;
         std::string infoJson;
@@ -235,7 +233,7 @@ private:
     void assertNodeEquality(const Node&a, const Node& b)
     {
         ASSERT_EQ(a.nodeId, b.nodeId);
-        ASSERT_EQ(a.host, b.host);
+        ASSERT_EQ(a.urls, b.urls);
         ASSERT_EQ(a.infoJson, b.infoJson);
         // expirationTime is volatile, so don't compare because it changes
     }
@@ -244,7 +242,7 @@ private:
     {
         ASSERT_EQ(node.nodeId, clientContext->nodeId);
         ASSERT_EQ(node.infoJson, clientContext->infoJson);
-        ASSERT_FALSE(node.host.empty());
+        ASSERT_FALSE(node.urls.empty());
 
         auto timeSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(
             node.expirationTime.time_since_epoch());
@@ -278,6 +276,16 @@ private:
             m_callbackFired = true;
         }
         m_wait.notify_all();
+    }
+
+    discovery::Settings settings()
+    {
+        discovery::Settings settings;
+        settings.discoveryServiceUrl = m_server->url();
+        settings.roundTripPadding = std::chrono::milliseconds(2);
+        settings.registrationErrorDelay = std::chrono::milliseconds(50);
+        settings.onlineNodesRequestDelay = std::chrono::milliseconds(10);
+        return settings;
     }
 
 private:
@@ -321,7 +329,7 @@ TEST_F(DiscoveryClient, registers_with_discovery_service)
 
 TEST_F(DiscoveryClient, provides_node_discovered_event)
 {
-    givenDiscoveryClient();
+    givenTwoDiscoveryClients();
     givenSubscriptionToNodeDiscoveredEvent();
 
     whenWaitForNodeDiscoveredEvent();

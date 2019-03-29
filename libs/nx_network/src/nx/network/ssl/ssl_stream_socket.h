@@ -59,6 +59,9 @@ public:
 
     virtual ~StreamSocket() override;
 
+    StreamSocket(const StreamSocket&) = delete;
+    StreamSocket& operator=(const StreamSocket&) = delete;
+
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 

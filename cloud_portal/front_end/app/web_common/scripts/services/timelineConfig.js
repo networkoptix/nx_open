@@ -187,10 +187,10 @@ window.TimelineConfig = {
     Here we detect if locale uses AM/PM
 */
 (function(){
-    var dateFormat = (new Date).toLocaleString();
+    var dateFormat = (new Date()).toLocaleString();
     var regex = /(am|pm)$/gi;
     if(regex.test(dateFormat)){
-        TimelineConfig.hourFormat = TimelineConfig.hourFormatAMPM;
-        TimelineConfig.timeFormat = TimelineConfig.timeFormatAMPM;
-    };
+        window.TimelineConfig.hourFormat = window.TimelineConfig.hourFormatAMPM;
+        window.TimelineConfig.timeFormat = window.TimelineConfig.timeFormatAMPM;
+    }
 })();

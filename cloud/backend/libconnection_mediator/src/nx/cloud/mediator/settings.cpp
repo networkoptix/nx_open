@@ -151,11 +151,29 @@ const QLatin1String kListeningPeerConnectionInactivityTimeout(
     "listeningPeer/connectionInactivityTimeout");
 const std::chrono::hours kDefaultListeningPeerConnectionInactivityTimeout(10);
 
+// Server settings
+
+const QLatin1String kServerName("server/name");
+
+// ClusterDbMap  settings
+namespace cluster_db_map {
+
+static constexpr char kGroupName[] = "clusterDbMap";
+static constexpr char kConnectionRetryDelay[] = "connectionRetryDelay";
+static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
+
+} //namespace cluster_db_map
+
 } // namespace
 
 namespace nx {
 namespace hpm {
 namespace conf {
+
+ClusterDbMap::ClusterDbMap():
+    connectionRetryDelay(cluster_db_map::kDefaultConnectionRetryDelay)
+{
+}
 
 ConnectionParameters::ConnectionParameters():
     connectionAckAwaitTimeout(kDefaultConnectionAckAwaitTimeout),
@@ -236,6 +254,16 @@ const nx::cloud::discovery::conf::Discovery& Settings::discovery() const
 const ListeningPeer& Settings::listeningPeer() const
 {
     return m_listeningPeer;
+}
+
+const Server& Settings::server() const
+{
+    return m_server;
+}
+
+const ClusterDbMap& Settings::clusterDbMap() const
+{
+    return m_clusterDbMap;
 }
 
 void Settings::initializeWithDefaultValues()
@@ -333,6 +361,10 @@ void Settings::loadSettings()
     m_discovery.load(settings());
 
     loadListeningPeer();
+
+    loadServer();
+
+    loadClusterDbMap();
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -480,6 +512,24 @@ void Settings::loadHttps()
     m_https.certificatePath =
         settings().value(kHttpsCertificatePath).toString().toStdString();
 }
+
+void Settings::loadServer()
+{
+    m_server.name = settings().value(kServerName).toString().toStdString();
+}
+
+void Settings::loadClusterDbMap()
+{
+    const auto str =
+        lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
+    m_clusterDbMap.connectionRetryDelay = nx::utils::parseTimerDuration(
+        settings().value(str).toString(),
+        cluster_db_map::kDefaultConnectionRetryDelay);
+
+    m_clusterDbMap.sql.loadFromSettings(settings(), cluster_db_map::kGroupName);
+    m_clusterDbMap.map.load(settings());
+}
+
 
 } // namespace conf
 } // namespace hpm

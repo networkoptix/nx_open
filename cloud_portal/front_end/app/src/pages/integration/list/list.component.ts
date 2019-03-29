@@ -3,9 +3,10 @@ import {
     Input, SimpleChanges, OnChanges
 } from '@angular/core';
 
-import { NxConfigService }  from '../../../services/nx-config';
-import { NxRibbonService }  from '../../../components/ribbon/ribbon.service';
-import { TranslateService } from '@ngx-translate/core';
+import { NxConfigService }           from '../../../services/nx-config';
+import { NxRibbonService }           from '../../../components/ribbon/ribbon.service';
+import { TranslateService }          from '@ngx-translate/core';
+import { NxLanguageProviderService } from '../../../services/nx-language-provider';
 
 @Component({
     selector   : 'integrations-list-component',
@@ -23,11 +24,16 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
     private setupDefaults() {
         this.config = this.configService.getConfig();
-        this.lang = this.translate.translations[this.translate.currentLang];
+        this.language
+            .translationsSubject
+            .subscribe((lang) => {
+                this.lang = lang;
+            });
     }
 
     constructor(private configService: NxConfigService,
                 private ribbonService: NxRibbonService,
+                private language: NxLanguageProviderService,
                 private translate: TranslateService) {
 
         this.setupDefaults();
@@ -62,15 +68,10 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        // on reload language service is initialized later
-        if (!this.lang) {
-            this.lang = this.translate.translations[this.translate.currentLang];
-        }
-
         let haveInReview = false;
-        if (changes.list) {
+        if (changes.list.currentValue) {
             // inject platform icons info
-            this.list.forEach(plugin => {
+            changes.list.currentValue.forEach(plugin => {
                 plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
                 this.setPlugunLogo(plugin);
 
@@ -79,8 +80,8 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
             if (haveInReview) {
                 this.ribbonService.show(
-                        this.lang.integration_preview,
-                        this.lang.integration_back_to_edit,
+                        this.lang[this.translate.currentLang].integration.previewRibbonText,
+                        this.lang[this.translate.currentLang].integration.backToEditText,
                         this.config.links.admin.product.replace('%ID%/pages/', '')
                 );
             }

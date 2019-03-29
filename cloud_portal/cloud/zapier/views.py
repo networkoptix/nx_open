@@ -12,13 +12,13 @@ from api.controllers import cloud_api, cloud_gateway
 
 from models import *
 from cloud import settings
+import logging
 from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
 CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
-
-import logging
 logger = logging.getLogger(__name__)
+
 
 def zapier_exceptions(func):
     """
@@ -51,6 +51,7 @@ def zapier_exceptions(func):
 
     return handler
 
+
 def authenticate(request):
     user, email, password = None, None, None
 
@@ -58,7 +59,7 @@ def authenticate(request):
         credentials = request.META['HTTP_AUTHORIZATION'].split()
         if credentials[0].lower() == "basic":
             email, password = base64.b64decode(credentials[1]).split(':', 1)
-            user = django.contrib.auth.authenticate(username=email, password=password)
+            user = django.contrib.auth.authenticate(request=request, username=email, password=password)
 
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')

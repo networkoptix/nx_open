@@ -333,7 +333,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $scope.switchPlaying = function(play){
-            if($scope.playerAPI) {
+            if ($scope.playerAPI && $scope.playerAPI.video) {
                 if (play) {
                     $scope.playerAPI.play();
                 } else {

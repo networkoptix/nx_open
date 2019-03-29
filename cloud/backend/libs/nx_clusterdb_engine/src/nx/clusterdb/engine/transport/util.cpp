@@ -1,8 +1,8 @@
 #include "util.h"
 
-namespace nx::clusterdb::engine::transport {
+#include "../http/http_paths.h"
 
-static constexpr char kSystemIdParamName[] = "systemId";
+namespace nx::clusterdb::engine::transport {
 
 std::string extractSystemIdFromHttpRequest(
     const nx::network::http::RequestContext& requestContext)
@@ -10,7 +10,7 @@ std::string extractSystemIdFromHttpRequest(
     using namespace nx::network::http;
 
     const auto systemId =
-        requestContext.requestPathParams.getByName(kSystemIdParamName);
+        requestContext.requestPathParams.getByName(kClusterIdParamName);
     if (!systemId.empty())
         return systemId;
 

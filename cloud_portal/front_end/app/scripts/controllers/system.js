@@ -44,7 +44,7 @@ angular.module('cloudApp')
                 }
                 $scope.currentlyMerging = true;
                 $scope.isMaster = mergeInfo.role ? mergeInfo.role !== Config.systemStatuses.slave : mergeInfo.masterSystemId === $scope.system.id;
-                $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
+                $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId) || L.system.unknownName;
             }
 
             // Retrieve system info
@@ -65,7 +65,7 @@ angular.module('cloudApp')
                 },
                 errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
             }).then(function () {
-                $scope.canMerge = $scope.system.canMerge && $scope.system.isOnline;
+                $scope.canMerge = $scope.system.isOnline;
                 if ($scope.system.mergeInfo) {
                     setMergeStatus($scope.system.mergeInfo);
                 }
@@ -132,8 +132,8 @@ angular.module('cloudApp')
                     .forceUpdateSystems()
                     .then(function () {
                         $timeout(function () {
-                            $location.path('/systems')
-                        })
+                            $location.path('/systems');
+                        });
                     });
             }
 

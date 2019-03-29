@@ -1,10 +1,17 @@
 #include "pollable.h"
 
-#include <nx/network/aio/aio_service.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/system_error.h>
 
+#include "aio_service.h"
+#include "../common_socket_impl.h"
+#include "../socket_global.h"
+
 namespace nx::network {
+
+Pollable::Pollable(AbstractSocket::SOCKET_HANDLE fd):
+    Pollable(fd, std::make_unique<CommonSocketImpl>())
+{
+}
 
 Pollable::Pollable(
     AbstractSocket::SOCKET_HANDLE fd,
@@ -18,6 +25,9 @@ Pollable::Pollable(
     if (!m_impl)
         m_impl = std::make_unique<CommonSocketImpl>();
 }
+
+// NOTE: The destructor is needed to hide CommonSocketImpl declaration.
+Pollable::~Pollable() = default;
 
 AbstractSocket::SOCKET_HANDLE Pollable::handle() const
 {

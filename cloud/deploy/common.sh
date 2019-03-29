@@ -1,4 +1,4 @@
-MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator vms_gateway traffic_relay nxcloud_host_agent)
+MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator traffic_relay nxcloud_host_agent)
 
 case $(uname -s) in
     Linux)
@@ -33,6 +33,39 @@ function check_vms_dirs()
     is_dir_by_var NX_VMS_DIR || { echo Exiting..; exit 1; }
 }
 
+function copy_deps()
+{
+    local binary=$1
+    local src=$2
+    local dest=$3
+
+    local libs="$(LD_LIBRARY_PATH=$src ldd $binary | awk '{print $1}' | grep -v /)"
+
+    for lib in $libs
+    do
+        [ -f "$src/$lib" -a ! -f "$dest/$lib" ] && cp -l $src/$lib $dest
+    done
+
+    true
+}
+
+function stage_cpp()
+{
+    rm -rf stage
+    check_vms_dirs
+
+    local libdir=stage/$MODULE/lib
+    local bindir=stage/$MODULE/bin
+
+    mkdir -p $bindir $libdir
+
+	cp -rl $environment/packages/linux-x64/qt-$QT_VERSION/lib/* $libdir
+	cp -rl $environment/packages/linux-x64/qt-$QT_VERSION/plugins/sqldrivers $bindir
+
+	cp -rl $NX_VMS_DIR/build_environment/target/bin/$BUILD_CONFIGURATION/$MODULE $bindir
+	cp -rl $NX_VMS_DIR/build_environment/target/lib/$BUILD_CONFIGURATION/* $libdir
+}
+
 function stage_cmake()
 {
     local cmakeBuildDirectory=$1
@@ -40,11 +73,13 @@ function stage_cmake()
 
     rm -rf stage
 
-    mkdir -p stage/$moduleName/bin stage/$moduleName/lib stage/qt/lib stage/qt/bin stage/var/log
-    cp -rl $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
-    cp -rl $cmakeBuildDirectory/lib/* stage/$moduleName/lib
+    mkdir -p stage/$moduleName/bin/sqldrivers stage/$moduleName/lib stage/var/log
 
-    mv stage/$moduleName/lib/libQt* stage/qt/lib/
+    cp ${QT_DIR}/plugins/sqldrivers/libqsqlmysql.so stage/${moduleName}/bin/sqldrivers/
+
+    cp -l $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
+    copy_deps stage/$moduleName/bin/$moduleName $cmakeBuildDirectory/lib stage/$moduleName/lib
+    copy_deps stage/$moduleName/bin/sqldrivers/libqsqlmysql.so $cmakeBuildDirectory/lib stage/$moduleName/lib
 }
 
 function pack()
@@ -53,7 +88,7 @@ function pack()
     local COMMON_BUILD_ARGS=(--build-arg VERSION="$VERSION" --build-arg REVISION="$REVISION" --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_HOST="$BUILD_HOST" --build-arg BUILD_USER="$BUILD_USER")
     local ALL_ARGS=("${COMMON_BUILD_ARGS[@]}" "${BUILD_ARGS[@]}")
 
-    docker pull 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+    docker pull 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
     docker build -t $MODULE:$VERSION "${ALL_ARGS[@]}" .
 }
 
