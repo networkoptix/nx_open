@@ -84,9 +84,11 @@ bool RemoteMediatorPeerPool::initialize()
     {
         auto sqlExecutor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(m_settings.sql);
         // Throws exception
-        m_map = std::make_unique<nx::clusterdb::map::EmbeddedDatabase>(
+        auto map = std::make_unique<nx::clusterdb::map::EmbeddedDatabase>(
             m_settings.map,
             sqlExecutor.get());
+
+        m_sqlExecutor = std::move(sqlExecutor);        m_map = std::move(map);
     }
     catch (const std::exception& e)
     {
