@@ -119,7 +119,12 @@ void CommonHttpConnection::stopWhileInAioThread()
 
 void CommonHttpConnection::start()
 {
-    m_baseTransactionTransport->startListening();
+    post(
+        [this]()
+        {
+            m_baseTransactionTransport->processExtraData();
+            m_baseTransactionTransport->startListening();
+        });
 }
 
 network::SocketAddress CommonHttpConnection::remotePeerEndpoint() const
@@ -245,6 +250,7 @@ void CommonHttpConnection::forwardTransactionToProcessor(
     }
     m_prevReceivedTransportSequence = transportHeader.sequence;
 
+    NX_ASSERT(m_gotTransactionEventHandler);
     if (!m_gotTransactionEventHandler)
         return;
 

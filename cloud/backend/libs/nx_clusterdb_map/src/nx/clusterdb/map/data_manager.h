@@ -28,6 +28,8 @@ enum ResultCode
     unknownError
 };
 
+NX_KEY_VALUE_DB_API const char * toString(ResultCode result);
+
 using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 
 /**

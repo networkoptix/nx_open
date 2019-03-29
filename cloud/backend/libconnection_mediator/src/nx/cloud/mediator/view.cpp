@@ -16,6 +16,7 @@ View::View(
         settings,
         controller->listeningPeerRegistrator(),
         &controller->discoveredPeerPool(),
+        &controller->remoteMediatorPeerPool(),
         &controller->cloudConnectProcessor()),
     m_stunServer(settings, &m_httpServer)
 {

@@ -196,11 +196,16 @@ void GenericTransport::processCommandData(
     if (!commandData)
     {
         NX_DEBUG(this,
-            lm("Failed to deserialized %1 command received from (%2, %3)")
+            lm("Failed to deserialize %1 command received from (%2, %3)")
             .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
         m_commandPipeline->closeConnection();
         return;
     }
+
+    NX_VERBOSE(this, "Received command %1 from (%2, %3)",
+        engine::toString(commandData->header()),
+        transportHeader.systemId,
+        transportHeader.endpoint.toString());
 
     if (m_remotePeer.persistentId.isNull() &&
         !commandData->header().persistentInfo.dbID.isNull())

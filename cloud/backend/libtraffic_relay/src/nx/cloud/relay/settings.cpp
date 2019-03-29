@@ -68,8 +68,14 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr char kConnectionRetryDelay[] = "clusterDbMap/connectionRetryDelay";
+namespace cluster_db_map {
+
+static constexpr char kGroupName[] = "clusterDbMap";
+static constexpr char kConnectionRetryDelay[] = "connectionRetryDelay";
 static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
+
+} // namespace cluster_db_map
+
 
 } // namespace
 
@@ -253,16 +259,19 @@ void Settings::loadConnectingPeer()
 }
 
 ClusterDbMap::ClusterDbMap():
-    connectionRetryDelay(kDefaultConnectionRetryDelay)
+    connectionRetryDelay(cluster_db_map::kDefaultConnectionRetryDelay)
 {
 }
 
 void ClusterDbMap::load(const QnSettings& settings)
 {
+    auto str =
+        lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
     connectionRetryDelay = nx::utils::parseTimerDuration(
-        settings.value(kConnectionRetryDelay).toString(),
-        kDefaultConnectionRetryDelay);
-    sql.loadFromSettings(settings);
+        settings.value(str).toString(),
+        cluster_db_map::kDefaultConnectionRetryDelay);
+
+    sql.loadFromSettings(settings, cluster_db_map::kGroupName);
     map.load(settings);
 }
 
