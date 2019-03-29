@@ -6,6 +6,7 @@ import { NG_VALUE_ACCESSOR }      from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NxUriService }           from '../../services/uri.service';
 import { TranslateService }       from '@ngx-translate/core';
+import { NxUtilsService }         from '../../services/utils.service';
 
 /* USAGE
  <nx-vendor-list
@@ -53,28 +54,46 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
         this.filters = [
             {
-                label: this.lang.cameraFilters.ptz, id: 'isPtzSupported'
+                label: this.lang.cameraFilters.highRes,
+                select: {id: 'maxResolution'}
             },
             {
-                label: this.lang.cameraFilters.aptz, id: 'isAptzSupported'
+                label: this.lang.cameraFilters.aptz,
+                tagId: 'isAptzSupported'
             },
             {
-                label: this.lang.cameraFilters.fisheye, id: 'isFisheye'
+                label: this.lang.cameraFilters.ptz,
+                tagId: 'isPtzSupported'
             },
             {
-                label: this.lang.cameraFilters.H265, id: 'isH265'
+                label: this.lang.cameraFilters.audio,
+                tagId: 'isAudioSupported',
+                multiselect: {id: 'hardwareTypes', value: 'camera'}
             },
             {
-                label: this.lang.cameraFilters.IO, id: 'isIoSupported'
+                label: this.lang.cameraFilters.H265,
+                tagId: 'isH265'
             },
             {
-                label: this.lang.cameraFilters.multiSensor, id: 'isMultiSensor'
+                label: this.lang.cameraFilters.encoder,
+                multiselect: { id: 'hardwareTypes', value: 'encoder' }
             },
             {
-                label: this.lang.cameraFilters.TwWayAudio, id: 'isTwAudioSupported'
+                label: this.lang.cameraFilters.TwWayAudio,
+                tagId: 'isTwAudioSupported'
             },
             {
-                label: this.lang.cameraFilters.highRes, id: 'maxResolution'
+                label: this.lang.cameraFilters.multiSensor,
+                multiselect: { id: 'hardwareTypes', value: 'multiSensorCamera' }
+            },
+            {
+                label: this.lang.cameraFilters.fisheye,
+                tagId: 'isFisheye'
+            },
+            {
+                label: this.lang.cameraFilters.IO,
+                tagId: 'isIoSupported',
+                multiselect: { id: 'hardwareTypes', value: 'other' }
             }
         ];
     }
@@ -100,24 +119,23 @@ export class NxVendorListComponent implements OnInit, OnChanges {
         }
     }
 
-    byParam (a, b, param, order) {
-        if (a[param] < b[param]) {
-            return (order) ? -1 : 1;
-        }
-        if (a[param] > b[param]) {
-            return (order) ? 1 : -1;
-        }
-        return 0;
-    }
-
     ngOnChanges(changes: SimpleChanges) {
         if (changes.vendors) {
+
+            const byCountDESC = NxUtilsService.byParam((elm) => {
+                return elm.count;
+            }, NxUtilsService.sortDESC);
+
+            const byNameASC = NxUtilsService.byParam((elm) => {
+                return elm.name.toLowerCase();
+            }, NxUtilsService.sortASC);
+
             this.remainingVendors = changes.vendors.currentValue.length - this.CONFIG.ipvd.vendorsShown;
             this.vendors = changes.vendors
                     .currentValue
-                    .sort((a, b) => this.byParam(a, b, 'count', this.DESC))
+                    .sort(byCountDESC)
                     .slice(0, this.CONFIG.ipvd.vendorsShown)
-                    .sort((a, b) => this.byParam(a, b, 'name', this.ASC));
+                    .sort(byNameASC);
         }
     }
 
@@ -143,20 +161,31 @@ export class NxVendorListComponent implements OnInit, OnChanges {
 
         const queryParams: Params = {};
 
-        if (filter.id === 'maxResolution') {
+        if (filter.select && filter.select.id === 'maxResolution') {
             this.filter.selects.find((select) => {
                 if (select.id === 'resolution') {
-                    queryParams.resolution = select.items[select.items.length - 1].name;
                     select.selected = select.items[select.items.length - 1];
+                    queryParams.resolution = select.selected.name;
                 }
             });
         } else {
-            queryParams.tags = filter.id;
-            this.filter.tags.find(tag => {
-                if (tag.id === filter.id) {
-                    tag.value = true;
-                }
-            });
+            if (filter.tagId) {
+                queryParams.tags = filter.tagId;
+                this.filter.tags.find(tag => {
+                    if (tag.id === filter.tagId) {
+                        tag.value = true;
+                    }
+                });
+            }
+
+            if (filter.multiselect) {
+                this.filter.multiselects.find((select) => {
+                    if (select.id === filter.multiselect.id) {
+                        select.selected.push(select.items.find(item => item.id === filter.multiselect.value).id);
+                        queryParams.hardwareTypes = select.selected;
+                    }
+                });
+            }
         }
 
         this.uri.updateURI('/ipvd', queryParams, true);

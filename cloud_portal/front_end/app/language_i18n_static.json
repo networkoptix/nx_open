@@ -14,12 +14,14 @@
 	},
 	"cameraFilters": {
 		"ptz": "PTZ cameras",
-		"aptz": "Advanced PTZ cameras",
+		"aptz": "Cameras with advanced PTZ",
 		"fisheye": "Fisheye cameras",
-		"H265": "Cameras supporting H.265",
+		"H265": "H.265 Cameras",
 		"IO": "I / O modules",
-		"multiSensor": "Multi-sensor Cameras",
-		"TwWayAudio": "Cameras with 2-way audio",
+		"multiSensor": "Multi-sensor cameras",
+		"TwWayAudio": "2-way audio devices",
+		"audio": "Cameras with audio",
+		"encoder": "Encoders",
 		"highRes": "Extra high resolution cameras"
 	},
 	"ipvd" : {
