@@ -9,11 +9,10 @@
 
 namespace {
 
-// TODO: Fix style of constants
-constexpr qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
-constexpr qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
-constexpr qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
-constexpr qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
+constexpr qint64 kCameraUpdateInterval = 1000000ll * 3600;
+constexpr qint64 kKeepIframesInterval = 1000000ll * 80;
+constexpr qint64 kKeepIframesDistance = 1000000ll * 5;
+constexpr qint64 kGetFrameMaxTime = 1000000ll * 15;
 constexpr int kMaxGopSize = 260;
 
 } // namespace
@@ -90,11 +89,11 @@ void GopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
             m_gotIFramesMask |= 1 << video->channelNumber;
             int ch = video->channelNumber;
             m_lastKeyFrame[ch] = video;
-            const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
+            const qint64 removeThreshold = video->timestamp - kKeepIframesInterval;
 
             if (m_lastKeyFrames[ch].empty()
                 || m_lastKeyFrames[ch].back()->timestamp <=
-                    video->timestamp - KEEP_IFRAMES_DISTANCE)
+                    video->timestamp - kKeepIframesDistance)
             {
                 m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(
                     video->clone(getAllocator(video->dataSize()))));
@@ -102,7 +101,7 @@ void GopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 
             while ((!m_lastKeyFrames[ch].empty()
                 && m_lastKeyFrames[ch].front()->timestamp < removeThreshold)
-                || m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE)
+                || m_lastKeyFrames[ch].size() > kKeepIframesInterval/kKeepIframesDistance)
             {
                 m_lastKeyFrames[ch].pop_front();
             }
@@ -355,7 +354,7 @@ void GopKeeper::updateCameraActivity()
 
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() && canUseProvider &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE
-            || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
+            || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > kCameraUpdateInterval) &&
         m_resource->commonModule()->globalSettings()->isAutoUpdateThumbnailsEnabled())
     {
         if (m_nextMinTryTime == 0) // get first screenshot after minor delay
@@ -370,7 +369,7 @@ void GopKeeper::updateCameraActivity()
             if (provider)
                 provider->startIfNotRunning();
         }
-        else if (m_activityStarted && usecTime - m_activityStartTime > GET_FRAME_MAX_TIME )
+        else if (m_activityStarted && usecTime - m_activityStartTime > kGetFrameMaxTime )
         {
             m_activityStarted = false;
             m_camera->notInUse(this);
