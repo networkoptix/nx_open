@@ -54,7 +54,7 @@ void QnResourceTreeModelLayoutNodeManager::primaryNodeAdded(QnResourceTreeModelN
         &QnResourceTreeModelNode::update);
 
     connect(layout, &QnLayoutResource::itemAdded, node,
-        [node](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        [this, node](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             if (node->resourcePool()->getResourceById(item.resource.id))
             {
@@ -63,7 +63,8 @@ void QnResourceTreeModelLayoutNodeManager::primaryNodeAdded(QnResourceTreeModelN
             }
             else
             {
-                NX_ASSERT(false, "Attempt to add tree node for nonexistent resource");
+                NX_ERROR(this, "Attempt to add tree node for nonexistent resource %1 (%2)",
+                    item.resource.id, item.resource.uniqueId);
             }
         });
 
