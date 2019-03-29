@@ -28,7 +28,7 @@ QtDbConnection::~QtDbConnection()
         close();
 
     m_connection = QSqlDatabase();
-    QSqlDatabase::removeDatabase(m_connectionName);
+    nx::sql::Database::removeDatabase(m_connectionName);
 }
 
 bool QtDbConnection::open()

@@ -37,11 +37,11 @@ bool QnTestCameraResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
+        for (const auto& address: nx::network::allLocalAddresses(nx::network::ipV4))
         {
-            DiscoveryInfo info(
-                nx::network::SocketFactory::createDatagramSocket().release(), iface.address);
-            if (info.sock->bind(iface.address.toString(), 0))
+            DiscoveryInfo info(nx::network::SocketFactory::createDatagramSocket().release(),
+                QHostAddress(address.toString()));
+            if (info.sock->bind(address.toString(), 0))
                 m_sockList << info;
             else
                 delete info.sock;

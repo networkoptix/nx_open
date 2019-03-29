@@ -470,8 +470,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
         static QAtomicInt swDecoderCount = 0;
+        DecoderConfig config = DecoderConfig::fromMediaResource(m_resource);
+        config.disableMtDecoding = qnSettings->disableMtDecoding();
         dec = new QnFfmpegVideoDecoder(
-            DecoderConfig::fromMediaResource(m_resource),
+            config,
             data->compressionType, data, /*mtDecoding*/ enableFrameQueue, &swDecoderCount);
         if (dec == nullptr)
         {

@@ -953,7 +953,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     auto connectionName = sqlDb.connectionName();
     sqlDb.close();
     sqlDb = QSqlDatabase();
-    QSqlDatabase::removeDatabase(connectionName);
+    nx::sql::Database::removeDatabase(connectionName);
 
     QString depracatedFileName = fileName + lit("_deprecated");
     if (!QFile::remove(depracatedFileName))

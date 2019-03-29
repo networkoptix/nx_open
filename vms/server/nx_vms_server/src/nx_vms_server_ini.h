@@ -4,7 +4,7 @@
 
 struct Ini: public nx::kit::IniConfig
 {
-    Ini(): IniConfig("mediaserver.ini") { reload(); }
+    Ini(): IniConfig("nx_vms_server.ini") { reload(); }
 
     NX_INI_FLAG(0, verboseAutoRequestForwarder, "Set log level to Verbose for AutoRequestForwarder.");
     NX_INI_FLAG(0, ignoreApiModuleInformationInAutoRequestForwarder, "");

@@ -206,7 +206,7 @@ void QnDbHelper::removeDatabase()
 {
     m_sdb = QSqlDatabase();
     if (!m_connectionName.isEmpty())
-        QSqlDatabase::removeDatabase(m_connectionName);
+        nx::sql::Database::removeDatabase(m_connectionName);
 }
 
 bool QnDbHelper::applyUpdates(const QString &dirName) {
