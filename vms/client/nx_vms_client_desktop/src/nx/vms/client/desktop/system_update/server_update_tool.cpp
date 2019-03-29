@@ -1064,7 +1064,7 @@ void ServerUpdateTool::atDownloadFailed(const QString& fileName)
     }
 }
 
-QString getServerUrl(QnCommonModule* commonModule, QString path)
+nx::utils::Url getServerUrl(QnCommonModule* commonModule, QString path)
 {
     if (const auto connection = commonModule->ec2Connection())
     {
@@ -1073,24 +1073,30 @@ QString getServerUrl(QnCommonModule* commonModule, QString path)
         url.setPath(path);
         bool hasSsl = commonModule->moduleInformation().sslAllowed;
         url.setScheme(nx::network::http::urlSheme(hasSsl));
-        return url.toString(QUrl::RemoveUserInfo);
+        return url;
     }
     return "";
 }
 
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateStatus");
+    const auto url = getServerUrl(commonModule(), "/ec2/updateStatus");
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 QString ServerUpdateTool::getUpdateInformationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateInformation");
+    const auto url = getServerUrl(commonModule(), "/ec2/updateInformation");
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    return getServerUrl(commonModule(), "/ec2/updateInfomation?version=installed");
+    auto url = getServerUrl(commonModule(), "/ec2/updateInfomation");
+    QUrlQuery query;
+    query.addQueryItem("version", "latest");
+    url.setQuery(query);
+    return url.toString(QUrl::RemoveUserInfo);
 }
 
 std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkLatestUpdate(
