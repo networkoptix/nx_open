@@ -1,35 +1,16 @@
+
 #include "discovery_api_client.h"
 
 #include <nx/utils/timer_holder.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/buffer_source.h>
 
 #include "request_paths.h"
 
 namespace nx::cloud::discovery {
-
-namespace {
-
-static std::set<Node> moveToSet(std::vector<Node>& nodes)
-{
-    std::set<Node> nodeSet;
-    for (auto& node : nodes)
-        nodeSet.emplace(std::move(node));
-    return nodeSet;
-}
-
-static std::vector<Node> toVector(const std::set<Node>& nodes)
-{
-    std::vector<Node> nodeList;
-    nodeList.reserve(nodes.size());
-    std::transform(nodes.begin(), nodes.end(),
-        std::back_inserter(nodeList), [](auto node) { return node; });
-    return nodeList;
-}
-
-} //namespace
 
 //-------------------------------------------------------------------------------------------------
 // RequestContext
@@ -89,6 +70,16 @@ bool DiscoveryClient::RequestContext::failed() const
     return m_httpClient.failed();
 }
 
+SystemError::ErrorCode DiscoveryClient::RequestContext::lastSysErrorCode() const
+{
+    return m_httpClient.lastSysErrorCode();
+}
+
+const nx::network::http::Request& DiscoveryClient::RequestContext::request() const
+{
+    return m_httpClient.request();
+}
+
 const nx::network::http::Response* DiscoveryClient::RequestContext::response() const
 {
     return m_httpClient.response();
@@ -98,15 +89,14 @@ const nx::network::http::Response* DiscoveryClient::RequestContext::response() c
 // DiscoveryClient
 
 DiscoveryClient::DiscoveryClient(
-    const nx::utils::Url& discoveryServiceUrl,
+    const Settings& discoverySettings,
     const std::string& clusterId,
-    const std::string& nodeId,
-    const std::string& infoJson)
+    const NodeInfo& nodeInfo)
     :
-    m_discoveryServiceUrl(discoveryServiceUrl)
+    m_settings(discoverySettings),
+    m_thisNodeInfo(nodeInfo)
 {
-    m_thisNodeInfo.nodeId = nodeId;
-    m_thisNodeInfo.infoJson = infoJson;
+    NX_ASSERT(m_settings.roundTripPadding >= std::chrono::milliseconds::zero());
 
     setupDiscoveryServiceUrl(clusterId);
     setupRegisterNodeRequest();
@@ -123,14 +113,14 @@ DiscoveryClient::~DiscoveryClient()
 void DiscoveryClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    m_registerNodeRequest->bindToAioThread(getAioThread());
-    m_onlineNodesRequest->bindToAioThread(getAioThread());
+    m_registerNodeRequest->bindToAioThread(aioThread);
+    m_onlineNodesRequest->bindToAioThread(aioThread);
 }
 
 void DiscoveryClient::start()
 {
-    startRegisterNodeRequest();
-    startOnlineNodesRequest();
+    startRegisterNodeRequest(std::chrono::milliseconds::zero());
+    startOnlineNodesRequest(std::chrono::milliseconds::zero());
 }
 
 void DiscoveryClient::updateInformation(const std::string& infoJson)
@@ -142,13 +132,13 @@ void DiscoveryClient::updateInformation(const std::string& infoJson)
 
     m_registerNodeRequest->cancelSync();
 
-    startRegisterNodeRequest();
+    startRegisterNodeRequest(std::chrono::milliseconds::zero());
 }
 
 std::vector<Node> DiscoveryClient::onlineNodes() const
 {
     QnMutexLocker lock(&m_mutex);
-    return toVector(m_onlineNodes);
+    return std::vector<Node>(m_onlineNodes.begin(), m_onlineNodes.end());
 }
 
 Node DiscoveryClient::node() const
@@ -176,9 +166,16 @@ void DiscoveryClient::stopWhileInAioThread()
 
 void DiscoveryClient::setupDiscoveryServiceUrl(const std::string& clusterId)
 {
-    QString nodeRegistryPath(kRegisterNodePath);
-    nodeRegistryPath.replace(kClusterIdTemplate, clusterId.c_str());
-    m_discoveryServiceUrl.setPath(nodeRegistryPath);
+    m_discoveryServiceUrl = m_settings.discoveryServiceUrl;
+    m_discoveryServiceUrl.setPath(
+        nx::network::http::rest::substituteParameters(
+            kRegisterNodePath,
+            {clusterId}).c_str());
+}
+
+const nx::utils::Url& DiscoveryClient::discoveryServiceUrl() const
+{
+    return m_discoveryServiceUrl;
 }
 
 void DiscoveryClient::setupRegisterNodeRequest()
@@ -186,44 +183,45 @@ void DiscoveryClient::setupRegisterNodeRequest()
     m_registerNodeRequest = std::make_unique<RequestContext>(
         [this](nx::network::http::BufferType messageBody)
         {
-            bool error = m_registerNodeRequest->failed();
-
-            if (error)
+            if (m_registerNodeRequest->failed())
             {
-                NX_ERROR(this,
-                    lm("Failed to connect to discovery server at: %1")
-                    .arg(m_discoveryServiceUrl).toQString());
+                NX_WARNING(this, lm("Failed to connect to discovery server at: %1, error: %2")
+                    .arg(discoveryServiceUrl())
+                    .arg(SystemError::toString(m_registerNodeRequest->lastSysErrorCode())));
+                startRegisterNodeRequest(m_settings.registrationErrorDelay);
+                return;
             }
 
-            if (auto response = m_registerNodeRequest->response())
+            if (!nx::network::http::StatusCode::isSuccessCode(
+                m_registerNodeRequest->response()->statusLine.statusCode))
             {
-                if (!nx::network::http::StatusCode::isSuccessCode(
-                    response->statusLine.statusCode))
-                {
-                    NX_ERROR(this, lm("Request to register node failed with: %1")
-                        .arg(response->statusLine.toString()));
-                    error = true;
-                }
+                NX_WARNING(this, lm("Request to register node failed: %1")
+                    .arg(m_registerNodeRequest->response()->statusLine.toString()));
+                startRegisterNodeRequest(m_settings.registrationErrorDelay);
+                return;
             }
 
-            if (!error)
+            bool ok = false;
+            Node node = NodeSerialization::deserialized(messageBody, Node(), &ok);
+            if (ok)
             {
-                bool ok = false;
-                Node node = QJson::deserialized(messageBody, Node(), &ok);
-                if (ok)
                 {
                     QnMutexLocker lock(&m_mutex);
                     m_thisNode = std::move(node);
                 }
-                else
-                {
-                    NX_ERROR(this, lm("Error deserializing register node response: %1")
-                        .arg(messageBody));
-                }
+                NX_VERBOSE(this, lm("Received registration response: %1").arg(messageBody));
+            }
+            else
+            {
+                NX_WARNING(this, lm("Error deserializing register node response: %1")
+                    .arg(messageBody));
             }
 
-            // Restart request regardless of errors.
-            startRegisterNodeRequest();
+            auto registrationDelay = calculateRegistrationDelay(m_registerNodeRequest->response());
+            startRegisterNodeRequest(
+                registrationDelay.has_value()
+                    ? *registrationDelay
+                    : m_settings.registrationErrorDelay);
         });
 }
 
@@ -233,60 +231,85 @@ void DiscoveryClient::setupOnlineNodesRequest()
         [this](nx::network::http::BufferType messageBody)
         {
             // All error logging related to server failure is done by lambda in
-            // setupRegisterNodeRequest().
-            bool error = m_onlineNodesRequest->failed();
-
-            if (auto response = m_registerNodeRequest->response())
+            // setupRegisterNodeRequest.
+            if (m_onlineNodesRequest->failed())
             {
-                error |=
-                    !nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode);
+                startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
+                return;
             }
 
-            if (!error)
+            if (!nx::network::http::StatusCode::isSuccessCode(
+                m_onlineNodesRequest->response()->statusLine.statusCode))
             {
-                bool ok = false;
-                auto onlineNodes = QJson::deserialized(messageBody, std::vector<Node>(), &ok);
-                if (ok)
-                    updateOnlineNodes(onlineNodes);
-                else
-                    NX_ERROR(this, lm("Error deserializing online nodes response: %1")
-                        .arg(messageBody));
+                startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
+                return;
             }
 
-            // Restart request regardless of errors.
-            startOnlineNodesRequest();
+            bool ok = false;
+            auto onlineNodes =
+                NodeSerialization::deserialized(messageBody, std::vector<Node>(), &ok);
+            if (ok)
+            {
+                updateOnlineNodes(std::move(onlineNodes));
+            }
+            else
+            {
+                NX_WARNING(this, lm("Error deserializing online nodes response: %1")
+                    .arg(messageBody));
+            }
+
+            startOnlineNodesRequest(m_settings.onlineNodesRequestDelay);
         });
 }
 
-void DiscoveryClient::startRegisterNodeRequest()
+void DiscoveryClient::startRegisterNodeRequest(const std::chrono::milliseconds& delay)
 {
+    static constexpr char kRequestMessageTemplate[] =
+        "Registration request made at %1."
+        " Node expiration time is %2.";
+
     m_registerNodeRequest->startTimer(
-        std::chrono::milliseconds::zero(),
+        delay,
         [this]()
         {
             QnMutexLocker lock(&m_mutex);
             m_registerNodeRequest->doPost(
-                m_discoveryServiceUrl,
+                discoveryServiceUrl(),
                 QJson::serialized(m_thisNodeInfo));
+
+            updateRequestSentTime(m_registerNodeRequest->request());
+
+            // dt will be invalid the first time registration is done.
+            QDateTime dt = toDateTime(m_thisNode.expirationTime);
+            QString expirationTime = dt.isValid() ? dt.toString() : "now";
+
+            NX_VERBOSE(this, lm(kRequestMessageTemplate)
+                .arg(m_requestSent.toString())
+                .arg(expirationTime));
         });
 }
 
-void DiscoveryClient::startOnlineNodesRequest()
+void DiscoveryClient::startOnlineNodesRequest(const std::chrono::milliseconds& delay)
 {
     m_onlineNodesRequest->startTimer(
-        std::chrono::milliseconds::zero(),
+        delay,
         [this]()
         {
-            m_onlineNodesRequest->doGet(m_discoveryServiceUrl);
+            m_onlineNodesRequest->doGet(discoveryServiceUrl());
         });
 }
 
-void DiscoveryClient::updateOnlineNodes(std::vector<Node>& onlineNodes)
+void DiscoveryClient::updateOnlineNodes(std::vector<Node> onlineNodes)
 {
-    auto onlineNodeSet = moveToSet(onlineNodes);
+    std::set<Node> onlineNodeSet;
+
+    std::move(
+        onlineNodes.begin(),
+        onlineNodes.end(),
+        std::inserter(onlineNodeSet, onlineNodeSet.end()));
 
     std::vector<Node> discoveredNodes;
-    std::vector<std::string> lostNodes;
+    std::vector<Node> lostNodes;
 
     // Nodes that are not present in onlineNodeSet and not m_onlineNodes are newly online.
     for (const auto& node : onlineNodeSet)
@@ -299,7 +322,7 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node>& onlineNodes)
     for (const auto& node : m_onlineNodes)
     {
         if (onlineNodeSet.find(node) == onlineNodeSet.end())
-            lostNodes.emplace_back(node.nodeId);
+            lostNodes.emplace_back(node);
     }
 
     // Update m_onlineNodes before emitting events, as events might access onlineNodes()
@@ -309,10 +332,15 @@ void DiscoveryClient::updateOnlineNodes(std::vector<Node>& onlineNodes)
     }
 
     for (const auto& node : discoveredNodes)
-        emitNodeDiscovered(node);
+    {
+        // don't emit discovery event for "this" node.
+        // Clients that rely on discovery event might try to connect to themselves.
+        if (node.nodeId != m_thisNodeInfo.nodeId)
+            emitNodeDiscovered(node);
+    }
 
-    for (const auto& nodeId : lostNodes)
-        emitNodeLost(nodeId);
+    for (const auto& node : lostNodes)
+        emitNodeLost(node);
 }
 
 void DiscoveryClient::emitNodeDiscovered(const Node& node)
@@ -321,10 +349,109 @@ void DiscoveryClient::emitNodeDiscovered(const Node& node)
         m_nodeDiscoveredHandler(node);
 }
 
-void DiscoveryClient::emitNodeLost(const std::string& nodeId)
+void DiscoveryClient::emitNodeLost(const Node& node)
 {
     if (m_nodeLostHandler)
-        m_nodeLostHandler(nodeId);
+        m_nodeLostHandler(node);
+}
+
+std::optional<QDateTime> DiscoveryClient::getServerResponseTime(
+    const nx::network::http::Response* response) const
+{
+    if (!response)
+        return std::nullopt;
+
+    auto it = response->headers.find("Date");
+    if (it == response->headers.end())
+    {
+        NX_WARNING(
+            this,
+            lm("http response does not contain 'Date' http header, using current time."));
+        return std::nullopt;
+    }
+
+    auto responseTime = nx::network::http::parseDate(it->second);
+    if (responseTime.isValid())
+        return responseTime;
+
+    NX_WARNING(
+        this,
+        lm("Error parsing Date header in http response: received %1. Using current time.")
+            .arg(it->second));
+
+    return std::nullopt;
+}
+
+void DiscoveryClient::updateRequestSentTime(const nx::network::http::Request& request)
+{
+    auto it = request.headers.find("Date");
+    if (it == request.headers.end())
+    {
+        NX_WARNING(
+            this,
+            lm("http request does not contain 'Date' http header, using current time."));
+        m_requestSent = QDateTime::currentDateTimeUtc();
+        return;
+    }
+
+    m_requestSent = nx::network::http::parseDate(it->second);
+    if (m_requestSent.isValid())
+        return;
+
+    NX_WARNING(
+        this,
+        lm("Error parsing date from http request. Format given by request is: %1. Using current time.")
+            .arg(it->second));
+    m_requestSent = QDateTime::currentDateTimeUtc();
+}
+
+std::optional<std::chrono::milliseconds>
+DiscoveryClient::calculateRegistrationDelay(const nx::network::http::Response* response)
+{
+    using namespace std::chrono;
+
+    static constexpr char kNegativeDelayErrorTemplate[] =
+        "Calculated a negative request delay using the following values:"
+        "node expiration time ET (msec since epoch) = %1,  "
+        "request travel time to server RTT (in msecs) = %2,  "
+        "time at which request delay was calculated N (msec since epoch) = %3,  "
+        "round trip padding used to buffer request RTP(in msecs) = %4,  "
+        "ET - N - RTT - RTP= %5. Using zero instead.";
+
+    auto serverResponseTime = getServerResponseTime(response);
+    if (!serverResponseTime.has_value())
+        return std::nullopt;
+
+    milliseconds travelTime(
+        (m_requestSent.msecsTo(*serverResponseTime)
+         + (*serverResponseTime).msecsTo(QDateTime::currentDateTimeUtc())) / 2);
+
+    if (travelTime < milliseconds::zero())
+    {
+        NX_WARNING(this,
+            lm("Error calculated %1 msec travel time from client to server. Using zero delay instead.")
+            .arg(travelTime.count()));
+        return std::nullopt;
+    }
+
+    auto now = system_clock::now();
+
+    auto registrationDelay = duration_cast<milliseconds>(
+            m_thisNode.expirationTime - now - travelTime - m_settings.roundTripPadding);
+
+    if (registrationDelay < milliseconds::zero())
+    {
+        NX_WARNING(this, lm(kNegativeDelayErrorTemplate)
+            .arg(duration_cast<milliseconds>(
+                m_thisNode.expirationTime.time_since_epoch()).count())
+            .arg(travelTime.count())
+            .arg(duration_cast<milliseconds>(now.time_since_epoch()).count())
+            .arg(m_settings.roundTripPadding.count())
+            .arg(registrationDelay.count()));
+        return std::nullopt;
+    }
+
+    return registrationDelay;
 }
 
 } // namespace nx::cloud::discovery

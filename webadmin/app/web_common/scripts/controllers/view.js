@@ -1,5 +1,3 @@
-import * as $ from 'jquery';
-
 (function () {
 
 'use strict';
@@ -335,7 +333,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $scope.switchPlaying = function(play){
-            if($scope.playerAPI) {
+            if ($scope.playerAPI && $scope.playerAPI.video) {
                 if (play) {
                     $scope.playerAPI.play();
                 } else {
@@ -503,15 +501,17 @@ angular.module('nxCommon').controller('ViewCtrl',
             // record actice camera again as only one camera should be selected per system
             $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
         }
+    
+        $scope.$watch('camerasProvider.cameras', function () {
+            if (!$scope.activeCamera && Object.keys($scope.camerasProvider.cameras).length !== 0) {
+                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+            }
+        }, true);
         
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
-                if (Object.keys($scope.camerasProvider.cameras).length !== 0) {
-                    $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
-                } else {
-                    $scope.showCameraPanel = false;
-                    return;
-                }
+                $scope.showCameraPanel = false;
+                return;
             }
             
             resetSystemActiveCamera();

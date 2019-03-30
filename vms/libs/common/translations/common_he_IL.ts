@@ -106,6 +106,11 @@
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>לא ניתן למזג את 'מערכות' משום שיש להם לפחות שרת אחד עם אותו מזהה. הסר את השרת ונסה שוב.</translation>
     </message>
+    <message>
+      <source>Cloud systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -1365,10 +1370,6 @@
       <translation>אירוע לא מוגדר אירע</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>התרחשו אירועים מרובים של %1</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>אירוע: %1</translation>
     </message>
@@ -1460,10 +1461,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>החיבור למצלמה (תזרים משני) נסגר באופן בלתי צפוי.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>זוהה איבוד מנת RTP, רצף קודם=%1 הרצף הבא=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1659,6 +1656,10 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation>זמן המצלמה חוזר למצב רגיל</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation type="unfinished">Multiple %1 events have occurred</translation>
     </message>
   </context>
   <context>

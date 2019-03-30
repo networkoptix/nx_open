@@ -1064,16 +1064,17 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*vi
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
-void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
-    widget->clearMotionSelection();
+void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget)
+{
+    widget->clearMotionSelection(false);
 }
 
 void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region)
 {
+    widget->addToMotionSelection(region); //< This will send changed() because it was not sent on at_motionRegionCleared.
+
     if (region.isEmpty())
         return;
-
-    widget->addToMotionSelection(region);
 
     if (!ini().exclusiveMotionSelection)
         return;

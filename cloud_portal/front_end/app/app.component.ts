@@ -42,7 +42,7 @@ export class AppComponent {
         };
 
         this.deviceInfo = this.deviceService.getDeviceInfo();
-        let allowedDevice = this.allowedDevices[ this.deviceInfo.os ];
+        let allowedDevice = this.allowedDevices[this.deviceInfo.os];
 
         // Special case for Kyle's robot tests
         // ... device detector doesn't detect it correctly
@@ -51,8 +51,8 @@ export class AppComponent {
         }
 
         if (allowedDevice !== undefined) {
-            const allowedVersion = allowedDevice[ this.deviceInfo.browser ] || 0;
-            const majorVersion = this.deviceInfo.browser_version.split('.')[ 0 ];
+            const allowedVersion = allowedDevice[this.deviceInfo.browser] || 0;
+            const majorVersion = this.deviceInfo.browser_version.split('.')[0];
 
             if (majorVersion < allowedVersion) {
                 // redirect
@@ -60,15 +60,16 @@ export class AppComponent {
             }
         } // else -> unknown platform or device ... cross fingers and hope for the best
 
-        const langCookie = this.cookieService.get('language');
-        const lang = langCookie || translate.getBrowserCultureLang().replace('-', '_');
-
         // this language will be used as a fallback when a translation
         // isn't found in the current language
         translate.setDefaultLang('en_US');
 
-        // the lang to use, if the lang isn't available, it will use
+        // TODO: Uncomment after removal of AJS. Currently language will be set in app.js
+        // the lang to use, if the lang isn't available, it will use *****
         // the current loader to get them
-        translate.use(lang);
+        // ***************************************************************
+        // const langCookie = this.cookieService.get('language');
+        // const lang = langCookie || translate.getBrowserCultureLang().replace('-', '_');
+        // translate.use(lang);
     }
 }

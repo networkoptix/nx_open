@@ -21,7 +21,7 @@ Camera::Camera(
     m_audioStream = std::make_unique<AudioStream>(m_cameraInfo.auxiliaryData, m_timeProvider);
 }
 
-void Camera::setCredentials(const char * username, const char * password)
+void Camera::setCredentials(const char* username, const char* password)
 {
     strncpy(m_cameraInfo.defaultLogin, username, sizeof(m_cameraInfo.defaultLogin) - 1);
     strncpy(m_cameraInfo.defaultPassword, password, sizeof(m_cameraInfo.defaultPassword) - 1);

@@ -1,8 +1,8 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2 } from '@angular/core';
-import { Location }                                                       from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }                          from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                                 from '@angular/forms';
-import { NxConfigService }                                                from '../../services/nx-config';
+import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2, ViewChild } from '@angular/core';
+import { Location }                                                                  from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }                                     from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator, NgForm }                                                    from '@angular/forms';
+import { NxConfigService }                                                           from '../../services/nx-config';
 
 @Component({
     selector: 'nx-modal-message-content',
@@ -17,16 +17,24 @@ export class MessageModalContent {
 
     config: any;
     sendMessage: any;
+    userName: string;
+    userEmail: string;
     message: string;
+    contact: boolean;
+    agree: boolean;
     title: string;
+
+    @ViewChild('feedbackForm') public feedbackForm: NgForm;
 
     constructor(private activeModal: NgbActiveModal,
                 private configService: NxConfigService,
                 private renderer: Renderer2,
+                @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any
                 ) {
+
         this.config = configService.getConfig();
     }
 
@@ -35,6 +43,7 @@ export class MessageModalContent {
             this.messageType = this.language.messageType.unknown;
         }
         this.title = this.language.lang.messageType[this.messageType].replace('{{product}}', this.product);
+
         this.sendMessage = this.process.init(() => {
             return this.cloudApi.sendMessage(this.messageType, this.productId, this.message);
         }, {
@@ -42,6 +51,14 @@ export class MessageModalContent {
         }).then(() => {
             this.activeModal.close(true);
         });
+
+        this.account
+            .get()
+            .then((account) => {
+                this.userName = account.first_name + ' ' + account.last_name ;
+                this.userEmail = account.email;
+            });
+
     }
 
     close() {
@@ -89,7 +106,6 @@ export class NxModalMessageComponent implements OnInit {
             product = '';
         }
 
-        console.log(product);
         return this.dialog(type, product, productId).result;
     }
 

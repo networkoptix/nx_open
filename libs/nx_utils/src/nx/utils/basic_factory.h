@@ -64,7 +64,7 @@ public:
         base_type(
             [this](auto&&... args)
             {
-                return defaultFactory(std::forward<decltype(args)>(args)...);
+                return this->defaultFactory(std::forward<decltype(args)>(args)...);
             })
     {
     }

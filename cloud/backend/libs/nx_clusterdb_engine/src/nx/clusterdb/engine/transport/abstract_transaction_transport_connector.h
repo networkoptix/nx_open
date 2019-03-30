@@ -47,8 +47,14 @@ struct ConnectResultDescriptor
 
     std::string toString() const
     {
-        // TODO
-        return "";
+        std::string str;
+        str.reserve(1024 + 40 + 38);//< SystemError length + HttpStatusCode length + string literals
+        str += "{ http status code: ";
+        str += nx::network::http::StatusCode::toString(httpStatusCode).toStdString();
+        str += ", system error: ";
+        str += SystemError::toString(systemResultCode).toStdString();
+        str += " }";
+        return str;
     }
 };
 

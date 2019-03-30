@@ -10,7 +10,15 @@
     "loginButton": "登入",
     "logoutAuthorisedTitle": "您已經登入",
     "logoutAuthorisedContinueButton": "繼續",
-    "logoutAuthorisedLogoutButton": "登出"
+    "logoutAuthorisedLogoutButton": "登出",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "找不到頁面"
   },
   "systemStatuses": {
-    "notActivated": "未啟動",
     "activated": "啟動",
+    "merging": "merging",
+    "notActivated": "未啟動",
     "online": "線上",
     "offline": "離線",
     "unavailable": "不可用的"
@@ -139,7 +148,8 @@
     "thisSystem": "系統",
     "oldSafariNotSupported": "不支持10歲以上的Safari版本",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "好",
@@ -186,7 +196,8 @@
     "successDisconnected": "系統成功地斷開 %PRODUCT_NAME%",
     "successDeleted": "從您的帳號成功刪除系統 {{systemName}}",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "權限從 {{email}} 被移除"
+    "permissionsRemoved": "權限從 {{email}} 被移除",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "您的帳號已成功儲存",

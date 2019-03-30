@@ -44,6 +44,7 @@ public:
     std::vector<network::SocketAddress> httpsEndpoints() const;
 
     const nx::network::http::server::MultiEndpointAcceptor& httpServer() const;
+    nx::network::http::server::rest::MessageDispatcher& messageDispatcher();
 
 private:
     /** Provides htdigest authentication for maintenance server*/

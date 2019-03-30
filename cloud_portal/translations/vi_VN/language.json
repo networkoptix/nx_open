@@ -10,7 +10,15 @@
     "loginButton": "Đăng nhập",
     "logoutAuthorisedTitle": "Bạn đã đăng nhập",
     "logoutAuthorisedContinueButton": "Tiếp tục",
-    "logoutAuthorisedLogoutButton": "Đăng xuất"
+    "logoutAuthorisedLogoutButton": "Đăng xuất",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Không tìm thấy trang"
   },
   "systemStatuses": {
-    "notActivated": "chưa kích hoạt",
     "activated": "đã kích hoạt",
+    "merging": "merging",
+    "notActivated": "chưa kích hoạt",
     "online": "trực tuyến",
     "offline": "ngoại tuyến",
     "unavailable": "không khả dụng"
@@ -139,7 +148,8 @@
     "thisSystem": "hệ thống",
     "oldSafariNotSupported": "Không hỗ trợ các phiên bản cũ hơn Safari 10",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "tốt",
@@ -186,7 +196,8 @@
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
+    "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Tài khoản của bạn đã được lưu thành công",

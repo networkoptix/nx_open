@@ -58,7 +58,7 @@ const char* kApiRequestPath = "/cgi-bin/cmd/";
 
 QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
     nx::vms::server::resource::Camera(serverModule),
-    m_desiredTransport(RtspTransport::notDefined),
+    m_desiredTransport(nx::vms::api::RtpTransportType::automatic),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -507,8 +507,9 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         m_availableEncoders.insert(lit("H264"));
     }
 
-    auto desiredTransport = resourceData().value<QString>(ResourceDataKey::kDesiredTransport);
-    m_desiredTransport = rtspTransportFromString(desiredTransport);
+    m_desiredTransport = resourceData().value<nx::vms::api::RtpTransportType>(
+        ResourceDataKey::kDesiredTransport,
+        nx::vms::api::RtpTransportType::automatic);
 
     bool dualStreamingCapability = false;
     bool fisheyeStreamingCapability = false;
@@ -704,7 +705,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     auto result = detectMaxFpsForSecondaryCodec();
     if (!result)
         return result;
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
@@ -931,7 +932,7 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
     return bitrateToDefaultString(bitrateKbps);
 }
 
-RtspTransport QnActiResource::getDesiredTransport() const
+nx::vms::api::RtpTransportType QnActiResource::getDesiredTransport() const
 {
     return m_desiredTransport;
 }

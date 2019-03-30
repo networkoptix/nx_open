@@ -26,14 +26,20 @@
                ng-class="{offline:server.status!='Online'}">
                 <div class="hide-excess-text d-flex align-items-center">
                     <div ng-if="server.active"
+                         title=""
                          class="glyphicon glyphicon-server-active" ></div>
                     <div ng-if="server.status == 'Online' && !server.active"
+                         title=""
                          class="glyphicon glyphicon-server-online" ></div>
                     <div ng-if="server.status != 'Online' && !server.active"
+                         title=""
                          class="glyphicon glyphicon-server-offline" ></div>
-                    <div class="server-name">{{server.name}}</div>
-                    <div class="ip-info" ng-if="toggleInfo">
-                        &nbsp;{{server.ip}}
+
+                    <div class="server-name" title="">{{server.name}}</div>
+                    <div class="ip-info"
+                         ng-if="toggleInfo"
+                         title="{{server.networkAddresses}}">
+                        {{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}
                     </div>
                 </div>
                 <div >

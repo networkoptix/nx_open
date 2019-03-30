@@ -1273,6 +1273,22 @@ void QnCamDisplay::processFillerPacket(
 
 void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
+    if (metadata->metadataType == MetadataType::MediaStreamEvent)
+    {
+        QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
+        auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
+            QString::fromLatin1(data));
+
+        m_lastMediaEvent = mediaEvent;
+        if (!m_lastMediaEventTimeout.isValid())
+            m_lastMediaEventTimeout.restart();
+
+        processFillerPacket(
+            m_speed >= 0 ? DATETIME_NOW : 0,
+            metadata->dataProvider,
+            QnAbstractMediaData::MediaFlags_None);
+    }
+
     QnMutexLocker lock(&m_metadataConsumersHashMutex);
     const auto consumers = m_metadataConsumerByType;
     lock.unlock();

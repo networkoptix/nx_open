@@ -3,7 +3,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
-#include "hanwha_ini_config.h"
+#include "vms_server_hanwha_ini.h"
 
 #include <core/ptz/ptz_preset.h>
 #include <utils/common/app_info.h>

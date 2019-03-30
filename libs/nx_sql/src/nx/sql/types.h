@@ -67,7 +67,7 @@ public:
 
     ConnectionOptions();
 
-    void loadFromSettings(const QnSettings& settings);
+    void loadFromSettings(const QnSettings& settings, const QString& groupName = "db");
 
     bool operator==(const ConnectionOptions&) const;
 };

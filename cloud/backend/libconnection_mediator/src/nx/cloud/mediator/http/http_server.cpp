@@ -21,10 +21,12 @@ Server::Server(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
     nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
+    RemoteMediatorPeerPool* remoteMediatorPeerPool,
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
     m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
+    m_remoteMediatorPeerPool(remoteMediatorPeerPool),
     m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());

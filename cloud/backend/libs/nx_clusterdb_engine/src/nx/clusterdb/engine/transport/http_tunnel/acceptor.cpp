@@ -83,11 +83,12 @@ void HttpTunnelTransportAcceptor::saveCreatedTunnel(
         m_localPeerData,
         std::move(commandPipeline));
 
+    const auto remoteNodeId = requestContext.attributes.remotePeer.id.toByteArray().toStdString();
     ConnectionManager::ConnectionContext context{
         std::move(newTransport),
+        remoteNodeId,
         requestContext.attributes.connectionId,
-        {requestContext.systemId,
-            requestContext.attributes.remotePeer.id.toByteArray().toStdString()},
+        {requestContext.systemId, remoteNodeId},
         requestContext.userAgent};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))

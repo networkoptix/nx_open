@@ -8,16 +8,51 @@
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/avi_resource.h>
 #include <plugins/utils/avi_motion_archive_delegate.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include "server_edge_stream_recorder.h"
 
 #include <nx/utils/std/cpp14.h>
 #include <media_server/media_server_module.h>
+#include <utils/media/utils.h>
+#include <core/resource/camera_media_stream_info.h>
 
 namespace nx {
 namespace vms::server {
 namespace recorder {
+
+class WearableCameraRecorder: public QnServerEdgeStreamRecorder
+{
+public:
+    using QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder;
+protected:
+    virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override
+    {
+        QnServerEdgeStreamRecorder::beforeProcessData(media);
+
+        if (m_mediaInfoSaved)
+            return;
+        auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return;
+        const auto videoData = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+        if (!videoData)
+            return;
+
+        QSize streamResolution = nx::media::getFrameSize(videoData);
+        CameraMediaStreamInfo mediaStreamInfo(
+            nx::vms::api::StreamIndex::primary,
+            QSize(streamResolution.width(), streamResolution.height()),
+            videoData->compressionType);
+
+        if (camera->saveMediaStreamInfoIfNeeded(mediaStreamInfo))
+            camera->savePropertiesAsync();
+
+        m_mediaInfoSaved = true;
+    }
+private:
+    bool m_mediaInfoSaved = false;
+};
 
 using namespace plugins;
 
@@ -161,7 +196,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
 
-    m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+    m_recorder = std::make_unique<WearableCameraRecorder>(
         serverModule(),
         m_camera,
         QnServer::ChunksCatalog::HiQualityCatalog,

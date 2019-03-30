@@ -26,7 +26,7 @@ module.exports = merge(common, {
                 //secure: false
 
             },
-            // Rewrite English translations to be served from DEV files
+            // Rewrite English translations and static pages to be served from DEV files
             {
                 context     : '/static/lang_en_US/',
                 target      : 'https://0.0.0.0:9000',
@@ -34,7 +34,7 @@ module.exports = merge(common, {
                 changeOrigin: true,
                 secure      : false
             },
-            // Rewrite Russian translations to be served from DEV files
+            // Rewrite Russian translations and static pages to be served from DEV files
             {
                 context: '/static/lang_ru_RU/',
                 target: 'https://0.0.0.0:9000',

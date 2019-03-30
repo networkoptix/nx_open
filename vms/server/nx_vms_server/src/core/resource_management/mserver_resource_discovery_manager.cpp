@@ -36,6 +36,7 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -326,9 +327,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         discoveredResources.insert(existingCamera->getUniqueId());
         existingCamera->setLastDiscoveredTime(qnSyncTime->currentDateTime());
-#ifndef EDGE_SERVER
-        pingResources(existingCamera);
-#endif
+        if (!nx::utils::AppInfo::isEdgeServer())
+            pingResources(existingCamera);
         it = resources.erase(it); // do not need to investigate OK resources
     }
 

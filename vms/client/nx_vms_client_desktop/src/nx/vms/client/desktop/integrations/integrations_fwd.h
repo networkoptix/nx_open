@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx_ec/ec_api_fwd.h>
+
 class QPainter;
 
 namespace nx::vms::client::desktop {

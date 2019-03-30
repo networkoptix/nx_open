@@ -2,7 +2,9 @@ from Queue import Queue
 from threading import Thread
 from os import system, path
 from get_names import get_threaded_names
+import datetime
 
+startTime = datetime.datetime.now()
 cmdList = []
 # list of files that are going to be run as a whole file, but threaded
 ThreadableFileList = ("activate", "register-form-validation", "login-form-validation", "change-pass-form-validation", "restore-pass-form-validation-email",
@@ -18,7 +20,7 @@ serialList = list(set((test[0] for test in get_threaded_names("Unthreaded"))))
 
 
 q = Queue(maxsize=0)
-num_threads = 10
+num_threads = 8
 
 # actually runs the commands in the queue
 
@@ -33,24 +35,23 @@ def threadedTestRun(loc, lang):
 
     # loop through the files and add a command to run each
     for idx, file in enumerate(ThreadableFileList):
-        cmdList.append('robot -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} --output {}multi{}.xml'.format(
-            path.join(loc, 'combined-results'), lang, file, idx) + ' test-cases\\' + file + '.robot')
+        cmdList.append('robot --loglevel trace -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} --output outputs\\{}multi{}.xml test-cases\\{}.robot'.format(path.join(loc, 'combined-results'), lang, file, idx, file))
 
     # loop through the files and add a command to run each test case
     for idx, file in enumerate(testList):
-        cmdList.append('robot -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -t "'.format(path.join(loc, 'combined-results'),
-                                                                                                                lang) + str(file[1]) + '" --output {}multi{}.xml'.format(str(file[0]), idx) + ' test-cases\\' + str(file[0]) + '.robot')
+        cmdList.append('robot --loglevel trace -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -t "{}" --output outputs\\{}multi{}.xml  test-cases\\{}.robot"'.format(path.join(loc, 'combined-results'), lang, str(file[1]), str(file[0]), idx, str(file[0])))
+
     # loop through the serial tests and run them
     for idx, file in enumerate(serialList):
-        system('robot -v BROWSER:headlesschrome --loglevel trace -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -e Threaded -e "Threaded File" --output {}multi{}.xml'.format(
-            path.join(loc, 'combined-results'), lang, str(file), idx + 200) + ' test-cases\\' + str(file) + '.robot')
+        system('robot --loglevel trace -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:{} -V getvars.py:{} -e Threaded -e "Threaded File" --output outputs\\{}multi{}.xml  test-cases\\{}.robot'.format(
+            path.join(loc, 'combined-results'), lang, str(file), idx + 200, str(file)))
 
     # fill the queue with all the commands
     for x in cmdList:
         q.put(x)
     # run and manage the threads
     for i in range(num_threads):
-        worker = Thread(target=do_stuff, args=(q,))
+        worker=Thread(target=do_stuff, args=(q,))
         worker.setDaemon(True)
         worker.start()
 
@@ -59,12 +60,12 @@ def threadedTestRun(loc, lang):
     # get the list of all file names
     # merge outputs with the same names to single outputs per file
     # merge single file outputs to one output file
-    fileList = (test[0] for test in get_threaded_names(""))
-    fileList = list(set(fileList))
+    fileList=(test[0] for test in get_threaded_names(""))
+    fileList=list(set(fileList))
     for idx, file in enumerate(fileList):
-        system('rebot -o threadedRun{}.xml -R {}multi*.xml'.format(idx, str(file)))
-    system('rebot -o queuedRun.xml --loglevel trace -N  {} threadedRun*.xml'.format(lang))
-
+        system('rebot -o outputs\\threadedRun{}.xml -R outputs\\{}multi*.xml'.format(idx, str(file)))
+    system('rebot --loglevel info -o queuedRun.xml -N  {} outputs\\threadedRun*.xml'.format(lang))
+    print datetime.datetime.now() - startTime
 
 if __name__ == '__main__':
-    threadedTestRun("outputs","pt_PT")   
+    threadedTestRun("outputs", "en_US")

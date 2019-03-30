@@ -684,7 +684,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         if (ret < 0)
         {
-            NX_WARNING(this, "AV packet write error");
+            NX_WARNING(this, "AV packet write error %1", QnFfmpegHelper::getErrorStr(ret));
         }
         else
         {

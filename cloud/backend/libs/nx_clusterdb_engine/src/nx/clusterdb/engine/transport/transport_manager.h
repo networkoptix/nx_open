@@ -17,7 +17,7 @@ class OutgoingCommandFilter;
 
 namespace nx::clusterdb::engine::transport {
 
-class TransportManager
+class NX_DATA_SYNC_ENGINE_API TransportManager
 {
 public:
     TransportManager(
@@ -27,7 +27,7 @@ public:
         const std::string& nodeId);
 
     std::unique_ptr<AbstractTransactionTransportConnector> createConnector(
-        const std::string& systemId,
+        const std::string& clusterId,
         const std::string& connectionId,
         const nx::utils::Url& targetUrl);
 

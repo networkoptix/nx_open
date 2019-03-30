@@ -116,6 +116,11 @@ const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
     return m_multiAddressHttpServer;
 }
 
+nx::network::http::server::rest::MessageDispatcher & View::messageDispatcher()
+{
+    return m_httpMessageDispatcher;
+}
+
 void View::registerAuthenticators()
 {
     if (!m_settings.http().maintenanceHtdigestPath.empty())

@@ -57,6 +57,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/time_sync/legacy/time_manager.h>
+#include <nx/sql/database.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -386,7 +387,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     }
 
     const static QString buildNumberConnectionName = "GetBuildNumberDB";
-    auto sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
+    auto sdb = nx::sql::Database::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
     sdb.setDatabaseName(dbFileName);
     if (!sdb.open())
     {
@@ -400,7 +401,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
         {
             sdb.close();
             sdb = QSqlDatabase();
-            QSqlDatabase::removeDatabase(buildNumberConnectionName);
+            nx::sql::Database::removeDatabase(buildNumberConnectionName);
         });
 
     QSqlQuery getVersionQuery(sdb);
@@ -446,7 +447,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             }
         }
 
-        m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
+        m_sdbStatic = nx::sql::Database::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
         QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
         m_sdbStatic.setDatabaseName(closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
 
@@ -2116,7 +2117,7 @@ QnDbManager::~QnDbManager()
     if (m_sdbStatic.isOpen())
     {
         m_sdbStatic = QSqlDatabase();
-        QSqlDatabase::removeDatabase(getDatabaseName("QnDbManagerStatic"));
+        nx::sql::Database::removeDatabase(getDatabaseName("QnDbManagerStatic"));
     }
 }
 
@@ -2529,7 +2530,17 @@ ErrorCode QnDbManager::executeTransactionInternal(
     f.write(tran.params.data);
     f.close();
 
-    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerTmp"));
+    QString databaseName = getDatabaseName("QnDbManagerTmp");
+    QSqlDatabase testDB = nx::sql::Database::addDatabase("QSQLITE", databaseName);
+
+    auto dbCloseGuard = nx::utils::makeScopeGuard(
+        [&]()
+    {
+        testDB.close();
+        testDB = QSqlDatabase();
+        nx::sql::Database::removeDatabase(databaseName);
+    });
+
     testDB.setDatabaseName( f.fileName());
     if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
         QFile::remove(f.fileName());
@@ -2544,7 +2555,6 @@ ErrorCode QnDbManager::executeTransactionInternal(
         qWarning() << "Skipping bad database dump file";
         return ErrorCode::dbError; // invalid back file
     }
-    testDB.close();
     return ErrorCode::ok;
 }
 
@@ -3285,7 +3295,7 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_AnalyticsEngine;
     else
     {
-        NX_ASSERT(false, "Unknown object type");
+        NX_WARNING(this, lm("Unknown object type for object %1").arg(objectId));
         return ApiObject_NotDefined;
     }
 }

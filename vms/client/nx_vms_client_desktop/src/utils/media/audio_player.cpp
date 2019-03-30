@@ -12,7 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
-#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <camera/audio_stream_display.h>
 #include <nx/utils/random.h>
 
@@ -208,7 +208,7 @@ void AudioPlayer::run()
             case sSynthesizingAutoPlay:
             {
                 if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
-                    !TextToWaveServer::instance()->generateSoundSync(
+                    !nx::speech_synthesizer::TextToWaveServer::instance()->generateSoundSync(
                         m_textToPlay, m_synthesizingTarget.get()))
                 {
                     emit done();

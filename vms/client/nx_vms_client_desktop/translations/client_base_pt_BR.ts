@@ -2589,17 +2589,6 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>A Configurar Servidor(es)</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>A actualizar Servidor(es)</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -5157,220 +5146,6 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Servidor</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Estado</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Seleccionar Ficheiro de Actualização...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Notas de lançamento</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Terá de actualizar o cliente manualmente usando um instalador.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Não é possível actualizar a partir deste ficheiro.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Última atualização disponível</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>Baixar o arquivo de atualização da versão mais recente</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Versão selecionada</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Baixar arquivo de atualização</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Procurar arquivo de atualização...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Arquivo de atualização selecionado</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Baixar no navegador externo</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Copiar link para a área de transferência</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Não foi possível verificar atualizações na Internet.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Número de compilação desconhecido.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Downgrade para uma versão anterior é proibida.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Atualizações para um ou mais servidores não foram encontradas.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>A atualização do cliente não foi encontrada.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Não foi possível extrair o arquivo de atualização. Não há espaço livre no disco.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Atualização concluída...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Verificando atualizações...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Baixando atualizações...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Instalando atualização do cliente...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Instalando atualizações para servidores incompatíveis...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Enviando atualizações para servidores...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Instalando atualizações...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Construção Específica...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Atualizar para Construção Específica</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Atualizar Sistema</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Atualização do sistema em processo</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Cancelar atualização</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Continuar em segundo plano</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>Espaço livre insuficiente em %n Servidores:</numerusform>
-        <numerusform>Espaço livre insuficiente em %n Servidores:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Tentativa de atualizar pode falhar ou causar malfunção do servidor.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Forçar atualização</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Atualização do servidor concluída</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Atualização concluída</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Atualização cancelada</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Todos os servidores já atualizados</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Atualização falhou</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Por favor, atualize %1 manualmente usando um pacote de instalação.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 será reiniciado para a versão atualizada.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Atualização não pode ser cancelada nesta fase</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Por favor, aguarde até que ele esteja concluído.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Todos os componentes do seu sistema estão atualizados.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Todos os componentes do seu sistema estão à altura desta versão.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Instância incompatível %1. Para atualizar o sistema de desconecte de %1 primeiro.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Atualizar Arquivos</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>A validar a atualização...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>A verificar o espaço livre...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -6051,10 +5826,6 @@ a %1</translation>
       <translation>Sincronização de arquivos remotos em andamento</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Ocorreu um erro durante a sincronização do arquivo remoto</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>A sincronização de arquivos remoto foi iniciada para o seguinte dispositivo:</translation>
     </message>
@@ -6103,6 +5874,10 @@ a %1</translation>
     <message>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
+    </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -6213,84 +5988,6 @@ a %1</translation>
     <message>
       <source>Hold to Speak</source>
       <translation>Premir para falar</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>A Actualização terminou com sucesso.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>A actualização foi cancelada.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Uma actualização já foi iniciada por outro utilizador.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Todos os servidores já estão actualizados.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Não foi possível descarregar as actualizações.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Sem espaço livre no disco.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Não foi possível fazer o 'push' para os servidores.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>O problema está a ser causado por %n servidor:</numerusform>
-        <numerusform>O problema está a ser causado por %n servidores:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>Sem espaço livre em %n servidor:</numerusform>
-        <numerusform>Sem espaço livre em %n servidores:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n Servidor não está a responder:</numerusform>
-        <numerusform>%n Servidores não estão a responder:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n Servidor ficaram offline:</numerusform>
-        <numerusform>%n Servidores ficaram offline:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>A autenticação falhou para %n servidor:</numerusform>
-        <numerusform>A autenticação falhou para %n servidores:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Não foi possível instalar uma actualização no cliente.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Não foi possível instalar actualizações em um ou mais servidores.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6744,25 +6441,6 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6771,10 +6449,6 @@ a %1</translation>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Servidores do outro sistema aparecerão na árvore de recursos.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Falha ao atualizar o servidor</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6945,29 +6619,6 @@ a %1</translation>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Release notes</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 versão disponível</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Principais problemas foram corrigidos. A atualização é altamente recomendada.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Actualizar...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Não notificar novamente sobre esta atualização</translation>
     </message>
   </context>
   <context>
@@ -8081,16 +7732,16 @@ a %1</translation>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>Erro interno.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8122,6 +7773,17 @@ a %1</translation>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Colado</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>A Configurar Servidor(es)</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>A actualizar Servidor(es)</translation>
     </message>
   </context>
   <context>
@@ -8240,6 +7902,25 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8309,10 +7990,6 @@ a %1</translation>
       <source>No events</source>
       <translation>Sem eventos</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>Não ocorreu qualquer evento</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8323,6 +8000,10 @@ a %1</translation>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8823,26 +8504,6 @@ a %1</translation>
       <translation>Alguns servidores estão offline e não serão atualizados. Ignorá-los?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>Instalar agora</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>Mais tarde</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>Actualizações descarregadas</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Falha ao baixar os pacotes de actualização</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>Por favor, verifique se há espaço de armazenamento livre suficiente e a conexão de rede está estável.</translation>
     </message>
@@ -9008,6 +8669,14 @@ a %1</translation>
     <message>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
   </context>
   <context>
@@ -9572,10 +9241,40 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 versão disponível</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Release notes</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Principais problemas foram corrigidos. A atualização é altamente recomendada.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Actualizar...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Não notificar novamente sobre esta atualização</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>vários valores</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

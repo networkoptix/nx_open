@@ -2,8 +2,6 @@
 
 #include <QtCore/QString>
 
-#include <nx/utils/literal.h>
-
 namespace nx {
 namespace utils {
 
@@ -26,41 +24,20 @@ public:
     static QString linuxOrganizationName();
     static QString organizationNameForSettings();
 
-    static bool isArm()
-    {
-        #if defined(__arm__) || defined(__aarch64__)
-            return true;
-        #else
-            return false;
-        #endif
-    }
+    static bool isEdgeServer();
+    static bool isArm();
+    static bool isWin64();
+    static bool isWin32();
 
-    static bool isBpi() { return armBox() == QStringLiteral("bpi"); }
-    static bool isRaspberryPi() { return armBox() == QStringLiteral("rpi"); }
-    static bool isNx1() { return armBox() == QStringLiteral("nx1"); }
-    static bool isAndroid() { return applicationPlatform() == QStringLiteral("android"); }
-    static bool isIos() { return applicationPlatform() == QStringLiteral("ios"); }
-    static bool isMobile() { return isAndroid() || isIos(); }
-    static bool isLinux() { return applicationPlatform() == QStringLiteral("linux"); }
-    static bool isWindows() { return applicationPlatform() == QStringLiteral("windows"); }
-    static bool isMacOsX() { return applicationPlatform() == QStringLiteral("macosx"); }
-
-    static bool isWin64()
-    {
-        if (!isWindows())
-            return false;
-
-        #if defined(Q_OS_WIN64)
-            return true;
-        #else
-            return false;
-        #endif
-    }
-
-    static bool isWin32()
-    {
-        return isWindows() && !isWin64();
-    }
+    static bool isBpi();
+    static bool isRaspberryPi();
+    static bool isNx1();
+    static bool isAndroid();
+    static bool isIos();
+    static bool isMobile();
+    static bool isLinux();
+    static bool isWindows();
+    static bool isMacOsX();
 };
 
 } // namespace utils

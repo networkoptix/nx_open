@@ -13,9 +13,8 @@ namespace {
 
 Qn::ResourceStatus getAviResourceStatus(QnAviResourcePtr aviResource)
 {
-    const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(
-        aviResource->createArchiveDelegate());
-    return archiveDelegate->open(aviResource) ? Qn::Online : Qn::Offline;
+    QFile file(aviResource->getUrl());
+    return file.open(QFile::ReadOnly) ? Qn::Online : Qn::Offline;
 }
 
 Qn::ResourceStatus getFileLayoutResourceStatus(QnFileLayoutResourcePtr layoutResource)

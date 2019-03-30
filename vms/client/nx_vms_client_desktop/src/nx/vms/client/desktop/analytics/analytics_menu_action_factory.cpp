@@ -6,6 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
@@ -72,9 +73,12 @@ QList<QAction*> AnalyticsMenuActionFactory::newActions(const ui::action::Paramet
             actionGroup->addAction(action);
         };
 
-    addAction(AnalyticsObjectsVisualizationMode::always, tr("Show Always"),
+    const bool canSeeTab = accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+    addAction(AnalyticsObjectsVisualizationMode::always,
+        canSeeTab ? tr("Show Always") : tr("Show"),
         currentMode == AnalyticsObjectsVisualizationMode::always);
-    addAction(AnalyticsObjectsVisualizationMode::tabOnly, tr("Show Only with \"Objects\" Tab"),
+    addAction(AnalyticsObjectsVisualizationMode::tabOnly,
+        canSeeTab ?  tr("Show Only with \"Objects\" Tab") : tr("Do Not Show"),
         currentMode == AnalyticsObjectsVisualizationMode::tabOnly);
 
     return actionGroup->actions();

@@ -8,6 +8,7 @@
 #include "relay/abstract_relay_cluster_client.h"
 #include "server/hole_punching_processor.h"
 #include "statistics/stats_manager.h"
+#include "remote_mediator_peer_pool.h"
 
 namespace nx {
 namespace hpm {
@@ -31,7 +32,13 @@ public:
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
     const nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool() const;
 
+    RemoteMediatorPeerPool& remoteMediatorPeerPool();
+    const RemoteMediatorPeerPool& remoteMediatorPeerPool() const;
+
     const stats::StatsManager& statisticsManager() const;
+
+    bool doMandatoryInitialization();
+    std::optional<network::HostAddress> discoverPublicAddress();
 
     void stop();
 
@@ -44,6 +51,7 @@ private:
     stats::StatsManager m_statsManager;
     HolePunchingProcessor m_cloudConnectProcessor;
     nx::cloud::discovery::RegisteredPeerPool m_discoveredPeerPool;
+    RemoteMediatorPeerPool m_remoteMediatorPeerPool;
 };
 
 } // namespace hpm

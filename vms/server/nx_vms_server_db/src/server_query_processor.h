@@ -23,6 +23,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <transaction/amend_transaction_data.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/network/app_info.h>
 
 namespace ec2 {
 
@@ -192,6 +193,8 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
         userDataEx->digest = hashes.passwordDigest;
         userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
     }
+    if(userDataEx->realm.isEmpty())
+        userDataEx->realm = nx::network::AppInfo::realm();
 
     fixRequestDataIfNeeded(static_cast<nx::vms::api::UserData* const>(userDataEx));
 }
@@ -498,8 +501,9 @@ private:
         const auto descriptor = getTransactionDescriptorByTransaction(tran);
         if (!descriptor)
             return ErrorCode::forbidden;
-        if (!descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
-            return ErrorCode::forbidden;
+        auto errorCode = descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
 
         postProcessList->push_back(std::bind(
             PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
@@ -877,7 +881,7 @@ public:
                         updatedTran.command = ApiCommand::removeAnalyticsEngine;
                         break;
                     default:
-                        return processUpdateSync(tran, transactionsPostProcessList, 0);
+                        return ErrorCode::badRequest;
                 }
                 return processUpdateSync(updatedTran, transactionsPostProcessList); //< calling recursively
             }

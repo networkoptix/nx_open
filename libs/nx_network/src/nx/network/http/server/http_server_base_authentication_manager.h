@@ -47,6 +47,7 @@ private:
     void passwordLookupDone(
         PasswordLookupResult passwordLookupResult,
         const nx::String& method,
+        const nx::utils::Url& requestUrl,
         const header::DigestAuthorization& authorizationHeader,
         AuthenticationCompletionHandler completionHandler);
     void reportSuccess(AuthenticationCompletionHandler completionHandler);

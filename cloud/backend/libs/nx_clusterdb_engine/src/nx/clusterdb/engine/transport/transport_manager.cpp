@@ -22,14 +22,11 @@ TransportManager::TransportManager(
 }
 
 std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createConnector(
-    const std::string& systemId,
+    const std::string& clusterId,
     const std::string& /*connectionId*/,
     const nx::utils::Url& targetUrl)
 {
     using namespace nx::network;
-
-    const auto syncApiTargetUrl = url::Builder(targetUrl).appendPath(
-        http::rest::substituteParameters(kBaseSynchronizationPath, {systemId})).toUrl();
 
     // TODO: #ak Is this class really needed?
 
@@ -37,8 +34,8 @@ std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createC
         m_protocolVersionRange,
         m_commandLog,
         m_outgoingCommandFilter,
-        syncApiTargetUrl,
-        systemId,
+        targetUrl,
+        clusterId,
         m_nodeId);
 }
 

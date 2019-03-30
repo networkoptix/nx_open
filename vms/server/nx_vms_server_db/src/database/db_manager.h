@@ -968,11 +968,9 @@ public:
         if (m_userAccessData != Qn::kSystemAccess)
         {
             const auto descriptor = getActualTransactionDescriptorByValue<T2>(command);
-            if (!descriptor->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
-            {
-                errorCode = ErrorCode::forbidden;
+            errorCode = descriptor->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2);
+            if (errorCode != ErrorCode::ok)
                 t2 = T2();
-            }
         }
 
         return errorCode;
@@ -1000,12 +998,13 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
+        auto errorCode = getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params);
+        if (errorCode != ErrorCode::ok)
         {
             NX_WARNING(this, lit("User %1 has not permission to execute transaction %2")
                 .arg(m_userAccessData.userId.toString())
                 .arg(toString(tran.command)));
-            return ErrorCode::forbidden;
+            return errorCode;
         }
         return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -1028,8 +1027,9 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
-            return ErrorCode::forbidden;
+        auto errorCode = getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
         return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 

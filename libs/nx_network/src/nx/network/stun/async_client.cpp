@@ -1,5 +1,6 @@
 #include "async_client.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/log/log.h>
@@ -15,6 +16,8 @@ AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_reconnectTimer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
+    ++SocketGlobals::instance().debugCounters().stunClientConnectionCount;
+
     bindToAioThread(getAioThread());
 }
 
@@ -30,6 +33,11 @@ AsyncClient::AsyncClient(
         bindToAioThread(tcpConnection->getAioThread());
         initializeMessagePipeline(std::move(tcpConnection));
     }
+}
+
+AsyncClient::~AsyncClient()
+{
+    --SocketGlobals::instance().debugCounters().stunClientConnectionCount;
 }
 
 void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)

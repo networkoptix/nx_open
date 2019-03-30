@@ -18,14 +18,14 @@ SystemHealthInfoProvider::SystemHealthInfoProvider(
 {
     using namespace std::placeholders;
 
-    m_ec2ConnectionManager->systemStatusChangedSubscription().subscribe(
+    m_ec2ConnectionManager->clusterStatusChangedSubscription().subscribe(
         std::bind(&SystemHealthInfoProvider::onSystemStatusChanged, this, _1, _2),
         &m_systemStatusChangedSubscriptionId);
 }
 
 SystemHealthInfoProvider::~SystemHealthInfoProvider()
 {
-    m_ec2ConnectionManager->systemStatusChangedSubscription().removeSubscription(
+    m_ec2ConnectionManager->clusterStatusChangedSubscription().removeSubscription(
         m_systemStatusChangedSubscriptionId);
 
     m_startedAsyncCallsCounter.wait();
@@ -63,7 +63,7 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
 
 void SystemHealthInfoProvider::onSystemStatusChanged(
     const std::string& systemId,
-    clusterdb::engine::SystemStatusDescriptor statusDescription)
+    clusterdb::engine::NodeStatusDescriptor statusDescription)
 {
     using namespace std::placeholders;
 

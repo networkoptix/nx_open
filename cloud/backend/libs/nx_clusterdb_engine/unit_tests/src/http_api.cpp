@@ -16,8 +16,7 @@ protected:
         addPeer();
 
         m_client = std::make_unique<api::Client>(
-            peer(0).syncronizationUrl(),
-            "systemId");
+            peer(0).process().moduleInstance()->synchronizationUrl());
     }
 
     void whenRequestInfo()
@@ -33,7 +32,7 @@ protected:
     void andPeerIdIsPresent()
     {
         ASSERT_EQ(
-            peer(0).process().moduleInstance()->syncronizationEngine()
+            peer(0).process().moduleInstance()->synchronizationEngine()
                 .peerId().toSimpleString().toStdString(),
             std::get<1>(m_prevInfoResponse).id);
     }

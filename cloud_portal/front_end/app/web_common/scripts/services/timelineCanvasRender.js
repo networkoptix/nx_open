@@ -262,7 +262,7 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
 
             point = level.interval.addToDate(point);
         }
-        if(counter == 3000){
+        if(counter === 3000){
             console.error('counter problem!', start,point, end, level);
         }
     }
@@ -870,8 +870,8 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
 
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
-        mouseX *= self.pixelAspectRatio
-        mouseY *= self.pixelAspectRatio
+        mouseX *= self.pixelAspectRatio;
+        mouseY *= self.pixelAspectRatio;
         var scrollButtonsWidth = timelineConfig.scrollButtonsWidth * self.pixelAspectRatio;
         var canScrollRight = self.scaleManager.canScroll(false);
         var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth * self.pixelAspectRatio &&

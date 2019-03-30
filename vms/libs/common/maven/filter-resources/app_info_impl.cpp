@@ -3,11 +3,6 @@
 //
 #include <utils/common/app_info.h>
 
-int QnAppInfo::ec2ProtoVersion()
-{
-    return ${nxec.ec2ProtoVersion};
-}
-
 QString QnAppInfo::applicationPlatformModification()
  {
     return QStringLiteral("${modification}");

@@ -2,19 +2,24 @@
 
 #include <string>
 #include <chrono>
+#include <vector>
+
+#include <QDateTime>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
 
 namespace nx::cloud::discovery {
 
 struct NX_DISCOVERY_CLIENT_API NodeInfo
 {
     std::string nodeId;
+    std::vector<std::string> urls;
     /* The object under "info" key */
     std::string infoJson;
 };
 
-#define NodeInfo_Fields (nodeId)(infoJson)
+#define NodeInfo_Fields (nodeId)(urls)(infoJson)
 
 QN_FUSION_DECLARE_FUNCTIONS(NodeInfo, (json), NX_DISCOVERY_CLIENT_API)
 
@@ -22,16 +27,16 @@ QN_FUSION_DECLARE_FUNCTIONS(NodeInfo, (json), NX_DISCOVERY_CLIENT_API)
 
 struct NX_DISCOVERY_CLIENT_API Node
 {
+    using time_point = std::chrono::system_clock::time_point;
+
     std::string nodeId;
-    std::string host;
-    /* http time format */
-    std::chrono::system_clock::time_point expirationTime;
+    std::vector<std::string> urls;
+    time_point expirationTime;
     /* The object under "info" key */
     std::string infoJson;
 
     bool operator==(const Node& right) const
     {
-        // TODO do other fields need to be compared? they are volatile.
         return nodeId == right.nodeId;
     }
 
@@ -41,8 +46,34 @@ struct NX_DISCOVERY_CLIENT_API Node
     }
 };
 
-#define Node_Fields (nodeId)(host)(expirationTime)(infoJson)
+//-------------------------------------------------------------------------------------------------
 
-QN_FUSION_DECLARE_FUNCTIONS(Node, (json), NX_DISCOVERY_CLIENT_API)
+QDateTime NX_DISCOVERY_CLIENT_API toDateTime(
+    const std::chrono::system_clock::time_point& timePoint);
+
+//-------------------------------------------------------------------------------------------------
+
+//TODO figure out how to use qnfusion library to serialize Node::expirationTime correctly.
+namespace NodeSerialization {
+
+Node NX_DISCOVERY_CLIENT_API deserialized(
+    const QByteArray& json,
+    const Node& defaultValue = Node(),
+    bool* ok = nullptr);
+
+QByteArray NX_DISCOVERY_CLIENT_API serialized(const Node& node);
+
+
+std::vector<Node> NX_DISCOVERY_CLIENT_API deserialized(
+    const QByteArray& json,
+    const std::vector<Node>& defaultValue,
+    bool*ok = nullptr);
+
+QByteArray NX_DISCOVERY_CLIENT_API serialized(const std::vector<Node>& nodes);
+
+} // namespace NodeSerialization
 
 } // namespace nx::cloud::discovery
+
+//-------------------------------------------------------------------------------------------------
+

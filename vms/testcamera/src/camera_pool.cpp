@@ -35,12 +35,27 @@ public:
 protected:
     virtual void run() override
     {
-        std::unique_ptr<nx::network::AbstractDatagramSocket> discoverySock(nx::network::SocketFactory::createDatagramSocket().release() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket>
+            discoverySock(nx::network::SocketFactory::createDatagramSocket().release() );
 #if 1
-        discoverySock->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, testCameraIni().discoveryPort));
+        discoverySock->bind(nx::network::SocketAddress(
+            nx::network::HostAddress::anyHost, testCameraIni().discoveryPort));
         for (const auto& addr: m_localInterfacesToListen)
         {
-            for (const auto& iface: nx::network::getAllIPv4Interfaces())
+            if (QHostAddress(addr).isLoopback())
+            {
+                IpRangeV4 netRange;
+                netRange.firstIp = QHostAddress("127.0.0.0").toIPv4Address();
+                netRange.lastIp = QHostAddress("127.255.255.255").toIPv4Address();
+                m_allowedIpRanges.push_back(netRange);
+                qDebug() << "Listening for discovery from range ("
+                         << "127.0.0.0" << ", "
+                         << "127.255.255.255" << ")";
+                continue;
+            }
+
+            for (const auto& iface: nx::network::getAllIPv4Interfaces(
+                nx::network::InterfaceListPolicy::keepAllAddressesPerInterface))
             {
                 if (iface.address == QHostAddress(addr))
                 {
@@ -48,8 +63,17 @@ protected:
                     netRange.firstIp = iface.subNetworkAddress().toIPv4Address();
                     netRange.lastIp = iface.broadcastAddress().toIPv4Address();
                     m_allowedIpRanges.push_back(netRange);
+                    qDebug() << "Listening for discovery from range ("
+                             << iface.subNetworkAddress().toString() << ", "
+                             << iface.broadcastAddress().toString() << ")";
                 }
             }
+        }
+
+        if (m_allowedIpRanges.size() == 0 && m_localInterfacesToListen.size() > 0)
+        {
+            qWarning() << "ERROR: Unable to listen for discovery on requested addresses";
+            abort();  // TODO: Should not be so radical. Better to exit gracefully...
         }
 #else
         // Linux doesn't support binding to specified interface and receiving broadcast packets at the same time.

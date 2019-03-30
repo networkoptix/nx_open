@@ -1,16 +1,16 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h3 class="modal-title">Merge Systems</h3>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span> <span class="sr-only"> Stäng </span></button>
+        <h3 class="modal-title">Sammanfoga system</h3>
     </div>
 
     <div class="modal-body">
         <ng-form name="findSystemForm">
             <div class="form-group">
-                <label for="otherSystemUrl" class="control-label">Other System URL</label>
+                <label for="otherSystemUrl" class="control-label">Annan systemURL</label>
                 <div class="">
                     <div class="input-group" uib-dropdown>
-                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="värd: port" required />
 
                         <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No Systems found</a></li>
@@ -30,19 +30,19 @@
 
 
             <div class="form-group">
-                <label for="otherSystemLogin" class="control-label">Other System Login</label>
+                <label for="otherSystemLogin" class="control-label"> Annan systemloggning </label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
-                           placeholder="Login" required>
+                           placeholder="Logga in" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="otherSystemPassword" class="control-label">Other System Password</label>
+                <label for="otherSystemPassword" class="control-label"> Annan systemloggning </label>
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
-                           placeholder="Password"/>
+                           placeholder="Lösenord"/>
                 </div>
             </div>
         </ng-form>
@@ -50,7 +50,7 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
             <div class="">
-                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Password" required />
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Lösenord" required />
             </div>
         </div>
 

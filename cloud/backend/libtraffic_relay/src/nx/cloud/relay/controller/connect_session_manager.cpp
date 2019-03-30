@@ -71,36 +71,32 @@ void ConnectSessionManager::createClientSession(
         return;
     }
 
-    m_remoteRelayPeerPool->findRelayByDomain(request.targetPeerName)
-        .then(
-            [completionHandler = std::move(completionHandler), response = std::move(response),
-                request, this](
-                    cf::future<std::string> findRelayFuture) mutable
+    m_remoteRelayPeerPool->findRelayByDomain(
+        request.targetPeerName,
+        [completionHandler = std::move(completionHandler), response = std::move(response),
+            request, this](
+                std::string redirectEndpointString) mutable
+        {
+            if (redirectEndpointString.empty())
             {
-                auto redirectEndpointString = findRelayFuture.get();
-                if (redirectEndpointString.empty())
-                {
-                    NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
-                        .arg(request.desiredSessionId).arg(request.targetPeerName));
-                    completionHandler(api::ResultCode::notFound, std::move(response));
+                NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
+                    .arg(request.desiredSessionId).arg(request.targetPeerName));
+                completionHandler(api::ResultCode::notFound, std::move(response));
+                return;
+            }
 
-                    return cf::unit();
-                }
+            std::stringstream ss;
+            ss << "http://" << redirectEndpointString << "/relay/server/"
+                << request.targetPeerName << "/client_sessions/";
 
-                std::stringstream ss;
-                ss << "http://" << redirectEndpointString << "/relay/server/"
-                    << request.targetPeerName << "/client_sessions/";
+            response.actualRelayUrl = ss.str();
+            NX_VERBOSE(this, lm("Session %1. Redirect relay %2 found for peer %3")
+                .arg(request.desiredSessionId)
+                .arg(response.actualRelayUrl)
+                .arg(request.targetPeerName));
 
-                response.actualRelayUrl = ss.str();
-                NX_VERBOSE(this, lm("Session %1. Redirect relay %2 found for peer %3")
-                    .arg(request.desiredSessionId)
-                    .arg(response.actualRelayUrl)
-                    .arg(request.targetPeerName));
-
-                completionHandler(api::ResultCode::needRedirect, std::move(response));
-
-                return cf::unit();
-            });
+            completionHandler(api::ResultCode::needRedirect, std::move(response));
+        });
 }
 
 void ConnectSessionManager::connectToPeer(

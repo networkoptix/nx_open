@@ -56,7 +56,7 @@ Download link is in the footer
 Download link takes you to the /downloads page
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
-    Location Should Be    ${url}/download
+    Location Should Contain    ${url}/download
 #    Wait Until Element Is Visible    ${LOG IN MODAL}
 
 Going to the downloads page anonymous asks for login and closing takes you back to home

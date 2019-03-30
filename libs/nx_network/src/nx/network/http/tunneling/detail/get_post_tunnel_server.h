@@ -195,7 +195,8 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
 
     insertionResult.first->second.connection->setMessageHandler(
         std::bind(&GetPostTunnelServer::onMessage, this, httpPipePtr, _1));
-    insertionResult.first->second.connection->startReadingConnection();
+    insertionResult.first->second.connection->startReadingConnection(
+        connection->inactivityTimeout());
 }
 
 template<typename ...ApplicationData>

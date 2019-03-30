@@ -1,12 +1,11 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
 
-COPY stage/qt /opt/networkoptix/qt
-COPY stage/cloud_connect_test_util /opt/networkoptix/cloud_connect_test_util
+COPY stage/ /opt/networkoptix/cloud_connect_test_util/
 
 COPY docker/nx_network.ini /tmp/nx_network.ini
 
-ENV QT_PLUGIN_PATH /opt/networkoptix/qt/bin
-ENV LD_LIBRARY_PATH /opt/networkoptix/qt/lib:/opt/networkoptix/cloud_connect_test_util/lib
+ENV QT_PLUGIN_PATH=/opt/networkoptix/cloud_connect_test_util/bin \
+    LD_LIBRARY_PATH=/opt/networkoptix/cloud_connect_test_util/lib
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/opt/networkoptix/cloud_connect_test_util/bin/cloud_connect_test_util"]
 

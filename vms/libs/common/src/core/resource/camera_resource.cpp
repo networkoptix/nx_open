@@ -25,6 +25,7 @@
 #include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -45,15 +46,6 @@ bool storeUrlForRole(Qn::ConnectionRole role)
     return false;
 }
 
-QSet<QnUuid> activeAnalyticsEngines(const QnVirtualCameraResource* device)
-{
-    const auto server = device->getParentServer();
-    if (!NX_ASSERT(server))
-        return {};
-
-    return server->activeAnalyticsEngines();
-}
-
 std::map<QnUuid, std::set<QString>> filterByActiveEngines(
     std::map<QnUuid, std::set<QString>> entitiesByEngine,
     const QSet<QnUuid>& activeEngines)
@@ -70,23 +62,18 @@ std::map<QnUuid, std::set<QString>> filterByActiveEngines(
     return entitiesByEngine;
 }
 
-} // namespace
+static const QString kUserEnabledAnalyticsEnginesProperty("userEnabledAnalyticsEngines");
+static const QString kDeviceAgentsSettingsValuesProperty("deviceAgentsSettingsValuesProperty");
+static const QString kDeviceAgentManifestsProperty("deviceAgentManifests");
 
-const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
-    "userEnabledAnalyticsEngines");
+} // namespace
 
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
     "compatibleAnalyticsEngines");
 
-const QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
-    "deviceAgentsSettingsValuesProperty");
-
-const QString QnVirtualCameraResource::kDeviceAgentManifestsProperty("deviceAgentManifests");
-
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
-    m_lastIssueTimer(),
     m_cachedUserEnabledAnalyticsEngines(
         [this]() { return calculateUserEnabledAnalyticsEngines(); }, &m_cacheMutex),
     m_cachedCompatibleAnalyticsEngines(
@@ -225,6 +212,13 @@ int QnVirtualCameraResource::issuesTimeoutMs() {
     return ISSUE_KEEP_TIMEOUT_MS;
 }
 
+nx::vms::api::RtpTransportType QnVirtualCameraResource::preferredRtpTransport() const
+{
+    return QnLexical::deserialized(
+        getProperty(QnMediaResource::rtpTransportKey()),
+        nx::vms::api::RtpTransportType::automatic);
+}
+
 CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 {
     const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
@@ -295,12 +289,10 @@ static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const Cam
     return streamParamsMatched && resolutionMatched;
 }
 
-#if !defined(EDGE_SERVER) && !defined(__arm__)
-#define TRANSCODING_AVAILABLE
-static const bool transcodingAvailable = true;
-#else
-static const bool transcodingAvailable = false;
-#endif
+static bool transcodingAvailable()
+{
+    return !nx::utils::AppInfo::isArm() && !nx::utils::AppInfo::isEdgeServer();
+}
 
 bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
@@ -322,7 +314,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
         } ) != supportedMediaStreams.streams.end();
 
     bool needUpdateStreamInfo = true;
-    if( isTranscodingAllowedByCurrentMediaStreamsParam == transcodingAvailable )
+    if (isTranscodingAllowedByCurrentMediaStreamsParam == transcodingAvailable())
     {
         //checking if stream info has been changed
         for( auto it = supportedMediaStreams.streams.begin();
@@ -530,18 +522,18 @@ void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supp
         ++it;
     }
 
-         // TODO: #GDM change to bool transcodingAvailable variable check
-#ifdef TRANSCODING_AVAILABLE
-    static const char* WEBM_TRANSPORT_NAME = "webm";
+    if (transcodingAvailable())
+    {
+        static const char* WEBM_TRANSPORT_NAME = "webm";
 
-    CameraMediaStreamInfo transcodedStream;
-    //any resolution is supported
-    transcodedStream.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
-    transcodedStream.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
-    transcodedStream.transports.push_back( QLatin1String(WEBM_TRANSPORT_NAME) );
-    transcodedStream.transcodingRequired = true;
-    fullStreamList.streams.push_back( transcodedStream );
-#endif
+        CameraMediaStreamInfo transcodedStream;
+        // Any resolution is supported.
+        transcodedStream.transports.push_back(QLatin1String(RTSP_TRANSPORT_NAME));
+        transcodedStream.transports.push_back(QLatin1String(MJPEG_TRANSPORT_NAME));
+        transcodedStream.transports.push_back(QLatin1String(WEBM_TRANSPORT_NAME));
+        transcodedStream.transcodingRequired = true;
+        fullStreamList.streams.push_back(transcodedStream);
+    }
 
     //saving fullStreamList;
     QByteArray serializedStreams = QJson::serialized( fullStreamList );
@@ -601,30 +593,38 @@ nx::vms::common::AnalyticsEngineResourceList
 
 void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines)
 {
+    auto ensureEnginesAreActive =
+        [this, engines]
+        {
+            const auto server = getParentServer();
+            if (!server)
+                return false;
+
+            // Make sure all set engines are active.
+            return (engines - server->activeAnalyticsEngineIds()).empty();
+        };
+
+    //NX_ASSERT_HEAVY_CONDITION(ensureEnginesAreActive());
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedEventTypes() const
 {
-    // This one looks very suspicious for me. Shouldn't we check enabledAnalyticsEngines() here?
-    // TODO: #dmishin
-    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), activeAnalyticsEngines(this));
+    return filterByActiveEngines(m_cachedSupportedEventTypes.get(), enabledAnalyticsEngines());
 }
 
 std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::supportedObjectTypes() const
 {
-    // This one looks very suspicious for me. Shouldn't we check enabledAnalyticsEngines() here?
-    // TODO: #dmishin
-    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), activeAnalyticsEngines(this));
+    return filterByActiveEngines(m_cachedSupportedObjectTypes.get(), enabledAnalyticsEngines());
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines()
+QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines()
+QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
         getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
@@ -676,7 +676,7 @@ std::map<QnUuid, std::set<QString>> QnVirtualCameraResource::calculateSupportedO
 }
 
 QnVirtualCameraResource::DeviceAgentManifestMap
-    QnVirtualCameraResource::fetchDeviceAgentManifests()
+    QnVirtualCameraResource::fetchDeviceAgentManifests() const
 {
     return QJson::deserialized<DeviceAgentManifestMap>(
         getProperty(kDeviceAgentManifestsProperty).toUtf8());
@@ -718,7 +718,7 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
 }
 
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
-    QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId)
+    QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId) const
 {
     const auto manifests = m_cachedDeviceAgentManifests.get();
     auto it = manifests.find(engineId);

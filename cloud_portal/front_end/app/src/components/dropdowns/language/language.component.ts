@@ -70,6 +70,7 @@ export class NxLanguageDropdown implements OnInit {
 
     ngOnInit(): void {
         this.direction = this.dropup ? 'dropup' : '';
+        this.instantReload = this.instantReload !== undefined;
 
         this.cloudApi
             .getLanguages()
