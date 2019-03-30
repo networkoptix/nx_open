@@ -1,6 +1,8 @@
 #pragma once
 
-#include "mediator_functional_test.h"
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
+
+#include <nx/cloud/mediator/remote_mediator_peer_pool.h>
 
 namespace nx::hpm::test {
 
@@ -13,8 +15,12 @@ public:
         std::vector <const char*> args = {},
         Mediator::MediatorTestFlags = Mediator::MediatorTestFlags::allFlags);
 
+    int size() const;
+
     Mediator& mediator(int index);
     const Mediator& mediator(int index) const;
+
+    bool peerInformationSynchronizedInCluster(const std::string& peerDomainName);
 
 private:
     std::vector<std::unique_ptr<Mediator>> m_mediators;
