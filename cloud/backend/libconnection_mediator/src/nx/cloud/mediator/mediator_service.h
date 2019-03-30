@@ -26,6 +26,7 @@ namespace hpm {
 
 namespace conf { class Settings; }
 namespace http { class Server; }
+class RemoteMediatorPeerPool;
 
 class Controller;
 class ListeningPeerPool;
@@ -48,7 +49,7 @@ public:
     Controller& controller();
     const Controller& controller() const;
 
-    std::string nodeId() const;
+    RemoteMediatorPeerPool& remoteMediatorPeerPool();
 
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;

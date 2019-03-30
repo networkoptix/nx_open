@@ -64,9 +64,9 @@ const Controller& MediatorProcess::controller() const
     return *m_controller;
 }
 
-std::string MediatorProcess::nodeId() const
+RemoteMediatorPeerPool& MediatorProcess::remoteMediatorPeerPool()
 {
-    return m_controller->remoteMediatorPeerPool().nodeId();
+    return m_controller->remoteMediatorPeerPool();
 }
 
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
